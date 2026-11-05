@@ -1,4 +1,4 @@
-import {MGW_QUOTE_0550 as quote,mgwQuoteItem0550} from "./mgwVendorBasis0550";
+import {MGW_QUOTE_0550 as quote,mgwQuoteItem0550,mgwGroupExcluded0550,mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550,MGW_SCOPE_EXCLUDED_0550,PROCUREMENT_SCOPE_0550,reconcileMgwWorkingScope0550} from "./mgwVendorBasis0550";
 import {policyDefaults0550} from "../bidWorkingBasis0550";
 import {sumMoney0550} from "./money0550";
 
@@ -9,7 +9,7 @@ export const mgwDetailCustomerRemark0550=id=>'Draft price for listed quoted scop
 export const MGW_DETAIL_PRICING_VERSION_0550="0550-mgw-detail-pricing-20261029-1";
 const make=(id,title,systemToken,customerRowCode,rows,select=true,wbs="A")=>({id,title,systemToken,customerRowCode,rowIds:rows.map(r=>r.id),select,wbs});
 const section=id=>quote.rows.filter(r=>r.section===id);
-export const MGW_DETAIL_GROUPS_0550=[
+const groups=[
  make("CCTV","CCTV — detailed quoted scope","TEL-CCTV","A1-06",section("CCTV")),
  make("LAN","LAN — detailed quoted scope","TEL-LAN","A1-01",section("LAN")),
  make("PABX","PABX / IP telephony — quoted scope","TEL-PABX","A1-04",section("PABX")),
@@ -23,7 +23,9 @@ export const MGW_DETAIL_GROUPS_0550=[
  ...section("SERVICES").map(r=>{const field=r.id.endsWith("006"),freight=r.id.endsWith("004");return make(r.id.replace("MGW-Q26-063-",""),r.description,"COMMON",field?"B4":freight?"B2":"B1",[r],!field,field?"B4":freight?"B2":"B1");}),
  make("PAGA-STUDY","BOSCH PAGA coverage study alternative","TEL-PAGA","B1",section("PAGA").filter(r=>r.wbs!=="A"),false,"B1")
 ];
-export const mgwDetailGroup0550=id=>MGW_DETAIL_GROUPS_0550.find(g=>g.id===id);
+export const MGW_DETAIL_GROUPS_0550=groups.filter(g=>!mgwGroupExcluded0550(g.id));
+// Legacy group identities remain readable for saved workspaces and frozen issues.
+export const mgwDetailGroup0550=id=>groups.find(g=>g.id===id);
 export function mgwDetailGroupBasis0550(data,id,line){
  const group=mgwDetailGroup0550(id);if(!group)return null;
  const record=line||data.lines.find(l=>l.mgwDetailGroupId===id);
@@ -31,6 +33,7 @@ export function mgwDetailGroupBasis0550(data,id,line){
  return {version:MGW_DETAIL_PRICING_VERSION_0550,group,source,offers:source.rows.map(row=>data.offers.filter(o=>o.id==="OFFER-"+row.rowId||o.mgwQuoteLineId===row.rowId))};
 }
 export function mgwDetailGroupPrice0550(data,id,line,today){
+ if(mgwGroupExcluded0550(id))return {costUSD:null,problems:[MGW_SCOPE_EXCLUDED_0550]};
  const basis=mgwDetailGroupBasis0550(data,id,line);if(!basis)return {costUSD:null,problems:["MGW pricing group missing"]};
  const problems=[],amounts=[];
  for(let i=0;i<basis.source.rows.length;i++){
@@ -41,12 +44,13 @@ export function mgwDetailGroupPrice0550(data,id,line,today){
   if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
   if(today&&offer.date>today)problems.push("Quote dated in future — confirm source date");
   if(today&&offer.validUntil&&offer.validUntil<today)problems.push("Quote expired — review replacement source");
-  if(line?.selected&&data.lines.some(other=>other.id!==line.id&&other.selected&&!other.coveredByLineId&&(other.offerId===offer.id||mgwDetailGroup0550(other.mgwDetailGroupId)?.rowIds.includes(row.rowId))))problems.push("MGW_SOURCE_COST_OWNER_DUPLICATE / "+row.rowId);
+  if(line?.selected&&data.lines.some(other=>other.id!==line.id&&other.selected&&!other.coveredByLineId&&(other.offerId===offer.id||mgwDetailGroup0550(other.mgwDetailGroupId)?.rowIds.includes(row.rowId))&&!mgwWorkingLineExcluded0550(data,other)&&!mgwProjectWideLineConflict0550(other,data.offers.find(o=>o.id===other.offerId))))problems.push("MGW_SOURCE_COST_OWNER_DUPLICATE / "+row.rowId);
   amounts.push(offer.unitCost*row.quantity);
  }
  return {costUSD:amounts.length===basis.source.rows.length?sumMoney0550(amounts):null,problems:[...new Set(problems)]};
 }
 export function prepareMgwDetailPricing0550(data,policies,today){
+ data=reconcileMgwWorkingScope0550(data);
  if(data.mgwDetailPricingImport?.version===MGW_DETAIL_PRICING_VERSION_0550)return data;
  const policy=policyDefaults0550(policies,"Goods / Procured Cost");if(!policy)return data;
  const replacedLineIds=[];
@@ -65,5 +69,5 @@ export function prepareMgwDetailPricing0550(data,policies,today){
    vendorId:data.offers.find(o=>mgwQuoteItem0550(o)?.id===g.rowIds[0])?.vendorId||"",offerId:"",calculationId:"",resultKey:"value",quantity:1,unit:"Lot",currency:"USD",manualCost:null,sellRate:null,markupPct:null,...policy,selected,customerRowCode:g.customerRowCode,customerRemark:mgwDetailCustomerRemark0550(g.id),brand:"",coverageBasis:basis});
   importedLineIds.push(id);
  }
- return {...next,mgwDetailPricingImport:{version:MGW_DETAIL_PRICING_VERSION_0550,date:today,importedLineIds,conflicts,replacedLineIds,decision:"User 29-Oct-2026: use MGW detail prices; corrected choice to MGW Marine/Aero/SSB instead of Jason; include all known USD255500 other charges pending BOSCH credit. INDUSTRONIC PAGA retained."}};
+ return {...next,mgwDetailPricingImport:{version:MGW_DETAIL_PRICING_VERSION_0550,date:today,importedLineIds,conflicts,replacedLineIds,decision:PROCUREMENT_SCOPE_0550.mgw.decision}};
 }

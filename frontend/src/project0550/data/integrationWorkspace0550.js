@@ -1,3 +1,4 @@
+import {mgwWorkingLineExcluded0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {validateTagBindings0550,tagBindingProblems0550} from './tagEvidence0550';
 // ADR-0550-001 principles 1–14: source → engineering proof → allocation → output.
 // This module derives workflow state; it never writes quantities, prices or approvals.
@@ -167,6 +168,9 @@ export function deriveIntegration0550(data,systems,today){
     problems.push(...readEvidence(r.supplierSourceIds,r.supplierLocator,r.supplierExcerpt,false));
    }
    if(r.offerIds.some(id=>!data.offers.some(o=>o.id===id)))problems.push("OFFER_MISSING");
+   const linkedOffers=[...r.offerIds,...(r.tagBindings||[]).flatMap(b=>b.offerIds)];
+   if(linkedOffers.some(id=>supplierOfferExcluded0550(data,data.offers.find(o=>o.id===id),r.systemToken))||
+      r.workLineIds.some(id=>data.lines.some(l=>l.id===id&&mgwWorkingLineExcluded0550(data,l))))problems.push(MGW_SCOPE_EXCLUDED_0550);
    for(const offerId of r.offerIds)if(!avlChecks.some(a=>a.requirementId===r.id&&a.offerId===offerId&&a.state==="REVIEWED_AVL"))problems.push("AVL_REVIEW_OPEN / "+offerId);
    if(r.proofMode!=="NOT_REQUIRED"&&!relatedProofs.some(p=>p.kind===r.proofMode&&p.state==="REVIEWED_PROOF"))problems.push("ENGINEERING_PROOF_OPEN");
    if(r.proofMode==="NOT_REQUIRED"&&!has(r.reason))problems.push("PROOF_DISPOSITION_OPEN");

@@ -1,7 +1,7 @@
 // ADR-0550-001: use canonical WP.1–8/source/offer records. Never reprice or approve.
 import {PAGA_AVL_BASIS_0550} from './avlDeviationBasis0550';
 import {integrationRequirements0550,blankRequirement0550,blankAvlCheck0550,blankDeviation0550,emptyIntegration0550,integrationFingerprint0550} from './integrationWorkspace0550';
-import {mgwQuoteItem0550} from './mgwVendorBasis0550';
+import {mgwQuoteItem0550,mgwOfferSystemTokens0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
 import {workingOffers0550,activeSupply0550} from './workingOffers0550';
 
 // Bounded facts visually checked in native Annex 2_1, PDF p13 / printed p11 of 12.
@@ -35,7 +35,7 @@ function assess(data,token,offer,basis,lines,reqs){
  const description=offer.description||'',cat=categoryFor(token,description),brand=offer.brand?.trim()||'';
  const selected=lines.some(l=>workingOffers0550(data,l).some(o=>o.id===offer.id)),allocated=reqs.filter(r=>r.offerIds.includes(offer.id));
  const quote=mgwQuoteItem0550(offer);
- const result=quote&&!quote.systemTokens.includes(token)?'OFFER_SYSTEM_CONFLICT':!cat?'CATEGORY_NOT_ESTABLISHED':unknown(brand)?'OEM_UNRESOLVED':cat.brands.some(b=>norm(b)===norm(brand))?'BRAND_LISTED':'NOT_LISTED';
+ const result=quote&&!mgwOfferSystemTokens0550(offer).includes(token)?'OFFER_SYSTEM_CONFLICT':!cat?'CATEGORY_NOT_ESTABLISHED':unknown(brand)?'OEM_UNRESOLVED':cat.brands.some(b=>norm(b)===norm(brand))?'BRAND_LISTED':'NOT_LISTED';
  return {id:token+'/'+offer.id,systemToken:token,offerId:offer.id,brand,description,quoteRef:offer.quoteRef,sourceRef:offer.sourceRef,basis,selected,allocated:allocated.length>0,category:cat,
   requirementIds:allocated.map(r=>r.id),sourceIds:uniq([...quoteSourceIds(data,offer),...allocated.flatMap(r=>r.supplierSourceIds)]),result};
 }
@@ -44,8 +44,9 @@ export function deriveAvlReconciliation0550(data,integration){
  const systems=integration.scopes.map(scope=>{
   const token=scope.id,reqs=requirements.filter(r=>r.systemToken===token),lines=data.lines.filter(l=>l.systemToken===token&&activeSupply0550(l)&&l.wbs==='A');
   const chosenIds=uniq([...lines.flatMap(l=>workingOffers0550(data,l).map(o=>o.id)),...reqs.filter(r=>r.disposition!=='NOT_APPLICABLE'&&r.responsibility!=='COMPANY').flatMap(r=>r.offerIds)]);
-  const chosen=data.offers.filter(o=>chosenIds.includes(o.id));
-  const offered=data.offers.filter(o=>mgwQuoteItem0550(o)?.systemTokens.includes(token)&&mgwQuoteItem0550(o)?.wbs==='A'&&!chosenIds.includes(o.id));
+  const applicable=currentSupplierOffers0550(data,token);
+  const chosen=applicable.filter(o=>chosenIds.includes(o.id));
+  const offered=applicable.filter(o=>mgwOfferSystemTokens0550(o).includes(token)&&mgwQuoteItem0550(o)?.wbs==='A'&&!chosenIds.includes(o.id));
   const chosenKnown=chosen.some(o=>!unknown(o.brand));
   // Explicit Working allocations remain visible; competing catalogue offers are
   // reference only once an OEM is chosen. Never substitute them into pricing.

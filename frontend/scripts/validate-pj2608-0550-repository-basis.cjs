@@ -6,7 +6,7 @@ let d=W.emptyBidWorkspace(repo.meta.datasetId);d=V.importLegacyVendorBasis0550(d
 const before=clone(d),p=R.prepareRepositoryBidBasis0550(d,repo,today);
 assert.deepEqual(d,before);assert.equal(p.fx.thbPerUSD,33.6335);assert.equal(p.fx.date,'2026-10-08');assert.equal(p.fx.thbPerEUR,null);assert(p.fx.source.includes('historical planning'));assert.equal(R.prepareRepositoryBidBasis0550(p,repo,today),p);
 for(const key of ['lines','vendors','offers','calculations','nodes','edges','audit','releaseRegister'])assert.deepEqual(p[key],before[key]);
-assert.equal(p.lines.filter(l=>l.mrRequirementId).length,264);assert.equal(p.offers.length,139);W.validateBidWorkspace(p,repo.meta.datasetId,D.SYSTEMS.map(s=>s.token));
+assert.equal(p.lines.filter(l=>l.mrRequirementId).length,264);assert.equal(p.offers.length,117);W.validateBidWorkspace(p,repo.meta.datasetId,D.SYSTEMS.map(s=>s.token));
 let model=W.deriveBidWorkspace(p,D.SYSTEMS.map(s=>s.token),today,I.deriveIntegration0550(p,D.SYSTEMS,today));
 assert(model.provisional.knownUSD>0);assert.equal(model.provisional.baseUSD,null);assert.equal(model.official.baseUSD,null);assert.equal(model.official.releaseAllowed,false);assert(model.lines.filter(l=>l.systemToken==='TEL-PAGA'&&l.selected).every(l=>l.customerUSD===null),'No invented EUR conversion');
 const cleared={...p,fx:before.fx};assert.equal(R.prepareRepositoryBidBasis0550(cleared,repo,today),cleared,'Intentional later clearing is preserved');
@@ -14,4 +14,4 @@ for(const fx of [{...before.fx,source:'User incomplete basis'},{...before.fx,thb
 assert.throws(()=>R.prepareRepositoryBidBasis0550(before,{...repo,meta:{...repo.meta,projectCode:'PJ2608-0553'}},today),/mismatch/);
 const future=R.prepareRepositoryBidBasis0550(before,{...repo,meta:{...repo.meta,snapshotDate:'2027-01-01'}},today);assert.deepEqual(future.fx,before.fx);
 assert.equal(F.releaseBasisKey0550(p),F.releaseBasisKey0550({...p,repositoryBasisImport:undefined}),'Administrative marker alone cannot invalidate a frozen price basis');
-console.log('PASS repository pricing preparation: actual GitHub MR264/Offer139, inherited historical USD FX and original date, known draft USD prices, EUR and full project remain OPEN, idempotent/nonmutating, user FX/edits/history preserved, future/foreign source rejected.');
+console.log('PASS repository pricing preparation: actual GitHub MR264/Offer117, inherited historical USD FX and original date, known draft USD prices, EUR and full project remain OPEN, idempotent/nonmutating, user FX/edits/history preserved, future/foreign source rejected.');

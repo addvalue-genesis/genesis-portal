@@ -1,0 +1,37 @@
+{
+  "projectId": "PJ2608-0550",
+  "decisionDate": "2026-11-05",
+  "authority": "User-confirmed bid procurement scope",
+  "contractor": "ADDVALUE",
+  "procurementOwner": "ADDVALUE",
+  "systemLabels": {
+    "TEL-DMR": "DMR · Digital Microwave Radio + WBB",
+    "TEL-RADIO-DTRS": "DTRS · VHF Trunked Radio"
+  },
+  "directProcurement": [
+    {
+      "name": "DMR",
+      "mgwExcludedSystemTokens": ["TEL-DMR"],
+      "supplier": "CERAGON",
+      "quoteRef": "26-30029 / printed26-3029-1 / RevA1",
+      "quotedSystemToken": "TEL-DMR",
+      "quotedScope": "ACP–APF digital microwave PtP link"
+    },
+    {
+      "name": "PAGA",
+      "mgwExcludedSystemTokens": ["TEL-PAGA"],
+      "supplier": "INDUSTRONIC",
+      "quoteRef": "A20261632-002",
+      "quotedSystemToken": "TEL-PAGA",
+      "quotedScope": "Public Address & General Alarm"
+    }
+  ],
+  "mgw": {
+    "quoteRef": "Q26-063 / ver1.0",
+    "excludedDetailGroupIds": ["PAGA-ALTERNATIVE", "PAGA-STUDY"],
+    "excludedCustomerRowCodes": ["A1-05", "A1-11"],
+    "projectWideServiceRowIds": ["MGW-Q26-063-SERVICES-001", "MGW-Q26-063-SERVICES-002"],
+    "decision": "2026-11-05: ADDVALUE is the contractor and direct procurement owner. DMR (Digital Microwave Radio) is from CERAGON, and PAGA is from INDUSTRONIC. MGW scope excludes DMR and PAGA and includes DTRS (VHF Trunked Radio).",
+    "sourceTreatment": "Preserve printed figures and original line IDs as source evidence. Exclude PAGA and DMR from the current MGW bid. VHF trunked radio is DTRS, a separate MGW system. CERAGON pricing applies to the digital microwave link only."
+  }
+}

@@ -12,7 +12,7 @@ import {towerWorkingBreakdown0550} from "./data/towerWorkingBreakdown0550";
 import {supplierCostProjection0550} from "./data/supplierCostProjection0550";
 import {WorkingPreview0550} from "./WorkingPreview0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
-import {mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
+import {mgwQuoteItem0550,currentSupplierOffers0550,mgwWorkingLineExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./data/mgwVendorBasis0550";
 import {MR_WORKING_CATALOG_0550,mrRequirement0550} from "./data/mrWorkingBasis0550";
 import React,{useEffect,useState,useRef,useMemo} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
@@ -44,6 +44,8 @@ function LineEditor({initialForm,editorState,onNavigate}){
  const [reviewSave,setReviewSave]=useState(false);
  const field=(k,v)=>setForm(f=>({...f,[k]:v}));
  const chosenOffer=data.offers.find(o=>o.id===form.offerId),mgwGroup=mgwDetailGroup0550(form.mgwDetailGroupId);
+ const mgwExcluded=mgwWorkingLineExcluded0550(data,form,chosenOffer);
+ const mgwProjectWideConflict=mgwProjectWideLineConflict0550(form,chosenOffer);
  const [basisChoice,setBasisChoice]=useState("");
  const [roleChoice,setRoleChoice]=useState("");
  return <form onSubmit={async e=>{e.preventDefault();const row={...form,id:form.id||newId("LINE")};if(reviewSave){row.officialReview={...(row.officialReview||blankOfficialReview())};row.officialReview.basisKey=officialLineBasisKey(data,row,row.officialReview);}if(await put("lines",row))setForm(blankLine());setReviewSave(false);}}>
@@ -57,11 +59,13 @@ function LineEditor({initialForm,editorState,onNavigate}){
  <Select label="Customer form row" value={form.customerRowCode||""} onChange={v=>field("customerRowCode",v)} options={[["","OPEN · suggested "+(suggestedCustomerCode(form)||"เลือกตามขอบเขต")],...CUSTOMER_FORM_0550.rows.filter(r=>r.part===form.wbs[0]).map(r=>[r.code,r.code+" · "+r.description])]}/><Field label="Customer brand / model" value={form.brand||""} onChange={v=>field("brand",v)}/><Field label="Customer remark" value={form.customerRemark||""} onChange={v=>field("customerRemark",v)}/>
  <Field label="Requirement reference" value={form.requirementRef} onChange={v=>field("requirementRef",v)}/><Field label="TAG / site reference" value={form.tagRef} onChange={v=>field("tagRef",v)}/><Field label="Line source / manual basis" value={form.sourceRef} onChange={v=>field("sourceRef",v)} required/>
  {!mgwGroup&&<><Select label="Line vendor" value={form.vendorId} onChange={v=>setForm(f=>({...f,vendorId:v,offerId:""}))} options={[["","Manual / owner OPEN"],...data.vendors.map(v=>[v.id,v.name])]}/>
- <Select label="Selected offer" value={form.offerId} onChange={v=>{const o=data.offers.find(o=>o.id===v);setForm(f=>({...f,offerId:v,...(o?{unit:o.unit,currency:o.currency,...(mgwQuoteItem0550(o)&&v!==f.offerId?{coverageBasis:""}:{})}: {})}));}} options={[["","Manual cost with stated basis"],...data.offers.filter(o=>o.vendorId===form.vendorId).map(o=>[o.id,o.quoteRef+" · "+o.description+" · "+amount(o.unitCost,o.currency)+" / "+o.unit])]}/>
+ <Select label="Selected offer" value={form.offerId} onChange={v=>{const o=data.offers.find(o=>o.id===v);setForm(f=>({...f,offerId:v,...(o?{unit:o.unit,currency:o.currency,...(mgwQuoteItem0550(o)&&v!==f.offerId?{coverageBasis:""}:{})}: {})}));}} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)).map(o=>[o.id,o.quoteRef+" · "+o.description+" · "+amount(o.unitCost,o.currency)+" / "+o.unit])]}/>
  <Select label="Quantity source" value={form.calculationId} onChange={v=>{const c=data.calculations.find(c=>c.id===v);setForm(f=>({...f,...calculationBinding0550(c,null,chosenOffer)}));}} options={[["","Manual quantity"],...data.calculations.filter(c=>c.systemToken===form.systemToken||c.systemToken==="COMMON").map(c=>[c.id,c.title+" · "+c.equationId])]}/>
  {form.calculationId?<Select label="Equation output" value={form.resultKey} onChange={v=>setForm(f=>({...f,...calculationBinding0550(data.calculations.find(c=>c.id===f.calculationId),v,chosenOffer)}))} options={["value","MD","MH"]}/>:<Field label="Manual quantity" type="number" min="0.000001" step="any" value={form.quantity} onChange={v=>field("quantity",v)}/>}
  {!chosenOffer&&<><Select label="Line unit" value={form.unit} onChange={v=>field("unit",v)} options={BID_UNITS}/><Select label="Line currency" value={form.currency} onChange={v=>field("currency",v)} options={["THB","USD","EUR"]}/><Field label="Manual unit cost" type="number" min="0" step="any" value={form.manualCost} onChange={v=>field("manualCost",v)}/></>}
  </>}
+ {mgwExcluded&&<p className="p55-callout">{MGW_SCOPE_EXCLUDED_0550}</p>}
+ {mgwProjectWideConflict&&<p className="p55-callout">{MGW_PROJECT_WIDE_SERVICE_0550}</p>}
  {mgwGroup&&<p>ราคาชุด {mgwGroup.id} · 1 Lot / USD จาก Offer ต้นทาง {mgwGroup.rowIds.length} รายการ · แก้เรตที่ Vendor Offer; เปลี่ยนการเลือกและนโยบายขายได้ด้านล่าง · ยังไม่ยืนยันว่าครบ MR</p>}
  <Select label="Selling method" value={form.sellMode} onChange={v=>field("sellMode",v)} options={[["DIRECT","E10 · Direct selling rate"],["MARKUP","E11 · Cost + markup"],["MARGIN","E12 · Target gross margin"]]}/>
  {form.sellMode==="DIRECT"?<Field label="ADDVALUE sell rate per unit" type="number" min="0" step="any" value={form.sellRate} onChange={v=>field("sellRate",v)}/>:form.sellMode==="MARKUP"?<Field label="Markup percent" type="number" min="0" step="any" value={form.markupPct} onChange={v=>field("markupPct",v)}/>:<Field label="Margin percent" type="number" min="0" max="99.9999" step="any" value={form.marginPct} onChange={v=>field("marginPct",v)}/>}
@@ -73,7 +77,7 @@ function LineEditor({initialForm,editorState,onNavigate}){
  <button type="button" onClick={()=>onNavigate(form.calculationId?"bid.engineering.calculation."+form.calculationId:"bid.engineering.equations")}>เปิดสมการ / Inputs ใน 02</button>
  <p>ต้นทุนและเรตขายใช้ {chosenOffer?.currency||form.currency} ต่อ {chosenOffer?.unit||form.unit} เดียวกัน · ช่องว่าง = OPEN; กรอก 0 เฉพาะเมื่อมีเหตุผลว่าเป็นศูนย์จริง · Trip/shared cost ให้ลงหนึ่งแถวด้วย scope key เดียว ไม่บวกซ้ำในทุกระบบ</p>
  <OfficialLineReviewFields value={form.officialReview} onChange={v=>field("officialReview",v)}/>
- <label><input type="checkbox" checked={form.selected} disabled={isSatelliteScope0550(form)&&form.satelliteScope==="COMPANY_SUPPLY"} onChange={e=>field("selected",e.target.checked)}/> เลือกแถวนี้ในข้อเสนอ Working</label><div><button type="submit" disabled={busy} onClick={()=>setReviewSave(false)}>บันทึกแถว Working</button><button type="submit" disabled={busy} onClick={()=>setReviewSave(true)}>บันทึกผลทบทวน OFF-03</button><button type="button" onClick={()=>setForm(blankLine())}>รายการใหม่</button></div>
+ <label><input type="checkbox" checked={form.selected} disabled={(mgwExcluded||mgwProjectWideConflict)&&!form.selected||isSatelliteScope0550(form)&&form.satelliteScope==="COMPANY_SUPPLY"} onChange={e=>field("selected",e.target.checked)}/> เลือกแถวนี้ในข้อเสนอ Working</label><div><button type="submit" disabled={busy} onClick={()=>setReviewSave(false)}>บันทึกแถว Working</button><button type="submit" disabled={busy} onClick={()=>setReviewSave(true)}>บันทึกผลทบทวน OFF-03</button><button type="button" onClick={()=>setForm(blankLine())}>รายการใหม่</button></div>
  </form>;
 }
 function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavigate}){
@@ -85,7 +89,7 @@ function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavig
  // this Part's direct groups; retain other Parts and nested reading choices.
  const toggleGroups=(event,open)=>event.currentTarget.closest('details').querySelectorAll(':scope > details.p55-price-group').forEach(group=>{group.open=open;});
  return <>{["A","B","C"].map(part=>{
- const rows=model.lines.filter(r=>r.wbs[0]===part),partId="bid.budget.working.part."+part;
+ const rows=model.lines.filter(r=>r.wbs[0]===part&&!r.historicalMgwPackage),partId="bid.budget.working.part."+part;
  return <details className="p55-price-group" key={part} open={rows.length>0} data-component-key={partId} data-module-number={identity(partId).number} data-bid-owner={part} style={bidOwnerStyle(part)}><summary><BidHeading {...identity(partId)}/><span className="p55-group-total">{workingCountLabel(rows)} · {rows.filter(companyReference).length} อ้างอิง COMPANY · Selected subtotal {amount(sumOfficial(rows.filter(r=>r.selected),"customerTHB"))}</span></summary>
  <div className="p55-review-toolbar" role="group" aria-label={'Working '+part+' expand collapse'}><button type="button" onClick={e=>toggleGroups(e,true)}>+ ขยายทุกหัวข้อ</button><button type="button" onClick={e=>toggleGroups(e,false)}>− หุบทุกหัวข้อ</button></div>
  {part==="A"&&<p>เรียงตาม MR Rev.B1 Appendix 1.1–1.8 · หัวข้ออ้างอิงเป็น working mapping; ขอบเขตและผู้รับผิดชอบต้องตรวจจาก Clause/หน้าในแต่ละรายการ</p>}

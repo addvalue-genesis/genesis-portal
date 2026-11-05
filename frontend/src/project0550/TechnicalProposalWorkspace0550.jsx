@@ -1,3 +1,4 @@
+import {currentSupplierOffers0550} from "./data/mgwVendorBasis0550";
 import {TechnicalTrace0550} from './TechnicalTrace0550';
 import React,{useEffect,useMemo,useState} from "react";
 import {SYSTEMS} from "./data";
@@ -27,7 +28,7 @@ export function TechnicalProposalWorkspace0550({navigationTarget,onNavigate,onDi
  const choose=(key,value)=>{if(dirty||vdrlDirty){setMessage("มีร่างที่ยังไม่บันทึก กรุณาบันทึกหรือยกเลิกก่อนเปลี่ยนหัวข้อ");return;}setMessage("");if(key==="panel")setPanel(value);else setSystem(value);setEquipment(null);};
  const edit=(key,value)=>{setForm(f=>({...f,[key]:value}));setDirty(true);setMessage("");};
  const save=async review=>{if(!form)return;const ok=await change(d=>saveTechnicalRecord0550(d,form,{review,today:reviewDate}),"Save Volume II draft / "+form.id);if(ok){setDirty(false);setMessage(review?"บันทึกผลทบทวนร่างแล้ว · รายการ OPEN/STALE ยังต้องแก้ ไม่ใช่การอนุมัติส่งลูกค้า":"บันทึกร่างแล้ว");}};
- const referenceFields=[["sourceIds","Source IDs",data.sourceIntake?.sources||[],s=>s.title],["requirementIds","Requirement IDs",model.integration.requirements.filter(r=>system==="COMMON"||[system,"COMMON"].includes(r.systemToken)),r=>r.title],["proofIds","CAL/RPT IDs",model.integration.proofs,r=>r.title],["offerIds","Supplier Offer IDs",data.offers,o=>o.description],["activityIds","Activity IDs",model.integration.activities,a=>a.title]];
+ const referenceFields=[["sourceIds","Source IDs",data.sourceIntake?.sources||[],s=>s.title],["requirementIds","Requirement IDs",model.integration.requirements.filter(r=>system==="COMMON"||[system,"COMMON"].includes(r.systemToken)),r=>r.title],["proofIds","CAL/RPT IDs",model.integration.proofs,r=>r.title],["offerIds","Supplier Offer IDs",currentSupplierOffers0550(data,system),o=>o.description],["activityIds","Activity IDs",model.integration.activities,a=>a.title]];
  const trace=(key,id)=>key==="sourceIds"?"bid.documents.source."+id:key==="requirementIds"?"bid.working-preview.requirement."+id:key==="proofIds"?"bid.working-preview.proof."+id:key==="offerIds"?"bid.vendor.offer."+id:"bid.working-preview.activity."+id;
  return <div className="p55-technical">
   <section className="p55-panel p55-technical-intro"><h2>12 · Volume II — Technical Proposal</h2><p>จัดทำคำตอบรายระบบจากข้อมูล Customer → System Integrator → Supplier ชุดเดียวกับ Working และ Release</p><a href={TECHNICAL_AUTHORITY_0550.url} target="_blank" rel="noreferrer">ข้อกำหนด CNEEC · {TECHNICAL_AUTHORITY_0550.date} · {TECHNICAL_AUTHORITY_0550.locator}</a><p><strong>DRAFT / NOT ISSUED</strong> · {view.authoredCount}/{view.records.length} คำตอบที่เริ่มเขียน · {view.reviewedCount} รายการผ่านการตรวจร่าง</p>

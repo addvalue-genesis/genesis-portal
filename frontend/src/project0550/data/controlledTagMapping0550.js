@@ -2,7 +2,7 @@ import {assessControlledTagMappingV2,matchQuotedSourceLineV2,deriveSourcedExtend
 import {roundMoney0550,sumMoney0550,PRICING_POLICY_0550} from './money0550';
 import {customerTagCatalogue0550,tagBindingProblems0550,tagCandidatesForRequirement0550} from './tagEvidence0550';
 import {nativeSupplierItem0550} from './supplierCostProjection0550';
-import {MGW_QUOTE_0550,mgwQuoteItem0550} from './mgwVendorBasis0550';
+import {MGW_QUOTE_0550,mgwQuoteItem0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from './mgwVendorBasis0550';
 import {bidRequirementOwners0550} from './bidProcess0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {mgwDetailGroupPrice0550} from './mgwDetailPricing0550';
@@ -28,6 +28,7 @@ export function deriveControlledTagMapping0550(data,model,systems,today){
   const offerIds=unique([...r.offerIds,...links.flatMap(l=>l.offerIds)]),offers=offerIds.map(id=>data.offers.find(o=>o.id===id));
   const sourceChecks=offers.map(o=>{
    if(!o)return {matched:false,issues:['OFFER_MISSING']};
+   if(supplierOfferExcluded0550(data,o,r.systemToken))return {id:o.id,matched:false,issues:[MGW_SCOPE_EXCLUDED_0550]};
    const n=nativeSupplierItem0550(o),mgw=mgwQuoteItem0550(o),sourceId=o.quoteEvidence?.sourceId||(mgw?'MGW:'+MGW_QUOTE_0550.sourceSha256:'');
    const itemCode=o.supplierQuoteRow?.itemCode||mgw?.id||o.quoteEvidence?.locator||'';
    const registered={offerId:o.id,sourceId,itemCode,quantity:n?.quantity,unit:n?.unit,rate:n?.rate,currency:n?.currency};

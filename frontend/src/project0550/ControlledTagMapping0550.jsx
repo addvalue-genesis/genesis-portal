@@ -1,3 +1,4 @@
+import {currentSupplierOffers0550} from "./data/mgwVendorBasis0550";
 import React,{useMemo,useState} from 'react';
 import {SYSTEMS} from './data';
 import {useBidWorkspace} from './BidWorkspaceContext';
@@ -28,7 +29,7 @@ export function ControlledTagMapping0550({system='ALL',onNavigate,summaryOnly=fa
 
 export function RequirementTagBindings0550({data,requirement,onChange,onOpenSource}){
  const catalogue=useMemo(()=>customerTagCatalogue0550(data),[data]),candidates=tagCandidatesForRequirement0550(requirement,catalogue),bindings=requirement.tagBindings||[];
- const parents=requirement.offerIds.map(id=>data.offers.find(o=>o.id===id)).filter(Boolean),supplierOptions=data.offers.filter(o=>parents.some(p=>p.id===o.id||o.supplierQuoteRow?.parentOfferId===p.id));
+ const offers=currentSupplierOffers0550(data,requirement.systemToken),parents=offers.filter(o=>requirement.offerIds.includes(o.id)),supplierOptions=offers.filter(o=>parents.some(p=>p.id===o.id||o.supplierQuoteRow?.parentOfferId===p.id));
  const set=(id,key,value)=>onChange(bindings.map(b=>b.id===id?{...b,[key]:value}:b));
  const add=t=>onChange([...bindings,{id:newId('TAGMAP'),tag:t.tag,site:t.site,sourceId:t.sourceId,locator:t.locator,excerpt:t.excerpt,quantity:t.quantity,unit:t.unit,offerIds:[],workLineIds:[],vdrlIds:[],basis:'DRAFT / source row reference; verify function, current revision, supplier items and unique ownership.',ruleVersion:TAG_MAPPING_RULE_VERSION}]);
  const multi=(label,value,options,change)=><label>{label}<select aria-label={label} multiple value={value} onChange={e=>change([...e.target.selectedOptions].map(o=>o.value))}>{options.map(o=><option key={o.id} value={o.id}>{o.label||o.description||o.title||o.id}</option>)}</select></label>;

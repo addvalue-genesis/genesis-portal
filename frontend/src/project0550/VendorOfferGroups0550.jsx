@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from 'react';
 import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550} from './data/vendorRegister0550';
-import {mgwQuoteItem0550} from './data/mgwVendorBasis0550';
+import {mgwQuoteItem0550,mgwProjectWideService0550} from './data/mgwVendorBasis0550';
 import {SYSTEMS} from './data';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
@@ -10,7 +10,7 @@ import {SupplierItemSourceText0550} from './SupplierItemSourceText0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 function QuoteTotal({quote,fx}){
- const t=vendorQuoteTotals0550(quote,fx);
+ const t=vendorQuoteTotals0550(quote,fx),isMgw=quote.entries.some(e=>mgwQuoteItem0550(e.offer));
  if(t.referenceOnly)return <span className="p55-vnd-total">ฐาน Working อ้างอิง · ดูยอดในใบเสนอราคาต้นฉบับ</span>;
  const show=(s,label)=><span className="p55-vnd-total-part">
   <strong>{label}: {s.totalTHB!==null?amount(s.totalTHB,'THB')+' THB':s.hasConverted?'ยอดที่ทราบ '+amount(s.knownTHB,'THB')+' THB · ยังไม่ครบ':'OPEN'}</strong>
@@ -20,7 +20,7 @@ function QuoteTotal({quote,fx}){
   {s.missingPrices>0&&<span>{s.missingPrices} รายการยังไม่มียอดแน่นอน / As actual</span>}
   {s.ambiguous&&<span>OPEN · พบยอดสุทธิหลายรายการ ต้องตรวจต้นฉบับก่อนรวม</span>}
  </span>;
- return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน</span>}</span>;
+ return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':isMgw?'รวมรายการในขอบเขตปัจจุบัน':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>{isMgw?"ยอดรวมขอบเขตที่แสดงในทะเบียนของใบเดียวกัน":"ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน"}</span>}</span>;
 }
 export function VendorOfferGroups0550({data,onEdit}){
  const [mode,setMode]=useState('company');
@@ -36,7 +36,7 @@ export function VendorOfferGroups0550({data,onEdit}){
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{o.description}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small>
-    <small>ขอบเขตใบเสนอราคา: {entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
+    <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}

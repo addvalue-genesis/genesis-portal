@@ -166,7 +166,7 @@ try {
  // MGW source import is additive and never silently substitutes an existing supplier.
  const {MGW_QUOTE_0550:mgwCatalog,importMgwVendorBasis0550,mgwQuoteItem0550,mgwOfferDraft0550,mgwOffersFor0550}=require(path.join(root,"project0550/data/mgwVendorBasis0550.js"));
  const mrBytes=JSON.stringify(mr),mgw=importMgwVendorBasis0550(mr,"2026-10-28");validate(mgw);
- assert.equal(JSON.stringify(mr),mrBytes);assert.equal(mgw.offers.length,139);assert.equal(mgw.vendors.length,mr.vendors.length+1);assert.deepEqual(mgw.lines,mr.lines);assert.deepEqual(mgw.fx,mr.fx);
+ assert.equal(JSON.stringify(mr),mrBytes);assert.equal(mgw.offers.length,117);assert.equal(mgw.vendors.length,mr.vendors.length+1);assert.deepEqual(mgw.lines,mr.lines);assert.deepEqual(mgw.fx,mr.fx);
  assert.equal(mgwCatalog.rows.length,130);assert.equal(mgwCatalog.rows.filter(r=>r.unitCost!==null).length,129);assert.equal(mgwCatalog.rows.filter(r=>r.unit===null).length,10);
  for(const r of mgwCatalog.rows){assert(r.systemTokens.every(t=>t==="COMMON"||ids.includes(t)),r.id);if(r.unitCost!==null)assert.equal(Math.round(r.quantity*r.unitCost*100),Math.round(r.extended*100),r.id);}
  assert.deepEqual(mgwCatalog.sections.filter(s=>s.status==="TOTAL_CONFLICT").map(s=>[s.id,s.coverTotal,s.detailTotal]),[["CCTV",133072,482142],["LAN",891222,881760]]);
@@ -176,7 +176,7 @@ try {
  const alias=emptyBidWorkspace(snapshot);alias.vendors=[{id:"VEN-EXISTING",name:"Megaway Technologies",kind:"SUPPLIER",reference:"Saved identity"}];
  const reused=importMgwVendorBasis0550(alias,"2026-10-28");assert.equal(reused.vendors.length,1);assert(reused.offers.every(o=>o.vendorId==="VEN-EXISTING"));
  const existing=JSON.parse(JSON.stringify(reused));delete existing.mgwQuoteImport;existing.offers[0].id="SAVED-OFFER";delete existing.offers[0].mgwQuoteLineId;existing.offers[0].unitCost=654;
- const recovered=importMgwVendorBasis0550(existing,"2026-10-28");assert.equal(recovered.offers.length,130);assert.equal(recovered.offers[0].unitCost,654);assert(mgwQuoteItem0550(recovered.offers[0]));
+ const recovered=importMgwVendorBasis0550(existing,"2026-10-28");assert.equal(recovered.offers.length,108);assert.equal(recovered.offers[0].unitCost,654);assert(mgwQuoteItem0550(recovered.offers[0]));
  alias.vendors.push({id:"VEN-SECOND",name:"MGW",kind:"SUPPLIER",reference:"Ambiguous"});const ambiguous=importMgwVendorBasis0550(alias,"2026-10-28");assert.equal(ambiguous.offers.length,0);assert.equal(ambiguous.mgwQuoteImport.conflicts.length,1);
  const collision=emptyBidWorkspace(snapshot);collision.vendors=mgw.vendors;collision.offers=[{...mgw.offers.find(mgwQuoteItem0550),mgwQuoteLineId:undefined,description:"Different saved offer"}];
  const collided=importMgwVendorBasis0550(collision,"2026-10-28");assert.equal(collided.mgwQuoteImport.conflicts.length,1);assert.equal(collided.offers[0].description,"Different saved offer");
@@ -191,7 +191,7 @@ try {
  assert.notEqual(mgwOfferDraft0550(camera,{...unknownUnit,unit:"SET",unitBasis:"SYNTHETIC TEST unit confirmation"}),camera);
  assert.equal(mgwOfferDraft0550(camera,mgw.offers.find(o=>mgwQuoteItem0550(o)&&o.unitCost===null)),camera);
  const mgwStamp=officialLineBasisKey(mgwWorking,selectedCamera);const repriced=JSON.parse(JSON.stringify(mgwWorking));repriced.offers.find(o=>o.id===cameraOffer.id).unitCost=10000;assert.notEqual(officialLineBasisKey(repriced,repriced.lines[0]),mgwStamp);
- console.log("PASS MGW: 130 multi-system offers / 129 prices / one vendor; 2 source-total conflicts, 10 unspecified units and TBD retained; additive/idempotent import preserves rates, identities, MR quantities and selected vendors; explicit rate basis, native cost/FX calculation and unchanged Official gates.");
+ console.log("PASS MGW: 108 in-scope offers / 130 preserved original quote rows / one vendor; 2 source-total conflicts, 10 unspecified units and TBD retained; additive/idempotent import preserves rates, identities, MR quantities and selected vendors; explicit rate basis, native cost/FX calculation and unchanged Official gates.");
  }
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));
  console.log("PASS 0550 Bidding: all E01–E18 + 4 engineering functions, manual/source inputs, unique ownership, offer/FX/unit gates, same THB/USD projection, options separation, review export and immutable Rev10; synthetic prices only.");

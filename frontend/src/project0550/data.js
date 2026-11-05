@@ -4,6 +4,7 @@
 import { getProject0550Dataset, getProject0550DataLayerStatus } from "./data/repository";
 import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
 import { buildCoverageMatrix } from "./coverageModel";
+import procurement from "./data/procurementScope0550.json";
 
 const DATASET = getProject0550Dataset();
 
@@ -13,7 +14,15 @@ export { loadProject0550Bid, saveProject0550Bid } from "./data/repository";
 
 export const PROJECT_0550 = DATASET.project;
 export const COMMERCIAL_POLICY = DATASET.commercialPolicy;
-export const SYSTEM_GROUPS = DATASET.systemGroups;
+const directProcurement=new Map(procurement.directProcurement.map(scope=>[scope.quotedSystemToken,scope]));
+export const SYSTEM_GROUPS = DATASET.systemGroups.map(group=>({
+  ...group,
+  systems:group.systems.map(system=>{
+    const scope=directProcurement.get(system.token);
+    return {...system,name:procurement.systemLabels[system.token]||system.name,
+      ...(scope?{owner:procurement.contractor+" · Contractor / procurement · "+scope.supplier+" · "+scope.quoteRef}:{})};
+  })
+}));
 export const SYSTEMS = SYSTEM_GROUPS.flatMap((group) =>
   group.systems.map((system) => ({ ...system, groupId: group.id, groupName: group.name }))
 );

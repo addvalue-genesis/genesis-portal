@@ -1,3 +1,4 @@
+import {mgwWorkingLineExcluded0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {workingOffers0550} from './workingOffers0550';
 // ADR-0550-001 §§1–4,6,8–14. Authoring records link canonical SI data;
@@ -68,7 +69,7 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
  // 0550's existing cost taxonomy: B5=startup/commissioning spares,
  // B6=tools, C1=installation services, C2=capital, C3=two-year spares.
  // Never import 0553's different B-category numbering here.
- const equipment=data.lines.filter(l=>["A","B5","B6","C2","C3"].includes(l.wbs)).map(l=>{
+ const equipment=data.lines.filter(l=>["A","B5","B6","C2","C3"].includes(l.wbs)&&!mgwWorkingLineExcluded0550(data,l)).map(l=>{
   const q=model.lines?.find(r=>r.id===l.id)||l,detail=p.equipmentDetails.find(d=>d.lineId===l.id),problems=[];
   if(!Number.isFinite(q.quantity)||q.quantity<=0)problems.push("QUANTITY_OPEN");
   if(!detail||!(detail.estimatedWeightKg>0)||!detail.dimensions.trim()||!detail.basis.trim()||!detail.sourceIds.length)problems.push("WEIGHT_DIMENSIONS_EVIDENCE_OPEN");
@@ -85,6 +86,7 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
    else if(linked.problems?.length)problems.push("LINK_OPEN / "+id);
    if(linked?.systemToken&&s.token!=="COMMON"&&![s.token,"COMMON"].includes(linked.systemToken))problems.push("LINK_SYSTEM_MISMATCH / "+id);
    if(linked?.requirementId&&!r.requirementIds.includes(linked.requirementId))problems.push("LINK_REQUIREMENT_MISMATCH / "+id);
+   if(key==="offerIds"&&supplierOfferExcluded0550(data,linked,s.token))problems.push(MGW_SCOPE_EXCLUDED_0550+" / "+id);
    if(key==="offerIds"&&linked&&!r.requirementIds.some(reqId=>(i.requirements||[]).find(q=>q.id===reqId)?.offerIds.includes(id)))problems.push("OFFER_REQUIREMENT_MAPPING_OPEN / "+id);
   }
   if(section.id==="equipment"){

@@ -9,8 +9,8 @@ function SourceAmount({quote}){
  const {totals:t,printed}=quote;
  const show=(s,label)=><span><strong>{label}: {s.totalTHB!==null?amount(s.totalTHB):s.hasConverted?'ยอดที่ทราบ '+amount(s.knownTHB)+' · ยังไม่ครบ':'OPEN'}</strong>{s.native.length>0&&<small>ต้นทาง {s.native.map(n=>amount(n.value,n.currency)).join(' + ')}</small>}{s.missingPrices>0&&<small>ยอดที่ยังไม่แน่นอน / As actual {s.missingPrices} รายการ</small>}{s.missingFX.length>0&&<small>FX ยังไม่ครบ {s.missingFX.join(' / ')}</small>}{s.ambiguous&&<small>พบยอดสุทธิหลายรายการ ต้องทบทวนต้นฉบับ</small>}</span>;
  return <span className="p55-source-amount">
-  {printed&&<span><strong>ยอดหน้าสรุปต้นฉบับ ({printed.currency}): {amount(printed.amount,printed.currency)}</strong><small>{printed.thb===null?'THB OPEN':amount(printed.thb)}</small><small>หน้าสรุปกับรายละเอียดขัดกัน: {printed.conflicts.join(' / ')} · ไม่ใช่การเลือกใช้ยอดนี้ใน Working</small></span>}
-  {show(t.base,printed?'รวมรายละเอียดทั้งใบที่ตรวจได้':t.net?'สุทธิทั้งใบตาม Supplier':'ยอดรายการทั้งใบตาม Supplier')}
+  {printed&&<span><strong>ยอดหน้าสรุปต้นฉบับ ({printed.currency}): {amount(printed.amount,printed.currency)}</strong><small>{printed.thb===null?'THB OPEN':amount(printed.thb)}</small><small>หน้าสรุปกับรายละเอียดขัดกัน: {printed.conflicts.join(' / ')} · ยอดเดิมก่อนตัด PAGA และ DMR จากขอบเขต MGW</small></span>}
+  {show(t.base,printed?'รวมรายละเอียด MGW ในขอบเขตปัจจุบัน':t.net?'สุทธิทั้งใบตาม Supplier':'ยอดรายการทั้งใบตาม Supplier')}
   {t.option&&show(t.option,'Option ต้นฉบับแยก')}
   {t.base.rates.some(r=>r.currency!=='THB')&&<small>FX {t.base.rates.filter(r=>r.currency!=='THB').map(r=>'1 '+r.currency+' = '+r.rate+' THB').join(' · ')} · {t.fxDate} · {t.fxSource}</small>}
  </span>;
@@ -19,7 +19,7 @@ function SourceQuote({quote:q,onNavigate,initiallyOpen=false}){
  const [open,setOpen]=useState(initiallyOpen),[full,setFull]=useState(false),shown=full?q.items:q.relevantItems;
  const linked=q.items.filter(e=>e.uses.length).length;
  return <details className="p55-panel" open={open} data-working-source-quote={q.title} data-source-identity={q.key} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
-  <summary>{q.vendor} · {q.title}{q.revision?' · '+q.revision:''} · {q.fileName||'ต้นฉบับ'} · {q.items.length} รายการทั้งใบ · พบลิงก์ราคา {linked}/{q.items.length}<SourceAmount quote={q}/><small>{q.owners.length?'พบการใช้ราคาใน Working '+q.owners.length+' เจ้าของ · ไม่ใช่อนุมัติทั้งใบ':'ยังไม่มีเจ้าของราคาที่เลือกจากใบนี้'}</small>{q.systems.length>1&&<small>อ้างอิงใบเดียวกันใน {q.systems.join(' / ')} · ยอดทั้งใบคงเดิมทุกมุมมอง ห้ามบวกรวมซ้ำระหว่างระบบ</small>}</summary>
+  <summary>{q.vendor} · {q.title}{q.revision?' · '+q.revision:''} · {q.fileName||'ต้นฉบับ'} · {q.items.length} รายการ{q.printed?'ในขอบเขตปัจจุบัน':'ทั้งใบ'} · พบลิงก์ราคา {linked}/{q.items.length}<SourceAmount quote={q}/><small>{q.owners.length?'พบการใช้ราคาใน Working '+q.owners.length+' เจ้าของ · ไม่ใช่อนุมัติทั้งใบ':'ยังไม่มีเจ้าของราคาที่เลือกจากใบนี้'}</small>{q.systems.length>1&&<small>อ้างอิงใบเดียวกันใน {q.systems.join(' / ')} · ยอดทั้งใบคงเดิมทุกมุมมอง ห้ามบวกรวมซ้ำระหว่างระบบ</small>}</summary>
   {open&&<>
    <p>ต้นทุน Supplier คือราคาต้นฉบับ ไม่ถูกลดลงเพราะจัดสรร A/B/C · NET รวมรายการ Gross แล้ว · Option แยกจาก Base · การใช้เรต/แพ็กเกจไม่ใช่การยืนยัน comply</p>
    {q.items.length!==q.relevantItems.length&&<button type="button" onClick={()=>setFull(v=>!v)}>{full?'ดูเฉพาะรายการที่เกี่ยวข้องกับระบบนี้':'ดูรายการทั้งใบ '+q.items.length+' รายการ'}</button>}

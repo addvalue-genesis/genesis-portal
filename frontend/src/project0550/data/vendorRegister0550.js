@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {validateBidWorkspace} from './bidWorkspaceModel';
 import {safeSourceUrl} from './sourceIntakeModel';
-import {mgwQuoteItem0550} from './mgwVendorBasis0550';
+import {mgwQuoteItem0550,mgwOfferSystemTokens0550,currentSupplierOffers0550,supplierOfferExcluded0550,mgwProjectWideService0550} from './mgwVendorBasis0550';
 import {workingOffers0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {validateSupplierQuoteRow0550} from './supplierRevision0550';
@@ -101,9 +101,16 @@ export function planVendorRegister0550(data,pack,systems){
 
 // All groupings are read-only projections of these same canonical Offer IDs.
 export function vendorOfferEntries0550(data){
- const links=new Map(data.offers.map(o=>[o.id,{systems:new Set(),working:[]}]));
- const sourceSystems=new Map(data.offers.map(o=>[o.id,[...new Set([...(o.quoteEvidence?.systemTokens||[]),...(mgwQuoteItem0550(o)?.systemTokens||[])])].sort()]));
- const add=(id,token)=>{if(token&&links.has(id))links.get(id).systems.add(token);};
+ const offers=currentSupplierOffers0550(data);
+ const links=new Map(offers.map(o=>[o.id,{offer:o,systems:new Set(),working:[]}]));
+ const sourceSystems=new Map(offers.map(o=>{
+  const tokens=mgwProjectWideService0550(o)?['COMMON']:[...(o.quoteEvidence?.systemTokens||[]),...mgwOfferSystemTokens0550(o)];
+  return [o.id,[...new Set(tokens.filter(token=>!supplierOfferExcluded0550(data,o,token)))].sort()];
+ }));
+ const add=(id,token)=>{
+  const link=links.get(id);
+  if(token&&link&&!supplierOfferExcluded0550(data,link.offer,token))link.systems.add(mgwProjectWideService0550(link.offer)?'COMMON':token);
+ };
  for(const [id,systems] of sourceSystems)for(const system of systems)add(id,system);
  for(const r of data.integrationWorkspace?.requirements||[])for(const id of r.offerIds||[])add(id,r.systemToken);
  for(const l of data.lines)for(const o of workingOffers0550(data,l)){add(o.id,l.systemToken);links.get(o.id)?.working.push(l);}
@@ -113,7 +120,7 @@ export function vendorOfferEntries0550(data){
   if(!allocations.has(id))allocations.set(id,[]);
   allocations.get(id).push(usage);
  }
- return data.offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
+ return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
   allocatedWorking:allocations.get(offer.id)||[],
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
