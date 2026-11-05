@@ -68,3 +68,18 @@ export function assessBidPunch({issues=[],plans=[],owners=[],today,documentsRead
   // This kernel never grants issue authorization or technical acceptance.
   engineeringReady,documentsReady,issueAuthorized:false};
 }
+
+// Workflow stage is separate from a proposed plan phase and from severity.
+// Adapters may supply a preparation hint; only explicit required phases can
+// put a task into the With-Bid/post-order groups. A plan never grants deferral.
+export const BID_PUNCH_STAGES=Object.freeze([
+ {id:'PREPARE',label:'1 · เตรียมขอบเขตและราคา'},
+ {id:'BID',label:'2 · จัดชุดเอกสารพร้อม Bid'},
+ {id:'AUTHORIZE',label:'3 · อนุมัติ / ตรึงฉบับ / ส่ง'},
+ {id:'POST_AWARD',label:'4 · ดำเนินงานหลัง PO'},
+ {id:'UNCLASSIFIED',label:'ต้องตรวจ Stage จากข้อกำหนด'}
+]);
+export function stageBidPunch(rows){
+ const staged=rows.map(r=>({...r,stage:r.hardPriceBlock?'PREPARE':r.requiredWithBid||r.requiredPhase==='BID'?'BID':r.requiredPhase==='POST_AWARD'?'POST_AWARD':r.workStage==='PREPARE'?'PREPARE':'UNCLASSIFIED'}));
+ return {rows:staged,stages:BID_PUNCH_STAGES.map(s=>({...s,count:staged.filter(r=>r.stage===s.id).length}))};
+}

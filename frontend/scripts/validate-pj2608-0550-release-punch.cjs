@@ -1,0 +1,29 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),babel=require('@babel/core');
+const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'],compile=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+const C=require(src+'/common/governance/bidPunch.js'),P=require(src+'/project0550/data/releasePunchList0550.js'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const plan={id:'POST',basisKey:'B1',severity:'MINOR',phase:'POST_AWARD',owner:'SI',action:'Check requirement',dueOn:'2027-01-01',priceBasis:'Existing quote retained',reference:'Synthetic clause; no waiver'};
+const issues=[{id:'INPUT',hardPriceBlock:true},{id:'BID',requiredWithBid:true,phase:'POST_AWARD'},{id:'UNKNOWN',requiredPhase:'REVIEW',phase:'POST_AWARD'},{id:'POST',requiredPhase:'POST_AWARD',plan},{id:'PREPARE',workStage:'PREPARE'}];
+const before=JSON.stringify(issues),staged=C.stageBidPunch(issues);assert.deepEqual(staged.rows.map(r=>r.stage),['PREPARE','BID','UNCLASSIFIED','POST_AWARD','PREPARE']);assert.equal(JSON.stringify(issues),before);assert.equal(staged.rows[3].plan,plan);assert.equal(staged.stages.reduce((n,s)=>n+s.count,0),issues.length);
+const D=require(src+'/project0550/data.js'),B=require(src+'/project0550/data/bidWorkspaceModel.js'),BP=require(src+'/project0550/data/bidPunch0550.js');
+const data=B.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),seedIntegration=require(src+'/project0550/data/integrationWorkspace0550.js').deriveIntegration0550(data,D.SYSTEMS,'2026-11-05'),model={...B.deriveBidWorkspace(data,D.SYSTEMS.map(s=>s.token),'2026-11-05',seedIntegration),integration:seedIntegration,releaseControl:{state:'HOLD',ready:false,problems:['BASE_TOTAL_OPEN','NEW_UNRECOGNIZED_GATE'],issues:[],transmittals:[]}};
+const immutable=JSON.stringify({data,model}),p=P.deriveReleasePunchList0550(data,model,'2026-11-05'),shared=BP.deriveBidPunch0550(data,model,D.SYSTEMS,'2026-11-05');
+assert.deepEqual(p.items,shared.rows,'Release consumes the existing Common roots, severity, basis keys and plans');assert.equal(p.items,p.common.rows);assert.equal(JSON.stringify({data,model}),immutable);
+assert(p.items.find(r=>r.id==='ISSUE|BASE_TOTAL_OPEN').stage==='PREPARE');assert(p.items.find(r=>r.id==='ISSUE|NEW_UNRECOGNIZED_GATE').stage==='UNCLASSIFIED');assert.deepEqual(p.gateRows.map(g=>g.code),model.releaseControl.problems);assert.equal(p.currentState,'HOLD');
+const ctx=require(src+'/project0550/BidWorkspaceContext.jsx');let current={data,model,reviewDate:'2026-11-05',busy:false,change:()=>{throw Error('Read-only rendering must not save');}};ctx.useBidWorkspace=()=>current;
+const View=require(src+'/project0550/ReleasePunchList0550.jsx').ReleasePunchList0550;
+const render=punch=>renderToStaticMarkup(React.createElement(View,{punch,onNavigate:()=>{}}));
+let html=render(p);for(const s of C.BID_PUNCH_STAGES)assert(html.includes(s.label));assert(html.includes('WP.8'));assert(!html.includes('data-release-raw-gates'),'Raw checks mount on disclosure');
+const large={...p,common:{...p.common,rows:Array.from({length:2432},(_,i)=>({...p.items[0],id:'ROW'+i}))}};assert.equal((render(large).match(/data-bid-punch=/g)||[]).length,25,'Initial Release DOM stays bounded');
+if(process.argv[2]){
+ const I=require(src+'/project0550/data/integrationWorkspace0550.js'),S=require(src+'/project0550/data/sourceReadiness0550.js'),R=require(src+'/project0550/data/releaseIssue0550.js'),today='2026-11-05';
+ const d=JSON.parse(fs.readFileSync(process.argv[2],'utf8')),raw=JSON.stringify(d),integration=I.deriveIntegration0550(d,D.SYSTEMS,today),derived={...B.deriveBidWorkspace(d,D.SYSTEMS.map(s=>s.token),today,integration),integration,sourceReadiness:S.deriveSourceReadiness0550(d,integration,today)};derived.releaseControl=R.deriveReleaseControl0550(d,derived,today);
+ const control=JSON.stringify(derived.releaseControl),prices=JSON.stringify(derived.provisional),a=P.deriveReleasePunchList0550(d,derived,today),common=BP.deriveBidPunch0550(d,derived,D.SYSTEMS,today);
+ assert.deepEqual(a.items,common.rows);assert.equal(new Set(a.items.map(r=>r.id)).size,a.items.length);assert.deepEqual(a.backlog,P.releaseReviewBacklog0550(derived));assert.deepEqual(a.gateRows.map(g=>g.code),derived.releaseControl.problems);
+ const task=a.items.find(r=>r.id==='REVIEW_OPEN|SYSTEM|TEL-TELT');assert(task);const authored={...plan,id:task.id,basisKey:task.basisKey},withPlan={...d,bidPunchPlans:[authored]};
+ B.validateBidWorkspace(withPlan,D.DATA_LAYER_META.datasetId,D.SYSTEMS.map(s=>s.token));const next=P.deriveReleasePunchList0550(withPlan,derived,today).items.find(r=>r.id===task.id);assert.equal(next.planComplete,true);assert.equal(next.plan.owner,'SI');assert.equal(next.stage,task.stage,'Proposed phase cannot move the required stage');assert.equal(next.resolved,false);assert.equal(next.submissionBlocked,true);
+ const changed={...withPlan,fx:{...withPlan.fx,thbPerUSD:withPlan.fx.thbPerUSD+1}};assert(P.deriveReleasePunchList0550(changed,derived,today).items.find(r=>r.id===task.id).stale);
+ assert.equal(JSON.stringify(d),raw);assert.equal(JSON.stringify(derived.provisional),prices);assert.equal(JSON.stringify(derived.releaseControl),control);
+ current={...current,data:d,model:derived};assert.equal((render(a).match(/data-bid-punch=/g)||[]).length,Math.min(25,a.items.length));
+ console.log('ACTUAL',JSON.stringify({state:a.currentState,gates:a.gateRows.length,legacyBacklog:a.backlog.length,commonRoots:a.recordCount,rawRequirementConditions:a.rawRequirementProblems,stages:a.stages}));
+}
+console.log('PASS shared Common roots/plans, independent required stage, unknown gates, bounded Release rendering, no data/price/gate changes.');

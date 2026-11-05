@@ -1,4 +1,4 @@
-import {assessBidPunch} from '../../common/governance/bidPunch';
+import {assessBidPunch,stageBidPunch} from '../../common/governance/bidPunch';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {deriveBidProcess0550,bidStudyDelivery0550} from './bidProcess0550';
 import {deriveBidVolumes0550} from './bidVolumes0550';
@@ -73,5 +73,6 @@ export function deriveBidPunch0550(data,model,systems,today){
  for(const problem of model.releaseControl?.problems||[]){const row=add('ISSUE|'+problem,{severity:'MAJOR',priceEffect:'EVIDENCE',title:problem,context:'เงื่อนไขออกฉบับอย่างเป็นทางการเดิม ไม่ใช่เงื่อนไขหยุดคำนวณร่าง',action:'ตรวจสาเหตุใน10.7และปิดที่ต้นทาง แผน Punch ไม่แทนการทบทวนหรือการอนุญาตออกฉบับ',target:'bid.budget.release'});row.systemTokens.push('COMMON');row.codes.push(problem);}
  const issues=[...groups.values()].map(r=>({...r,systemTokens:[...new Set(r.systemTokens.length?r.systemTokens:['COMMON'])],requirementIds:[...new Set(r.requirementIds)].filter(id=>reqById.has(id)),workLineIds:[...new Set(r.workLineIds)],codes:[...new Set(r.codes)]}));
  const assessed=assessBidPunch({issues,plans:data.bidPunchPlans||[],owners:owners.map(o=>({id:o.id,selected:o.selected,costAmount:o.costTHB,sellAmount:o.customerUSD})),today,documentsReady:volumes.ready,engineeringReady:Boolean(integration.ready)});
- return {...assessed,process,rawRequirementProblems:reqs.reduce((n,r)=>n+(r.problems?.length||0),0)};
+ const stageView=stageBidPunch(assessed.rows.map(r=>({...r,workStage:r.hardPriceBlock||/^(PRICE\||COMMERCIAL\||BUDGET_BASIS_CHANGED|A_INPUT\|)/.test(r.id)||/^ISSUE\|(NATIVE_EXHIBIT_C:|CUSTOMER_SCOPE_OPEN|REVIEWED_USD_PRICE_OPEN|BASE_TOTAL_OPEN|CURRENT_FX_OPEN|REQUIREMENT_OR_PRICE_MAPPING_OPEN|A_INPUT_READINESS_OPEN|SOURCE_INTAKE_OPEN)/.test(r.id)?'PREPARE':r.workStage})));
+ return {...assessed,...stageView,volumeView:volumes,process,rawRequirementProblems:reqs.reduce((n,r)=>n+(r.problems?.length||0),0)};
 }

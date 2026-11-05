@@ -163,12 +163,12 @@ export const MODULE_REGISTRY = [
     name: "Released Customer Output",
     layer: "PARTICULAR_PROJECT",
     lifecycleStatus: "CONTROLLED_HOLD",
-    purpose: "Represent formally authorized final customer pricing only.",
+    purpose: "Represent formally authorized final customer pricing and explain readiness through the existing Release stage and punch-list projection.",
     why: "Budgetary/preliminary output must not be mistaken for final contractual release.",
-    inputs: ["Closed engineering/commercial gates", "Release authorization"],
-    outputs: ["RELEASED_SELL"],
-    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js", "frontend/src/project0550/exhibitCNative0550.js", "frontend/src/project0550/data/bidPackageOutput0550.js", "frontend/src/project0550/data/releaseIssue0550.js", "frontend/src/project0550/QuotationBaselineControls0550.jsx", "frontend/src/project0550/data/quotationBaseline0550.js", "frontend/src/common/governance/quotationBaseline.js", "frontend/src/common/governance/quotationBaselineStore.js"],
-    invariants: ["Remain HOLD until controlled release criteria are satisfied."]
+    inputs: ["Canonical readiness problems", "Source / requirement / Working records", "Volume I/II/III and VDRL submission-phase evidence", "Existing Common bidPunchPlans", "Release authorization"],
+    outputs: ["Stage/punch projection with original source navigation and shared Common plan editing", "RELEASED_SELL only when controlled readiness passes"],
+    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js", "frontend/src/project0550/exhibitCNative0550.js", "frontend/src/project0550/data/bidPackageOutput0550.js", "frontend/src/project0550/data/releaseIssue0550.js", "frontend/src/project0550/ReleaseIssueControls0550.jsx", "frontend/src/project0550/ReleasePunchList0550.jsx", "frontend/src/project0550/data/releasePunchList0550.js", "frontend/src/project0550/BidPunch0550.jsx", "frontend/src/project0550/data/bidPunch0550.js", "frontend/src/common/governance/bidPunch.js", "frontend/src/project0550/QuotationBaselineControls0550.jsx", "frontend/src/project0550/data/quotationBaseline0550.js", "frontend/src/common/governance/quotationBaseline.js", "frontend/src/common/governance/quotationBaselineStore.js"],
+    invariants: ["Remain HOLD until controlled release criteria are satisfied.", "Stage/punch projection never waives a gate, closes a record or invents owner, deadline or accepted applicability."]
   },
   {
     id: "MOD-EXECUTION",

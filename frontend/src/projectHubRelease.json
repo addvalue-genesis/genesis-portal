@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.7",
+  "version": "2026-11-05.8",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "4a1c5b2b",
-  "capability": "Working system groups always link existing Vendor07.2 and Supplier Mapping WP.7, including unquoted KU/C Internet. MR trace reads authored requirement links, directly selected Offers and shared owner Offers without filtering away cross-system candidates or legacy references. Show manual Working bases separately from original supplier costs; missing/dangling Offers remain explicit. Preserve all existing module IDs, source scopes, pricing/Qty/FX/reviews/history and Common bid Punch controls."
+  "source0550": "473e0792",
+  "capability": "Existing10.7 consumes the same Common Bid Punch roots, plans and editor as WP.8; required Stage is separate from proposed phase and acceptance. Preserve the latest KU Vendor07.2/WP.7 shortcuts and canonical MR/direct/shared-owner Offer links; manual bases remain distinct from original quotes. Keep IDs, all prices/Qty/FX/source/reviews, original gates and frozen history; no second Punch store or automatic acceptance."
 }

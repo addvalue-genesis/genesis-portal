@@ -1,6 +1,8 @@
+import {deriveReleasePunchList0550} from './data/releasePunchList0550';
+import {ReleasePunchList0550} from './ReleasePunchList0550';
 import {QuotationBaselineControls0550,useQuotationBaseline0550} from "./QuotationBaselineControls0550";
 import {PackageConsistency0550} from "./BidVolumesWorkspace0550";
-import React,{useState} from "react";
+import React,{useMemo,useState} from "react";
 import {useBidWorkspace,downloadBidFile} from "./BidWorkspaceContext";
 import {Field,Save} from "./BidControls";
 import {newId,deriveBidWorkspace} from "./data/bidWorkspaceModel";
@@ -8,33 +10,27 @@ import {SYSTEMS} from "./data";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {prepareReleaseIssue0550,recordReleaseTransmittal0550} from "./data/releaseIssue0550";
 
-export function ReleaseIssueControls0550({provisional=false,onNavigate}){
+export function ReleaseIssueControls0550({provisional=false,onNavigate,onOpenSource}){
  const {data,model,busy,change,reviewDate}=useBidWorkspace();
  const baseline=useQuotationBaseline0550();
  const [authorization,setAuthorization]=useState({number:"",authorizedBy:"",authorizedOn:reviewDate,authorizationRef:"",customerFormConfirmed:false});
  const [sent,setSent]=useState({issueId:"",sentOn:reviewDate,recipient:"",reference:"",recordedBy:""}),[message,setMessage]=useState("");
+ const punch=useMemo(()=>data&&model?.releaseControl?deriveReleasePunchList0550(data,model,reviewDate):null,[data,model,reviewDate]);
  const c=model?.releaseControl;if(!c)return null;
  const derive=(d,date)=>{const integration=deriveIntegration0550(d,SYSTEMS,date);return {...deriveBidWorkspace(d,SYSTEMS.map(s=>s.token),date,integration),integration};};
  const freeze=async e=>{e.preventDefault();if(await change(d=>prepareReleaseIssue0550(d,derive(d,reviewDate),{...authorization,id:newId("ISSUE")},reviewDate),"Authorize and freeze commercial issue / "+authorization.number)){setMessage("ตรึงฉบับที่อนุมัติแล้ว · ยังไม่ได้บันทึกว่าส่งลูกค้า");setAuthorization(a=>({...a,number:"",customerFormConfirmed:false}));}};
  const transmit=async e=>{e.preventDefault();if(await change(d=>recordReleaseTransmittal0550(d,{...sent,id:newId("TX")},reviewDate),"Record actual commercial transmittal / "+sent.reference))setMessage("บันทึกหลักฐานการส่งแล้ว · โปรแกรมไม่ได้ส่งอีเมลให้อัตโนมัติ");};
  const exportIssue=issue=>baseline.exportIssue(issue,"commercial-xlsx");
- const backlog=[
-  ...(model.sourceReadiness?.rows||[]).filter(r=>r.problems.length).map(r=>({type:"A_INPUT",id:r.id,title:r.documentNo+" "+r.revision+" / "+r.title,locator:r.locator,sourceIds:r.binding?.sourceIds||[],problems:r.problems})),
-  ...(model.integration?.documentGaps||[]).map(r=>({type:"DOCUMENT",id:r.id,problems:[r.reason]})),
-  ...(model.integration?.requirements||[]).filter(r=>r.problems.length).map(r=>({type:"REQUIREMENT",id:r.id,system:r.systemToken,title:r.title,sourceIds:r.sourceIds,locator:r.sourceLocator,problems:r.problems})),
-  ...model.official.selected.filter(r=>r.reviewProblems.length).map(r=>({type:"PRICE",id:r.id,customerRow:r.customerRowCode,title:r.description,problems:r.reviewProblems})),
-  ...model.official.schedule.filter(r=>!r.ready).map(r=>({type:"CUSTOMER_ROW",id:r.code,problems:r.problems}))
- ];
+ const backlog=punch.backlog;
  return <section className="p55-panel" aria-label="Commercial release control">
-  {data.bidVolumes?<PackageConsistency0550 onNavigate={onNavigate}/>:<p>Commercial control เดิมยังไม่รับรองครบสาม Volume · จัดทำ 11 Volume I / 12 Volume II / 13 Volume III ก่อนออกชุด Tender ใหม่</p>}
+  {data.bidVolumes?<PackageConsistency0550 compact view={punch.volumeView} onNavigate={onNavigate}/>:<p>Commercial control เดิมยังไม่รับรองครบสาม Volume · จัดทำ 11 Volume I / 12 Volume II / 13 Volume III ก่อนออกชุด Tender ใหม่</p>}
   <QuotationBaselineControls0550 control={baseline} data={data} official={model.official} busy={busy}/>
   <p>Frozen exports เก็บไฟล์พร้อม SHA-256 ก่อนดาวน์โหลด · กรอกผู้บันทึกและเหตุผลในฉบับราคาอ้างอิงก่อน · ไฟล์ที่สร้างจากตารางประวัติไม่ยืนยันว่าเป็นต้นฉบับที่เคยส่ง</p>
   <p role="status">{baseline.message}</p>
   <h3>ตรวจความพร้อม / อนุมัติ / ตรึงฉบับ / หลักฐานการส่ง</h3>
   <p><strong>{c.state}</strong> · {c.issues.length} ฉบับที่ตรึงแล้ว · {c.transmittals.length} หลักฐานการส่ง · การกรอกชื่อผู้อนุมัติเป็นบันทึกภายใน ไม่ใช่ลายเซ็นหรือการยืนยันตัวตน</p>
-  {c.problems.length>0&&<ul>{c.problems.map(p=><li key={p}>{p}</li>)}</ul>}
-  <button type="button" disabled={busy} onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,preparedOn:reviewDate,state:c.state,checks:c.problems,backlog},`PJ2608-0550_Release_Review_R${data.revision}.json`)}>Export Internal Release Review / รายการที่ต้องปิด</button>
-  <details><summary>รายละเอียดที่ยังต้องปิด · {backlog.length} รายการตรวจ</summary><p>รายการตรวจอาจอ้างประเด็นเดียวกันหลายระดับ ห้ามรวมจำนวนเป็นจำนวนข้อผิดพลาดหรือเปอร์เซ็นต์ความครบ</p><div className="p55-table-wrap"><table className="p55-table" aria-label="Release readiness backlog"><thead><tr><th>ประเภท / ID</th><th>รายละเอียด</th></tr></thead><tbody>{backlog.map((r,i)=><tr key={r.type+r.id+i}><td>{r.type} / {r.id}</td><td>{r.title}<small>{r.problems.join(" / ")}</small></td></tr>)}</tbody></table></div></details>
+  <ReleasePunchList0550 punch={punch} onNavigate={onNavigate} onOpenSource={onOpenSource}/>
+  <button type="button" disabled={busy} onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,preparedOn:reviewDate,state:c.state,checks:c.problems,backlog,punchList:{schema:punch.schema,stages:punch.stages,gateRows:punch.gateRows,items:punch.items}},`PJ2608-0550_Release_Review_R${data.revision}.json`)}>Export Internal Release Review / รายการที่ต้องปิด</button>
   <details><summary>บันทึกอนุมัติและตรึงราคาฉบับปัจจุบัน</summary>
    <p>เปิดให้บันทึกเมื่อ Integration, Customer scope, ราคาสกุล USD, FX และข้อค้นพบผ่านครบ ต้องยืนยันว่าแบบราคานี้ใช้กับ Tender รอบปัจจุบันแล้ว</p>
    {provisional&&<p>เลือกมุมมอง Official · ตรวจทบทวนแล้ว ก่อนอนุมัติฉบับ</p>}

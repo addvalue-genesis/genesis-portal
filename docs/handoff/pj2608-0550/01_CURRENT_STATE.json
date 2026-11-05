@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_COMMON_BID_PUNCH_AND_STATUS_TRIAGE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_RELEASE_STAGE_PUNCH_LIST.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -44,7 +44,9 @@
     "docs/handoff/pj2608-0550/20261105_TOWER_FULL_QUOTE_COST.md",
     "docs/handoff/pj2608-0550/20261105_ALL_SYSTEM_SUPPLIER_COST_SEPARATION.md",
     "docs/handoff/pj2608-0550/20261105_WORKING_STATUS_AND_TRACE_AUDIT.md",
-    "docs/handoff/pj2608-0550/20261105_COMMON_BID_PUNCH_AND_STATUS_TRIAGE.md"
+    "docs/handoff/pj2608-0550/20261105_COMMON_BID_PUNCH_AND_STATUS_TRIAGE.md",
+    "docs/handoff/pj2608-0550/20261105_RELEASE_STAGE_PUNCH_LIST.md",
+    "docs/handoff/pj2608-0550/20261105_KU_SUPPLIER_MAPPING_VISIBILITY.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -69,7 +71,8 @@
     "vendorDefaultMetadata": "frontend/src/project0550/data/vendorRegisterDefaults0550.json",
     "ceragonDefaultMetadata": "frontend/src/project0550/data/vendorRegisterCeragonDefaults0550.json",
     "supplierCostProjection": "frontend/src/project0550/data/supplierCostProjection0550.js",
-    "supplierWorkingSourceView": "frontend/src/project0550/WorkingSupplierTrace0550.jsx"
+    "supplierWorkingSourceView": "frontend/src/project0550/WorkingSupplierTrace0550.jsx",
+    "releasePunchView": "frontend/src/project0550/data/releasePunchList0550.js"
   },
   "dataContinuity": {
     "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
@@ -87,6 +90,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "UI2026-11-05.8: existing10.7 consumes the same Common roots, basis keys, severity, bidPunchPlans and plan editor as WP.8. Stage reflects required phase or known preparation work, never proposed deferral. Keep unknown stage explicit, original A/B source actions, all current gates and original internal backlog/export fields. No new module/tab/schema/store; viewing stays read-only, explicit plan save changes only existing plans and normal revision/audit. Preserve prices/Qty/FX/source/reviews/frozen history. See latest checkpoint for validation and Windows/engineering limits. Retain concurrent473e0792 KU/source-link update.",
     "UI2026-11-05.6 / Common bid Punch: existing WP.8 consolidates actual conditions, durable Major/Minor/review plans and independent proposed phase. Preserve concurrent2c62170e source/selected-quote trace, all prices/Qty/FX/reviews/frozen history and existing IDs. Labels use รอทบทวน. No auto-PASS, deferral waiver or customer issue. See latest checkpoint for tests and Windows limits.",
     "UI2026-11-05.5: audited all19 systems+COMMON on reconstructed SourceRev13/ARev09/Vendor DATA. Correct generic old-price labels; show bound quotes and registered alternatives; defer named many-to-many requirement links and28 saved CCTV source quantities. Preserve prices/Qty/FX/IDs/source/reviews/frozen history and existing selection. PAGA A20261632 remains selected;002 is registered separately. Numerical draft audit88 owners passed; engineering/Windows confirmation is separate. See latest checkpoint for final validation.",
     "UI2026-11-05.4: all19 systems+COMMON share immutable full Supplier quote cost versus separate A/B/C allocation. Shared quote identity/totals stay invariant; no source grand-total sum across alternatives. Native quotes/net/options/units/FX, MGW cover/detail conflict and Asactual stay explicit. Metadata-declared scope is separate from candidate SI/Working links; tested7 quotes/16 direct source groups,4 no-direct-register groups. Lazy original item bodies prevent eager duplication. No financial/source/schema/review/export/history writes or new modules; source/actual/browser checks in latest checkpoint. Windows consumption remains unobserved.",
