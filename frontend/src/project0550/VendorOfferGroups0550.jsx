@@ -1,4 +1,4 @@
-import React,{useMemo,useState} from 'react';
+import React,{useEffect,useMemo,useState} from 'react';
 import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550} from './data/vendorRegister0550';
 import {mgwQuoteItem0550,mgwProjectWideService0550} from './data/mgwVendorBasis0550';
 import {SYSTEMS} from './data';
@@ -22,10 +22,13 @@ function QuoteTotal({quote,fx}){
  </span>;
  return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':isMgw?'รวมรายการในขอบเขตปัจจุบัน':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>{isMgw?"ยอดรวมขอบเขตที่แสดงในทะเบียนของใบเดียวกัน":"ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน"}</span>}</span>;
 }
-export function VendorOfferGroups0550({data,onEdit}){
+export function VendorOfferGroups0550({data,onEdit,navigationTarget}){
  const [mode,setMode]=useState('company');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
  const groups=useMemo(()=>groupVendorOffers0550(entries,mode,SYSTEMS),[entries,mode]);
+ useEffect(()=>{
+  if(entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId))setMode('company');
+ },[entries,navigationTarget]);
  const anchors=new Set();
  const renderRows=quote=><div className="p55-table-wrap"><table className="p55-table" aria-label={'Vendor costs '+quote.title}><thead><tr><th>รายการ / ระบบ</th><th>จำนวน / หน่วยต้นฉบับ</th><th>ต้นทุน / หน่วยเรต<br/>Unit Price ต้นฉบับ</th><th>Total Price ต้นฉบับ</th><th>วันที่ / เงื่อนไข</th><th>Offer ID / การใช้ใน Working</th></tr></thead><tbody>{quote.entries.map(entry=>{
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow;
@@ -69,10 +72,10 @@ export function VendorOfferGroups0550({data,onEdit}){
    <span>{entries.length} Offer IDs · ต้นทุนตามสกุล/หน่วยต้นฉบับ</span>
   </div>
   <p>จัดกลุ่มตามระบบในใบเสนอราคาเมื่อมีหลักฐาน · ระบบที่อ้าง Offer ใน Mapping / Working แสดงแยกในแถว · Qty / Unit / Unit Price / Total ใช้ข้อมูลต้นฉบับของ Supplier</p>
-  {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} style={bidOwnerStyle(g.system)}>
-   <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs</summary>
+  {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
+   <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs{mode==='company'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+g.key}/></>}</summary>
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>
-    <summary><Toggle/>{child.title}</summary>
+    <summary><Toggle/>{child.title}{mode==='system'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+child.key}/></>}</summary>
     {child.quotes.map(q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
      <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx}/></summary>
      {renderRows(q)}

@@ -21,11 +21,22 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  const target=new Set(pack.offers.map(o=>o.id));assert.deepEqual(registered.offers.filter(o=>!target.has(o.id)).slice(0,before.offers.filter(o=>!target.has(o.id)).length),before.offers.filter(o=>!target.has(o.id)));
  assert.deepEqual(registered.vendors.slice(0,before.vendors.length),before.vendors);
  assert.equal(registered.offers.length,before.offers.length+pack.offers.filter(o=>!before.offers.some(x=>x.id===o.id)).length);assert.equal(registered.vendors.length,before.vendors.length+pack.vendors.filter(v=>!before.vendors.some(x=>x.id===v.id)).length);
- await jump('bid.vendor.master');await page.locator('[data-component-key="bid.vendor.'+pack.vendors[0].id+'"]').waitFor();
+ const vendorKey='bid.vendor.'+pack.vendors[0].id,vendorModuleId='PJ2608-0550 / '+vendorKey;
+ await jump('bid.vendor.master');await page.locator('[data-component-key="bid.vendor.master"]').getByRole('button',{name:'Copy component ID '+vendorKey,exact:true}).waitFor();
  await jump('bid.vendor.offers');const registry=page.getByLabel('Vendor cost register'),company=registry.getByRole('button',{name:'บริษัท → ระบบ',exact:true}),system=registry.getByRole('button',{name:'ระบบ → บริษัท',exact:true});
  assert.equal(await page.locator('[data-component-key="bid.vendor.master"]').count(),1);assert.equal(await page.locator('[data-component-key="bid.vendor.offers"]').count(),1);
  const open=async locator=>{if(!await locator.evaluate(el=>el.open))await locator.locator(':scope > summary').click();};
- const first=registry.locator('[data-vnd-group="'+pack.vendors[0].id+'"]');await open(first);
+ const first=registry.locator('[data-component-key="'+vendorKey+'"]');
+ const firstSummary=first.locator(':scope > summary');
+ const groups=await registry.locator('[data-vnd-group]').evaluateAll(nodes=>nodes.map(node=>({vendorId:node.dataset.vndGroup,key:node.dataset.componentKey,code:node.querySelector(':scope > summary code')?.textContent})));
+ assert(groups.length>1,'Multiple registered companies are visible');
+ for(const {vendorId,key,code} of groups){assert.equal(key,'bid.vendor.'+vendorId);assert.equal(code,key);}
+ await page.context().grantPermissions(['clipboard-read','clipboard-write']);
+ await firstSummary.getByRole('button',{name:'Copy component ID '+vendorKey,exact:true}).click();
+ assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),vendorModuleId);
+ assert.equal(await first.evaluate(el=>el.open),false,'Copy leaves the company collapsed');
+ assert.equal(await page.locator('[data-component-key="'+vendorKey+'"]').count(),1,'Company has one navigation target');
+ await jump(vendorModuleId);await first.locator(':scope > summary + details').first().waitFor();
  const child=first.locator('[data-vnd-subgroup="TEL-PAGA"]');await open(child);
  const quote=child.locator('.p55-vnd-quote').filter({hasText:pack.offers[0].quoteRef}).first(),summary=quote.locator(':scope > summary');
  assert.equal(await quote.evaluate(el=>el.open),false,'Quote initially collapsed');
@@ -36,7 +47,11 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  const ids=pack.offers.map(o=>o.id);
  for(const id of ids)assert.equal(await page.locator('[data-component-key="bid.vendor.offer.'+id+'"]').count(),1);
  await system.click();assert.equal(await system.getAttribute('aria-pressed'),'true');
+ await jump(vendorModuleId);await first.locator(':scope > summary + details').first().waitFor();
+ assert.equal(await company.getAttribute('aria-pressed'),'true','Company ID reopens all company quotes from system view');
+ await system.click();
  const sys=registry.locator('[data-vnd-group="TEL-PAGA"]');await open(sys);const supplier=sys.locator('[data-vnd-subgroup="'+pack.vendors[0].id+'"]');await open(supplier);await open(supplier.locator('.p55-vnd-quote').first());
+ assert(await supplier.locator(':scope > summary').getByRole('button',{name:'Copy component ID '+vendorKey,exact:true}).isVisible(),'Both groupings display the same company ID');
  assert.deepEqual(await supplier.locator('tr[data-vnd-offer]').evaluateAll(rs=>rs.map(r=>r.dataset.vndOffer)),ids);
  const rateRow=supplier.locator('tr[data-vnd-offer="'+ids[1]+'"]');await rateRow.getByRole('button',{name:'เปิด Offer / แก้ไข',exact:true}).click();
  assert.equal(await page.getByLabel('Quoted unit cost',{exact:true}).inputValue(),String(pack.offers[1].unitCost));
@@ -50,5 +65,5 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  await page.reload();await ready();assert.deepEqual(await read(),registered,'Reload retains imported quotes and receipt');
  await jump('bid.documents.si-work-package');await page.getByLabel('Import SI work package',{exact:true}).setInputFiles({name:'vendor-register.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(pack))});await preview.waitFor();assert(await preview.getByRole('button',{name:'Apply SI work package',exact:true}).isDisabled(),'Consumed register batch cannot add duplicates');
  assert.deepEqual(await read(),registered);assert.deepEqual(errors,[]);
- console.log('PASS Vendor browser: actual app/IndexedDB import via existing SI surface, one company/four quotes, original financial/source/history preserved, both hierarchy modes, cost edit/source IDs, deep links, mobile containment, reload and idempotence.');
+ console.log('PASS Vendor browser: actual app/IndexedDB import via existing SI surface, one company/four quotes, original financial/source/history preserved, both hierarchy modes, company ID/clipboard/navigation, cost edit/source IDs, deep links, mobile containment, reload and idempotence.');
 }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});
