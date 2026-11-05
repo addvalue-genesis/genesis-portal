@@ -139,6 +139,7 @@
     "UI 2026-11-05.17: the full AVL audit lives in 14.1. WP.7 links from its system summary and 14.3 links from Export to review. Uses shared Working/Requirement/Offer and Deviation records. Context, SSR, AVL validation and production build passed; Windows runtime unverified.",
     "UI 2026-11-05.18: WP.5 opens and highlights the selected requirement in its system quantity group. Unlinked records have an exact WP.4 route. Context, Working Preview, build and targeted actual-workspace browser validation passed; see the checkpoint for the legacy harness startup limitation.",
     "UI 2026-11-05.19: WP.5 opens directly to quantity groups by system. WP.2 and WP.6 retain the requirement picker for draft creation. Context, Working Preview SSR and production build passed. Windows runtime unverified.",
+    "A Work Package Rev11: TEL-TELT APF and ACP link the matching original NET and Items 2–5. Two site RPTs and existing Volume II equipment trace remain DRAFT / OPEN. Exact Rev10 ancestry, single supply owner and provisional commercial projections verified. Pull and restart for the shared 76 MiB preparation limit. Windows consumption unverified.",
     "Implementation verification and existing-branch delivery are recorded in the latest checkpoint. No customer issue or PR merge is authorised by presentation completion."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."

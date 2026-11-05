@@ -50,8 +50,7 @@ export function repairPagaEngineeringDrafts0550(data){
  const requirements=workspace.requirements.map(repairPagaEngineeringDraft);
  return requirements.some((r,i)=>r!==workspace.requirements[i])?{...data,integrationWorkspace:{...workspace,requirements}}:data;
 }
-// Retain exact predecessor receipts within a bounded 64 MiB continuation.
-// Paired response is bounded by the unchanged32MiB source +64MiB preparation limits.
+// Retain exact predecessor receipts within the shared preparation byte limit.
 export const SI_FILE_LIMIT_0550=sourceLimits.preparationBytes;
 const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
