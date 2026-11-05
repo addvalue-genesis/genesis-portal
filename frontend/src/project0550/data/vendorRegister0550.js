@@ -102,8 +102,9 @@ export function planVendorRegister0550(data,pack,systems){
 // All groupings are read-only projections of these same canonical Offer IDs.
 export function vendorOfferEntries0550(data){
  const links=new Map(data.offers.map(o=>[o.id,{systems:new Set(),working:[]}]));
+ const sourceSystems=new Map(data.offers.map(o=>[o.id,[...new Set([...(o.quoteEvidence?.systemTokens||[]),...(mgwQuoteItem0550(o)?.systemTokens||[])])].sort()]));
  const add=(id,token)=>{if(token&&links.has(id))links.get(id).systems.add(token);};
- for(const o of data.offers){for(const s of o.quoteEvidence?.systemTokens||[])add(o.id,s);for(const s of mgwQuoteItem0550(o)?.systemTokens||[])add(o.id,s);}
+ for(const [id,systems] of sourceSystems)for(const system of systems)add(id,system);
  for(const r of data.integrationWorkspace?.requirements||[])for(const id of r.offerIds||[])add(id,r.systemToken);
  for(const l of data.lines)for(const o of workingOffers0550(data,l)){add(o.id,l.systemToken);links.get(o.id)?.working.push(l);}
  const referenced=new Set(data.offers.flatMap(o=>o.quoteEvidence?.workingReferenceOfferIds||[]));
@@ -112,7 +113,7 @@ export function vendorOfferEntries0550(data){
   if(!allocations.has(id))allocations.set(id,[]);
   allocations.get(id).push(usage);
  }
- return data.offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
+ return data.offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
   allocatedWorking:allocations.get(offer.id)||[],
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
@@ -121,7 +122,9 @@ export function groupVendorOffers0550(entries,mode,systems){
  const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),quoteEntries=new Map(),systemName=s=>s==='UNASSIGNED'?'ยังไม่ผูกระบบ':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
  const evidence=new Map();
  for(const {offer:o} of entries)if(o.quoteEvidence){const k=JSON.stringify([o.vendorId,o.quoteRef,o.quoteEvidence.revision]);if(!evidence.has(k))evidence.set(k,new Set());evidence.get(k).add(o.quoteEvidence.sourceSha256);}
- for(const entry of entries)for(const system of entry.systemTokens.length?entry.systemTokens:['UNASSIGNED']){
+ for(const entry of entries){
+ const scopes=entry.sourceSystemTokens?.length?entry.sourceSystemTokens:entry.systemTokens;
+ for(const system of scopes.length?scopes:['UNASSIGNED']){
   const company=entry.vendor?.id||entry.offer.vendorId,companyName=entry.vendor?.name||company;
   const first=mode==='system'?system:company,second=mode==='system'?company:system;
   if(!groups.has(first))groups.set(first,{key:first,title:mode==='system'?systemName(system):companyName,system:mode==='system'?system:null,children:new Map(),offerIds:new Set()});
@@ -136,6 +139,7 @@ export function groupVendorOffers0550(entries,mode,systems){
   if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,referenceOnly:entry.referenceOnly,entries:[]});
   if(e?.fileName)child.quotes.get(quoteKey).fileName=e.fileName;
   child.quotes.get(quoteKey).entries.push(entry);
+ }
  }
  const sort=(a,b)=>a.title.localeCompare(b.title,'en',{numeric:true});
  return [...groups.values()].sort(sort).map(g=>({...g,children:[...g.children.values()].sort(sort).map(c=>({...c,quotes:[...c.quotes.values()].sort(sort).map(q=>({...q,totalEntries:[...quoteEntries.get(q.key).values()]}))}))}));

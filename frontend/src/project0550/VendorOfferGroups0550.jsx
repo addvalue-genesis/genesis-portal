@@ -33,8 +33,11 @@ export function VendorOfferGroups0550({data,onEdit}){
   const selected=entry.working.filter(activeSupply0550),referenceSelected=entry.referenceWorking.filter(activeSupply0550);
   const allocated=entry.allocatedWorking.filter(u=>u.current&&activeSupply0550(u.line)),stale=entry.allocatedWorking.filter(u=>!u.current);
   const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
+  const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{o.description}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small><small>{entry.systemTokens.join(' / ')||'ยังไม่ผูกระบบ'}</small>
+   <td><strong>{o.description}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small>
+    <small>ขอบเขตใบเสนอราคา: {entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
+    {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
      {e&&<><p>{e.locator} · revision: {e.revision||'ต้นฉบับไม่ระบุ'}</p><p><a href={e.sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></p><small>Source ID: {e.sourceId}<br/>SHA256: {e.sourceSha256}</small></>}
@@ -56,7 +59,6 @@ export function VendorOfferGroups0550({data,onEdit}){
     {allocated.map(u=><small key={u.line.id}>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'} · {u.line.description}{u.kind==='ESTIMATE'?' · รวมในต้นทุนผสมใบเสนอราคาและประมาณการ':''}</small>)}
     {stale.map(u=><small key={u.line.id}>ต้องทบทวนลิงก์ {u.line.id} · ข้อมูลรายการหรือราคาต้นทางเปลี่ยน</small>)}
     {referenceSelected.length>0&&<small>อ้างอิงฐาน Working เดิม {referenceSelected.length} รายการ · ตรวจขอบเขตก่อนเปลี่ยนราคา</small>}
-    {entry.systemTokens.length>1&&<small>อ้างอิง Offer เดียวกันหลายระบบ · ไม่รวมต้นทุนซ้ำ</small>}
    </td>
   </tr>;
  })}</tbody></table></div>;
@@ -66,7 +68,7 @@ export function VendorOfferGroups0550({data,onEdit}){
    <button type="button" aria-pressed={mode==='system'} onClick={()=>setMode('system')}>ระบบ → บริษัท</button>
    <span>{entries.length} Offer IDs · ต้นทุนตามสกุล/หน่วยต้นฉบับ</span>
   </div>
-  <p>เก็บรายการต้นฉบับทุกฉบับ รวมรายการที่ยังไม่เลือกใช้ · Qty / Unit / Unit Price / Total เป็นข้อมูล Supplier ส่วน Working เก็บจำนวนและราคาที่เลือกใช้แยกกัน · การแสดงในกลุ่มยังไม่ยืนยันว่าผ่านข้อกำหนด MR</p>
+  <p>จัดกลุ่มตามระบบในใบเสนอราคาเมื่อมีหลักฐาน · ระบบที่อ้าง Offer ใน Mapping / Working แสดงแยกในแถว · Qty / Unit / Unit Price / Total ใช้ข้อมูลต้นฉบับของ Supplier</p>
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} style={bidOwnerStyle(g.system)}>
    <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs</summary>
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>

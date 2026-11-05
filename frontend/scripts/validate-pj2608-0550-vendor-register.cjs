@@ -29,6 +29,15 @@ for(const mode of ['company','system']){
 assert.equal(R.groupVendorOffers0550(R.vendorOfferEntries0550(both),'company',D.SYSTEMS)[0].children[0].quotes.length,2,'Keep distinct revisions');
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550.jsx');
 const html=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:shared,onEdit:()=>{}}));
+const crossSystem={...next,integrationWorkspace:{requirements:['TEL-AIS','TEL-RADIO-DTRS','TEL-VSAT','COMMON'].map(systemToken=>({systemToken,offerIds:[next.offers[0].id]}))}};
+const crossEntries=R.vendorOfferEntries0550(crossSystem);
+assert.deepEqual(crossEntries[0].sourceSystemTokens,['TEL-PAGA']);
+assert(crossEntries[0].systemTokens.includes('TEL-AIS'),'Keep usage trace separately');
+assert.deepEqual(R.groupVendorOffers0550(crossEntries,'company',D.SYSTEMS)[0].children.map(c=>c.key),['TEL-PAGA']);
+assert.deepEqual(R.groupVendorOffers0550(crossEntries,'system',D.SYSTEMS).map(g=>g.key),['TEL-PAGA']);
+const crossHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:crossSystem,onEdit:()=>{}}));
+assert(crossHtml.includes('ระบบที่อ้างใน Mapping / Working:'));
+assert(!crossHtml.includes('data-vnd-subgroup="TEL-AIS"'));
 assert(html.includes('บริษัท → ระบบ')&&html.includes('ระบบ → บริษัท'));assert(html.includes('OPTION'));assert(html.includes('ต้นทุน / หน่วยเรต'));
 const ids=[...html.matchAll(/data-component-key="(bid\.vendor\.offer\.[^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,shared.offers.length);assert.equal(new Set(ids).size,ids.length,'One canonical navigation anchor per Offer ID');
 const unsafe=structuredClone(shared);unsafe.offers[0].description='<script>unsafe</script>';assert(renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:unsafe,onEdit:()=>{}})).includes('&lt;script&gt;'));

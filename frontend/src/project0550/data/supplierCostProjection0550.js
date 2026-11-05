@@ -44,7 +44,7 @@ export function supplierCostProjection0550(data){
  };
  // Source applicability comes from the registered quotation, not a later SI
  // candidate/Working allocation. Keep those extra references separately.
- const sourceEntries=entries.filter(e=>!e.referenceOnly&&original(e.offer)).map(e=>({...e,systemTokens:e.offer.quoteEvidence?.systemTokens||mgwQuoteItem0550(e.offer)?.systemTokens||[]}));
+ const sourceEntries=entries.filter(e=>!e.referenceOnly&&original(e.offer)).map(e=>({...e,systemTokens:e.sourceSystemTokens}));
  const groups=groupVendorOffers0550(sourceEntries,'company',[]),quotes=new Map(),bySystem=new Map();
  for(const g of groups)for(const child of g.children)for(const q of child.quotes){
   if(!quotes.has(q.key)){

@@ -25,6 +25,31 @@ export function preparationAncestors0550(pack){
 // the original predecessor objects/hashes for receipt and edit comparisons.
 function rebasedPreparation(pack,source){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source),...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source)}:{})};}
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
+const PAGA_ONLY_ENGINEERING_OFFER='OFFER-PAGA-A20261632-002-22030';
+// Exact unchanged requirement drafts in the received source lineage (A Rev09/10).
+// Keep the received package and its receipt hash intact. Repair the live records only.
+const PAGA_CROSS_SCOPE_DRAFTS=new Map([
+ ["REQDEF-MR-TEL-VSAT-ENG","iw1:2954459244:2077712362:13080"],
+ ["REQDEF-MR-TEL-AIS-ENG","iw1:3301926646:123765164:13761"],
+ ["REQDEF-MR-TEL-RADIO-DTRS-ENG","iw1:1377988980:2876273358:13829"]
+]);
+function repairPagaEngineeringDraft(requirement){
+ const expected=PAGA_CROSS_SCOPE_DRAFTS.get(requirement.id);
+ if(!expected||requirement.status!=="DRAFT"||integrationFingerprint0550(requirement)!==expected)return requirement;
+ const excerptStart=requirement.supplierExcerpt.lastIndexOf("\n[PDF PAGE 14]");
+ const locatorStart=requirement.supplierLocator.lastIndexOf("\n"+PAGA_ONLY_ENGINEERING_OFFER+" / ");
+ if(excerptStart<0||locatorStart<0)return requirement;
+ return {...requirement,offerIds:requirement.offerIds.filter(id=>id!==PAGA_ONLY_ENGINEERING_OFFER),
+  supplierSourceIds:requirement.supplierSourceIds.slice(0,-1),
+  supplierExcerpt:requirement.supplierExcerpt.slice(0,excerptStart),
+  supplierLocator:requirement.supplierLocator.slice(0,locatorStart)};
+}
+export function repairPagaEngineeringDrafts0550(data){
+ const workspace=data.integrationWorkspace;
+ if(!workspace)return data;
+ const requirements=workspace.requirements.map(repairPagaEngineeringDraft);
+ return requirements.some((r,i)=>r!==workspace.requirements[i])?{...data,integrationWorkspace:{...workspace,requirements}}:data;
+}
 // Retain exact predecessor receipts within a bounded 64 MiB continuation.
 // Paired response is bounded by the unchanged32MiB source +64MiB preparation limits.
 export const SI_FILE_LIMIT_0550=sourceLimits.preparationBytes;
@@ -108,12 +133,13 @@ export function planSiWorkPackage0550(data,pack,systems){
  validateSiWorkPackage0550(pack,systems,data.sourceIntake);
  const selected=linked?{workspace:data,state:"LINKED_CURRENT"}:selectAutomaticSource(data,pack.sourceIntake,systems);
  if(selected.state==="LOCAL_NEWER")fail("local source is newer; reconcile this package before import");
- const w={...emptyIntegration0550(),...data.integrationWorkspace},stats=[];
+ const repaired=repairPagaEngineeringDrafts0550(data);
+ const w={...emptyIntegration0550(),...repaired.integrationWorkspace},stats=[];
  const audit=pack.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550,epc=pack.schema===EPC_WORK_PACKAGE_SCHEMA_0550||audit;
  if(epc){
   const own=(data.sourcePreparationImports||[]).find(r=>r.batchId===pack.batchId);
   if(own&&own.packageKey!==integrationFingerprint0550(pack))fail('EPC preparation batch changed');
-  if(own||(data.audit||[]).some(a=>a.action==='Import SI engineering drafts / '+pack.batchId))return {workspace:data,stats:[],sourceState:selected.state,changed:false};
+  if(own||(data.audit||[]).some(a=>a.action==='Import SI engineering drafts / '+pack.batchId))return {workspace:repaired,stats:[],sourceState:selected.state,changed:repaired!==data};
  }
  const chain=epc?preparationAncestors0550(pack):[pack.predecessor];
  for(const prior of chain.filter(Boolean)){const receipt=(data.sourcePreparationImports||[]).find(r=>r.batchId===prior.batchId);if(receipt&&receipt.packageKey!==integrationFingerprint0550(prior))fail('predecessor preparation changed');}
@@ -131,15 +157,16 @@ export function planSiWorkPackage0550(data,pack,systems){
  const merged={...w};
  for(const collection of collections){
   const old=w[collection],ids=new Map(old.map(r=>[r.id,r]));
+  const correct=collection==="requirements"?repairPagaEngineeringDraft:r=>r;
   const added=[],same=[],preserved=[],updated=[];
   for(const raw of pack.integrationWorkspace[collection]||[]){
    if(collection==="requirements"&&aliases.has(raw.id)){preserved.push(raw.id+' / reused existing '+aliases.get(raw.id));continue;}
-   const r=epc?resolve(raw):raw;
+   const record=correct(raw),r=epc?resolve(record):record;
    if(consumed&&!ids.has(r.id)&&previous.integrationWorkspace[collection]?.some(p=>p.id===r.id)){preserved.push(r.id+' / deliberate deletion from prior preparation');continue;}
    if(epc&&(deletedReqs.has(r.requirementId)||(r.requirementIds||[]).some(id=>deletedReqs.has(id)))){preserved.push(r.id+' / dependency deliberately deleted');continue;}
    if(!ids.has(r.id))added.push(r);
    else if(JSON.stringify(ids.get(r.id))===JSON.stringify(r))same.push(r.id);
-   else if(epc&&consumed&&(collection==="requirements"||audit&&collection==="documentReviews")&&previous.integrationWorkspace[collection].some(p=>p.id===r.id&&integrationFingerprint0550(p)===integrationFingerprint0550(ids.get(r.id))))updated.push(r);
+   else if(epc&&consumed&&(collection==="requirements"||audit&&collection==="documentReviews")&&previous.integrationWorkspace[collection].some(p=>p.id===r.id&&integrationFingerprint0550(correct(p))===integrationFingerprint0550(ids.get(r.id))))updated.push(r);
    else preserved.push(r.id);
   }
   merged[collection]=[...old.map(r=>JSON.parse(JSON.stringify(updated.find(n=>n.id===r.id)||r))),...JSON.parse(JSON.stringify(added))];
@@ -198,7 +225,7 @@ export function planSiWorkPackage0550(data,pack,systems){
   }
   bidVolumes=next;
  }
- const changed=selected.workspace!==data||stats.some(s=>s.added||s.updated);
+ const changed=repaired!==data||selected.workspace!==data||stats.some(s=>s.added||s.updated);
  const workspace=changed?{...selected.workspace,integrationWorkspace:merged,...(sourceControl?{sourceControl}:{}),...(technicalProposal?{technicalProposal}:{}),...(bidVolumes?{bidVolumes}:{})}:data;
  validateIntegration0550(workspace);
  validateSourceControl0550(workspace);
