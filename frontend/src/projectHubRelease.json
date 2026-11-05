@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.13",
+  "version": "2026-11-05.14",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "d2076b5e",
-  "capability": "Existing WP.7 and pricing summary share a versioned MAP01–10 adapter, explicit customer TAG/source/Supplier Item/Working/VDRL bindings in canonical requirements, revision impact and independent numeric versus engineering readiness. Preserve E01–E18,0553 MAP callers,all prices/Qty/FX,frozen history and latest A-input reconciliation/bounded loaders. Working Volume preview counts explicit source-bound bid references non-additively, without accepting their scope. No invented TAG or customer issue."
+  "source0550": "968f181a",
+  "capability": "WP.5 groups linked requirements by system and COMMON, with lazy +/− quantity tables and source/Mapping shortcuts. Existing WP.7 and pricing summary share a versioned MAP01–10 adapter, explicit customer TAG/source/Supplier Item/Working/VDRL bindings in canonical requirements, revision impact and independent numeric versus engineering readiness. Preserve E01–E18,0553 MAP callers,all prices/Qty/FX,frozen history and latest A-input reconciliation/bounded loaders. Working Volume preview counts explicit source-bound bid references non-additively, without accepting their scope. No invented TAG or customer issue."
 }

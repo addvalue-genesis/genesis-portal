@@ -29,8 +29,31 @@ const server=http.createServer((req,res)=>{
   for(const old of fixture.lines){const row=saved.lines.find(l=>l.id===old.id),completion=saved.repositoryBasisImport.bidCompletion?.rows.find(r=>r.lineId===old.id);if(completion){if(old.wbs==='A')assert.deepEqual(row,old,'Native equipment input preserved / '+old.id);for(const key of ['quantity','manualCost','sellRate',...((Number.isFinite(old.manualCost)||Number.isFinite(old.sellRate))?['markupPct','marginPct','primePct']:[])])if(Number.isFinite(old[key]))assert.equal(row[key],old[key],'Previously authored numeric input / '+old.id+' / '+key);if(Number.isFinite(old.sellRate))assert.equal(row.sellMode,old.sellMode,'Protected selling method');}else assert.deepEqual(row,saved.repositoryBasisImport.bidProcess.controlLineIds.includes(old.id)?{...old,selected:false}:old,'Prior Working input preserved / '+old.id);} 
   assert((await plan.innerText()).includes('P+4'));assert((await prices.innerText()).includes(saved.repositoryBasisImport.bidCompletion?'คำนวณราคาครบแถวที่เลือก':'ยอดที่มีฐานแล้ว'));if(saved.repositoryBasisImport.bidCompletion){const basis=page.locator('[aria-label="Bid estimate basis"]');assert(await basis.isVisible());await basis.locator('details > summary').click();const rows=page.locator('table[aria-label="Bid completion basis"]');assert((await rows.innerText()).includes('ESTIMATE'));assert((await rows.innerText()).includes('QUOTED'));assert((await rows.innerText()).includes('ไม่บวกเพิ่ม')||((await rows.innerText()).includes('ไม่มีราคาเพิ่ม')));assert(!(await rows.innerText()).includes('OPEN'));await basis.locator('details > summary').click();}
  }
- console.log('CHECK plan and inputs');await nav('bid.working-preview.step.5');const stage=page.locator('[data-component-key="bid.working-preview.step.5"]'),select=page.locator('select[aria-label="Working Preview system"]');await select.selectOption('COMMON');
- const table=stage.locator('table[aria-label="Physical requirement Working allocation"]');await table.waitFor();assert(!(await table.innerText()).includes('Proof OPEN'));
+ console.log('CHECK plan and inputs');
+ await nav('bid.working-preview.step.5');
+ const stage=page.locator('[data-component-key="bid.working-preview.step.5"]');
+ const select=page.locator('select[aria-label="Working Preview system"]');
+ const groups=stage.locator('[data-wp-quantity-system]');
+ await groups.first().waitFor();
+ assert(await groups.count()>1,'All-system view shows separate groups');
+ const table=stage.getByRole('table',{name:'Physical requirement Working allocation',exact:true});
+ assert.equal(await stage.locator('table[aria-label="Physical requirement Working allocation"]').count(),0,'Collapsed groups do not mount quantity rows');
+ const common=stage.locator('[data-wp-quantity-system="COMMON"]');
+ const summary=common.locator(':scope > summary');
+ assert(await summary.getByText('+',{exact:true}).isVisible());
+ await summary.click();
+ await table.waitFor();
+ assert(await summary.getByText('−',{exact:true}).isVisible());
+ assert.equal(await stage.locator('[data-wp-quantity-system][open]').count(),1);
+ const expectedCount=Number((await summary.innerText()).match(/(\d+) ข้อกำหนด/)[1]);
+ assert.equal(await table.locator('tbody tr').count(),expectedCount);
+ await summary.press('Space');
+ await table.waitFor({state:'detached'});
+ assert(await summary.getByText('+',{exact:true}).isVisible());
+ await select.selectOption('COMMON');
+ await table.waitFor();
+ assert.equal(await groups.count(),1,'A selected system opens its only group');
+ assert(!(await table.innerText()).includes('Proof OPEN'));
  // A null stored quantity is expected when the canonical equation supplies it.
  const candidates=saved.lines.filter(l=>l.calculationId&&l.quantity===null&&l.systemToken==='COMMON');let calculatedShown=false;
  for(const line of candidates){const rows=table.locator('[data-bid-working-line="'+line.id+'"]');if(!await rows.count())continue;const text=await rows.first().innerText();if(!text.includes('ปริมาณจากสมการ'))continue;assert(!text.includes('ยังไม่มีฐานปริมาณ'),line.id+' uses computed quantity');calculatedShown=true;break;}
@@ -46,5 +69,5 @@ const server=http.createServer((req,res)=>{
  await page.setViewportSize({width:390,height:844});await nav('bid.budget.official.summary');const mobile=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,boxes:[...document.querySelectorAll('html,body,#root,.p55,.p55-bid-presentation,.p55-bid-content,.p55-bid-module,.p55-table-wrap')].filter(e=>e.getBoundingClientRect().width>0).slice(0,35).map(e=>({tag:e.tagName,cls:e.className,client:e.clientWidth,scroll:e.scrollWidth,x:e.getBoundingClientRect().x,right:e.getBoundingClientRect().right,overflow:getComputedStyle(e).overflowX})),offenders:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+2&&e.getBoundingClientRect().width>0&&getComputedStyle(e).position!=='fixed'&&!(()=>{for(let p=e.parentElement;p&&p!==document.body;p=p.parentElement)if(['auto','scroll','hidden','clip'].includes(getComputedStyle(p).overflowX))return true;return false;})()).sort((a,b)=>b.getBoundingClientRect().right-a.getBoundingClientRect().right).slice(0,12).map(e=>({tag:e.tagName,cls:e.className,right:e.getBoundingClientRect().right,txt:e.textContent.slice(0,80)}))}));if(mobile.scroll>mobile.width+1){console.log('MOBILE_OVERFLOW',JSON.stringify(mobile));await page.screenshot({path:'/tmp/pj0550-overflow.png'});}assert(mobile.scroll<=mobile.width+1,'Mobile page containment');
  assert.deepEqual(await read(),saved,'Read-only pricing, quantities, plans and owner navigation never save');
  console.log('CHECK mobile/read-only');await page.reload();await ready();await nav('bid.budget.official.summary');assert.deepEqual(await read(),saved,'Repeat startup preserves exact workspace and creates no duplicate costs');assert.deepEqual(errors,[]);
- console.log('PASS bid process browser: A/B/C money and19-system plan, computed WP.5 quantities, existing owner/package price references, neutral release references, original inputs/history, idempotent reload,390px containment and zero page errors'+(fixture?' / actual private workspace.':' / repository seed.'));
+ console.log('PASS bid process browser: A/B/C money and19-system plan, collapsed and filtered WP.5 groups, computed quantities, existing owner/package price references, neutral release references, original inputs/history, idempotent reload,390px containment and zero page errors'+(fixture?' / actual private workspace.':' / repository seed.'));
  }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});
