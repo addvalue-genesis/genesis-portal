@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.6",
+  "version": "2026-11-05.7",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "2c62170e",
-  "capability": "Common bid Punch in existing WP.8 separates numeric pricing, Major/Minor/review work, proposed due phase and original engineering/package/issue checks. Consolidated source/system tasks retain links and source-bound optional plans. Preserve concurrent selected-versus-registered quote and deferred MGW/requirement trace, all existing IDs, financial/source/Qty/FX/review/frozen history. Owner wording: รอทบทวน."
+  "source0550": "4a1c5b2b",
+  "capability": "Working system groups always link existing Vendor07.2 and Supplier Mapping WP.7, including unquoted KU/C Internet. MR trace reads authored requirement links, directly selected Offers and shared owner Offers without filtering away cross-system candidates or legacy references. Show manual Working bases separately from original supplier costs; missing/dangling Offers remain explicit. Preserve all existing module IDs, source scopes, pricing/Qty/FX/reviews/history and Common bid Punch controls."
 }

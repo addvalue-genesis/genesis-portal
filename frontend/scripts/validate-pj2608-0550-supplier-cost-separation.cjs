@@ -12,6 +12,17 @@ const edited=structuredClone(d);edited.offers[0].unitCost=9999;assert.equal(P.su
 const missing=structuredClone(d);missing.offers[0].quoteEvidence.quotedTotal=null;assert.equal(P.supplierCostProjection0550(missing).bySystem.get('TEL-PABX')[0].totals.base.totalTHB,null,'Unknown net is not filled with gross rows');
 const fx=structuredClone(d);fx.fx.thbPerEUR=null;const nofx=P.supplierCostProjection0550(fx).bySystem.get('TEL-PABX')[0];assert.equal(nofx.totals.base.totalTHB,null);assert.equal(nofx.totals.base.native[0].value,1000);
 assert(render(d,'TEL-PABX',index).includes('ห้ามบวกรวมซ้ำระหว่างระบบ'));assert.equal((render(d,'TEL-PABX',index).match(/data-working-source-item=/g)||[]).length,0,'Native details mount only on disclosure');assert(render(d,'TEL-AIS',index).includes('ไม่ใช่ต้นทุน Supplier เป็นศูนย์'));assert.equal(JSON.stringify(d),before);
+// Regression: canonical Mapping links may use authored Requirement IDs, shared
+// owners, or quotes whose declared source scope is another system.
+const {mrSupplierLinks0550}=require(src+'/project0550/data/mrSupplierLinks0550.js');
+const linked=structuredClone(d),native={id:'MR-KU',mrRequirementId:'NATIVE-KU',systemToken:'TEL-VSAT-KU',wbs:'A',coveredByLineId:'OWNER'};
+linked.lines.push(native);linked.integrationWorkspace={requirements:[{id:'AUTHORED-KU',systemToken:'TEL-VSAT-KU',workLineIds:['MR-KU'],offerIds:['B','DELETED'],state:'OPEN'},{id:'OTHER-SYSTEM',systemToken:'TEL-AIS',workLineIds:['UNRELATED'],offerIds:['OPT']},{id:'SHARED-OWNER-OTHER',systemToken:'TEL-AIS',workLineIds:['OWNER'],offerIds:['OPT']}]};
+const saved=JSON.stringify(linked),mapping=mrSupplierLinks0550(linked,native);
+assert.deepEqual(mapping.links.map(e=>e.id),['NET','B','DELETED']);assert.equal(mapping.requirements.length,1);assert.equal(mapping.links[2].offer,undefined,'Dangling saved evidence remains visible');assert.equal(mapping.owner.id,'OWNER');
+assert.equal(mrSupplierLinks0550({...linked,lines:linked.lines.filter(l=>l.id!=='OWNER')},native).owner,undefined,'Deleted owner does not create coverage');
+const direct=mrSupplierLinks0550(linked,{...native,coveredByLineId:'',offerId:'A'});assert(direct.links.some(e=>e.id==='A'),'Direct saved Offer need not have a Requirement candidate');
+const scoped=P.supplierCostProjection0550(linked);assert(scoped.candidateBySystem.get('TEL-VSAT-KU').length);assert(!scoped.bySystem.has('TEL-VSAT-KU'),'SI link must not rewrite supplier declared scope');assert.equal(JSON.stringify(linked),saved);
+for(const token of ['TEL-VSAT-KU','TEL-AIS']){const view=render(linked,token,scoped);assert(view.includes('07.2 · เปิดโมดูลราคาผู้ขาย'));assert(view.includes('WP.7 · ตรวจ Mapping Supplier'));}
 const ref=structuredClone(d),option=ref.offers.find(o=>o.id==='OPT');option.quoteEvidence.quotedQuantity=2;option.quoteEvidence.quotedTotal=100;option.supplierQuoteRow.quantity=2;
 const alias=structuredClone(option);delete alias.supplierQuoteRow;alias.id='WORKING-RATE-REFERENCE';alias.quoteEvidence.locator+=' / Working rate reference';ref.offers.push(alias);
 const R=require(src+'/project0550/data/vendorRegister0550.js'),originalView=R.groupVendorOffers0550(R.vendorOfferEntries0550(ref),'company',[])[0].children[0].quotes[0];assert.equal(R.vendorQuoteTotals0550(originalView,ref.fx).option.totalTHB,3800,'Vendor source totals exclude Working rate references, including options');

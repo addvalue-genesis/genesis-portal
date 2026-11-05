@@ -1,6 +1,8 @@
 import React,{useMemo,useState} from 'react';
 import {amount} from './BidControls';
 import {supplierCostProjection0550} from './data/supplierCostProjection0550';
+import {mrSupplierLinks0550} from './data/mrSupplierLinks0550';
+import {activeSupply0550} from './data/workingOffers0550';
 
 function SourceAmount({quote}){
  const {totals:t,printed}=quote;
@@ -28,22 +30,25 @@ function SourceQuote({quote:q,onNavigate}){
   </>}
  </details>;
 }
-function MrMapping({data,systemToken,quotes,onNavigate}){
- const native=data.lines.filter(l=>l.systemToken===systemToken&&l.wbs==='A'&&l.mrRequirementId),[open,setOpen]=useState(systemToken==='TEL-TELT'),requirements=data.integrationWorkspace?.requirements||[];
+function MrMapping({data,systemToken,onNavigate}){
+ const native=data.lines.filter(l=>l.systemToken===systemToken&&l.wbs==='A'&&l.mrRequirementId),[open,setOpen]=useState(systemToken==='TEL-TELT');
  return <details className="p55-panel" open={open} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>MR → ใบเสนอราคา → Working · {native.length} รายการ · Mapping แยกจากต้นทุน</summary>{open&&<div className="p55-table-wrap"><table className="p55-table" aria-label={'MR supplier mapping '+systemToken}><thead><tr><th>MR / สถานที่ / จำนวน</th><th>ใบเสนอราคาที่เชื่อม</th><th>เจ้าของราคา / ขอบเขต</th></tr></thead><tbody>{native.map(line=>{
-  const req=requirements.find(r=>r.id==='REQDEF-'+line.mrRequirementId),ids=new Set(req?.offerIds||[]),matched=quotes.filter(q=>q.allEntries.some(e=>ids.has(e.offer.id))),owner=data.lines.find(l=>l.id===line.coveredByLineId);
-  return <tr key={line.id}><td>{line.description}<small>{line.quantity??'OPEN'} {line.unit} · {line.requirementRef}</small></td><td>{matched.length?matched.map(q=><small key={q.key}>{q.title}</small>):'OPEN · ยังไม่พบลิงก์ใบเสนอราคา'}<small>สถานะ SI: {req?.status||'OPEN'}</small></td><td>{line.responsibility==='COMPANY'?'COMPANY จัดหา · ไม่คิดราคา TSI':<button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+(owner?.id||line.id))}>{owner?.description||'เปิด Working เดิม'}</button>}{owner&&<small>INCLUDED · ไม่คิดราคา MR ซ้ำ</small>}</td></tr>;
+  const {owner,requirements,links}=mrSupplierLinks0550(data,line);
+  return <tr key={line.id}><td>{line.description}<small>{line.quantity??'OPEN'} {line.unit} · {line.requirementRef}</small></td><td>{links.length?links.map(e=><div key={e.id}>{e.offer?<button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+e.id)}>{e.offer.quoteRef||e.id} · {e.offer.description}</button>:<small>OPEN · Offer ที่อ้างอิงไม่อยู่ในทะเบียน: {e.id}</small>}<small>{e.labels.join(' / ')} · ไม่ใช่การอนุมัติ comply</small></div>):<small>{line.responsibility==='COMPANY'?'COMPANY จัดหา · ไม่มี Offer TSI ที่เชื่อม':'OPEN · ยังไม่มี Offer เชื่อมกับรายการนี้'}</small>}{requirements.map(r=><small key={r.id}><button type="button" onClick={()=>onNavigate?.('bid.working-preview.requirement.'+r.id)}>{r.title||r.id}</button>สถานะ SI: {r.state||r.status||'OPEN'}</small>)}{!requirements.length&&<small>ยังไม่มี Requirement เชื่อม · ตรวจ WP.7</small>}</td><td>{line.responsibility==='COMPANY'?'COMPANY จัดหา · ไม่คิดราคา TSI':<button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+(owner?.id||line.id))}>{owner?.description||'เปิด Working เดิม'}</button>}{owner&&<small>อ้างอิงเจ้าของราคา · {owner.selected?'เลือกใน Working':'ยังไม่เลือกใน Working'} · ตรวจฐานครอบคลุมก่อนยืนยัน INCLUDED</small>}</td></tr>;
  })}</tbody></table></div>}</details>;
 }
 // Shared across every existing Part-A system/COMMON; no financial/schema writes.
 export function WorkingSupplierTrace0550({data,systemToken,onNavigate,projection}){
  const fallback=useMemo(()=>projection?null:supplierCostProjection0550(data),[data,projection]),index=projection||fallback,quotes=index.bySystem.get(systemToken)||[],candidates=index.candidateBySystem.get(systemToken)||[],references=index.referencesBySystem.get(systemToken)||[];
+ const estimates=data.lines.filter(l=>l.systemToken===systemToken&&l.wbs==='A'&&activeSupply0550(l)&&!l.offerId&&!l.mgwDetailGroupId&&Number.isFinite(l.manualCost));
  return <div className="p55-supplier-trace" aria-label={'Supplier to Working trace '+systemToken}>
+  <div className="p55-review-toolbar"><strong>ราคาผู้ขาย / Vendor · {systemToken}</strong><button type="button" onClick={()=>onNavigate?.('bid.vendor.offers')}>07.2 · เปิดโมดูลราคาผู้ขาย</button><button type="button" onClick={()=>onNavigate?.('bid.working-preview.step.7')}>WP.7 · ตรวจ Mapping Supplier</button></div>
   <p><strong>ต้นทุน Supplier ตามใบเสนอราคาต้นฉบับ · {quotes.length} ใบ</strong><br/>แสดงยอดทั้งใบก่อนการจัดสรร A/B/C · หลายใบ/Revision/ทางเลือกไม่ใช่ยอดจัดซื้อรวม · การแปลง THB ใช้ FX โครงการโดยคงสกุลเงินต้นฉบับ</p>
   {!quotes.length&&<p>ยังไม่มีรายการต้นฉบับในทะเบียน Vendor สำหรับระบบนี้ · Working อาจเป็นราคาอ้างอิง/ประมาณการ หรือ COMPANY จัดหา · ไม่ใช่ต้นทุน Supplier เป็นศูนย์</p>}
+  {estimates.length>0&&<details className="p55-panel"><summary>ฐานราคา Working ที่ไม่มี Offer · {estimates.length} รายการ · ไม่ใช่ราคาผู้ขายต้นฉบับ</summary><p>ฐานราคาของระบบแยกจาก Mapping รายข้อ · ต้องตรวจการครอบคลุม MR ก่อนยืนยันรวมแล้ว</p>{estimates.map(l=><div key={l.id}><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+l.id)}>{l.description}</button><small>ต้นทุนต่อหน่วย {amount(l.manualCost,l.currency)} × {l.quantity??'OPEN'} {l.unit}</small><p>{l.sourceRef}</p></div>)}</details>}
   {quotes.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}
   {candidates.length>0&&<details className="p55-panel"><summary>ใบอ้างอิงจาก Mapping / Working · {candidates.length} ใบ · ยังไม่ใช่ใบเสนอราคาครบระบบนี้</summary><p>เป็นลิงก์ประกอบจาก SI หรือการจัดสรร ไม่ได้เปลี่ยนขอบเขตต้นฉบับของ Supplier และไม่ยืนยันว่ารวมอุปกรณ์ครบระบบ</p>{candidates.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}</details>}
-  <MrMapping data={data} systemToken={systemToken} quotes={quotes} onNavigate={onNavigate}/>
+  <MrMapping data={data} systemToken={systemToken} onNavigate={onNavigate}/>
   {references.length>0&&<details className="p55-panel"><summary>ฐานราคาอ้างอิงเดิม · {references.length} รายการ · ไม่ใช่ยอดต้นฉบับที่ยืนยันแล้ว</summary><ul>{references.map(e=><li key={e.offer.id}>{e.offer.quoteRef} · {e.offer.description} <button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+e.offer.id)}>เปิดฐานเดิม</button></li>)}</ul></details>}
  </div>;
 }
