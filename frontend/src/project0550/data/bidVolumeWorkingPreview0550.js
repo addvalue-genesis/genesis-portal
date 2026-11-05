@@ -120,7 +120,9 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const lines=model.official.lines.map(line=>{
   const working=model.lines.find(l=>l.id===line.id),reviewed=Number.isFinite(line.customerUSD),current=Number.isFinite(working?.customerUSD),provisional=Number.isFinite(working?.provisionalCustomerUSD);
   const basis=reviewed?'REVIEWED_WORKING':current?'WORKING_PENDING_REVIEW':provisional?(working?.sellBasisState==='WORKING_SELL_KNOWN_COST_UNESTABLISHED'?'WORKING_SELL_COST_PENDING':'PROVISIONAL_VENDOR'):'PRICE_OPEN';priceBasis.set(line.id,basis);
-  return {...line,...(references.has(line.id)?{selected:false,bidPriceAllocation:references.get(line.id)}:{}),customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null};
+  return {...line,...(references.has(line.id)?{selected:false,bidPriceAllocation:references.get(line.id)}:{}),
+   customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null,
+   customerTHB:reviewed?line.customerTHB:current?working.customerTHB:working?.provisionalCustomerTHB??null};
  });
  const existingBindings=(data.bidVolumes?.bindings||[]).map(b=>{const raw=data.lines.find(l=>l.id===b.lineId),hours=b.schedule==='C7'&&b.hoursPerDay===null?scheduleHoursFromCalculation0550(data,raw):null;return hours?{...b,hoursPerDay:hours.hoursPerDay}:b;});
  const previewData={...data,bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:[...existingBindings,...proposed.map(p=>p.proposal)]}};

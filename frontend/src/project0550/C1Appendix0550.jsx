@@ -7,8 +7,8 @@ import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0
 // package-price block first so an expanded Appendix still reveals its price.
 const screenSites=(sites,documentMode)=>documentMode?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
-export function C1Appendix0550({view,onNavigate,disabled=false}){
- const projection=useMemo(()=>deriveC1Appendix0550(view),[view]);
+export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
+ const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
  const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
@@ -41,15 +41,15 @@ export function C1Appendix0550({view,onNavigate,disabled=false}){
    <p>{projection.rows.filter(r=>r.kind==='MR').length} แถว MR · {projection.bindings.length} เจ้าของราคา C1 · ไม่แบ่งราคา package ตามสัดส่วนโดยไม่มีฐาน</p>
    {projection.pendingOwners?.length>0&&<details aria-label="C1 pending Working owners"><summary>Working รอ Mapping / ราคา · {projection.pendingOwners.length} รายการ</summary><p>รายการเหล่านี้ยังไม่ยืนยันเจ้าของราคาให้แถว MR และยังไม่มีราคา จึงไม่สร้างแถว supply package เพิ่มในเอกสารลูกค้า</p>{projection.pendingOwners.map(b=><div key={b.lineId}><strong>{b.line.description}</strong><span> · {b.quantity??'—'} {b.unit}</span><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+b.lineId}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+b.lineId)}>SI-COST · ตรวจ Working</button></div>)}</details>}
    {projection.mrNameDuplicates?.length>0&&<details aria-label="C1 MR repeated names"><summary>ตรวจชื่อรายการซ้ำตาม MR · {projection.mrNameDuplicates.length} กลุ่ม</summary><p>ตำแหน่ง MR ต่างกันยังเป็นคนละรายการ ต้องเทียบสถานที่ติดตั้ง ส่วนประกอบ และเจ้าของราคา ไม่รวมจำนวนหรือคิดราคาเพิ่มจากชื่อที่ตรงกัน</p>{projection.mrNameDuplicates.map(rs=><div key={rs[0].key}><strong>APPENDIX {rs[0].appendix} · {rs[0].site} · {rs[0].description}</strong>{rs.map(r=><p key={r.key}>{r.sn} · {r.mr.reference}{r.notes.filter(n=>/\binstall(?:ed|ation)?\b/i.test(n)).map((note,i)=><span key={i}> · {note}</span>)}<button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+(r.mr.canonicalIds?.[0]||r.key))}>SI-REQ · ตรวจรายการ {r.sn}</button></p>)}</div>)}</details>}
-   <details aria-label="C1 Appendix summary diagnostics"><summary>ผลรวมแต่ละ Appendix · ยอดที่มีราคา / รายการที่ยังขาด</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Appendix</th><th>ยอดที่มีราคา USD</th><th>เจ้าของราคา ครบ / ขาด</th><th>MR ขอบเขต / จำนวนยังขาด</th><th>ความครบถ้วนของยอด</th></tr></thead><tbody>{overview.map(g=><tr key={g.id}><td>{g.id}</td><td>{c1Display0550(g.knownUSD)}</td><td>{g.priced} / {g.open}</td><td>{g.openMR}</td><td>{g.complete?'ครบราคาภายในหมวด':'ยังไม่ใช่ยอดครบหมวด'}</td></tr>)}</tbody></table></div></details>
+   <details aria-label="C1 Appendix summary diagnostics"><summary>ผลรวมแต่ละ Appendix · ยอดที่มีราคา / รายการที่ยังขาด</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Appendix</th><th>ยอดที่มีราคา {currency}</th><th>เจ้าของราคา ครบ / ขาด</th><th>MR ขอบเขต / จำนวนยังขาด</th><th>ความครบถ้วนของยอด</th></tr></thead><tbody>{overview.map(g=><tr key={g.id}><td>{g.id}</td><td>{c1Display0550(g.knownAmount)}</td><td>{g.priced} / {g.open}</td><td>{g.openMR}</td><td>{g.complete?'ครบราคาภายในหมวด':'ยังไม่ใช่ยอดครบหมวด'}</td></tr>)}</tbody></table></div></details>
    {projection.problems.length>0&&<ul>{projection.problems.map(p=><li key={p}>{p}</li>)}</ul>}
   </details>
   <div className="p55-c1-scroll">
   <article className={'p55-c1-document'+(documentMode?' p55-c1-expanded':'')} data-native-schedule="C1">
-   <div className="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span><span>Currency: USD</span><span>DRAFT — NOT FOR SUBMISSION</span></div>
+   <div className="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span><span>Currency: {currency}</span><span>DRAFT — NOT FOR SUBMISSION</span></div>
    <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2>
    <table aria-label="Schedule C1 preview"><colgroup><col style={{width:'9%'}}/><col style={{width:'39%'}}/><col style={{width:'7%'}}/><col style={{width:'7%'}}/><col style={{width:'11%'}}/><col style={{width:'11%'}}/><col style={{width:'16%'}}/></colgroup>
-    <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB (USD or RMB)</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
+    <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB ({currency==='THB'?'THB':'USD or RMB'})</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
     {projection.groups.map(g=>{const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;return <tbody key={g.id}>
      <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?g.title.toUpperCase():'APPENDIX '+g.id+' · '+g.title.toUpperCase())}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>

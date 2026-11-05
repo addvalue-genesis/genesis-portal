@@ -9,6 +9,7 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  const ready=()=>page.locator('.p55-bid-save').filter({hasText:/Revision \d/}).waitFor();
  await page.goto('http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550');await ready();
  const seed=await read(),lan=seed.lines.find(l=>l.id==='REQ-MR-B1-13-APF-09');assert(lan);
+ Object.assign(seed.fx,{thbPerUSD:32.5,source:'SYNTHETIC UI TEST FX',date:'2026-11-05'});
  Object.assign(lan,{quantity:1,unit:'Lot',currency:'USD',manualCost:987654.32,sellMode:'DIRECT',sellRate:1000,primePct:0,selected:true,responsibility:'TSI',offerId:'',calculationId:'',coveredByLineId:'',coverageBasis:'SYNTHETIC independent cabinet; distinct from existing package candidates in this isolated test',scopeBasis:'SYNTHETIC LAN CABINET / UI TEST ONLY',sourceRef:'PRIVATE COST 987654.32 / must not enter customer paper'});
  seed.lines.push(...Array.from({length:3},(_,i)=>({...lan,id:'SYNTHETIC-CABLE-'+i,mrRequirementId:'',systemToken:'TEL-FO',description:'Synthetic cable detail '+i,scopeKey:'SYNTHETIC.CABLE.'+i,manualCost:null,sellRate:null})));
  await write(seed);await page.reload();await ready();const before=await read();
@@ -23,6 +24,25 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  const pagaKnown=pagaSnapshot.map(r=>Number(r.amount.replace(/,/g,''))).filter(Number.isFinite).reduce((a,b)=>a+b,0),pagaTotal=form.locator('[data-c1-summary-amount="1.4"]');assert(pagaKnown>0);assert.equal(await pagaTotal.innerText(),pagaKnown.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));assert((await pagaTotal.locator('xpath=..').innerText()).includes('Priced items subtotal'));assert((await paga.locator('.c1-subtotal').innerText()).includes('—'),'Known package prices do not accept unallocated MR coverage');
  const entertainment=await form.locator('[data-c1-mr-id^="MR-B1-16-"]').evaluateAll(rs=>rs.map(r=>({number:r.cells[0].textContent,name:r.cells[1].textContent,note:r.cells[6].textContent})));assert.equal(entertainment.length,11);assert.deepEqual(entertainment.map(r=>r.number),Array.from({length:11},(_,i)=>'1.6.'+(i+1)));assert(entertainment[7].name.includes('Audio Conferencing Phone'));assert(entertainment[8].name.includes('Video Conferencing'));assert(entertainment[0].note.includes('Accommodation Building'));assert(entertainment[1].note.includes('Catering Building'));assert((await form.innerText()).includes('SCOPE OF SUPPLY FOR ENTERTAINMENT SYSTEM'));
  const lanRow=form.locator('[data-c1-mr-id="MR-B1-13-APF-09"]');assert((await lanRow.innerText()).includes('1,000.00'),await lanRow.innerText());assert.equal(await lanRow.getByRole('button').getAttribute('aria-expanded'),'false');await lanRow.getByRole('button').click();assert((await lanRow.locator('xpath=following-sibling::tr[2]').innerText()).includes('Fire Wall'));
+ const currency=page.getByRole('combobox',{name:'Currency',exact:true});
+ await currency.selectOption('THB');
+ assert((await workspace.locator('.p55-c1-document-meta').innerText()).includes('Currency: THB'));
+ assert.equal(await form.getByRole('columnheader',{name:'CIF or FOB (THB)',exact:true}).count(),1);
+ for(const i of [4,5])assert.equal(await lanRow.locator('td').nth(i).innerText(),'32,500.00');
+ assert((await form.locator('tfoot').innerText()).includes('—'));
+ const pagaTHB=await pagaOwners.evaluateAll(rs=>rs.map(r=>Number(r.cells[5].textContent.replace(/,/g,''))).filter(Number.isFinite).reduce((a,b)=>a+b,0));
+ assert(pagaTHB>pagaKnown);
+ assert.equal(await pagaTotal.innerText(),pagaTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+ const sections=page.getByRole('navigation',{name:'Volume I sections',exact:true});
+ for(const id of ['A1','B','C','C7']){
+  await sections.getByRole('button',{name:'11.'+id,exact:true}).click();
+  const schedule=page.getByRole('region',{name:'Native Exhibit C Schedule '+id,exact:true});
+  assert((await schedule.locator('.p55-native-help').innerText()).includes('Currency: THB'));
+ }
+ await sections.getByRole('button',{name:'11.C1',exact:true}).click();
+ assert.equal(await lanRow.locator('td').nth(5).innerText(),'32,500.00');
+ await currency.selectOption('USD');
+ assert.equal(await lanRow.locator('td').nth(5).innerText(),'1,000.00');
  const appToggle=form.locator('.c1-app').first().getByRole('button');await appToggle.click();assert.equal(await appToggle.getAttribute('aria-expanded'),'false');await appToggle.click();
  const systemToggle=form.locator('.c1-system').first().getByRole('button');await systemToggle.click();assert.equal(await systemToggle.getAttribute('aria-expanded'),'false');await systemToggle.click();
  const siteToggle=form.locator('.c1-site').first().getByRole('button');await siteToggle.click();assert.equal(await siteToggle.getAttribute('aria-expanded'),'false');await siteToggle.click();
@@ -40,7 +60,10 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  await jump('si-wp-07');await page.getByRole('table',{name:'Customer integrator supplier mapping'}).waitFor();
  await page.getByRole('button',{name:'VND · Vendor Offers / Evidence',exact:true}).click();await page.locator('[data-component-key="bid.vendor.offers"]').waitFor();
  await jump('cus');await page.locator('[data-component-key="l3.original"]').waitFor();await jump('bid.quotation.C1');await form.waitFor();
+ await currency.selectOption('THB');
  const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:'Export Schedule C1 Word (.docx)',exact:true}).click();const download=await downloadEvent,bytes=fs.readFileSync(await download.path()).toString();assert(bytes.includes('APPENDIX 1.8'));assert(bytes.includes('1,000.00'));assert(!bytes.includes('987654.32'));assert(!bytes.includes('PRIVATE COST'));assert(bytes.includes('DRAFT'));assert(bytes.includes('1.6.8'));assert(bytes.includes('Audio Conferencing Phone'));assert(bytes.includes('Scope of Supply for Entertainment System'));assert(bytes.includes('Instrument &amp; Telecom Room'));assert(bytes.includes('ABV01, ACP and MOGE'));
+ assert(bytes.includes('Currency: USD'));assert(!bytes.includes('Currency: THB'));
+ await currency.selectOption('USD');
  if(process.env.PJ0550_C1_SCREENSHOT){if(process.env.PJ0550_QA_THAI_FONT){const font=fs.readFileSync(process.env.PJ0550_QA_THAI_FONT).toString('base64');await page.addStyleTag({content:'@font-face{font-family:Tahoma;src:url(data:font/woff2;base64,'+font+') format("woff2");font-weight:100 900;}'});await page.evaluate(()=>document.fonts.ready);}await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.screenshot({path:process.env.PJ0550_C1_SCREENSHOT});}
  if(process.env.PJ0550_C1_ENT_SCREENSHOT){await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.getByRole('navigation',{name:'C1 Appendices'}).getByRole('button',{name:'1.6',exact:true}).click();await workspace.screenshot({path:process.env.PJ0550_C1_ENT_SCREENSHOT});}
  if(process.env.PJ0550_C1_PAGA_SCREENSHOT){await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.getByRole('navigation',{name:'C1 Appendices'}).getByRole('button',{name:'1.4',exact:true}).click();await form.locator('tr[id="p55-c1-app-1.4"]').scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_C1_PAGA_SCREENSHOT});}

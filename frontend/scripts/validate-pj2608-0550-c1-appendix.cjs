@@ -32,6 +32,23 @@ const unsafe=make(data,[binding({...lan,customerRemark:'<script>unsafe()</script
 assert.equal((html.match(/APPENDIX 1\.[1-8] ·/g)||[]).length,8);assert(!C.c1AppendixHtml0550(unsafe).includes('<script>'));
 assert(html.includes('>1.6.8<'));const word=C.c1AppendixWord0550(view);assert(word.includes('1.6.8'));assert(word.includes('Audio Conferencing Phone'));assert(word.includes('1,234.56'));assert(!word.includes('987654.32'));assert(word.includes('w:tblHeader'));assert(!word.includes('REQ-MR'));
 const table=C.c1AppendixTable0550(view);assert(table.rows.some(r=>r[1]==='Currency: USD'));const lanTable=table.rows.find(r=>r[1]==='LAN Cabinet'&&r[5]===1234.56);assert(lanTable);assert.equal(lanTable[3],1);assert(table.rows.some(r=>/^\d+\.\d+\.\d+\.\d+$/.test(String(r[0]))));assert(table.rows.filter(r=>/^\d+\.\d+\.\d+\.\d+$/.test(String(r[0]))).every(r=>r[4]===null&&r[5]===null));
+const {scheduleViewTHB0550}=require(root+'/project0550/data/scheduleRollup0550');
+const dual={...make(data,[binding({...lan,customerTHB:40123.45})]),baseAssigned:1234.56};
+const thb=C.deriveC1Appendix0550(dual,'THB');
+assert.equal(thb.rows.find(r=>r.key===row.key).unitPrice,40123.45);
+assert.equal(thb.amount,40123.45);
+assert.equal(C.c1AppendixOverview0550(thb).find(g=>g.id==='1.3').knownAmount,40123.45);
+assert.equal(C.deriveC1Appendix0550(view,'THB').amount,null,'No USD fallback when THB is unavailable');
+assert.equal(C.deriveC1Appendix0550(dual).amount,1234.56);
+const screen=scheduleViewTHB0550(dual);
+assert.equal(screen.baseAssigned,40123.45);
+assert(N.nativeSchedule0550(screen,'A1','THB').html.includes('THB 40,123.45'));
+assert(N.nativeSchedule0550(screen,'A','THB').html.includes('Thai Baht forty thousand'));
+for(const id of ['A','A1','A2','C5','C6','C7','C8']){
+ const native=N.nativeSchedule0550(screen,id,'THB').html.replace(/<[^>]*>/g,' ');
+ assert(!/RMB|United States Dollar|US\/h|\$\//.test(native),id+' displays only THB currency labels');
+}
+assert(N.nativeExhibitHtml0550(dual,'A1').includes('USD 1,234.56'));
 assert(word.includes('<w:gridSpan w:val="2"/>'));assert(word.includes('<w:vMerge w:val="restart"/>'));
 // Guard exact historical v1 rendering against the pre-change a0d4f948 baseline.
 const legacy={proposal:{documentNo:'SYNTHETIC-V1',revision:'TEST'},outputLabel:'AUTHORIZED COPY / SYNTHETIC / 2026-11-03',bindings:[],scheduleRows:()=>[],getRecord:()=>({nativeFields:{},content:''}),baseAssigned:null,optionsAssigned:null};

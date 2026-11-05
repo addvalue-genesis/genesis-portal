@@ -6,7 +6,7 @@ import {MR_READER_SECTIONS_0550} from './mrReaderProfile0550';
 import {sumMoney0550,displayPriceCheck0550} from './money0550';
 import {satelliteScope0550} from './satelliteScope0550';
 import {mrLineScope0550} from './mrWorkingBasis0550';
-import {scheduleRollup0550} from './scheduleRollup0550';
+import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
@@ -76,12 +76,17 @@ export function c1NativeDetails0550(r){
  return {intro:intro.join(' '),components:components.map(c1Component0550),notes};
 }
 
-export function deriveC1Appendix0550(view){
+export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
- const bindings=view.scheduleRows('C1').filter(b=>b.line&&!b.nonAdditive);
+ const usdBindings=view.scheduleRows('C1').filter(b=>b.line&&!b.nonAdditive);
+ // THB uses the same Working selling-price basis and ownership as USD.
+ const bindings=currency==='THB'?usdBindings.map(scheduleBindingTHB0550):usdBindings;
  const problems=[],byOwner=new Map();
  const resolveOwner=l=>{if(!l)return null;if(!l.coveredByLineId)return l.id;const scope=mrLineScope0550({lines},l);if(!scope.covered){problems.push('C1_COVERAGE_OWNER_UNRESOLVED / '+l.id);return null;}return scope.owner.id;};
- for(const b of bindings){if(byOwner.has(b.lineId))problems.push('DUPLICATE_C1_OWNER / '+b.lineId);else byOwner.set(b.lineId,b);}
+ for(const [i,b] of bindings.entries()){
+  if(byOwner.has(b.lineId))problems.push('DUPLICATE_C1_OWNER / '+b.lineId);
+  else byOwner.set(b.lineId,{binding:b,usdPriced:Number.isFinite(usdBindings[i].amount)});
+ }
  const ownerUse=new Map(),rows=mrDisplayRows().map(r=>{
   const canonicalIds=r.canonicalIds||[r.id],matches=lines.filter(l=>canonicalIds.includes(l.mrRequirementId));
   const raw=matches.length===1?matches[0]:null,detail=c1NativeDetails0550(r);
@@ -106,12 +111,12 @@ export function deriveC1Appendix0550(view){
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
  const charged=new Set(),extra=[],pendingOwners=[];
- for(const b of byOwner.values()){
+ for(const {binding:b,usdPriced} of byOwner.values()){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   const targets=ownerUse.get(b.lineId)||[];
   // A draft Working row without a price or MR link is an internal mapping task,
   // not an additional customer supply package. Keep its canonical owner intact.
-  if(view.c1LayoutVersion!==C1_APPENDIX_LAYOUT_LEGACY_0550&&!targets.length&&!Number.isFinite(b.amount)){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
+  if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
   if(targets.length===1){const target=targets[0];charged.add(b.lineId);target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
   const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id;
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):'PROJECT',
@@ -161,7 +166,7 @@ export function c1AppendixOverview0550(projection){
   const includedIn=unique(g.rows.flatMap(r=>r.ownerIds).map(id=>chargedIn.get(id)).filter(id=>id&&id!==g.id));
   const complete=Number.isFinite(g.amount)&&!rollup.open&&!openMR&&!problems.length;
   const amount=complete?g.amount:rollup.knownUSD;
-  return {id:g.id,amount,knownUSD:rollup.knownUSD,priced:rollup.priced,open:rollup.open,count:rollup.count,openMR,complete,includedIn,
+  return {id:g.id,amount,knownAmount:rollup.knownUSD,priced:rollup.priced,open:rollup.open,count:rollup.count,openMR,complete,includedIn,
    label:Number.isFinite(amount)?complete?'Subtotal':'Priced items subtotal':includedIn.length?'Included in Appendix '+includedIn.join(', '):''};
  });
 }

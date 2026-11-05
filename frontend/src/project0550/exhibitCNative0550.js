@@ -22,21 +22,30 @@ const normalize=s=>String(s||'').trim().toUpperCase();
 const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',OFFICE:'OFFICE','IN-CITY TRANSPORTATION':'TRANSPORT','AIRPORT PICK-UP & DROP-OFF':'AIRPORT','OFFICE CONSUMABLES':'OFFICE_CONSUMABLES','WORKING LAUNCH':'WORKING_LUNCH'};
 const role=b=>aliases[normalize(b.summary)]||normalize(b.summary);
 const shared=(rows,key)=>{const values=[...new Set(rows.map(b=>b[key]||''))];return values.length===1&&values[0]?values[0]:'OPEN';};
-function words(n){
+function words(n,currency='USD'){
  if(!Number.isFinite(n))return 'OPEN';
  const small=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],tens=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
  const w=x=>x<20?small[x]:x<100?tens[Math.floor(x/10)]+(x%10?' '+small[x%10]:''):x<1000?small[Math.floor(x/100)]+' hundred'+(x%100?' '+w(x%100):''):[1e12,1e9,1e6,1e3].reduce((out,k)=>out||(x>=k?w(Math.floor(x/k))+' '+({1000:'thousand',1000000:'million',1000000000:'billion',1000000000000:'trillion'}[k])+(x%k?' '+w(x%k):''):''),'');
- if(n<0||n>=1e15)return 'OPEN';const cents=Math.round(n*100),whole=Math.floor(cents/100);return 'United States Dollars '+w(whole)+(cents%100?' and '+w(cents%100)+' cents':'')+' only';
+ if(n<0||n>=1e15)return 'OPEN';
+ const cents=Math.round(n*100),whole=Math.floor(cents/100),thb=currency==='THB';
+ return (thb?'Thai Baht ':'United States Dollars ')+w(whole)+(cents%100?' and '+w(cents%100)+(thb?' satang':' cents'):'')+' only';
 }
 const blankValues=id=>Object.fromEntries(Object.keys(template.defaults).filter(k=>k.startsWith(id+'_')).map(k=>[k,template.defaults[k]]));
-function fill(id,values,format){
- return template.schedules[id][format].replace(/\{\{([\w]+)\}\}/g,(_,key)=>{
+function fill(id,values,format,currency){
+ let source=template.schedules[id][format];
+ if(format==='html'&&currency==='THB'){
+  // Replace fixed currency labels in the preview template before adding user values.
+  source=source.replace(/Amount in words:\s+United States Dollars?\s*/g,'Amount in words: ')
+   .replace(/United States Dollars?|US Dollar or RMB|USD(?:<\/b><b>)? or RMB|US<\/b><b>D<\/b><b> or RMB/g,'THB')
+   .replaceAll('US/h','THB/h').replaceAll('$/','THB/');
+ }
+ return source.replace(/\{\{([\w]+)\}\}/g,(_,key)=>{
   if(key==='NATIVE_RESPONSE')return '{{NATIVE_RESPONSE}}';
   const v=Object.hasOwn(values,key)?values[key]:template.defaults[key]||'';
   return escape(v).replace(/\n/g,format==='xml'?'</w:t><w:br/><w:t xml:space="preserve">':'<br>');
  });
 }
-function nativePages(view,id){
+function nativePages(view,id,currency='USD'){
  const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='')=>pages.push({id,values,detail});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
@@ -57,14 +66,14 @@ function nativePages(view,id){
     set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
    }
   }
-  if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: USD '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned)+(partial?'\nKnown subtotal: USD '+number(shownSum(view,eligible))+' / '+partial:''));}
-  else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?'USD '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs)):'OPEN'));}
+  if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
+  else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?currency+' '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs),currency):'OPEN'));}
   add(v);return {pages,issues};
  }
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?'USD '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
  }
  if(['C2','C3','C4'].includes(id)){
   const groups=new Map();for(const b of rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
@@ -84,10 +93,10 @@ function nativePages(view,id){
  }
  return {pages,issues};
 }
-function renderPage(view,page,format){
- let result=fill(page.id,page.values,format);
+function renderPage(view,page,format,currency='USD'){
+ let result=fill(page.id,page.values,format,currency);
  if(page.id==='A'){
-  const vals=['OPEN','OPEN',number(view.baseAssigned),words(view.baseAssigned),number(view.optionsAssigned),words(view.optionsAssigned)];let i=0;
+  const vals=['OPEN','OPEN',number(view.baseAssigned),words(view.baseAssigned,currency),number(view.optionsAssigned),words(view.optionsAssigned,currency)];let i=0;
   result=result.replace(/_{5,}/g,()=>escape(vals[i++]||'OPEN'));
  }
  if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
@@ -104,10 +113,10 @@ function renderPage(view,page,format){
 }
 const logo='data:image/png;base64,'+template.binary['word/media/image1.png'];
 export const nativeFormCss0550=`.p55-native-paper{box-sizing:border-box;width:1120px;max-width:none;min-height:720px;background:white;color:#000;padding:28px 40px;margin:0 auto 24px;font:13px Arial,sans-serif;box-shadow:0 1px 8px #0002}.p55-native-paper *{box-sizing:border-box}.p55-native-paper header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid black;margin-bottom:24px;font-size:11px}.p55-native-paper header img{width:100px;height:auto}.p55-native-paper h2{font:bold 15px Arial;text-align:center;color:#000;margin:18px 0 22px}.p55-native-paper p{margin:0;white-space:pre-wrap;line-height:1.2}.p55-native-paper>p{margin:10px 0}.p55-native-paper table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;color:#000;font:12px Arial}.p55-native-paper td{border:1px solid #000;padding:3px 4px;vertical-align:middle;overflow-wrap:break-word;line-height:1.12;min-height:23px}.p55-native-paper tr{height:23px;break-inside:avoid}.p55-native-paper thead td{text-align:center;font-weight:bold;background:#fff}.p55-native-paper footer{display:flex;justify-content:space-between;border-top:1px solid #000;margin-top:24px;padding-top:4px;font:10px 'Times New Roman',serif}.p55-native-paper .native-status{font:10px Arial;text-align:right;margin:4px 0;color:#555}.p55-native-paper .native-response{margin-top:14px}.p55-native-scroll{max-width:100%;overflow:auto;background:#e8edf2;padding:18px 12px}.p55-native-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.p55-native-help{font-size:13px}.p55-native-issues{color:#8a4200}@media print{body{margin:0}.p55-native-paper{width:auto;min-height:0;box-shadow:none;margin:0;padding:0;break-before:page}.p55-native-paper:first-child{break-before:auto}.p55-native-paper table{font-size:10px}.p55-native-paper header img{width:85px}thead{display:table-header-group}@page{size:A4 landscape;margin:12mm}}`;
-export function nativeSchedule0550(view,id){
+export function nativeSchedule0550(view,id,currency='USD'){
  if(id==='C1'&&isC1Appendix0550(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
- const {pages,issues}=nativePages(view,id),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
- const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html')}<footer><span>Exhibit C - Commercial Terms</span><span>Source page ${template.schedules[id].page} of 18${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
+ const {pages,issues}=nativePages(view,id,currency),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
+ const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>Source page ${template.schedules[id].page} of 18${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
  return {html,issues,pages};
 }
 export function nativeExhibitProblems0550(view,only){
