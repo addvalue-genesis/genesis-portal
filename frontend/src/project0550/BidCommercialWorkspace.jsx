@@ -1,3 +1,4 @@
+import {ControlledTagMapping0550} from './ControlledTagMapping0550';
 import {WorkingLineSource0550,WorkingRequirementTrace0550,WorkingQuoteBasis0550,workingRequirementIndex0550} from './WorkingLineTrace0550';
 import {bidCompletionBasisChanged0550} from "./data/bidCompletion0550";
 import {deriveBidProcess0550} from "./data/bidProcess0550";
@@ -149,6 +150,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <Module id="bid.budget.scope-gates" title="OFF-03 · Coverage / gaps ก่อนอนุมัติข้อเสนอ" open={false}><p>Customer rows รอตรวจ: {official.schedule.filter(r=>!r.ready).map(r=>r.code).join(", ")||"ไม่มี"}</p><p>รายการยังไม่ระบุ Customer row: {official.unmapped.length} · แถวรอทบทวน: {official.selected.length-official.reviewedCount}</p><p>MR requirements ยังเปิด: {official.requirementGaps?.length||0} · Import conflicts: {data.mrWorkingImport?.conflicts.join(", ")||"ไม่มี"}</p><p>Engineering/TAG completeness, quote validity, ownership และ customer-form mapping ต้องตรวจครบ · C1 ต้องมีการตัดสินใจและหลักฐาน · Part C แยกเป็น Option · ผลทบทวนนี้เป็น Working review; การอนุมัติและบันทึกส่งลูกค้ายังเป็น HOLD</p></Module>
  <Module id="bid.budget.official.summary" open={true} title="สรุปสถานะและยอดราคา">
  <BidProcessResult0550 data={data} model={model} onNavigate={onNavigate}/>
+ <ControlledTagMapping0550 onNavigate={onNavigate} summaryOnly/>
  <BidKnownPrices0550 provisional={model.provisional} fx={data.fx} onWorking={id=>go("working",id||"bid.budget.working.lines")}/>
  <div className="p55-metric-grid"><div className="p55-metric"><span>แถวที่เลือก / ทบทวนครบ</span><strong>{official.selected.length} / {official.reviewedCount}</strong></div><div className="p55-metric"><span>Selected subtotal · {currency}</span><strong>{amount(currency==="USD"?official.selectedUSD:official.selectedTHB,currency)}</strong><small>เฉพาะแถวที่เลือก ยังต้องตรวจขอบเขต Customer row</small></div><div className="p55-metric"><span>Working revision / Release</span><strong>R{data.revision} · {model.releaseControl?.state||"HOLD"}</strong><small>OPEN / STALE ไม่ถูกแทนด้วยราคา HIS-01</small></div></div>
  <div className="p55-metric-grid"><div className="p55-metric"><span>Base A+B · ต้องมีราคาครบทุกหมวด</span><strong>{amount(currency==="USD"?official.baseUSD:official.baseTHB,currency)}</strong></div><div className="p55-metric"><span>Part C · Optional</span><strong>{amount(currency==="USD"?official.optionsUSD:official.optionsTHB,currency)}</strong></div></div>

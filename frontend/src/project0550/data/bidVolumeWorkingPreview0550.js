@@ -112,11 +112,15 @@ export function saveScheduleAllocationDrafts0550(data,plan,today){
  return next;
 }
 export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,savedView){
- const plan=scheduleAllocationPlan0550(data,savedView),proposed=plan.filter(p=>p.proposal),priceBasis=new Map();
+ // A prepared bid-package reference is not another financial owner. Keep its
+ // scope review OPEN; exclude only that explicit reference from draft arithmetic.
+ const references=new Map((model.provisional?.lines||[]).filter(l=>l.bidPriceAllocation).map(l=>[l.id,l.bidPriceAllocation]));
+ const draftSaved={...savedView,unallocated:savedView.unallocated.filter(l=>!references.has(l.id))};
+ const plan=scheduleAllocationPlan0550(data,draftSaved),proposed=plan.filter(p=>p.proposal),priceBasis=new Map();
  const lines=model.official.lines.map(line=>{
   const working=model.lines.find(l=>l.id===line.id),reviewed=Number.isFinite(line.customerUSD),current=Number.isFinite(working?.customerUSD),provisional=Number.isFinite(working?.provisionalCustomerUSD);
   const basis=reviewed?'REVIEWED_WORKING':current?'WORKING_PENDING_REVIEW':provisional?(working?.sellBasisState==='WORKING_SELL_KNOWN_COST_UNESTABLISHED'?'WORKING_SELL_COST_PENDING':'PROVISIONAL_VENDOR'):'PRICE_OPEN';priceBasis.set(line.id,basis);
-  return {...line,customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null};
+  return {...line,...(references.has(line.id)?{selected:false,bidPriceAllocation:references.get(line.id)}:{}),customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null};
  });
  const existingBindings=(data.bidVolumes?.bindings||[]).map(b=>{const raw=data.lines.find(l=>l.id===b.lineId),hours=b.schedule==='C7'&&b.hoursPerDay===null?scheduleHoursFromCalculation0550(data,raw):null;return hours?{...b,hoursPerDay:hours.hoursPerDay}:b;});
  const previewData={...data,bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:[...existingBindings,...proposed.map(p=>p.proposal)]}};
@@ -136,6 +140,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:data.offers.filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
  return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,suggested:proposed.length,unresolved:plan.length-proposed.length,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
+  packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),
  };
 }

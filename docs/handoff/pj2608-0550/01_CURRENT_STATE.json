@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_A_INPUT_RECONCILIATION_COMPLETE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_VERSIONED_TAG_MAPPING_AND_19_SYSTEM_DRAFT.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -51,7 +51,8 @@
     "docs/handoff/pj2608-0550/20261105_PUNCH_OPTIONAL_CONTROLS.md",
     "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md",
     "docs/handoff/pj2608-0550/20261105_A_INPUT_AUDIT_EXECUTION.md",
-    "docs/handoff/pj2608-0550/20261105_A_INPUT_RECONCILIATION_COMPLETE.md"
+    "docs/handoff/pj2608-0550/20261105_A_INPUT_RECONCILIATION_COMPLETE.md",
+    "docs/handoff/pj2608-0550/20261105_VERSIONED_TAG_MAPPING_AND_19_SYSTEM_DRAFT.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -95,6 +96,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "UI2026-11-05.13: existing WP.7/summary versioned MAP01–10 adapter and optional canonical TAG evidence, child Offer/VDRL/source review dependencies and impact. Draft schedules count explicit bid-package references non-additively; no automatic coverage/engineering/issue acceptance. Preserve old equations/0553/all financial and frozen records. Actual private88-owner price basis is a reconstruction, not Windows deployment proof.",
     "UI2026-11-05.12 supersedes prior search-only classification: original technical RAR73 PDFs checked, four exact required editions absent and three10006/10008 mismatches. Existing private Source14/A10 carries finding A-RECEIPT-RECON-20261105 and MR partial31-35 reading DRAFT; exact Rev09 ancestry, original source records and all financial/FX/review/history values preserved. Loader pair cap96MiB+1024 and16 ancestors support actual90MB pair; per-file caps32/64MiB unchanged. Seven-case clarification prepared, NOT_SENT. Originator authority and full A/engineering review remain OPEN; Windows consumption unobserved.",
     "Actual source work5-Nov-2026: original MR Appendix2 PDF31-35/printed29-33 visually verified against available681-source reconstruction;100/107 inputs satisfy receipt,7 unresolved:5 version/number discrepancies and2 exact originals not located in searched sources. Bound-document review gaps95; no completed manifest review. SI assistant owns continuing archive/source reconciliation and native evidence drafts. Do not replace10008 with10006 or historical2022 C revisions by inference. No UI/source/price/Qty/FX/acceptance/history writes; owner Windows database unobserved. See A-input audit execution checkpoint.",
     "UI2026-11-05.11: show original Supplier item detail in existing Working/Vendor views; source-text correction only. MAP-01–10/Common TAG primitives audited before future0550 adapter; do not equate site tagRef with verified customer equipment TAG. Preserve Mapping, all prices/Qty/FX/source/reviews/history; see checkpoint for tests/limits.",

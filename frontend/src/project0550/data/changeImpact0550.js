@@ -1,3 +1,4 @@
+import {TAG_MAPPING_RULE_VERSION} from '../../common/engineering/controlledTagMappingV2';
 import {mgwDetailGroup0550} from './mgwDetailPricing0550';
 // Explicit references only: not a semantic reader or a complete engineering graph.
 export const INPUT_RULES_0550=[
@@ -12,6 +13,7 @@ export function buildChangeGraph0550(data,model){
  const nodes=new Map(),edges=[],add=(id,label,target)=>{if(!nodes.has(id))nodes.set(id,{id,label:label||id,target});},edge=(from,to)=>{if(nodes.has(from)&&nodes.has(to))edges.push([from,to]);};
  const w=data.integrationWorkspace||{},p=data.bidVolumes||{};
  add('FX','FX / commercial currency basis','bid.budget.fx');
+ add('RULE:'+TAG_MAPPING_RULE_VERSION,'Versioned MAP rules','bid.working-preview.step.7');
  for(const [id,label,target] of [['VI','11 Volume I','bid.quotation'],['VII','12 Volume II','bid.technical.overview'],['VIII','13 Volume III','bid.commercial'],['REL','10.7 Current release','bid.budget.release']])add(id,label,target);
  for(const s of data.sourceIntake?.sources||[])add('S:'+s.id,s.title,'bid.documents.source.'+s.id);
  for(const o of data.offers)add('O:'+o.id,o.quoteRef+' / '+o.description,'bid.vendor.offer.'+o.id);
@@ -31,6 +33,7 @@ export function buildChangeGraph0550(data,model){
  for(const r of p.vdrl||[])add('V:'+r.id,r.documentNo+' / '+r.title,'bid.technical.vdrl');
  for(const r of p.commercialDeviations||[])add('CD:'+r.id,r.title,'bid.commercial.deviations');
  for(const r of model.integration?.requirements||[]){
+  for(const b of r.tagBindings||[]){const id='TAG:'+r.id+':'+b.id;add(id,b.site+' / '+b.tag,'bid.working-preview.requirement.'+r.id);edge('RULE:'+b.ruleVersion,id);edge('S:'+b.sourceId,id);edge(id,'R:'+r.id);for(const oid of b.offerIds)edge('O:'+oid,id);for(const lid of b.workLineIds)edge(id,'L:'+lid);for(const vid of b.vdrlIds)edge(id,'V:'+vid);}
   for(const id of [...r.sourceIds,...r.supplierSourceIds])edge('S:'+id,'R:'+r.id);
   for(const id of r.offerIds)edge('O:'+id,'R:'+r.id);
   for(const id of r.workLineIds)edge('R:'+r.id,'L:'+id);

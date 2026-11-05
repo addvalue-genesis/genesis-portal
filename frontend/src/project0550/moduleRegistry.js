@@ -140,9 +140,10 @@ export const MODULE_REGISTRY = [
     why: "Management needs a controllable working model before final vendor and engineering closure.",
     inputs: ["19-system scope", "Commercial sources", "Engineering quantities", "Service/logistics/resource assumptions"],
     outputs: ["Part A/B/C direct basis", "Component breakdown", "Price/source trace", "Internal commercial working"],
-    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/C1Appendix0550.jsx", "frontend/src/project0550/data/c1Appendix0550.js", "frontend/src/project0550/data/c1MrDetails0550.json", "frontend/src/project0550/workspaceLabels0550.js"],
+    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/C1Appendix0550.jsx", "frontend/src/project0550/data/c1Appendix0550.js", "frontend/src/project0550/data/c1MrDetails0550.json", "frontend/src/project0550/workspaceLabels0550.js", "frontend/src/project0550/ControlledTagMapping0550.jsx", "frontend/src/project0550/data/controlledTagMapping0550.js", "frontend/src/project0550/data/tagEvidence0550.js", "frontend/src/common/engineering/controlledTagMappingV2.js", "frontend/src/project0550/data/bidVolumeWorkingPreview0550.js"],
     invariants: [
       "System-level allowance must be distinguishable from source quote.",
+      "Customer TAG links stay in canonical requirements with version/source/quantity/Item/owner/VDRL references; normalization and historical candidates never authorize scope or issue. Existing E01–E18 and0553 MAP behavior remain compatible.",
       "Original supplier quote cost is independent of A/B/C allocation for every system; shared quotation references never create another financial owner.",
       "No back-solving to a management target.",
       "B5/C2/C3 and other duplicate scopes must remain separated."
