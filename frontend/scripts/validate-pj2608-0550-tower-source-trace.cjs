@@ -6,6 +6,11 @@ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const S=require(src+'/project0550/data/supplierCostProjection0550.js'),R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
 const {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
 const empty={lines:[],offers:[],vendors:[],fx:{}},render=d=>renderToStaticMarkup(React.createElement(WorkingSupplierTrace0550,{data:d,systemToken:'TEL-TELT',onNavigate:()=>{}}));
+const {SupplierItemSourceText0550}=require(src+'/project0550/SupplierItemSourceText0550.jsx');
+const sample={id:'SOURCE-TEXT-QA',description:'Short item title',sourceRef:'Recorded location only',quoteEvidence:{terms:['Line one\n  Exact detail <unsafe> & punctuation','Line one\n  Exact detail <unsafe> & punctuation']}};
+const sampleBefore=JSON.stringify(sample),sampleHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:sample}));
+assert.equal((sampleHtml.match(/Line one/g)||[]).length,1,'Duplicate exact source text appears once');assert(sampleHtml.includes('\n  Exact detail &lt;unsafe&gt; &amp; punctuation'),'Exact wording and line breaks remain escaped text');assert(!sampleHtml.includes('<unsafe>'));
+const missingHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:{id:'NO-SOURCE-DETAIL',sourceRef:'Reference, not a verified excerpt'}}));assert(missingHtml.includes('ยังไม่มีข้อความรายละเอียดต้นฉบับ'));assert(missingHtml.includes('Reference, not a verified excerpt'));assert.equal(JSON.stringify(sample),sampleBefore);
 assert.deepEqual(C.bidCompletionSourceUsages0550(empty),[]);assert(render(empty).includes('ยังไม่มีรายการต้นฉบับ'));
 const legacyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:{...empty,integrationWorkspace:{}},line:{id:'MR-LEGACY',mrRequirementId:'NATIVE-LEGACY',description:'Legacy MR'},projection:{quotes:new Map()},onNavigate:()=>{}}));assert(legacyMr.includes('Mapping ของ MR · 0 ใบ'),'Old/empty Integration workspace remains readable');
 if(process.argv[2]){
@@ -24,6 +29,14 @@ if(process.argv[2]){
  assert(originals.flatMap(q=>q.items).some(e=>e.uses.some(u=>u.label.includes('ต้นทุนผสม'))));assert.deepEqual(originals.flatMap(q=>q.items).filter(e=>e.offer.supplierQuoteRow.itemCode==='3').map(e=>[e.native.quantity,e.native.unit]).sort((a,b)=>a[0]-b[0]),[[35,'Gl'],[70,'Gl']],'Original paint units, never normalized U');
  assert(html.includes('APF')&&html.includes('ACP')&&html.includes('2609.95.1')&&html.includes('2609.95.2'));
  const projection=S.supplierCostProjection0550(d);
+ for(const e of tower){
+  assert.deepEqual(S.supplierItemSourceText0550(e.offer),e.offer.quoteEvidence.terms,'Source item detail remains verbatim');
+  const body=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:e.offer}));
+  assert(body.includes('data-supplier-source-text="'+e.offer.id+'"'));
+  const vendorRow=vendorHtml.match(new RegExp('data-vnd-offer="'+e.offer.id+'"[\\s\\S]*?</tr>'))?.[0];assert(vendorRow&&vendorRow.includes('data-supplier-source-text="'+e.offer.id+'"'),'Vendor and Working use the same source text');
+ }
+ for(const ref of ['2609.95.1','2609.95.2']){const item=tower.find(e=>e.offer.quoteRef===ref&&e.offer.supplierQuoteRow.itemCode==='2').offer,text=S.supplierItemSourceText0550(item).join('\n');assert(text.includes('square self-supporting tower'));assert(text.includes(ref.endsWith('.1')?'9.90 x 9.90':'2.0 x 2.0'));}
+ const mgwItem=[...projection.quotes.values()].flatMap(q=>q.items).find(e=>e.offer.mgwQuoteLineId);assert(mgwItem);assert(S.supplierItemSourceText0550(mgwItem.offer).length,'MGW uses the same native catalogue detail');
  for(const id of ['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06']){
   const line=d.lines.find(l=>l.id===id),row=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:d,line,projection,onNavigate:()=>{}}));
   assert(row.includes('Mapping ของ MR · 1 ใบ'));assert(!row.includes('data-working-source-item='),'Original items beside each MR remain lazy');

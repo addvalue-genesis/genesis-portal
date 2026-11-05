@@ -9,6 +9,12 @@ const rateReference=vendorWorkingRateReference0550;
 const itemCode=o=>o.supplierQuoteRow?.itemCode||o.quoteEvidence?.locator?.match(/\bitem\s+([\w.-]+)/i)?.[1]||mgwQuoteItem0550(o)?.sn||o.id;
 const sourceIdentity=o=>[o.vendorId,o.quoteRef,o.quoteEvidence?.sourceSha256||'',itemCode(o)].join('|');
 const original=o=>Boolean(o.quoteEvidence||mgwQuoteItem0550(o))&&!rateReference(o);
+// Read the recorded source text verbatim. This is not a specification parser,
+// a Mapping decision, or an adoption of any supplier condition into the bid.
+export function supplierItemSourceText0550(offer){
+ const detail=mgwQuoteItem0550(offer)?.detail,terms=offer.quoteEvidence?.terms;
+ return [...new Set([detail,...(Array.isArray(terms)?terms:[])].filter(t=>typeof t==='string'&&t.trim()))];
+}
 export function nativeSupplierItem0550(offer){
  const e=offer.quoteEvidence,r=mgwQuoteItem0550(offer);
  return e?{quantity:e.quotedQuantity,unit:e.quotedUnit,rate:e.quotedUnitCost,total:e.quotedTotal,totalText:e.quotedTotalText,currency:e.quotedCurrency,locator:e.locator,url:e.sourceUrl,basis:e.rateBasis,option:e.classification==='OPTION'||offer.supplierQuoteRow?.classification==='OPTION'}:

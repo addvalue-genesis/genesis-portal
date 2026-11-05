@@ -111,7 +111,8 @@ export const MODULE_REGISTRY = [
     invariants: [
       "Do not show only a quotation total when line items/terms are available.",
       "Commercial source truth must remain separate from internal allowance.",
-      "Per-MR supplier item detail reads canonical requirement Offer references; it never infers Mapping from a shared price owner or adds another cost contribution."
+      "Per-MR supplier item detail reads canonical requirement Offer references; it never infers Mapping from a shared price owner or adds another cost contribution.",
+      "Working and Vendor show existing original item text from Offer evidence/MGW catalogue without generating specifications, TAGs, Mapping approval or new financial records."
     ]
   },
   {

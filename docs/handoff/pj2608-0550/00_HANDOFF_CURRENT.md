@@ -1,3 +1,5 @@
+Latest: [Supplier item text and mapping-equation audit](20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md), UI2026-11-05.11 / parent163a1bbf. Existing Working/Vendor item descriptions now show canonical source detail. Existing MAP rules and0550 wiring boundaries are recorded; no auto TAG Mapping or financial adoption.
+
 Latest checkpoint: [optional Punch inspection controls](20261105_PUNCH_OPTIONAL_CONTROLS.md), UI2026-11-05.10 / parent4a7d0f7. Native source work is independent of optional tracking-plan controls. Existing closure, routes and canonical records remain authoritative.
 
 Latest: [Punch source closure and per-MR Vendor details](20261105_PUNCH_CLOSURE_AND_MR_VENDOR_DETAILS.md), UI2026-11-05.9, parent9c065470. Existing WP.8 has live native-cause closure versus deletion/unverified history, explicit work stages and exact CAL/RPT/activity routes. Existing Part-A MR rows open full original Supplier items from their canonical Mapping; no new mapping or cost store. Optional tracking is explicit-save only; legacy notes remain unverified without evidence. Preserve source/prices/Qty/FX/reviews/history and all IDs. Read before the initial Punch checkpoint.

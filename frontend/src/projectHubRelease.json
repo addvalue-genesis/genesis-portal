@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.10",
+  "version": "2026-11-05.11",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "4a7d0f7",
-  "capability": "Punch in existing WP.8/10.7 explains native work can proceed without a tracking plan. Manual source/editor controls are optional disclosures, not Start/Continue actions. Preserve source-verified closure, exact RPT/activity routes, all current MR Vendor detail, IDs, prices/Qty/FX, plan storage and original issue gates."
+  "source0550": "163a1bbf",
+  "capability": "Existing MR/Working and Vendor views show original Supplier item detail from canonical Offer terms and MGW catalogue, with source references and no changes to Mapping, money, quantity, FX, reviews or frozen outputs. Existing MAP01-10/Common tag primitives audited; no invented customer TAGs or automatic mapping approval. Retain latest optional Punch controls."
 }

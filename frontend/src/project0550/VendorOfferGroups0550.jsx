@@ -6,6 +6,7 @@ import {bidOwnerStyle} from './bidPresentation0550';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
+import {SupplierItemSourceText0550} from './SupplierItemSourceText0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 function QuoteTotal({quote,fx}){
@@ -33,9 +34,9 @@ export function VendorOfferGroups0550({data,onEdit}){
   const allocated=entry.allocatedWorking.filter(u=>u.current&&activeSupply0550(u.line)),stale=entry.allocatedWorking.filter(u=>!u.current);
   const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{o.description}</strong><small>{o.brand}</small><small>{entry.systemTokens.join(' / ')||'ยังไม่ผูกระบบ'}</small>
+   <td><strong>{o.description}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small><small>{entry.systemTokens.join(' / ')||'ยังไม่ผูกระบบ'}</small>
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
-     {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p><p style={{whiteSpace:'pre-wrap'}}>{r.detail}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
+     {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
      {e&&<><p>{e.locator} · revision: {e.revision||'ต้นฉบับไม่ระบุ'}</p><p><a href={e.sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></p><small>Source ID: {e.sourceId}<br/>SHA256: {e.sourceSha256}</small></>}
      <p>{o.sourceRef}</p>
     </details>

@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_PUNCH_OPTIONAL_CONTROLS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -48,7 +48,8 @@
     "docs/handoff/pj2608-0550/20261105_RELEASE_STAGE_PUNCH_LIST.md",
     "docs/handoff/pj2608-0550/20261105_KU_SUPPLIER_MAPPING_VISIBILITY.md",
     "docs/handoff/pj2608-0550/20261105_PUNCH_CLOSURE_AND_MR_VENDOR_DETAILS.md",
-    "docs/handoff/pj2608-0550/20261105_PUNCH_OPTIONAL_CONTROLS.md"
+    "docs/handoff/pj2608-0550/20261105_PUNCH_OPTIONAL_CONTROLS.md",
+    "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -92,6 +93,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "UI2026-11-05.11: show original Supplier item detail in existing Working/Vendor views; source-text correction only. MAP-01–10/Common TAG primitives audited before future0550 adapter; do not equate site tagRef with verified customer equipment TAG. Preserve Mapping, all prices/Qty/FX/source/reviews/history; see checkpoint for tests/limits.",
     "UI2026-11-05.10: optional Punch tools are for inspection/explicit plan editing, never a start dependency. Source work proceeds directly; only native validators establish closure. Preserve4a7d0f7 source-tracking, exact work routes and per-MR original Supplier details. No automatic assignments, plans, source edits or issue acceptance. See latest checkpoint for actual validation.",
     "UI2026-11-05.9: continue existing Punch with native cause-level closure, no false closure by deletion/phase change, and unsaved exact Proof/Activity editor routes. Per-MR full Supplier detail reuses canonical Mapping, preserving source and financial ownership. Optional tracking is explicit-save only; old notes stay unverified without subjects. See latest checkpoint for actual tests and formal-issue/Windows limits.",
     "UI2026-11-05.8: existing10.7 consumes the same Common roots, basis keys, severity, bidPunchPlans and plan editor as WP.8. Stage reflects required phase or known preparation work, never proposed deferral. Keep unknown stage explicit, original A/B source actions, all current gates and original internal backlog/export fields. No new module/tab/schema/store; viewing stays read-only, explicit plan save changes only existing plans and normal revision/audit. Preserve prices/Qty/FX/source/reviews/frozen history. See latest checkpoint for validation and Windows/engineering limits. Retain concurrent473e0792 KU/source-link update.",
