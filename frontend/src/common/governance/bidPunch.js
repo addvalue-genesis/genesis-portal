@@ -1,7 +1,7 @@
 // Project-independent bid-work triage. A work plan never changes source truth,
 // arithmetic, technical acceptance, contractual due phases or issue authority.
 export const BID_PUNCH_VERSION='genesis.bid-punch/1';
-export const BID_PUNCH_STAGE_NAMES={UNPLANNED:'ยังไม่จัดแผน',PLAN_INCOMPLETE:'แผนยังไม่ครบ',ACTION_PLANNED:'มีแผน · รอดำเนินการที่ต้นทาง',OVERDUE:'เลยกำหนดในแผน',STALE:'ฐานเปลี่ยน · ต้องทบทวนแผน',VERIFIED_CLOSED:'ต้นทางตรวจปิดสาเหตุนี้แล้ว',UNVERIFIED_REMOVAL:'ต้นเหตุไม่ปรากฏ · ยังยืนยันการปิดไม่ได้'};
+export const BID_PUNCH_STAGE_NAMES={UNPLANNED:'ยังไม่มีแผนที่บันทึก',PLAN_INCOMPLETE:'ข้อมูลแผนยังไม่ครบ',ACTION_PLANNED:'มีแผนติดตาม · ต้นทางยังเปิด',OVERDUE:'เลยกำหนดในแผน',STALE:'ฐานเปลี่ยน · ต้องทบทวนแผน',VERIFIED_CLOSED:'ต้นทางตรวจปิดสาเหตุนี้แล้ว',UNVERIFIED_REMOVAL:'ต้นเหตุไม่ปรากฏ · ยังยืนยันการปิดไม่ได้'};
 export const BID_PUNCH_STATES=[
  ['Source','METADATA_ONLY / TEXT_PARTIAL / TEXT_READ','อ่านข้อมูลได้มากน้อยเท่าไร ไม่ใช่ผลทบทวนหรืออนุมัติ'],
  ['Authority','CURRENT_TENDER / UNCONFIRMED / HISTORICAL / REPLACED_COPY','ฐานเอกสารและฉบับใช้งาน ต้องตรวจเมื่อใช้ตัดสินใจ'],

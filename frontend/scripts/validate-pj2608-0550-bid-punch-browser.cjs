@@ -35,7 +35,9 @@ const server=http.createServer((req,res)=>{
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');
  const task=punch.locator('[data-bid-punch="REVIEW_OPEN|SYSTEM|TEL-TELT"]');await task.waitFor();
  assert((await task.innerText()).includes('เกี่ยวข้อง 4 ข้อกำหนด'));
- await task.getByRole('button',{name:'เปิดต้นทาง / ทำงานเดิม',exact:true}).click();
+ assert.equal(await task.getByRole('button',{name:'เปิดแบบบันทึกแผน',exact:true}).isVisible(),false,'Optional manual editor stays behind disclosure');
+ assert((await punch.innerText()).includes('แม้ยังไม่ได้บันทึกแผน'));
+ await task.locator('[data-punch-tools] > summary').click();await task.getByRole('button',{name:'เปิดต้นทาง',exact:true}).click();
  await mapping.waitFor();assert.equal(await mapping.getByLabel('Requirement system token',{exact:true}).inputValue(),'TEL-TELT');
  await jump('bid.working-preview.step.8');
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');
@@ -55,7 +57,7 @@ const server=http.createServer((req,res)=>{
  await jump('bid.working-preview.step.8');await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('ALL');
  await punch.getByLabel('Search Bid Punch',{exact:true}).fill('ENGINEERING_PROOF_OPEN');
  const proofTask=punch.locator('[data-bid-punch="ENGINEERING_PROOF_OPEN|SYSTEM|TEL-TELT|RPT"]');await proofTask.waitFor();
- await proofTask.getByRole('button',{name:'เปิดต้นทาง / ทำงานเดิม',exact:true}).click();
+ await proofTask.locator('[data-punch-tools] > summary').click();await proofTask.getByRole('button',{name:'เปิดต้นทาง',exact:true}).click();
  const proof=page.getByRole('form',{name:'Engineering Proof editor',exact:true});await proof.waitFor();
  assert.equal(await proof.getByLabel('Linked requirement',{exact:true}).inputValue(),'REQDEF-MR-B1-11-ACP-06','Keep the MR selected from its full quote, rather than jumping to the first tower');
  assert.equal(await proof.getByLabel('Derived proof type',{exact:true}).inputValue(),'RPT');
@@ -64,7 +66,7 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(await read(),before,'Full quote inspection and a fresh Proof draft must not write data or approve anything');
  await jump('bid.working-preview.step.8');await punch.getByLabel('Search Bid Punch',{exact:true}).fill('');
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');
- await task.getByRole('button',{name:'จัดแผน Major / Minor',exact:true}).click();
+ if(!await task.locator('[data-punch-tools]').evaluate(e=>e.open))await task.locator('[data-punch-tools] > summary').click();await task.getByRole('button',{name:'เปิดแบบบันทึกแผน',exact:true}).click();
  const editor=page.getByRole('form',{name:'Bid Punch plan editor',exact:true});await editor.waitFor();
  await editor.getByLabel('Punch owner',{exact:true}).fill('SI QA');
  await editor.getByLabel('Punch due date',{exact:true}).fill('2026-11-12');

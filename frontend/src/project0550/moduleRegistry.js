@@ -193,7 +193,7 @@ export const MODULE_REGISTRY = [
     inputs: ["Risk scenarios", "Contract entitlement", "Insurance/mitigation"],
     outputs: ["Exposure", "Mitigation", "Recovery logic", "Residual risk"],
     implementation: ["riskScenarios in controlled dataset", "frontend/src/common/governance/bidPunch.js", "frontend/src/project0550/data/bidPunch0550.js", "frontend/src/project0550/BidPunch0550.jsx", "frontend/src/project0550/WorkingPreview0550.jsx"],
-    invariants: ["Cost exposure ≠ customer recovery.", "Bid Punch plans preserve original source/financial/technical/issue states; severity and due phase are independent, never an approval or contractual waiver.", "Punch closure uses live native validators and tracked original subjects; deletion, old untracked notes and planned deferrals cannot count as verified closure."]
+    invariants: ["Cost exposure ≠ customer recovery.", "Punch plans are optional tracking; native source work never requires opening or saving a Punch form first.", "Bid Punch plans preserve original source/financial/technical/issue states; severity and due phase are independent, never an approval or contractual waiver.", "Punch closure uses live native validators and tracked original subjects; deletion, old untracked notes and planned deferrals cannot count as verified closure."]
   },
   {
     id: "MOD-REGULATORY-KNOWLEDGE",

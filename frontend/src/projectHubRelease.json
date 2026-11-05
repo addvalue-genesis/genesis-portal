@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.9",
+  "version": "2026-11-05.10",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "9c065470",
-  "capability": "Complete existing Punch work routes and native-cause closure: separate planned/overdue/stale/verified/unverified stages, preserve old notes and original acceptance gates, and open correct unsaved CAL/RPT/activity editors. Existing Part-A MR rows open full original Supplier items from canonical Mapping with unchanged costs/Qty/FX/source/history and Module IDs. Retain shared WP.8/Release workflow stages and the latest canonical KU supplier links."
+  "source0550": "4a7d0f7",
+  "capability": "Punch in existing WP.8/10.7 explains native work can proceed without a tracking plan. Manual source/editor controls are optional disclosures, not Start/Continue actions. Preserve source-verified closure, exact RPT/activity routes, all current MR Vendor detail, IDs, prices/Qty/FX, plan storage and original issue gates."
 }
