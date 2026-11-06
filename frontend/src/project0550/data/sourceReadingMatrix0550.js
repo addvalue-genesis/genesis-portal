@@ -1,6 +1,7 @@
 import {documentFamily0550} from "./integrationWorkspace0550";
 import {mrReaderReferences0550} from "./mrSourceReader0550";
 import {deriveDocumentRevisionRegister} from "./sourceIntakeModel";
+import {documentReadingStage0550} from "./documentReadingProgress0550";
 
 export const SOURCE_MATRIX_GROUPS_0550 = [
  ["ประมูล", ["RFQ", "ADD", "MR"]],
@@ -114,7 +115,7 @@ export function sourceReadingMatrix0550(index, integration, systems, findings = 
    if (point?.locator) item.points.set([point.locator, point.text, point.site, point.kind].join("|"), point);
    if (follow && source?.effectiveAuthority === "CURRENT_TENDER" && !["MR","PHI","RFQ","ADD"].includes(family)) queue.add(id);
   };
-  const addReference = (number, edges, locator, follow = true) => {
+  const addReference = (number, edges, locator, follow = true, primary = false) => {
    const family = familyOf({documentNo:number, title:""});
    const cell = cells.get(family), registered = index.byNo.get(number) || [];
    if (!edges.length && !registered.length) return;
@@ -127,7 +128,7 @@ export function sourceReadingMatrix0550(index, integration, systems, findings = 
     : !current.length ? "ยังไม่มีฉบับใช้งานที่ตรงกับอ้างอิง"
     : revisions.length > 1 ? "รายการอ้างอิงระบุหลาย Rev." : "";
    cell.references.set(number, {
-    number, revisions,
+    number, revisions, primary:primary || Boolean(previous?.primary),
     edges:[...new Map([...(previous?.edges || []), ...edges].map(edge => [[edge.fromId, edge.locator, edge.excerpt].join("|"), edge])).values()],
     reason,
    });
@@ -160,7 +161,7 @@ export function sourceReadingMatrix0550(index, integration, systems, findings = 
   }
   const mrEdges = (index.byNo.get(mrNo) || []).flatMap(source => index.bySource.get(source.id) || []);
   const catalog = (number, locator, follow = true) =>
-   addReference(number, index.appendix.get(number) || mrEdges.filter(edge => edge.toDocumentNo === number), locator, follow);
+   addReference(number, index.appendix.get(number) || mrEdges.filter(edge => edge.toDocumentNo === number), locator, follow, true);
   if (token === "COMMON") {
    for (const family of ["RFQ","ADD"]) for (const source of index.byFamily.get(family) || []) {
     if (source.effectiveAuthority === "CURRENT_TENDER") addSource(source.id);
@@ -193,19 +194,32 @@ export function sourceReadingMatrix0550(index, integration, systems, findings = 
    const sources = [...cell.sources.values()].map(item => {
     const authority = item.source?.effectiveAuthority;
     const revisionState = index.revisions.get(norm(item.source?.documentNo));
-    const reviewed = authority === "CURRENT_TENDER" && (!revisionState || revisionState === "CURRENT_PACKAGE") &&
-     item.review?.state === "REVIEWED_DOCUMENT" && item.review.systemTokens.includes(token);
-    return {...item, reviewed, revisionState, points:[...item.points.values()]};
+    const currentVersion = authority === "CURRENT_TENDER" && (!revisionState || revisionState === "CURRENT_PACKAGE");
+    const reviewed = currentVersion && item.review?.state === "REVIEWED_DOCUMENT" && item.review.systemTokens.includes(token);
+    const readingStage = documentReadingStage0550(item.source,currentVersion?item.review:null);
+    return {...item, reviewed, readingStage, revisionState, points:[...item.points.values()]};
    });
    const references = [...cell.references.values()];
+   const byReference = new Map(references.map(ref=>[ref.number,ref]));
    const expected = scope?.review?.families.some(value => family === value || (family === "RPT/CAL" && ["RPT","CAL"].includes(value)));
    const hasOpen = (expected && !sources.length) || issues.length || references.some(ref => ref.reason) || sources.some(item =>
     !item.source || item.source.effectiveAuthority !== "CURRENT_TENDER" ||
     item.source.readState === "METADATA_ONLY" || (item.revisionState && item.revisionState !== "CURRENT_PACKAGE"));
    const state = hasOpen ? "open" : !sources.length ? "pending" : sources.every(item => item.reviewed) ? "reviewed" :
     sources.some(item => item.source.content && item.points.some(point => !point.hint)) ? "found" : "reference";
+   const current = sources.filter(item=>{
+    if(item.source?.effectiveAuthority!=="CURRENT_TENDER")return false;
+    const ref=byReference.get(norm(item.source.documentNo));
+    return !ref?.revisions.length || ref.revisions.includes(norm(item.source.revision));
+   });
+   const receiptOpen=references.some(ref=>ref.primary&&ref.reason) || current.some(item=>item.revisionState&&item.revisionState!=="CURRENT_PACKAGE");
+   const stages=current.map(item=>item.readingStage);
+   const readingStage=!current.length ? (hasOpen?"receipt":"pending") :
+    stages.every(stage=>stage==="unread")?"unread" :
+    stages.some(stage=>stage==="partial"||stage==="unread")?"partial" :
+    stages.includes("verify")?"verify":receiptOpen?"receipt":"complete";
    return {family, state, issues, references, sources, candidates:index.byFamily.get(family) || [],
-    expected};
+    expected,readingStage,readingSources:current,receiptOpen};
   })};
  });
 }

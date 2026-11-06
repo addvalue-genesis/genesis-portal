@@ -253,6 +253,7 @@ assert.deepEqual(matrix.map(row=>row.token),[...tokens,'COMMON']);
 const matrixCell=(token,family)=>matrix.find(row=>row.token===token).cells.find(cell=>cell.family===family);
 const layout=matrixCell('TEL-DMR','LAY');
 assert.equal(layout.state,'open');
+assert.equal(layout.readingStage,'receipt','Wrong revision must not count as read');
 assert.deepEqual(layout.references[0].revisions,['C4']);
 assert.match(layout.references[0].reason,/Rev\./);
 assert.equal(layout.sources[0].source.revision,'B1','Keep the mismatching copy visible');
@@ -260,6 +261,20 @@ assert.equal(matrixCell('TEL-PAGA','LAY').state,'pending','Do not copy Microwave
 assert.equal(matrixCell('TEL-DMR','TYP').state,'open');
 assert(matrixCell('TEL-DMR','STD').references.some(ref=>ref.number==='10008-STD-6-TEL-004'));
 assert.deepEqual(matrixData,matrixBefore);
+const sharedReading=clone(matrixData);
+const actualMR=sharedReading.sourceIntake.sources[0];
+sharedReading.sourceIntake.sources.push({...actualMR,id:'MR-HISTORY',revision:'A1',authority:'HISTORICAL'});
+const readingModel={...emptyIntegration,
+ scopes:[{id:'TEL-DMR',requirements:[],review:{sourceIds:[actualMR.id,'MR-HISTORY'],families:['MR']}}],
+ documentReviews:[{id:actualMR.id,state:'REVIEWED_DOCUMENT',systemTokens:['COMMON']}]};
+const sharedCells=sourceReadingMatrix0550(sourceMatrixIndex0550(sharedReading.sourceIntake),readingModel,SYSTEMS);
+const microwaveMR=sharedCells.find(row=>row.token==='TEL-DMR').cells.find(cell=>cell.family==='MR');
+assert.equal(microwaveMR.state,'open','Keep engineering evidence and former-copy checks separate');
+assert.equal(microwaveMR.readingStage,'complete','An exact current document reviewed once is read for all referencing systems');
+assert.equal(microwaveMR.readingSources.length,1);
+actualMR.readState='TEXT_PARTIAL';
+const partialMR=sourceReadingMatrix0550(sourceMatrixIndex0550(sharedReading.sourceIntake),readingModel,SYSTEMS).find(row=>row.token==='TEL-DMR').cells.find(cell=>cell.family==='MR');
+assert.equal(partialMR.readingStage,'partial','A partial source cannot display as fully read');
 const flattenedPhi=source('MM-ASK-1A-APF-TEL-PHI-0001','Table 7-3 Telecommunication System for APF\nIP Telephony ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nVHF-FM Marine ■\nFiber Optic Cable ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nTable 7-4');
 assert.equal(apfPhiMatrix0550([{...flattenedPhi,effectiveAuthority:'CURRENT_TENDER'}]).source,null,'Never infer positions from flattened table text');
 const matrixHtml=renderToStaticMarkup(React.createElement(SourceReadingMatrix0550,{data:matrixData,integration:emptyIntegration,systems:SYSTEMS,onOpenSource:()=>{}}));
