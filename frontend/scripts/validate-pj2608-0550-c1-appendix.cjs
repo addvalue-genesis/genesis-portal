@@ -84,5 +84,14 @@ const cross=structuredClone(data),crossOwner={...packageOwner,id:'SYNTHETIC-CROS
 assert.equal(hash(html),'d5ac216e8fd7ccc9815230ef85446a757ebff3e998df476a25a2ebc70c69fd5b');assert.equal(hash(word),'78f1e95bbd3c5540227cc9fb28517c90bb6de5ecf6177e1f2161106a723e2840');assert.equal(hash(JSON.stringify(table)),'73cbb0e21a126d902f8bd2d441643e3d3da86ecb5b9fb13d2e4ab41363a4c58e','Current native v3 exports are also byte-identical');
 assert.equal(L.workspaceAlias0550('l3.original'),'CUS');assert.equal(L.workspaceAlias0550('bid.vendor.offers'),'VND');assert.equal(L.workspaceAlias0550('bid.working-preview.step.7'),'SI-WP-07');assert.equal(L.workspaceAlias0550('bid.budget.working.group.TEL-LAN'),'SI-COST');assert.equal(L.WORKSPACE_ALIAS_TARGETS_0550['si-wp-07'],'bid.working-preview.step.7');
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),UI=require(root+'/project0550/C1Appendix0550.jsx');const rendered=renderToStaticMarkup(React.createElement(UI.C1Appendix0550,{view}));assert(rendered.includes('bid.quotation.C1'));assert(rendered.includes('bid.budget.working.line.'+id));assert(rendered.includes('C1 internal trace'));assert(rendered.includes('data-c1-mr-id="MR-B1-13-APF-09"'));assert(rendered.includes('--bid-tint'));assert.equal(JSON.stringify(data),before);
+const footer=(screen,currency)=>renderToStaticMarkup(React.createElement(UI.C1Appendix0550,{view:screen,currency})).match(/<tfoot>.*?<\/tfoot>/)[0];
+const otherOwner={...packageOwner,id:'SYNTHETIC-OTHER',systemToken:'COMMON',customerTHB:32.50};
+const otherView=make(queued,[binding({...lan,customerTHB:40123.45}),...pendingBindings.slice(1),binding(otherOwner,1)]);
+assert(C.deriveC1Appendix0550(otherView).groups.some(g=>g.id==='OTHER'));
+assert(footer(otherView,'USD').includes('1,235.56</td><td>Priced items subtotal'));
+assert(footer(otherView,'THB').includes('40,155.95</td><td>Priced items subtotal'));
+assert(footer(view).includes('1,234.56</td><td></td>'),'Strict total takes precedence');
+assert(footer(missing).includes('—</td><td></td>'),'Empty prices stay unknown');
+assert(footer(make(queued,[...pendingBindings.slice(1),binding(otherOwner,0)])).includes('0.00</td><td>Priced items subtotal'));
 if(process.env.PJ0550_C1_FIXTURE)fs.writeFileSync(process.env.PJ0550_C1_FIXTURE,JSON.stringify(data));
 console.log('PASS C1 Appendix: 179 MR rows / 8 groups, stable identity and aliases, LAN parent/components, one shared package owner, invalid coverage/missing/duplicate gates, source/customer-price separation, escaped HTML/Word, colours/Copy IDs, readonly React SSR, pending owner queue, NDB twelve-owner transitive regression, exact MR titles/order and1.6.1–11 numbering, distinct satellite dishes, exact legacy v2 bytes and unchanged data.');

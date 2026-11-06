@@ -2,6 +2,7 @@ import React,{useMemo,useState} from 'react';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
+import {sumMoney0550} from './data/money0550';
 
 // Keep the native MR rows in order. In the interactive screen, put a separate
 // package-price block first so an expanded Appendix still reveals its price.
@@ -11,6 +12,9 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
  const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
+ const draftSubtotal=!documentMode&&projection.amount===null
+  ?sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite))
+  :null;
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
  const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
  const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
@@ -66,7 +70,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
      </React.Fragment>)}
      {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td><td className="number">{c1Display0550(g.amount)}</td><td/></tr>}
     </tbody>;})}
-    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount)}</td><td/></tr></tfoot>
+    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount??draftSubtotal)}</td><td>{draftSubtotal!==null?'Priced items subtotal':''}</td></tr></tfoot>
    </table>
    {view.getRecord('I.C1').content&&<p>{view.getRecord('I.C1').content}</p>}
    <footer>Schedule C1 · {view.proposal.documentNo} / {view.proposal.revision}</footer>
