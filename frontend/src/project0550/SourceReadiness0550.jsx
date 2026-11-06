@@ -4,11 +4,61 @@ import {Field,Select,Save} from "./BidControls";
 import {Multi} from "./WorkingPreview0550";
 import {deriveSourceReadiness0550,emptySourceControl0550,bindUniqueSourceInputs0550,stampSourceControl0550,SOURCE_INPUT_PANEL_0550,sourceInputRowId0550,isSourceInputTarget0550,sourceInputQuery0550,filterSourceInputRows0550} from "./data/sourceReadiness0550";
 import {newId} from "./data/bidWorkspaceModel";
-import {blankDocumentReview0550,stampIntegration0550,emptyIntegration0550} from "./data/integrationWorkspace0550";
+import {blankDocumentReview0550,stampIntegration0550,emptyIntegration0550,DOCUMENT_READING_CHECKS_0550} from "./data/integrationWorkspace0550";
 import {DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {DocumentReadingCoverage0550} from "./DocumentReadingCoverage0550";
-import {READING_LABELS_0550,hasPreparedReading0550,readingReviewChecks0550,sourceReadingQueue0550} from "./data/documentReadingProgress0550";
+import {READING_LABELS_0550,hasPreparedReading0550,readingReviewChecks0550,sourceReadingQueue0550,confirmSourceReadingBatch0550,sourceReadingBatchBasis0550} from "./data/documentReadingProgress0550";
+
+function SourceReadingBatch0550({items,data,busy,reviewDate,onEdit,onConfirm}){
+ const [selected,setSelected]=useState(()=>new Map()),[reviewer,setReviewer]=useState(""),[checks,setChecks]=useState({});
+ const eligible=items.filter(item=>item.batchReady);
+ const waiting=items.filter(item=>item.stage!=="complete"&&!item.batchReady);
+ const selectedCount=eligible.filter(item=>selected.has(item.source.id)).length;
+ const label=source=>[source.documentNo||source.title,source.revision].filter(Boolean).join(" · ");
+ const basis=item=>sourceReadingBatchBasis0550(data,item.source.id);
+ const toggle=(item,checked)=>{
+  const next=new Map(selected);
+  if(checked)next.set(item.source.id,basis(item));else next.delete(item.source.id);
+  setSelected(next);setChecks({});
+ };
+ const selectAll=()=>{
+  setSelected(new Map(eligible.map(item=>[item.source.id,basis(item)])));
+  setChecks({});
+ };
+ const submit=async e=>{
+  e.preventDefault();
+  if(await onConfirm(selected,reviewer,checks)){setSelected(new Map());setChecks({});}
+ };
+ return <details>
+  <summary>ยืนยันอ่านครบเป็นชุด · {eligible.length} ฉบับมีหน้า / Sheet ครบในร่าง</summary>
+  {eligible.length>0&&<form onSubmit={submit} aria-label="ยืนยันผลอ่าน CUS เป็นชุด">
+   <p>เลือกเฉพาะฉบับที่ตรวจต้นฉบับและผลอ่านครบแล้ว การยืนยันจะบันทึกชื่อผู้ตรวจและวันที่ {reviewDate} ให้แต่ละฉบับที่เลือก</p>
+   <button type="button" onClick={selectAll}>เลือกทุกฉบับที่มีหน้าครบในร่าง</button>
+   <button type="button" onClick={()=>{setSelected(new Map());setChecks({});}}>ล้างรายการที่เลือก</button>
+   <ul>{eligible.map(item=><li key={item.source.id}>
+    <label><input type="checkbox" checked={selected.has(item.source.id)} onChange={e=>toggle(item,e.target.checked)}/>{label(item.source)}</label>
+    {" · "+item.inputIds.join(", ")+" · "+item.review.reviewedPages}
+    <button type="button" onClick={()=>onEdit(item.source)}>เปิดผลอ่าน</button>
+   </li>)}</ul>
+   <div className="p55-bid-fields">
+    <Field label="ผู้ตรวจผลอ่าน CUS" value={reviewer} onChange={setReviewer} required/>
+    {DOCUMENT_READING_CHECKS_0550.map(([key,text])=><label key={key}><input type="checkbox" disabled={!selectedCount}
+     checked={Boolean(checks[key])} onChange={e=>setChecks({...checks,[key]:e.target.checked})}/>{text} ของทุกฉบับที่เลือก</label>)}
+   </div>
+   <button type="submit" className="p55-export-button" disabled={busy||!selectedCount||!reviewer.trim()||DOCUMENT_READING_CHECKS_0550.some(([key])=>!checks[key])}>
+    {busy?"กำลังบันทึก…":"บันทึกอ่านครบ "+selectedCount+" ฉบับ"}
+   </button>
+  </form>}
+  {waiting.length>0&&<details><summary>ฉบับที่ยังต้องเติมผลอ่านก่อนยืนยัน · {waiting.length}</summary>
+   <ul>{waiting.map(item=><li key={item.source.id}>{label(item.source)}{" · "+item.inputIds.join(", ")}
+    {item.review?.expectedPages&&<small>ช่วงที่บันทึก {item.review.reviewedPages||"—"} / ทั้งหมด {item.review.expectedPages} หน้า / หน่วยอ่าน</small>}
+    <small>{readingReviewChecks0550({problems:item.batchProblems.length?item.batchProblems:item.review?.problems}).join(" · ")}</small>
+    <button type="button" onClick={()=>onEdit(item.source)}>เปิดตรวจผลอ่าน</button>
+   </li>)}</ul>
+  </details>}
+ </details>;
+}
 
 // Part of the existing A controlled-source-inventory module, not a new module ID.
 export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
@@ -26,6 +76,14 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
  const save=async(transform,action)=>{const ok=await change(d=>({...d,sourceControl:transform(d)}),"A input control / "+action);if(ok)setMessage("บันทึกแล้ว · ตรวจสถานะ A ด้านล่าง; ยังไม่ใช่การอนุมัติ Engineering หรือ Release");return ok;};
  const showSource=s=>onOpenSource("bid.documents.source."+s.id);
  const editReading=s=>setDoc(data.integrationWorkspace?.documentReviews.find(r=>r.id===s.id)||blankDocumentReview0550(s.id));
+ const confirmReadingBatch=async (selected,reviewer,checks)=>{
+  const ok=await change(d=>confirmSourceReadingBatch0550(d,selected,reviewer,reviewDate,checks),"A document reading / batch "+selected.size);
+  if(ok){
+   setDoc(current=>current&&selected.has(current.id)?null:current);
+   setMessage("บันทึกอ่านครบแล้ว "+selected.size+" ฉบับ · ตาราง CUS ใช้ผลตรวจเดียวกัน");
+  }
+  return ok;
+ };
  const readingSource=doc&&sources.find(s=>s.id===doc.id);
  const readingChecks=doc?readingReviewChecks0550(model?.integration?.documentReviews?.find(r=>r.id===doc.id)):[];
  const blankExtra=()=>({id:newId("RFQ-EXTRA"),kind:"DOCUMENT",documentNo:"",revision:"",title:"",requiredBy:"",locator:"",sourceExcerpt:""});
@@ -42,6 +100,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
     {readingQueue.next&&<button type="button" onClick={()=>editReading(readingQueue.next.source)}>อ่านต่อ · {readingQueue.next.source.documentNo||readingQueue.next.source.title}</button>}
    </div>
    <p>ขอบเขตการอ่านครอบคลุมทุกหน้า / Sheet, Notes, Comments, สีและภาพ, Appendix และเอกสารอ้างอิงที่ต้องใช้</p>
+   {readingQueue.distinct.some(item=>item.stage!=="complete")&&<SourceReadingBatch0550 items={readingQueue.distinct} data={data} busy={busy} reviewDate={reviewDate} onEdit={editReading} onConfirm={confirmReadingBatch}/>}
   </section>
   <p>ฐาน MR Appendix 2 มี 78 รายการเลขเอกสาร/ฉบับ พร้อม SDRL/ITR ที่ฝังใน MR และเอกสารประกวดราคาเพิ่มเติม · ตัวหารนี้เป็นฐานเริ่มต้น ต้องตรวจ RFQ และ cross-references เพิ่ม ไม่ใช่การยืนยันว่าครบทั้งโครงการ</p>
   <p>78 รายการข้างต้นมีทุกประเภทตาม MR รวม PHI/SPE/DTS/BLD/LAY/STD/LIS ไม่จำกัดเฉพาะ MR, PHI และ LIS · เอกสารส่งมอบภายหลัง เช่น FAT/SAT report ตาม SDRL เป็นงานของ B ไม่ถูกนับเป็นไฟล์ลูกค้าที่ขาดใน A</p>
@@ -64,7 +123,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
    <DocumentReadingCoverage0550 source={sources.find(s=>s.id===doc.id)} doc={doc} setDoc={setDoc} prefix="A "/>
    <Multi label="A document obligation categories reviewed" value={doc.categories} onChange={v=>setDoc(f=>({...f,categories:v}))} options={DELIVERY_KINDS_0550.map(k=>[k,k])}/>
    <label>หลักฐานผลอ่าน / ข้อยกเว้น<textarea rows={8} value={doc.basis} onChange={e=>setDoc(f=>({...f,basis:e.target.value}))}/></label>
-   {[["notesReviewed","ตรวจ Notes / Comments / ข้อความท้ายตาราง"],["colourReviewed","ตรวจภาพ สี ไฮไลต์ และ annotations"],["appendicesReviewed","ตรวจ Appendix / Attachments และอ้างอิง"]].map(([k,label])=><label key={k}><input type="checkbox" checked={doc[k]} onChange={e=>setDoc(f=>({...f,[k]:e.target.checked}))}/>{label}</label>)}
+   {DOCUMENT_READING_CHECKS_0550.map(([k,label])=><label key={k}><input type="checkbox" checked={doc[k]} onChange={e=>setDoc(f=>({...f,[k]:e.target.checked}))}/>{label}</label>)}
    <Select label="A document review status" value={doc.status} onChange={v=>setDoc(f=>({...f,status:v,reviewedOn:f.reviewedOn||reviewDate}))} options={["DRAFT","REVIEWED"]}/><Field label="A document reviewer" value={doc.reviewer} onChange={v=>setDoc(f=>({...f,reviewer:v}))}/><Field label="A document review date" type="date" value={doc.reviewedOn} onChange={v=>setDoc(f=>({...f,reviewedOn:v}))}/></div>
    <p>บันทึกใน documentReviews เดียวกับ B · ไม่เปลี่ยน readState ของ intake อัตโนมัติ หากต้นฉบับยัง TEXT_PARTIAL / METADATA_ONLY ต้องตรวจและอัปเดตทะเบียนเนื้อหาก่อนจึงผ่าน</p>
    <Save busy={busy}>บันทึกการอ่านเอกสารใน A</Save><button type="button" onClick={()=>setDoc(null)}>ปิด</button>

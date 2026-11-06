@@ -2,8 +2,8 @@ import React, {useEffect, useMemo, useRef, useState} from "react";
 import {BidHeading} from "./BidModulePresentation";
 import {WP_NAVIGATION_0550} from "./workingPreviewStages0550";
 import {APF_BUILDINGS_0550, apfPhiMatrix0550} from "./data/apfPhiMatrix0550";
-import {READING_LABELS_0550,documentReadingStage0550,readingReviewChecks0550} from "./data/documentReadingProgress0550";
-import {SOURCE_INPUT_PANEL_0550} from "./data/sourceReadiness0550";
+import {READING_LABELS_0550,documentReadingStage0550,readingReviewChecks0550,sourceReadingQueue0550} from "./data/documentReadingProgress0550";
+import {SOURCE_INPUT_PANEL_0550,sourceInputRowId0550} from "./data/sourceReadiness0550";
 import {
  SOURCE_MATRIX_CHECKS_0550, SOURCE_MATRIX_GROUPS_0550, sourceMatrixIndex0550, sourceReadingMatrix0550,
 } from "./data/sourceReadingMatrix0550";
@@ -24,7 +24,7 @@ const headings = {SOFTWARE:"SOFT."};
 const sourceTitle = source => source?.documentNo || source?.title;
 const sourceTarget = id => "bid.documents.controlled-source-inventory.document." + id;
 
-function SourceList0550({sources, onOpen, initial = 12}) {
+function SourceList0550({sources, onOpen, inputBySource, onOpenInput, initial = 12}) {
  const [all,setAll] = useState(false);
  return <>
   <ul>{(all ? sources : sources.slice(0,initial)).map(item => <li key={item.id}>
@@ -32,6 +32,8 @@ function SourceList0550({sources, onOpen, initial = 12}) {
     <button type="button" onClick={() => onOpen(item.id)}>{sourceTitle(item.source)}{item.source.revision ? " · " + item.source.revision : ""} ↗</button>
     <small>{item.source.effectiveAuthority} · {item.source.readState} · {READING_LABELS_0550[item.readingStage||documentReadingStage0550(item.source,null)]}
      {item.revisionState && item.revisionState !== "CURRENT_PACKAGE" ? " · " + item.revisionState : ""}</small>
+    {item.readingStage!=="complete"&&inputBySource?.has(item.id)&&<button type="button"
+     onClick={()=>onOpenInput(inputBySource.get(item.id))}>เปิดผลอ่านฉบับนี้ในทะเบียน ↗</button>}
     {item.review?.problems?.length>0&&<details><summary>งานอ่านค้างจากทะเบียน</summary>
      <ul>{readingReviewChecks0550(item.review).map(check=><li key={check}>{check}</li>)}</ul>
     </details>}
@@ -49,7 +51,7 @@ function SourceList0550({sources, onOpen, initial = 12}) {
  </>;
 }
 
-function DocumentCell0550({cell, onOpen, onOpenRegister}) {
+function DocumentCell0550({cell, onOpen, onOpenRegister, inputBySource, onOpenInput}) {
  const linked = new Set(cell.sources.map(item => item.id));
  const candidates = cell.candidates.filter(source => !linked.has(source.id));
  const references = cell.references.filter(ref => ref.edges.length || ref.reason);
@@ -62,7 +64,7 @@ function DocumentCell0550({cell, onOpen, onOpenRegister}) {
   {cell.issues.length > 0 && <ul>{cell.issues.map(issue => <li key={issue}>{issue}</li>)}</ul>}
   {cell.readingSources.length > 0 && <>
    <h4>ฉบับใช้งานในคิวอ่าน · {cell.readingSources.length}</h4>
-   <SourceList0550 sources={cell.readingSources} onOpen={onOpen}/>
+   <SourceList0550 sources={cell.readingSources} onOpen={onOpen} inputBySource={inputBySource} onOpenInput={onOpenInput}/>
   </>}
   {otherCopies.length>0&&<details><summary>ฉบับเก่า / ฉบับอื่น / แหล่งที่ยังไม่พบ · {otherCopies.length}</summary>
    <SourceList0550 sources={otherCopies} onOpen={onOpen}/>
@@ -96,7 +98,7 @@ const locationState = (apf, row, i) => {
  return !items ? "blank" : items.some(item => item.note) ? "note" : "location";
 };
 
-export function SourceReadingMatrix0550({data, integration, systems, onOpenSource, navigationTarget}) {
+export function SourceReadingMatrix0550({data, integration, readiness, systems, onOpenSource, navigationTarget}) {
  const [view,setView] = useState(navigationTarget===WP_NAVIGATION_0550.locations.id?"locations":"documents"), [selection,setSelection] = useState(null);
  useEffect(()=>{
   if(navigationTarget===WP_NAVIGATION_0550.documents.id)setView("documents");
@@ -106,6 +108,8 @@ export function SourceReadingMatrix0550({data, integration, systems, onOpenSourc
  const index = useMemo(() => sourceMatrixIndex0550(data.sourceIntake), [data.sourceIntake]);
  const rows = useMemo(() => sourceReadingMatrix0550(index,integration,systems,data.sourceIntake?.findings),
   [index,integration,systems,data.sourceIntake?.findings]);
+ const queue=useMemo(()=>readiness?sourceReadingQueue0550(readiness.rows,integration.documentReviews):null,[readiness,integration.documentReviews]);
+ const inputBySource=useMemo(()=>new Map(queue?.distinct.map(item=>[item.source.id,item.inputIds[0]])||[]),[queue]);
  const isDocumentView = view === "documents";
  const apf = useMemo(() => isDocumentView ? null : apfPhiMatrix0550([...index.byId.values()]), [index,isDocumentView]);
  const displayedRows = isDocumentView ? rows : rows.filter(row => row.token !== "COMMON");
@@ -138,6 +142,10 @@ export function SourceReadingMatrix0550({data, integration, systems, onOpenSourc
    </>:<>{locationLegend.map(key=><span key={key}><b data-state={key}>{states[key][0]}</b> {states[key][1]}</span>)}
     <span><b data-state="pending">·</b> {READING_LABELS_0550.pending}</span></>}
   </div>
+  {isDocumentView&&queue&&<p className="p55-note">
+   อ่านครบตามทะเบียน {queue.counts.complete} / {readiness.expected} รายการ RFQ · ต้องยืนยันต้นฉบับ / Rev. {queue.counts.receipt} รายการ{" "}
+   <button type="button" onClick={()=>onOpenSource(SOURCE_INPUT_PANEL_0550)}>เปิดคิวอ่านและยืนยันเป็นชุด ↗</button>
+  </p>}
   {!isDocumentView && <p className="p55-note">
    {apf.source ? <>PHI-0001 · {apf.source.revision} · Table 7-3 · ตำแหน่งจากข้อความที่รักษาคอลัมน์ไว้ ตรวจสีและฉบับจริงใน CUS <button type="button" onClick={() => onOpenSource(sourceTarget(apf.source.id))}>เปิด PHI ต้นฉบับ ↗</button></>
     : "OPEN · รอตรวจฉบับและต้นฉบับ Table 7-3 ที่รักษาตำแหน่งของช่อง"}
@@ -174,7 +182,8 @@ export function SourceReadingMatrix0550({data, integration, systems, onOpenSourc
    <header><h3 id="p55-source-matrix-detail-title">{selectedRow?.name} × {selectedCell?.family || (selection && APF_BUILDINGS_0550[selection.column])}</h3>
     <form method="dialog"><button type="submit" autoFocus>ปิด</button></form></header>
    {selectedCell && <DocumentCell0550 key={selectedRow.token + selectedCell.family} cell={selectedCell}
-    onOpen={openSource} onOpenRegister={() => openCus(SOURCE_INPUT_PANEL_0550)}/>}
+    onOpen={openSource} onOpenRegister={() => openCus(SOURCE_INPUT_PANEL_0550)} inputBySource={inputBySource}
+    onOpenInput={inputId=>openCus(sourceInputRowId0550(inputId))}/>}
    {selectedRow && !isDocumentView && <>
     <p>{states[locationState(apf,selectedRow,selection.column)]?.[1]||READING_LABELS_0550.pending} · PHI Table 7-3</p>
     {selectedLocation?.length > 0 && <ul>{selectedLocation.map(item => <li key={item.label}>{item.label}{item.note && " · " + item.note}</li>)}</ul>}

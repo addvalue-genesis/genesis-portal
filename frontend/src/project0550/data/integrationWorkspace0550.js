@@ -11,7 +11,7 @@ import {documentReadingUnits0550} from "./documentReadingUnits0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
 export const emptyIntegration0550=()=>({schema:INTEGRATION_SCHEMA_0550,requirements:[],proofs:[],activities:[],scopeReviews:[],particulars:[],avlChecks:[],deviations:[],documentReviews:[]});
 export const blankDocumentReview0550=id=>({id,systemTokens:[],expectedPages:null,reviewedPages:"",notesReviewed:false,colourReviewed:false,appendicesReviewed:false,categories:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
-export function reviewedPageSet0550(text){const pages=new Set();for(const token of text.split(",").map(s=>s.trim()).filter(Boolean)){if(!/^\d+(?:-\d+)?$/.test(token))return null;const [a,b=a]=token.split("-").map(Number);if(a<1||b<a||b>10000)return null;for(let p=a;p<=b;p++)pages.add(p);}return pages;}
+export function reviewedPageSet0550(text){const pages=new Set();for(const token of text.replace(/[–—]/g,"-").split(",").map(s=>s.trim()).filter(Boolean)){if(!/^\d+(?:\s*-\s*\d+)?$/.test(token))return null;const [a,b=a]=token.split("-").map(Number);if(a<1||b<a||b>10000)return null;for(let p=a;p<=b;p++)pages.add(p);}return pages;}
 export function obligationCandidates0550(source){
  if(!source?.content)return [];
  const patterns=[['TRAINING',/train(?:ing)?|อบรม/i],['FAT',/\bFAT\b|factory acceptance/i],['IFAT',/\bIFAT\b|integrated factory/i],['SAT',/\bSAT\b|site acceptance/i],['PRECOM',/pre.?commission/i],['COMMISSIONING',/commissioning/i],['SPARES',/spare|อะไหล่/i],['WARRANTY',/warrant|guarantee/i],['VDRL',/VDRL|documentation|documents? shall|shall.*documents?/i],['SDRL',/SDRL/i],['ITP',/\bITP\b|inspection|hold point|witness/i],['INSTALLATION',/install(?:ation)?|erection/i],['PRESERVATION',/preserv|storage/i],['OTHER',/\bnote\b|appendi[xc]|addendum|amendment/i]];
@@ -87,6 +87,22 @@ function evidenceReader0550(data){
  };
 }
 function reviewProblems(data,collection,r,today){const out=[];if(r.status!=="REVIEWED"||!has(r.reviewer)||!r.reviewedOn||r.reviewedOn>today)out.push("REVIEW_OPEN");if(r.status==="REVIEWED"&&!r.basisKey)out.push("REVIEW_BASIS_OPEN");else if(r.basisKey&&r.basisKey!==integrationRecordBasis0550(data,collection,r))out.push("STALE_DEPENDENCIES");return out;}
+export const DOCUMENT_READING_CHECKS_0550=[
+ ["notesReviewed","ตรวจ Notes / Comments / ข้อความท้ายตาราง"],
+ ["colourReviewed","ตรวจภาพ สี ไฮไลต์ และ annotations"],
+ ["appendicesReviewed","ตรวจ Appendix / Attachments และอ้างอิง"],
+];
+export function documentReadingEvidenceProblems0550(source,review){
+ const problems=[],pages=reviewedPageSet0550(review.reviewedPages);
+ if(review.readingKind&&review.readingKind!=="PDF_PAGE"){
+  const native=documentReadingUnits0550(source);
+  if(native.kind!==review.readingKind||!native.units.length||review.expectedPages!==native.units.length)problems.push("NATIVE_READING_UNITS_OPEN");
+ }
+ if(source?.readState!=="TEXT_READ")problems.push("FULL_SOURCE_TEXT_REVIEW_OPEN");
+ if(!Number.isInteger(review.expectedPages)||review.expectedPages<1||!pages||pages.size!==review.expectedPages||[...pages].some(p=>p>review.expectedPages))problems.push("DOCUMENT_PAGES_UNREVIEWED");
+ if(!has(review.basis)||!review.systemTokens.length)problems.push("DOCUMENT_READING_BASIS_OR_SYSTEM_OPEN");
+ return problems;
+}
 export function deriveIntegrationProof0550(data,p,today,readEvidence=evidenceReader0550(data)){
  const r=integrationRequirements0550(data).find(r=>r.id===p.requirementId),problems=reviewProblems(data,"proofs",p,today);
  if(!r)problems.push("REQUIREMENT_MISSING");
@@ -106,14 +122,9 @@ export function deriveIntegrationProof0550(data,p,today,readEvidence=evidenceRea
 export function deriveIntegration0550(data,systems,today){
  const readEvidence=evidenceReader0550(data);
  const w={...emptyIntegration0550(),...data.integrationWorkspace},requirements=integrationRequirements0550(data),proofs=w.proofs.map(p=>deriveIntegrationProof0550(data,p,today,readEvidence));
- const documentReviews=w.documentReviews.map(d=>{const problems=reviewProblems(data,"documentReviews",d,today),s=sourcesFor(data,[d.id])[0],pages=reviewedPageSet0550(d.reviewedPages);
-  if(d.readingKind&&d.readingKind!=="PDF_PAGE"){
-   const native=documentReadingUnits0550(s);
-   if(native.kind!==d.readingKind||!native.units.length||d.expectedPages!==native.units.length)problems.push("NATIVE_READING_UNITS_OPEN");
-  }
-  if(!s||s.readState!=="TEXT_READ")problems.push("FULL_SOURCE_TEXT_REVIEW_OPEN");
-  if(!Number.isInteger(d.expectedPages)||d.expectedPages<1||!pages||pages.size!==d.expectedPages||[...pages].some(p=>p>d.expectedPages))problems.push("DOCUMENT_PAGES_UNREVIEWED");
-  if(!d.notesReviewed||!d.colourReviewed||!d.appendicesReviewed||!has(d.basis)||!d.systemTokens.length)problems.push("NOTES_COLOUR_APPENDICES_REVIEW_OPEN");
+ const documentReviews=w.documentReviews.map(d=>{
+  const s=sourcesFor(data,[d.id])[0],problems=[...reviewProblems(data,"documentReviews",d,today),...documentReadingEvidenceProblems0550(s,d)];
+  if(DOCUMENT_READING_CHECKS_0550.some(([key])=>!d[key]))problems.push("NOTES_COLOUR_APPENDICES_REVIEW_OPEN");
   return {...d,problems,state:problems.length?"OPEN":"REVIEWED_DOCUMENT"};
  });
  const particulars=w.particulars.map(p=>{

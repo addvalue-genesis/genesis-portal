@@ -176,7 +176,7 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
   const common=<div className="p55-review-toolbar"><button type="button" onClick={()=>stage.target==="l3.original"?onOpenSource("l3.original"):onNavigate(stage.target)}>เปิดโมดูลต้นทาง {stage.step.toString().padStart(2,"0")}</button></div>;
   let body;
   if(stage.step===1)body=<>
-   <SourceReadingMatrix0550 data={data} integration={model} systems={SYSTEMS} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
+   <SourceReadingMatrix0550 data={data} integration={model} readiness={bidModel.sourceReadiness} systems={SYSTEMS} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
    <Note>A: ข้อกำหนดลูกค้า ↔ Web App: System Integrator / CAL–RPT ↔ B: MGW / INDUSTRONIC และ catalog/datasheet · ใช้ขอบเขตจากเอกสาร ไม่จำกัดตามรายการที่ Supplier เสนอ</Note>
    <details data-component-key={WP_NAVIGATION_0550.inventory.id} data-module-number={WP_NAVIGATION_0550.inventory.number}>
    <summary><BidHeading {...WP_NAVIGATION_0550.inventory}/></summary>

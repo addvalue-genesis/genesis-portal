@@ -51,7 +51,7 @@ assert.equal(S.filterSourceInputRows0550(m.rows,S.SOURCE_INPUT_PANEL_0550).lengt
 const focusedMarkup=renderToStaticMarkup(React.createElement(SourceReadiness0550,{navigationTarget:S.sourceInputRowId0550('RFQ-001')}));
 assert(focusedMarkup.includes('input.RFQ-001'));assert(!focusedMarkup.includes('input.RFQ-002'),'Direct row navigation starts with just the addressed input');assert.equal(JSON.stringify(d),inputSnapshot);
 
-const {sourceReadingQueue0550}=require(root+'/project0550/data/documentReadingProgress0550.js');
+const {sourceReadingQueue0550,confirmSourceReadingBatch0550,sourceReadingBatchBasis0550}=require(root+'/project0550/data/documentReadingProgress0550.js');
 const queue=data=>sourceReadingQueue0550(derive(data).rows,integration(data).documentReviews);
 const finished=queue(d);
 assert.equal(finished.counts.complete,85);
@@ -67,6 +67,30 @@ assert.equal(Object.values(readQueue.counts).reduce((a,b)=>a+b,0),85);
 assert.equal(readQueue.next.stage,'partial');
 assert(markup.includes('คิวอ่านเอกสาร CUS')&&markup.includes('อ่านครบ 85 / 85 รายการ RFQ'));
 assert.equal(JSON.stringify(d),inputSnapshot);
+
+const draftBatch=clone(d),shared=finished.distinct.find(e=>e.inputIds.includes('RFQ-001'));
+const draft=draftBatch.integrationWorkspace.documentReviews.find(r=>r.id===shared.source.id);
+Object.assign(draft,{status:'DRAFT',reviewedPages:'1 – 2',expectedPages:2,basisKey:'',notesReviewed:false,colourReviewed:false,appendicesReviewed:false});
+const checks=Object.fromEntries(I.DOCUMENT_READING_CHECKS_0550.map(([key])=>[key,true]));
+const selected=new Map([[draft.id,sourceReadingBatchBasis0550(draftBatch,draft.id)]]);
+assert.equal(queue(draftBatch).distinct.find(e=>e.source.id===draft.id).batchReady,true);
+context.useBidWorkspace=()=>({data:draftBatch,model:{integration:integration(draftBatch),sourceReadiness:derive(draftBatch)},reviewDate:today,busy:false});
+const draftMarkup=renderToStaticMarkup(React.createElement(SourceReadiness0550));
+assert(draftMarkup.includes('ยืนยันอ่านครบเป็นชุด')&&draftMarkup.includes('ผู้ตรวจผลอ่าน CUS'));
+assert.throws(()=>confirmSourceReadingBatch0550(draftBatch,selected,'Reviewer',today,{}),/ยืนยันผลตรวจ/);
+const changedSource=clone(draftBatch);
+changedSource.sourceIntake.sources.find(s=>s.id===draft.id).content+=' changed after selection';
+assert.throws(()=>confirmSourceReadingBatch0550(changedSource,selected,'Reviewer',today,checks),/เปลี่ยนแล้ว/);
+const incomplete=clone(draftBatch);incomplete.integrationWorkspace.documentReviews.find(r=>r.id===draft.id).reviewedPages='1';
+assert.equal(queue(incomplete).distinct.find(e=>e.source.id===draft.id).batchReady,false);
+assert.throws(()=>confirmSourceReadingBatch0550(incomplete,selected,'Reviewer',today,checks),/เปลี่ยนแล้ว/);
+const complete=confirmSourceReadingBatch0550(draftBatch,selected,'Reviewer',today,checks);
+assert.equal(queue(complete).counts.complete,85,'One shared source confirmation advances each RFQ input that uses it');
+assert.equal(draft.status,'DRAFT');
+assert.strictEqual(complete.lines,draftBatch.lines);
+assert.strictEqual(complete.sourceControl,draftBatch.sourceControl);
+assert.equal(complete.integrationWorkspace.documentReviews.find(r=>r.id===draft.id).reviewer,'Reviewer');
+assert.throws(()=>confirmSourceReadingBatch0550(complete,selected,'Reviewer',today,checks),/เปลี่ยนแล้ว/);
 
 if(process.argv[2]){const intake=JSON.parse(fs.readFileSync(process.argv[2]));let real={...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),sourceIntake:intake};const before=JSON.stringify(real);const initial=S.deriveSourceReadiness0550(real,I.deriveIntegration0550(real,D.SYSTEMS,today),today);assert(!initial.ready);assert.equal(initial.rows.filter(r=>r.kind==='DOCUMENT'&&r.candidates.length).length,71);const conflict=initial.rows.find(r=>r.documentNo==='10008-STD-6-ICT-003');assert(!conflict.candidates.length&&conflict.related.length);assert.equal(JSON.stringify(real),before);console.log('Private intake read-only:',JSON.stringify({sources:intake.sources.length,expected:initial.expected,numberedExactMatches:71,state:initial.state}));}
 console.log('PASS A input readiness: actual document-ledger prerequisites; full expected denominator; explicit versions and bindings; missing/partial/mismatched inputs; 10006/10008 investigation only; embedded versus future deliverables; no checkbox bypass; stale content and bindings; extra cross-references; strict schema; no financial mutation; canonical evidence lookup and real React SSR.');
