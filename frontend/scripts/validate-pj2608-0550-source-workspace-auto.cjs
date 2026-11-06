@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];requir
 const A=require(root+'/project0550/data/sourceWorkspaceAuto0550.js'),P=require(root+'/project0550/data/siWorkPackage0550.js'),S=require(root+'/project0550/data/sourceReadiness0550.js'),I=require(root+'/project0550/data/integrationWorkspace0550.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),D=require(root+'/project0550/data.js'),bridge=require('./source-drive-0550.cjs');
 // The paired cap must admit both per-file caps; ancestry stays bounded.
 const limits=require('../src/project0550/data/sourceWorkspaceLimits0550.json');
-assert.equal(limits.sourceBytes,32*1024*1024);assert.equal(P.SI_FILE_LIMIT_0550,84*1024*1024);
+assert.equal(limits.sourceBytes,32*1024*1024);assert.equal(P.SI_FILE_LIMIT_0550,96*1024*1024);
 assert.equal(bridge.MAX_WORKSPACE_BYTES,limits.sourceBytes+P.SI_FILE_LIMIT_0550+limits.responseOverheadBytes);
 const chain=n=>{let p={batchId:'BOUND-0'};for(let i=1;i<=n;i++)p={batchId:'BOUND-'+i,predecessor:p};return p;};
 assert.equal(P.preparationAncestors0550(chain(limits.maxAncestors)).length,limits.maxAncestors);

@@ -8,7 +8,7 @@ import {blankDocumentReview0550,stampIntegration0550,emptyIntegration0550} from 
 import {DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {DocumentReadingCoverage0550} from "./DocumentReadingCoverage0550";
-import {READING_LABELS_0550,readingReviewChecks0550,sourceReadingQueue0550} from "./data/documentReadingProgress0550";
+import {READING_LABELS_0550,hasPreparedReading0550,readingReviewChecks0550,sourceReadingQueue0550} from "./data/documentReadingProgress0550";
 
 // Part of the existing A controlled-source-inventory module, not a new module ID.
 export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
@@ -35,6 +35,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
   <section className="p55-callout" aria-label="คิวอ่านเอกสาร CUS">
    <h4>คิวอ่านเอกสาร CUS</h4>
    <p>อ่านครบ {readingQueue.counts.complete} / {readiness.expected} รายการ RFQ · ผูกฉบับใช้งานแล้ว {readingQueue.distinct.length} แหล่งไม่ซ้ำ · เอกสารที่ใช้ร่วมกันบันทึกผลอ่านครั้งเดียวต่อฉบับ</p>
+   {readingQueue.prepared>0&&<p>มีร่างผลอ่าน {readingQueue.prepared} / {readingQueue.distinct.length} ฉบับ · เปิดร่างเพื่อดูหน้าที่ตรวจพบ หลักฐาน และรายการที่ต้องยืนยัน</p>}
    <div className="p55-review-toolbar">
     <Select label="ขั้นตอนการอ่าน" value={readingFilter} onChange={value=>{setReadingFilter(value);setOpenOnly(false);}}
      options={[["all","ทุกขั้นตอน"],...Object.entries(readingQueue.counts).map(([key,count])=>[key,READING_LABELS_0550[key]+" · "+count])]}/>
@@ -62,7 +63,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
    <div className="p55-bid-fields"><Multi label="A document applicable systems" value={doc.systemTokens} onChange={v=>setDoc(f=>({...f,systemTokens:v}))} options={(model?.integration?.scopes||[]).map(s=>[s.id,s.id])}/>
    <DocumentReadingCoverage0550 source={sources.find(s=>s.id===doc.id)} doc={doc} setDoc={setDoc} prefix="A "/>
    <Multi label="A document obligation categories reviewed" value={doc.categories} onChange={v=>setDoc(f=>({...f,categories:v}))} options={DELIVERY_KINDS_0550.map(k=>[k,k])}/>
-   <Field label="A document review basis / exceptions" value={doc.basis} onChange={v=>setDoc(f=>({...f,basis:v}))}/>
+   <label>หลักฐานผลอ่าน / ข้อยกเว้น<textarea rows={8} value={doc.basis} onChange={e=>setDoc(f=>({...f,basis:e.target.value}))}/></label>
    {[["notesReviewed","ตรวจ Notes / Comments / ข้อความท้ายตาราง"],["colourReviewed","ตรวจภาพ สี ไฮไลต์ และ annotations"],["appendicesReviewed","ตรวจ Appendix / Attachments และอ้างอิง"]].map(([k,label])=><label key={k}><input type="checkbox" checked={doc[k]} onChange={e=>setDoc(f=>({...f,[k]:e.target.checked}))}/>{label}</label>)}
    <Select label="A document review status" value={doc.status} onChange={v=>setDoc(f=>({...f,status:v,reviewedOn:f.reviewedOn||reviewDate}))} options={["DRAFT","REVIEWED"]}/><Field label="A document reviewer" value={doc.reviewer} onChange={v=>setDoc(f=>({...f,reviewer:v}))}/><Field label="A document review date" type="date" value={doc.reviewedOn} onChange={v=>setDoc(f=>({...f,reviewedOn:v}))}/></div>
    <p>บันทึกใน documentReviews เดียวกับ B · ไม่เปลี่ยน readState ของ intake อัตโนมัติ หากต้นฉบับยัง TEXT_PARTIAL / METADATA_ONLY ต้องตรวจและอัปเดตทะเบียนเนื้อหาก่อนจึงผ่าน</p>
@@ -94,7 +95,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
   <div className="p55-table-wrap"><table className="p55-table" aria-label="A expected versus received inputs"><thead><tr><th>เอกสารที่ต้องมี / เหตุผล</th><th>พบต้นฉบับ / ฉบับใกล้เคียง</th><th>ต้นฉบับที่ผูก / อ่าน</th><th>สถานะ / ทำต่อ</th></tr></thead><tbody>{!rows.length&&<tr><td colSpan={4}>ไม่พบรายการตามตัวกรอง <button type="button" onClick={()=>{setQuery("");setOpenOnly(false);setReadingFilter("all");}}>ล้างตัวกรองรายการ A</button></td></tr>}{rows.map(r=><tr key={r.id} data-component-key={sourceInputRowId0550(r.id)} tabIndex={-1}>
    <td><strong>{r.documentNo||r.title} {r.revision}</strong><small>{r.title} / {r.id}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={sourceInputRowId0550(r.id)}/><small>ต้องมีเพราะ: {r.requiredBy} / {r.locator}</small></td>
    <td>{r.candidates.length?`${r.candidates.length} ต้นฉบับเลข/ฉบับตรง`:(r.kind==="ATTACHMENT"?"ต้องเลือกเอกสารแนบจริง":"ยังไม่พบเลข/ฉบับตรง")}{r.related.length>0&&<details><summary>มีฉบับ/เลขอื่นให้ตรวจ {r.related.length}</summary>{r.related.map(s=><p key={s.id}><button type="button" onClick={()=>showSource(s)}>{s.title}</button> {s.revision} / {s.authority}</p>)}</details>}</td>
-   <td>{r.bound.map(s=><div key={s.id}><button type="button" onClick={()=>showSource(s)}>{s.title}</button><small>{s.readState} / {s.effectiveAuthority}</small><button type="button" onClick={()=>editReading(s)}>ตรวจอ่านทุกหน้าใน A</button></div>)}{!r.bound.length&&"ยังไม่ผูกต้นฉบับ"}<small>{r.binding?.locator}</small></td>
+   <td>{r.bound.map(s=><div key={s.id}><button type="button" onClick={()=>showSource(s)}>{s.title}</button><small>{s.readState} / {s.effectiveAuthority}</small><button type="button" onClick={()=>editReading(s)}>{hasPreparedReading0550(data.integrationWorkspace?.documentReviews.find(d=>d.id===s.id))?"เปิดร่างผลอ่านใน A":"ตรวจอ่านทุกหน้าใน A"}</button></div>)}{!r.bound.length&&"ยังไม่ผูกต้นฉบับ"}<small>{r.binding?.locator}</small></td>
    <td><strong>{READING_LABELS_0550[readingQueue.stages.get(r.id)]}</strong><small>{r.state}</small><details><summary>เหตุผล</summary>{r.problems.length?<ul>{r.problems.map(p=><li key={p}>{p}</li>)}</ul>:<p>ผ่าน receipt และการอ่านตามข้อมูลที่ผูก; ยังต้องผ่าน manifest review และ SI</p>}</details><button type="button" disabled={busy} onClick={()=>setEdit(r.binding?{...r.binding,sourceIds:[...r.binding.sourceIds]}:{inputId:r.id,sourceIds:[],locator:r.kind==="EMBEDDED"?r.locator:r.kind==="DOCUMENT"?"Document cover / document identity":""})}>ผูก / ตรวจต้นฉบับ</button></td>
   </tr>)}</tbody></table></div>
   <p>การอ่านใน A ใช้ Document reading ledger กลางเดียวกับ B → System Particular · {readiness.documentGaps.length} current source records ยังไม่มีผลอ่านครบ · เมื่อ A พร้อม B ยังต้องทำ SI 1–8 จึงไปถึง Release ได้</p>

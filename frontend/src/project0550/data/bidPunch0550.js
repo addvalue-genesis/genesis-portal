@@ -24,6 +24,11 @@ export function punchCause0550(code){
  if(/SOURCE|EXCERPT|CLAUSE|PARTICULAR|DOCUMENT/.test(code))return {severity:'REVIEW',priceEffect:'UNKNOWN',title:'ต้องตรวจฐานเอกสาร/ประเด็นต้นทาง',action:'อ่านประเด็นและฉบับที่เกี่ยวข้อง ระบุว่ากระทบชนิด จำนวน ขอบเขต หรือเป็นงานเอกสาร; ผูกหลักฐานและฐานราคาที่ใช้'};
  return {severity:'REVIEW',priceEffect:'UNKNOWN',title:'ต้องประเมินเงื่อนไขเพิ่มเติม',action:'เปิดต้นทางของเงื่อนไข ประเมินผลต่อราคาและกำหนดส่งก่อนจัด Major/Minor'};
 }
+export function sourceFindingPunchCause0550(finding){
+ const cause=punchCause0550('SOURCE_FINDING');
+ const severity={'CUS Punch / MAJOR':'MAJOR','CUS Punch / MINOR':'MINOR'}[finding?.category];
+ return severity?{...cause,severity,priceEffect:severity==='MAJOR'?'SCOPE':'EVIDENCE',action:finding.impact}:cause;
+}
 // A disappeared row is not evidence of closure. New plans retain their exact
 // source subjects; the original live validators must clear the tracked cause.
 export function punchGateScope0550(data,model){
@@ -83,13 +88,14 @@ export function deriveBidPunch0550(data,model,systems,today){
   return row;
  }
  for(const r of reqs)for(const problem of r.problems||[]){
-  const [code,ref]=problem.split(' / '),cause=punchCause0550(code);
+  const [code,ref]=problem.split(' / ');
   const shared=['PARTICULAR_OPEN','PARTICULAR_ACTIVITY_OPEN','SOURCE_FINDING','CURRENT_SOURCE_OPEN','SOURCE_REVISION_OR_COPY_OPEN','SOURCE_MISSING','CONTENT_UNREAD'].includes(code)&&ref;
   // One SI task per cause/system/proof method, with the exact affected MR IDs
   // retained below it. Do not hand thousands of identical review tasks to the
   // owner or make one shared source problem look like thousands of purchases.
   const key=shared?code+'|'+ref:code+'|SYSTEM|'+r.systemToken+(code==='ENGINEERING_PROOF_OPEN'?'|'+r.proofMode:'');
   const particular=(integration.particulars||[]).find(p=>p.id===ref),finding=(data.sourceIntake?.findings||[]).find(f=>f.id===ref);
+  const cause=code==='SOURCE_FINDING'?sourceFindingPunchCause0550(finding):punchCause0550(code);
   let target='bid.working-preview.requirement.'+r.id,sourceTarget=false;
   if(code==='PARTICULAR_OPEN'||code==='PARTICULAR_ACTIVITY_OPEN')target='bid.working-preview.particular.'+ref;
   if(code==='SOURCE_FINDING'){target='bid.documents.finding.'+ref;sourceTarget=true;}
@@ -106,7 +112,7 @@ export function deriveBidPunch0550(data,model,systems,today){
   const row=add('PARTICULAR_OPEN|'+p.id,{...punchCause0550('PARTICULAR_OPEN'),title:p.title,context:p.impact,shared:true,target:'bid.working-preview.particular.'+p.id});row.systemTokens.push(p.systemToken);row.codes.push(...p.problems);
  }
  for(const f of data.sourceIntake?.findings||[])if(f.state!=='SOURCE_SUPPORTED'){
-  const row=add('SOURCE_FINDING|'+f.id,{...punchCause0550('SOURCE_FINDING'),title:f.statement,context:f.impact,shared:true,target:'bid.documents.finding.'+f.id,sourceTarget:true});row.systemTokens.push(...(f.systemTokens.length?f.systemTokens:['COMMON']));row.codes.push(f.state);
+  const row=add('SOURCE_FINDING|'+f.id,{...sourceFindingPunchCause0550(f),title:f.statement,context:f.impact,shared:true,target:'bid.documents.finding.'+f.id,sourceTarget:true});row.systemTokens.push(...(f.systemTokens.length?f.systemTokens:['COMMON']));row.codes.push(f.state);
  }
  // Genuine numerical/identity/unit errors remain price blockers. Existing
  // scope warnings and Included MR references must not become extra purchases.

@@ -17,6 +17,7 @@ const REVIEW_CHECKS={
  NOTES_COLOUR_APPENDICES_REVIEW_OPEN:"ตรวจ Notes, Comments, ภาพ, สี และ Appendix",
 };
 export const readingReviewChecks0550=review=>review?.problems?.map(code=>REVIEW_CHECKS[code]||code)||[];
+export const hasPreparedReading0550=review=>review?.status==="DRAFT"&&Boolean(review.expectedPages&&review.basis?.trim());
 
 export function documentReadingStage0550(source, review){
  if(!source?.content||source.readState==="METADATA_ONLY")return "unread";
@@ -44,6 +45,7 @@ export function sourceReadingQueue0550(rows, documentReviews){
   stages.set(row.id,stage);
  }
  const distinct=[...sources.values()];
+ const prepared=distinct.filter(item=>hasPreparedReading0550(reviews.get(item.source.id))).length;
  const next=distinct.find(item=>item.stage==="partial"||item.stage==="verify")||distinct.find(item=>item.stage==="unread");
- return {counts,stages,distinct,next};
+ return {counts,stages,distinct,next,prepared};
 }
