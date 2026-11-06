@@ -29,6 +29,7 @@ import {BID_GROUPS_0550,bidPresentationIndex,bidOwnerStyle,lineOwner0550,bidModu
 import {BidInheritedBasis} from "./BidInheritedBasis";
 import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550} from "./bidWorkingBasis0550";
 import {OfficialCustomerForm} from "./OfficialCustomerForm";
+import {LicensingCost0550} from "./LicensingCost0550";
 import {SATELLITE_SCOPE_OPTIONS,isSatelliteScope0550,satelliteScopeNote0550} from "./data/satelliteScope0550";
 const companyReference=line=>Boolean(line.mrScopeState?.excluded||line.satelliteScopeState?.excluded);
 const includedPriceReference=line=>Boolean(line.mrScopeState?.covered||line.bidPriceAllocation);
@@ -102,6 +103,7 @@ function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavig
  {part==="A"&&code==="TEL-TELT"&&<p className="p55-callout">{RETIRED_TOWER_BASIS_0550}</p>}
  {code==="B1"&&<p className="p55-callout">TEL-TELT · ส่ง structural calculation, แบบฐานรากและสเปก anchor bolts ก่อนปิดประมูล · คง Part B สำหรับงานออกแบบและควบคุมการติดตั้ง · วันและทีม supervision หน้างานยัง OPEN <a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a></p>}
  {code==="B7"&&<p className="p55-callout">TEL-TELT · B7-D04 ใช้ราคา TSSR Item 6 · Item 7 รอตรวจรายงานดินจาก EPC ก่อนตั้งค่าเจาะสำรวจ</p>}
+ {code==="B8"&&<LicensingCost0550 lines={children} onNavigate={onNavigate}/>}
  {code==="C1"&&<p className="p55-callout">TEL-TELT · งานตั้งเสาจริงเป็น CNEEC Option · ก่อสร้างฐานรากอยู่นอก TSI · ดูจุดแบ่งงานกราวด์ รั้ว และปรับพื้นที่ในรายการอ้างอิงด้านล่าง <a href={TOWER_C1_0550}>Priced Breakdown C1</a></p>}
  <p>การจัดสรรต้นทุน / ราคาขาย Working ด้านล่างเป็นอีกชั้นหนึ่ง · ไม่เปลี่ยนยอด Supplier ต้นฉบับ · ประมาณการและงานเพิ่มต้องมีฐานแยก · เจ้าของราคาคิดครั้งเดียว</p>
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>

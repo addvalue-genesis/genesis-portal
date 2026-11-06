@@ -14,6 +14,18 @@ const dir=process.env.PJ0550_NATIVE_OUTPUT||path.join(os.tmpdir(),'0550-native-e
 for(const s of V.SCHEDULES_0550){const result=N.nativeSchedule0550(view,s.id);assert(result.html.replace(/<[^>]+>/g,'').includes('SCHEDULE '+s.id));assert(!result.html.includes('{{'));fs.writeFileSync(path.join(dir,s.id+'.html'),N.nativeExhibitHtml0550(view,s.id));fs.writeFileSync(path.join(dir,s.id+'.docx'),N.buildNativeExhibitDocx0550(view,s.id));}
 fs.writeFileSync(path.join(dir,'all.docx'),N.buildNativeExhibitDocx0550(view));fs.writeFileSync(path.join(dir,'all.html'),N.nativeExhibitHtml0550(view));
 assert(N.nativeSchedule0550(view,'A1').html.includes('whiteness'),'Preserve native wording, including source errors');
+const licenceId='REQ-MR-ACT-B8-D05',licence={...b,lineId:licenceId,schedule:'A1',summary:'OTHER',treatment:'BASE',amount:100,line:{...b.line,id:licenceId,selected:true,customerTHB:3000,costTHB:2777}};
+const licenceView={...view,workingPreview:true,bindings:[licence],baseAssigned:100};
+const licencePage=N.nativeSchedule0550(licenceView,'A1').pages[0].values;
+assert.equal(licencePage.A1_11_6,'100.00');
+assert(licencePage.A1_11_7.includes('Telecom import, radio and operating licence coordination'));
+assert(!N.nativeSchedule0550({...licenceView,workingPreview:false},'A1').pages[0].values.A1_11_7.includes('Telecom import, radio and operating licence coordination'));
+const {LicensingCost0550}=require(root+'/project0550/LicensingCost0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const renderLicences=props=>renderToStaticMarkup(React.createElement(LicensingCost0550,{lines:[licence.line],...props}));
+assert(renderLicences({}).includes('2,777.00'));
+assert(renderLicences({schedule:licenceView,currency:'USD'}).includes('100.00'));
+assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('2,777.00'));
+assert(!renderLicences({schedule:{bindings:[{...licence,schedule:'C7'}]},currency:'USD'}).includes('100.00'));
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};
 const extra=N.nativeSchedule0550(overflow,'C1');assert.equal(extra.pages.length,2);assert(extra.html.includes('OVERFLOW-35'));assert.equal((extra.html.match(/OVERFLOW-/g)||[]).length,35);assert(extra.html.includes('Continuation 2'));

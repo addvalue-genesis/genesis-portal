@@ -165,3 +165,23 @@ Preview passed. The Rev.36 reconstruction verified the four prices,
 preservation of existing owner totals, staleness after quote or owner change,
 deletion/edit preservation and Release HOLD. The user's Windows workspace
 remains unverified.
+
+## 7-Nov-2026. Licensing cost visibility and single-dish design evidence
+
+Part B8 displays the five existing regulatory cost owners. They cover
+frequency and operating licence coordination, equipment type approval,
+import permits, application support and the separate authority/agent fee
+allowance. Volume I shows the same IDs and sales amounts in the 11.A1 Others
+allocation. The native draft remark identifies the included licensing scope.
+Amounts, original allocations, approved outputs and historical issues retain
+their canonical owners. MR Appendix 1.0 §2.0(l), SPE-0011 §7.1 and LIS-0004
+Item 12 distinguish TSI dossier preparation and representation from COMPANY
+licence ownership. Confirm actual application counts and payer before issue.
+
+SPE-0011 §§7.2–7.4 require a 7 GHz link, 99.99% availability and assessment
+of diversity. The SPE does not prescribe two dishes per site. DTS equipment
+tags, BLD-0011, DWG, LAY and RPT-0001 C4 §8.1 equipment schedules support
+one dish per site as the design candidate. RPT §11.1 separately describes
+space diversity. The MR Appendix 1.5 schedule remains two dishes per site
+and permits detailed BOQ adjustment after approval of the link study.
+Confirm this difference before removing the two-dish bid allowance.

@@ -5,6 +5,7 @@ import {sumMoney0550} from './data/money0550';
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
+import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
@@ -65,6 +66,7 @@ function nativePages(view,id,currency='USD'){
     for(const [t,rate,total] of [['CIF',5,7],['FOB',6,8]]){const selected=bs.filter(b=>term(b)===t);if(selected.length){set(v,r,rate,r===4?diemQty>0&&terms.size===1?number(sum(selected)/diemQty):'OPEN':number(sum(selected)));set(v,r,total,number(sum(selected)));}}
     set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
    }
+   if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
   }
   if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
   else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?currency+' '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs),currency):'OPEN'));}
