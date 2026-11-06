@@ -123,3 +123,45 @@ the tested fixture. The canonical reviews, quantities, prices and issue state
 are unchanged. Context, system constraints and Working Preview validation and
 the development webpack build passed. The owner's saved Windows workspace has
 yet to be verified.
+
+## 7-Nov-2026. Customer quantity and separate supply prices
+
+The MR Rev.B1 Appendix 1.5 quantity is two installed dishes at each endpoint.
+PHI §7.3.11 and SPE §7.2 establish 7 GHz, 99.99% and diversity assessment.
+DTS-0010 sets the 1.2 m antenna basis and LIS-0004 item 12 assigns complete
+system supply to TSI. The earlier ACP LIS cable-schedule comment refers to one
+antenna. CERAGON Rev.A1 BoQ F93/G93 includes one shared dish per site. Add one
+per site in the bid draft and retain the Full Outdoor versus separate IDU/ODU
+architecture, link design and cable reconciliation as technical review.
+
+The native APF DWG-0001 C4 and ACP DWG-0001 C1, sheet 2/2 Item 02, show
+one microwave dish at 50 m and 29 m respectively. APF LAY-0010 C4 sheet 8
+and ACP LAY-0003 C1 sheet 3 identify one microwave tag each in Detail A and
+call for EPC to revisit quantities. DTS-0010 B1 sheet 4 likewise has one
+microwave antenna tag per site. The layouts, drawings, older LIS and
+RPT-0001 C4 are useful for interfaces and layout verification. The MR retains
+two dishes per site as the bid baseline and calls for detailed BOQ adjustment
+after the approved path and availability study. PHI text says about 40 km
+and its Figure 7-15 labels 12 km. Verify the actual path and available
+mounting separation before claiming space diversity or 99.99% availability.
+Both MTO-0001s are bulk takeoffs. APF C5 item 4 gives 400 m of 50-ohm coax
+before allowance and ACP C1 item 5 gives 360 m. These bulk values repeat in
+MR Appendix 1.8 and cannot establish the microwave circuit quantity. Keep
+the 200 m per site in Appendix 1.5 until the cable and route reconciliation.
+
+The existing Working preparation installs four source-bound cost adjustments
+after the controlled sources and original quote basis are present. It prices
+each native tower row from that site's Master Tower items 2–5. Erection Item
+10 stays in Base B4 and physical foundation construction Item 9 is excluded.
+The CERAGON dish and MGW handheld differences are separate estimates. The dish
+reserve uses the R11 non-protected link price less R12 two spare radios, and
+the handheld reserve uses the Q26-063 mixed-lot rate divided by the quoted 122
+radios. Neither calculation establishes an OEM unit rate. The Volume II
+draft lists the bid scope and quantities without these costs. Reconcile the
+previous budget-derived reserves before use.
+
+ADR §§3–6 and 8–13 apply. Context, bid completion, live dossier and Working
+Preview passed. The Rev.36 reconstruction verified the four prices,
+preservation of existing owner totals, staleness after quote or owner change,
+deletion/edit preservation and Release HOLD. The user's Windows workspace
+remains unverified.

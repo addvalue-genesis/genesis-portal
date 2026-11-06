@@ -15,6 +15,88 @@ const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calc
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);
 const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
 
+const TOWER_SUPPLY_ROWS = [
+ ['REQ-MR-B1-11-APF-08', '2609.95.1'],
+ ['REQ-MR-B1-11-ACP-06', '2609.95.2'],
+];
+const MICROWAVE_ALLOWANCE = 'LINE-BID-DMR-ANTENNA-GAP-0550';
+const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
+const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
+
+// Use the approved customer bid quantities and the existing quote owners. New
+// allowances are separate from the original quote; they are not unit quotations.
+function prepareCusQuantityPricing0550(data, policies, today) {
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ if(!receipt||today<'2026-11-07')return data;
+ const sources=data.sourceIntake?.sources||[], replaced=new Set(sources.flatMap(s=>s.replaces||[]));
+ const current=no=>sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-'+no&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)).length===1;
+ if(!current('MR-0001'))return data;
+ const findings=new Set((data.sourceIntake.findings||[]).map(f=>f.id));
+ const rows=new Map(receipt.rows.map(r=>[r.lineId,r])),lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
+ const goods=policyDefaults0550(policies,'Goods / Procured Cost');
+ if(!goods)return data;
+ const pricedSupply=token=>data.lines.filter(l=>l.systemToken===token&&l.wbs==='A'&&l.selected&&!l.coveredByLineId&&
+  (l.offerId||l.calculationId||l.mgwDetailGroupId||finite(l.manualCost)||finite(l.sellRate)));
+ let changed=false;
+ const install=(line,kind,basis,offerIds,ownerIds=[])=>{
+  const next={...line,sourceRef:basis+'\n'+line.requirementRef};
+  lines.set(next.id,next);
+  rows.set(next.id,{lineId:next.id,kind,basis,offerIds,ownerIds,inputKey:lineKey(data,next),sourceKey:sourceKey(data,offerIds),ownerKeys:ownerIds.map(id=>ownerKey(data,lines.get(id)))});
+  changed=true;
+ };
+ if(towerErectionBaseApproved0550(data)){
+  const pristine=new Map(importMrWorkingBasis0550({lines:[],offers:[]},policies,today).lines.map(l=>[l.id,l]));
+  const occupied=pricedSupply('TEL-TELT').some(l=>!TOWER_SUPPLY_ROWS.some(([id])=>id===l.id));
+  for(const [id,quoteRef] of TOWER_SUPPLY_ROWS){
+   const line=lines.get(id),expected=pristine.get(id);
+   if(occupied||rows.has(id)||!line||!expected||!same(line,expected))continue;
+   const items=['02','03','04','05'].map(code=>offers.get('OFFER-MASTER-TOWER-'+quoteRef+'-'+code));
+   if(items.some(o=>!isTowerSourceItem0550(o)||o.quoteRef!==quoteRef||o.currency!=='THB'||!finite(o.quoteEvidence?.quotedTotal)||o.quoteEvidence.quotedTotal<=0))continue;
+   const basis='Master Tower '+quoteRef+' / PDF p1 Items 2–5 only. Supply, paint, warning light and lightning system. Item 10 erection has its own Base owner in B4. Item 9 foundation construction is excluded. Full quotation NET and legacy tower package are separate.';
+   install({...line,manualCost:sumMoney0550(items.map(o=>o.quoteEvidence.quotedTotal)),vendorId:items[0].vendorId,brand:'MASTER TOWER',
+    customerRemark:'One tower with quoted supply items. Tower erection is separately included under Base services.'},'QUOTED',basis,items.map(o=>o.id));
+  }
+ }
+ const estimate=(id,owner,quantity,rate,description,requirementRef,basis,customerRemark,offerIds)=>{
+  if(lines.has(id)||rows.has(id)||!finite(rate)||rate<=0)return;
+  install({id,systemToken:owner.systemToken,wbs:'A',description,scopeKey:id,tagRef:'CUS bid quantity balance',requirementRef,
+   vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity,unit:'Pc',currency:'USD',manualCost:rate,
+   sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,
+   customerRowCode:owner.customerRowCode,customerRemark,brand:''},'ESTIMATE',basis,offerIds,[owner.id]);
+ };
+ const microwave=pricedSupply('TEL-DMR');
+ const ceragon=['R10','R11','R12'].map(row=>offers.get('OFFER-CERAGON-26-30029-REVA1-E90E86E5-'+row));
+ if(current('PHI-0001')&&current('DTS-0010')&&current('SPE-0011')&&current('LIS-0004')&&
+  findings.has('A-SI-R24-MICROWAVE-MR-BASE-DESIGN')&&microwave.length===1&&microwave[0].id==='LINE-CERAGON-ASK-REVA1-BASE'&&
+  ceragon.every(o=>o?.currency==='USD'&&o.quoteEvidence?.revision==='RevA1'&&finite(o.quoteEvidence.quotedUnitCost)&&o.quoteEvidence.quotedUnitCost>0)&&microwave[0].offerId===ceragon[0].id){
+  const [,alternative,spares]=ceragon, reference=alternative.quoteEvidence.quotedUnitCost, radio=spares.quoteEvidence.quotedUnitCost;
+  const basis='Budget allowance for two additional 1.2 m installed dishes and associated RF/mounting hardware, one per site. CERAGON Rev.A1 BoQ F93/G93 includes one dish at each site. Pricing proxy: R11 whole unprotected link USD '+reference+' less R12 two spare radios USD '+radio+', shared across two additional dish assemblies. The residual includes other non-radio material and is a planning reserve, not an antenna unit quote. No separate IDU is included by this allowance.';
+  estimate(MICROWAVE_ALLOWANCE,microwave[0],2,roundMoney0550((reference-radio)/2),'ประมาณการ · Microwave 1.2 m antenna and RF/mounting balance',
+   'MR Rev.B1 Appendix 1.5 pp21–22 / PHI B1 Figure 7-15 / SPE-0011 B1 §7.2 / DTS-0010 B1 sheets 3–4',basis,
+   'Bid basis: two installed antennas per site under MR Appendix 1.5. FEED drawings and the DTS tag list show one location per site. Confirm the updated mounting positions, cable takeoff, link availability and the Full Outdoor departure from the specified IDU/ODU arrangement.',ceragon.map(o=>o.id));
+ }
+ const dtrs=pricedSupply('TEL-RADIO-DTRS'), handheld=offers.get('OFFER-MGW-Q26-063-RADIO-009');
+ if(current('DTS-0008')&&findings.has('REV-DMR-002')&&dtrs.length===1&&dtrs[0].mgwDetailGroupId==='RADIO-DTRS'&&
+  handheld?.currency==='USD'&&finite(handheld.unitCost)&&handheld.unitCost>0&&workingOffers0550(data,dtrs[0]).some(o=>o.id===handheld.id)){
+  const basis='Budget allowance for 98 required less 96 quoted handheld radios. MGW Q26-063 p10 Item 1 provides only one mixed lot (96 ATEX handhelds, 26 mobiles, subscriber licences and accessories). Blended planning rate USD '+handheld.unitCost+' / 122 quoted radios. Carry matching accessories/licence exposure in this allowance; reconcile both licence layers and fixed/mobile TAGs separately.';
+  estimate(DTRS_ALLOWANCE,dtrs[0],2,roundMoney0550(handheld.unitCost/122),'ประมาณการ · Two additional DTRS ATEX handhelds',
+   'DTS-0008 Rev.B1 p3 comment 9 and sheet 8: VPR-308-001 through VPR-308-098',basis,
+   'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
+ }
+ return changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
+}
+
+export function cusQuantityPricingProblems0550(data,line){
+ if(!cusPriceIds.has(line.id))return [];
+ const row=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id&&['QUOTED','ESTIMATE'].includes(r.kind));
+ if(!row||row.inputKey!==lineKey(data,line))return [];
+ const current=row.sourceKey===sourceKey(data,row.offerIds)&&row.ownerIds.every((id,i)=>{
+  const owner=data.lines.find(l=>l.id===id);
+  return owner?.selected&&ownerKey(data,owner)===row.ownerKeys[i];
+ });
+ return current?[]:['CUS_QUANTITY_PRICE_STALE: quote or selected package changed; reconcile the additional price'];
+}
+
 export function towerSurveyReviewPending0550(data){
  return Boolean(data.repositoryBasisImport?.bidCompletion?.rows.some(row=>row.lineId===TOWER_SURVEY_ID_0550&&
   row.offerIds.some(id=>/^OFFER-MASTER-TOWER-2609\.95\.[12]-07$/.test(id))));
@@ -76,7 +158,8 @@ export function reconcileTowerTenderScope0550(data){
  return {...data,lines,...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{})};
 }
 export function prepareBidCompletion0550(data,{policies,team,pricing},today){
- if(today<'2026-11-04'||data.repositoryBasisImport?.bidCompletion?.version===BID_COMPLETION_VERSION_0550)return data;
+ if(today<'2026-11-04')return data;
+ if(data.repositoryBasisImport?.bidCompletion?.version===BID_COMPLETION_VERSION_0550)return prepareCusQuantityPricing0550(data,policies,today);
  // Wait for the actual project evidence. A repository seed is not the user's DATA.
  const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
  const currentMR=sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)),mr=currentMR.length===1?currentMR[0]:null;
@@ -240,7 +323,8 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  }
  const result={...data,lines};
  for(const row of rows){row.inputKey=lineKey(result,byId.get(row.lineId));row.sourceKey=key(row.offerIds.map(id=>data.offers.find(o=>o.id===id)||null));row.ownerKeys=row.ownerIds.map(id=>ownerKey(result,byId.get(id)));}
- return {...result,repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{version:BID_COMPLETION_VERSION_0550,preparedOn:today,basisLineIds:pricedOwners.map(l=>l.id),basisKey:key([data.fx,pricedOwners.map(l=>ownerKey(result,l))]),supplyBasisTHB:supplyCost,nonMicrowaveBasisTHB:nonMicrowave,rows,conflicts}}};
+ const prepared={...result,repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{version:BID_COMPLETION_VERSION_0550,preparedOn:today,basisLineIds:pricedOwners.map(l=>l.id),basisKey:key([data.fx,pricedOwners.map(l=>ownerKey(result,l))]),supplyBasisTHB:supplyCost,nonMicrowaveBasisTHB:nonMicrowave,rows,conflicts}}};
+ return prepareCusQuantityPricing0550(prepared,policies,today);
 }
 
 export function bidCompletionReference0550(data,id){return data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===id&&r.kind==='INCLUDED')||null;}
@@ -269,7 +353,16 @@ export function validateBidCompletion0550(receipt){
 export function bidCompletionBasisChanged0550(data){
  const receipt=data.repositoryBasisImport?.bidCompletion;if(!receipt)return false;
  const byId=new Map(data.lines.map(l=>[l.id,l]));
+ // Earlier percentage allowances were derived before these procurement costs.
+ if(receipt.rows.some(r=>cusPriceIds.has(r.lineId)&&byId.get(r.lineId)?.selected&&!receipt.basisLineIds.includes(r.lineId)))return true;
  return receipt.rows.some(r=>!byId.has(r.lineId)||lineKey(data,byId.get(r.lineId))!==r.inputKey||r.sourceKey!==key(r.offerIds.map(id=>data.offers.find(o=>o.id===id)||null)))||receipt.basisLineIds.some(id=>!byId.has(id))||receipt.basisKey!==key([data.fx,receipt.basisLineIds.map(id=>ownerKey(data,byId.get(id)))]);
+}
+
+export function cusQuantityWorkingRows0550(data,model,systemToken){
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ if(!receipt)return [];
+ const ids=new Set(receipt.rows.filter(r=>cusPriceIds.has(r.lineId)).map(r=>r.lineId));
+ return model.provisional?.lines.filter(l=>l.systemToken===systemToken&&l.selected&&ids.has(l.id))||[];
 }
 
 // Read-only source usage for Vendor/Working inspection. Do not extend
@@ -281,7 +374,7 @@ export function bidCompletionSourceUsages0550(data){
  const lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
  return receipt.rows.filter(r=>['QUOTED','ESTIMATE'].includes(r.kind)&&r.offerIds.length).flatMap(row=>{
   const line=lines.get(row.lineId);if(!line||towerC1Reference0550(line))return [];
-  const current=lineKey(data,line)===row.inputKey&&key(row.offerIds.map(id=>offers.get(id)||null))===row.sourceKey;
+  const current=lineKey(data,line)===row.inputKey&&key(row.offerIds.map(id=>offers.get(id)||null))===row.sourceKey&&!cusQuantityPricingProblems0550(data,line).length;
   return [{line,offerIds:row.offerIds,current,kind:row.kind,basis:row.basis}];
  });
 }

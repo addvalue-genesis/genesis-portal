@@ -3,6 +3,7 @@ import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord055
 import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
 import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
+import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
 const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference catalogue: '+MGW_QUOTE_0550.sourceName+' / p'+r.page+' / '+r.section+' / item '+(r.sn||r.id):'Source locator OPEN — review the canonical supplier Offer ID';};
 const unique=a=>[...new Set(a.filter(Boolean))];
@@ -13,6 +14,10 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const record=view.records.find(r=>r.systemToken===systemToken&&r.sectionId===sectionId);
  const sourceIds=unique([...requirements.flatMap(r=>[...(r.sourceIds||[]),...(r.supplierSourceIds||[])]),...(record?.sourceIds||[])]);
  const tables=[];
+ if(['description','equipment'].includes(sectionId)){
+  const quantityRows=cusQuantityWorkingRows0550(data,model,systemToken);
+  if(quantityRows.length)tables.push({title:'Customer bid quantities / additional supply',heads:['Working item','Quantity on this row','Bid scope / customer basis'],rows:quantityRows.map(l=>[l.description.replace(/^ประมาณการ · /,''),l.quantity+' '+l.unit,l.customerRemark+'\n'+l.requirementRef])});
+ }
  if(['description','parameters'].includes(sectionId))tables.push({title:'Customer requirements / current SI disposition',heads:['Requirement','Customer statement / source','SI need / acceptance criteria','State'],rows:requirements.map(r=>[r.id,(r.statement||r.title||'STATEMENT OPEN')+'\n'+(r.sourceLocator||r.reference||'SOURCE LOCATOR OPEN'),(r.need||'SI ANALYSIS OPEN')+'\n'+(r.criteria||'CRITERIA OPEN'),r.state||'OPEN'])});
  if(sectionId==='description')tables.push({title:'Derived engineering CAL/RPT — separate from received evidence and FAT/SAT',heads:['Proof / Requirement','Method / basis','Result / review'],rows:proofs.map(p=>[p.id+' / '+p.requirementId,(p.method||'METHOD OPEN')+'\nInputs: '+(p.inputsBasis||'OPEN')+'\nCriteria: '+(p.criteria||'OPEN'),(p.kind==='CAL'?(p.result?.value==null?'CALCULATION OPEN':/USD|THB|EUR|RMB|CNY|[$€฿]/i.test(p.result.unit||'')?'Monetary calculation: see internal SI record':p.result.value+' '+p.result.unit)+'\nCriterion: '+p.operator+' '+(p.limit??'OPEN')+' '+p.unit+' / '+(p.passes?'SATISFIED IN CALCULATION':'NOT PROVEN'):(p.report||'REPORT OPEN')+'\nOutcome: '+(p.outcome||'OPEN'))+' / '+(p.state||'OPEN')+'\nLimitations: '+(p.limitations||'OPEN')])});
  if(['parameters','equipment'].includes(sectionId)){

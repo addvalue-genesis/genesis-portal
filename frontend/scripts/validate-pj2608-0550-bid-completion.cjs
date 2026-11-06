@@ -7,6 +7,26 @@ const today='2026-11-04',tokens=D.SYSTEMS.map(s=>s.token),hash=x=>crypto.createH
 const options=d=>({policies:D.COMMERCIAL_POLICY,team:D.CORE_TEAM,pricing:()=>B.deriveBidWorkspace(d,tokens,today)});
 const empty=B.emptyBidWorkspace(D.DATA_LAYER_META.datasetId);assert.equal(C.prepareBidCompletion0550(empty,options(empty),today),empty,'No private evidence means no price/assumption installation');
 assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
+{
+ const {importMrWorkingBasis0550}=require(src+'/project0550/data/mrWorkingBasis0550.js');
+ const date='2026-11-07', base=importMrWorkingBasis0550(empty,D.COMMERCIAL_POLICY,date);
+ const id='REQ-MR-B1-11-APF-08', offerIds=['02','03','04','05'].map(code=>'OFFER-MASTER-TOWER-2609.95.1-'+code);
+ const fixture={...base,repositoryBasisImport:{bidCompletion:{version:C.BID_COMPLETION_VERSION_0550,rows:[],basisLineIds:[]}},
+  sourceIntake:{sources:[{id:'TEST-CURRENT-MR',documentNo:'MM-ASK-1A-APF-TEL-MR-0001',revision:'B1',authority:'CURRENT_TENDER',content:'Synthetic MR'}],findings:[{id:'A-SI-R33-TOWER-ERECTION-BASE',state:'SOURCE_SUPPORTED'}]},
+  offers:offerIds.map(id=>({id,quoteRef:'2609.95.1',currency:'THB',vendorId:'TEST-TOWER',quoteEvidence:{quotedTotal:200},supplierQuoteRow:{classification:'BASE_PRICE'}}))};
+ const ready=C.prepareBidCompletion0550(fixture,options(fixture),date), line=ready.lines.find(l=>l.id===id);
+ assert.equal(line.manualCost,800,'Only matching APF quote items supply one native tower');
+ assert.equal(line.quantity,1);
+ assert.equal(ready.lines.find(l=>l.id==='REQ-MR-B1-11-ACP-06').manualCost,null,'Missing ACP evidence cannot inherit APF price');
+ assert.equal(C.prepareBidCompletion0550(ready,options(ready),date),ready,'Repeated preparation preserves the applied decision');
+ assert(C.bidCompletionBasisChanged0550(ready),'Dependent estimates must be reconciled after added supply');
+ const changed={...ready,offers:ready.offers.slice(1)};
+ assert(C.cusQuantityPricingProblems0550(changed,line).length,'Unavailable quote evidence stops reuse of an automatic price');
+ const edited={...fixture,lines:fixture.lines.map(l=>l.id===id?{...l,manualCost:0}:l)};
+ assert.equal(C.prepareBidCompletion0550(edited,options(edited),date),edited,'Keep an authored price');
+ const deleted={...ready,lines:ready.lines.filter(l=>l.id!==id)};
+ assert.equal(C.prepareBidCompletion0550(deleted,options(deleted),date),deleted,'Keep a deliberate deletion');
+}
 if(process.argv[2]){
  const original=JSON.parse(fs.readFileSync(process.argv[2],'utf8')),data=P.prepareBidProcess0550(retireLegacyTowerPricing0550(original),D.COMMERCIAL_POLICY,today),before=hash(data),beforeModel=B.deriveBidWorkspace(data,tokens,today);
  const ambiguous=structuredClone(data),mr=ambiguous.sourceIntake.sources.find(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER');ambiguous.sourceIntake.sources.push({...mr,id:'TEST-DUPLICATE-MR'});assert.equal(C.prepareBidCompletion0550(ambiguous,options(ambiguous),today),ambiguous,'Ambiguous current MR cannot install a budget automatically');

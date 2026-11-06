@@ -10,7 +10,7 @@ import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationR
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -93,7 +93,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const lines=data.lines.map(l=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const selected=l.selected&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
-  const problems=[...satelliteScope.problems,...mrScope.problems,...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
+  const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}
   if(!l.description.trim()||!l.sourceRef.trim()||!l.scopeKey.trim())problems.push("Description, scope key and source/basis required");
