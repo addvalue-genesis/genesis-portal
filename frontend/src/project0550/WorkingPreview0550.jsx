@@ -12,6 +12,7 @@ import {WORKING_PREVIEW_STAGES_0550,DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} 
 import {blankRequirement0550,documentFamily0550,emptyIntegration0550,stampIntegration0550} from "./data/integrationWorkspace0550";
 import {mgwQuoteItem0550,currentSupplierOffers0550,supplierOfferExcluded0550} from "./data/mgwVendorBasis0550";
 import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
+import {SourceReadingMatrix0550} from "./SourceReadingMatrix0550";
 import {SystemConstraints0550} from "./SystemConstraints0550";
 import {BidPunch0550} from "./BidPunch0550";
 import {punchTaskRoute0550,punchProofDraft0550,punchActivityDraft0550} from "./data/bidPunch0550";
@@ -174,9 +175,12 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
   const common=<div className="p55-review-toolbar"><button type="button" onClick={()=>stage.target==="l3.original"?onOpenSource("l3.original"):onNavigate(stage.target)}>เปิดโมดูลต้นทาง {stage.step.toString().padStart(2,"0")}</button></div>;
   let body;
   if(stage.step===1)body=<>
+   <SourceReadingMatrix0550 data={data} integration={model} systems={SYSTEMS} onOpenSource={onOpenSource}/>
    <Note>A: ข้อกำหนดลูกค้า ↔ Web App: System Integrator / CAL–RPT ↔ B: MGW / INDUSTRONIC และ catalog/datasheet · ใช้ขอบเขตจากเอกสาร ไม่จำกัดตามรายการที่ Supplier เสนอ</Note>
+   <details><summary>สรุปทะเบียนเอกสารและสถานะข้อความทุกแหล่ง</summary>
    <div className="p55-table-wrap"><table className="p55-table" aria-label="Working document coverage"><thead><tr><th>ประเภทเอกสาร</th><th>ลงทะเบียน</th><th>TEXT_READ</th><th>TEXT_PARTIAL</th><th>METADATA_ONLY</th></tr></thead><tbody>{sourceCounts.map(g=><tr key={g.family}><td>{g.family}</td><td>{g.sources.length}</td>{["TEXT_READ","TEXT_PARTIAL","METADATA_ONLY"].map(state=><td key={state}>{g.sources.filter(s=>s.readState===state).length}</td>)}</tr>)}</tbody></table></div>
    <Note>จำนวนข้างต้นรวมฉบับเก่าและ Supplier ตามทะเบียนที่โหลด ไม่ใช่จำนวนข้อกำหนดที่ตรวจผ่าน · Current Tender ต้องตรวจ applicability และ revision แยก</Note>
+   </details>
    <SystemConstraints0550 data={data} model={bidModel} system={system} onEditRequirement={editRequirement} onNavigate={onNavigate} onOpenSource={onOpenSource} systemName={names} onSelectSystem={s=>{setSystem(s.id);setScope(s.review||{id:s.id,sourceIds:[],families:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});}}/>
    {scope&&<form onSubmit={async e=>{e.preventDefault();await save("scopeReviews",scope);}}><h3>ขอบเขต {names(scope.id)}</h3><div className="p55-bid-fields"><Multi label="Scope source IDs" value={scope.sourceIds} onChange={v=>setField(setScope,"sourceIds",v)} options={ids(model.sources)}/><Multi label="Applicable document families" value={scope.families} onChange={v=>setField(setScope,"families",v)} options={DOCUMENT_FAMILIES_0550.map(f=>[f,f])}/><Field label="Scope completeness / applicability basis" value={scope.basis} onChange={v=>setField(setScope,"basis",v)}/><ReviewFields form={scope} setForm={setScope} date={reviewDate}/></div><Save busy={busy}>บันทึกผลตรวจขอบเขต</Save></form>}
   </>;

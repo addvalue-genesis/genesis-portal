@@ -234,3 +234,36 @@ assert(releaseHtml.includes('Export Excel'));assert(releaseHtml.includes('bid.de
 for(const column of R.DEVIATION_RELEASE_LAYOUT_0550.columns)assert(releaseHtml.includes(column.replace(/&/g,'&amp;').replace(/'/g,'&#x27;')));
 if(process.env.PJ0550_DEVIATION_QA_OUTPUT)require('node:fs').writeFileSync(process.env.PJ0550_DEVIATION_QA_OUTPUT,bytes);
 console.log('PASS deviation Release: native eleven-column layout, same saved preview/export projection, explicit selection, unchanged approvals/financials, backward-compatible editable fields, missing/stale selection gates, XML escaping, multi-document rows and real Release render.');
+
+const {sourceMatrixIndex0550,sourceReadingMatrix0550}=require(root+'/project0550/data/sourceReadingMatrix0550');
+const {apfPhiMatrix0550}=require(root+'/project0550/data/apfPhiMatrix0550');
+const {SourceReadingMatrix0550}=require(root+'/project0550/SourceReadingMatrix0550.jsx');
+const microwaveLay='MM-ASK-1A-APF-TEL-LAY-0010', microwaveTyp='MM-ASK-1A-ACP-TEL-TYP-0001';
+const matrixData={sourceIntake:{...d.sourceIntake,sources:[
+ source('MM-ASK-1A-APF-TEL-MR-0001',microwaveLay+' C4  Layout'),
+ source(microwaveLay,'Earlier layout'),
+ {...source(microwaveTyp,'Typical detail'),authority:'HISTORICAL',revision:'C2'},
+ source('MM-ASK-1A-APF-TEL-SPE-0011','10008-STD-6-TEL-004'),
+ source('10008-STD-6-TEL-004','MM-ASK-1A-APF-TEL-SPE-0011'),
+]}};
+const emptyIntegration={scopes:[],requirements:[],documentReviews:[],particulars:[]};
+const matrixBefore=clone(matrixData),matrixIndex=sourceMatrixIndex0550(matrixData.sourceIntake);
+const matrix=sourceReadingMatrix0550(matrixIndex,emptyIntegration,SYSTEMS);
+assert.deepEqual(matrix.map(row=>row.token),[...tokens,'COMMON']);
+const matrixCell=(token,family)=>matrix.find(row=>row.token===token).cells.find(cell=>cell.family===family);
+const layout=matrixCell('TEL-DMR','LAY');
+assert.equal(layout.state,'open');
+assert.deepEqual(layout.references[0].revisions,['C4']);
+assert.match(layout.references[0].reason,/Rev\./);
+assert.equal(layout.sources[0].source.revision,'B1','Keep the mismatching copy visible');
+assert.equal(matrixCell('TEL-PAGA','LAY').state,'pending','Do not copy Microwave applicability to PAGA');
+assert.equal(matrixCell('TEL-DMR','TYP').state,'open');
+assert(matrixCell('TEL-DMR','STD').references.some(ref=>ref.number==='10008-STD-6-TEL-004'));
+assert.deepEqual(matrixData,matrixBefore);
+const flattenedPhi=source('MM-ASK-1A-APF-TEL-PHI-0001','Table 7-3 Telecommunication System for APF\nIP Telephony ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nVHF-FM Marine ■\nFiber Optic Cable ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nTable 7-4');
+assert.equal(apfPhiMatrix0550([{...flattenedPhi,effectiveAuthority:'CURRENT_TENDER'}]).source,null,'Never infer positions from flattened table text');
+const matrixHtml=renderToStaticMarkup(React.createElement(SourceReadingMatrix0550,{data:matrixData,integration:emptyIntegration,systems:SYSTEMS,onOpenSource:()=>{}}));
+assert.equal((matrixHtml.match(/data-system-token=/g)||[]).length,20);
+assert(matrixHtml.includes('ระบบ × ตำแหน่ง APF'));
+for(const family of ['STD','LAY','DWG','TYP','MTO','SOFTWARE']) assert(matrixHtml.includes('aria-label="'+family+'"'));
+console.log('PASS WP.1 CUS matrix: canonical system rows, revision mismatch, distinct TYP, reference cycles, shared applicability, flattened PHI safety and real SSR.');
