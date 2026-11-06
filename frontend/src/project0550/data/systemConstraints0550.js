@@ -2,15 +2,30 @@
 // COMMON is review context, never an implicit per-system obligation or cost.
 import {documentFamily0550} from './integrationWorkspace0550';
 import {MR_WORKING_CATALOG_0550, mrLineScope0550} from './mrWorkingBasis0550';
+import {sumMoney0550} from './money0550';
 import {vendorOfferEntries0550} from './vendorRegister0550';
 
 const unique = values => [...new Set(values.filter(Boolean))];
 const text = value => String(value || '').replace(/\s+/g, ' ').trim();
 
+function workingSubtotal(rows) {
+ const priced = rows.filter(r => Number.isFinite(r.costTHB) && Number.isFinite(r.customerTHB));
+ return {
+  rows,
+  costTHB: sumMoney0550(rows.map(r => r.costTHB).filter(Number.isFinite)),
+  customerTHB: sumMoney0550(rows.map(r => r.customerTHB).filter(Number.isFinite)),
+  openCount: rows.length - priced.length,
+ };
+}
+
 // Counts are canonical record/reference counts, never equipment quantities,
 // technical acceptance, money allocations or an overall completeness score.
 export function systemResponsibilityOverview0550(data, model) {
  const integration = model.integration, lines = new Map(model.lines.map(l => [l.id, l]));
+ const selectedPrices = new Map((model.provisional?.selected || []).map(l => [l.id, l]));
+ const pricedLines = new Map((model.provisional?.lines || []).map(l => [l.id, l]));
+ const vendors = new Map(data.vendors.map(v => [v.id, v.name]));
+ const descriptions = new Map((data.technicalProposal?.records || []).filter(r => r.sectionId === 'description' && text(r.content)).map(r => [r.systemToken, r]));
  const catalog = new Map(MR_WORKING_CATALOG_0550.rows.map(r => ['REQDEF-' + r.id, r]));
  const offers = new Set(data.offers.map(o => o.id)), entries = vendorOfferEntries0550(data);
  const supplyWbs = new Set(['A', 'B5', 'B6', 'C2', 'C3']);
@@ -44,10 +59,22 @@ export function systemResponsibilityOverview0550(data, model) {
    }
   }
   const owners = [...ownerIds].map(id => lines.get(id));
+  const systemPrices = [...selectedPrices.values()].filter(l => l.systemToken === scope.id).map(l => ({...l, vendorName: vendors.get(l.vendorId)}));
+  const packageReferences = [...pricedLines.values()].filter(l => l.systemToken === scope.id);
+  const crossSystemOwners = unique([...ownerIds, ...packageReferences.flatMap(l => l.bidPriceAllocation?.ownerIds || [])])
+   .map(id => selectedPrices.get(id)).filter(l => l && l.systemToken !== scope.id);
+  const draft = descriptions.get(scope.id);
+  const findings = (data.sourceIntake?.findings || []).filter(f => f.state !== 'SOURCE_SUPPORTED' && f.systemTokens.includes(scope.id));
   return {id: scope.id, scope, groups, requirements: requirements.length,
    registeredOfferIds: entries.filter(e => e.systemTokens.includes(scope.id)).map(e => e.offer.id),
    linkedOfferIds: [...linkedOffers], missingOfferIds: [...missingOffers], ownerIds: [...ownerIds], ownerIssueIds: [...ownerIssues], unlinkedRequirementIds: unlinkedRequirements,
    knownPriceOwnerIds: owners.filter(l => Number.isFinite(l.provisionalCustomerTHB)).map(l => l.id),
+   workingResult: {
+    base: workingSubtotal(systemPrices.filter(l => !l.wbs.startsWith('C'))),
+    option: workingSubtotal(systemPrices.filter(l => l.wbs.startsWith('C'))),
+    crossSystemOwners,
+   },
+   draft, findings,
    reviewedMappings: requirements.filter(r => r.state === 'REVIEWED_MAPPING').length};
  });
 }

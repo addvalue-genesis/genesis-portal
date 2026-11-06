@@ -1,9 +1,34 @@
 import React, {useMemo, useState, useEffect} from 'react';
+import {amount} from './BidControls';
 import {systemConstraints0550, systemResponsibilityOverview0550} from './data/systemConstraints0550';
 
 function RequirementGroup0550({ids, label, requirements, onOpen}) {
  const [open, setOpen] = useState(false);
  return <details onToggle={e => setOpen(e.currentTarget.open)}><summary>{label} · {ids.length} records</summary>{open && ids.map(id => <p key={id}><button type="button" onClick={() => onOpen(requirements.get(id))}>{requirements.get(id)?.title || id}</button><small>{id}</small></p>)}</details>;
+}
+
+function WorkingResult0550({result, onNavigate}) {
+ const openLine = id => onNavigate('bid.budget.working.line.' + id);
+ return <>
+  {!result.base.rows.length && !result.option.rows.length && <p>ไม่มีแถวต้นทุนแยกในระบบนี้ · ตรวจขอบเขตและการจัดสรรด้านล่าง</p>}
+  {[['Base A/B', result.base], ['Option C', result.option]].filter(([, part]) => part.rows.length).map(([label, part]) => <div key={label}>
+   <strong>{label}{part.openCount > 0 && ' · ยอดเฉพาะแถวที่มีราคา'}</strong>
+   <small>ต้นทุน {amount(part.costTHB)} · ขาย {amount(part.customerTHB)}</small>
+   <details><summary>{part.rows.length} เจ้าของต้นทุน · ราคาเปิด {part.openCount} แถว</summary>
+    {part.rows.map(l => <div key={l.id}>
+     <button type="button" onClick={() => openLine(l.id)}>{l.wbs} · {l.description}</button>
+     <small>{Number.isFinite(l.quantity) ? l.quantity : 'Qty OPEN'} {l.unit} · ต้นทุน {amount(l.costTHB)} · ขาย {amount(l.customerTHB)}</small>
+     <small>{[l.vendorName, l.offer?.quoteRef, l.sourceRef].filter(Boolean).join(' · ')}</small>
+     {l.offerId && <button type="button" onClick={() => onNavigate('bid.vendor.offer.' + l.offerId)}>เปิดใบเสนอราคา</button>}
+     {l.problems?.length > 0 && <small>{l.problems.join(' · ')}</small>}
+    </div>)}
+   </details>
+  </div>)}
+  {result.crossSystemOwners.length > 0 && <details><summary>อ้างต้นทุนในแพ็กเกจอื่น · {result.crossSystemOwners.length} แถว</summary>
+   <small>ยอดอยู่กับเจ้าของต้นทุนด้านล่างเพียงครั้งเดียว · ตรวจขอบเขตและหลักฐานเทคนิคแยก</small>
+   {result.crossSystemOwners.map(l => <p key={l.id}><button type="button" onClick={() => openLine(l.id)}>{l.systemToken} · {l.wbs} · {l.description}</button></p>)}
+  </details>}
+ </>;
 }
 
 export function SystemConstraints0550({data, model, system, onEditRequirement, onNavigate, onOpenSource, onSelectSystem, heading, systemName = token => token}) {
@@ -15,14 +40,23 @@ export function SystemConstraints0550({data, model, system, onEditRequirement, o
  const group = (ids, label) => <RequirementGroup0550 ids={ids} label={label} requirements={requirements} onOpen={r => {onEditRequirement(r); onNavigate('bid.working-preview.step.4');}}/>;
  const summary = <section aria-label="System responsibility overview">
   <h3>{heading || "ขอบเขต CUS ↔ VND และงาน SI"}</h3>
-  <p className="p55-note">จำนวนเป็น records / references ไม่ใช่จำนวนอุปกรณ์หรือเปอร์เซ็นต์ความครบถ้วน · COMPANY จัดหาอุปกรณ์หลักยังอาจมีงาน SI · ไม่มี Offer ผูกระบบไม่ได้แปลว่าไม่มี Vendor · COMMON คงเป็นงานร่วม ไม่คัดลอกต้นทุนเข้าทุกระบบ</p>
-  <div className="p55-table-wrap"><table className="p55-table" aria-label="All system scope reviews"><thead><tr><th>ระบบ / Scope review</th><th>TSI จัดหา / COMPANY / งาน SI</th><th>รอยืนยัน / ไม่เกี่ยวข้อง</th><th>Vendor / Mapping</th><th>Working cost owners</th><th>เปิดทำงาน</th></tr></thead><tbody>{overview.filter(r => system === 'ALL' || r.id === system).map(r => <tr key={r.id} data-system-responsibility={r.id}>
+  <p className="p55-note">ผลร่าง SI จากข้อมูลที่มี · ใช้ทำ Working และ Volume II ได้ระหว่างที่ CUS ยังเปิด · ยอด THB จากเจ้าของต้นทุนที่เลือก แยก Base / Option / COMMON · สถานะ Release ตรวจแยก</p>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="All system scope reviews"><thead><tr><th>ระบบ / Scope review</th><th>TSI จัดหา / COMPANY / งาน SI</th><th>รอยืนยัน / ไม่เกี่ยวข้อง</th><th>Vendor / Mapping</th><th>ผล Working · THB</th><th>ร่างเทคนิค / ประเด็นที่ต้องแก้</th></tr></thead><tbody>{overview.filter(r => system === 'ALL' || r.id === system).map(r => <tr key={r.id} data-system-responsibility={r.id}>
    <td><strong>{systemName(r.id)}</strong><small>{r.id} · {r.requirements} requirements</small><small>Scope review: {r.scope.state}</small><details><summary>{r.scope.problems.length} ประเด็น Scope</summary>{r.scope.problems.map(problem => <p key={problem}>{problem}</p>)}</details></td>
    <td>{group(r.groups.tsiSupply, 'TSI จัดหา')}{group(r.groups.company, 'COMPANY รับผิดชอบ')}{group(r.groups.tsiServices, 'TSI บริการ / งาน SI')}</td>
    <td>{group(r.groups.unresolved, 'รอยืนยันผู้รับผิดชอบ / ประเภทงาน')}{group(r.groups.notApplicable, 'ไม่เกี่ยวข้องตามผลทบทวน')}</td>
    <td><p>{r.registeredOfferIds.length ? `มี Offer ผูกกับระบบ ${r.registeredOfferIds.length} IDs` : 'ยังไม่มี Offer ผูกกับระบบ'}</p><small>ข้อกำหนดอ้าง Offer ที่พบ {r.linkedOfferIds.length} IDs · refs หาไม่พบ {r.missingOfferIds.length}</small><small>REVIEWED_MAPPING {r.reviewedMappings} records</small><details><summary>เปิด Offer / ตรวจหลักฐานเดิม</summary>{[...new Set([...r.registeredOfferIds, ...r.missingOfferIds])].map(id => <button key={id} type="button" onClick={() => onNavigate('bid.vendor.offer.' + id)}>{id}</button>)}</details></td>
-   <td><p>Owner ที่เลือกและผูกอยู่ {r.ownerIds.length} IDs · มีราคา Working {r.knownPriceOwnerIds.length} IDs</p><small>ราคา / inputs ยัง OPEN {r.ownerIds.length - r.knownPriceOwnerIds.length} · owner ref รอแก้ {r.ownerIssueIds.length} · ยังไม่ผูก Working {r.unlinkedRequirementIds.length} requirements</small><small>เป็นราคา Working ที่คำนวณได้ ยังไม่ใช่ Release · owner ร่วมอาจปรากฏหลายระบบ ห้ามรวมจำนวนหรือราคาไประบบอื่น</small><details><summary>เปิด Working เดิม</summary>{[...new Set([...r.ownerIds, ...r.ownerIssueIds])].map(id => <button type="button" key={id} onClick={() => onNavigate('bid.budget.working.line.' + id)}>{id}</button>)}</details></td>
-   <td><button type="button" onClick={() => onSelectSystem?.(r.scope)}>ตรวจขอบเขต</button></td>
+   <td><WorkingResult0550 result={r.workingResult} onNavigate={onNavigate}/></td>
+   <td>
+    <button type="button" onClick={() => onNavigate('bid.technical.description.system.' + r.id)}>เปิด Volume II</button>
+    {r.draft ? <details><summary>ข้อความในร่างเทคนิคเดิม</summary><p>{r.draft.content}</p><small>{r.draft.sourceLocator}</small></details> : <small>ร่างคำอธิบายระบบ OPEN</small>}
+    {r.findings.length > 0 && <details><summary>ประเด็นจากทะเบียน CUS · {r.findings.length} ข้อ</summary>
+     {r.findings.map(f => <p key={f.id}><strong>{f.category}</strong> · {f.statement}<small>{f.locator} · {f.impact}</small>
+      {f.sourceIds.map(id => <button key={id} type="button" onClick={() => onOpenSource('bid.documents.controlled-source-inventory.document.' + id)}>{id}</button>)}
+     </p>)}
+    </details>}
+    <button type="button" onClick={() => onSelectSystem?.(r.scope)}>ตรวจขอบเขต / Mapping</button>
+   </td>
   </tr>)}</tbody></table></div>
  </section>;
  if (!view) return summary;

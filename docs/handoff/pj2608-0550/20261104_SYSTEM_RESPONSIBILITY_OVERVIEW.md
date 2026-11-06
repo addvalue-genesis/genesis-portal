@@ -106,3 +106,20 @@ Keep separate CUS sources, supplier evidence and authored SI mappings; do not us
 Vendor quotations to rewrite the MR requirement catalogue. Follow canonical Working
 pricing into both presenters, with explicit reviewed Schedule allocation and exact
 reconciliation; do not delete HOLD controls or frozen-history protections.
+
+## 7-Nov-2026. Working results by system
+
+WP.1 `10.2.2.1.3` shows the existing Volume II draft and selected Working
+owners for each system while CUS review is open. It displays THB subtotals for
+Base A/B and Option C separately, retaining open owner rows and non-additive
+references to other systems and COMMON. Existing CUS findings link back to
+their source records. ADR §§4–6, 8–13 govern the projection.
+
+The Rev.36 Drive pair combined with the reconstructed Working fixture produces
+19 system drafts and COMMON. Selected Working owners appear once across those
+rows. Hazardous Area Telephone references the existing PABX package and AIS
+references COMMON activities. The two tower equipment prices remain open in
+the tested fixture. The canonical reviews, quantities, prices and issue state
+are unchanged. Context, system constraints and Working Preview validation and
+the development webpack build passed. The owner's saved Windows workspace has
+yet to be verified.
