@@ -8,13 +8,14 @@ export function sourceLoadMessage(code) {
   return 'ยังโหลดทะเบียนจาก Drive ไม่สำเร็จ — เก็บข้อมูลเดิมไว้ ตรวจว่า Google Drive for Desktop เปิดอยู่และโฟลเดอร์โครงการพร้อมใช้งาน แล้วกดตรวจอีกครั้ง';
 }
 
-function batchKey(value) {
-  const m=/^PJ2608-0550-SOURCE-INTAKE-REV(\d+)-(\d{8})$/.exec(value || '');
+function batchKey(value, allowLocalLegacy = false) {
+  const m=/^PJ2608-0550-SOURCE-INTAKE-REV(\d+)-(\d{8})$/.exec(value || '') ||
+    (allowLocalLegacy && /^PJ2608-0550_SOURCE_INTAKE_REV(\d+)_(\d{8})$/.exec(value || ''));
   return m && {revision:Number(m[1]),date:m[2]};
 }
 export function selectAutomaticSource(workspace,intake,systems) {
   validateSourceIntake(intake,systems);
-  const next=batchKey(intake.batchId),current=workspace.sourceIntake,previous=batchKey(current?.batchId);
+  const next=batchKey(intake.batchId),current=workspace.sourceIntake,previous=batchKey(current?.batchId,true);
   if(!next || intake.reviewedOn.replace(/-/g,'')!==next.date)throw Error('SOURCE_BATCH_INVALID');
   if(current) {
     if(current.batchId===intake.batchId) {

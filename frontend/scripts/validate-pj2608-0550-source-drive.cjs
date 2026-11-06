@@ -33,7 +33,7 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
   await fs.writeFile(older,JSON.stringify({...intake,coverageNote:'conflicting content'}));await assert.rejects(loadDriveIntake({roots:[tmp]}),/CONFLICT/);await fs.unlink(older);
   const original=await fs.readFile(file);await fs.writeFile(file,' '.repeat(MAX_BYTES+1));await assert.rejects(loadDriveIntake({roots:[tmp]}),/TOO_LARGE/);await fs.writeFile(file,original);
   // A retained-history preparation can exceed 32 MiB; source reads still cannot.
-  assert.equal(MAX_BYTES,32*1024*1024);assert.equal(MAX_PREPARATION_BYTES,76*1024*1024);
+  assert.equal(MAX_BYTES,32*1024*1024);assert.equal(MAX_PREPARATION_BYTES,84*1024*1024);
   assert.equal(require(path.join(root,'project0550/data/siWorkPackage0550.js')).SI_FILE_LIMIT_0550,MAX_PREPARATION_BYTES);
   const prep=path.join(dir,'PJ2608-0550_A_Work_Package_Rev07_20261102.json');
   await fs.writeFile(prep,JSON.stringify({schema:'genesis.0550.si-work-package.v5',projectId:'PJ2608-0550',batchId:'SYNTHETIC-BOUNDED-PREPARATION',preparedOn:'2026-11-02',sourceBatchId:intake.batchId,coverageNote:'x'.repeat(MAX_BYTES)}));

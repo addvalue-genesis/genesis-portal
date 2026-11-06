@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];requir
 const A=require(root+'/project0550/data/sourceWorkspaceAuto0550.js'),P=require(root+'/project0550/data/siWorkPackage0550.js'),S=require(root+'/project0550/data/sourceReadiness0550.js'),I=require(root+'/project0550/data/integrationWorkspace0550.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),D=require(root+'/project0550/data.js'),bridge=require('./source-drive-0550.cjs');
 // The paired cap must admit both per-file caps; ancestry stays bounded.
 const limits=require('../src/project0550/data/sourceWorkspaceLimits0550.json');
-assert.equal(limits.sourceBytes,32*1024*1024);assert.equal(P.SI_FILE_LIMIT_0550,76*1024*1024);
+assert.equal(limits.sourceBytes,32*1024*1024);assert.equal(P.SI_FILE_LIMIT_0550,84*1024*1024);
 assert.equal(bridge.MAX_WORKSPACE_BYTES,limits.sourceBytes+P.SI_FILE_LIMIT_0550+limits.responseOverheadBytes);
 const chain=n=>{let p={batchId:'BOUND-0'};for(let i=1;i<=n;i++)p={batchId:'BOUND-'+i,predecessor:p};return p;};
 assert.equal(P.preparationAncestors0550(chain(limits.maxAncestors)).length,limits.maxAncestors);
@@ -25,6 +25,10 @@ const changed=structuredClone(bundle);changed.aWorkPackage.coverageNote+=' chang
 const bad=structuredClone(bundle);bad.aWorkPackage.sourceBasisKey='wrong';assert.throws(()=>A.selectAutomaticSourceWorkspace0550(data,bad,tokens),/basis changed/);assert.equal(JSON.stringify(data),before,'Failure must not mutate or save half a bundle');
 assert.equal(A.selectAutomaticSourceWorkspace0550(data,{...bundle,aWorkPackage:null},tokens).preparationState,'NOT_FOUND');
 const newer=structuredClone(first.workspace);newer.sourceIntake.batchId='PJ2608-0550-SOURCE-INTAKE-REV09-20261030';assert.equal(A.selectAutomaticSourceWorkspace0550(newer,bundle,tokens).workspace,newer);
+const legacyLocal=structuredClone(first.workspace);legacyLocal.sourceIntake.batchId='PJ2608-0550_SOURCE_INTAKE_REV07_20261030';
+assert.equal(A.selectAutomaticSourceWorkspace0550(legacyLocal,bundle,tokens).workspace.sourceIntake.batchId,intake.batchId);
+legacyLocal.sourceIntake.batchId='PJ2608-0550_SOURCE_INTAKE_REV09_20261030';
+assert.equal(A.selectAutomaticSourceWorkspace0550(legacyLocal,bundle,tokens).workspace,legacyLocal);
 for(const receipts of [null,[{batchId:'bad'}],[...first.workspace.sourcePreparationImports,...first.workspace.sourcePreparationImports]])assert.throws(()=>A.validateSourcePreparationImports0550(receipts));
 (async()=>{const temp=await fs.mkdtemp(path.join(os.tmpdir(),'0550-auto-a-'));let server;try{
  const project=path.join(temp,'PJ2608-0550 Synthetic'),dir=path.join(project,'90_SYSTEM_WORKING','DATA');await fs.mkdir(dir,{recursive:true});const sourceFile=path.join(dir,'PJ2608-0550_Source_Intake_Rev08_20261030.json'),packFile=path.join(dir,'PJ2608-0550_A_Work_Package_20261030.json');await fs.writeFile(sourceFile,JSON.stringify(intake));await fs.writeFile(packFile,JSON.stringify(pack));

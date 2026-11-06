@@ -32,7 +32,7 @@ assert.throws(()=>planSiWorkPackage0550(newer,pack,tokens),/local source is newe
 const conflict=structuredClone(plan.workspace);conflict.sourceIntake.coverageNote='local edit';
 assert.throws(()=>planSiWorkPackage0550(conflict,pack,tokens),/SOURCE_BATCH_CONFLICT/);
 // Exact-lineage MR mapping continuation uses a bounded preparation file.
-assert.equal(SI_FILE_LIMIT_0550,76*1024*1024);
+assert.equal(SI_FILE_LIMIT_0550,84*1024*1024);
 const context=require(root+'/project0550/BidWorkspaceContext.jsx');context.useBidWorkspace=()=>({data,change:()=>{},busy:false});
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{SiWorkPackage0550}=require(root+'/project0550/SiWorkPackage0550.jsx');
 const html=renderToStaticMarkup(React.createElement(SiWorkPackage0550));

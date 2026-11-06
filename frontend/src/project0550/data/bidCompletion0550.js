@@ -5,7 +5,7 @@ import {policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
-import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550} from './towerTenderScope0550';
+import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -23,7 +23,19 @@ export function towerSurveyReviewPending0550(data){
 export function reconcileTowerTenderScope0550(data){
  const receipt=data.repositoryBasisImport?.bidCompletion;
  const byLine=new Map((receipt?.rows||[]).filter(row=>[TOWER_SURVEY_ID_0550,TOWER_ENGINEERING_ID_0550].includes(row.lineId)).map(row=>[row.lineId,row])),updates=new Map();
+ const erectionBase=towerErectionBaseApproved0550(data);
+ const erectionBasis=TOWER_ERECTION_BASE_BASIS_0550;
+ const erectionOfferIds=['OFFER-MASTER-TOWER-2609.95.1-10','OFFER-MASTER-TOWER-2609.95.2-10'];
+ const erectionItems=erectionBase?erectionOfferIds.map(id=>data.offers.find(o=>o.id===id)):[];
+ const erectionQuoted=erectionBase&&erectionItems.every(o=>isTowerSourceItem0550(o)&&o.currency==='THB'&&finite(o.quoteEvidence?.quotedTotal))
+  ?sumMoney0550(erectionItems.map(o=>o.quoteEvidence.quotedTotal)):null;
  const lines=data.lines.map(line=>{
+  if(erectionBase&&line.id===TOWER_ERECTION_ID_0550&&line.wbs==='C1'){
+   const existingCost=finite(line.manualCost)||line.offerId||line.calculationId;
+   return {...line,wbs:'B4',customerRowCode:'B4',responsibility:'TSI',selected:true,scopeBasis:erectionBasis,
+    sourceRef:[erectionBasis,line.sourceRef&&'Previous allocation record / '+line.sourceRef].filter(Boolean).join('\n'),customerRemark:erectionBasis,
+    ...(!existingCost&&erectionQuoted!==null?{quantity:1,unit:'Lot',currency:'THB',manualCost:erectionQuoted}:{})};
+  }
   const scope=towerC1Reference0550(line);
   if(scope){
    const description=line.description==='PROJECT · Civil / foundations / trench-related work'?'PROJECT · Tower civil / foundations and site interfaces':line.description;
@@ -46,8 +58,20 @@ export function reconcileTowerTenderScope0550(data){
   updates.set(line.id,{...row,basis,offerIds,inputKey:lineKey(data,next),sourceKey:sourceKey(data,offerIds)});
   return next;
  });
- const rows=receipt?.rows.filter(r=>!towerC1Reference0550({id:r.lineId})).map(r=>updates.get(r.lineId)||r);
- const receiptChanged=receipt&&(rows.length!==receipt.rows.length||updates.size>0);
+ const erectionLine=lines.find(l=>l.id===TOWER_ERECTION_ID_0550);
+ const rows=receipt?.rows.filter(r=>!towerC1Reference0550(r.lineId===TOWER_ERECTION_ID_0550&&erectionLine?erectionLine:{id:r.lineId})).map(r=>updates.get(r.lineId)||r);
+ const migratedErection=erectionLine!==data.lines.find(l=>l.id===TOWER_ERECTION_ID_0550);
+ const priorErectionIndex=rows?.findIndex(r=>r.lineId===TOWER_ERECTION_ID_0550);
+ let erectionReceiptChanged=false;
+ if(rows&&erectionQuoted!==null&&erectionLine?.wbs==='B4'&&erectionLine.scopeBasis===erectionBasis&&
+  (migratedErection||priorErectionIndex===-1)&&erectionLine.currency==='THB'&&erectionLine.quantity===1&&
+  erectionLine.manualCost===erectionQuoted&&!erectionLine.offerId&&!erectionLine.calculationId){
+  const row={lineId:erectionLine.id,kind:'QUOTED',basis:erectionBasis,offerIds:erectionOfferIds,ownerIds:[],ownerKeys:[],
+   inputKey:lineKey(data,erectionLine),sourceKey:sourceKey(data,erectionOfferIds)};
+  if(priorErectionIndex===-1)rows.push(row);else rows[priorErectionIndex]=row;
+  erectionReceiptChanged=true;
+ }
+ const receiptChanged=receipt&&(rows.length!==receipt.rows.length||updates.size>0||erectionReceiptChanged);
  if(!receiptChanged&&lines.every((line,i)=>line===data.lines[i]))return data;
  return {...data,lines,...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{})};
 }

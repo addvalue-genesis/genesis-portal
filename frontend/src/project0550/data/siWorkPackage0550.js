@@ -23,7 +23,7 @@ export function preparationAncestors0550(pack){
 }
 // Validate inherited excerpts against the expanded source text, while retaining
 // the original predecessor objects/hashes for receipt and edit comparisons.
-function rebasedPreparation(pack,source){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source),...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source)}:{})};}
+function rebasedPreparation(pack,source,basis){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:basis,...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source,basis)}:{})};}
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
 const PAGA_ONLY_ENGINEERING_OFFER='OFFER-PAGA-A20261632-002-22030';
 // Exact unchanged requirement drafts in the received source lineage (A Rev09/10).
@@ -56,6 +56,9 @@ const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};
 export function validateSiWorkPackage0550(pack,systems,intake){
+ return validateSiPreparation(pack,systems,intake,new Map());
+}
+function validateSiPreparation(pack,systems,intake,sourceChecks){
  preparationAncestors0550(pack);
  const linked=linkedPackage(pack),corpus=pack?.schema===A_CORPUS_WORK_PACKAGE_SCHEMA_0550,audit=pack?.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550,epc=pack?.schema===EPC_WORK_PACKAGE_SCHEMA_0550||audit;
  keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace","technicalProposal",...((corpus||epc)?["predecessor"]:[]),...(epc?["bidVolumes"]:[])]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
@@ -64,13 +67,24 @@ export function validateSiWorkPackage0550(pack,systems,intake){
  if(typeof pack.preparedOn!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(pack.preparedOn)||!Number.isFinite(Date.parse(pack.preparedOn))||new Date(pack.preparedOn).toISOString().slice(0,10)!==pack.preparedOn)fail("invalid date");
  if(typeof pack.coverageNote!=="string"||!pack.coverageNote.trim()||pack.coverageNote.length>6000)fail("coverage note required");
  const source=linked?intake:pack.sourceIntake;
- if(linked&&(!source||pack.sourceBatchId!==source.batchId||pack.sourceBasisKey!==sourcePackageBasis0550(source)))fail("A source basis changed or missing; load the matching source intake and prepare again");
- validateSourceIntake(source,systems);
- if(corpus){const prev=pack.predecessor;if(!prev||prev.schema!==A_WORK_PACKAGE_SCHEMA_0550||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>=pack.preparedOn)fail("invalid predecessor preparation");validateSiWorkPackage0550({...prev,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source)},systems,source);}
+ if(linked&&(!source||pack.sourceBatchId!==source.batchId))fail("A source basis changed or missing; load the matching source intake and prepare again");
+ if(!sourceChecks.has(source)){
+  validateSourceIntake(source,systems);
+  const byId=new Map(source.sources.map(s=>[s.id,s]));
+  const normalized=new Map();
+  const normalizedContent=id=>{
+   if(!normalized.has(id)&&byId.has(id))normalized.set(id,byId.get(id).content.replace(/\s+/g," "));
+   return normalized.get(id);
+  };
+  sourceChecks.set(source,{basis:linked?sourcePackageBasis0550(source):null,byId,normalizedContent});
+ }
+ const {basis,byId,normalizedContent}=sourceChecks.get(source);
+ if(linked&&pack.sourceBasisKey!==basis)fail("A source basis changed or missing; load the matching source intake and prepare again");
+ if(corpus){const prev=pack.predecessor;if(!prev||prev.schema!==A_WORK_PACKAGE_SCHEMA_0550||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>=pack.preparedOn)fail("invalid predecessor preparation");validateSiPreparation({...prev,sourceBatchId:source.batchId,sourceBasisKey:basis},systems,source,sourceChecks);}
  if(epc){
   const prev=pack.predecessor;
   if(!prev||!(audit?[EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550]:[A_CORPUS_WORK_PACKAGE_SCHEMA_0550]).includes(prev.schema)||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>pack.preparedOn||(!audit&&(prev.sourceBatchId!==pack.sourceBatchId||prev.sourceBasisKey!==pack.sourceBasisKey)))fail("invalid EPC predecessor");
-  validateSiWorkPackage0550(audit?rebasedPreparation(prev,source):prev,systems,source);
+  validateSiPreparation(audit?rebasedPreparation(prev,source,basis):prev,systems,source,sourceChecks);
   for(const collection of collections)for(const r of prev.integrationWorkspace[collection]||[])if(!pack.integrationWorkspace?.[collection]?.some(n=>n.id===r.id))fail("EPC predecessor record omitted / "+r.id);
  }
  if(linked){
@@ -78,12 +92,11 @@ export function validateSiWorkPackage0550(pack,systems,intake){
   validateSourceControl0550({sourceControl:pack.sourceControl});
   const r=pack.sourceControl.review;
   if(r.status!=="DRAFT"||r.basisKey||r.reviewer||r.reviewedOn||r.rfqReviewed||r.receivedSetReviewed||r.referencesReviewed)fail("A manifest must be an unstamped draft");
-  const ids=new Set(source.sources.map(s=>s.id));
-  for(const b of pack.sourceControl.bindings)if(b.sourceIds.some(id=>!ids.has(id)))fail("A binding source missing");
+  for(const b of pack.sourceControl.bindings)if(b.sourceIds.some(id=>!byId.has(id)))fail("A binding source missing");
  }
  if(!pack.integrationWorkspace)fail("draft workspace required");
  validateIntegration0550({integrationWorkspace:pack.integrationWorkspace});
- const sources=new Set(source.sources.map(s=>s.id));
+ const sources=byId;
  const reqs=new Set(pack.integrationWorkspace.requirements.map(r=>r.id));
  for(const collection of collections)for(const r of pack.integrationWorkspace[collection]||[]){
   // No imported stamps, dispositions or acceptance can close a gate by ingestion.
@@ -96,11 +109,11 @@ export function validateSiWorkPackage0550(pack,systems,intake){
   if(collection==="documentReviews"&&!sources.has(r.id))fail("document review source missing / "+r.id);
   if(linked&&collection==="documentReviews"&&(r.notesReviewed||r.colourReviewed||r.appendicesReviewed||(!audit&&r.reviewedPages)))fail("A reading jobs cannot import completed page/visual attestations");
   if(linked&&collection==="requirements"&&r.sourceExcerpt){
-   if(!r.sourceLocator.trim()||!r.sourceIds.some(id=>source.sources.find(s=>s.id===id)?.content.replace(/\s+/g," ").includes(r.sourceExcerpt.replace(/\s+/g," "))))fail("requirement excerpt missing from source / "+r.id);
+   const excerpt=r.sourceExcerpt.replace(/\s+/g," ");
+   if(!r.sourceLocator.trim()||!r.sourceIds.some(id=>normalizedContent(id)?.includes(excerpt)))fail("requirement excerpt missing from source / "+r.id);
   }
   if(linked&&collection==="particulars")for(const ref of r.references){
-   const s=source.sources.find(s=>s.id===ref.sourceId);
-   if(!ref.locator.trim()||!ref.excerpt.trim()||!s.content.replace(/\s+/g," ").includes(ref.excerpt.replace(/\s+/g," ")))fail("particular excerpt missing from source / "+r.id);
+   if(!ref.locator.trim()||!ref.excerpt.trim()||!normalizedContent(ref.sourceId).includes(ref.excerpt.replace(/\s+/g," ")))fail("particular excerpt missing from source / "+r.id);
   }
   if(r.requirementId&&!reqs.has(r.requirementId))fail("requirement missing / "+r.requirementId);
  }

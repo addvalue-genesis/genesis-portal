@@ -44,6 +44,22 @@ if(process.argv[2]){
   assert(!model.provisional.schedule.find(r=>r.code==='C1').children.some(l=>l.id===id));
  }
  const sum=items=>saved.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&items.includes(o.supplierQuoteRow?.itemCode)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0);
+ const erectionId='REQ-MR-ACT-C1-D04';
+ const approved={...active,sourceIntake:{...active.sourceIntake,findings:[
+  ...active.sourceIntake.findings,{id:'A-SI-R33-TOWER-ERECTION-BASE',state:'SOURCE_SUPPORTED'}
+ ]}};
+ const base=C.reconcileTowerTenderScope0550(approved);
+ const baseModel=B.deriveBidWorkspace(base,tokens,today).provisional;
+ const erectionRows=baseModel.selected.filter(l=>l.id===erectionId);
+ assert.equal(erectionRows.length,1);
+ assert.equal(erectionRows[0].wbs,'B4');
+ assert.equal(erectionRows[0].costTHB,sum(['10']));
+ assert(!baseModel.schedule.find(r=>r.code==='C1').children.some(l=>l.id===erectionId));
+ assert.equal(base.lines.find(l=>l.id==='REQ-MR-ACT-C1-D05').selected,false);
+ assert.equal(C.reconcileTowerTenderScope0550(base),base);
+ const baseReceipt=C.bidCompletionSourceUsages0550(base).find(u=>u.line.id===erectionId);
+ assert(baseReceipt.current);
+ assert.equal(baseReceipt.offerIds.length,2);
  assert.equal(active.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04').manualCost,sum(['6']));
  assert.equal(active.lines.find(l=>l.id==='LINE-TOWER-QUOTED-ENGINEERING-0550').manualCost,sum(['1','8','15']));
  assert.equal(C.bidCompletionSourceUsages0550(active).filter(u=>u.current).flatMap(u=>u.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-')).length,10);
