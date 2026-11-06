@@ -1,12 +1,13 @@
-import React from "react";
-import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import React,{useContext} from "react";
+import {ComponentCopyId,ComponentNumbersContext} from "../common/ui/ComponentCopyId";
 import {SiOperatingPrinciples0550} from "./SiOperatingPrinciples0550";
 import {workspaceAlias0550} from './workspaceLabels0550';
 import {BID_SECTIONS_0550,BID_GROUPS_0550,BID_MODULE_COLORS_0550,bidOwnerStyle,bidSection0550,bidModuleProps0550} from "./bidPresentation0550";
 
 export function BidHeading({id,title,number}){
- const meta=bidSection0550(id),label=title||meta?.title||id,n=number||meta?.number;
- return <span className="p55-module-heading"><span className="p55-module-heading__title">{n&&<strong className="p55-module-number">{n}</strong>}<span className="p55-workspace-alias">{workspaceAlias0550(id)}</span><strong>{label}</strong></span><span className="p55-module-copy" onClick={e=>e.stopPropagation()}><ComponentCopyId projectId="PJ2608-0550" componentKey={id}/></span></span>;
+ const directory=useContext(ComponentNumbersContext);
+ const meta=bidSection0550(id),label=title||meta?.title||id,n=directory?.numbers.get(id)||number||meta?.number;
+ return <span className="p55-module-heading"><span className="p55-module-heading__title">{n&&<strong className="p55-module-number">{n}</strong>}<span className="p55-workspace-alias">{workspaceAlias0550(id)}</span><strong>{label}</strong></span><span className="p55-module-copy" onClick={e=>e.stopPropagation()}><ComponentCopyId projectId="PJ2608-0550" componentKey={id} showNumber={!n}/></span></span>;
 }
 export function BidPrinciples({id}){
  const meta=bidSection0550(id);if(!meta)return null;

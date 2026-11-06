@@ -8,7 +8,8 @@ import {SYSTEMS} from "./data";
 import {newId} from "./data/bidWorkspaceModel";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-import {WORKING_PREVIEW_STAGES_0550,DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
+import {WORKING_PREVIEW_STAGES_0550,WP_NAVIGATION_0550,wpStageForTarget0550,DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
+import {BidHeading} from "./BidModulePresentation";
 import {blankRequirement0550,documentFamily0550,emptyIntegration0550,stampIntegration0550} from "./data/integrationWorkspace0550";
 import {mgwQuoteItem0550,currentSupplierOffers0550,supplierOfferExcluded0550} from "./data/mgwVendorBasis0550";
 import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
@@ -170,18 +171,21 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
  const requirementSelect=(form,setter)=><Select label="Linked requirement" value={form.requirementId} onChange={v=>setField(setter,"requirementId",v)} options={[["","เลือกข้อกำหนด"],...requirementOptions]}/>;
  const selection=<div className="p55-wp-current"><strong>ข้อกำหนดที่เลือก: {current?current.site+" · "+current.title:"ยังไม่มีรายการ"}</strong>{current&&<><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.requirement."+current.id}/><Select label="Working requirement" value={current.id} onChange={setSelected} options={requirementOptions}/></>}</div>;
  const sourceCounts=DOCUMENT_FAMILIES_0550.map(f=>({family:f,sources:model.sources.filter(s=>documentFamily0550(s)===f)}));
- const targetStage=navigationTarget?.match(/^bid\.working-preview\.step\.([1-8])$/)?.[1]||(/\.requirement\./.test(navigationTarget||"")?"4":/\.proof\./.test(navigationTarget||"")?"2":/\.activity\./.test(navigationTarget||"")?"6":null);
+ const targetStage=wpStageForTarget0550(navigationTarget)||(/\.requirement\./.test(navigationTarget||"")?"4":/\.proof\./.test(navigationTarget||"")?"2":/\.activity\./.test(navigationTarget||"")?"6":null);
  const renderStage=stage=><Module key={stage.id} id={stage.id} title={stage.title} open={expanded||String(stage.step)===targetStage} defer>{()=>{
   const common=<div className="p55-review-toolbar"><button type="button" onClick={()=>stage.target==="l3.original"?onOpenSource("l3.original"):onNavigate(stage.target)}>เปิดโมดูลต้นทาง {stage.step.toString().padStart(2,"0")}</button></div>;
   let body;
   if(stage.step===1)body=<>
-   <SourceReadingMatrix0550 data={data} integration={model} systems={SYSTEMS} onOpenSource={onOpenSource}/>
+   <SourceReadingMatrix0550 data={data} integration={model} systems={SYSTEMS} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
    <Note>A: ข้อกำหนดลูกค้า ↔ Web App: System Integrator / CAL–RPT ↔ B: MGW / INDUSTRONIC และ catalog/datasheet · ใช้ขอบเขตจากเอกสาร ไม่จำกัดตามรายการที่ Supplier เสนอ</Note>
-   <details><summary>สรุปทะเบียนเอกสารและสถานะข้อความทุกแหล่ง</summary>
+   <details data-component-key={WP_NAVIGATION_0550.inventory.id} data-module-number={WP_NAVIGATION_0550.inventory.number}>
+   <summary><BidHeading {...WP_NAVIGATION_0550.inventory}/></summary>
    <div className="p55-table-wrap"><table className="p55-table" aria-label="Working document coverage"><thead><tr><th>ประเภทเอกสาร</th><th>ลงทะเบียน</th><th>TEXT_READ</th><th>TEXT_PARTIAL</th><th>METADATA_ONLY</th></tr></thead><tbody>{sourceCounts.map(g=><tr key={g.family}><td>{g.family}</td><td>{g.sources.length}</td>{["TEXT_READ","TEXT_PARTIAL","METADATA_ONLY"].map(state=><td key={state}>{g.sources.filter(s=>s.readState===state).length}</td>)}</tr>)}</tbody></table></div>
    <Note>จำนวนข้างต้นรวมฉบับเก่าและ Supplier ตามทะเบียนที่โหลด ไม่ใช่จำนวนข้อกำหนดที่ตรวจผ่าน · Current Tender ต้องตรวจ applicability และ revision แยก</Note>
    </details>
-   <SystemConstraints0550 data={data} model={bidModel} system={system} onEditRequirement={editRequirement} onNavigate={onNavigate} onOpenSource={onOpenSource} systemName={names} onSelectSystem={s=>{setSystem(s.id);setScope(s.review||{id:s.id,sourceIds:[],families:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});}}/>
+   <section data-component-key={WP_NAVIGATION_0550.constraints.id} data-module-number={WP_NAVIGATION_0550.constraints.number}>
+    <SystemConstraints0550 heading={<BidHeading {...WP_NAVIGATION_0550.constraints}/>} data={data} model={bidModel} system={system} onEditRequirement={editRequirement} onNavigate={onNavigate} onOpenSource={onOpenSource} systemName={names} onSelectSystem={s=>{setSystem(s.id);setScope(s.review||{id:s.id,sourceIds:[],families:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});}}/>
+   </section>
    {scope&&<form onSubmit={async e=>{e.preventDefault();await save("scopeReviews",scope);}}><h3>ขอบเขต {names(scope.id)}</h3><div className="p55-bid-fields"><Multi label="Scope source IDs" value={scope.sourceIds} onChange={v=>setField(setScope,"sourceIds",v)} options={ids(model.sources)}/><Multi label="Applicable document families" value={scope.families} onChange={v=>setField(setScope,"families",v)} options={DOCUMENT_FAMILIES_0550.map(f=>[f,f])}/><Field label="Scope completeness / applicability basis" value={scope.basis} onChange={v=>setField(setScope,"basis",v)}/><ReviewFields form={scope} setForm={setScope} date={reviewDate}/></div><Save busy={busy}>บันทึกผลตรวจขอบเขต</Save></form>}
   </>;
   if(stage.step===2)body=<>{selection}<Note>CAL/RPT ที่จัดทำที่นี่เป็นผลพิสูจน์ของ Integrator แยกจากเอกสาร CAL/RPT ต้นฉบับ · Input ไม่มีค่าที่เดาให้ · ผล design check แยกจากผล FAT/SAT จริง</Note><button type="button" onClick={()=>onNavigate("bid.engineering.equations")}>เปิดสมการ / Inputs</button> <button type="button" onClick={newProof} disabled={!current}>เพิ่ม CAL/RPT</button>
@@ -240,9 +244,9 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
    {body}
   </>;
  }}</Module>;
- return <section ref={root} className="p55-working-preview" data-component-key="bid.working-preview" aria-label="Working Preview 1–8">
+ return <section ref={root} className="p55-working-preview" data-component-key={WP_NAVIGATION_0550.preview.id} data-module-number={WP_NAVIGATION_0550.preview.number} aria-label="Working Preview 1–8">
   <aside className="p55-callout" aria-label="A readiness before B"><strong>ฐานข้อมูล A: {bidModel.sourceReadiness?.state||"A_OPEN"}</strong><p>{bidModel.sourceReadiness?.ready?"A ผ่านการตรวจรับและอ่านตามทะเบียนแล้ว · ยังต้องตรวจ SI 1–8 และ Release ต่อ":"ทำงานร่างต่อจากข้อมูลที่มีหลักฐานได้ · A ยังมีรายการรับเอกสาร/อ่าน/ทบทวนค้าง ไม่ได้แปลว่าทุกระบบไม่มีข้อมูล · การออก Issue ยังคงตรวจความพร้อมและอนุมัติตามเกณฑ์เดิม"}</p><button type="button" onClick={()=>onOpenSource("l3.original")}>กลับ A · ตรวจเอกสารที่ RFQ ต้องมี</button></aside>
-  <div className="p55-wp-header"><div><h2>Working Preview · สมอง System Integrator · 1–8</h2><p>A ลูกค้า ↔ วิเคราะห์ / CAL–RPT / รวมระบบ ↔ B Supplier → Working → Budgetary → Release → Source</p></div><ComponentCopyId projectId="PJ2608-0550" componentKey="bid.working-preview"/></div>
+  <div className="p55-wp-header"><div><h2><BidHeading {...WP_NAVIGATION_0550.preview}/></h2><p>A ลูกค้า ↔ วิเคราะห์ / CAL–RPT / รวมระบบ ↔ B Supplier → Working → Budgetary → Release → Source</p></div></div>
   <div className="p55-review-toolbar"><Select label="Working Preview system" value={system} onChange={setSystem} options={systemOptions}/><button type="button" onClick={()=>{setExpanded(true);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=true);}}>ขยาย 1–8</button><button type="button" onClick={()=>{setExpanded(false);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=false);}}>หุบ 1–8</button></div>
   <div className="p55-wp-status" role="status" aria-live="polite">{saved||`${model.scopes.length} ระบบ/งานร่วม · ${model.requirements.length} requirement records · ${model.proofs.length} derived CAL/RPT · ${model.activities.length} activities/deliverables · ข้อที่ยังไม่อ่าน/วิเคราะห์แสดง OPEN`}</div>
   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าผลวิเคราะห์ SI จากเอกสาร</button>

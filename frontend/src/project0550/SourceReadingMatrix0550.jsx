@@ -1,4 +1,6 @@
 import React, {useEffect, useMemo, useRef, useState} from "react";
+import {BidHeading} from "./BidModulePresentation";
+import {WP_NAVIGATION_0550} from "./workingPreviewStages0550";
 import {APF_BUILDINGS_0550, apfPhiMatrix0550} from "./data/apfPhiMatrix0550";
 import {
  SOURCE_MATRIX_CHECKS_0550, SOURCE_MATRIX_GROUPS_0550, sourceMatrixIndex0550, sourceReadingMatrix0550,
@@ -83,8 +85,12 @@ const locationState = (apf, row, i) => {
  return !items ? "blank" : items.some(item => item.note) ? "note" : "location";
 };
 
-export function SourceReadingMatrix0550({data, integration, systems, onOpenSource}) {
- const [view,setView] = useState("documents"), [selection,setSelection] = useState(null);
+export function SourceReadingMatrix0550({data, integration, systems, onOpenSource, navigationTarget}) {
+ const [view,setView] = useState(navigationTarget===WP_NAVIGATION_0550.locations.id?"locations":"documents"), [selection,setSelection] = useState(null);
+ useEffect(()=>{
+  if(navigationTarget===WP_NAVIGATION_0550.documents.id)setView("documents");
+  if(navigationTarget===WP_NAVIGATION_0550.locations.id)setView("locations");
+ },[navigationTarget]);
  const dialog = useRef(null);
  const index = useMemo(() => sourceMatrixIndex0550(data.sourceIntake), [data.sourceIntake]);
  const rows = useMemo(() => sourceReadingMatrix0550(index,integration,systems,data.sourceIntake?.findings),
@@ -102,14 +108,17 @@ export function SourceReadingMatrix0550({data, integration, systems, onOpenSourc
   onOpenSource(target);
  };
  const openSource = id => openCus(sourceTarget(id));
- return <section className="p55-source-matrix" aria-label="CUS Document Reading Matrix">
+ return <section className="p55-source-matrix" aria-label="CUS Document Reading Matrix" data-component-key={WP_NAVIGATION_0550.matrix.id} data-module-number={WP_NAVIGATION_0550.matrix.number}>
   <div className="p55-source-matrix-header">
-   <h3>ตารางระบบและเอกสาร CUS</h3>
+   <h3><BidHeading {...WP_NAVIGATION_0550.matrix}/></h3>
    <span>{systems.length} ระบบ + COMMON</span>
   </div>
   <div className="p55-review-toolbar">
-   <button type="button" aria-pressed={isDocumentView} onClick={() => setView("documents")}>ระบบ × เอกสาร</button>
-   <button type="button" aria-pressed={!isDocumentView} onClick={() => setView("locations")}>ระบบ × ตำแหน่ง APF</button>
+   {["documents","locations"].map(key=>{
+    const item=WP_NAVIGATION_0550[key];
+    return <button type="button" key={key} aria-label={item.title} aria-pressed={view===key}
+     data-component-key={item.id} data-module-number={item.number} onClick={()=>setView(key)}>{item.number} · {item.title}</button>;
+   })}
   </div>
   <div className="p55-source-matrix-legend" aria-label="สัญลักษณ์">
    {legend.map(key => <span key={key}><b data-state={key}>{states[key][0]}</b> {states[key][1]}</span>)}

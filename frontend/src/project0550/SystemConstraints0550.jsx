@@ -6,7 +6,7 @@ function RequirementGroup0550({ids, label, requirements, onOpen}) {
  return <details onToggle={e => setOpen(e.currentTarget.open)}><summary>{label} · {ids.length} records</summary>{open && ids.map(id => <p key={id}><button type="button" onClick={() => onOpen(requirements.get(id))}>{requirements.get(id)?.title || id}</button><small>{id}</small></p>)}</details>;
 }
 
-export function SystemConstraints0550({data, model, system, onEditRequirement, onNavigate, onOpenSource, onSelectSystem, systemName = token => token}) {
+export function SystemConstraints0550({data, model, system, onEditRequirement, onNavigate, onOpenSource, onSelectSystem, heading, systemName = token => token}) {
  const [query, setQuery] = useState(''), [limit, setLimit] = useState(25);
  useEffect(() => {setQuery(''); setLimit(25);}, [system]);
  const view = useMemo(() => system === 'ALL' ? null : systemConstraints0550(data, model, system), [data, model, system]);
@@ -14,7 +14,7 @@ export function SystemConstraints0550({data, model, system, onEditRequirement, o
  const requirements = new Map(model.integration.requirements.map(r => [r.id, r]));
  const group = (ids, label) => <RequirementGroup0550 ids={ids} label={label} requirements={requirements} onOpen={r => {onEditRequirement(r); onNavigate('bid.working-preview.step.4');}}/>;
  const summary = <section aria-label="System responsibility overview">
-  <h3>ขอบเขต CUS ↔ VND และงาน SI</h3>
+  <h3>{heading || "ขอบเขต CUS ↔ VND และงาน SI"}</h3>
   <p className="p55-note">จำนวนเป็น records / references ไม่ใช่จำนวนอุปกรณ์หรือเปอร์เซ็นต์ความครบถ้วน · COMPANY จัดหาอุปกรณ์หลักยังอาจมีงาน SI · ไม่มี Offer ผูกระบบไม่ได้แปลว่าไม่มี Vendor · COMMON คงเป็นงานร่วม ไม่คัดลอกต้นทุนเข้าทุกระบบ</p>
   <div className="p55-table-wrap"><table className="p55-table" aria-label="All system scope reviews"><thead><tr><th>ระบบ / Scope review</th><th>TSI จัดหา / COMPANY / งาน SI</th><th>รอยืนยัน / ไม่เกี่ยวข้อง</th><th>Vendor / Mapping</th><th>Working cost owners</th><th>เปิดทำงาน</th></tr></thead><tbody>{overview.filter(r => system === 'ALL' || r.id === system).map(r => <tr key={r.id} data-system-responsibility={r.id}>
    <td><strong>{systemName(r.id)}</strong><small>{r.id} · {r.requirements} requirements</small><small>Scope review: {r.scope.state}</small><details><summary>{r.scope.problems.length} ประเด็น Scope</summary>{r.scope.problems.map(problem => <p key={problem}>{problem}</p>)}</details></td>

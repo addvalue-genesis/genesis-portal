@@ -1,6 +1,9 @@
-import React,{useState} from "react";
+import React,{createContext,useContext,useState} from "react";
+export const ComponentNumbersContext=createContext(null);
 // Common presentation only; the key is supplied by the project registry.
-export function ComponentCopyId({projectId,componentKey,componentName=null}){
+export function ComponentCopyId({projectId,componentKey,componentName=null,showNumber=true}){
+ const directory=useContext(ComponentNumbersContext);
+ const number=showNumber&&directory?.projectId===projectId?directory.numbers.get(componentKey):null;
  const [state,setState]=useState("Copy ID");
  const value=projectId+" / "+componentKey;
  const [nameState,setNameState]=useState("Copy name");
@@ -16,6 +19,7 @@ export function ComponentCopyId({projectId,componentKey,componentName=null}){
   }
  };
  return <span className="gns-copy-id">
+  {number&&<strong className="p55-module-number">{number}</strong>}
   <code title={value}>{componentKey}</code>
   <button type="button" onClick={copy} title={"Copy "+value} aria-label={"Copy component ID "+componentKey}>{state==="Copied"?"✓ ":"⧉ "}{state}</button>
   {state==="Select ID"&&<input readOnly aria-label="Select component ID" value={value} onFocus={e=>e.target.select()}/>}

@@ -10,4 +10,13 @@ export const WORKING_PREVIEW_STAGES_0550 = [
  [8,"Risk / Change / Readiness","release","ตรวจทุกขั้นและย้อนกลับถึง source ทั้งสองฝั่ง","Scope / requirements / proofs / activities / Working / findings","Common Punch: จัดต้นเหตุ Major/Minor/รอประเมิน แยกตัวเลข ขอบเขต หลักฐานและกำหนดส่ง; ตรวจ stale เมื่อฐานเปลี่ยน","Punch / วิธีทำงานต่อ / ผู้รับผิดชอบ / ฐานราคาและกำหนดส่ง","แผนไม่ปิด OPEN ไม่อนุมัติ Proof และไม่เปลี่ยนเงื่อนไขออกฉบับ","bid.risk"]
 ].map(([step,title,family,purpose,inputs,method,outputs,limits,target])=>({step,id:`bid.working-preview.step.${step}`,number:`WP.${step}`,title,purpose,inputs,method,outputs,limits,next:step<8?`WP.${step+1}`:"Working → Budgetary → Release → Source",family,target}));
 export const DOCUMENT_FAMILIES_0550=["MR","PHI","BOD","DTS","SPE","BLD","LAY","DWG","LIS","MTO","RPT","CAL","STD","OTHER"];
+export const WP_NAVIGATION_0550={
+ preview:{id:"bid.working-preview",number:"10.2.2",title:"Working Preview · สมอง System Integrator · 1–8"},
+ matrix:{id:"bid.working-preview.step.1.matrix",number:"10.2.2.1.1",title:"ตารางระบบและเอกสาร CUS"},
+ documents:{id:"bid.working-preview.step.1.matrix.documents",number:"10.2.2.1.1.1",title:"ระบบ × เอกสาร"},
+ locations:{id:"bid.working-preview.step.1.matrix.locations",number:"10.2.2.1.1.2",title:"ระบบ × ตำแหน่ง APF"},
+ inventory:{id:"bid.working-preview.step.1.inventory",number:"10.2.2.1.2",title:"สรุปทะเบียนเอกสารและสถานะข้อความทุกแหล่ง"},
+ constraints:{id:"bid.working-preview.step.1.constraints",number:"10.2.2.1.3",title:"ขอบเขต CUS ↔ VND และงาน SI"},
+};
+export const wpStageForTarget0550=target=>target?.match(/^bid\.working-preview\.step\.([1-8])(?:\.|$)/)?.[1];
 export const DELIVERY_KINDS_0550=["INSTALLATION","INTEGRATION","PERSONNEL","ITP","VDRL","SDRL","FAT","IFAT","SAT","PRECOM","COMMISSIONING","TRAINING","SPARES","WARRANTY","MAINTENANCE","PACKING","PRESERVATION","LOGISTICS","OTHER"];

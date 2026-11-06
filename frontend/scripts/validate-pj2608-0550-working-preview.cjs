@@ -267,3 +267,35 @@ assert.equal((matrixHtml.match(/data-system-token=/g)||[]).length,20);
 assert(matrixHtml.includes('ระบบ × ตำแหน่ง APF'));
 for(const family of ['STD','LAY','DWG','TYP','MTO','SOFTWARE']) assert(matrixHtml.includes('aria-label="'+family+'"'));
 console.log('PASS WP.1 CUS matrix: canonical system rows, revision mismatch, distinct TYP, reference cycles, shared applicability, flattened PHI safety and real SSR.');
+
+const {moduleDirectory0550,moduleDirectoryText0550}=require(root+'/project0550/moduleDirectory0550');
+const {WP_NAVIGATION_0550,wpStageForTarget0550}=require(root+'/project0550/workingPreviewStages0550');
+const {bidPresentationIndex}=require(root+'/project0550/bidPresentation0550');
+const navigationEntries=[
+ {id:'bid.budget',title:'Budget',number:'10',tab:'budget'},
+ {id:'l3.original',title:'CUS',number:'A',area:'A',tab:'documents'},
+ {id:'bid.documents.controlled-source-inventory.mr',title:'MR',number:'A.1',area:'A',tab:'documents'},
+ {id:'bid.documents.controlled-source-inventory.mr.page.5',title:'MR page 5',number:'A.1',area:'A',tab:'documents'},
+ {id:'bid.working-preview.requirement.REQ-1',title:'Requirement',tab:'budget'},
+ ...bidPresentationIndex(d.lines),
+];
+const navigation=moduleDirectory0550(navigationEntries);
+assert.equal(navigation.entries.length,new Set(navigationEntries.map(item=>item.id)).size);
+assert.equal(new Set(navigation.numbers.values()).size,navigation.entries.length);
+assert.equal(navigation.numbers.get('bid.budget.working.lines'),'10.2');
+assert.equal(navigation.numbers.get('bid.budget.working.editor'),'10.2.1');
+assert.equal(navigation.numbers.get('bid.working-preview.step.1'),'10.2.2.1');
+assert.equal(navigation.entries.find(item=>item.id==='bid.working-preview.step.1').legacyNumber,'WP.1');
+assert.equal(navigation.numbers.get(WP_NAVIGATION_0550.locations.id),'10.2.2.1.1.2');
+assert.equal(navigation.children.get(WP_NAVIGATION_0550.matrix.id).length,2);
+assert(navigation.children.get('bid.working-preview.step.4').some(item=>item.id.endsWith('REQ-1')));
+assert.match(navigation.numbers.get('bid.documents.controlled-source-inventory.mr.page.5'),/^A\.1\./);
+assert.equal(wpStageForTarget0550(WP_NAVIGATION_0550.locations.id),'1');
+assert.equal(wpStageForTarget0550('bid.working-preview.step.10'),undefined);
+const tsv=moduleDirectoryText0550(navigation.entries);
+assert.equal(tsv.split('\n').length,navigation.entries.length+1);
+assert(tsv.includes('10.2.2.1.1.2\tระบบ × ตำแหน่ง APF\tPJ2608-0550 / '+WP_NAVIGATION_0550.locations.id));
+const locationHtml=renderToStaticMarkup(React.createElement(SourceReadingMatrix0550,{data:matrixData,integration:emptyIntegration,systems:SYSTEMS,onOpenSource:()=>{},navigationTarget:WP_NAVIGATION_0550.locations.id}));
+assert(locationHtml.includes('aria-label="ระบบ × ตำแหน่ง APF" aria-pressed="true"'));
+assert(locationHtml.includes('data-module-number="10.2.2.1.1.2"'));
+console.log('PASS module directory: all registered IDs, hierarchical display numbers, exact matrix targets, legacy aliases and complete clipboard TSV.');

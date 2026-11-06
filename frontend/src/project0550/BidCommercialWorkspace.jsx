@@ -12,6 +12,7 @@ import {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550} from "./WorkingSu
 import {RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OWNER_0550} from "./data/towerLegacyPricing0550";
 import {supplierCostProjection0550} from "./data/supplierCostProjection0550";
 import {WorkingPreview0550} from "./WorkingPreview0550";
+import {WP_NAVIGATION_0550} from "./workingPreviewStages0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
 import {mgwQuoteItem0550,currentSupplierOffers0550,mgwWorkingLineExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./data/mgwVendorBasis0550";
 import {MR_WORKING_CATALOG_0550,mrRequirement0550} from "./data/mrWorkingBasis0550";
@@ -147,6 +148,9 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <Module id="bid.budget.working.sources" open={false} title="ฐานข้อเสนอ — MR / ค่าเริ่มต้น / วิธีคิดจาก 01–08"><p><strong>ฐานขอบเขต: MM-ASK-1A-APF-TEL-MR-0001 Rev.B1</strong> · รูปแบบข้อเสนอ: Release เดิม 8 คอลัมน์ · ตรวจหลักฐานและ revision ใน RFQ-02 ก่อนทบทวนราคา</p><p>นำราคาผู้ขายเดิมเข้า Working แล้ว {data.vendorBasisImport?.importedLineIds.length||0} รายการ · คงรายการที่มีอยู่แล้วในระบบ: {data.vendorBasisImport?.skippedSystems.join(", ")||"ไม่มี"} · MET/NDB จาก Jason เป็นทางเลือกที่ยังไม่เลือกใช้</p><p><strong>VSAT: แยก COMPANY / TSI ก่อนรวมราคา</strong> · COMPANY-supplied ไม่รวมใน Working / Budget / Release; รายการเก่าที่ยังไม่แยกเป็น OPEN · Cabinet, Cable และงานบริการ TSI ยังต้องตรวจให้ครบ · Router รอยืนยันขอบเขต · KU/C Band Internet รอ clarification</p><p>MGW Q26-063: {data.offers.filter(mgwQuoteItem0550).length} รายการต้นทาง · เปิดหัวข้อราคาผู้ขายในแต่ละกลุ่มเพื่อเทียบและเลือกเรต · CCTV/LAN มีประเด็นยอดรวมต้นฉบับ</p><p><strong>รายการ MR / กิจกรรมที่เตรียม: {data.lines.filter(l=>l.mrRequirementId).length} / {MR_WORKING_CATALOG_0550.rows.length}</strong> · ครบโครงสร้าง 19 ระบบและ B/C · OPEN = ยังขาดฐานราคา/ปริมาณ/ขอบเขต ไม่ใช่ไม่มีรายการ · ข้อมูลเดิมที่บันทึกไว้ยังอยู่</p><BidInheritedBasis onNavigate={onNavigate}/><OfficialSourceImpact onOpenSource={onOpenSource}/>{fxPanel}</Module>
  <Module id="bid.budget.working.lines" title="เตรียมข้อเสนอ A / B / C — ขอบเขต → ปริมาณ → Cost / Sell" open={false}>
  <p>ขั้นตอนภายใน 10.2: Particular → WP.1–WP.8 → รายการ A/B/C → รายละเอียดต้นทุน · ใช้ข้อมูลชุดเดียวกับ Budget และ Release</p>
+ <button type="button" disabled={!onNavigate} onClick={()=>onNavigate(WP_NAVIGATION_0550.matrix.id)}>
+  {WP_NAVIGATION_0550.matrix.number} · {WP_NAVIGATION_0550.matrix.title}
+ </button>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
  <p>เริ่มจากรายการที่จะเสนอใน Release แล้วแตกอุปกรณ์และกิจกรรม · หมวด A เรียงการทำงานตาม MR; แบบ Release คงรหัสและลำดับเดิม · การเลือกปลายทางยังไม่ใช่ผลตรวจ scope</p>

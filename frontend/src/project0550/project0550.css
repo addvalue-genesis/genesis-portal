@@ -1557,6 +1557,10 @@
 .p55-bid-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:16px; }
 .p55-bid-field { display:flex; flex-direction:column; gap:6px; font-size:14px; }
 .p55-bid-field input, .p55-bid-field select, .p55-module-nav input { width:100%; padding:10px; box-sizing:border-box; border:1px solid #97b0c1; border-radius:6px; font-size:15px; background:#fff; color:#102e44; }
+.p55-module-nav textarea { width:100%; box-sizing:border-box; }
+.p55-module-directory, .p55-module-directory ul { padding-inline-start:1.25rem; }
+.p55-module-directory li { margin-block:.3rem; }
+.p55-module-directory li button { margin-inline-end:.4rem; }
 .p55-bid-result { display:block; padding:14px; background:#e5f4f6; border:1px solid #69a9b2; margin:14px 0; font-weight:700; font-size:18px; }
 .p55-bid-content button { margin:4px; cursor:pointer; }
 .p55-bid-content tr:focus { outline:3px solid #eea22d; outline-offset:-3px; background:#fff5d9; }
