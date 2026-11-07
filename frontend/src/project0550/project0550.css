@@ -1870,6 +1870,15 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-vnd-groups td{overflow-wrap:anywhere}
 .p55-vnd-groups .p55-review-toolbar{flex-wrap:wrap}
 .p55-vnd-groups button[aria-pressed=true]{background:#00556b;color:#fff}
+.p55-supplier-evidence{box-sizing:border-box;width:min(1000px,calc(100% - 24px));max-width:100%;max-height:88vh;overflow:auto;padding:20px;border:1px solid #8aa6b6;border-radius:8px;color:#19303d;background:#fff;overflow-wrap:anywhere}
+.p55-supplier-evidence::backdrop{background:#132d40a0}
+.p55-supplier-evidence-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.p55-supplier-evidence-head form{margin:0}
+.p55-supplier-verbatim{white-space:pre-wrap;overflow-wrap:anywhere}
+.p55-supplier-boq{min-width:660px}
+.p55-boq-qty{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.p55-quote-boq .p55-review-toolbar{flex-wrap:wrap}
+.p55-quote-boq button[aria-pressed=true]{background:#00556b;color:#fff}
 
 .p55-quotation-baseline{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .p55-quotation-baseline input,.p55-quotation-baseline select,.p55-quotation-baseline button{max-width:100%}

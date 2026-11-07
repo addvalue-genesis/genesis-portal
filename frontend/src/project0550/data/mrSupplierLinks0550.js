@@ -1,6 +1,10 @@
 import {workingOffers0550} from './workingOffers0550';
 import {RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from './towerLegacyPricing0550';
 
+export const requirementSupplierOfferIds0550=requirement=>[...new Set([
+ ...(requirement.offerIds||[]),...(requirement.tagBindings||[]).flatMap(binding=>binding.offerIds||[])
+])];
+
 // Read canonical links, including shared owners and authored requirement IDs.
 // A requirement candidate is evidence to review, never a selected price/approval.
 export function mrSupplierLinks0550(data,line){
@@ -11,6 +15,6 @@ export function mrSupplierLinks0550(data,line){
  // Preserve a dangling selection so a deleted Offer cannot look unmapped.
  if(line.offerId)add(line.offerId,'Offer ที่ผูกกับ Working');
  if(owner){for(const o of workingOffers0550(data,owner))add(o.id,'Offer ของเจ้าของราคาอ้างอิง');if(owner.offerId)add(owner.offerId,'Offer ของเจ้าของราคาอ้างอิง');}
- for(const r of requirements)for(const id of r.offerIds||[])add(id,'ลิงก์ Requirement · รอตรวจ Mapping');
+ for(const r of requirements)for(const id of requirementSupplierOfferIds0550(r))add(id,'ลิงก์ Requirement / TAG · ดูผลตรวจ Mapping');
  return {owner,requirements,links:[...links.values()]};
 }

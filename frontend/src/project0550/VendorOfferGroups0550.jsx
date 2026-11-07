@@ -7,7 +7,9 @@ import {bidOwnerStyle} from './bidPresentation0550';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
-import {SupplierItemSourceText0550} from './SupplierItemSourceText0550';
+import {SupplierItemSourceText0550,SupplierQuoteBoq0550} from './SupplierItemSourceText0550';
+import {supplierItemLabel0550} from './data/supplierCostProjection0550';
+import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 function QuoteTotal({quote,fx}){
@@ -23,10 +25,20 @@ function QuoteTotal({quote,fx}){
  </span>;
  return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':isMgw?'รวมรายการในขอบเขตปัจจุบัน':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>{isMgw?"ยอดรวมขอบเขตที่แสดงในทะเบียนของใบเดียวกัน":"ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน"}</span>}</span>;
 }
-export function VendorOfferGroups0550({data,onEdit,navigationTarget}){
+export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget}){
  const [mode,setMode]=useState('company');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
  const groups=useMemo(()=>groupVendorOffers0550(entries,mode,SYSTEMS),[entries,mode]);
+ const requirementsByOffer=useMemo(()=>{
+  const index=new Map();
+  for(const requirement of data.integrationWorkspace?.requirements||[]){
+   for(const id of requirementSupplierOfferIds0550(requirement)){
+    if(!index.has(id))index.set(id,[]);
+    index.get(id).push(requirement);
+   }
+  }
+  return index;
+ },[data.integrationWorkspace]);
  useEffect(()=>{
   if(entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId))setMode('company');
  },[entries,navigationTarget]);
@@ -39,7 +51,7 @@ export function VendorOfferGroups0550({data,onEdit,navigationTarget}){
   const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{o.description}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
@@ -56,13 +68,14 @@ export function VendorOfferGroups0550({data,onEdit,navigationTarget}){
    </td>
    <td>{entry.referenceOnly?'อ้างอิงยอดต้นฉบับแยกแต่ละฉบับ':e?.quotedTotal!==undefined?(e.quotedTotal===null?e.quotedTotalText||'ต้นฉบับไม่ระบุยอดแยก':amount(e.quotedTotal,e.quotedCurrency)):r?amount(r.extended,'USD'):'OPEN · ยังไม่บันทึกยอดต้นฉบับ'}{e&&<small>{e.locator}</small>}</td>
    <td>{o.date||'วันที่ OPEN'}<small>Valid until: {o.validUntil||'ไม่ระบุวันสิ้นสุด'}</small>
-    {e&&<details><summary>เงื่อนไขต้นทุน</summary>{e.terms.map((t,i)=><p key={i}>{t}</p>)}</details>}
    </td>
    <td><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.offer.'+o.id}/><button type="button" onClick={()=>onEdit(o)}>เปิด Offer / แก้ไข</button>
     <small>{towerScope?towerScope.text:selected.length?'มี Working ที่เลือกใช้ '+selected.length+' รายการ':allocated.length?'จัดสรรต้นทุนใน Working แล้ว '+allocated.length+' รายการ':referenceSelected.length?'อ้างอิงเจ้าของราคา Working เดิม':stale.length?'ฐานจัดสรรเปลี่ยน · ต้องทบทวน':'ยังไม่เลือกใช้ใน Working'}</small>
     {allocated.map(u=><small key={u.line.id}>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'} · {u.line.description}{u.kind==='ESTIMATE'?' · รวมในต้นทุนผสมใบเสนอราคาและประมาณการ':''}</small>)}
     {stale.map(u=><small key={u.line.id}>ต้องทบทวนลิงก์ {u.line.id} · ข้อมูลรายการหรือราคาต้นทางเปลี่ยน</small>)}
     {referenceSelected.length>0&&<small>อ้างอิงฐาน Working เดิม {referenceSelected.length} รายการ · ตรวจขอบเขตก่อนเปลี่ยนราคา</small>}
+    {onNavigate&&requirementsByOffer.has(o.id)&&<details><summary>SI Mapping · {requirementsByOffer.get(o.id).length} ข้อ</summary>{requirementsByOffer.get(o.id).map(r=><div key={r.id}><button type="button" onClick={()=>onNavigate('bid.working-preview.requirement.'+r.id)}>{r.site? r.site+' · ':''}{r.title||r.id}</button></div>)}</details>}
+    {onNavigate&&[...new Map([...selected,...allocated.map(u=>u.line),...referenceSelected].map(line=>[line.id,line])).values()].map(line=><div key={line.id}><button type="button" onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>10.2 · {line.wbs} · {line.description}</button></div>)}
    </td>
   </tr>;
  })}</tbody></table></div>;
@@ -80,6 +93,7 @@ export function VendorOfferGroups0550({data,onEdit,navigationTarget}){
     {child.quotes.map(q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
      <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx}/></summary>
      {renderRows(q)}
+     <SupplierQuoteBoq0550 offers={q.entries.map(entry=>entry.offer)}/>
     </details>)}
    </details>)}
   </details>)}

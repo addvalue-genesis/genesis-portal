@@ -38,11 +38,16 @@ const server=http.createServer((req,res)=>{
  await jump('bid.budget.working.group.TEL-TELT');await group.waitFor({state:'visible'});
  for(const [id,ref] of [['REQ-MR-B1-11-APF-08','2609.95.1'],['REQ-MR-B1-11-ACP-06','2609.95.2']]){
   const detail=group.locator('[data-working-mr-vendor="'+id+'"]');await detail.locator(':scope > summary').click();await detail.locator('[data-supplier-source-text]').first().waitFor();
+  assert.deepEqual(await detail.locator('[data-working-source-item]').evaluateAll(rows=>rows.map(row=>row.dataset.workingSourceItem)),[2,3,4,5].map(n=>'OFFER-MASTER-TOWER-'+ref+'-0'+n),'Only the items linked by WP.7 are shown first');
+  await detail.getByRole('button',{name:'ดูรายการทั้งใบ 15 รายการ'}).click();
   assert.equal(await detail.locator('[data-working-source-item]').count(),15);
   for(const offer of before.offers.filter(o=>o.quoteRef===ref&&o.supplierQuoteRow?.classification==='BASE_PRICE')){
    const text=await detail.locator('[data-supplier-source-text="'+offer.id+'"]').textContent();for(const source of offer.quoteEvidence.terms)assert(text.includes(source),'Exact original Supplier item description / '+offer.id);
   }
-  const towerText=await detail.locator('[data-supplier-source-text="OFFER-MASTER-TOWER-'+ref+'-02"]').innerText();assert(towerText.includes('square self-supporting tower'));assert(towerText.includes(ref.endsWith('.1')?'9.90 x 9.90':'2.0 x 2.0'));
+  const item=detail.locator('[data-supplier-source-text="OFFER-MASTER-TOWER-'+ref+'-02"]');
+  await item.getByRole('button',{name:/ดูรายละเอียด Supplier/}).click();
+  const dialog=item.getByRole('dialog'),towerText=await dialog.innerText();assert(towerText.includes('square self-supporting tower'));assert(towerText.includes(ref.endsWith('.1')?'9.90 x 9.90':'2.0 x 2.0'));
+  await dialog.getByRole('button',{name:'ปิดรายละเอียด'}).click();
   await detail.locator(':scope > summary').click();
  }
  console.log('PASS native15+15 original item specification/scope text visible beside both MR rows');
@@ -64,7 +69,7 @@ const server=http.createServer((req,res)=>{
   assert((await quote.locator(':scope > summary').innerText()).includes('พบลิงก์ราคา 5/15'));
   await quote.locator(':scope > summary').click();await quote.locator('tbody tr').first().waitFor();assert.equal(await quote.locator('tbody tr').count(),15);
  }
- const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('CNEEC Option'));
+ const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('ประกอบ ยก และตั้งเสาจริง'));
  await erection.getByRole('button',{name:'เปิดแถวขอบเขต Working',exact:true}).click();
  const erectionReference=page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]');
  await erectionReference.waitFor({state:'visible'});
@@ -89,6 +94,36 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(await trace.locator('[data-working-source-quote]').evaluateAll(ns=>ns.map(n=>n.open)),nested,'Bulk disclosure retains nested source state');
  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});await trace.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Page contained at '+width);}
  if(process.env.PJ0550_TOWER_SCREENSHOT){await page.setViewportSize({width:1440,height:1000});await trace.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_TOWER_SCREENSHOT});}
+ await page.setViewportSize({width:1440,height:1000});
+ const ceragon='OFFER-CERAGON-26-30029-REVA1-E90E86E5-R10',apf='REQDEF-MR-B1-15-APF-01';
+ await jump('bid.vendor.offer.'+ceragon);
+ const vendorRow=page.locator('[data-vnd-offer="'+ceragon+'"]');await vendorRow.waitFor();
+ const ownerLink=vendorRow.getByRole('button',{name:/10\.2 · A · CERAGON/});await ownerLink.click();
+ await page.locator('[data-component-key="bid.budget.working.line.LINE-CERAGON-ASK-REVA1-BASE"]').waitFor();
+ await jump('bid.vendor.offer.'+ceragon);await vendorRow.waitFor();
+ const vendorQuote=vendorRow.locator('xpath=ancestor::details[contains(@class,"p55-vnd-quote")]');
+ const comparison=vendorQuote.locator('.p55-quote-boq');
+ await comparison.locator(':scope > summary').click();
+ const radio=comparison.locator('[data-supplier-boq-locator="BoQ!C66:J66"]');
+ await radio.waitFor();
+ assert.deepEqual((await radio.getByRole('cell').allTextContents()).slice(2,7),['2','2','1','1','2']);
+ const coupler=comparison.locator('[data-supplier-boq-locator="BoQ!C70:J70"]');
+ assert.deepEqual((await coupler.getByRole('cell').allTextContents()).slice(2,7),['1','1','—','—','—']);
+ await comparison.getByRole('button',{name:'Alternative 2+0'}).click();
+ await coupler.waitFor({state:'detached'});
+ const mapping=vendorRow.locator('details').filter({has:page.locator('summary').filter({hasText:'SI Mapping'})});await mapping.locator('summary').click();
+ await mapping.getByRole('button',{name:/APF · Microwave System/}).click();
+ await page.locator('[data-component-key="bid.working-preview.requirement.'+apf+'"]').waitFor();
+ await jump('bid.working-preview.step.7');
+ const apfEvidence=page.locator('[data-mapping-requirement="'+apf+'"] [data-supplier-mapping-offer="'+ceragon+'"]');
+ await apfEvidence.getByRole('button',{name:/ดูรายละเอียด Supplier/}).click();
+ const boq=apfEvidence.getByRole('dialog'),antenna=boq.locator('[data-supplier-boq-locator="BoQ!C93:J93"]');
+ assert.deepEqual((await antenna.getByRole('cell').allTextContents()).slice(2,4),['1','1']);assert((await boq.innerText()).includes('CUS · APF'));
+ await page.keyboard.press('Escape');await boq.waitFor({state:'hidden'});
+ await jump('bid.budget.working.group.TEL-DMR');
+ const dmrMr=page.locator('[data-working-mr-vendor="REQ-MR-B1-15-APF-01"]');
+ await dmrMr.locator(':scope > summary').click();await dmrMr.locator('[data-working-source-item="'+ceragon+'"]').waitFor();
+ assert.equal(await dmrMr.locator('[data-working-source-item]').count(),1,'Working starts with the mapped package only');
  assert.deepEqual(await read(),before,'Source inspection/navigation/disclosure never writes any canonical field');
  await page.reload();await ready();await jump('bid.budget.working.group.TEL-TELT');await openQuotes();assert.equal(await trace.locator('[data-working-source-item]').count(),30);assert.deepEqual(await read(),before,'Reload retains original workspace');assert.deepEqual(errors,[]);
  console.log('PASS production browser:all20 source panels,shared MGW whole-invoice invariance/conflicts,missing quotes,PAGA revisions/IDIE Asactual,lazy native rows,cancelled legacy price and OPEN costs/sell in both MR rows,2 quotes/30 items,10 Vendor price allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');

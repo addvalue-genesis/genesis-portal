@@ -15,10 +15,25 @@ export function supplierItemSourceText0550(offer){
  const detail=mgwQuoteItem0550(offer)?.detail,terms=offer.quoteEvidence?.terms;
  return [...new Set([detail,...(Array.isArray(terms)?terms:[])].filter(t=>typeof t==='string'&&t.trim()))];
 }
+export const supplierItemLabel0550=offer=>offer.description?.trim().split(/\r?\n/,1)[0]||offer.id;
+
+// Read the recorded worksheet excerpts as evidence. Blank fields remain blank
+// and these rows do not become Offers, prices or confirmed Mapping links.
+const boqQuantity=/^(ACP\(main\)|APF\(main\)|ACP\(alternative\)|APF\(alternative\)|Spares)=([+-]?\d+(?:\.\d+)?)$/;
+export function supplierBoqRows0550(offer){
+ return supplierItemSourceText0550(offer).flatMap(text=>{
+  const match=/^(BoQ!C(\d+):J\2):\s*([^\n]+)$/.exec(text);
+  if(!match)return [];
+  const [part,description,quantities,...remarks]=match[3].split(' / ');
+  const cells=quantities?.split(/,\s*/).map(cell=>boqQuantity.exec(cell));
+  if(!part||!description||!cells?.length||cells.some(cell=>!cell))return [];
+  return [{text,locator:match[1],row:Number(match[2]),part,description,remark:remarks.join(' / '),quantities:Object.fromEntries(cells.map(cell=>[cell[1],Number(cell[2])]))}];
+ });
+}
 export function nativeSupplierItem0550(offer){
  const e=offer.quoteEvidence,r=mgwQuoteItem0550(offer);
  return e?{quantity:e.quotedQuantity,unit:e.quotedUnit,rate:e.quotedUnitCost,total:e.quotedTotal,totalText:e.quotedTotalText,currency:e.quotedCurrency,locator:e.locator,url:e.sourceUrl,basis:e.rateBasis,option:e.classification==='OPTION'||offer.supplierQuoteRow?.classification==='OPTION'}:
- r?{quantity:r.quantity,unit:r.sourceUnit||r.unit||'หน่วยต้นฉบับ OPEN',rate:r.unitCost,total:r.extended,currency:'USD',locator:`PDF p${r.page} / item ${r.sn||r.id}`,url:MGW_QUOTE_0550.sourceUrl,basis:r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป ไม่ใช่รายละเอียด BOM ครบถ้วน':r.issues.join(' · '),option:false}:null;
+ r?{site:r.site,quantity:r.quantity,unit:r.sourceUnit||r.unit||'หน่วยต้นฉบับ OPEN',rate:r.unitCost,total:r.extended,currency:'USD',locator:`PDF p${r.page} / item ${r.sn||r.id}`,url:MGW_QUOTE_0550.sourceUrl,basis:r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป ไม่ใช่รายละเอียด BOM ครบถ้วน':r.issues.join(' · '),option:false}:null;
 }
 export function sourceAmountTHB0550(value,currency,fx){
  if(!Number.isFinite(value))return null;
