@@ -7,13 +7,39 @@ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const S=require(src+'/project0550/data/supplierCostProjection0550.js'),R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
 const {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
 const empty={lines:[],offers:[],vendors:[],fx:{}},render=d=>renderToStaticMarkup(React.createElement(WorkingSupplierTrace0550,{data:d,systemToken:'TEL-TELT',onNavigate:()=>{}}));
-const {SupplierItemSourceText0550}=require(src+'/project0550/SupplierItemSourceText0550.jsx');
+const {SupplierItemSourceText0550,SupplierTowerBom0550}=require(src+'/project0550/SupplierItemSourceText0550.jsx');
 const sample={id:'SOURCE-TEXT-QA',description:'Short item title',sourceRef:'Recorded location only',quoteEvidence:{terms:['Line one\n  Exact detail <unsafe> & punctuation','Line one\n  Exact detail <unsafe> & punctuation']}};
 const sampleBefore=JSON.stringify(sample),sampleHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:sample}));
 assert.equal((sampleHtml.match(/Line one/g)||[]).length,1,'Duplicate exact source text appears once');assert(sampleHtml.includes('\n  Exact detail &lt;unsafe&gt; &amp; punctuation'),'Exact wording and line breaks remain escaped text');assert(!sampleHtml.includes('<unsafe>'));
 const missingHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:{id:'NO-SOURCE-DETAIL',sourceRef:'Reference, not a verified excerpt'}}));assert(missingHtml.includes('ยังไม่มีข้อความรายละเอียดต้นฉบับ'));assert(missingHtml.includes('Reference, not a verified excerpt'));assert.equal(JSON.stringify(sample),sampleBefore);
 assert.deepEqual(C.bidCompletionSourceUsages0550(empty),[]);assert(render(empty).includes('ยังไม่มีรายการต้นฉบับ'));
 const legacyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:{...empty,integrationWorkspace:{}},line:{id:'MR-LEGACY',mrRequirementId:'NATIVE-LEGACY',description:'Legacy MR'},projection:{quotes:new Map()},onNavigate:()=>{}}));assert(legacyMr.includes('Mapping ของ MR · 0 ใบ'),'Old/empty Integration workspace remains readable');
+
+// Tower BOM reads native units and exact SI links, including deleted mappings.
+const bomData={...empty,offers:[1,2].map(site=>({
+ id:'OFFER-MASTER-TOWER-2609.95.'+site+'-03',vendorId:'BOM-QA-VENDOR',
+ quoteRef:'BOM-QA-'+site,description:'Paint <source> '+site,unit:'Gl',unitCost:3,
+ supplierQuoteRow:{itemCode:'3',classification:'BASE_PRICE'},
+ quoteEvidence:{systemTokens:['TEL-TELT'],revision:'QA',sourceSha256:String(site).repeat(64),
+  quotedQuantity:site===1?7:0,quotedUnit:'Gl',quotedUnitCost:3,quotedTotal:site===1?21:null,
+  quotedTotalText:'As actual',quotedCurrency:'THB',locator:'PDF p1 / Item 3',
+  sourceUrl:'https://drive.google.com/file/d/qa-bom-'+site+'/view'}
+})),integrationWorkspace:{requirements:[]}};
+bomData.integrationWorkspace.requirements=[{id:'BOM-QA-MR',site:'APF',title:'QA Tower',offerIds:[bomData.offers[0].id],status:'DRAFT'}];
+const bomBefore=JSON.stringify(bomData);
+const renderBom=data=>renderToStaticMarkup(React.createElement(SupplierTowerBom0550,{data,initiallyOpen:true}));
+const bomHtml=renderBom(bomData);
+assert(bomHtml.includes('7 Gl')&&bomHtml.includes('0 Gl'),'Keep native unit and printed zero');
+assert(bomHtml.includes('As actual'),'Unknown supplier amount retains its text');
+assert(bomHtml.includes('&lt;source&gt;'),'Escape source text in the BOM');
+assert(bomHtml.includes('SI Mapping · APF'),'Read the existing requirement link');
+const withoutMapping={...bomData,integrationWorkspace:{requirements:[]}};
+assert(!renderBom(withoutMapping).includes('SI Mapping · APF'),'Do not reconstruct a deleted mapping');
+const withoutItem={...bomData,offers:[bomData.offers[1]],integrationWorkspace:{requirements:[]}};
+assert(!renderBom(withoutItem).includes('data-tower-bom-offer="'+bomData.offers[0].id+'"'),'Do not reconstruct a deleted source item');
+assert.equal(JSON.stringify(bomData),bomBefore,'BOM rendering leaves canonical records unchanged');
+console.log('PASS Tower BOM: native unit/zero/unknown amounts, escaped source text, canonical/deleted Mapping and read-only records.');
+
 if(process.argv[2]){
  const d=C.reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(JSON.parse(fs.readFileSync(process.argv[2])))),before=JSON.stringify(d),html=render(d),entries=R.vendorOfferEntries0550(d);
  const tower=entries.filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')&&e.offer.supplierQuoteRow?.classification==='BASE_PRICE');

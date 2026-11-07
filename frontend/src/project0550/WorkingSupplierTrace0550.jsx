@@ -4,7 +4,7 @@ import {amount} from './BidControls';
 import {supplierCostProjection0550,supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {mrSupplierLinks0550,requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {activeSupply0550} from './data/workingOffers0550';
-import {SupplierItemSourceText0550,SupplierQuoteBoq0550} from './SupplierItemSourceText0550';
+import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550} from './SupplierItemSourceText0550';
 
 function SourceAmount({quote}){
  const {totals:t,printed}=quote;
@@ -70,6 +70,7 @@ export function WorkingSupplierTrace0550({data,systemToken,onNavigate,projection
   <p><strong>ต้นทุน Supplier ตามใบเสนอราคาต้นฉบับ · {quotes.length} ใบ</strong><br/>แสดงยอดทั้งใบก่อนการจัดสรร A/B/C · หลายใบ/Revision/ทางเลือกไม่ใช่ยอดจัดซื้อรวม · การแปลง THB ใช้ FX โครงการโดยคงสกุลเงินต้นฉบับ</p>
   {!quotes.length&&<p>ยังไม่มีรายการต้นฉบับในทะเบียน Vendor สำหรับระบบนี้ · Working อาจเป็นราคาอ้างอิง/ประมาณการ หรือ COMPANY จัดหา · ไม่ใช่ต้นทุน Supplier เป็นศูนย์</p>}
   {estimates.length>0&&<details className="p55-panel"><summary>ฐานราคา Working ที่ไม่มี Offer · {estimates.length} รายการ · ไม่ใช่ราคาผู้ขายต้นฉบับ</summary><p>ฐานราคาของระบบแยกจาก Mapping รายข้อ · ต้องตรวจการครอบคลุม MR ก่อนยืนยันรวมแล้ว</p>{estimates.map(l=><div key={l.id}><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+l.id)}>{l.description}</button><small>ต้นทุนต่อหน่วย {amount(l.manualCost,l.currency)} × {l.quantity??'OPEN'} {l.unit}</small><p>{l.sourceRef}</p></div>)}</details>}
+  {systemToken==='TEL-TELT'&&<SupplierTowerBom0550 data={data} projection={index} onNavigate={onNavigate}/>}
   {quotes.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}
   {candidates.length>0&&<details className="p55-panel"><summary>ใบอ้างอิงจาก Mapping / Working · {candidates.length} ใบ · ยังไม่ใช่ใบเสนอราคาครบระบบนี้</summary><p>เป็นลิงก์ประกอบจาก SI หรือการจัดสรร ไม่ได้เปลี่ยนขอบเขตต้นฉบับของ Supplier และไม่ยืนยันว่ารวมอุปกรณ์ครบระบบ</p>{candidates.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}</details>}
   <MrMapping data={data} systemToken={systemToken} onNavigate={onNavigate}/>

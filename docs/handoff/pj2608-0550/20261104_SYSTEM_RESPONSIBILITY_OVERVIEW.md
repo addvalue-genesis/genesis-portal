@@ -350,3 +350,29 @@ An isolated browser opened the WP.2 report detail and verified the 10.7
 Working subtotal and Official hold without workspace writes. Completion,
 Punch, price summary, native Exhibit, Working Preview and issue regressions
 passed. The saved Windows workspace remains unverified.
+
+## 7-Nov-2026. Telecom Tower BOM in Vendor, Mapping and Working
+
+The existing Supplier detail component presents Master Tower's two original
+quotations as APF/ACP columns. Its default equipment view uses Items 2–5.
+Services, interfaces and all quoted items are selectable in the same disclosure.
+Each cell shows the original quantity/unit, the quoted rate/amount when used
+in a cost view, native package detail and the existing SI/Working links.
+WP.7 uses the same BOM with its live Mapping state and technical display.
+
+The BOM uses the canonical Vendor quotation projection and exact Requirement
+Offer/TAG links. One LS for tower/accessories stays one LS, with the supplier's
+included components available in the source dialog. Additional source items,
+missing source cells, deleted mappings and stale cost allocations stay visible.
+The current Base erection and excluded foundation construction follow existing
+Working/source scope. ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply.
+
+The Rev.36 reconstruction applies the existing startup retirement/scope
+normalisation before bid preparation. Model and isolated browser checks passed
+for both original quotes, all 30 native items, exact paint units and package
+text, scope links, Vendor/WP.7/10.2 navigation, 390/1440 containment and byte
+preservation of the saved workspace after viewing. Existing source-trace,
+Working Preview, Vendor, price-summary and bid-completion regressions passed.
+Production webpack compiled with its existing application-size advisory.
+Structural adequacy and commercial acceptance require their existing reviews.
+The owner's Windows workspace has yet to be verified.
