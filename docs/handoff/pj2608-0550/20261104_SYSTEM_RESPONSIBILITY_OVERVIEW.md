@@ -207,3 +207,22 @@ The 0553 requirements JSON and costing JS are separate references.
 fee allowance and reserves. The THB 100,000 Instrument figure was a separate
 provisional SELL allowance with unknown direct cost. Neither is a 0550 charge
 or an authority tariff.
+
+## 7-Nov-2026. Official fee payer and payment milestones
+
+B8 distinguishes the licensee/applicant, TSI application work, statutory
+payment, and any authorized advance/recovery. MR Appendix 1.0 §2.0(l),
+SPE-0011 §7.1 and LIS-0004 Item 12 establish different application roles.
+The documents reviewed do not establish an ADDVALUE advance with recovery
+via CNEEC. The working proposal is for the licensee to pay or for CNEEC to
+arrange an agreed route. An ADDVALUE advance requires written terms.
+
+The internal comparison shows MOC's CIF-based import reference and the
+PTD Link by Link example at 7 GHz and 28 MHz. The PTD page was posted in
+2018. Neither estimate is booked as a project fee. Before issue confirm
+whether a fresh licence is needed, the PTD charging unit, first-year and
+renewal payer, and FX. The Purchase Agreement ties customs to Incoterms;
+the upstream EPC §31.5.2 net-cost reimbursement is conditional and is
+separate from licence fees and from any ADDVALUE entitlement.
+Annex 6 §5.3.1 sets a FaFE filing milestone at least six months ahead of
+shipment. Payment timing follows the applicable authority's notice.

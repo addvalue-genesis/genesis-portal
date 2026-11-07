@@ -28,9 +28,13 @@ assert.equal(licenceBasis.workingAllowance.reduce((sum,r)=>sum+r.quantity*r.rate
 assert.equal(licenceBasis.benchmark0553.costs.reduce((sum,r)=>sum+r.amountTHB,0),200000);
 assert(renderLicences({}).includes('เอกสาร MOTC/PTD'));
 assert(renderLicences({}).includes('200,000.00'));
+assert(renderLicences({}).includes('Official licence fee responsibility'));
+assert(renderLicences({}).includes('5,080,000 MMK'));
+assert(renderLicences({}).includes('PO ก่อนชำระ'));
 assert(renderLicences({schedule:licenceView,currency:'USD'}).includes('100.00'));
 assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('2,777.00'));
 assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('200,000.00'));
+assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('Official licence fee responsibility'));
 assert(!renderLicences({schedule:{bindings:[{...licence,schedule:'C7'}]},currency:'USD'}).includes('100.00'));
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};

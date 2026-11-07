@@ -24,5 +24,22 @@
     {"owner":"B8-D03/D04","description":"เตรียม Proforma Invoice จาก FaFE (มูลค่าวัสดุ), รูปและคำอธิบายการใช้งาน, brochure, HS code 10 หลัก และเอกสาร MOTC/PTD ก่อนยื่น MOC ประสาน COMPANY เรื่อง Drawback/re-export และแยกการเดินทางเฉพาะงานยื่นออกจาก FAT/SAT หากจำเป็นต้องเดินทาง"},
     {"owner":"B8-D05","description":"แยกใบเสนอราคาตัวแทนและค่าแปล/ยื่น/ติดตามจากใบแจ้งค่าธรรมเนียมราชการ ตรวจผู้ชำระ ค่าอนุมัติเพิ่ม และวงเงินแก้ไขเอกสารก่อนยืนยันยอด"},
     {"owner":"B2 / ตรวจผู้รับผิดชอบ","description":"แยกค่าขนส่ง บรรจุและทำ shipping mark เอกสาร pre-alert เช่น CIPL, AWB/B/L, COO และ Insurance Certificate ตามที่ใช้ นายหน้าศุลกากร ค่ายก/เก็บสินค้าและประกันตาม Incoterms ตรวจอากร ภาษีและการยกเว้นเป็นรายกรณี"}
-  ]
+  ],
+  "officialFees": {
+    "purchasingBasis":"ก่อนปิดราคา ให้ระบุผู้ถือใบอนุญาต ผู้จ่ายจริง และช่องทางชำระเป็นลายลักษณ์อักษร ข้อเสนอเบื้องต้นคือ COMPANY/ผู้ถือใบอนุญาตจ่ายค่าราชการโดยตรง หรือให้ CNEEC จัดการช่องทางชำระตามที่ยืนยัน ส่วน TSI รับผิดชอบเอกสารและประสานงาน",
+    "advanceBasis":"หากขอให้ ADDVALUE สำรองจ่าย ต้องตกลงเป็นหนังสือหรือ PO ก่อนชำระ โดยระบุประเภทค่าธรรมเนียม วงเงิน สกุลเงิน ผู้อนุมัติ ใบแจ้งหนี้หรือใบเสร็จราชการ หลักเกณฑ์ FX และกำหนดคืนเงิน แยกค่าบริการตัวแทนออกจากยอดราชการ",
+    "rates": {
+      "mocUrl":"https://www.myanmartradeportal.gov.mm/index.php/print/procedure/37/description",
+      "ptdUrl":"https://www.ptd.gov.mm/ServicesDetail.aspx?id=LUKdZ6dcujUriHlPirNYSQ%3D%3D",
+      "contractUrl":"https://docs.google.com/document/d/1M5CQ7GsMhNvNEnPMB-pcJTeU9J4QR5LM/edit",
+      "mocRangeMMK":"30,000–90,000 MMK ตามมูลค่า CIF ต่อคำขอ",
+      "microwaveExample":"7 GHz / 28 MHz หนึ่งลิงก์ ตามหมวด Link by Link ที่ PTD เผยแพร่ปี 2018: ค่าแรกเข้า 3,000,000 MMK และค่าใช้คลื่นรายปี 28 × 70,000 + 120,000 = 2,080,000 MMK รวมปีแรก 5,080,000 MMK หากใช้หมวดนี้และต้องขอสิทธิใหม่ ให้ยืนยันเรต จำนวนช่องที่คิดเงิน และการใช้ใบอนุญาตเดิมกับ PTD"
+    },
+    "items":[
+      {"fee":"MOC Import Licence / Permit","scope":"รายคำขอตาม CIF และชุดนำเข้า รวมแก้ไข/ต่ออายุเฉพาะที่จำเป็น","responsibility":"TSI จัดข้อมูลผ่าน FaFE; ผู้นำเข้าที่ได้รับมอบหมายยื่นและชำระตามใบแจ้งของ MOC; ยืนยันผู้รับต้นทุนกับ COMPANY/CNEEC","timing":"Annex 6 §5.3.1 ให้ยื่น FaFE อย่างน้อย 6 เดือนก่อน shipment; ชำระเมื่อ MOC อนุมัติเพื่อรับใบอนุญาต และคุมวันหมดอายุถึงการนำเข้า"},
+      {"fee":"Type Approval / PTD Import Recommendation / DCA","scope":"ตามรุ่นอุปกรณ์และประเภทการอนุมัติ; DCA สำหรับ NDB/Air-band ที่เข้าข่าย","responsibility":"VND ส่งข้อมูลผลิตภัณฑ์; TSI จัด dossier; ผู้ยื่นและผู้ชำระค่าราชการกำหนดตามคำขอ","timing":"ให้ได้หนังสืออนุมัติก่อนยื่น MOC ในรายการที่ต้องขออนุมัติล่วงหน้า"},
+      {"fee":"Radio / Station / Frequency / Operating Licence","scope":"แยกค่าแรกเข้าและค่าใช้คลื่น/อุปกรณ์รายปี ตรวจผู้ถือสิทธิ สถานี ลิงก์ ช่องสัญญาณและ bandwidth","responsibility":"LIS Item 12 ให้ COMPANY ขอสิทธิใช้คลื่น; SPE §7.1 ให้ TSI ดำเนินการในนาม COMPANY; ผู้ชำระและวิธีส่งผ่าน CNEEC ยังต้องยืนยัน","timing":"มีใบอนุญาตก่อน deployment ตาม SPE; ก่อนส่งมอบให้ระบุวันหมดอายุ เจ้าของการต่ออายุ และภาระหลังส่งมอบ"},
+      {"fee":"Customs Duty / Import Tax","scope":"อากรและภาษีของแต่ละ shipment แยกจากค่าใบอนุญาต B8","responsibility":"ตาม Incoterm และ Purchase Agreement ของแพ็กเกจ; สิทธิคืนตาม EPC §31.5.2 เป็นระหว่างคู่สัญญา EPC และมีเงื่อนไข","timing":"ตรวจสิทธิยกเว้นและแจ้งผู้เกี่ยวข้องก่อนชำระและผ่านพิธีการ หากต้องเบิกให้ใช้หลักฐานและรอบที่ตกลง"}
+    ]
+  }
 }

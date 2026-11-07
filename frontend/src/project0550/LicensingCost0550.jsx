@@ -22,6 +22,23 @@ function LicensingBudgetBasis0550(){
  </details>;
 }
 
+function OfficialLicenceFees0550(){
+ const {items,rates,purchasingBasis,advanceBasis}=budget.officialFees;
+ return <details>
+  <summary>ค่าธรรมเนียมราชการ · ผู้ยื่น / ผู้ชำระ / รอบจ่าย</summary>
+  <p>{purchasingBasis}</p>
+  <p>{advanceBasis}</p>
+  <p>วงเงิน Radio / Operating Licence ใน B8-D05 เป็นสมมติฐานตั้งงบ ต้องตรวจอัตราจริงและขอบเขตที่ ADDVALUE ต้องรับก่อนใช้เป็นราคา</p>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="Official licence fee responsibility">
+   <thead><tr><th>ค่าธรรมเนียม</th><th>ขอบเขตที่คิด</th><th>ผู้ดำเนินการ / ผู้ชำระ</th><th>จ่ายเมื่อไร / ถึงเมื่อไร</th></tr></thead>
+   <tbody>{items.map(r=><tr key={r.fee}><td>{r.fee}</td><td>{r.scope}</td><td>{r.responsibility}</td><td>{r.timing}</td></tr>)}</tbody>
+  </table></div>
+  <p>ตัวอย่างอัตรา MOC ที่เผยแพร่ {rates.mocRangeMMK} ให้ตรวจค่าบริการและยอดในใบแจ้งชำระของคำขอจริง <a href={rates.mocUrl}>Myanmar National Trade Portal</a></p>
+  <p>{rates.microwaveExample} <a href={rates.ptdUrl}>PTD · Link by Link</a></p>
+  <p>Annex 6 §5.3.1 ให้ยื่น FaFE อย่างน้อย 6 เดือนก่อน shipment ส่วนการคืนอากรตาม EPC §31.5.2 ต้องแจ้งก่อนจ่ายและคืนตามยอดสุทธิเมื่อครบเงื่อนไข ให้ตรวจสิทธิผ่านสัญญาของ ADDVALUE แยกต่างหาก <a href={rates.contractUrl}>Attachment 2 · Annex 6 / Purchase Agreement / Exhibit F</a></p>
+ </details>;
+}
+
 export function LicensingCost0550({lines, schedule, currency="THB", onNavigate, disabled=false}){
  const working=new Map(lines.map(l=>[l.id,l]));
  const bindings=new Map((schedule?.bindings||[]).map(b=>[b.lineId,b]));
@@ -45,6 +62,6 @@ export function LicensingCost0550({lines, schedule, currency="THB", onNavigate, 
     return <tr key={id}><td><strong>{label}</strong><small>{scope}</small></td><td>{amount(total,currency)}<small>{status}</small></td><td>{line&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.(target)}>{schedule?"เปิด 11.M":"เปิด Working"} · {id.slice(-6)}</button>}</td></tr>;
    })}
   </tbody></table></div>
-  {!schedule&&<LicensingBudgetBasis0550/>}
+  {!schedule&&<><OfficialLicenceFees0550/><LicensingBudgetBasis0550/></>}
  </section>;
 }
