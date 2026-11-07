@@ -18,3 +18,7 @@ ADDVALUE owns the DMR, PAGA and Telecom Tower offers. The procurement scope reco
 For a selected cost owner bound to CERAGON, INDUSTRONIC or a verified Master Tower quote allocation, ADDVALUE sell is E11 cost × 1.50. E13 applies the recorded prime rate after that amount. ID IE, MGW and internal ADDVALUE labour keep their individual selling bases. B2-D02 remains an open mixed estimate under the existing MGW cost review. Identify the Master Tower portion separately before pricing that line at the new rate.
 
 Application saves the selling method to the existing Working owner, keeping original source prices, amounts, offer selection, quantities and currency inputs. Current allocation receipts remain linked. The affected Official reviews require review against the new basis and frozen issues retain their snapshots. ADR principles 2, 4–6 and 8–11 apply.
+
+## CERAGON R11 working price display
+
+Working now shows separate cost, ADDVALUE sell and customer sell amounts beside the selected R11 owner and inside the expanded source quotation. The summary uses the existing Working or reviewed Official calculation and identifies the selected Lot, E11 markup and SAMTEL rate. The original quotation table still shows the source quantity, rate and extension. This display adds no cost or price owner.
