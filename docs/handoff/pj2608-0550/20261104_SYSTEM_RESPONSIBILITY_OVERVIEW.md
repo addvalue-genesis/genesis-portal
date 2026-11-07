@@ -185,3 +185,25 @@ one dish per site as the design candidate. RPT §11.1 separately describes
 space diversity. The MR Appendix 1.5 schedule remains two dishes per site
 and permits detailed BOQ adjustment after approval of the link study.
 Confirm this difference before removing the two-dish bid allowance.
+
+## 7-Nov-2026. Licensing budget evidence and logistics checks
+
+The internal B8 panel now shows the basis of the existing THB 300,000
+authority/agent reserve: two import/export work packages at THB 25,000 and
+five radio approval work packages at THB 50,000. These are planning drivers,
+not an application count or statutory fee. The Rev.36 reconstruction adds
+THB 80,000 of existing TSI labour for THB 380,000 total. Volume I continues to
+read the existing price owners through A1 Others.
+
+R03 Table 6.1 and §§6.1.2 and 6.1.5 identify the FaFE and prior-approval
+requirements. The cost detail distinguishes approval preparation, agency and
+authority fees, and physical logistics/customs costs. Confirm the intended
+Satellite Systems route and the respective applicant and payer with COMPANY.
+The planning schedule allows 5–6 months for sequential prior approval and
+MOC licence processing while noting Table 6.1 lists 4–5 months.
+
+The 0553 requirements JSON and costing JS are separate references.
+0553's THB 200,000 was a project-specific external budget including agency,
+fee allowance and reserves. The THB 100,000 Instrument figure was a separate
+provisional SELL allowance with unknown direct cost. Neither is a 0550 charge
+or an authority tariff.

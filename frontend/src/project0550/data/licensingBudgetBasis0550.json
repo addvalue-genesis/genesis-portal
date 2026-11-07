@@ -1,0 +1,28 @@
+{
+  "logisticsInstruction": {
+    "url": "https://drive.google.com/file/d/1bfzV1CljQlvJFVANEUyHl3v81qVUpVKJ/view",
+    "reference": "10015-WIS-LOG-MM0001-R03 §6.1.1 Table 6.1, §6.1.2, §6.1.5 and Myanmar Shipment appendix §6.1"
+  },
+  "workingAllowance": [
+    {"label":"Import Licence / Import Permit","quantity":2,"unit":"ชุดงานนำเข้า/ส่งออกตามแผน","rateTHB":25000},
+    {"label":"Radio / Operating Licence, frequency and related approvals","quantity":5,"unit":"ชุดเอกสารกลุ่มวิทยุ","rateTHB":50000}
+  ],
+  "benchmark0553": {
+    "requirementsUrl":"https://github.com/addvalue-genesis/genesis-portal/blob/d940fff7331a10843cb35b4bb0e11c9e36c23033/frontend/src/project0553/data/documentParticularRequirements0553.json#L1228-L1242",
+    "costUrl":"https://github.com/addvalue-genesis/genesis-portal/blob/d940fff7331a10843cb35b4bb0e11c9e36c23033/frontend/src/project0553/data/importOperationalBudget0553.js#L15-L27",
+    "instrumentUrl":"https://github.com/addvalue-genesis/genesis-portal/blob/d940fff7331a10843cb35b4bb0e11c9e36c23033/frontend/src/project0553/data/b1LifecycleReview0553.js#L15-L19",
+    "costs":[
+      {"label":"ตัวแทนเมียนมา / แปล / ยื่น / ติดตาม","amountTHB":78750},
+      {"label":"วงเงินเผื่อค่าธรรมเนียมราชการ","amountTHB":25000},
+      {"label":"เผื่อ Type / Station / Frequency approval และข้อกำหนดปีแรก","amountTHB":75000},
+      {"label":"เผื่อแก้ไขและยื่นเอกสารใหม่","amountTHB":21250}
+    ],
+    "instrumentSellTHB":100000
+  },
+  "costChecks":[
+    {"owner":"B8-D01/D02","description":"จัดทะเบียนรุ่น ผู้ถือใบอนุญาต ไซต์ สถานีและความถี่ ตรวจ Type Approval, Radio Licence, Frequency Assignment และ Operating Licence ตามรายการที่เข้าข่าย รวม DCA สำหรับ NDB และ Air-band ตามเอกสาร"},
+    {"owner":"B8-D03/D04","description":"เตรียม Proforma Invoice จาก FaFE (มูลค่าวัสดุ), รูปและคำอธิบายการใช้งาน, brochure, HS code 10 หลัก และเอกสาร MOTC/PTD ก่อนยื่น MOC ประสาน COMPANY เรื่อง Drawback/re-export และแยกการเดินทางเฉพาะงานยื่นออกจาก FAT/SAT หากจำเป็นต้องเดินทาง"},
+    {"owner":"B8-D05","description":"แยกใบเสนอราคาตัวแทนและค่าแปล/ยื่น/ติดตามจากใบแจ้งค่าธรรมเนียมราชการ ตรวจผู้ชำระ ค่าอนุมัติเพิ่ม และวงเงินแก้ไขเอกสารก่อนยืนยันยอด"},
+    {"owner":"B2 / ตรวจผู้รับผิดชอบ","description":"แยกค่าขนส่ง บรรจุและทำ shipping mark เอกสาร pre-alert เช่น CIPL, AWB/B/L, COO และ Insurance Certificate ตามที่ใช้ นายหน้าศุลกากร ค่ายก/เก็บสินค้าและประกันตาม Incoterms ตรวจอากร ภาษีและการยกเว้นเป็นรายกรณี"}
+  ]
+}

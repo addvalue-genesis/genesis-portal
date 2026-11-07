@@ -3,6 +3,7 @@
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
 import {policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
+import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
@@ -265,7 +266,9 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  estimate('B6-D02','THB',100000,'Supplementary proprietary/software licence provision THB100000, excluding INTRON-X service tool already described in the selected INDUSTRONIC package. Budget estimate for unconfirmed additional licences; not evidence of licence entitlement.');
  estimate('B6-D03','THB',3*10*7500,'Test equipment rental/adapters:3 campaigns ×10 days × estimated THB7500/day. Rental, not purchase; excludes special tools above and instruments provided by existing OEM packages.');
  estimate('B6-D04','THB',5*5000,'Calibration/certification provision5 instrument families × estimated THB5000. Excludes calibration already included in the rental/OEM package; reconcile certificates before purchase.');
- estimate('B8-D05','THB',5*50000+2*25000,'Authority/agent provisional cash allowance:5 radio-family dossiers × THB50000 plus2 import/export actions × THB25000. Estimated exposure, not published statutory tariffs or approval. TSI preparation labour is already separate.');
+ const licenceAllowance=licensingBudget.workingAllowance;
+ estimate('B8-D05','THB',sumMoney0550(licenceAllowance.map(r=>r.quantity*r.rateTHB)),
+  'Authority/agent provisional cash allowance: '+licenceAllowance.map(r=>r.label+' · '+r.quantity+' × THB '+r.rateTHB).join(' / ')+'. Estimated exposure, not published statutory tariffs or approval. TSI preparation labour is already separate.');
  // Cash pass-through assumptions are explicit; goods margins do not apply.
  for(const key of ['B8-D05','B2-D04']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,marginPct:null,primePct:0};}
  estimate('B9-D01','THB',supplyCost*0.005,'Project liability/contract-risk premium provision0.5% of selected PartA procurement value. Explicit bid budget, not insurance advice, a quoted premium or confirmed policy wording; cargo and personnel cover are separate.');

@@ -23,8 +23,14 @@ assert(!N.nativeSchedule0550({...licenceView,workingPreview:false},'A1').pages[0
 const {LicensingCost0550}=require(root+'/project0550/LicensingCost0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const renderLicences=props=>renderToStaticMarkup(React.createElement(LicensingCost0550,{lines:[licence.line],...props}));
 assert(renderLicences({}).includes('2,777.00'));
+const licenceBasis=require(root+'/project0550/data/licensingBudgetBasis0550.json');
+assert.equal(licenceBasis.workingAllowance.reduce((sum,r)=>sum+r.quantity*r.rateTHB,0),300000);
+assert.equal(licenceBasis.benchmark0553.costs.reduce((sum,r)=>sum+r.amountTHB,0),200000);
+assert(renderLicences({}).includes('เอกสาร MOTC/PTD'));
+assert(renderLicences({}).includes('200,000.00'));
 assert(renderLicences({schedule:licenceView,currency:'USD'}).includes('100.00'));
 assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('2,777.00'));
+assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('200,000.00'));
 assert(!renderLicences({schedule:{bindings:[{...licence,schedule:'C7'}]},currency:'USD'}).includes('100.00'));
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};
