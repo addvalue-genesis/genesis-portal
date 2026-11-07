@@ -101,7 +101,37 @@ assert.equal(R.vendorQuoteTotals0550(thbOnly,{}).base.totalTHB,0,'Native THB zer
 const conflictNet=structuredClone(pricedQuote),extraNet=structuredClone(conflictNet.totalEntries[0]);extraNet.offer.id='SECOND-NET';conflictNet.totalEntries.push(extraNet);
 assert.equal(R.vendorQuoteTotals0550(conflictNet,fx).base.totalTHB,null,'Ambiguous net owners never produce a complete total');
 const sharedQuote=structuredClone(originals);sharedQuote.offers[1].quoteEvidence.systemTokens=['TEL-PAGA','TEL-CCTV'];
-for(const mode of ['company','system'])for(const g of R.groupVendorOffers0550(R.vendorOfferEntries0550(sharedQuote),mode,D.SYSTEMS))for(const c of g.children)for(const q of c.quotes)assert.equal(R.vendorQuoteTotals0550(q,fx).base.totalTHB,4000,'Each system view shows full quotation, not its component subtotal');
+const scopedQuotes=(workspace,mode)=>R.groupVendorOffers0550(R.vendorOfferEntries0550(workspace),mode,D.SYSTEMS,{sourceGroups:true}).flatMap(g=>g.children.flatMap(c=>c.quotes));
+const crossQuote=structuredClone(next);
+crossQuote.offers[0].quoteEvidence.systemTokens=['TEL-FO'];
+crossQuote.offers[1].quoteEvidence.systemTokens=['TEL-PAGA','TEL-LAN'];
+crossQuote.offers[2].quoteEvidence.systemTokens=['TEL-LAN'];
+crossQuote.offers[3].quoteEvidence.systemTokens=['TEL-LAN'];
+crossQuote.offers.push({...unknown,quoteRef:'UNASSIGNED-SOURCE'});
+crossQuote.integrationWorkspace={requirements:[{systemToken:'TEL-FO',offerIds:[unknown.id]}]};
+for(const mode of ['company','system']){
+ const packageGroups=scopedQuotes(sharedQuote,mode);
+ assert(packageGroups.some(q=>q.system==='SHARED'));
+ for(const q of packageGroups){
+  assert.equal(R.vendorQuoteTotals0550(q,fx).base.totalTHB,4000,'Keep the original full package total');
+  const subtotal=R.vendorQuoteTotals0550(q,fx,true);
+  assert(subtotal.packageUnallocated);
+  assert.equal(subtotal.base.totalTHB,null,'A gross component or shared NET must not become a system subtotal');
+ }
+ const byGroup=new Map(scopedQuotes(crossQuote,mode).map(q=>[q.system,q]));
+ assert.equal(byGroup.size,4);
+ assert.deepEqual(byGroup.get('UNASSIGNED').entries.map(e=>e.offer.id),[unknown.id]);
+ assert.deepEqual(byGroup.get('SHARED').entries.map(e=>e.offer.id),[crossQuote.offers[1].id]);
+ const fibre=R.vendorQuoteTotals0550(byGroup.get('TEL-FO'),fx,true),lan=R.vendorQuoteTotals0550(byGroup.get('TEL-LAN'),fx,true);
+ assert.equal(fibre.base.totalTHB,4000);
+ assert.equal(fibre.option,null,'A LAN option must never appear in the fibre subtotal');
+ assert.equal(lan.base.totalTHB,12000);
+ assert.equal(lan.option.totalTHB,20000);
+ assert.equal(R.vendorQuoteTotals0550(byGroup.get('TEL-FO'),fx).base.totalTHB,18000,'The whole quotation counts shared scope once');
+}
+const scopedHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:{...crossQuote,fx},onEdit:()=>{}}));
+assert.equal((scopedHtml.match(/aria-label="Full quotation SYNTHETIC-Q1"/g)||[]).length,1);
+assert.match(scopedHtml,/<tbody data-vnd-treatment="OPTION">.*OFFER-SYNTHETIC-RATE-4/);
 const totalHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:{...editedSource,fx},onEdit:()=>{}}));assert(totalHtml.includes('4,000.00')&&totalHtml.includes('1 EUR = 40 THB')&&totalHtml.includes('SYNTHETIC FX'));
 assert.equal(JSON.stringify(editedSource),snapshot,'Read-only totals preserve all records');
 if(process.env.PJ0550_VENDOR_REGISTER_FILE){

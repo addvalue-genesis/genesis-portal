@@ -127,13 +127,19 @@ export function vendorOfferEntries0550(data){
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
 }
-export function groupVendorOffers0550(entries,mode,systems){
- const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),quoteEntries=new Map(),systemName=s=>s==='UNASSIGNED'?'ยังไม่ผูกระบบ':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
+const vendorSourceGroup0550=({sourceSystemTokens=[]})=>
+ sourceSystemTokens.length===1?sourceSystemTokens[0]:sourceSystemTokens.length?'SHARED':'UNASSIGNED';
+
+export function groupVendorOffers0550(entries,mode,systems,{sourceGroups=false}={}){
+ const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),quoteEntries=new Map();
+ const systemName=s=>s==='UNASSIGNED'?'รอยืนยันระบบในใบเสนอราคา':s==='SHARED'?'งานร่วมหลายระบบตามใบเสนอราคา':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
  const evidence=new Map();
  for(const {offer:o} of entries)if(o.quoteEvidence){const k=JSON.stringify([o.vendorId,o.quoteRef,o.quoteEvidence.revision]);if(!evidence.has(k))evidence.set(k,new Set());evidence.get(k).add(o.quoteEvidence.sourceSha256);}
  for(const entry of entries){
  const scopes=entry.sourceSystemTokens?.length?entry.sourceSystemTokens:entry.systemTokens;
- for(const system of scopes.length?scopes:['UNASSIGNED']){
+ // The VND register assigns each source row to one group. Working can still
+ // look up the same quotation under every system that the source supports.
+ for(const system of sourceGroups?[vendorSourceGroup0550(entry)]:scopes?.length?scopes:['UNASSIGNED']){
   const company=entry.vendor?.id||entry.offer.vendorId,companyName=entry.vendor?.name||company;
   const first=mode==='system'?system:company,second=mode==='system'?company:system;
   if(!groups.has(first))groups.set(first,{key:first,title:mode==='system'?systemName(system):companyName,system:mode==='system'?system:null,children:new Map(),offerIds:new Set()});
@@ -145,7 +151,7 @@ export function groupVendorOffers0550(entries,mode,systems){
   const quoteKey=JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'',hash||o.supplierQuoteRow?.sourceId||'']);
   if(!quoteEntries.has(quoteKey))quoteEntries.set(quoteKey,new Map());
   quoteEntries.get(quoteKey).set(o.id,entry);
-  if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,referenceOnly:entry.referenceOnly,entries:[]});
+  if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,system,referenceOnly:entry.referenceOnly,entries:[]});
   if(e?.fileName)child.quotes.get(quoteKey).fileName=e.fileName;
   child.quotes.get(quoteKey).entries.push(entry);
  }
@@ -155,15 +161,25 @@ export function groupVendorOffers0550(entries,mode,systems){
 }
 
 // Supplier totals are a read-only projection, never Working cost adoption.
-// Use full quotation identity across system views, one net owner, and separate options.
 export const vendorWorkingRateReference0550=offer=>/Working rate reference/i.test(offer.quoteEvidence?.locator||'');
-export function vendorQuoteTotals0550(quote,fx={}){
+export function vendorQuoteRowTreatment0550(entry){
+ const {offer}=entry,classification=offer.supplierQuoteRow?.classification;
+ if(entry.referenceOnly||vendorWorkingRateReference0550(offer)||classification==='INCLUDED_REFERENCE'||mgwCurrentIncluded0550(offer))return 'REFERENCE';
+ return classification==='OPTION'||offer.quoteEvidence?.classification==='OPTION'?'OPTION':'BASE';
+}
+export function vendorQuoteTotals0550(quote,fx={},groupOnly=false){
  const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
  const entries=[...new Map((quote.totalEntries||quote.entries).filter(e=>!e.referenceOnly&&!vendorWorkingRateReference0550(e.offer)).map(e=>[e.offer.id,e])).values()];
  const net=e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE'||(!e.offer.supplierQuoteRow&&/\bitem\s+NET\b/i.test(e.offer.quoteEvidence?.locator||''));
- const option=e=>e.offer.supplierQuoteRow?.classification==='OPTION'||e.offer.quoteEvidence?.classification==='OPTION';
+ const option=e=>vendorQuoteRowTreatment0550(e)==='OPTION';
  const owners=entries.filter(net),hasComponents=entries.some(e=>e.offer.supplierQuoteRow);
- const base=owners.length?owners:entries.filter(e=>!option(e)&&!mgwCurrentIncluded0550(e.offer)&&e.offer.supplierQuoteRow?.classification!=='INCLUDED_REFERENCE'&&(!hasComponents||e.offer.supplierQuoteRow));
+ const base=owners.length?owners:entries.filter(e=>vendorQuoteRowTreatment0550(e)==='BASE'&&(!hasComponents||e.offer.supplierQuoteRow));
+ // Choose the original net basis before narrowing to displayed rows. A package
+ // spanning source groups has one full price, with no evidenced split by system.
+ const packageUnallocated=groupOnly&&owners.length>0&&new Set(entries.filter(e=>!option(e)).map(vendorSourceGroup0550)).size>1;
+ const localIds=new Set(quote.entries.map(e=>e.offer.id));
+ const withinGroup=rows=>groupOnly?rows.filter(e=>localIds.has(e.offer.id)):rows;
+ const baseRows=packageUnallocated?[]:withinGroup(base),options=withinGroup(entries.filter(option));
  const summarize=(rows,ambiguous=false)=>{
   const native=new Map();let missingPrices=0;
   for(const {offer:o} of rows){
@@ -187,6 +203,6 @@ export function vendorQuoteTotals0550(quote,fx={}){
   return {totalTHB:complete?knownTHB:null,knownTHB,hasConverted:rates.length>0,missingPrices,missingFX,rates,ambiguous,
    native:[...native].map(([currency,value])=>({currency,value:value.toDecimalPlaces(2).toNumber()}))};
  };
- return {base:summarize(base,owners.length>1),option:entries.some(option)?summarize(entries.filter(option)):null,net:owners.length===1,
-  referenceOnly:quote.referenceOnly,fullQuote:entries.length>quote.entries.length,fxSource:fx.source||'',fxDate:fx.date||''};
+ return {base:summarize(baseRows,owners.length>1),option:options.length?summarize(options):null,net:owners.length===1,
+  referenceOnly:quote.referenceOnly,packageUnallocated,hasBase:baseRows.length>0,fxSource:fx.source||'',fxDate:fx.date||''};
 }
