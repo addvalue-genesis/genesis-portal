@@ -226,3 +226,24 @@ the upstream EPC §31.5.2 net-cost reimbursement is conditional and is
 separate from licence fees and from any ADDVALUE entitlement.
 Annex 6 §5.3.1 sets a FaFE filing milestone at least six months ahead of
 shipment. Payment timing follows the applicable authority's notice.
+
+## 7-Nov-2026. Import and operating licence review by system
+
+Working Part B8 lists all 19 canonical systems. The review covers goods
+imported by TSI, COMPANY, its service provider, or Offshore under the relevant
+package. Applications and their charges are tracked by the importer and
+application, which can cover multiple systems. The system links open the
+existing Part A groups. Operating licence notes reference LIS-0004 Rev.B1
+items, with the Microwave SPE and Logistics Instruction cited where relevant.
+The review distinguishes seven systems with a stated licence check, three
+conditional checks and nine with no system-specific RF licence found in the
+reviewed basis. Actual BOM, applicant, applicable approvals, payer and
+renewals still need reconciliation for payment.
+
+Internal B8 presents the published TradeNet CIF bands and the PTD 2018
+Microwave example and selected Private Network/VSAT unit rates in MMK and
+equivalent THB. The 6-Nov-2026 CBM snapshot
+uses 109.11 MMK/THB as the indicative Market Trading basis, alongside the
+62.60 MMK/THB Reference basis. Actual settlement terms remain open. The
+comparison has no cost allocation. B8-D05 remains the shared provisional
+fee owner and Volume I reads the same existing A1 Others bindings.

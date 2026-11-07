@@ -22,19 +22,41 @@ assert(licencePage.A1_11_7.includes('Telecom import, radio and operating licence
 assert(!N.nativeSchedule0550({...licenceView,workingPreview:false},'A1').pages[0].values.A1_11_7.includes('Telecom import, radio and operating licence coordination'));
 const {LicensingCost0550}=require(root+'/project0550/LicensingCost0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const renderLicences=props=>renderToStaticMarkup(React.createElement(LicensingCost0550,{lines:[licence.line],...props}));
-assert(renderLicences({}).includes('2,777.00'));
+const workingLicences=renderLicences({});
+const customerLicences=renderLicences({schedule:licenceView,currency:'USD'});
+assert(workingLicences.includes('2,777.00'));
 const licenceBasis=require(root+'/project0550/data/licensingBudgetBasis0550.json');
 assert.equal(licenceBasis.workingAllowance.reduce((sum,r)=>sum+r.quantity*r.rateTHB,0),300000);
 assert.equal(licenceBasis.benchmark0553.costs.reduce((sum,r)=>sum+r.amountTHB,0),200000);
-assert(renderLicences({}).includes('เอกสาร MOTC/PTD'));
-assert(renderLicences({}).includes('200,000.00'));
-assert(renderLicences({}).includes('Official licence fee responsibility'));
-assert(renderLicences({}).includes('5,080,000 MMK'));
-assert(renderLicences({}).includes('PO ก่อนชำระ'));
-assert(renderLicences({schedule:licenceView,currency:'USD'}).includes('100.00'));
-assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('2,777.00'));
-assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('200,000.00'));
-assert(!renderLicences({schedule:licenceView,currency:'USD'}).includes('Official licence fee responsibility'));
+assert(workingLicences.includes('เอกสาร MOTC/PTD'));
+assert(workingLicences.includes('200,000.00'));
+assert(workingLicences.includes('Official licence fee responsibility'));
+assert(workingLicences.includes('5,080,000 MMK'));
+for(const expected of ['27,495.19','19,063.33','46,558.52','81,150.16','274.95','824.86','157,500 MMK','10,500 MMK','2026-11-06']){
+ assert(workingLicences.includes(expected),expected);
+}
+const {LICENSING_SYSTEM_REVIEW_0550}=require(root+'/project0550/data/licensingScope0550.js');
+const {BID_GROUPS_0550}=require(root+'/project0550/bidPresentation0550.js');
+const systemTokens=D.SYSTEMS.map(s=>s.token);
+const displayedTokens=Array.from(workingLicences.matchAll(/data-licensing-system="([^"]+)"/g),m=>m[1]);
+assert.equal(systemTokens.length,19);
+assert.deepEqual(displayedTokens,systemTokens);
+assert.deepEqual(Object.keys(LICENSING_SYSTEM_REVIEW_0550).sort(),[...systemTokens].sort());
+for(const token of displayedTokens){
+ const review=LICENSING_SYSTEM_REVIEW_0550[token];
+ assert(review.goods&&review.basis&&review.item&&review.page);
+ assert(BID_GROUPS_0550.some(group=>group.part==='A'&&group.code===token),token);
+}
+assert.equal((workingLicences.match(/CUS ระบุให้ตรวจใบอนุญาต/g)||[]).length,7);
+assert.equal((workingLicences.match(/ตรวจสิทธิหรือเงื่อนไขตามอุปกรณ์/g)||[]).length,3);
+assert.equal((workingLicences.match(/ยังไม่พบใบอนุญาต RF เฉพาะระบบ/g)||[]).length,9);
+assert(!customerLicences.includes('46,558.52'));
+assert(!customerLicences.includes('data-licensing-system'));
+assert(workingLicences.includes('PO ก่อนชำระ'));
+assert(customerLicences.includes('100.00'));
+assert(!customerLicences.includes('2,777.00'));
+assert(!customerLicences.includes('200,000.00'));
+assert(!customerLicences.includes('Official licence fee responsibility'));
 assert(!renderLicences({schedule:{bindings:[{...licence,schedule:'C7'}]},currency:'USD'}).includes('100.00'));
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};

@@ -32,8 +32,24 @@
       "mocUrl":"https://www.myanmartradeportal.gov.mm/index.php/print/procedure/37/description",
       "ptdUrl":"https://www.ptd.gov.mm/ServicesDetail.aspx?id=LUKdZ6dcujUriHlPirNYSQ%3D%3D",
       "contractUrl":"https://docs.google.com/document/d/1M5CQ7GsMhNvNEnPMB-pcJTeU9J4QR5LM/edit",
-      "mocRangeMMK":"30,000–90,000 MMK ตามมูลค่า CIF ต่อคำขอ",
-      "microwaveExample":"7 GHz / 28 MHz หนึ่งลิงก์ ตามหมวด Link by Link ที่ PTD เผยแพร่ปี 2018: ค่าแรกเข้า 3,000,000 MMK และค่าใช้คลื่นรายปี 28 × 70,000 + 120,000 = 2,080,000 MMK รวมปีแรก 5,080,000 MMK หากใช้หมวดนี้และต้องขอสิทธิใหม่ ให้ยืนยันเรต จำนวนช่องที่คิดเงิน และการใช้ใบอนุญาตเดิมกับ PTD"
+      "mocImportTiers":[
+        {"cifMMK":"≤ 5,000,000","feeMMK":30000},
+        {"cifMMK":"5,000,001–10,000,000","feeMMK":50000},
+        {"cifMMK":"10,000,001–50,000,000","feeMMK":60000},
+        {"cifMMK":"50,000,001–150,000,000","feeMMK":80000},
+        {"cifMMK":"≥ 150,000,000","feeMMK":90000}
+      ],
+      "microwave":{"bandGHz":7,"bandwidthMHz":28,"initialMMK":3000000,"perMHzMMK":70000,"minimumMMK":120000,"publishedYear":2018},
+      "ptdUnitReferences":[
+        {"label":"Private Network · ค่าแรกเข้า / สิทธิ","mmk":210000},
+        {"label":"Private Network · วิทยุมือถือหรือประจำรถ / เครื่อง / ปี","mmk":10500},
+        {"label":"Private Network · Repeater / สถานี / ปี","mmk":52500},
+        {"label":"Private Network · Base Station / สถานี / ปี","mmk":105000},
+        {"label":"VSAT Network · ค่าแรกเข้า / สิทธิ","mmk":1050000},
+        {"label":"Commercial VSAT · Terminal / ปี","mmk":157500},
+        {"label":"Private VSAT · Terminal / ปี","mmk":105000}
+      ],
+      "fx":{"date":"2026-11-06","url":"https://forex.cbm.gov.mm/index.php/fxrate","marketMMKPerTHB":109.11,"referenceMMKPerTHB":62.60}
     },
     "items":[
       {"fee":"MOC Import Licence / Permit","scope":"รายคำขอตาม CIF และชุดนำเข้า รวมแก้ไข/ต่ออายุเฉพาะที่จำเป็น","responsibility":"TSI จัดข้อมูลผ่าน FaFE; ผู้นำเข้าที่ได้รับมอบหมายยื่นและชำระตามใบแจ้งของ MOC; ยืนยันผู้รับต้นทุนกับ COMPANY/CNEEC","timing":"Annex 6 §5.3.1 ให้ยื่น FaFE อย่างน้อย 6 เดือนก่อน shipment; ชำระเมื่อ MOC อนุมัติเพื่อรับใบอนุญาต และคุมวันหมดอายุถึงการนำเข้า"},
