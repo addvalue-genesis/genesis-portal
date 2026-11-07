@@ -41,3 +41,14 @@ export const CERAGON_R11_C1_0550 = {
     'Radio mounted to the antenna assembly through OMT; verify installation detail.',
   ],
 };
+
+// ADDVALUE owns these activities for the single APF–ACP link. The IDs
+// identify existing shared Working owners, so the same effort is counted once.
+export const DMR_PART_B_0550=[
+  {title:'Engineering and system integration',activity:'B1-D02',schedule:'A1 / Vendor Documents'},
+  {title:'SDRL and document control',activity:'B1-D04',schedule:'A1 / Vendor Documents'},
+  {title:'iFAT',activity:'B4-D02',schedule:'A1 / Inspection and Tests'},
+  {title:'FAT',activity:'B4-D01',schedule:'A1 / Inspection and Tests'},
+  {title:'SAT',activity:'B4-D03',schedule:'C7 / Site Service'},
+  {title:'Site Survey',activity:'B7-D01',schedule:'C7 / Site Service'},
+].map(r=>({...r,wbs:r.activity.split('-')[0],lineId:'REQ-MR-ACT-'+r.activity}));

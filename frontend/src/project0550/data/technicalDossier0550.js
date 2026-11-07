@@ -2,7 +2,7 @@ import {MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550,MGW_CURRENT_SCOPE_0550,mgwCur
 // Read-only live SI dossier. Source facts remain separate from authored interpretation.
 import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord0550,emptyTechnicalProposal0550} from './technicalProposal0550';
 import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
-import {CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import {DMR_PART_B_0550,CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
@@ -28,7 +28,11 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  }
  if(systemToken==='TEL-DMR'&&ceragonR11Selected0550(data)&&['description','parameters','equipment','deviations'].includes(sectionId)){
   tables.push({title:'DMR APF–ACP / selected bid configuration',heads:['Selected Offer','Proposed configuration','Open verification / deviations'],
-   rows:[[CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550]]});
+   rows:[[DMR_PART_B_0550,CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550]]});
+ }
+ if(systemToken==='TEL-DMR'&&ceragonR11Selected0550(data)&&['description','delivery'].includes(sectionId)){
+  tables.push({title:'DMR APF–ACP / service responsibilities',heads:['Activity','Responsible party','Working activity reference'],
+   rows:DMR_PART_B_0550.map(task=>[task.title,'ADDVALUE',task.activity])});
  }
  if(['description','equipment'].includes(sectionId)){
   const quantityRows=cusQuantityWorkingRows0550(data,model,systemToken);

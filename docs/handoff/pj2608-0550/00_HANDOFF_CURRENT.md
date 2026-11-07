@@ -1,3 +1,5 @@
+Latest scope and costing update: [MGW LAN/PBX/FO and Part B](20261107_MGW_LAN_PBX_FO_AND_PART_B.md). Existing Working and Budget show ADDVALUE service cost and distinguish shared project activity from the DMR engineering share.
+
 Latest scope decision: [TEL-TELT foundation and installation tender boundary](20261105_TELT_CIVIL_SCOPE_BOUNDARY.md). C1-D04 is a CNEEC option reference, C1-D05 separates excluded foundation construction and open site interfaces, and Part B retains design and TSSR.
 
 Latest pricing decision: [TEL-TELT legacy Part A pricing cancelled](20261105_TELT_LEGACY_PRICING_CANCELLED.md). APF and ACP MR rows require new pricing. The Vendor originals and separate B/C allocations remain available.
