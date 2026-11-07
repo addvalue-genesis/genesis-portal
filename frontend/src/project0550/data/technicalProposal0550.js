@@ -1,4 +1,5 @@
-import {mgwWorkingLineExcluded0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
+import {mgwCurrentOffer0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {workingOffers0550} from './workingOffers0550';
 // ADR-0550-001 §§1–4,6,8–14. Authoring records link canonical SI data;
@@ -47,9 +48,11 @@ const byIds=(rows,ids)=>ids.map(id=>rows.find(r=>r.id===id)||{id,missing:true});
 export function technicalRecordBasis0550(data,r){
  const p=data.technicalProposal||emptyTechnicalProposal0550(),{reviewer,reviewedOn,status,basisKey,...content}=r,w=data.integrationWorkspace||{};
  const requirements=byIds(integrationRequirements0550(data),r.requirementIds).map(q=>q.missing?q:{record:q,basis:integrationRecordBasis0550(data,"requirements",q)});
+ const mgwCurrent=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(r.systemToken)).map(o=>o.quoteEvidence);
  // Seeded MR requirements also belong to the canonical derived model. Their
  // linked work rows and raw workspace dependencies are captured below.
  return integrationFingerprint0550({policy:"0550-volume-ii-draft-v1",documentNo:p.documentNo,revision:p.revision,record:content,
+  ...(mgwCurrent.length?{mgwCurrent}:{}),
   sources:byIds(data.sourceIntake?.sources||[],r.sourceIds),requirements,
   proofs:byIds(w.proofs||[],r.proofIds).map(q=>q.missing?q:{record:q,basis:integrationRecordBasis0550(data,"proofs",q)}),offers:byIds(data.offers,r.offerIds),activities:byIds(w.activities||[],r.activityIds).map(q=>q.missing?q:{record:q,basis:integrationRecordBasis0550(data,"activities",q)}),
   ...((data.lines.some(l=>l.systemToken===r.systemToken&&l.mgwDetailGroupId))?{packageOffers:data.lines.filter(l=>l.systemToken===r.systemToken&&l.mgwDetailGroupId).flatMap(l=>workingOffers0550(data,l))}:{}),
@@ -86,7 +89,7 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
    else if(linked.problems?.length)problems.push("LINK_OPEN / "+id);
    if(linked?.systemToken&&s.token!=="COMMON"&&![s.token,"COMMON"].includes(linked.systemToken))problems.push("LINK_SYSTEM_MISMATCH / "+id);
    if(linked?.requirementId&&!r.requirementIds.includes(linked.requirementId))problems.push("LINK_REQUIREMENT_MISMATCH / "+id);
-   if(key==="offerIds"&&supplierOfferExcluded0550(data,linked,s.token))problems.push(MGW_SCOPE_EXCLUDED_0550+" / "+id);
+   if(key==="offerIds"&&supplierOfferExcluded0550(data,linked,s.token))problems.push((mgwHistoricalOffer0550(data,linked)?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550)+" / "+id);
    if(key==="offerIds"&&linked&&!r.requirementIds.some(reqId=>(i.requirements||[]).find(q=>q.id===reqId)?.offerIds.includes(id)))problems.push("OFFER_REQUIREMENT_MAPPING_OPEN / "+id);
   }
   if(section.id==="equipment"){

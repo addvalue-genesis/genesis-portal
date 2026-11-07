@@ -39,7 +39,7 @@ export function vendorRegisterLoadMessage0550(code){
 }
 
 export function vendorRegisterSyncSuccess0550(plan,data){
- const pending=pendingVendorDefaultCount0550(data),message=plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · เติมเรตต้นฉบับ ${plan.updatedOffers} รายการ · ราคา Working คงเดิม`:plan.packages?'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้':'แสดงทะเบียนตั้งต้นแล้ว';
+ const pending=pendingVendorDefaultCount0550(data),message=plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · เติมเรตต้นฉบับ ${plan.updatedOffers} รายการ`:plan.packages?'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้':'แสดงทะเบียนตั้งต้นแล้ว';
  return {state:pending?'PENDING':plan.changed?'APPLIED':plan.packages?'CURRENT':'EMPTY',message:message+(pending?` · เรตราคาต้นฉบับ ${pending} รายการยัง OPEN · ตรวจต้นทางอัตโนมัติช่วงเปิดโครงการ`:'')};
 }
 export function vendorRegisterSyncFailure0550(code,data){

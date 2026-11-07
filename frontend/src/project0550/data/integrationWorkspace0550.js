@@ -1,4 +1,5 @@
-import {mgwWorkingLineExcluded0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
+import {mgwCurrentRequirementTrace0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {validateTagBindings0550,tagBindingProblems0550} from './tagEvidence0550';
 // ADR-0550-001 principles 1–14: source → engineering proof → allocation → output.
 // This module derives workflow state; it never writes quantities, prices or approvals.
@@ -181,7 +182,9 @@ export function deriveIntegration0550(data,systems,today){
    }
    if(r.offerIds.some(id=>!data.offers.some(o=>o.id===id)))problems.push("OFFER_MISSING");
    const linkedOffers=[...r.offerIds,...(r.tagBindings||[]).flatMap(b=>b.offerIds)];
-   if(linkedOffers.some(id=>supplierOfferExcluded0550(data,data.offers.find(o=>o.id===id),r.systemToken))||
+   const linked=linkedOffers.map(id=>data.offers.find(o=>o.id===id));
+   if(linked.some(o=>mgwHistoricalOffer0550(data,o)))problems.push(MGW_SUPERSEDED_0550);
+   else if(linked.some(o=>supplierOfferExcluded0550(data,o,r.systemToken))||
       r.workLineIds.some(id=>data.lines.some(l=>l.id===id&&mgwWorkingLineExcluded0550(data,l))))problems.push(MGW_SCOPE_EXCLUDED_0550);
    for(const offerId of r.offerIds)if(!avlChecks.some(a=>a.requirementId===r.id&&a.offerId===offerId&&a.state==="REVIEWED_AVL"))problems.push("AVL_REVIEW_OPEN / "+offerId);
    if(r.proofMode!=="NOT_REQUIRED"&&!relatedProofs.some(p=>p.kind===r.proofMode&&p.state==="REVIEWED_PROOF"))problems.push("ENGINEERING_PROOF_OPEN");
@@ -192,7 +195,14 @@ export function deriveIntegration0550(data,systems,today){
   }
   const findings=(data.sourceIntake?.findings||[]).filter(f=>f.state!=="SOURCE_SUPPORTED"&&f.sourceIds.some(id=>r.sourceIds.includes(id))&&(f.systemTokens.includes(r.systemToken)||f.systemTokens.length===0));
   if(findings.length)problems.push(...findings.map(f=>"SOURCE_FINDING / "+f.id));
-  return {...r,proofs:relatedProofs,activities:relatedActivities,particulars:relatedParticulars,problems:[...new Set(problems)],state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):r.disposition==="NOT_APPLICABLE"?"NOT_APPLICABLE":"REVIEWED_MAPPING"};
+  const currentMgw=mgwCurrentRequirementTrace0550(data,r.id);
+  const currentMgwIds=currentMgw.map(o=>o.id);
+  const trace=currentMgw.length?{
+   offerIds:[...new Set([...r.offerIds.filter(id=>!mgwHistoricalOffer0550(data,data.offers.find(o=>o.id===id))),...currentMgwIds])],
+   workLineIds:[...new Set([...r.workLineIds,...data.lines.filter(l=>l.selected&&currentMgwIds.includes(l.offerId)).map(l=>l.id)])],
+   supplierLocator:currentMgw.map(o=>o.quoteEvidence.locator).join(' / '),
+  }:{};
+  return {...r,...trace,proofs:relatedProofs,activities:relatedActivities,particulars:relatedParticulars,problems:[...new Set(problems)],state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):r.disposition==="NOT_APPLICABLE"?"NOT_APPLICABLE":"REVIEWED_MAPPING"};
  });
  const tokens=[...new Set([...systems.map(s=>typeof s==="string"?s:s.token),"COMMON",...requirements.map(r=>r.systemToken),...w.particulars.map(p=>p.systemToken),...w.documentReviews.flatMap(d=>d.systemTokens)])];
  const scopes=tokens.map(id=>{const review=w.scopeReviews.find(r=>r.id===id),rs=rows.filter(r=>r.systemToken===id),problems=[];

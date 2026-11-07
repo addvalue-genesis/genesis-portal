@@ -1,3 +1,4 @@
+import {mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
 import {ceragonSupersededOffer0550} from "./ceragonSelection0550";
 import catalog from "./mgwQuote0550.json";
 import procurement from "./procurementScope0550.json";
@@ -8,6 +9,15 @@ const excludedSystems=new Set(procurement.directProcurement.flatMap(system=>syst
 const allowedSystems=tokens=>tokens.filter(token=>!excludedSystems.has(token));
 const isMgwVendor=vendor=>vendor?.id==="VENDOR-MGW-0550"||/\bMGW\b|MEGAWAY/i.test(vendor?.name||"");
 const isMgwOffer=(data,offer)=>Boolean(mgwQuoteItem0550(offer)||offer&&isMgwVendor(data.vendors?.find(v=>v.id===offer.vendorId)));
+export const mgwHistoricalOffer0550=(data,offer)=>mgwReplacementActive0550(data)&&isMgwOffer(data,offer)&&!mgwCurrentOffer0550(offer);
+export function mgwHistoricalLine0550(data,line,offer=data.offers?.find(o=>o.id===line.offerId)){
+ if(!mgwReplacementActive0550(data))return false;
+ if(line.mgwDetailGroupId||mgwHistoricalOffer0550(data,offer)||
+  isMgwVendor(data.vendors?.find(v=>v.id===line.vendorId))&&!mgwCurrentOffer0550(offer))return true;
+ const basis=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id);
+ return Boolean(basis&&basis.kind!=='PRICE_REFERENCE'&&basis.offerIds.some(id=>mgwHistoricalOffer0550(data,data.offers?.find(o=>o.id===id)))||
+  line.id==='LINE-BID-BULK-SCOPE-PROVISION-0550');
+}
 const rowExcluded=row=>row.systemTokens.length>0&&!allowedSystems(row.systemTokens).length;
 export const MGW_SCOPE_EXCLUDED_0550="MGW_SCOPE_EXCLUDED: ADDVALUE จัดหา DMR และ PAGA เองตามขอบเขตเสนอราคาปัจจุบัน";
 export const MGW_PROJECT_WIDE_SERVICE_0550="MGW_PROJECT_WIDE_SERVICE: ค่าแรงระดับโครงการ ลงต้นทุนที่ COMMON / B1";
@@ -22,12 +32,12 @@ export const mgwOfferSystemTokens0550=offer=>allowedSystems(mgwQuoteItem0550(off
 export function supplierOfferExcluded0550(data,offer,systemToken){
  if(!isMgwOffer(data,offer))return false;
  const row=mgwQuoteItem0550(offer),tokens=offer.quoteEvidence?.systemTokens||[];
- return excludedSystems.has(systemToken)||Boolean(row&&rowExcluded(row))||Boolean(tokens.length&&!allowedSystems(tokens).length);
+ return mgwHistoricalOffer0550(data,offer)||excludedSystems.has(systemToken)||Boolean(row&&rowExcluded(row))||Boolean(tokens.length&&!allowedSystems(tokens).length);
 }
 export const currentSupplierOffers0550=(data,systemToken)=>data.offers.filter(o=>o.id!==RETIRED_TOWER_OFFER_0550&&!ceragonSupersededOffer0550(data,o.id)&&!supplierOfferExcluded0550(data,o,systemToken));
 export function mgwWorkingLineExcluded0550(data,line,offer=data.offers?.find(o=>o.id===line.offerId)){
  const ownerIsMgw=Boolean(line.mgwDetailGroupId)||isMgwVendor(data.vendors?.find(v=>v.id===line.vendorId))||isMgwOffer(data,offer);
- return mgwGroupExcluded0550(line.mgwDetailGroupId)||supplierOfferExcluded0550(data,offer,line.systemToken)||
+ return mgwHistoricalLine0550(data,line,offer)||mgwGroupExcluded0550(line.mgwDetailGroupId)||supplierOfferExcluded0550(data,offer,line.systemToken)||
   ownerIsMgw&&(excludedSystems.has(line.systemToken)||procurement.mgw.excludedCustomerRowCodes.includes(line.customerRowCode));
 }
 export function reconcileMgwWorkingScope0550(data){

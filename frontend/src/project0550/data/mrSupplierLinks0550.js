@@ -1,3 +1,5 @@
+import {mgwHistoricalOffer0550} from "./mgwVendorBasis0550";
+import {mgwCurrentRequirementTrace0550} from "./mgwQuoteSelection0550";
 import {ceragonSupersededOffer0550} from './ceragonSelection0550';
 import {workingOffers0550} from './workingOffers0550';
 import {RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from './towerLegacyPricing0550';
@@ -11,11 +13,12 @@ export const requirementSupplierOfferIds0550=requirement=>[...new Set([
 export function mrSupplierLinks0550(data,line){
  const owner=data.lines.find(l=>l.id===line.coveredByLineId&&l.id!==RETIRED_TOWER_OWNER_0550);
  const requirements=(data.integrationWorkspace?.requirements||[]).filter(r=>r.id==='REQDEF-'+line.mrRequirementId||(r.workLineIds||[]).includes(line.id));
- const links=new Map(),add=(id,label)=>{if(id===RETIRED_TOWER_OFFER_0550||ceragonSupersededOffer0550(data,id))return;if(!links.has(id))links.set(id,{id,offer:data.offers.find(o=>o.id===id),labels:[]});const entry=links.get(id);if(!entry.labels.includes(label))entry.labels.push(label);};
+ const links=new Map(),add=(id,label)=>{if(id===RETIRED_TOWER_OFFER_0550||ceragonSupersededOffer0550(data,id)||mgwHistoricalOffer0550(data,data.offers.find(o=>o.id===id)))return;if(!links.has(id))links.set(id,{id,offer:data.offers.find(o=>o.id===id),labels:[]});const entry=links.get(id);if(!entry.labels.includes(label))entry.labels.push(label);};
  for(const o of workingOffers0550(data,line))add(o.id,'Offer ที่ผูกกับ Working');
  // Preserve a dangling selection so a deleted Offer cannot look unmapped.
  if(line.offerId)add(line.offerId,'Offer ที่ผูกกับ Working');
  if(owner){for(const o of workingOffers0550(data,owner))add(o.id,'Offer ของเจ้าของราคาอ้างอิง');if(owner.offerId)add(owner.offerId,'Offer ของเจ้าของราคาอ้างอิง');}
+ for(const o of mgwCurrentRequirementTrace0550(data,'REQDEF-'+line.mrRequirementId))add(o.id,'MGW ปัจจุบัน · ขอบเขตเทียบ MR รอตรวจ');
  for(const r of requirements)for(const id of requirementSupplierOfferIds0550(r))add(id,'ลิงก์ Requirement / TAG · ดูผลตรวจ Mapping');
  return {owner,requirements,links:[...links.values()]};
 }

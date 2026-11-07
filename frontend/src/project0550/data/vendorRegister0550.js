@@ -1,3 +1,4 @@
+import {mgwCurrentIncluded0550,mgwCurrentMr0550} from "./mgwQuoteSelection0550";
 import Decimal from 'decimal.js';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {validateBidWorkspace} from './bidWorkspaceModel';
@@ -113,6 +114,7 @@ export function vendorOfferEntries0550(data){
  };
  for(const [id,systems] of sourceSystems)for(const system of systems)add(id,system);
  for(const r of data.integrationWorkspace?.requirements||[])for(const id of r.offerIds||[])add(id,r.systemToken);
+ for(const offer of offers)if(mgwCurrentMr0550(offer).some(id=>id.startsWith('MR-B1-13-'))&&offer.quoteEvidence?.systemTokens.includes('TEL-FO'))add(offer.id,'TEL-LAN');
  for(const l of data.lines)for(const o of workingOffers0550(data,l)){add(o.id,l.systemToken);links.get(o.id)?.working.push(l);}
  const referenced=new Set(data.offers.flatMap(o=>o.quoteEvidence?.workingReferenceOfferIds||[]));
  const allocations=new Map();
@@ -161,7 +163,7 @@ export function vendorQuoteTotals0550(quote,fx={}){
  const net=e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE'||(!e.offer.supplierQuoteRow&&/\bitem\s+NET\b/i.test(e.offer.quoteEvidence?.locator||''));
  const option=e=>e.offer.supplierQuoteRow?.classification==='OPTION'||e.offer.quoteEvidence?.classification==='OPTION';
  const owners=entries.filter(net),hasComponents=entries.some(e=>e.offer.supplierQuoteRow);
- const base=owners.length?owners:entries.filter(e=>!option(e)&&e.offer.supplierQuoteRow?.classification!=='INCLUDED_REFERENCE'&&(!hasComponents||e.offer.supplierQuoteRow));
+ const base=owners.length?owners:entries.filter(e=>!option(e)&&!mgwCurrentIncluded0550(e.offer)&&e.offer.supplierQuoteRow?.classification!=='INCLUDED_REFERENCE'&&(!hasComponents||e.offer.supplierQuoteRow));
  const summarize=(rows,ambiguous=false)=>{
   const native=new Map();let missingPrices=0;
   for(const {offer:o} of rows){

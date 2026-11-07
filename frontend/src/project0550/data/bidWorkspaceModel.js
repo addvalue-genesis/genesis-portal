@@ -1,3 +1,4 @@
+import {mgwCurrentOffer0550,mgwCurrentIncluded0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
 import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
@@ -5,13 +6,13 @@ import {validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
 import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroup0550,mgwDetailGroupPrice0550} from "./mgwDetailPricing0550";
-import {mgwOfferProblems0550,MGW_QUOTE_0550,mgwWorkingLineExcluded0550,mgwGroupExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./mgwVendorBasis0550";
+import {mgwOfferProblems0550,MGW_QUOTE_0550,mgwWorkingLineExcluded0550,mgwHistoricalLine0550,mgwGroupExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./mgwVendorBasis0550";
 import {mrLineScope0550,mrWorkingGaps0550,MR_WORKING_CATALOG_0550} from "./mrWorkingBasis0550";
 import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationRuntime";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {mgwDependentEstimateOpen0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -95,7 +96,8 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const counts=new Map();data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
  const lines=data.lines.map(l=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
-  const selected=l.selected&&!supersededCeragon(l)&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
+  const retiredMgw=mgwHistoricalLine0550(data,l);
+  const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
   const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}
@@ -105,6 +107,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(l.offerId){
    if(!offer)problems.push("Selected offer missing");
    else {currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;if(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE"){costRate=null;problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the net package owner; options require separate allocation review");}problems.push(...mgwOfferProblems0550(offer,l));
+    if(mgwCurrentOffer0550(offer)&&selected){
+     if(mgwCurrentIncluded0550(offer)||offer.quoteEvidence.classification==='OPTION')problems.push('MGW_QUOTE_NON_ADDITIVE_OR_OPTION');
+     if(data.lines.some(other=>other.id!==l.id&&other.selected&&!other.coveredByLineId&&other.offerId===offer.id))problems.push('MGW_SOURCE_COST_OWNER_DUPLICATE / '+offer.id);
+    }
     if(offer.vendorId!==l.vendorId)problems.push("Vendor/offer mismatch");
     if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");
     if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
@@ -124,7 +130,11 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   }
   if(mgwWorkingLineExcluded0550(data,l,offer)){
    costRate=null;
-   problems.push(MGW_SCOPE_EXCLUDED_0550);
+   problems.push(retiredMgw?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550);
+  }
+  if(mgwDependentEstimateOpen0550(data,l)){
+   costRate=null;
+   problems.push('MGW_DEPENDENT_ESTIMATE_OPEN: ตรวจฐานประมาณการหลังเปลี่ยนขอบเขตและต้นทุน MGW');
   }
   if(mgwProjectWideLineConflict0550(l,offer)){
    costRate=null;
@@ -157,13 +167,13 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   // A sourced DIRECT selling rate is independent of unestablished internal cost.
   // Cost stays null; the strict Working/Official problems above are retained.
   const provisionalProblems=problems.filter(p=>!isBidScopeWarning0550(p)&&!(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
-  const nativeReady=provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
+  const nativeReady=!retiredMgw&&provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
   const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
   // Keep the established FX/rounding path when available; native USD needs no invented FX.
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
   const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  return {...l,...provisional,historicalMgwPackage,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,...provisional,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  });
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);

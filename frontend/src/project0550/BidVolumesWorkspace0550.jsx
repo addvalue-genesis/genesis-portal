@@ -1,3 +1,4 @@
+import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
 import {QualificationChecklist0550,QualificationResponse0550} from './QualificationChecklist0550';
@@ -83,6 +84,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <label>Schedule ที่แสดง<select aria-label="Schedules shown" value={showAllSchedules?'ALL':'C1_C2'} disabled={dirty} onChange={e=>changeScheduleScope(e.target.value)}><option value="C1_C2">แสดงเฉพาะ C1 และ C2</option><option value="ALL">แสดง Schedule ทั้งหมด</option></select></label><p>A / A1 / A2 และตาราง C เดิมแสดงครบเป็นค่าเริ่มต้น · A1 รับยอด Base และ A2 รับยอด Option จาก Working / Schedule allocation ชุดเดิม · เลือกดูเฉพาะ C1/C2 ได้ · ปุ่ม Export ทั้งชุดยังรวมทุก Schedule</p><Select label="Schedule price view" value={showWorking?'WORKING':'REVIEWED'} onChange={v=>{if(!dirty)setShowWorking(v==='WORKING');}} rows={[["WORKING","Working Preview · แสดงรายการ/ราคาที่มี พร้อมหมวดแนะนำ"],["REVIEWED","เฉพาะข้อมูลที่บันทึกและราคาทบทวนแล้ว"]]}/>{showWorking&&<WorkingScheduleStatus0550 onNavigate={go} view={preview} disabled={dirty||busy} onSave={saveSuggested} onAllocate={()=>choose('mapping')}/>}</>}
  <nav className="p55-technical-tabs" aria-label={'Volume '+volume+' sections'}>{panels.map(([id,label])=><button key={id} type="button" aria-pressed={panel===id} title={label} onClick={()=>choose(id)}>{volume==='I'&&SCHEDULES_0550.some(s=>s.id===id)?'11.'+id:label}</button>)}</nav><p role="status">{message}</p>
  <section className="p55-panel" data-component-key={prefix+'.'+panel}><ComponentCopyId projectId="PJ2608-0550" componentKey={prefix+'.'+panel}/>
+ {(panel==='overview'||volume==='I'&&['A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&panel==='A1'&&<LicensingCost0550 lines={model.lines} schedule={displayView} currency={currency} onNavigate={go} disabled={dirty}/>}
  {panel==='overview'&&<>{volume==='III'&&<QualificationChecklist0550 view={view} onOpen={choose}/>}
  {volume==='III'&&ceragonR11Selected0550(data)&&<div className="p55-panel">

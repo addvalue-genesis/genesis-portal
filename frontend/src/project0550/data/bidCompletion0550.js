@@ -1,3 +1,4 @@
+import {mgwReplacementActive0550} from "./mgwQuoteSelection0550";
 // Current bid preparation, not supplier/engineering acceptance. Estimates are
 // explicit planning allowances; original quotations and authored inputs survive.
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
@@ -13,6 +14,16 @@ export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
 const prefix='BID WORKING ESTIMATE / '+BID_COMPLETION_VERSION_0550;
+const mgwDependentEstimateIds=new Set([
+ 'REQ-MR-ACT-B2-D01','REQ-MR-ACT-B2-D02','REQ-MR-ACT-B2-D04','REQ-MR-ACT-B3-D01',
+ 'LINE-BID-OEM-TRAINING-TRAVEL-0550','REQ-MR-ACT-B5-D01','REQ-MR-ACT-B5-D02','REQ-MR-ACT-B5-D03',
+ 'REQ-MR-ACT-B9-D01','REQ-MR-ACT-C2-D03','REQ-MR-ACT-C3-D02','REQ-MR-ACT-C3-D03','REQ-MR-WARRANTY',
+]);
+export function mgwDependentEstimateOpen0550(data,line){
+ if(!mgwReplacementActive0550(data)||!mgwDependentEstimateIds.has(line.id))return false;
+ const receipt=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id);
+ return receipt?.kind==='ESTIMATE'&&receipt.inputKey===lineKey(data,line);
+}
 const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return 'bid1:'+(h>>>0).toString(16)+':'+text.length;};
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);

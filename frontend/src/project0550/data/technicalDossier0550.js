@@ -1,3 +1,4 @@
+import {MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550,MGW_CURRENT_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentIncluded0550} from "./mgwQuoteSelection0550";
 // Read-only live SI dossier. Source facts remain separate from authored interpretation.
 import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord0550,emptyTechnicalProposal0550} from './technicalProposal0550';
 import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
@@ -15,6 +16,16 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const record=view.records.find(r=>r.systemToken===systemToken&&r.sectionId===sectionId);
  const sourceIds=unique([...requirements.flatMap(r=>[...(r.sourceIds||[]),...(r.supplierSourceIds||[])]),...(record?.sourceIds||[])]);
  const tables=[];
+ const currentMgw=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(systemToken));
+ if(currentMgw.length&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
+  tables.push({title:'MGW LAN/PBX/FO · supplier proposal and drawing',heads:['Technical basis','Open verification'],
+   rows:[[MGW_CURRENT_SCOPE_0550+' Drawing: ASK LAN,PABX BLD Model.pdf, p1 · '+MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550]]});
+ }
+ if(currentMgw.length&&sectionId==='equipment'){
+  tables.push({title:'MGW quoted BOM · supplier quantities and equipment data',heads:['Offer / PDF locator','Equipment / model detail','Quoted quantity / treatment'],
+   rows:currentMgw.map(o=>[o.id+' / '+o.quoteEvidence.locator,o.brand+' / '+o.description+'\n'+o.quoteEvidence.terms.filter(t=>!t.startsWith('Supplier technical drawing:')).join('\n'),
+    o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
+ }
  if(systemToken==='TEL-DMR'&&ceragonR11Selected0550(data)&&['description','parameters','equipment','deviations'].includes(sectionId)){
   tables.push({title:'DMR APF–ACP / selected bid configuration',heads:['Selected Offer','Proposed configuration','Open verification / deviations'],
    rows:[[CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550]]});
