@@ -20,7 +20,8 @@ export const SYSTEM_GROUPS = DATASET.systemGroups.map(group=>({
   systems:group.systems.map(system=>{
     const scope=directProcurement.get(system.token);
     return {...system,name:procurement.systemLabels[system.token]||system.name,
-      ...(scope?{owner:procurement.contractor+" · Contractor / procurement · "+scope.supplier+" · "+scope.quoteRef}:{})};
+      bidOfferOwner:scope?procurement.procurementOwner:procurement.mgw.bidOfferOwner,
+      ...(scope?{owner:procurement.procurementOwner+" · จัดหาโดยตรงจาก "+scope.suppliers.map(s=>s.name).join(" / ")}:{})};
   })
 }));
 export const SYSTEMS = SYSTEM_GROUPS.flatMap((group) =>

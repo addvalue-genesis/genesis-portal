@@ -19,7 +19,7 @@ export function mgwHistoricalLine0550(data,line,offer=data.offers?.find(o=>o.id=
   line.id==='LINE-BID-BULK-SCOPE-PROVISION-0550');
 }
 const rowExcluded=row=>row.systemTokens.length>0&&!allowedSystems(row.systemTokens).length;
-export const MGW_SCOPE_EXCLUDED_0550="MGW_SCOPE_EXCLUDED: ADDVALUE จัดหา DMR และ PAGA เองตามขอบเขตเสนอราคาปัจจุบัน";
+export const MGW_SCOPE_EXCLUDED_0550="MGW_SCOPE_EXCLUDED: "+procurement.procurementOwner+" จัดหา "+procurement.directProcurement.map(scope=>scope.name).join(" / ")+" ตามขอบเขตเสนอราคาปัจจุบัน";
 export const MGW_PROJECT_WIDE_SERVICE_0550="MGW_PROJECT_WIDE_SERVICE: ค่าแรงระดับโครงการ ลงต้นทุนที่ COMMON / B1";
 export const mgwProjectWideService0550=offer=>procurement.mgw.projectWideServiceRowIds.includes(mgwQuoteItem0550(offer)?.id);
 export function mgwProjectWideLineConflict0550(line,offer){

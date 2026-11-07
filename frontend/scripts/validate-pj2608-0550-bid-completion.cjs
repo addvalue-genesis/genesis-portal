@@ -13,12 +13,18 @@ assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
  const id='REQ-MR-B1-11-APF-08', offerIds=['02','03','04','05'].map(code=>'OFFER-MASTER-TOWER-2609.95.1-'+code);
  const fixture={...base,repositoryBasisImport:{bidCompletion:{version:C.BID_COMPLETION_VERSION_0550,rows:[],basisLineIds:[]}},
   sourceIntake:{sources:[{id:'TEST-CURRENT-MR',documentNo:'MM-ASK-1A-APF-TEL-MR-0001',revision:'B1',authority:'CURRENT_TENDER',content:'Synthetic MR'}],findings:[{id:'A-SI-R33-TOWER-ERECTION-BASE',state:'SOURCE_SUPPORTED'}]},
-  offers:offerIds.map(id=>({id,quoteRef:'2609.95.1',currency:'THB',vendorId:'TEST-TOWER',quoteEvidence:{quotedTotal:200},supplierQuoteRow:{classification:'BASE_PRICE'}}))};
+  offers:offerIds.map(id=>({id,quoteRef:'2609.95.1',currency:'THB',vendorId:'LEGACY-VENDOR-MASTER-TOWER',quoteEvidence:{quotedTotal:200},supplierQuoteRow:{classification:'BASE_PRICE'}}))};
  const ready=C.prepareBidCompletion0550(fixture,options(fixture),date), line=ready.lines.find(l=>l.id===id);
  assert.equal(line.manualCost,800,'Only matching APF quote items supply one native tower');
  assert.equal(line.quantity,1);
  assert.equal(ready.lines.find(l=>l.id==='REQ-MR-B1-11-ACP-06').manualCost,null,'Missing ACP evidence cannot inherit APF price');
  assert.equal(C.prepareBidCompletion0550(ready,options(ready),date),ready,'Repeated preparation preserves the applied decision');
+ const marked=C.applyDirectSupplierMarkup0550(ready),markedTower=marked.lines.find(l=>l.id===id);
+ assert.deepEqual(markedTower,{...line,sellMode:'MARKUP',markupPct:50,marginPct:null,sellRate:null});
+ assert.equal(marked.offers,ready.offers);
+ assert.equal(C.bidCompletionSourceUsages0550(marked).find(r=>r.line.id===id).current,true);
+ assert.equal(C.applyDirectSupplierMarkup0550(marked),marked);
+
  assert(C.bidCompletionBasisChanged0550(ready),'Dependent estimates must be reconciled after added supply');
  const changed={...ready,offers:ready.offers.slice(1)};
  assert(C.cusQuantityPricingProblems0550(changed,line).length,'Unavailable quote evidence stops reuse of an automatic price');

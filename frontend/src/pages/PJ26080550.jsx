@@ -631,6 +631,7 @@ function SystemCard({ system, expanded, onToggle }) {
             <div><dt>Project reference</dt><dd>{system.ref}</dd></div>
             <div><dt>Engineering proof</dt><dd>{system.proof}</dd></div>
             <div><dt>Quantity state</dt><dd><Badge>{system.quantityState}</Badge></dd></div>
+            <div><dt>Bid offer owner</dt><dd>{system.bidOfferOwner}</dd></div>
             <div><dt>Execution / boundary</dt><dd>{system.owner}</dd></div>
           </dl>
           <div className="p55-open-item">

@@ -10,6 +10,7 @@ import {workingOffers0550} from './workingOffers0550';
 import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 import {CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import procurement from './procurementScope0550.json';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -28,6 +29,59 @@ const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);
 const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
+const directMarkupSystems=new Map(procurement.directProcurement.flatMap(system=>
+ system.suppliers.filter(supplier=>supplier.useDirectMarkup).flatMap(supplier=>
+  supplier.vendorIds.map(id=>[id,system.quotedSystemToken]))));
+
+// Apply the approved selling basis to the active cost owner. Original offer
+// prices, quantities and the downstream prime rate remain the existing inputs.
+export function applyDirectSupplierMarkup0550(data){
+ const markupPct=procurement.directSupplierMarkupPct;
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ const rowsByLine=new Map((receipt?.rows||[]).map(row=>[row.lineId,row]));
+ const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
+ const changed=new Map();
+ const lines=data.lines.map(line=>{
+  if(!line.selected||line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
+  if(line.sellMode==='MARKUP'&&line.markupPct===markupPct&&line.sellRate===null&&line.marginPct===null)return line;
+  const offer=offers.get(line.offerId),row=rowsByLine.get(line.id);
+  const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
+  const matchesSystem=directSystem&&(directSystem===line.systemToken||
+   line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
+  const direct=matchesSystem&&offer.vendorId===line.vendorId&&
+   finite(offer.unitCost)&&(!offer.supplierQuoteRow||offer.supplierQuoteRow.classification==='NET_PACKAGE')&&
+   !(offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data));
+  // Allocated Master Tower items have one THB cost owner even when the
+  // activity is recorded under COMMON. Mixed estimates retain their own basis.
+  const allocated=!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
+   row.offerIds.every(id=>isTowerSourceItem0550(offers.get(id))&&directMarkupSystems.get(offers.get(id).vendorId)==='TEL-TELT')&&
+   row.inputKey===lineKey(data,line)&&row.sourceKey===sourceKey(data,row.offerIds);
+  if(!direct&&!allocated)return line;
+  const updated={...line,sellMode:'MARKUP',markupPct,marginPct:null,sellRate:null};
+  changed.set(line.id,{previous:line,updated});
+  return updated;
+ });
+ if(!changed.size)return data;
+ const next={...data,lines};
+ if(!receipt)return next;
+ // A price policy change keeps current cost-source receipts valid. Only
+ // rebind previously matching keys so stale or edited inputs stay stale.
+ const previousLines=new Map(data.lines.map(line=>[line.id,line]));
+ const nextLines=new Map(lines.map(line=>[line.id,line]));
+ const rows=receipt.rows.map(row=>{
+  const update=changed.get(row.lineId);
+  const inputKey=update&&row.inputKey===lineKey(data,update.previous)?lineKey(next,update.updated):row.inputKey;
+  const ownerKeys=row.ownerIds.map((id,index)=>{
+   const owner=changed.get(id),previous=row.ownerKeys[index];
+   return owner&&previous===ownerKey(data,owner.previous)?ownerKey(next,owner.updated):previous;
+  });
+  return inputKey===row.inputKey&&ownerKeys.every((id,i)=>id===row.ownerKeys[i])?row:{...row,inputKey,ownerKeys};
+ });
+ const basisMatches=receipt.basisLineIds.every(id=>previousLines.has(id))&&
+  receipt.basisKey===key([data.fx,receipt.basisLineIds.map(id=>ownerKey(data,previousLines.get(id)))]);
+ const basisKey=basisMatches?key([data.fx,receipt.basisLineIds.map(id=>ownerKey(next,nextLines.get(id)))]):receipt.basisKey;
+ return {...next,repositoryBasisImport:{...next.repositoryBasisImport,bidCompletion:{...receipt,rows,basisKey}}};
+}
 
 const TOWER_SUPPLY_ROWS = [
  ['REQ-MR-B1-11-APF-08', '2609.95.1'],

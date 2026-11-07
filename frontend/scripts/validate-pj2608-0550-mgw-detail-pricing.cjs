@@ -8,7 +8,7 @@ const groupIds=G.MGW_DETAIL_GROUPS_0550.flatMap(g=>g.rowIds);assert.equal(groupI
 let model=derive(d),packages=model.lines.filter(l=>l.mgwDetailGroupId),selected=packages.filter(l=>l.selected);assert.equal(packages.length,18);assert.equal(selected.length,17);assert.equal(selected.reduce((n,l)=>n+l.costRate,0),2560753);
 for(const [id,cost] of [['CCTV',482142],['LAN',881760],['RADIO-DTRS',476819],['MET',34316],['NDB',90060]])assert.equal(packages.find(l=>l.mgwDetailGroupId===id).costRate,cost);
 assert.equal(packages.find(l=>l.mgwDetailGroupId==='CCTV').provisionalCustomerUSD,609021.47);assert.equal(packages.find(l=>l.mgwDetailGroupId==='LAN').provisionalCustomerUSD,1113802.11);
-assert.equal(model.provisional.knownUSD,3382702.02);
+assert.equal(model.provisional.knownUSD,3234635.36,"Known USD excludes the retired tower package");
 const originalQty=Q.MGW_QUOTE_0550.rows.find(r=>r.id==='MGW-Q26-063-CCTV-014');originalQty.quantity+=5;
 try{assert.equal(derive(d).lines.find(l=>l.mgwDetailGroupId==='CCTV').costRate,482142,'Saved quote quantities survive later catalogue edits');}finally{originalQty.quantity-=5;}
 const savedQuantities=d.lines.find(l=>l.mgwDetailGroupId==='CCTV').mgwDetailBasis;assert.equal(savedQuantities.sourceSha256,Q.MGW_QUOTE_0550.sourceSha256);assert(savedQuantities.rows.length===28);
@@ -18,7 +18,11 @@ assert.equal(packages.find(l=>l.mgwDetailGroupId==='SERVICES-006').selected,fals
 const register=require(root+'/project0550/data/vendorRegister0550.js');
 const scope=Q.PROCUREMENT_SCOPE_0550,mgw=d.vendors.find(v=>v.id==='VENDOR-MGW-0550');
 assert.equal(scope.contractor,'ADDVALUE');
-assert.deepEqual(scope.directProcurement.map(s=>[s.quotedSystemToken,s.supplier]),[['TEL-DMR','CERAGON'],['TEL-PAGA','INDUSTRONIC']]);
+assert.deepEqual(scope.directProcurement.map(s=>[s.quotedSystemToken,s.suppliers.map(v=>v.name)]),
+ [['TEL-DMR',['CERAGON']],['TEL-PAGA',['INDUSTRONIC','ID IE']],['TEL-TELT',['Master Tower']]]);
+assert.deepEqual(D.SYSTEMS.filter(s=>s.bidOfferOwner==='ADDVALUE').map(s=>s.token).sort(),['TEL-DMR','TEL-PAGA','TEL-TELT']);
+assert(D.SYSTEMS.filter(s=>!scope.directProcurement.some(r=>r.quotedSystemToken===s.token)).every(s=>s.bidOfferOwner==='MGW'));
+assert.equal(Q.supplierOfferExcluded0550(d,d.offers.find(Q.mgwQuoteItem0550),'TEL-TELT'),true);
 assert.match(D.SYSTEMS.find(s=>s.token==='TEL-DMR').name,/Digital Microwave Radio/);
 assert.match(D.SYSTEMS.find(s=>s.token==='TEL-RADIO-DTRS').name,/DTRS/);
 const archivedRows=Q.MGW_QUOTE_0550.rows.filter(r=>r.section==='PAGA');

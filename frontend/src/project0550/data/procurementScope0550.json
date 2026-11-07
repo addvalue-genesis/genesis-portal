@@ -1,9 +1,10 @@
 {
   "projectId": "PJ2608-0550",
-  "decisionDate": "2026-11-05",
+  "decisionDate": "2026-11-07",
   "authority": "User-confirmed bid procurement scope",
   "contractor": "ADDVALUE",
   "procurementOwner": "ADDVALUE",
+  "directSupplierMarkupPct": 50,
   "systemLabels": {
     "TEL-DMR": "DMR · Digital Microwave Radio + WBB",
     "TEL-RADIO-DTRS": "DTRS · VHF Trunked Radio"
@@ -12,26 +13,39 @@
     {
       "name": "DMR",
       "mgwExcludedSystemTokens": ["TEL-DMR"],
-      "supplier": "CERAGON",
-      "quoteRef": "26-30029 / printed26-3029-1 / RevA1",
+      "suppliers": [
+        {"name": "CERAGON", "vendorIds": ["VENDOR-CERAGON-0550"], "quoteRef": "26-30029 / printed26-3029-1 / RevA1", "useDirectMarkup": true}
+      ],
       "quotedSystemToken": "TEL-DMR",
       "quotedScope": "ACP–APF digital microwave PtP link"
     },
     {
       "name": "PAGA",
       "mgwExcludedSystemTokens": ["TEL-PAGA"],
-      "supplier": "INDUSTRONIC",
-      "quoteRef": "A20261632-002",
+      "suppliers": [
+        {"name": "INDUSTRONIC", "vendorIds": ["LEGACY-VENDOR-INDUSTRONIC", "VENDOR-INDUSTRONIC-0550"], "quoteRef": "A20261632-002", "useDirectMarkup": true},
+        {"name": "ID IE", "vendorIds": ["VENDOR-IDIE-0550"], "quoteRef": "QO26163", "quoteScope": "PAGA services"}
+      ],
       "quotedSystemToken": "TEL-PAGA",
       "quotedScope": "Public Address & General Alarm"
+    },
+    {
+      "name": "Telecom Tower",
+      "mgwExcludedSystemTokens": ["TEL-TELT"],
+      "suppliers": [
+        {"name": "Master Tower", "vendorIds": ["LEGACY-VENDOR-MASTER-TOWER"], "quoteRef": "2609.95.1 / 2609.95.2", "useDirectMarkup": true}
+      ],
+      "quotedSystemToken": "TEL-TELT",
+      "quotedScope": "APF 60 m and ACP 30 m towers"
     }
   ],
   "mgw": {
+    "bidOfferOwner": "MGW",
     "quoteRef": "Q26-063 / ver1.0",
     "excludedDetailGroupIds": ["PAGA-ALTERNATIVE", "PAGA-STUDY"],
     "excludedCustomerRowCodes": ["A1-05", "A1-11"],
     "projectWideServiceRowIds": ["MGW-Q26-063-SERVICES-001", "MGW-Q26-063-SERVICES-002"],
-    "decision": "2026-11-05: ADDVALUE is the contractor and direct procurement owner. DMR (Digital Microwave Radio) is from CERAGON, and PAGA is from INDUSTRONIC. MGW scope excludes DMR and PAGA and includes DTRS (VHF Trunked Radio).",
-    "sourceTreatment": "Preserve printed figures and original line IDs as source evidence. Exclude PAGA and DMR from the current MGW bid. VHF trunked radio is DTRS, a separate MGW system. CERAGON pricing applies to the digital microwave link only."
+    "decision": "2026-11-07: ADDVALUE owns DMR, PAGA and Telecom Tower. Source suppliers are CERAGON, INDUSTRONIC and ID IE, and Master Tower respectively. MGW is the bid source for the other systems, including DTRS, subject to receipt and scope verification.",
+    "sourceTreatment": "Preserve original figures and line IDs. DMR, PAGA and Telecom Tower are outside the MGW system offer. CERAGON pricing applies to the digital microwave link only."
   }
 }

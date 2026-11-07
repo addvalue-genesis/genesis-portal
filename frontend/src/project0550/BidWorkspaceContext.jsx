@@ -1,6 +1,6 @@
 import {prepareMgwCurrentWorking0550} from "./data/mgwCurrentWorking0550";
 import {mgwOfferSourcePending0550} from "./data/mgwQuoteSelection0550";
-import {prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
+import {applyDirectSupplierMarkup0550,prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
 import {prepareBidProcess0550} from "./data/bidProcess0550";
 import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
 import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
@@ -52,6 +52,10 @@ export function BidWorkspaceProvider({children}){
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
    const prepared=prepareBidCompletion0550(processed,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(processed,SYSTEMS.map(s=>s.token),reviewDate)},reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata and authorised TSI estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
+   else{
+    const withMarkup=applyDirectSupplierMarkup0550(current);
+    if(withMarkup!==current)current=await saveProject0550Bid(withMarkup,current.revision,"Apply ADDVALUE direct supplier markup");
+   }
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
