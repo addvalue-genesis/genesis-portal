@@ -8,6 +8,11 @@ export const CERAGON_LINK_OWNER_0550 = 'LINE-CERAGON-ASK-REVA1-BASE';
 export const CERAGON_DISH_ALLOWANCE_0550 = 'LINE-BID-DMR-ANTENNA-GAP-0550';
 export const CERAGON_R11_DECISION_DATE_0550 = '2026-11-07';
 export const CERAGON_R11_CONFIGURATION_0550 = 'CERAGON IP-50CX 7 GHz, 2+0, one Full Outdoor radio and one 1.2 m antenna per site, without Hot Standby.';
+export const CERAGON_R11_WORKING_BASIS_0550 = {
+  description:'Full Outdoor 2+0 · ไม่ใช้ IDU แยก · ต่อ Fiber จาก ODU เข้า Access Switch และจ่าย DC โดยตรงให้ ODU พร้อม Grounding',
+  installationSheet:'2+0 Installation',
+  open:'ตรวจชนิด Fiber/SFP และพอร์ต Switch, ต้นทางไฟ DC และความจำเป็นของ AC/DC 150 W ตามไซต์',
+};
 export const CERAGON_R11_OPEN_SCOPE_0550 = 'MR Appendix 1.5: reconcile Full Outdoor / no Hot Standby, MR antenna quantity versus BLD/TYP/LIS, APF cabinet and access switch, and both cable schedules. Verify net throughput at 99.99% availability with the 2+0 RF path losses.';
 export const ceragonR11Selected0550 = data => data.lines.some(line =>
   line.id === CERAGON_LINK_OWNER_0550 && line.selected && line.offerId === CERAGON_R11_0550);

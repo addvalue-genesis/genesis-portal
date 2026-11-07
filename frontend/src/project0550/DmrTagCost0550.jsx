@@ -1,13 +1,16 @@
 import React,{useMemo,useState} from 'react';
 import {amount} from './BidControls';
+import {SupplierQuoteBoq0550} from './SupplierItemSourceText0550';
 import {MR_WORKING_CATALOG_0550} from './data/mrWorkingBasis0550';
+import {nativeSupplierItem0550} from './data/supplierCostProjection0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R12_0550,CERAGON_R11_BOQ_REVIEW_0550,DMR_MR_0550,ceragonR11RequirementSite0550,
- ceragonR11Dts0550,ceragonR11ScopeCheck0550,dmrDtsEquipment0550,dmrMrAdditionalScope0550} from './data/ceragonSelection0550';
+ CERAGON_R11_WORKING_BASIS_0550,ceragonR11Dts0550,ceragonR11ScopeCheck0550,ceragonR11Source0550,dmrDtsEquipment0550,dmrMrAdditionalScope0550} from './data/ceragonSelection0550';
 
 const workRoute='bid.budget.working.line.';
 const partTitles={A:'อุปกรณ์และสายตามตำแหน่ง / TAG',B:'วิศวกรรม บริการ และต้นทุนโครงการ',C:'ทางเลือกและอะไหล่ระยะใช้งาน'};
 const physicalClauses=new Set([1,2,14,15,16,23]);
 const qty=(value,unit)=>value==null?'OPEN':value+' '+unit;
+const accessoryGroups={81:'Fiber → Switch',87:'Fiber → Switch',88:'Fiber → Switch',83:'Grounding',84:'DC Power',85:'DC Power',89:'DC Power'};
 
 function DmrVendorParts0550({parts}){
  if(!parts?.length)return null;
@@ -30,13 +33,15 @@ export function dmrTagCostView0550(data,integration,working,lineId){
   const checks=requirement.dmrChecks||ceragonR11ScopeCheck0550(requirement,mr,null,dts,[]);
   return checks.map(check=>{
    const packageRef=activePackage&&check.vendorReference?.parts.length>0;
+   const fullOutdoorIdu=activePackage&&check.vendorReference?.type==='DESIGN_ALTERNATIVE'&&check.offered===0;
    const bindings=(requirement.tagBindings||[]).filter(b=>check.tag&&b.tag===check.tag&&b.site===check.site);
    const boundRefs=[...new Set(bindings.flatMap(b=>b.workLineIds).filter(id=>requirement.workLineIds.includes(id)&&id!==CERAGON_LINK_OWNER_0550&&owners.get(id)?.wbs==='A'))];
    const location=check.tag?(check.location||'ตำแหน่งติดตั้ง OPEN'):'แนวสายและจุดต่อ · ตรวจ Cable LIS รายช่วง';
-   return {...check,id:id+'/'+check.component,requirementId:id,mrLineId:'REQ-'+mr.id,location,packageRef,
+   return {...check,id:id+'/'+check.component,requirementId:id,mrLineId:'REQ-'+mr.id,location,packageRef,fullOutdoorIdu,
     tagQuantityOpen:check.tag&&check.source&&check.required>1,
     workLineIds:[...(packageRef?[CERAGON_LINK_OWNER_0550]:[]),...boundRefs],
     label:check.tag&&(!check.source||!check.location)?'ตรวจ TAG / ตำแหน่ง':
+     fullOutdoorIdu?'เลือก Full Outdoor ใน Working · Deviation ยังต้องตรวจ':
      check.component==='IDU'?'ทางเลือก Full Outdoor · ตรวจหน้าที่ IDU':
      check.component==='สายและ Interface'?'ตรวจชนิดสาย / ความยาว / ของประกอบ':
      check.state==='DEVIATION_PENDING'?'พบใน R11 บางจำนวน · ตรวจส่วนต่าง':
@@ -152,11 +157,86 @@ export function DmrTagCostRows0550({view,lineId,onNavigate,onOpenSource=onNaviga
     <DmrVendorParts0550 parts={r.vendorReference?.parts}/>
    </>:<>{r.requirement}<small>{r.reference}</small></>}
     {r.source&&onOpenSource&&<button type="button" onClick={()=>onOpenSource('bid.documents.source.'+r.source.id)}>DTS · {r.source.locator.split(' / ').at(-1)}</button>}</td>
-   <td>{r.packageRef?'อ้างแพ็กเกจ R11':r.workLineIds.length?'อ้างเจ้าของต้นทุน':'OPEN'}</td>
+   <td>{r.fullOutdoorIdu?'IDU แยก 0 ตัวตามแบบที่เลือก':r.packageRef?'อ้างแพ็กเกจ R11':r.workLineIds.length?'อ้างเจ้าของต้นทุน':'OPEN'}</td>
    <td>—</td><td>—</td>
    <td><strong>{r.label||'ตรวจขอบเขต / เจ้าของต้นทุน'}</strong><small>{r.reason||r.action}</small>
     {r.workLineIds.map(id=>onNavigate&&<button key={id} type="button" onClick={()=>onNavigate(workRoute+id)}>
      {id===CERAGON_LINK_OWNER_0550?'เปิดเจ้าของต้นทุน R11':view.owners.get(id)?.description||id}</button>)}</td>
   </tr>;
  });
+}
+
+export function DmrWorkingBoq0550({offers,view,lineId,onNavigate,provisional}){
+ if(!lineId.endsWith('-01'))return null;
+ const site=ceragonR11RequirementSite0550({id:'REQDEF-'+lineId.slice(4)});
+ if(!site)return null;
+ const offer=offers.find(ceragonR11Source0550);
+ const spares=offer&&offers.find(o=>o.id===CERAGON_R12_0550&&o.vendorId===offer.vendorId&&o.quoteRef===offer.quoteRef&&
+  o.quoteEvidence?.sourceSha256===offer.quoteEvidence.sourceSha256);
+ const owner=view.owners.get(CERAGON_LINK_OWNER_0550);
+ const selected=owner?.selected&&owner.offerId===offer?.id;
+ const visibleCost=selected&&(provisional||owner.reviewState==='REVIEWED_WORKING');
+ const cost=visibleCost?owner.provisionalCostNative:null;
+ const costTHB=visibleCost?(provisional?owner.provisionalCostTHB:owner.costTHB):null;
+ const quote=offer&&nativeSupplierItem0550(offer);
+ const spareQuote=spares&&nativeSupplierItem0550(spares);
+ const siteColumn=site+'(alternative)';
+ const siteEvidence=view.equipment.filter(r=>r.site===site&&r.vendorReference);
+ const conditionalPower=row=>row.row===89&&row.part==='AC/DC OUTDOOR 150W';
+ const isSpareOnly=row=>row.quantities[siteColumn]==null&&Object.hasOwn(row.quantities,'Spares');
+ const groupFor=row=>{
+  const quantity=row.quantities[siteColumn];
+  if(quantity===0)return {key:'zero',order:1,label:site+' · Qty 0 ตาม BoQ',costBasis:'ไม่มีจำนวนใช้ที่ไซต์นี้'};
+  if(isSpareOnly(row))return {key:'spares',order:2,label:'Spares · อ้างอิง R12 / C2',costBasis:'ยอดอยู่ที่ใบอะไหล่ R12'};
+  if(quantity==null)return {key:'comparison',order:1,label:site+' · แถวเปรียบเทียบ · ต้นทางไม่ระบุจำนวนที่ไซต์นี้',costBasis:'แสดงตาม BoQ ต้นทาง'};
+  // The vendor line joins to the WP.7 mapping by worksheet cell, P/N and quantity.
+  const matches=siteEvidence.filter(r=>r.vendorReference.parts.some(p=>
+   p.locator===`BoQ!${r.vendorReference.column}${row.row}`&&p.part===row.part&&p.quantity===quantity));
+  if(matches.length!==1)return {key:'open',label:site+' · OPEN รอผูก TAG / Location ใน WP.7',costBasis:'ยอดกลุ่ม OPEN'};
+  const [r]=matches;
+  const identity=r.tag?`${r.source?r.tag:'TAG รอยืนยัน · '+r.tag} · ${r.location}`
+   : `${site} · สายและ Interface · ${r.location}`;
+  const subgroup=accessoryGroups[row.row]||(r.component==='ODU'?(row.row>=73?'Activation Keys':'Radio / Diplexer'):'Antenna / RF Accessories');
+  return {key:r.id+'/'+subgroup,label:identity+' · '+subgroup+' · '+r.label,
+   costBasis:selected?'ยอดกลุ่มอ้าง R11 · ใบเสนอราคาไม่แยกราคา':'ยอดกลุ่ม OPEN · รอเลือกต้นทุน Working'};
+ };
+ const statusFor=row=>{
+  const quantity=row.quantities[siteColumn];
+  if(quantity===0)return 'Qty 0 · ไม่ใช้ที่ไซต์นี้';
+  if(isSpareOnly(row))return 'อะไหล่ R12';
+  if(quantity==null)return 'ต้นทางไม่ระบุจำนวนที่ไซต์นี้';
+  return conditionalPower(row)?'มีเงื่อนไข · เมื่อจำเป็นต้องใช้ AC/DC':'เสนอใน R11 · 2+0';
+ };
+ const costFor=row=>{
+  const quantity=row.quantities[siteColumn];
+  if(isSpareOnly(row))return 'อ้าง R12 / C2';
+  if(!quantity)return '—';
+  if(conditionalPower(row))return 'มีเงื่อนไขเมื่อจำเป็นต้องใช้ AC/DC';
+  return 'อ้างราคาแพ็กเกจ R11';
+ };
+ return <section className="p55-panel" data-dmr-working-boq={lineId} aria-label={'DMR Working BoQ '+site}>
+  <h4>BOM อุปกรณ์จาก 07 Vendor · {site} · จัดกลุ่มตาม TAG / Location</h4>
+  {selected&&<p><strong>ฐานแบบที่ผู้ใช้เลือกใน Working</strong> · {CERAGON_R11_WORKING_BASIS_0550.description} · {CERAGON_R11_WORKING_BASIS_0550.open} · <a href={CERAGON_R11_BOQ_REVIEW_0550.url} target="_blank" rel="noreferrer">CERAGON · {CERAGON_R11_WORKING_BASIS_0550.installationSheet}</a></p>}
+  <div className="p55-table-wrap"><table className="p55-table" aria-label={'DMR product cost summary '+site}>
+   <thead><tr><th>ขอบเขตต้นทุนสินค้า</th><th>จำนวน</th><th>เรตจาก 07 Vendor</th><th>ยอดต้นทุน</th></tr></thead>
+   <tbody>
+    <tr><td>07 Vendor · R11 · Option 2 · APF–ACP<small>{quote?.locator}</small></td><td>{quote?.quantity??'OPEN'}<small>QTY ในใบเสนอราคา</small></td>
+     <td>{amount(quote?.rate,quote?.currency||'USD')} / Lot</td><td>{amount(quote?.total,quote?.currency||'USD')}<small>ยอดตาม QTY ในใบเสนอราคา</small></td></tr>
+    <tr><td><strong>Working · R11 ต้นทุนสินค้าทั้งลิงก์ APF–ACP</strong></td><td>{selected?qty(owner.quantity,owner.unit):'OPEN'}</td>
+     <td>{amount(visibleCost?owner.costRate:null,owner?.currency||'USD')} / Lot</td><td><strong>{amount(cost,owner?.currency||'USD')}</strong>
+      {Number.isFinite(costTHB)&&<small>{amount(costTHB,'THB')}</small>}<small>คิดที่เจ้าของต้นทุน R11 รายเดียว</small></td></tr>
+    <tr><td>{site} · ยอดต้นทุนเฉพาะไซต์ / TAG</td><td>ตาม BoQ ด้านล่าง</td><td>ใบเสนอราคาเป็น Lot</td><td>OPEN · รอราคาแยกหรือฐานจัดสรร</td></tr>
+    {spareQuote&&<tr><td>07 Vendor · R12 Spares / C2<small>{spareQuote.locator}</small></td><td>{spareQuote.quantity??'OPEN'}</td>
+     <td>{amount(spareQuote.rate,spareQuote.currency||'USD')} / Lot</td><td>{amount(spareQuote.total,spareQuote.currency||'USD')}<small>ยอดอะไหล่แยกจาก R11</small></td></tr>}
+   </tbody>
+  </table></div>
+  <p>จัดกลุ่มจากผล WP.7 ตาม MR → TAG / Location → เซลล์ BoQ / P/N / จำนวน → เจ้าของต้นทุน · — = ต้นทางเว้นว่าง · 0 = ต้นทางระบุศูนย์</p>
+  <div className="p55-review-toolbar">
+   {selected&&onNavigate&&<button type="button" onClick={()=>onNavigate(workRoute+owner.id)}>เปิดเจ้าของต้นทุน R11</button>}
+   {offer&&onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+offer.id)}>เปิด R11 ใน 07 Vendor</button>}
+   {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.working-preview.step.7')}>ตรวจ Mapping ใน WP.7</button>}
+  </div>
+  {offer?<SupplierQuoteBoq0550 offers={spares?[offer,spares]:[offer]} workingScope={{site,configurationOfferId:offer.id,groupFor,statusFor,costFor}}/>
+   :<p>OPEN · ยังไม่พบ CERAGON R11 ในทะเบียน 07 Vendor</p>}
+ </section>;
 }

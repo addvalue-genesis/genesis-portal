@@ -107,7 +107,7 @@ assert(Selection.ceragonR11ScopeCheck0550(apf,mr,offer,sources.map(s=>({...s,rev
 assert(Selection.ceragonR11ScopeCheck0550(apf,mr,{...offer,quoteEvidence:{...offer.quoteEvidence,sourceSha256:'changed'}},sources,[decision]).every(r=>r.state==='OPEN'&&!r.vendorReference));
 const working=W.deriveBidWorkspace(chosen,tokens,today,integration).provisional;
 assert.equal(working.lines.find(l=>l.id===current.id).provisionalCostNative,price.provisionalCostNative);
-const {DmrTagCost0550,DmrTagCostRows0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
+const {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
 const costView=dmrTagCostView0550(chosen,integration,working);
 const apfId='REQ-MR-B1-15-APF-01';
 const apfCost=dmrTagCostView0550(chosen,integration,working,apfId);
@@ -138,10 +138,53 @@ const inlineRows=lineId=>renderToStaticMarkup(React.createElement(DmrTagCostRows
 const apfInline=inlineRows(apfId);
 assert.equal((apfInline.match(/<tr /g)||[]).length,5,'Show three TAGs, cabinet and switch in the Working table');
 for(const value of ['APF-MR-320-201','APF-MR-320-202','APF-ANT-320-201','Access Switch 1 Ea.','Control Room',
- 'เปิดเจ้าของต้นทุน R11','อ้างแพ็กเกจ R11','OPEN'])assert(apfInline.includes(value),value);
+ 'เปิดเจ้าของต้นทุน R11','อ้างแพ็กเกจ R11','IDU แยก 0 ตัวตามแบบที่เลือก','OPEN'])assert(apfInline.includes(value),value);
 assert(!apfInline.includes('ACP-MR-320-001'),'APF cost rows are scoped to their MR parent');
 assert(!apfInline.includes('data-component-key'),'TAG references do not register additional Working owners');
 assert.match(inlineRows('REQ-MR-B1-15-ACP-01'),/ACP-MR-320-002.*RAD-308-001/);
 assert.match(inlineRows('REQ-MR-B1-15-APF-02'),/200 m.*75 m/);
+const withBoq=(o,terms)=>({...o,quoteEvidence:{...o.quoteEvidence,terms}});
+const r11=withBoq(offer,[
+ 'BoQ!C66:J66: IP-50CX-7-8w / IP-50CX 7-8GHz Basic Radio ROW / ACP(alternative)=1, APF(alternative)=1',
+ 'BoQ!C68:J68: DXCX07-161F-01W02-L / Low Diplexer / ACP(alternative)=1, APF(alternative)=0',
+ 'BoQ!C70:J70: IP-20C_DUAL_CPLR_kit_7-8G / Main option coupler / ACP(main)=1, APF(main)=1',
+ 'BoQ!C73:J73: SL-Capacity-150M / Capacity 150M / ACP(alternative)=2, APF(alternative)=2',
+ 'BoQ!C83:J83: GRND CABLE 16MM^2 / Grounding cable / ACP(alternative)=0.5, APF(alternative)=0.5',
+ 'BoQ!C84:J84: Outdoor_DC_cbl_2x14AWG_drum / DC cable / ACP(alternative)=0.5, APF(alternative)=0.5',
+ 'BoQ!C87:J87: IP-20_FO_MM_LC2LC_ARM_80m / Armored fiber / ACP(alternative)=1, APF(alternative)=1',
+ 'BoQ!C89:J89: AC/DC OUTDOOR 150W / Power supply / ACP(alternative)=1, APF(alternative)=1 / Optional if AC/DC required',
+ 'BoQ!C99:J99: UNMAPPED-PART / Unmapped vendor line / APF(alternative)=1',
+]);
+const r12=withBoq(chosen.offers.find(o=>o.id===Selection.CERAGON_R12_0550),[
+ 'BoQ!C66:J66: IP-50CX-7-8w / IP-50CX 7-8GHz Basic Radio ROW / Spares=2',
+ 'BoQ!C96:J96: SPARE-PART / Spare part / Spares=1',
+]);
+const workingBoq=(offers,lineId=apfId)=>renderToStaticMarkup(React.createElement(DmrWorkingBoq0550,{
+ offers,view:costView,lineId,provisional:true,onNavigate:()=>{},
+}));
+const apfBoq=workingBoq([r11,r12]);
+for(const value of ['IP-50CX-7-8w','SL-Capacity-150M','2+0 · ACP','2+0 · APF','Spares',
+ 'APF-MR-320-201 · Telecom Tower','APF · สายและ Interface','APF · Qty 0 ตาม BoQ',
+ 'APF · OPEN รอผูก TAG / Location','Spares · อ้างอิง R12 / C2','เปิดเจ้าของต้นทุน R11',
+ 'Fiber → Switch','DC Power','Grounding','2+0 Installation','ยอดกลุ่มอ้าง R11','เรตราย P/N','มีเงื่อนไขเมื่อจำเป็นต้องใช้ AC/DC',
+ 'BOM ที่เสนอใน R11 · APF · 7 P/N ที่มีจำนวน','เสนอใน R11 · 2+0','Qty 0 · ไม่ใช้ที่ไซต์นี้','อะไหล่ R12'])assert(apfBoq.includes(value),value);
+assert.equal((apfBoq.match(/data-supplier-boq-locator="BoQ!C66:J66"/g)||[]).length,1,'R11 and R12 keep their native columns on the same P/N row');
+assert(!apfBoq.includes('IP-20C_DUAL_CPLR_kit_7-8G'),'The selected BOM omits lines exclusive to the main 2+2 option');
+assert(apfBoq.indexOf('UNMAPPED-PART')<apfBoq.indexOf('APF · Qty 0 ตาม BoQ'),'Place the site BOM above reference groups');
+assert(!apfBoq.includes('ACP-MR-320-001'),'The APF module shows the APF mapping only');
+assert.match(workingBoq([r11,r12],'REQ-MR-B1-15-ACP-01'),/ACP-MR-320-001/);
+assert(!workingBoq([r11,withBoq({...r12,quoteEvidence:{...r12.quoteEvidence,sourceSha256:'different'}},r12.quoteEvidence.terms)]).includes('SPARE-PART'));
+assert.match(workingBoq([withBoq(offer,[])]),/ทะเบียน 07 Vendor ยังไม่มีรายละเอียด BoQ/);
+const quotedR11={...r11,quoteEvidence:{...r11.quoteEvidence,quotedUnitCost:29468,quotedTotal:0}};
+const quotedR12={...r12,quoteEvidence:{...r12.quoteEvidence,quotedUnitCost:7190,quotedTotal:7190}};
+const pricedOwner={...costView.owners.get(current.id),costRate:29468,provisionalCostNative:29468};
+const pricedBoq=renderToStaticMarkup(React.createElement(DmrWorkingBoq0550,{
+ offers:[quotedR11,quotedR12],view:{...costView,owners:new Map([[current.id,pricedOwner]])},lineId:apfId,provisional:true,
+}));
+assert.match(pricedBoq,/07 Vendor · R11.*?<td>0<small>QTY ในใบเสนอราคา.*?29,468\.00.*?\$0\.00/);
+assert.match(pricedBoq,/Working · R11 ต้นทุนสินค้าทั้งลิงก์ APF–ACP.*?1 Lot.*?29,468\.00/);
+assert.match(pricedBoq,/R12 Spares \/ C2.*?7,190\.00.*?ยอดอะไหล่แยกจาก R11/);
+assert.match(pricedBoq,/ยอดต้นทุนเฉพาะไซต์ \/ TAG.*?OPEN · รอราคาแยกหรือฐานจัดสรร/);
+assert(!pricedBoq.includes('44,202.00')&&!pricedBoq.includes('53,042.40'),'Product cost view does not show sell rates');
 assert.deepEqual(chosen,before);
 console.log('PASS DMR R11 SI: site TAG and MR quantities, scoped deviation, cable segments, ACP/APF BoQ, all 24 MR scope bullets, inline ABC cost trace, and unchanged Working price.');
