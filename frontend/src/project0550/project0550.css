@@ -1630,6 +1630,8 @@
 /* Numbered, copyable 0550 presentation: scoped away from frozen history/0553. */
 .p55-bid-presentation { --bid-accent:#526777; --bid-tint:#f0f4f7; grid-template-columns:minmax(0,1fr); }
 .p55-bid-presentation :is(.p55-panel,.p55-price-group,.p55-review-fields,.p55-table-wrap) { min-width:0; max-width:100%; }
+.p55-table tr.p55-dmr-cost-reference > td { background:var(--bid-tint,#f4f8fc); }
+.p55-table tr.p55-dmr-cost-reference > td:first-child { padding-left:1.5rem; }
 .p55-module-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; width:100%; min-width:0; }
 .p55-module-heading__title { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; min-width:0; }
 .p55-module-heading__title>strong { overflow-wrap:anywhere; }

@@ -9,6 +9,13 @@ const partTitles={A:'อุปกรณ์และสายตามตำแ�
 const physicalClauses=new Set([1,2,14,15,16,23]);
 const qty=(value,unit)=>value==null?'OPEN':value+' '+unit;
 
+function DmrVendorParts0550({parts}){
+ if(!parts?.length)return null;
+ return <details><summary>ชิ้นส่วน / License / อุปกรณ์ประกอบ</summary>
+  <ul>{parts.map(p=><li key={p.locator}>{p.part} · {p.locator}{p.quantity!=null&&` · Qty ${p.quantity}`}{p.note&&` · ${p.note}`}</li>)}</ul>
+ </details>;
+}
+
 export function dmrTagCostView0550(data,integration,working,lineId){
  const mrRows=MR_WORKING_CATALOG_0550.rows.filter(r=>r.systemToken==='TEL-DMR'&&r.wbs==='A'&&/^MR-B1-15-/.test(r.id));
  const requirements=(integration?.requirements||[]).filter(ceragonR11RequirementSite0550);
@@ -73,9 +80,9 @@ export function dmrTagCostView0550(data,integration,working,lineId){
  return {equipment,additional,owners,sites,affectedTags:allEquipment.filter(r=>r.source&&r.tag).map(r=>r.tag),offerIds:new Set(data.offers.map(o=>o.id))};
 }
 
-export function DmrTagCost0550({data,integration,working,lineId,onNavigate,onOpenSource=onNavigate}){
+export function DmrTagCost0550({data,integration,working,lineId,costView,onNavigate,onOpenSource=onNavigate}){
  const [part,setPart]=useState('A'),[site,setSite]=useState('');
- const view=useMemo(()=>dmrTagCostView0550(data,integration,working,lineId),[data,integration,working,lineId]);
+ const view=useMemo(()=>costView||dmrTagCostView0550(data,integration,working,lineId),[costView,data,integration,working,lineId]);
  const selectedSite=view.sites.includes(site)?site:'';
  const equipment=part==='A'?view.equipment.filter(r=>!selectedSite||r.site===selectedSite)
   .sort((a,b)=>a.site.localeCompare(b.site)||a.location.localeCompare(b.location)):[];
@@ -107,8 +114,7 @@ export function DmrTagCost0550({data,integration,working,lineId,onNavigate,onOpe
      {source(r)}{r.cusReference&&<small><a href={r.cusReference.url} target="_blank" rel="noreferrer">{r.cusReference.label}</a></small>}
     </td><td>{qty(r.required,r.unit)}{r.tagQuantityOpen&&<small>แถวนี้อ้าง 1 TAG จาก DTS · รอยืนยันจำนวนที่ TAG ครอบคลุม</small>}
      {r.routes&&<small>ยอดรวมต่อไซต์ · ความยาวรายช่วง OPEN</small>}</td>
-    <td>{qty(r.offered,r.offerUnit)}{r.routes&&r.offered!=null&&<small>ระยะที่ Offer ระบุสำหรับจุดต่อแบบ Full Outdoor</small>}{r.vendorReference?.parts.length>0&&<details><summary>ชิ้นส่วน / License / อุปกรณ์ประกอบ</summary>
-     <ul>{r.vendorReference.parts.map(p=><li key={p.locator}>{p.part} · {p.locator}{p.quantity!=null&&` · Qty ${p.quantity}`}{p.note&&` · ${p.note}`}</li>)}</ul></details>}</td>
+    <td>{qty(r.offered,r.offerUnit)}{r.routes&&r.offered!=null&&<small>ระยะที่ Offer ระบุสำหรับจุดต่อแบบ Full Outdoor</small>}<DmrVendorParts0550 parts={r.vendorReference?.parts}/></td>
     <td><strong>{r.label}</strong><small>{r.reason}</small>{r.packageRef&&<small>อ้างต้นทุน R11 ทั้งลิงก์ · ยอดในทะเบียนเจ้าของด้านล่าง</small>}
      {refs(r)}{jump('bid.working-preview.requirement.'+r.requirementId,'เปิดข้อกำหนด')}</td></tr>)}</tbody>
   </table></div>}
@@ -128,10 +134,29 @@ export function DmrTagCost0550({data,integration,working,lineId,onNavigate,onOpe
  </section>;
 }
 
-export function DmrTagCostDetails0550(props){
- const [open,setOpen]=useState(false);
- return <details onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
-  <summary>ตรวจ TAG / Location และต้นทุนประกอบ</summary>
-  {open&&<DmrTagCost0550 {...props}/>}
- </details>;
+export function DmrTagCostRows0550({view,lineId,onNavigate,onOpenSource=onNavigate}){
+ const requirementId='REQDEF-'+lineId.slice(4);
+ const equipment=view.equipment.filter(r=>r.mrLineId===lineId);
+ const additional=view.additional.filter(r=>r.requirementId===requirementId);
+ return [...equipment,...additional].map(r=>{
+  const isEquipment=Boolean(r.component);
+  const title=r.tag?(r.source?r.tag:`TAG รอยืนยัน · ${r.tag}`):r.component||r.itemName;
+  return <tr key={r.id||r.title} className="p55-dmr-cost-reference" data-dmr-tag-parent={lineId} data-dmr-tag={r.tag}>
+   <td><strong>{title}</strong><small>{r.tag?r.component:r.title||'รายการประกอบ / อ้างอิง MR'} · {r.site}</small>
+    {r.location&&<small>{r.location}</small>}
+    {r.routes?.map(route=><small key={route.title}>{route.title}{route.endpoints&&` · ${route.endpoints}`}</small>)}</td>
+   <td>{isEquipment?<>CUS {qty(r.required,r.unit)}
+    {r.routes&&<small>ยอดรวมต่อไซต์ · ระยะรายช่วง OPEN</small>}
+    {r.tagQuantityOpen&&<small>ตรวจจำนวนที่ TAG ครอบคลุม</small>}
+    {r.offered!=null&&<small>CERAGON R11 {qty(r.offered,r.offerUnit)}{r.routes&&' · จุดต่อ Full Outdoor'}</small>}
+    <DmrVendorParts0550 parts={r.vendorReference?.parts}/>
+   </>:<>{r.requirement}<small>{r.reference}</small></>}
+    {r.source&&onOpenSource&&<button type="button" onClick={()=>onOpenSource('bid.documents.source.'+r.source.id)}>DTS · {r.source.locator.split(' / ').at(-1)}</button>}</td>
+   <td>{r.packageRef?'อ้างแพ็กเกจ R11':r.workLineIds.length?'อ้างเจ้าของต้นทุน':'OPEN'}</td>
+   <td>—</td><td>—</td>
+   <td><strong>{r.label||'ตรวจขอบเขต / เจ้าของต้นทุน'}</strong><small>{r.reason||r.action}</small>
+    {r.workLineIds.map(id=>onNavigate&&<button key={id} type="button" onClick={()=>onNavigate(workRoute+id)}>
+     {id===CERAGON_LINK_OWNER_0550?'เปิดเจ้าของต้นทุน R11':view.owners.get(id)?.description||id}</button>)}</td>
+  </tr>;
+ });
 }

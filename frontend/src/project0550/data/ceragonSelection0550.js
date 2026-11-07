@@ -231,11 +231,11 @@ export function dmrMrAdditionalScope0550(requirements) {
   const apfRows = [
     ['Microwave Cabinet', 'APF · MR-320 ใช้ร่วมกับ Wireless Broadband IDU', 'ไม่มีบรรทัดตู้ใน BoQ Option 2 คอลัมน์ I · ตรวจเจ้าของตู้และงานประกอบร่วม'],
     ['Access Switch', 'APF · ตรวจ TAG จากแบบ LAN', 'CERAGON ระบุไม่รวม Switch/Router ที่ Offer!F11 · ตรวจขอบเขต LAN ของ ADDVALUE'],
-  ].map(([name,title,action])=>({reference:'p21 · APF Item 1.0', title,
+  ].map(([name,title,action])=>({reference:'p21 · APF Item 1.0', title, itemName:name,
     requirement:apfComponents.find(component=>component.startsWith(name)) || name, action, requirementId:apf?.id}));
   return [
     ...(apf ? apfRows : []),
-    ...(acp ? [{reference:'p21 · ACP Item 1.0', title:'ACP · ตู้ร่วม RAD-308-001',
+    ...(acp ? [{reference:'p21 · ACP Item 1.0', title:'ACP · ตู้ร่วม RAD-308-001', itemName:'Radio Cabinet · RAD-308-001',
       requirement:'ตำแหน่งติดตั้ง IDU ตาม MR / DTS / LIS', action:'ตรวจจุดต่อของ Full Outdoor กับตู้ Radio เดิม · MR แถว ACP ไม่แยกจำนวนตู้', requirementId:acp.id}] : []),
     ...dmrMrObligations.map(([bullets,title,action,activities=[],offers=[]])=>({
       reference:'p22 · ข้อ '+bullets.join(', '), bullets, title, action,

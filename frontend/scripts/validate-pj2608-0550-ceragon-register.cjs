@@ -107,7 +107,7 @@ assert(Selection.ceragonR11ScopeCheck0550(apf,mr,offer,sources.map(s=>({...s,rev
 assert(Selection.ceragonR11ScopeCheck0550(apf,mr,{...offer,quoteEvidence:{...offer.quoteEvidence,sourceSha256:'changed'}},sources,[decision]).every(r=>r.state==='OPEN'&&!r.vendorReference));
 const working=W.deriveBidWorkspace(chosen,tokens,today,integration).provisional;
 assert.equal(working.lines.find(l=>l.id===current.id).provisionalCostNative,price.provisionalCostNative);
-const {DmrTagCost0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
+const {DmrTagCost0550,DmrTagCostRows0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
 const costView=dmrTagCostView0550(chosen,integration,working);
 const apfId='REQ-MR-B1-15-APF-01';
 const apfCost=dmrTagCostView0550(chosen,integration,working,apfId);
@@ -132,5 +132,16 @@ const costHtml=renderToStaticMarkup(React.createElement(DmrTagCost0550,{data:cho
 for(const value of ['Control Room','APF-MR-320-202','Access Switch 1 Ea.','Part B','Part C','BoQ!I73','ต้นทุน Working ตามเจ้าของเดิม'])assert(costHtml.includes(value),value);
 assert(!costHtml.includes('ACP-MR-320-001'),'APF equipment editor stays scoped to APF');
 assert.equal((costHtml.match(/CERAGON ACP–APF microwave link \/ RevA1 R11 2\+0/g)||[]).length,1,'Package ledger shows the cost owner once');
+const inlineRows=lineId=>renderToStaticMarkup(React.createElement(DmrTagCostRows0550,{
+ view:costView,lineId,onNavigate:()=>{},onOpenSource:()=>{},
+}));
+const apfInline=inlineRows(apfId);
+assert.equal((apfInline.match(/<tr /g)||[]).length,5,'Show three TAGs, cabinet and switch in the Working table');
+for(const value of ['APF-MR-320-201','APF-MR-320-202','APF-ANT-320-201','Access Switch 1 Ea.','Control Room',
+ 'เปิดเจ้าของต้นทุน R11','อ้างแพ็กเกจ R11','OPEN'])assert(apfInline.includes(value),value);
+assert(!apfInline.includes('ACP-MR-320-001'),'APF cost rows are scoped to their MR parent');
+assert(!apfInline.includes('data-component-key'),'TAG references do not register additional Working owners');
+assert.match(inlineRows('REQ-MR-B1-15-ACP-01'),/ACP-MR-320-002.*RAD-308-001/);
+assert.match(inlineRows('REQ-MR-B1-15-APF-02'),/200 m.*75 m/);
 assert.deepEqual(chosen,before);
-console.log('PASS DMR R11 SI: site TAG and MR quantities, scoped deviation, cable segments, ACP/APF BoQ, all 24 MR scope bullets, ABC cost trace by location, and unchanged Working price.');
+console.log('PASS DMR R11 SI: site TAG and MR quantities, scoped deviation, cable segments, ACP/APF BoQ, all 24 MR scope bullets, inline ABC cost trace, and unchanged Working price.');
