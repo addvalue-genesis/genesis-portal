@@ -297,3 +297,30 @@ The current Rev.36 model and browser checks reconcile the two DMR owners to the
 deletions, stale-quote handling, the Official HOLD and existing export cells.
 The older optional 4-Nov completion fixture reports the same stale-basis check
 failure on the parent. Standard completion, release and native Exhibit tests pass.
+
+## 7-Nov-2026. B8 licence fee research results Rev.01
+
+Reviewed the submitted research against the publication for each rate. Myanmar's
+WTO notification G/LIC/N/3/MMR/3 (2025), section 19, paragraph 12, states no
+fee for PTD Recommendation Approval and MMK 90,000 for the telecom import
+licence. The 2026 notification was located in the index but its clause was
+unavailable to this review. The project still needs the actual HS/CIF and
+invoice. Recommendation, equipment type approval and testing are separate.
+
+The TradeNet reference shows the fee changes reported by DFDL under Newsletter
+6/2025, effective 15 October 2025. Apply membership once per applicable
+account and application/amendment fees by actual event. The source is a
+secondary summary. PTD's displayed Ship Station and Aircraft Station rates
+are comparison categories. They do not establish the rate for the project's
+coast, ground or NDB stations. The WLAN SRD technical reference requires a
+model and deployment check before treating an RF device as exempt. Confirm
+the applicability and rates of DCA and local construction approvals.
+
+Each of the 19 system rows now states its fee position. For the nine original
+gap rows, N/A is restricted to the specified wired or structural case.
+TVRO, optional RF and other approvals are shown separately. The COMMON
+coverage and B8-D01 through B8-D05 ownership are retained. These additions
+are informational in Working only. The existing budget and Volume I
+allocations do not incorporate the published rates as new charges. ADR-0550-001
+principles 2, 4–6, 8 and 10 apply. Verified with the Native Exhibit and Bid
+Completion checks and a production webpack compile.

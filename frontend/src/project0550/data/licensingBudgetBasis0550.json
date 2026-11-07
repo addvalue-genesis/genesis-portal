@@ -31,6 +31,10 @@
     "advanceBasis":"หากขอให้ ADDVALUE สำรองจ่าย ต้องตกลงเป็นหนังสือหรือ PO ก่อนชำระ โดยระบุประเภทค่าธรรมเนียม วงเงิน สกุลเงิน ผู้อนุมัติ ใบแจ้งหนี้หรือใบเสร็จราชการ หลักเกณฑ์ FX และกำหนดคืนเงิน แยกค่าบริการตัวแทนออกจากยอดราชการ",
     "rates": {
       "mocUrl":"https://www.myanmartradeportal.gov.mm/index.php/print/procedure/37/description",
+      "wtoTelecomUrl":"https://web.wtocenter.org.tw/downFiles/13645/416645/00GowPxxDOAl9F6huEkT0dcTec1zFMqdXRkGU4tXBIwAoIhxiYWaI7zA700000hcyOkb6RGzLZlgC7Gp4j4Phrk4Dg3Q%3D%3D#page=37",
+      "tradeNetNewsletterSummaryUrl":"https://www.dfdl.com/insights/legal-and-tax-updates/myanmar-updates-on-myanmar-trade-service-fees",
+      "ptdSrdUrl":"https://www.ptd.gov.mm/Uploads/Reports/Attach/102021/211511422102021_SRD%20Website%20Letter.pdf",
+      "dcaObstaclesUrl":"https://dcamyanmar.com/dcadca/images/ASSD/DCA-AC-AGA%2001%20Control%20of%20Obstacles-2nd%20Edition-Oct%202019.pdf",
       "ptdUrl":"https://www.ptd.gov.mm/ServicesDetail.aspx?id=LUKdZ6dcujUriHlPirNYSQ%3D%3D",
       "contractUrl":"https://docs.google.com/document/d/1M5CQ7GsMhNvNEnPMB-pcJTeU9J4QR5LM/edit",
       "mocImportTiers":[
@@ -40,21 +44,38 @@
         {"cifMMK":"50,000,001–150,000,000","feeMMK":80000},
         {"cifMMK":"≥ 150,000,000","feeMMK":90000}
       ],
+      "importFeeReferences":[
+        {"label":"PTD Recommendation Approval · WTO 2025 §19.12","mmk":0},
+        {"label":"MOC Telecom Import Licence · อัตราที่แจ้ง WTO 2025 §19.12 / ใบ","mmk":90000},
+        {"label":"TradeNet · สมาชิก / บัญชี / ปี · อ้างอิง Newsletter 6/2025","mmk":50000},
+        {"label":"TradeNet · Online Application / คำขอ · อ้างอิง Newsletter 6/2025","mmk":10000},
+        {"label":"TradeNet · แก้ไขใบอนุญาต / ครั้ง · อ้างอิง Newsletter 6/2025","mmk":10000}
+      ],
       "microwave":{"bandGHz":7,"bandwidthMHz":28,"initialMMK":3000000,"perMHzMMK":70000,"minimumMMK":120000,"publishedYear":2018},
       "ptdUnitReferences":[
         {"label":"Private Network · ค่าแรกเข้า / สิทธิ","mmk":210000},
+        {"label":"Private Network · Single Channel ≤12.5 kHz / ปี","mmk":52500},
+        {"label":"Private Network · Single Channel >12.5 kHz / ปี","mmk":105000},
+        {"label":"Private Network · Two Channel / Repeater ≤12.5 kHz / ปี","mmk":105000},
+        {"label":"Private Network · Two Channel / Repeater >12.5 kHz / ปี","mmk":210000},
         {"label":"Private Network · วิทยุมือถือหรือประจำรถ / เครื่อง / ปี","mmk":10500},
         {"label":"Private Network · Repeater / สถานี / ปี","mmk":52500},
         {"label":"Private Network · Base Station / สถานี / ปี","mmk":105000},
         {"label":"VSAT Network · ค่าแรกเข้า / สิทธิ","mmk":1050000},
         {"label":"Commercial VSAT · Terminal / ปี","mmk":157500},
-        {"label":"Private VSAT · Terminal / ปี","mmk":105000}
+        {"label":"Private VSAT · Terminal / ปี","mmk":105000},
+        {"label":"Satellite Spectrum · ส่วนขั้นต่ำในสูตรรายปี","mmk":420000},
+        {"label":"Ship / Aircraft Station · ค่าแรกเข้า (เทียบเคียง)","mmk":210000},
+        {"label":"Ship / Aircraft Station · ค่าใช้คลื่นรายปี (เทียบเคียง)","mmk":157500},
+        {"label":"Ship / Aircraft Station · ค่าต่ออายุสิทธิรอบ 5 ปี (เทียบเคียง)","mmk":105000},
+        {"label":"Ship Station · ค่ายื่นต่อเครื่อง (เทียบเคียง)","mmk":5000},
+        {"label":"Aircraft Station · ค่ายื่น Equipment Licence (เทียบเคียง)","mmk":5000}
       ],
       "fx":{"date":"2026-11-06","url":"https://forex.cbm.gov.mm/index.php/fxrate","marketMMKPerTHB":109.11,"referenceMMKPerTHB":62.60}
     },
     "items":[
       {"fee":"MOC Import Licence / Permit","scope":"รายคำขอตาม CIF และชุดนำเข้า รวมแก้ไข/ต่ออายุเฉพาะที่จำเป็น","responsibility":"TSI จัดข้อมูลผ่าน FaFE; ผู้นำเข้าที่ได้รับมอบหมายยื่นและชำระตามใบแจ้งของ MOC; ยืนยันผู้รับต้นทุนกับ COMPANY/CNEEC","timing":"Annex 6 §5.3.1 ให้ยื่น FaFE อย่างน้อย 6 เดือนก่อน shipment; ชำระเมื่อ MOC อนุมัติเพื่อรับใบอนุญาต และคุมวันหมดอายุถึงการนำเข้า"},
-      {"fee":"Type Approval / PTD Import Recommendation / DCA","scope":"ตามรุ่นอุปกรณ์และประเภทการอนุมัติ; DCA สำหรับ NDB/Air-band ที่เข้าข่าย ค่าธรรมเนียม PTD Recommendation รอยืนยัน","responsibility":"VND ส่งข้อมูลผลิตภัณฑ์; TSI จัด dossier; ผู้ยื่นและผู้ชำระค่าราชการกำหนดตามคำขอ","timing":"ให้ได้หนังสืออนุมัติก่อนยื่น MOC ในรายการที่ต้องขออนุมัติล่วงหน้า"},
+      {"fee":"Type Approval / PTD Import Recommendation / DCA","scope":"ตามรุ่นอุปกรณ์และประเภทการอนุมัติ; DCA สำหรับ NDB/Air-band ที่เข้าข่าย WTO 2025 §19.12 ระบุ PTD Recommendation Approval ไม่มีค่าธรรมเนียม ส่วน Type Approval/ทดสอบและค่า DCA รอยืนยันแยกตามรุ่น","responsibility":"VND ส่งข้อมูลผลิตภัณฑ์; TSI จัด dossier; ผู้ยื่นและผู้ชำระค่าราชการกำหนดตามคำขอ","timing":"ให้ได้หนังสืออนุมัติก่อนยื่น MOC ในรายการที่ต้องขออนุมัติล่วงหน้า"},
       {"fee":"Radio / Station / Frequency / Operating Licence","scope":"แยกค่าแรกเข้าและค่าใช้คลื่น/อุปกรณ์รายปี ตรวจผู้ถือสิทธิ สถานี ลิงก์ ช่องสัญญาณและ bandwidth","responsibility":"LIS Item 12 ให้ COMPANY ขอสิทธิใช้คลื่น; SPE §7.1 ให้ TSI ดำเนินการในนาม COMPANY; ผู้ชำระและวิธีส่งผ่าน CNEEC ยังต้องยืนยัน","timing":"มีใบอนุญาตก่อน deployment ตาม SPE; ก่อนส่งมอบให้ระบุวันหมดอายุ เจ้าของการต่ออายุ และภาระหลังส่งมอบ"},
       {"fee":"Customs Duty / Import Tax","scope":"อากรและภาษีของแต่ละ shipment แยกจากค่าใบอนุญาต B8","responsibility":"ตาม Incoterm และ Purchase Agreement ของแพ็กเกจ; สิทธิคืนตาม EPC §31.5.2 เป็นระหว่างคู่สัญญา EPC และมีเงื่อนไข","timing":"ตรวจสิทธิยกเว้นและแจ้งผู้เกี่ยวข้องก่อนชำระและผ่านพิธีการ หากต้องเบิกให้ใช้หลักฐานและรอบที่ตกลง"}
     ]

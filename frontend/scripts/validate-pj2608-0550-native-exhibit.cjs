@@ -42,13 +42,19 @@ const displayedTokens=Array.from(workingLicences.matchAll(/data-licensing-system
 assert.equal(systemTokens.length,19);
 assert.equal((workingLicences.match(/data-licensing-common=/g)||[]).length,1);
 assert(BID_GROUPS_0550.some(group=>group.part==='A'&&group.code==='COMMON'));
-assert(workingLicences.includes('PTD Recommendation รอยืนยัน'));
+assert(workingLicences.includes('PTD Recommendation Approval ไม่มีค่าธรรมเนียม'));
+assert(workingLicences.includes('PTD Recommendation Approval · WTO 2025 §19.12</th><td>0 MMK'));
+assert(workingLicences.includes('TradeNet · Online Application / คำขอ · อ้างอิง Newsletter 6/2025</th><td>10,000 MMK'));
+assert(workingLicences.includes('หมวด Coast/Shore Station'));
+assert(workingLicences.includes('รอ PTD/DCA ยืนยันหมวด Ground Station'));
+assert(!workingLicences.includes('ยังไม่มีฐานตั้งค่าธรรมเนียม RF ในขอบเขตที่ตรวจ'));
+assert(!customerLicences.includes('WTO 2025'));
 assert(!customerLicences.includes('data-licensing-common'));
 assert.deepEqual(displayedTokens,systemTokens);
 assert.deepEqual(Object.keys(LICENSING_SYSTEM_REVIEW_0550).sort(),[...systemTokens].sort());
 for(const token of displayedTokens){
  const review=LICENSING_SYSTEM_REVIEW_0550[token];
- assert(review.goods&&review.basis&&review.item&&review.page);
+ assert(review.goods&&review.basis&&review.fee&&review.item&&review.page);
  assert(BID_GROUPS_0550.some(group=>group.part==='A'&&group.code===token),token);
 }
 assert.equal((workingLicences.match(/CUS ระบุให้ตรวจใบอนุญาต/g)||[]).length,7);

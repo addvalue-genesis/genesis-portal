@@ -34,6 +34,7 @@ function SystemLicenceReview0550({onNavigate,disabled}){
   <summary>Import Licence และ Operating Licence · ครบ {SYSTEMS.length} ระบบ + COMMON</summary>
   <p>เข้าทะเบียน Import ทุกบรรทัดที่มีสินค้านำเข้า รวมอุปกรณ์เสริมและอะไหล่ ตรวจ HS code, CIF, ผู้ยื่น และใบอนุญาตของแต่ละชุดนำเข้า รายการ COMPANY / ผู้ให้บริการ / Offshore ให้ติดตามแยกจากยอด TSI ส่วนของที่จัดหาในเมียนมาให้แยกออกจากชุดนำเข้า <a href={budget.logisticsInstruction.url+"#page=10"}>Logistics Instruction R03</a></p>
   <p>หนึ่งคำขออาจครอบคลุมหลายระบบ คิดค่าราชการตามคำขอหรือสิทธิจริงใน B8-D05 และแยกจากค่าเตรียมเอกสาร TSI</p>
+  <p>ผลวิจัย Rev.01 · N/A ในตารางใช้กับค่าคลื่นเฉพาะกรณีแบบสายหรือโครงสร้างที่ระบุ ส่วน Import และ Type Approval ยังตรวจแยกตามอุปกรณ์ <a href={budget.officialFees.rates.ptdSrdUrl}>PTD · ข้อกำหนดเทคนิค SRD</a> · <a href={budget.officialFees.rates.dcaObstaclesUrl}>DCA · Control of Obstacles</a></p>
   <div className="p55-table-wrap"><table className="p55-table" aria-label="Import and operating licence review by system">
    <thead><tr><th scope="col">ระบบ / Working</th><th scope="col">Import Licence · ขอบเขตและผู้ยื่น</th><th scope="col">Operating Licence · ผลอ่าน CUS</th><th scope="col">สถานะค่าธรรมเนียม</th></tr></thead>
    <tbody>{SYSTEMS.map(({token,name})=>{
@@ -43,7 +44,7 @@ function SystemLicenceReview0550({onNavigate,disabled}){
      <td>{review?.goods || "ตามรายการนำเข้า · รอทบทวนขอบเขต"}</td>
      <td><strong>{OPERATION_REVIEW[review?.operation] || "รอทบทวนเอกสาร"}</strong><small>{review?.basis}</small>
       {review&&<a href={LICENSING_INTERFACE_0550+"#page="+review.page}>LIS-0004 Rev.B1 · Item {review.item}</a>}</td>
-     <td>{review?.fee || (review?.operation==="none"?"ยังไม่มีฐานตั้งค่าธรรมเนียม RF ในขอบเขตที่ตรวจ":"รอยืนยันประเภทสิทธิ อัตรา และผู้ชำระ")}</td>
+     <td>{review?.fee || "รอยืนยันประเภทสิทธิ อัตรา และผู้ชำระ"}</td>
     </tr>;
    })}
    <tr data-licensing-common="true">
@@ -67,6 +68,7 @@ function LicenceFeeReferences0550({rates}){
  const annualMMK=microwave.bandwidthMHz*microwave.perMHzMMK+microwave.minimumMMK;
  const feeRows=[
   ...rates.mocImportTiers.map(({cifMMK,feeMMK})=>({label:"MOC · CIF "+cifMMK+" MMK",mmk:feeMMK})),
+  ...rates.importFeeReferences,
   {label:"Microwave · ค่าแรกเข้า",mmk:microwave.initialMMK},
   {label:"Microwave · ค่าใช้คลื่นรายปี",mmk:annualMMK},
   {label:"Microwave · รวมปีแรก",mmk:microwave.initialMMK+annualMMK},
@@ -82,9 +84,12 @@ function LicenceFeeReferences0550({rates}){
    </tr>)}</tbody>
   </table></div>
   <p>MOC แสดงค่าราชการต่อคำขอตามมูลค่า CIF ให้ยืนยันขั้น CIF ที่จุด 150,000,000 MMK และค่าบริการเพิ่มเติมจากใบแจ้งชำระจริง <a href={rates.mocUrl}>Myanmar National Trade Portal</a></p>
+  <p>Myanmar แจ้ง WTO ปี 2025 ว่า PTD Recommendation Approval ไม่มีค่าธรรมเนียม และ MOC Telecom Import Licence มีค่าธรรมเนียม 90,000 MMK ให้ตรวจการจัดประเภท HS/CIF และใบแจ้งชำระจริง ค่า Type Approval การทดสอบ และค่าตัวแทนตรวจแยก <a href={rates.wtoTelecomUrl}>WTO G/LIC/N/3/MMR/3 · §19 ข้อ 12</a></p>
+  <p>ค่าบริการ TradeNet อ้างอิงสรุป Newsletter 6/2025 มีผล 15 ต.ค. 2025 ตรวจว่าผู้นำเข้ามีสมาชิกอยู่แล้วหรือไม่ และคิดค่าคำขอ/แก้ไขตามที่เกิดจริง <a href={rates.tradeNetNewsletterSummaryUrl}>DFDL · สรุปประกาศและอัตรา</a></p>
   <p><strong>กรณีสมมติจาก Rev.01</strong> · {applications.join("–")} คำขอ × {formatMMK.format(cifTierFeeMMK)} MMK ในขั้น CIF สูงสุด = {comparisonMMK.map(mmk=>formatMMK.format(mmk)).join("–")} MMK · {rangeTHB(fx.marketMMKPerTHB)} ตาม Market Trading หรือ {rangeTHB(fx.referenceMMKPerTHB)} ตาม Reference ใช้เทียบเฉพาะค่าคำขอ MOC จนกว่าจะทราบจำนวนคำขอและ CIF จริง</p>
   <p>Microwave {microwave.bandGHz} GHz / {microwave.bandwidthMHz} MHz เป็นตัวอย่างสำหรับหนึ่งลิงก์ที่ต้องขอสิทธิใหม่ในหมวด Link by Link ตามตารางที่ PTD เผยแพร่ปี {microwave.publishedYear} ค่าใช้คลื่นรายปีคำนวณจาก {microwave.bandwidthMHz} × {formatMMK.format(microwave.perMHzMMK)} + {formatMMK.format(microwave.minimumMMK)} MMK ให้ยืนยันอัตราปัจจุบัน หน่วยที่ PTD คิดจริง และสิทธิเดิมของ COMPANY รวมถึงกรณี Main/Standby ว่าได้รับสิทธิช่องเดียวกันหรือแยกช่อง <a href={rates.ptdUrl}>PTD · Link by Link</a></p>
   <p>Private Network และ VSAT แสดงเฉพาะอัตราต่อหน่วยบางรายการจากตาราง PTD ปี {microwave.publishedYear} ให้ยืนยันหมวดสิทธิและจำนวนอุปกรณ์ที่คิดเงินจริง รวมค่าใช้คลื่นรายปีและค่าธรรมเนียมอื่นก่อนรวมยอด โดยตรวจสิทธิเดิมของ COMPANY หรือผู้ให้บริการด้วย</p>
+  <p>อัตรา Ship Station และ Aircraft Station ใช้เทียบเคียงเท่านั้น หมวดและอัตราสำหรับ Coast/Shore, Air-band Ground Station และ NDB ของโครงการยังต้องยืนยันกับ PTD/DCA <a href={rates.ptdUrl}>PTD · Ship / Aircraft Station</a></p>
  </>;
 }
 
