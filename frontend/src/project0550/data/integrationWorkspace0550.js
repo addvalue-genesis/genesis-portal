@@ -1,6 +1,7 @@
 import {mgwCurrentRequirementTrace0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
 import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {validateTagBindings0550,tagBindingProblems0550} from './tagEvidence0550';
+import {CERAGON_R11_0550,ceragonR11Selected0550,ceragonR11RequirementSite0550,ceragonR11Dts0550,ceragonR11ScopeCheck0550} from './ceragonSelection0550';
 // ADR-0550-001 principles 1–14: source → engineering proof → allocation → output.
 // This module derives workflow state; it never writes quantities, prices or approvals.
 import mr from "./mrWorkingCatalog0550.json";
@@ -51,6 +52,10 @@ export function integrationRecordBasis0550(data,collection,r){
  const common={record:clean(r),requirement:clean(req),sources:ids.map(id=>sourcesFor(data,[id])[0]||{id,missing:true}),offers:[...new Set([...(req?.offerIds||[]),...(req?.tagBindings||[]).flatMap(b=>b.offerIds)])].map(id=>data.offers.find(o=>o.id===id)||{id,missing:true}),lines:(req?.workLineIds||[]).map(id=>lineBasis(data.lines.find(l=>l.id===id))||{id,missing:true})};
  if(req?.tagBindings?.length)common.tagDocuments=[...new Set(req.tagBindings.flatMap(b=>b.vdrlIds))].map(id=>data.bidVolumes?.vdrl?.find(v=>v.id===id)||{id,missing:true});
  if(req)common.topology=integrationTopologyBasis0550(data,req.systemToken);
+ if(req&&ceragonR11RequirementSite0550(req)&&ceragonR11Selected0550(data)){
+  common.dmrDts=ceragonR11Dts0550(data);
+  common.dmrOffer=data.offers.find(o=>o.id===CERAGON_R11_0550)||null;
+ }
  if(collection==="proofs")common.calculation=data.calculations.find(c=>c.id===r.calculationId)||null;
  if(req&&collection!=="particulars")common.particulars=w.particulars.filter(p=>particularApplies0550(p,req)).map(p=>({record:p,sources:p.references.map(ref=>sourcesFor(data,[ref.sourceId])[0]||{id:ref.sourceId,missing:true})}));
  if(collection==="avlChecks"){
@@ -166,9 +171,19 @@ export function deriveIntegration0550(data,systems,today){
   if(!a.workLineId||!data.lines.some(l=>l.id===a.workLineId&&(req?.workLineIds||[]).includes(l.id)))problems.push("ACTIVITY_COST_OWNER_OPEN");
   return {...a,problems,state:problems.length?"OPEN":"REVIEWED_PLAN"};
  });
+ const r11Active=ceragonR11Selected0550(data),r11Dts=r11Active?ceragonR11Dts0550(data):[];
+ const r11Offer=r11Active?data.offers.find(o=>o.id===CERAGON_R11_0550):null;
  const rows=requirements.map(r=>{
   const problems=[...readEvidence(r.sourceIds,r.sourceLocator,r.sourceExcerpt),...reviewProblems(data,"requirements",r,today)];
   const relatedProofs=proofs.filter(p=>p.requirementId===r.id),relatedActivities=activities.filter(a=>a.requirementId===r.id);
+  const dmrChecks=r11Active&&ceragonR11RequirementSite0550(r)?
+   ceragonR11ScopeCheck0550(r,mr.rows.find(row=>r.id==="REQDEF-"+row.id),r11Offer,r11Dts,deviations):[];
+  if(dmrChecks.length){
+   for(const check of dmrChecks)if(['OPEN','DEVIATION_PENDING'].includes(check.state))
+    problems.push(`DMR_${check.state} / ${check.site} / ${check.tag||'CABLE_INTERFACE'}`);
+   if(r.disposition==='NOT_APPLICABLE')problems.push('DMR_R11_SCOPE_DISPOSITION_OPEN');
+   if(dmrChecks.some(check=>check.tag)&&!relatedProofs.some(p=>p.state==='REVIEWED_PROOF'))problems.push('ENGINEERING_PROOF_OPEN');
+  }
   for(const d of deviations.filter(d=>d.requirementId===r.id))if(d.problems.length)problems.push("TECHNICAL_DEVIATION_OPEN / "+d.id);
   const relatedParticulars=particulars.filter(p=>particularApplies0550(p,r));
   for(const p of relatedParticulars)if(p.problems.length)problems.push("PARTICULAR_OPEN / "+p.id);
@@ -202,7 +217,7 @@ export function deriveIntegration0550(data,systems,today){
    workLineIds:[...new Set([...r.workLineIds,...data.lines.filter(l=>l.selected&&currentMgwIds.includes(l.offerId)).map(l=>l.id)])],
    supplierLocator:currentMgw.map(o=>o.quoteEvidence.locator).join(' / '),
   }:{};
-  return {...r,...trace,proofs:relatedProofs,activities:relatedActivities,particulars:relatedParticulars,problems:[...new Set(problems)],state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):r.disposition==="NOT_APPLICABLE"?"NOT_APPLICABLE":"REVIEWED_MAPPING"};
+  return {...r,...trace,...(dmrChecks.length?{dmrChecks}:{}),proofs:relatedProofs,activities:relatedActivities,particulars:relatedParticulars,problems:[...new Set(problems)],state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):r.disposition==="NOT_APPLICABLE"?"NOT_APPLICABLE":"REVIEWED_MAPPING"};
  });
  const tokens=[...new Set([...systems.map(s=>typeof s==="string"?s:s.token),"COMMON",...requirements.map(r=>r.systemToken),...w.particulars.map(p=>p.systemToken),...w.documentReviews.flatMap(d=>d.systemTokens)])];
  const scopes=tokens.map(id=>{const review=w.scopeReviews.find(r=>r.id===id),rs=rows.filter(r=>r.systemToken===id),problems=[];
