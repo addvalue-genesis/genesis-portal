@@ -7,6 +7,7 @@
     {"label":"Import Licence / Import Permit","quantity":2,"unit":"ชุดงานนำเข้า/ส่งออกตามแผน","rateTHB":25000},
     {"label":"Radio / Operating Licence, frequency and related approvals","quantity":5,"unit":"ชุดเอกสารกลุ่มวิทยุ","rateTHB":50000}
   ],
+  "importScenarioRev01":{"applications":[8,15],"cifTierFeeMMK":90000},
   "benchmark0553": {
     "requirementsUrl":"https://github.com/addvalue-genesis/genesis-portal/blob/d940fff7331a10843cb35b4bb0e11c9e36c23033/frontend/src/project0553/data/documentParticularRequirements0553.json#L1228-L1242",
     "costUrl":"https://github.com/addvalue-genesis/genesis-portal/blob/d940fff7331a10843cb35b4bb0e11c9e36c23033/frontend/src/project0553/data/importOperationalBudget0553.js#L15-L27",
@@ -53,7 +54,7 @@
     },
     "items":[
       {"fee":"MOC Import Licence / Permit","scope":"รายคำขอตาม CIF และชุดนำเข้า รวมแก้ไข/ต่ออายุเฉพาะที่จำเป็น","responsibility":"TSI จัดข้อมูลผ่าน FaFE; ผู้นำเข้าที่ได้รับมอบหมายยื่นและชำระตามใบแจ้งของ MOC; ยืนยันผู้รับต้นทุนกับ COMPANY/CNEEC","timing":"Annex 6 §5.3.1 ให้ยื่น FaFE อย่างน้อย 6 เดือนก่อน shipment; ชำระเมื่อ MOC อนุมัติเพื่อรับใบอนุญาต และคุมวันหมดอายุถึงการนำเข้า"},
-      {"fee":"Type Approval / PTD Import Recommendation / DCA","scope":"ตามรุ่นอุปกรณ์และประเภทการอนุมัติ; DCA สำหรับ NDB/Air-band ที่เข้าข่าย","responsibility":"VND ส่งข้อมูลผลิตภัณฑ์; TSI จัด dossier; ผู้ยื่นและผู้ชำระค่าราชการกำหนดตามคำขอ","timing":"ให้ได้หนังสืออนุมัติก่อนยื่น MOC ในรายการที่ต้องขออนุมัติล่วงหน้า"},
+      {"fee":"Type Approval / PTD Import Recommendation / DCA","scope":"ตามรุ่นอุปกรณ์และประเภทการอนุมัติ; DCA สำหรับ NDB/Air-band ที่เข้าข่าย ค่าธรรมเนียม PTD Recommendation รอยืนยัน","responsibility":"VND ส่งข้อมูลผลิตภัณฑ์; TSI จัด dossier; ผู้ยื่นและผู้ชำระค่าราชการกำหนดตามคำขอ","timing":"ให้ได้หนังสืออนุมัติก่อนยื่น MOC ในรายการที่ต้องขออนุมัติล่วงหน้า"},
       {"fee":"Radio / Station / Frequency / Operating Licence","scope":"แยกค่าแรกเข้าและค่าใช้คลื่น/อุปกรณ์รายปี ตรวจผู้ถือสิทธิ สถานี ลิงก์ ช่องสัญญาณและ bandwidth","responsibility":"LIS Item 12 ให้ COMPANY ขอสิทธิใช้คลื่น; SPE §7.1 ให้ TSI ดำเนินการในนาม COMPANY; ผู้ชำระและวิธีส่งผ่าน CNEEC ยังต้องยืนยัน","timing":"มีใบอนุญาตก่อน deployment ตาม SPE; ก่อนส่งมอบให้ระบุวันหมดอายุ เจ้าของการต่ออายุ และภาระหลังส่งมอบ"},
       {"fee":"Customs Duty / Import Tax","scope":"อากรและภาษีของแต่ละ shipment แยกจากค่าใบอนุญาต B8","responsibility":"ตาม Incoterm และ Purchase Agreement ของแพ็กเกจ; สิทธิคืนตาม EPC §31.5.2 เป็นระหว่างคู่สัญญา EPC และมีเงื่อนไข","timing":"ตรวจสิทธิยกเว้นและแจ้งผู้เกี่ยวข้องก่อนชำระและผ่านพิธีการ หากต้องเบิกให้ใช้หลักฐานและรอบที่ตกลง"}
     ]

@@ -32,7 +32,7 @@ assert(workingLicences.includes('เอกสาร MOTC/PTD'));
 assert(workingLicences.includes('200,000.00'));
 assert(workingLicences.includes('Official licence fee responsibility'));
 assert(workingLicences.includes('5,080,000 MMK'));
-for(const expected of ['27,495.19','19,063.33','46,558.52','81,150.16','274.95','824.86','157,500 MMK','10,500 MMK','2026-11-06']){
+for(const expected of ['27,495.19','19,063.33','46,558.52','81,150.16','274.95','824.86','157,500 MMK','10,500 MMK','2026-11-06','720,000–1,350,000 MMK','6,598.85','12,372.83']){
  assert(workingLicences.includes(expected),expected);
 }
 const {LICENSING_SYSTEM_REVIEW_0550}=require(root+'/project0550/data/licensingScope0550.js');
@@ -40,6 +40,10 @@ const {BID_GROUPS_0550}=require(root+'/project0550/bidPresentation0550.js');
 const systemTokens=D.SYSTEMS.map(s=>s.token);
 const displayedTokens=Array.from(workingLicences.matchAll(/data-licensing-system="([^"]+)"/g),m=>m[1]);
 assert.equal(systemTokens.length,19);
+assert.equal((workingLicences.match(/data-licensing-common=/g)||[]).length,1);
+assert(BID_GROUPS_0550.some(group=>group.part==='A'&&group.code==='COMMON'));
+assert(workingLicences.includes('PTD Recommendation รอยืนยัน'));
+assert(!customerLicences.includes('data-licensing-common'));
 assert.deepEqual(displayedTokens,systemTokens);
 assert.deepEqual(Object.keys(LICENSING_SYSTEM_REVIEW_0550).sort(),[...systemTokens].sort());
 for(const token of displayedTokens){

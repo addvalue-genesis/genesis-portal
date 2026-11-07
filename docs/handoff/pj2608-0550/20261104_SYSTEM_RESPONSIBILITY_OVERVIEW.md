@@ -247,3 +247,31 @@ uses 109.11 MMK/THB as the indicative Market Trading basis, alongside the
 62.60 MMK/THB Reference basis. Actual settlement terms remain open. The
 comparison has no cost allocation. B8-D05 remains the shared provisional
 fee owner and Volume I reads the same existing A1 Others bindings.
+
+## 7-Nov-2026. Supplemental licensing budget Rev.01
+
+Reviewed the user-supplied PJ2608-0550 Import and Operation License Budget
+Myanmar Rev.01, sections 1–4, against R03 §§6.1.1 and 6.1.5, the MOC TradeNet
+CIF fee table, the PTD historical Link by Link schedule and the existing CBM
+snapshot. B8 adds a single COMMON review row for shared goods and temporary
+test tools linked to the existing Part A COMMON group. R03 distinguishes
+permanent from temporary import routes and restricts hand-carry and specified
+radio installations in Yangon. Applicability and eligibility are checked per
+shipment and RF use. The VSAT and Ku/C-Band import route remains open pending
+written confirmation from COMPANY.
+
+The Rev.01 MOC scenario of 8–15 applications uses the top illustrative
+CIF-band fee of 90,000 MMK and totals 720,000–1,350,000 MMK. B8 converts the
+scenario at both existing CBM rates. The number of applications remains an
+assumption. The WTO entry and Myanmar import form establish the telecom
+approval route but do not confirm a zero PTD Recommendation fee for ASK.
+The aggregate Rev.01 range overlaps radio, satellite and agent cost
+assumptions. The published PTD Microwave reference remains visible and its
+applicability, including Main/Standby charging, remains open. Keep official
+fees and agency handling separate pending actual charging units, quotes and
+payer confirmation.
+
+This read-only update follows ADR-0550-001 principles 2, 4–6, 8 and 10.
+The existing five B8 owners, Working allowance and Volume I binding are
+preserved. The native Exhibit regression verifies the single COMMON row,
+the converted comparison and separation from customer forms.

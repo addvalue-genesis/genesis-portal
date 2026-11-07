@@ -1,6 +1,6 @@
 {
   "schema": "pj2608-0550-handoff/2.0",
-  "updatedDate": "2026-11-05",
+  "updatedDate": "2026-11-07",
   "repo": "addvalue-genesis/genesis-portal",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "pr": 53,
@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_TELT_CIVIL_SCOPE_BOUNDARY.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
     "docs/handoff/pj2608-0550/20261105_TELT_CIVIL_SCOPE_BOUNDARY.md",
     "docs/handoff/pj2608-0550/20261105_TELT_LEGACY_PRICING_CANCELLED.md",
     "AGENTS.md",
@@ -33,7 +34,6 @@
     "docs/handoff/pj2608-0550/20261104_PAGA_ORIGINAL_QUOTATIONS.md",
     "docs/handoff/pj2608-0550/20261104_CERAGON_REVA1_VENDOR_REGISTER.md",
     "docs/handoff/pj2608-0550/20261104_MASTER_TOWER_IDIE_ORIGINAL_PRICES.md",
-    "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
     "docs/handoff/pj2608-0550/20261104_EXISTING_11M_CROSSWALK.md",
     "docs/handoff/pj2608-0550/20261104_SERVICE_PRICE_BASIS.md",
     "docs/handoff/pj2608-0550/20261104_C1_EXPANDED_PRICE_AND_COST.md",
