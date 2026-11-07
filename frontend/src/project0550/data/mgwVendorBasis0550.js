@@ -1,3 +1,4 @@
+import {ceragonSupersededOffer0550} from "./ceragonSelection0550";
 import catalog from "./mgwQuote0550.json";
 import procurement from "./procurementScope0550.json";
 import {RETIRED_TOWER_OFFER_0550} from "./towerLegacyPricing0550";
@@ -23,7 +24,7 @@ export function supplierOfferExcluded0550(data,offer,systemToken){
  const row=mgwQuoteItem0550(offer),tokens=offer.quoteEvidence?.systemTokens||[];
  return excludedSystems.has(systemToken)||Boolean(row&&rowExcluded(row))||Boolean(tokens.length&&!allowedSystems(tokens).length);
 }
-export const currentSupplierOffers0550=(data,systemToken)=>data.offers.filter(o=>o.id!==RETIRED_TOWER_OFFER_0550&&!supplierOfferExcluded0550(data,o,systemToken));
+export const currentSupplierOffers0550=(data,systemToken)=>data.offers.filter(o=>o.id!==RETIRED_TOWER_OFFER_0550&&!ceragonSupersededOffer0550(data,o.id)&&!supplierOfferExcluded0550(data,o,systemToken));
 export function mgwWorkingLineExcluded0550(data,line,offer=data.offers?.find(o=>o.id===line.offerId)){
  const ownerIsMgw=Boolean(line.mgwDetailGroupId)||isMgwVendor(data.vendors?.find(v=>v.id===line.vendorId))||isMgwOffer(data,offer);
  return mgwGroupExcluded0550(line.mgwDetailGroupId)||supplierOfferExcluded0550(data,offer,line.systemToken)||

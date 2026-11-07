@@ -1,11 +1,12 @@
 // Read-only live SI dossier. Source facts remain separate from authored interpretation.
 import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord0550,emptyTechnicalProposal0550} from './technicalProposal0550';
 import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
+import {CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
-const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference catalogue: '+MGW_QUOTE_0550.sourceName+' / p'+r.page+' / '+r.section+' / item '+(r.sn||r.id):'Source locator OPEN — review the canonical supplier Offer ID';};
+const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference catalogue: '+MGW_QUOTE_0550.sourceName+' / p'+r.page+' / '+r.section+' / item '+(r.sn||r.id):o.quoteEvidence?.locator||'Source locator OPEN — review the canonical supplier Offer ID';};
 const unique=a=>[...new Set(a.filter(Boolean))];
 export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const requirements=(model.integration.requirements||[]).filter(r=>r.systemToken===systemToken),ids=requirements.map(r=>r.id);
@@ -14,6 +15,10 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const record=view.records.find(r=>r.systemToken===systemToken&&r.sectionId===sectionId);
  const sourceIds=unique([...requirements.flatMap(r=>[...(r.sourceIds||[]),...(r.supplierSourceIds||[])]),...(record?.sourceIds||[])]);
  const tables=[];
+ if(systemToken==='TEL-DMR'&&ceragonR11Selected0550(data)&&['description','parameters','equipment','deviations'].includes(sectionId)){
+  tables.push({title:'DMR APF–ACP / selected bid configuration',heads:['Selected Offer','Proposed configuration','Open verification / deviations'],
+   rows:[[CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550]]});
+ }
  if(['description','equipment'].includes(sectionId)){
   const quantityRows=cusQuantityWorkingRows0550(data,model,systemToken);
   if(quantityRows.length)tables.push({title:'Customer bid quantities / additional supply',heads:['Working item','Quantity on this row','Bid scope / customer basis'],rows:quantityRows.map(l=>[l.description.replace(/^ประมาณการ · /,''),l.quantity+' '+l.unit,l.customerRemark+'\n'+l.requirementRef])});

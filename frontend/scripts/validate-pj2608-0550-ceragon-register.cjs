@@ -24,3 +24,23 @@ const edited=structuredClone(defaults);const ids=actual.offers.map(o=>o.id);edit
 assert.equal(kept.offers.find(o=>o.id===ids[0]).unitCost,99);assert(!kept.offers.some(o=>o.id===ids[1]));assert.equal(A.prepareVendorDefaults0550(kept,tokens),kept);assert.equal(A.planAutomaticVendorRegisters0550(kept,bundle,tokens).workspace,kept);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550'),html=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:plan.workspace,onEdit:()=>{}}));assert(html.includes('CERAGON'));assert(html.includes('RevA1'));assert(html.includes('0 QTY'));assert(html.includes('/ year'));assert(html.includes('Total Price ต้นฉบับ'));assert(actual.offers.every(o=>typeof o.quoteEvidence.quotedTotal==='number'));for(const o of actual.offers)assert(html.includes(o.quoteEvidence.quotedTotal.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})),'Render each native original total');assert(html.includes('OPTION'));
 console.log('PASS CERAGON register: four native rows, zero alternative, two annual support units, separate family receipts, both grouping identities, exact private hydration, edit/delete/idempotency and all other workspace fields preserved.');
+
+const Selection=require(root+'/project0550/data/ceragonSelection0550'),Process=require(root+'/project0550/data/bidProcess0550');
+const today=Selection.CERAGON_R11_DECISION_DATE_0550;
+const prepared={...plan.workspace,repositoryBasisImport:{version:'test',snapshotId:data.baselineSnapshotId,preparedOn:today,fxInherited:false}};
+const mrPrepared=require(root+'/project0550/data/mrWorkingBasis0550').importMrWorkingBasis0550(prepared,D.COMMERCIAL_POLICY,'2026-11-06');
+const previous=Process.prepareBidProcess0550(mrPrepared,D.COMMERCIAL_POLICY,'2026-11-06');
+assert(previous.lines.some(l=>l.offerId===Selection.CERAGON_R10_0550));
+const selected=Process.prepareBidProcess0550(previous,D.COMMERCIAL_POLICY,today);
+const current=selected.lines.find(l=>l.id===Selection.CERAGON_LINK_OWNER_0550);
+assert.equal(current.offerId,Selection.CERAGON_R11_0550);
+assert.equal(current.quantity,1);
+assert.equal(selected.lines.length,previous.lines.length);
+assert.deepEqual(selected.offers,previous.offers);
+assert.strictEqual(Process.prepareBidProcess0550(selected,D.COMMERCIAL_POLICY,today),selected);
+const chosenOffers=R.vendorOfferEntries0550(selected);
+assert(!chosenOffers.some(entry=>entry.offer.id===Selection.CERAGON_R10_0550));
+assert(chosenOffers.some(entry=>entry.offer.id===Selection.CERAGON_R11_0550&&entry.offer.quoteEvidence.quotedQuantity===0));
+const price=W.deriveBidWorkspace(selected,tokens,today).provisional.lines.find(l=>l.id===current.id);
+assert.equal(price.provisionalCostNative,actual.offers.find(o=>o.id===current.offerId).unitCost);
+console.log('PASS CERAGON R11: prior workspace migrates one owner, keeps native option quantity zero, and hides the superseded offer from active views.');

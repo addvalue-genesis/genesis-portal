@@ -6,8 +6,9 @@ import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
-import {blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
+import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
+import {CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -89,6 +90,64 @@ function linkPreparedMicrowaveDrafts0550(data, currentMr){
  return changed?{...data,integrationWorkspace:{...workspace,requirements,proofs}}:data;
 }
 
+// Move only the four Appendix 1.5 requirements and their non-additive bid
+// references. Keep existing CAL/RPT, source snapshots and review fingerprints.
+function reconcileCeragonR11(data){
+ if(!ceragonR11Selected0550(data))return data;
+ const owner=data.lines.find(l=>l.id===MICROWAVE_PACKAGE);
+ const workspace=data.integrationWorkspace;
+ const offer=data.offers.find(o=>o.id===owner.offerId);
+ if(!offer)return data;
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ const basis='R11 / '+CERAGON_R11_CONFIGURATION_0550+' '+CERAGON_R11_OPEN_SCOPE_0550;
+ let next=data;
+ if(workspace){
+  const requirements=workspace.requirements.map(req=>{
+   if(!Object.hasOwn(MICROWAVE_DRAFTS,req.id)||!req.sourceIds?.length||req.disposition==='NOT_APPLICABLE')return req;
+   if(req.offerIds.includes(CERAGON_R11_0550)&&!req.offerIds.includes(CERAGON_R10_0550)&&req.workLineIds.includes(owner.id)&&!req.workLineIds.includes(MICROWAVE_ALLOWANCE))return req;
+   const oldLocator=req.supplierLocator.startsWith(CERAGON_R10_0550+' / ');
+   const oldBasis=req.supplierBasis.replace('CERAGON main proposal is one ACP–APF7GHz300Mbps link, four ODUs/two antennas across both ends. ','');
+   return {...req,...(oldLocator?{
+    supplierLocator:offer.id+' / '+offer.quoteEvidence.locator+' / Option 2 columns H/I',
+    supplierExcerpt:offer.description,
+   }:{}),
+    offerIds:[...new Set([...req.offerIds.filter(id=>id!==CERAGON_R10_0550),CERAGON_R11_0550])],
+    workLineIds:[...new Set([...req.workLineIds.filter(id=>id!==MICROWAVE_ALLOWANCE),owner.id])],
+    supplierBasis:[oldBasis.replace(/ Draft price trace: R10[^.]*\.(?: Cable medium and length remain open\.)?/,''),
+     basis].filter(Boolean).join('\n').slice(-4000)};
+  });
+  if(requirements.some((r,i)=>r!==workspace.requirements[i])){
+   let deviations=workspace.deviations;
+   const req=requirements.find(r=>r.id==='REQDEF-MR-B1-15-APF-01'&&r.offerIds.includes(CERAGON_R11_0550));
+   const id='DEV-DMR-CERAGON-R11-BID-DRAFT';
+   if(req&&req!==workspace.requirements.find(r=>r.id===req.id)&&!deviations.some(d=>d.id===id||d.offerIds.includes(CERAGON_R11_0550))){
+    deviations=[...deviations,{...blankDeviation0550(id),systemToken:'TEL-DMR',requirementId:req.id,
+     offerIds:[CERAGON_R11_0550],mrRef:'MR Rev.B1 Appendix 1.5 / APF and ACP',
+     vendorQuoteRef:'CERAGON 26-30029 Rev.A1 / Offer R11',
+     vendorDeviation:CERAGON_R11_CONFIGURATION_0550,justification:CERAGON_R11_OPEN_SCOPE_0550}];
+   }
+   const proofs=workspace.proofs.map(proof=>{
+    if(!/^RPT-DMR-CERAGON-R10-(APF|ACP)-DRAFT$/.test(proof.id)||proof.status!=='DRAFT'||proof.report!==MICROWAVE_LINK_REPORT||proof.title!=='CERAGON ACP–APF Link Budget · bid evidence review')return proof;
+    return {...proof,title:'CERAGON R11 2+0 Link Budget · open verification',
+     method:'Use CERAGON 2+2 HSB Pathloss as received reference. Reconcile the 2+0 RF losses with the R11 BoQ without the dual coupler and verify the selected radio path at the required net throughput.',
+     limitations:'The referenced report is for 2+2 HSB. Its result is reference evidence and does not establish availability for the selected 2+0 design. Verify mounting heights, TX/RX losses, net throughput and availability together.'};
+   });
+   next={...next,integrationWorkspace:{...workspace,requirements,deviations,proofs}};
+  }
+ }
+ if(!receipt)return next;
+ const rows=receipt.rows.map(row=>{
+  if(row.kind!=='PRICE_REFERENCE'||!Object.hasOwn(MICROWAVE_DRAFTS,row.lineId.replace(/^REQ-/,'REQDEF-'))||row.ownerIds.length!==1||row.ownerIds[0]!==owner.id)return row;
+  const line=data.lines.find(l=>l.id===row.lineId);
+  if(!line||row.inputKey!==lineKey(data,line))return row;
+  const offerIds=[CERAGON_R11_0550],source=sourceKey(data,offerIds),ownerKeys=[ownerKey(data,owner)];
+  if(row.basis===basis&&row.sourceKey===source&&row.ownerKeys[0]===ownerKeys[0])return row;
+  return {...row,basis,offerIds,sourceKey:source,ownerKeys};
+ });
+ if(rows.every((row,i)=>row===receipt.rows[i]))return next;
+ return {...next,repositoryBasisImport:{...next.repositoryBasisImport,bidCompletion:{...receipt,rows}}};
+}
+
 // Use the approved customer bid quantities and the existing quote owners. New
 // allowances are separate from the original quote; they are not unit quotations.
 function prepareCusQuantityPricing0550(data, policies, today) {
@@ -152,7 +211,7 @@ function prepareCusQuantityPricing0550(data, policies, today) {
    'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
  }
  const prepared=changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
- return microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared,mrCandidates[0]):prepared;
+ return ceragonR11Selected0550(prepared)?reconcileCeragonR11(prepared):microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared,mrCandidates[0]):prepared;
 }
 
 export function cusQuantityPricingProblems0550(data,line){
@@ -228,6 +287,7 @@ export function reconcileTowerTenderScope0550(data){
 }
 export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(today<'2026-11-04')return data;
+ data=reconcileCeragonR11(data);
  if(data.repositoryBasisImport?.bidCompletion?.version===BID_COMPLETION_VERSION_0550)return prepareCusQuantityPricing0550(data,policies,today);
  // Wait for the actual project evidence. A repository seed is not the user's DATA.
  const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
@@ -444,7 +504,7 @@ export function bidCompletionSourceUsages0550(data){
  if(receipt?.version!==BID_COMPLETION_VERSION_0550)return [];
  const lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
  return receipt.rows.filter(r=>['QUOTED','ESTIMATE'].includes(r.kind)&&r.offerIds.length).flatMap(row=>{
-  const line=lines.get(row.lineId);if(!line||towerC1Reference0550(line))return [];
+  const line=lines.get(row.lineId);if(!line||towerC1Reference0550(line)||row.lineId===MICROWAVE_ALLOWANCE&&!line.selected)return [];
   const current=lineKey(data,line)===row.inputKey&&key(row.offerIds.map(id=>offers.get(id)||null))===row.sourceKey&&!cusQuantityPricingProblems0550(data,line).length;
   return [{line,offerIds:row.offerIds,current,kind:row.kind,basis:row.basis}];
  });

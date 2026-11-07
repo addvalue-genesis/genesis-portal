@@ -1,3 +1,4 @@
+import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
 import {validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
@@ -86,13 +87,15 @@ export function validateBidWorkspace(data,snapshotId,systems){
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
  data=reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(data));
  const towerSurveyOpen=towerSurveyReviewPending0550(data);
+ const r11=ceragonR11Selected0550(data);
+ const supersededCeragon=line=>r11&&(line.id===CERAGON_DISH_ALLOWANCE_0550||line.offerId===CERAGON_R10_0550);
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
- const counts=new Map();data.lines.filter(l=>l.selected&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
+ const counts=new Map();data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
  const lines=data.lines.map(l=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
-  const selected=l.selected&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
+  const selected=l.selected&&!supersededCeragon(l)&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
   const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}

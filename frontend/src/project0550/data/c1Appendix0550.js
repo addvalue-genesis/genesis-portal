@@ -1,3 +1,4 @@
+import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
 import catalog from './mrWorkingCatalog0550.json';
@@ -87,9 +88,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(byOwner.has(b.lineId))problems.push('DUPLICATE_C1_OWNER / '+b.lineId);
   else byOwner.set(b.lineId,{binding:b,usdPriced:Number.isFinite(usdBindings[i].amount)});
  }
+ const r11=!legacy&&ceragonR11Selected0550({lines});
  const ownerUse=new Map(),rows=mrDisplayRows().map(r=>{
   const canonicalIds=r.canonicalIds||[r.id],matches=lines.filter(l=>canonicalIds.includes(l.mrRequirementId));
   const raw=matches.length===1?matches[0]:null,detail=c1NativeDetails0550(r);
+  const response=r11?CERAGON_R11_C1_0550[r.id]:undefined;
+  if(response)detail.components=detail.components.map((c,i)=>({...c,note:response[i+1]}));
   const reqs=requirements.filter(q=>canonicalIds.some(id=>q.id==='REQDEF-'+id)||q.workLineIds?.some(id=>matches.some(l=>l.id===id)));
   // SI workLineIds are many-to-many technical trace, not blanket financial
   // coverage. Only the MR's own Working row / explicit coveredByLineId owns
@@ -101,7 +105,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const item={key:r.id,mr:r,appendix:'1.'+appendix(r),system:c1SystemLabel0550(r),site:r.site,
    description:r.description,quantity,unit:r.canonicalIds?r.unit:raw?raw.unit:r.unit,
    ...detail,ownerIds:excluded?[]:ids,raw,raws:matches,requirements:reqs,
-   amount:null,unitPrice:null,note:excluded?'By COMPANY':unique(matches.map(l=>customerRemark(l,legacy).trim()).filter(Boolean)).join('; '),excluded,kind:'MR'};
+   amount:null,unitPrice:null,note:excluded?'By COMPANY':unique([response?.[0],...matches.map(l=>customerRemark(l,legacy).trim())].filter(Boolean)).join('; '),excluded,kind:'MR'};
   if(canonicalIds.some(id=>matches.filter(l=>l.mrRequirementId===id).length>1))problems.push('MULTIPLE_MR_WORKING_LINES / '+r.id);
   if(!excluded&&!ids.length)problems.push('MR_C1_OWNER_UNRESOLVED / '+r.id);
   if(!excluded&&!(item.quantity>0))problems.push('C1_REQUIRED_QUANTITY_OPEN / '+r.id);
@@ -178,7 +182,7 @@ export const c1Display0550=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minim
 export function c1AppendixTable0550(view){
  const p=deriveC1Appendix0550(view),rows=[],group=label=>rows.push(['',label,'','','','','']);
  if(view.c1LayoutVersion!==C1_APPENDIX_LAYOUT_LEGACY_0550)group('Currency: USD');
- for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount,'']);}
+ for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount,'']);}
  rows.push(['','TOTAL — BASE SCOPE OF SUPPLY','','','',p.amount,'']);
  return {heads:['SN','Item Description','Unit','Qty.','CIF or FOB (USD or RMB) — Unit Rates','CIF or FOB (USD or RMB) — Total Price','Notes'],rows};
 }
@@ -191,7 +195,7 @@ export function c1AppendixHtml0550(view){
    for(const site of sys.sites){html+=`<tr class="c1-site"><td colspan="7">${escape(site.name)}</td></tr>`;
     for(const r of site.rows){html+='<tr>'+cell(r.sn)+cell(r.description)+cell(r.unit||'—')+cell(r.quantity??'—')+cell(c1Display0550(r.unitPrice),'number')+cell(c1Display0550(r.amount),'number')+cell(r.note)+'</tr>';
      if(r.intro)html+='<tr class="c1-detail-note"><td></td><td colspan="6">'+escape(r.intro)+'</td></tr>';
-     for(const [i,c] of r.components.entries())html+='<tr class="c1-component">'+cell(r.sn+'.'+(i+1))+cell(c.description)+cell(c.unit||'—')+cell(c.quantity??'—')+cell('—')+cell('—')+cell('')+'</tr>';
+     for(const [i,c] of r.components.entries())html+='<tr class="c1-component">'+cell(r.sn+'.'+(i+1))+cell(c.description)+cell(c.unit||'—')+cell(c.quantity??'—')+cell('—')+cell('—')+cell(c.note||'')+'</tr>';
      for(const note of r.notes||[])html+='<tr class="c1-detail-note"><td></td><td colspan="6">'+escape(note)+'</td></tr>';
     }
    }
@@ -213,7 +217,7 @@ export function c1AppendixWord0550(view){
  const header='<w:tr><w:trPr><w:tblHeader/></w:trPr>'+['SN','Item Description','Unit','Qty.'].map(t=>headerCell(t,'<w:vMerge w:val="restart"/>')).join('')+headerCell('CIF or FOB (USD or RMB)','<w:gridSpan w:val="2"/>')+headerCell('Notes','<w:vMerge w:val="restart"/>')+'</w:tr><w:tr><w:trPr><w:tblHeader/></w:trPr>'+Array.from({length:4},()=>headerCell('','<w:vMerge/>')).join('')+headerCell('Unit Rates')+headerCell('Total Price')+headerCell('','<w:vMerge/>')+'</w:tr>';
  let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+(legacy?[600,4200,700,700,1100,1100,1600]:[900,3900,700,700,1100,1100,1600]).map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
-  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=row(['',r.intro,'','','','','']);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—','']);});for(const note of r.notes||[])xml+=row(['',note,'','','','','']);}}}
+  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=row(['',r.intro,'','','','','']);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—',c.note||'']);});for(const note of r.notes||[])xml+=row(['',note,'','','','','']);}}}
   xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount),'']);
  }
  return xml+row(['TOTAL — BASE SCOPE OF SUPPLY','','','','',c1Display0550(c1.amount),''])+'</w:tbl>'+p(view.getRecord('I.C1').content||'')+p('Schedule C1');

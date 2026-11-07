@@ -3,6 +3,7 @@
 import {sumMoney0550} from './money0550';
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
 import {policyDefaults0550} from '../bidWorkingBasis0550';
+import {CERAGON_LINK_OWNER_0550,CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,CERAGON_R11_0550,CERAGON_R11_DECISION_DATE_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Source0550} from './ceragonSelection0550';
 const finite=Number.isFinite;
 const unique=a=>[...new Set(a.filter(Boolean))];
 export const BID_PROCESS_VERSION_0550='0550-bid-process-20261104-1';
@@ -64,6 +65,7 @@ export function deriveBidProcess0550(data,model,systems){
 export function prepareBidProcess0550(data,policies,today){
  if(data.projectId!=='PJ2608-0550'||!data.repositoryBasisImport)return data;
  const previous=data.repositoryBasisImport.bidProcess;
+ if(today>=CERAGON_R11_DECISION_DATE_0550)data=prepareCeragonR11(data,policies,today,previous?.ceragonHandled);
  if(previous?.version===BID_PROCESS_VERSION_0550&&previous.ceragonHandled)return data;
  const pristine=importMrWorkingBasis0550({lines:[],offers:[]},policies,today).lines;
  let lines=data.lines,changed=false;
@@ -73,9 +75,11 @@ export function prepareBidProcess0550(data,policies,today){
   lines=lines.map(l=>{if(!controls.has(l.id)||!same(l,pristine.find(x=>x.id===l.id)))return l;changed=true;controlLineIds.push(l.id);return {...l,selected:false};});
  }
  let ceragonHandled=previous?.ceragonHandled||false;
- const id='LINE-CERAGON-ASK-REVA1-BASE';
- const offers=data.offers.filter(o=>o.vendorId==='VENDOR-CERAGON-0550'&&o.id.endsWith('-R10')&&o.quoteEvidence?.revision==='RevA1'&&o.quoteEvidence?.systemTokens?.length===1&&o.quoteEvidence.systemTokens[0]==='TEL-DMR'&&o.quoteEvidence.quotedQuantity===1&&o.currency==='USD'&&o.unit==='Lot'&&finite(o.unitCost)&&o.unitCost>=0&&o.date&&o.date<=today&&o.validUntil&&o.validUntil>=today);
- if(!ceragonHandled&&offers.length===1){
+ const id=CERAGON_LINK_OWNER_0550;
+ const offers=data.offers.filter(o=>o.vendorId==='VENDOR-CERAGON-0550'&&o.id===CERAGON_R10_0550&&o.quoteEvidence?.revision==='RevA1'&&o.quoteEvidence?.systemTokens?.length===1&&o.quoteEvidence.systemTokens[0]==='TEL-DMR'&&o.quoteEvidence.quotedQuantity===1&&o.currency==='USD'&&o.unit==='Lot'&&finite(o.unitCost)&&o.unitCost>=0&&o.date&&o.date<=today&&o.validUntil&&o.validUntil>=today);
+ if(today>=CERAGON_R11_DECISION_DATE_0550){
+  ceragonHandled=ceragonHandled||lines.some(line=>line.id===id&&line.offerId===CERAGON_R11_0550);
+ }else if(!ceragonHandled&&offers.length===1){
   // Do not replace a saved DMR commercial selection or any edited native row.
   const native=lines.filter(l=>l.systemToken==='TEL-DMR');
   const authored=native.length!==pristine.filter(l=>l.systemToken==='TEL-DMR').length||native.some(l=>!l.mrRequirementId||!same(l,pristine.find(x=>x.id===l.id)));
@@ -88,6 +92,36 @@ export function prepareBidProcess0550(data,policies,today){
  if(previous&&!changed&&ceragonHandled===previous.ceragonHandled)return data;
  return {...data,lines,repositoryBasisImport:{...data.repositoryBasisImport,bidProcess:{version:BID_PROCESS_VERSION_0550,preparedOn:today,controlLineIds,ceragonHandled}}};
 }
+// Adopt the authorised 2+0 offer against the existing whole-link owner.
+// A deleted, deselected or independently edited commercial basis stays authored.
+function prepareCeragonR11(data,policies,today,handled){
+ const offer=data.offers.find(ceragonR11Source0550);
+ if(!offer)return data;
+ const old=data.lines.find(l=>l.id===CERAGON_LINK_OWNER_0550);
+ if(old?.offerId===CERAGON_R11_0550){
+  if(!old.selected||!data.lines.some(l=>l.id===CERAGON_DISH_ALLOWANCE_0550&&l.selected))return data;
+  return {...data,lines:data.lines.map(l=>l.id===CERAGON_DISH_ALLOWANCE_0550?{...l,selected:false}:l)};
+ }
+ if(old&&(old.offerId!==CERAGON_R10_0550||old.scopeKey!=='CERAGON.ACP-APF.REVA1.R10'||old.systemToken!=='TEL-DMR'||old.wbs!=='A'||!old.selected||old.quantity!==1||old.unit!=='Lot'||old.calculationId||old.manualCost!==null||old.sellRate!==null))return data;
+ if(!old&&handled)return data;
+ if(!old&&data.lines.some(l=>l.id!==CERAGON_DISH_ALLOWANCE_0550&&l.systemToken==='TEL-DMR'&&l.wbs==='A'&&l.selected&&(l.offerId||l.calculationId||l.mgwDetailGroupId||finite(l.manualCost)||finite(l.sellRate))))return data;
+ const policy=policyDefaults0550(policies,'Goods / Procured Cost');
+ if(!old&&!policy)return data;
+ const owner={
+  ...(old||{id:CERAGON_LINK_OWNER_0550,systemToken:'TEL-DMR',wbs:'A',tagRef:'ACP–APF',
+   calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'USD',manualCost:null,
+   sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,...policy,selected:true,customerRowCode:'A1-11'}),
+  description:'CERAGON ACP–APF microwave link / RevA1 R11 2+0',
+  scopeKey:'CERAGON.ACP-APF.REVA1.R11',
+  requirementRef:'MR Rev.B1 Appendix 1.5 / APF and ACP / one shared link',
+  sourceRef:offer.sourceRef+' / '+today+' / R11 selected: one Working Lot. Original quotation option quantity remains zero.',
+  vendorId:offer.vendorId,offerId:offer.id,brand:offer.brand,
+  customerRemark:CERAGON_R11_CONFIGURATION_0550+' '+CERAGON_R11_OPEN_SCOPE_0550
+ };
+ const lines=data.lines.map(l=>l===old?owner:l.id===CERAGON_DISH_ALLOWANCE_0550&&l.selected?{...l,selected:false}:l);
+ return {...data,lines:old?lines:[...lines,owner]};
+}
+
 export function isBidControlOnly0550(data,line){
  const r=data.repositoryBasisImport?.bidProcess;
  return Boolean(r?.version===BID_PROCESS_VERSION_0550&&r.controlLineIds.includes(line.id)&&!line.selected&&controls.has(line.id)&&!finite(line.manualCost)&&!finite(line.sellRate)&&!line.offerId&&!line.calculationId);

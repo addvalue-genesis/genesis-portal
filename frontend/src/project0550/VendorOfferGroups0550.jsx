@@ -1,3 +1,4 @@
+import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
 import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550} from './data/vendorRegister0550';
@@ -12,7 +13,15 @@ import {supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
-function QuoteTotal({quote,fx}){
+function QuoteTotal({quote,fx,selectedR11}){
+ const r11=selectedR11&&quote.entries.find(e=>e.offer.id===CERAGON_R11_0550);
+ if(r11){
+  const {offer}=r11,rate=offer.unitCost;
+  const total=vendorQuoteTotals0550({entries:[{...r11,offer:{...offer,quoteEvidence:{...offer.quoteEvidence,classification:'RATE',quotedTotal:rate}}}]},fx).base;
+  return <span className="p55-vnd-total"><strong>R11 · ฐาน Working 1 Lot · {amount(rate,offer.currency)}</strong>
+   <span>เทียบเงินโครงการ {amount(total.totalTHB,'THB')} · R12 อะไหล่ / R14 SLA แยกขอบเขต</span>
+   <span>Qty ต้นฉบับของ R11 = 0</span></span>;
+ }
  const t=vendorQuoteTotals0550(quote,fx),isMgw=quote.entries.some(e=>mgwQuoteItem0550(e.offer));
  if(t.referenceOnly)return <span className="p55-vnd-total">ฐาน Working อ้างอิง · ดูยอดในใบเสนอราคาต้นฉบับ</span>;
  const show=(s,label)=><span className="p55-vnd-total-part">
@@ -42,7 +51,8 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
  useEffect(()=>{
   if(entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId))setMode('company');
  },[entries,navigationTarget]);
- const anchors=new Set();
+ const anchors=new Set(),selectedR11=ceragonR11Selected0550(data);
+ const archived=selectedR11&&data.offers.find(o=>o.id===CERAGON_R10_0550);
  const renderRows=quote=><div className="p55-table-wrap"><table className="p55-table" aria-label={'Vendor costs '+quote.title}><thead><tr><th>รายการ / ระบบ</th><th>จำนวน / หน่วยต้นฉบับ</th><th>ต้นทุน / หน่วยเรต<br/>Unit Price ต้นฉบับ</th><th>Total Price ต้นฉบับ</th><th>วันที่ / เงื่อนไข</th><th>Offer ID / การใช้ใน Working</th></tr></thead><tbody>{quote.entries.map(entry=>{
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o);
   const anchor=!anchors.has(o.id);anchors.add(o.id);
@@ -62,7 +72,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    </td>
    <td>{entry.referenceOnly?<>{entry.working.map(l=>(l.quantity??'OPEN')+' '+l.unit).join(' / ')||'Working basis'}<small>จำนวนที่ใช้ใน Working</small></>:<>{sourceQty===undefined?'ไม่ระบุ':sourceQty} {sourceUnit||'หน่วยรอยืนยัน'}{e&&<small>จำนวนอ้างอิงใน Quote</small>}{r&&<small>{r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป':'จำนวนต้นฉบับ ไม่แทนจำนวน MR'}</small>}</>}</td>
    <td><strong>{amount(e?e.quotedUnitCost:o.unitCost,e?.quotedCurrency||o.currency)}</strong><small>/ {e?.quotedUnit||o.unit}</small>{entry.referenceOnly&&<small>ฐาน Working เดิมรวมหลายใบเสนอราคา · ดูต้นฉบับแยกฉบับ</small>}{e&&<><small>{e.rateBasis}</small>{(o.unitCost!==e.quotedUnitCost||o.currency!==e.quotedCurrency||o.unit!==e.quotedUnit)&&<small>เรตที่บันทึกไว้ {amount(o.unitCost,o.currency)} / {o.unit}</small>}</>}
-    {e?.classification==='OPTION'&&<small>OPTION · ยังไม่รวมในฐานโดยอัตโนมัติ</small>}
+    {e?.classification==='OPTION'&&<small>{selectedR11&&o.id===CERAGON_R11_0550?'OPTION ในใบต้นฉบับ · เลือกใช้ 1 Lot ใน Working':'OPTION · ยังไม่รวมในฐานโดยอัตโนมัติ'}</small>}
     {s&&<small>{s.classification==='NET_PACKAGE'?'ต้นทุนสุทธิทั้งแพ็กเกจ':s.classification==='INCLUDED_REFERENCE'?'รวมใน Package · ไม่มีราคาแยก':s.classification==='OPTION'?'OPTION · อ้างอิงแยกจากฐาน':'ราคาก่อนส่วนลด · อ้าง Package เดียว'} · Item {s.itemCode}</small>}
     {s?.classification!=='NET_PACKAGE'&&s?.parentOfferId&&<small>{s.parentOfferId}</small>}
    </td>
@@ -86,6 +96,11 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    <span>{entries.length} Offer IDs · ต้นทุนตามสกุล/หน่วยต้นฉบับ</span>
   </div>
   <p>จัดกลุ่มตามระบบในใบเสนอราคาเมื่อมีหลักฐาน · ระบบที่อ้าง Offer ใน Mapping / Working แสดงแยกในแถว · Qty / Unit / Unit Price / Total ใช้ข้อมูลต้นฉบับของ Supplier</p>
+  {archived&&<details data-component-key={'bid.vendor.offer.'+archived.id}><summary>CERAGON · R10 ต้นฉบับ / ประวัติ</summary>
+   <ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.offer.'+archived.id}/>
+   <p>R10 · 2+2 Hot Standby · ฐานเดิมก่อนเลือก R11</p>
+   {archived.quoteEvidence?.sourceUrl&&<a href={archived.quoteEvidence.sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a>}
+  </details>}
   <SupplierTowerBom0550 data={data} onNavigate={onNavigate}/>
   <SupplierPagaBom0550 data={data} onNavigate={onNavigate}/>
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
@@ -93,7 +108,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>
     <summary><Toggle/>{child.title}{mode==='system'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+child.key}/></>}</summary>
     {child.quotes.map(q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
-     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx}/></summary>
+     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx} selectedR11={selectedR11}/></summary>
      {renderRows(q)}
      <SupplierQuoteBoq0550 offers={q.entries.map(entry=>entry.offer)}/>
     </details>)}
