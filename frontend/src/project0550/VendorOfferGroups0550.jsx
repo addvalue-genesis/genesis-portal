@@ -1,5 +1,5 @@
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
-import {mgwCurrentMr0550} from "./data/mgwQuoteSelection0550";
+import {MGW_CURRENT_QUOTE_0550,mgwCurrentMr0550,mgwCurrentOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
@@ -15,7 +15,7 @@ import {supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
-function QuoteTotal({quote,fx,selectedR11}){
+function QuoteTotal({quote,fx,selectedR11,systemSubtotal=false}){
  const r11=selectedR11&&quote.entries.find(e=>e.offer.id===CERAGON_R11_0550);
  if(r11){
   const {offer}=r11,rate=offer.unitCost;
@@ -24,8 +24,9 @@ function QuoteTotal({quote,fx,selectedR11}){
    <span>เทียบเงินโครงการ {amount(total.totalTHB,'THB')} · R12 อะไหล่ / R14 SLA แยกขอบเขต</span>
    <span>Qty ต้นฉบับของ R11 = 0</span></span>;
  }
- const t=vendorQuoteTotals0550(quote,fx),isMgw=quote.entries.some(e=>mgwQuoteItem0550(e.offer));
+ const t=vendorQuoteTotals0550(systemSubtotal?{entries:quote.entries}:quote,fx),isMgw=quote.entries.some(e=>mgwQuoteItem0550(e.offer));
  if(t.referenceOnly)return <span className="p55-vnd-total">ฐาน Working อ้างอิง · ดูยอดในใบเสนอราคาต้นฉบับ</span>;
+ const baseLabel=systemSubtotal?'รวมเฉพาะระบบนี้':t.net?'รวมสุทธิใบเสนอราคา':isMgw?'รวมรายการในขอบเขตปัจจุบัน':'รวมใบเสนอราคา';
  const show=(s,label)=><span className="p55-vnd-total-part">
   <strong>{label}: {s.totalTHB!==null?amount(s.totalTHB,'THB')+' THB':s.hasConverted?'ยอดที่ทราบ '+amount(s.knownTHB,'THB')+' THB · ยังไม่ครบ':'OPEN'}</strong>
   {s.native.length>0&&<span>ต้นทาง {s.native.map(n=>amount(n.value,n.currency)+' '+n.currency).join(' + ')}{s.missingPrices>0?' · เฉพาะยอดที่ทราบ':''}</span>}
@@ -34,12 +35,13 @@ function QuoteTotal({quote,fx,selectedR11}){
   {s.missingPrices>0&&<span>{s.missingPrices} รายการยังไม่มียอดแน่นอน / As actual</span>}
   {s.ambiguous&&<span>OPEN · พบยอดสุทธิหลายรายการ ต้องตรวจต้นฉบับก่อนรวม</span>}
  </span>;
- return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':isMgw?'รวมรายการในขอบเขตปัจจุบัน':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>{isMgw?"ยอดรวมขอบเขตที่แสดงในทะเบียนของใบเดียวกัน":"ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน"}</span>}</span>;
+ return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,baseLabel)}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>{isMgw?"ยอดรวมขอบเขตที่แสดงในทะเบียนของใบเดียวกัน":"ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน"}</span>}</span>;
 }
 export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget}){
  const [mode,setMode]=useState('company');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
  const groups=useMemo(()=>groupVendorOffers0550(entries,mode,SYSTEMS),[entries,mode]);
+ const mgwQuoteEntries=entries.filter(({offer})=>mgwCurrentOffer0550(offer));
  const requirementsByOffer=useMemo(()=>{
   const index=new Map();
   for(const requirement of data.integrationWorkspace?.requirements||[]){
@@ -101,6 +103,10 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
   </div>
   <p>จัดกลุ่มตามระบบในใบเสนอราคาเมื่อมีหลักฐาน · ระบบที่อ้าง Offer ใน Mapping / Working แสดงแยกในแถว · Qty / Unit / Unit Price / Total ใช้ข้อมูลต้นฉบับของ Supplier</p>
   <MgwCurrentQuote0550 data={data}/>
+  {mgwQuoteEntries.length>0&&<div className="p55-panel" aria-label="MGW full quotation total">
+   <strong>{MGW_CURRENT_QUOTE_0550} · ยอดทั้งใบทุกระบบ</strong>
+   <QuoteTotal quote={{entries:mgwQuoteEntries}} fx={data.fx}/>
+  </div>}
   {archived&&<details data-component-key={'bid.vendor.offer.'+archived.id}><summary>CERAGON · R10 ต้นฉบับ / ประวัติ</summary>
    <ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.offer.'+archived.id}/>
    <p>R10 · 2+2 Hot Standby · ฐานเดิมก่อนเลือก R11</p>
@@ -113,7 +119,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>
     <summary><Toggle/>{child.title}{mode==='system'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+child.key}/></>}</summary>
     {child.quotes.map(q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
-     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx} selectedR11={selectedR11}/></summary>
+     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx} selectedR11={selectedR11} systemSubtotal={q.entries.some(({offer})=>mgwCurrentOffer0550(offer))}/></summary>
      {renderRows(q)}
      <SupplierQuoteBoq0550 offers={q.entries.map(entry=>entry.offer)}/>
     </details>)}
