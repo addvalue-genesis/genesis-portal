@@ -11,6 +11,7 @@ import {documentReadingUnits0550} from "./documentReadingUnits0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
 export const emptyIntegration0550=()=>({schema:INTEGRATION_SCHEMA_0550,requirements:[],proofs:[],activities:[],scopeReviews:[],particulars:[],avlChecks:[],deviations:[],documentReviews:[]});
 export const blankDocumentReview0550=id=>({id,systemTokens:[],expectedPages:null,reviewedPages:"",notesReviewed:false,colourReviewed:false,appendicesReviewed:false,categories:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
+export const blankProof0550=(requirement,id)=>({id,requirementId:requirement?.id||"",title:"",kind:requirement?.proofMode==="RPT"?"RPT":"CAL",calculationId:"",operator:"GTE",limit:null,unit:"",method:"",inputsBasis:"",criteria:requirement?.criteria||"",limitations:"",report:"",outcome:"OPEN",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
 export function reviewedPageSet0550(text){const pages=new Set();for(const token of text.replace(/[–—]/g,"-").split(",").map(s=>s.trim()).filter(Boolean)){if(!/^\d+(?:\s*-\s*\d+)?$/.test(token))return null;const [a,b=a]=token.split("-").map(Number);if(a<1||b<a||b>10000)return null;for(let p=a;p<=b;p++)pages.add(p);}return pages;}
 export function obligationCandidates0550(source){
  if(!source?.content)return [];

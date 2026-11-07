@@ -1,5 +1,5 @@
 import {assessBidPunch,stageBidPunch} from '../../common/governance/bidPunch';
-import {integrationFingerprint0550} from './integrationWorkspace0550';
+import {blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {deriveBidProcess0550,bidStudyDelivery0550} from './bidProcess0550';
 import {deriveBidVolumes0550} from './bidVolumes0550';
 import {bidCompletionBasisChanged0550} from './bidCompletion0550';
@@ -10,7 +10,7 @@ export function punchTaskRoute0550(row,requirements,preferredId){
  if(code==='ACTIVITY_OPEN'&&requirement){const kind=requirement.problems.find(p=>p.startsWith('ACTIVITY_OPEN / '))?.split(' / ')[1];return {kind:'ACTIVITY',requirement,activityKind:kind||'INSTALLATION',recordId:requirement.activities?.find(a=>a.kind===kind&&a.state!=='REVIEWED_PLAN')?.id};}
  return {kind:'TARGET',target:requirement&&row.target?.startsWith('bid.working-preview.requirement.')?'bid.working-preview.requirement.'+requirement.id:row.target,sourceTarget:row.sourceTarget};
 }
-export const punchProofDraft0550=(r,id)=>({id,requirementId:r?.id||'',title:'',kind:r?.proofMode==='RPT'?'RPT':'CAL',calculationId:'',operator:'GTE',limit:null,unit:'',method:'',inputsBasis:'',criteria:r?.criteria||'',limitations:'',report:'',outcome:'OPEN',reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''});
+export const punchProofDraft0550=blankProof0550;
 export const punchActivityDraft0550=(r,id,kind='INSTALLATION')=>({id,requirementId:r?.id||'',kind,title:'',responsible:'',quantity:null,unit:'',calculationId:'',workLineId:'',scopeBasis:'',acceptanceCriteria:r?.criteria||'',deliverable:'',dueDate:'',reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''});
 
 // Translate existing 0550 conditions, never rewrite their state or acceptance.

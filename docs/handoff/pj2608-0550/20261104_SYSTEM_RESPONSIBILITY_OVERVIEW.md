@@ -324,3 +324,29 @@ are informational in Working only. The existing budget and Volume I
 allocations do not incorporate the published rates as new charges. ADR-0550-001
 principles 2, 4–6, 8 and 10 apply. Verified with the Native Exhibit and Bid
 Completion checks and a production webpack compile.
+
+## 7-Nov-2026. DMR source and link-budget review
+
+The four untouched Appendix 1.5 equipment and cable drafts now cite the
+current MR Rev.B1, printed p21 / PDF p23, with separate APF and ACP item
+locators. The exact earlier draft and previously linked versions both upgrade
+when the replacement source and unchanged price receipts match. The MR bid
+basis remains two dishes and 200 m per site. WP.2 links the CERAGON Pathloss
+report as open evidence on both equipment requirements.
+
+The 12.06 km supplier case models one antenna position per site at ACP 30 m
+and APF 60 m. Total annual availability is 99.9603% at 4KQAM (262–320 Mbps)
+and 99.9924% at 2KQAM (242–295 Mbps). The report does not demonstrate 99.99%
+at the highest mode or prove the two-dish bid layout. The bid review still
+needs the required net throughput/availability combination, the final link
+case and cable/interface reconciliation. Keep the owner's Full Outdoor bid
+basis and two-dish allowance, with the estimate and AVL/commercial review
+still open. Official A1-11 also includes the two Master Tower scope rows.
+
+Rev.36 model QA confirmed the current source and both open proofs, the same
+two DMR price owners, 10.7/C1 draft prices and Official HOLD. Idempotence,
+legacy migration, authored edits, deletions and stale-quote guards passed.
+An isolated browser opened the WP.2 report detail and verified the 10.7
+Working subtotal and Official hold without workspace writes. Completion,
+Punch, price summary, native Exhibit, Working Preview and issue regressions
+passed. The saved Windows workspace remains unverified.

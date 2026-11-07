@@ -6,7 +6,7 @@ import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
-import {integrationFingerprint0550} from './integrationWorkspace0550';
+import {blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
@@ -24,36 +24,69 @@ const TOWER_SUPPLY_ROWS = [
 const MICROWAVE_ALLOWANCE = 'LINE-BID-DMR-ANTENNA-GAP-0550';
 const MICROWAVE_PACKAGE = 'LINE-CERAGON-ASK-REVA1-BASE';
 const MICROWAVE_DRAFTS = {
- 'REQDEF-MR-B1-15-APF-01': 'iw1:4066144719:2751717861:6057',
- 'REQDEF-MR-B1-15-APF-02': 'iw1:2305603546:1944763840:5997',
- 'REQDEF-MR-B1-15-ACP-01': 'iw1:2824451539:4225883257:6009',
- 'REQDEF-MR-B1-15-ACP-02': 'iw1:3469904913:3132963819:5997',
+ 'REQDEF-MR-B1-15-APF-01': ['iw1:4066144719:2751717861:6057','iw1:2433556402:3434919004:6182'],
+ 'REQDEF-MR-B1-15-APF-02': ['iw1:2305603546:1944763840:5997','iw1:3689590334:1881833468:6111'],
+ 'REQDEF-MR-B1-15-ACP-01': ['iw1:2824451539:4225883257:6009','iw1:183896312:3465622310:6134'],
+ 'REQDEF-MR-B1-15-ACP-02': ['iw1:3469904913:3132963819:5997','iw1:2169286181:1805160687:6111'],
 };
+const MICROWAVE_LINK_REPORT = 'https://drive.google.com/file/d/1hGcBbwgqPR1DhbsfUzSrtc43E-FS8cS8/view';
 const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
 
 // Continue only the exact prepared MR drafts. A saved edit, review or deletion
 // is authoritative. These links identify price owners without claiming coverage.
-function linkPreparedMicrowaveDrafts0550(data){
+function linkPreparedMicrowaveDrafts0550(data, currentMr){
  const workspace=data.integrationWorkspace;
  const allowance=data.lines.find(line=>line.id===MICROWAVE_ALLOWANCE&&line.selected);
  if(!workspace||!allowance||cusQuantityPricingProblems0550(data,allowance).length)return data;
  const allocations=new Map(data.repositoryBasisImport.bidCompletion.rows.map(row=>[row.lineId,row]));
  const receipt=allocations.get(allowance.id);
  if(receipt?.kind!=='ESTIMATE'||receipt.inputKey!==lineKey(data,allowance)||receipt.ownerIds.length!==1||receipt.ownerIds[0]!==MICROWAVE_PACKAGE)return data;
+ const appendixPage=currentMr.content.split('[PDF PAGE 23; printed 21]')[1]?.split('[PDF PAGE 24; printed 22]')[0]?.trim()||'';
+ const normalizedPage=appendixPage.replace(/\s+/g,' ');
+ const appendixVerified=currentMr.id==='DRV-1KFCSSo3D50fAS6LUBz0IYKPG4NjGVcDS'&&
+  normalizedPage.includes('APPENDIX 1.5 : SCOPE OF SUPPLY FOR MICROWAVE COMMUNICATION SYSTEM')&&
+  (normalizedPage.match(/Microwave Antena 2 Ea\./g)||[]).length===2&&
+  (normalizedPage.match(/200M Vendor Cable/g)||[]).length===2;
+ const proofs=[...workspace.proofs];
  let changed=false;
  const requirements=workspace.requirements.map(requirement=>{
-  const fingerprint=MICROWAVE_DRAFTS[requirement.id];
-  if(!fingerprint||integrationFingerprint0550(requirement)!==fingerprint)return requirement;
+  const fingerprints=MICROWAVE_DRAFTS[requirement.id];
+  if(!fingerprints)return requirement;
+  const fingerprint=integrationFingerprint0550(requirement);
+  if(!fingerprints.includes(fingerprint))return requirement;
+  const linked=fingerprint===fingerprints[1];
+  const rebind=appendixVerified&&currentMr.replaces.includes(requirement.sourceIds[0]);
+  if(linked&&!rebind)return requirement;
   const native=data.lines.find(line=>line.id===requirement.workLineIds[0]&&line.selected);
   const reference=allocations.get(native?.id);
   if(reference?.kind!=='PRICE_REFERENCE'||reference.inputKey!==lineKey(data,native)||!reference.ownerIds.includes(MICROWAVE_PACKAGE))return requirement;
   changed=true;
   const equipment=requirement.id.endsWith('-01');
-  return {...requirement,workLineIds:[...requirement.workLineIds,MICROWAVE_PACKAGE,...(equipment?[MICROWAVE_ALLOWANCE]:[])],
-   supplierBasis:requirement.supplierBasis+(equipment?' Draft price trace: R10 and separate antenna balance allowance.':' Draft price trace: R10 package reference only. Cable medium and length remain open.')};
+  if(rebind&&equipment){
+   const id='RPT-DMR-CERAGON-R10-'+requirement.site+'-DRAFT';
+   if(!proofs.some(proof=>proof.id===id||proof.requirementId===requirement.id&&proof.report===MICROWAVE_LINK_REPORT)){
+    proofs.push({...blankProof0550(requirement,id),title:'CERAGON ACP–APF Link Budget · bid evidence review',
+     method:'Compare CERAGON Pathloss ACP-APF.pl5, 3-Nov-2026, pp. 1–2, against the current MR, PHI, SPE and DTS. Use the Total annual column at the required throughput.',
+     inputsBasis:'Vendor case: 12.06 km, 7500 MHz, 28 MHz, 2+2 HSB, one modelled antenna position per site at ACP 30 m / APF 60 m. p. 2: 4KQAM 262–320 Mbps at 99.9603%; 2KQAM 242–295 Mbps at 99.9924%; 128QAM 158–193 Mbps at 99.9996%.',
+     criteria:'PHI §7.3.11, SPE-0011 §§7.2–7.3 and DTS-0010 Rev.B1: minimum 99.99% link availability. Confirm required simultaneous net throughput and availability. DTS states up to 300 Mbps.',
+     limitations:'The highest mode in this vendor report is below 99.99%. The report is for the quoted single-dish case and does not verify the two-dish bid layout, final mounting heights, updated RF losses, Full Outdoor interfaces or power autonomy.',
+     report:MICROWAVE_LINK_REPORT});
+   }
+  }
+  const next={...requirement};
+  if(!linked){
+   next.workLineIds=[...requirement.workLineIds,MICROWAVE_PACKAGE,...(equipment?[MICROWAVE_ALLOWANCE]:[])];
+   next.supplierBasis+=equipment?' Draft price trace: R10 and separate antenna balance allowance.':' Draft price trace: R10 package reference only. Cable medium and length remain open.';
+  }
+  if(rebind){
+   next.sourceIds=[currentMr.id];
+   next.sourceExcerpt=appendixPage;
+   next.sourceLocator='MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 1.5 / printed p21 / PDF p23 / '+requirement.site+' Item '+(equipment?'1.0':'2.0');
+  }
+  return next;
  });
- return changed?{...data,integrationWorkspace:{...workspace,requirements}}:data;
+ return changed?{...data,integrationWorkspace:{...workspace,requirements,proofs}}:data;
 }
 
 // Use the approved customer bid quantities and the existing quote owners. New
@@ -62,8 +95,10 @@ function prepareCusQuantityPricing0550(data, policies, today) {
  const receipt=data.repositoryBasisImport?.bidCompletion;
  if(!receipt||today<'2026-11-07')return data;
  const sources=data.sourceIntake?.sources||[], replaced=new Set(sources.flatMap(s=>s.replaces||[]));
- const current=no=>sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-'+no&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)).length===1;
- if(!current('MR-0001'))return data;
+ const candidates=no=>sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-'+no&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id));
+ const current=no=>candidates(no).length===1;
+ const mrCandidates=candidates('MR-0001');
+ if(mrCandidates.length!==1)return data;
  const findings=new Set((data.sourceIntake.findings||[]).map(f=>f.id));
  const rows=new Map(receipt.rows.map(r=>[r.lineId,r])),lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
  const goods=policyDefaults0550(policies,'Goods / Procured Cost');
@@ -117,7 +152,7 @@ function prepareCusQuantityPricing0550(data, policies, today) {
    'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
  }
  const prepared=changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
- return microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared):prepared;
+ return microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared,mrCandidates[0]):prepared;
 }
 
 export function cusQuantityPricingProblems0550(data,line){

@@ -21,6 +21,7 @@ import {preparePagaRevisionMapping0550,pagaRevisionRequirementDraft0550} from ".
 import {SupplierItemSourceText0550} from "./SupplierItemSourceText0550";
 import {supplierBoqRows0550,supplierItemLabel0550} from "./data/supplierCostProjection0550";
 import {requirementSupplierOfferIds0550} from "./data/mrSupplierLinks0550";
+import {safeSourceUrl} from "./data/sourceIntakeModel";
 
 const ids=a=>a.map(x=>[x.id,x.title||x.description||x.id]);
 export function Multi({label,value,onChange,options}){return <Field label={label}><select multiple size={Math.min(6,Math.max(3,options.length))} aria-label={label} value={value} onChange={e=>onChange(Array.from(e.target.selectedOptions,o=>o.value))}>{options.map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></Field>;}
@@ -190,7 +191,20 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
    {proof&&<form aria-label="Engineering Proof editor" onSubmit={async e=>{e.preventDefault();await save("proofs",proof);}}><div className="p55-bid-fields">{requirementSelect(proof,setProof)}<Field label="Proof title" value={proof.title} onChange={v=>setField(setProof,"title",v)} required/><Select label="Derived proof type" value={proof.kind} onChange={v=>setField(setProof,"kind",v)} options={["CAL","RPT"]}/><Field label="Proof method / model" value={proof.method} onChange={v=>setField(setProof,"method",v)}/><Field label="Proof input sources / units / assumptions" value={proof.inputsBasis} onChange={v=>setField(setProof,"inputsBasis",v)}/><Field label="Proof acceptance criteria / source clause" value={proof.criteria} onChange={v=>setField(setProof,"criteria",v)}/><Field label="Proof limitations / validity conditions" value={proof.limitations} onChange={v=>setField(setProof,"limitations",v)}/>
     {proof.kind==="CAL"?<><Select label="Proof calculation ID" value={proof.calculationId} onChange={v=>setField(setProof,"calculationId",v)} options={[["","เลือกผลคำนวณ"],...data.calculations.map(c=>[c.id,c.title+" / "+c.equationId])]}/><Select label="Acceptance comparison" value={proof.operator} onChange={v=>setField(setProof,"operator",v)} options={[["GTE","ผล ≥ เกณฑ์"],["LTE","ผล ≤ เกณฑ์"],["EQ","ผล = เกณฑ์"]]}/><Field label="Acceptance numeric limit" type="number" step="any" value={proof.limit} onChange={v=>setField(setProof,"limit",v)}/><Field label="Acceptance unit (match equation output)" value={proof.unit} onChange={v=>setField(setProof,"unit",v)}/></>:<><Field label="Engineering report / reasoning"><textarea aria-label="Engineering report / reasoning" value={proof.report} rows={5} onChange={e=>setField(setProof,"report",e.target.value)}/></Field><Select label="Report conclusion" value={proof.outcome} onChange={v=>setField(setProof,"outcome",v)} options={["OPEN","PASS","FAIL"]}/></>}
     <ReviewFields form={proof} setForm={setProof} date={reviewDate}/></div><Save busy={busy}>บันทึกผลพิสูจน์</Save></form>}
-   {model.proofs.filter(p=>visible.some(r=>r.id===p.requirementId)).map(p=><details key={p.id} data-component-key={"bid.working-preview.proof."+p.id}><summary>{p.kind} · {p.title} · {p.state}</summary><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.proof."+p.id}/><p>{p.method} · {p.result?.value??"—"} {p.result?.unit} · {p.report}</p><Problems items={p.problems}/><button type="button" onClick={()=>setProof(w.proofs.find(x=>x.id===p.id))}>แก้ผลพิสูจน์</button></details>)}
+   {model.proofs.filter(p=>visible.some(r=>r.id===p.requirementId)).map(p=>{
+    const reportUrl=safeSourceUrl(p.report);
+    return <details key={p.id} data-component-key={"bid.working-preview.proof."+p.id}>
+     <summary>{p.kind} · {p.title} · {p.state}</summary>
+     <ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.proof."+p.id}/>
+     <p>{p.method}{p.result&&<> · {p.result.value??"—"} {p.result.unit}</>}</p>
+     {p.inputsBasis&&<p><strong>ฐานที่ใช้ตรวจ</strong> · {p.inputsBasis}</p>}
+     {p.criteria&&<p><strong>เกณฑ์อ้างอิง</strong> · {p.criteria}</p>}
+     {p.limitations&&<p><strong>ข้อจำกัดของผลตรวจ</strong> · {p.limitations}</p>}
+     {p.report&&<p>{reportUrl?<a href={reportUrl} target="_blank" rel="noopener noreferrer">เปิดรายงานต้นฉบับ</a>:p.report}</p>}
+     <Problems items={p.problems}/>
+     <button type="button" onClick={()=>setProof(w.proofs.find(x=>x.id===p.id))}>แก้ผลพิสูจน์</button>
+    </details>;
+   })}
   </>;
   if(stage.step===3)body=<>{selection}<Note>ตรวจ architecture ร่วมกับ requirement และขอบเขตจาก drawings; หลักฐานต้องระบุ port/protocol, license, core network, firewall, power และ interface ที่เกี่ยวข้องตามเอกสารจริง</Note>
    <div className="p55-table-wrap"><table className="p55-table" aria-label="Requirement interface allocation"><thead><tr><th>Requirement</th><th>Functional need / acceptance</th><th>Architecture / interfaces</th><th>Responsibility</th></tr></thead><tbody>{visible.map(r=><tr key={r.id}><td>{r.title}</td><td>{r.need||"OPEN"}<small>{r.criteria||"เกณฑ์ OPEN"}</small></td><td>{r.interfaceBasis||"OPEN"}</td><td>{r.responsibility}<button type="button" onClick={()=>{editRequirement(r);onNavigate("bid.working-preview.step.4");}}>จัดข้อกำหนด</button></td></tr>)}</tbody></table></div>
