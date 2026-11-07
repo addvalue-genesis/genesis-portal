@@ -83,3 +83,31 @@ if(process.argv[2]){
  if(process.env.PJ0550_PRIVATE_OUTPUT)fs.writeFileSync(process.env.PJ0550_PRIVATE_OUTPUT,JSON.stringify(output.workspace));
  console.log('PASS actual recovered PAGA: Rev11 exact679-source successor; 95 existing drafts updated +217 TAG candidates +26 topics +40 offers; base18/options5/references16 preserved; reconciled net base unselected; legacy selected prices/quantities/FX unchanged; older automatic reload retained; engineering HOLD.');
 }
+
+// Native item reading must stay inside the exact source page and quote.
+{
+ const {supplierQuotedSection0550}=require(root+'/project0550/data/supplierCostProjection0550.js');
+ const item={...detail,id:'OFFER-PAGA-A20261632-002-5010',quoteRef:'A20261632-002',
+  supplierQuoteRow:{...detail.supplierQuoteRow,itemCode:'5010',quantity:3},
+  quoteEvidence:{locator:'PDF p1 / item 5010',quotedQuantity:3,quotedUnit:'U',sourceSha256:'a'.repeat(64)}};
+ const body='5010 3,00 U Synthetic node\ncontains following main components:\n2x Synthetic switch\n1x Synthetic amplifier\nClass-D, N+1 configuration\nWallmounted cabinet, 9 RU\n(The technical data refers to 1 unit.)\n5020 1,00 U Next item\n1x Outside this item';
+ const nativeSource={...source,id:item.supplierQuoteRow.sourceId,documentNo:item.quoteRef,content:'[PDF PAGE 1]\n'+body};
+ const workspace={sourceIntake:{sources:[nativeSource]}},snapshot=JSON.stringify(workspace);
+ const section=supplierQuotedSection0550(workspace,item);
+ assert.equal(section.components.length,3);
+ assert.equal(section.components[0].quantity,2);
+ assert(section.components[1].description.includes('N+1'));
+ assert.equal(section.components[2].quantity,null,'Cabinet quantity is unprinted');
+ assert(!section.text.includes('Outside this item'));
+ assert.deepEqual(supplierQuotedSection0550({sourceIntake:{sources:[{...nativeSource,content:body+'\f'}]}},item).components,section.components,'Support the original form-feed source layout');
+ for(const changedSource of [
+  {...nativeSource,documentNo:'A20261632'},
+  {...nativeSource,readState:'METADATA_ONLY'},
+  {...nativeSource,content:nativeSource.content.replace('5010 3,00 U','5010 1,00 U')},
+  {...nativeSource,content:nativeSource.content+'\n5010 3,00 U Duplicate'},
+  {...nativeSource,note:'SHA256 '+('b'.repeat(64))}
+ ])assert.equal(supplierQuotedSection0550({sourceIntake:{sources:[changedSource]}},item),null);
+ assert.equal(supplierQuotedSection0550({},item),null);
+ assert.equal(JSON.stringify(workspace),snapshot);
+ console.log('PASS native PAGA BOM: exact page/revision, per-unit components, unprinted quantities, next-item boundaries, form-feed sources and stale/duplicate/missing evidence.');
+}

@@ -1,6 +1,6 @@
 import React,{useMemo,useRef,useState} from 'react';
 import {amount} from './BidControls';
-import {nativeSupplierItem0550,supplierBoqRows0550,supplierItemLabel0550,supplierItemSourceText0550,supplierCostProjection0550} from './data/supplierCostProjection0550';
+import {nativeSupplierItem0550,supplierBoqRows0550,supplierItemLabel0550,supplierItemSourceText0550,supplierCostProjection0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {isTowerSourceItem0550,towerOfferScope0550} from './data/towerTenderScope0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
@@ -48,20 +48,10 @@ const towerBomGroups = [
   {key:'delivery', title:'จัดเก็บและขนส่ง', codes:['14']}
 ];
 
-function TowerBomItem0550({entry, requirements, onNavigate, showPrices}) {
-  const {offer, native, uses, stale} = entry;
-  const scope = towerOfferScope0550(offer);
-  return <div data-tower-bom-offer={offer.id}>
-    <strong>{supplierItemLabel0550(offer)}</strong>
-    <p className="p55-bom-quantity">{native.quantity ?? 'ไม่ระบุจำนวน'} {native.unit}</p>
-    {showPrices && <p>
-      เรต {amount(native.rate,native.currency)} / {native.unit}<br/>
-      ยอดต้นฉบับ {Number.isFinite(native.total) ? amount(native.total,native.currency) : native.totalText || 'OPEN'}
-    </p>}
-    <SupplierItemSourceText0550 offer={offer} showPrice={showPrices} requirement={requirements[0]}/>
-    <small>
-      {native.locator} · <a href={native.url} target="_blank" rel="noopener noreferrer">เปิดต้นฉบับ</a>
-    </small>
+function SupplierBomLinks0550({entry,requirements,onNavigate}) {
+  const {offer,uses,stale}=entry;
+  const scope=towerOfferScope0550(offer);
+  return <>
     {requirements.map(requirement => <div key={requirement.id}>
       <button type="button" onClick={() => onNavigate?.('bid.working-preview.requirement.'+requirement.id)}>
         SI Mapping · {requirement.site} · {requirement.title}
@@ -81,6 +71,21 @@ function TowerBomItem0550({entry, requirements, onNavigate, showPrices}) {
     {stale.map(usage => <small key={usage.line.id}>ฐานจัดสรรเปลี่ยน · ทบทวน {usage.line.description}</small>)}
     {!requirements.length && !scope && !uses.length && !stale.length &&
       <small>ยังไม่มี Mapping หรือการจัดสรร Working ของ Item นี้</small>}
+  </>;
+}
+
+function TowerBomItem0550({entry,requirements,onNavigate,showPrices}) {
+  const {offer,native}=entry;
+  return <div data-tower-bom-offer={offer.id}>
+    <strong>{supplierItemLabel0550(offer)}</strong>
+    <p className="p55-bom-quantity">{native.quantity ?? 'ไม่ระบุจำนวน'} {native.unit}</p>
+    {showPrices && <p>
+      เรต {amount(native.rate,native.currency)} / {native.unit}<br/>
+      ยอดต้นฉบับ {Number.isFinite(native.total) ? amount(native.total,native.currency) : native.totalText || 'OPEN'}
+    </p>}
+    <SupplierItemSourceText0550 offer={offer} showPrice={showPrices} requirement={requirements[0]}/>
+    <small>{native.locator} · <a href={native.url} target="_blank" rel="noopener noreferrer">เปิดต้นฉบับ</a></small>
+    <SupplierBomLinks0550 entry={entry} requirements={requirements} onNavigate={onNavigate}/>
   </div>;
 }
 
@@ -164,8 +169,114 @@ export function SupplierTowerBom0550({
   </details>;
 }
 
+const pagaBomGroups=[
+  {key:'nodes',title:'ตู้ Main Node / Remote Amplifier'},
+  {key:'field',title:'Access Panel / Call Station / Speakers / Beacons'},
+  {key:'tools',title:'เครื่องมือและ Software'},
+  {key:'licenses',title:'Activation Bundle / สิทธิ์ที่รวม'},
+  {key:'services',title:'บริการ / FAT / บรรจุภัณฑ์'},
+  {key:'options',title:'Options ตามใบเสนอราคา'},
+  {key:'other',title:'รายการอื่นในต้นฉบับ'}
+];
+const isPagaBomOffer=offer=>offer.id.startsWith('OFFER-PAGA-A20261632')&&offer.supplierQuoteRow;
+function pagaBomGroup0550(offer){
+  if(offer.supplierQuoteRow.classification==='OPTION')return 'options';
+  const code=Number(offer.supplierQuoteRow.itemCode);
+  return [{key:'nodes',from:1000,to:10000},{key:'field',from:10000,to:18000},
+    {key:'tools',from:18000,to:20000},{key:'licenses',from:20000,to:22000},
+    {key:'services',from:22000,to:25000}].find(group=>code>=group.from&&code<group.to)?.key||'other';
+}
+
+export function SupplierPagaBom0550({
+  data,projection,onNavigate,
+  requirements=data.integrationWorkspace?.requirements||[],
+  showPrices=true,initiallyOpen=false
+}){
+  const [open,setOpen]=useState(initiallyOpen);
+  const [quoteKey,setQuoteKey]=useState('');
+  const [view,setView]=useState('equipment');
+  const index=useMemo(()=>open?(projection||supplierCostProjection0550(data)):null,[data,projection,open]);
+  if(!data.offers.some(isPagaBomOffer))return null;
+  const quotes=(index?.bySystem.get('TEL-PAGA')||[]).filter(quote=>quote.items.some(entry=>isPagaBomOffer(entry.offer)));
+  const quote=quotes.find(candidate=>candidate.key===quoteKey)||quotes.find(candidate=>candidate.title==='A20261632-002')||quotes[0];
+  const mappings=new Map();
+  for(const requirement of open?requirements:[]){
+    for(const id of requirementSupplierOfferIds0550(requirement)){
+      if(!mappings.has(id))mappings.set(id,[]);
+      mappings.get(id).push(requirement);
+    }
+  }
+  const groups=pagaBomGroups.map(group=>({...group,entries:(quote?.items||[])
+    .filter(entry=>isPagaBomOffer(entry.offer)&&pagaBomGroup0550(entry.offer)===group.key)}))
+    .filter(group=>group.entries.length&&(view==='all'||(view==='equipment'
+      ?!['services','options'].includes(group.key):group.key===view)));
+  return <details className="p55-panel p55-quote-boq p55-paga-bom" open={open} data-supplier-paga-bom
+    onToggle={event=>{if(event.target===event.currentTarget)setOpen(event.currentTarget.open);}}>
+    <summary>BOM PAGA INDUSTRONIC · เลือกฉบับ / อุปกรณ์ / สิทธิ์ที่รวม / บริการ / Options</summary>
+    {open&&quote&&<>
+      <div className="p55-review-toolbar" aria-label="PAGA BOM quotation">
+        {quotes.map(candidate=><button key={candidate.key} type="button" aria-pressed={candidate.key===quote.key}
+          onClick={()=>setQuoteKey(candidate.key)}>
+          {candidate.title} · {candidate.items.length} Item{candidate.hash?' · '+candidate.hash.slice(0,8):''}
+        </button>)}
+      </div>
+      <p><strong>{quote.vendor} · {quote.title}</strong> · {quote.fileName||quote.revision||'ต้นฉบับในทะเบียน'}
+        <br/>จำนวนเป็นยอดของทั้งใบ · สถานที่และ TAG ตรวจจาก SI Mapping ของแต่ละ Item
+      </p>
+      {showPrices&&<p>สุทธิในใบที่เปิดดู {quote.totals.base.native.map(total=>amount(total.value,total.currency)).join(' + ')||'OPEN'}
+        {' · '}เทียบเงินโครงการ {quote.totals.base.totalTHB===null?'OPEN':amount(quote.totals.base.totalTHB,'THB')}
+      </p>}
+      <details><summary>ลิงก์ราคาใบนี้ใน Working · {quote.owners.length} เจ้าของราคา</summary>
+        {quote.owners.map(usage=><p key={usage.line.id}>
+          <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+usage.line.id)}>
+            10.2 · {usage.line.wbs} · {usage.line.description}
+          </button><small>{usage.label}</small>
+        </p>)}
+        {!quote.owners.length&&<p>ยังไม่พบเจ้าของราคา Working ที่เลือกใช้ใบนี้ · เปิด WP.5 เพื่อตรวจฐานราคาที่บันทึก</p>}
+      </details>
+      <div className="p55-review-toolbar">
+        {[['equipment','อุปกรณ์และสิทธิ์ที่รวม'],['services','บริการ / FAT / บรรจุภัณฑ์'],['options','Options'],['all','ทุก Item ในใบนี้']].map(([key,label])=>
+          <button type="button" key={key} aria-pressed={view===key} onClick={()=>setView(key)}>{label}</button>)}
+      </div>
+      <div className="p55-table-wrap"><table className="p55-table p55-supplier-boq" aria-label="PAGA INDUSTRONIC BOM">
+        <thead><tr><th>Item / รุ่น / รายละเอียด</th><th>จำนวน Supplier ทั้งใบ</th>{showPrices&&<th>ราคาต้นฉบับ</th>}<th>SI Mapping / Working</th></tr></thead>
+        <tbody>{groups.map(group=><React.Fragment key={group.key}>
+          <tr className="p55-bom-group"><th scope="rowgroup" colSpan={showPrices?4:3}>{group.title}</th></tr>
+          {group.entries.map(entry=>{
+            const {offer,native}=entry;
+            const section=supplierQuotedSection0550(data,offer);
+            const mapped=mappings.get(offer.id)||[];
+            const classification=offer.supplierQuoteRow.classification;
+            return <tr key={offer.id} data-paga-bom-offer={offer.id}>
+              <td>
+                <small>Item {offer.supplierQuoteRow.itemCode}</small><strong>{supplierItemLabel0550(offer)}</strong>
+                {section?.part&&<small>P/N {section.part}</small>}
+                {classification==='INCLUDED_REFERENCE'&&<small>รวมในแพ็กเกจ · ไม่มีราคาแยก</small>}
+                {classification==='OPTION'&&<small>OPTION ตามต้นฉบับ</small>}
+                <SupplierItemSourceText0550 offer={offer} requirement={mapped[0]} showPrice={showPrices} sourceSection={section}/>
+                <small>{native.locator} · <a href={native.url} target="_blank" rel="noopener noreferrer">เปิดต้นฉบับ</a></small>
+                {section?.components.length>0&&<small>เปิดรายละเอียดเพื่อดู BOM ภายในชุด · {section.components.length} แถว</small>}
+              </td>
+              <td className="p55-bom-quantity">{native.quantity??'ไม่ระบุจำนวน'} {native.unit}</td>
+              {showPrices&&<td>
+                {classification==='INCLUDED_REFERENCE'?'รวมในแพ็กเกจ':<>
+                  เรต {amount(native.rate,native.currency)} / {native.unit}<br/>
+                  ยอด {Number.isFinite(native.total)?amount(native.total,native.currency):native.totalText||'ไม่ระบุยอดรวม'}
+                </>}
+              </td>}
+              <td><SupplierBomLinks0550 entry={entry} requirements={mapped} onNavigate={onNavigate}/></td>
+            </tr>;
+          })}
+        </React.Fragment>)}</tbody>
+      </table></div>
+      {!groups.length&&<p>ไม่มีรายการหมวดนี้ในใบที่เปิดดู</p>}
+      <p>ตรวจราคาแพ็กเกจที่เจ้าของราคา Working เดิม · เลือกฉบับด้านบนเพื่อเปิดดู BOM และหลักฐานของฉบับนั้น</p>
+    </>}
+  </details>;
+}
+
 // A full-width disclosure shared by the existing Vendor, Mapping and Working views.
-export function SupplierItemSourceText0550({offer,requirement,showPrice=true}){
+export function SupplierItemSourceText0550({offer,requirement,showPrice=true,data,sourceSection=supplierQuotedSection0550(data,offer)}){
  const dialog=useRef(null);
  const texts=supplierItemSourceText0550(offer);
  const rows=supplierBoqRows0550(offer),native=nativeSupplierItem0550(offer);
@@ -187,8 +298,21 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true}){
     {showPrice&&<> · เรต {amount(native.rate,native.currency)} · ยอดต้นฉบับ {Number.isFinite(native.total)?amount(native.total,native.currency):native.totalText||'—'}</>}
     <br/><code>{native.locator}</code>{native.url&&<> · <a href={native.url} target="_blank" rel="noopener noreferrer">เปิดต้นฉบับ</a></>}</p>}
    {rows.length>0&&<><p>BoQ อ้างอิง Offer นี้ · ราคาแยกต่อ P/N ไม่ปรากฏในหลักฐานที่บันทึก</p><SupplierBoqTable0550 rows={rows}/></>}
+   {sourceSection?.components.length>0&&<>
+    <p>ส่วนประกอบที่รวมใน Item นี้ · จำนวนต่อ 1 {native.unit} ตามข้อความ Supplier</p>
+    <div className="p55-table-wrap"><table className="p55-table p55-supplier-boq" aria-label="Included component BOM">
+     <thead><tr><th>อุปกรณ์ / รายละเอียดต้นฉบับ</th><th>ต่อ 1 {native.unit}</th><th>รวมตาม {native.quantity} {native.unit} ในใบนี้</th></tr></thead>
+     <tbody>{sourceSection.components.map((component,i)=><tr key={i}>
+      <td className="p55-supplier-verbatim">{component.description}</td>
+      <td>{component.quantity??'ไม่ระบุ'}</td>
+      <td>{component.quantity!==null&&Number.isFinite(native.quantity)?component.quantity*native.quantity:'—'}</td>
+     </tr>)}</tbody>
+    </table></div>
+    <p>ส่วนประกอบใช้ราคาแพ็กเกจเดิม · จำนวนข้างต้นเป็นจำนวนในใบเสนอราคาฉบับที่เปิดดู</p>
+   </>}
+   {sourceSection&&<details><summary>ข้อความ Item จากต้นฉบับ · {sourceSection.locator}</summary><p className="p55-supplier-verbatim">{sourceSection.text}</p></details>}
    {details.length>0&&<details open={!rows.length}><summary>ข้อความ Supplier / เงื่อนไขที่บันทึก</summary>{details.map((text,i)=><p key={i} className="p55-supplier-verbatim">{text}</p>)}</details>}
-   {!texts.length&&<p>ยังไม่มีข้อความรายละเอียดต้นฉบับของ Item นี้ในข้อมูลที่โหลด · ตรวจใบเสนอราคาต้นฉบับ</p>}
+   {!texts.length&&!sourceSection&&<p>ยังไม่มีข้อความรายละเอียดต้นฉบับของ Item นี้ในข้อมูลที่โหลด · ตรวจใบเสนอราคาต้นฉบับ</p>}
    <details data-supplier-source-ref={offer.id}><summary>ข้อความรายการเต็ม / แหล่งอ้างอิงที่บันทึก</summary><p className="p55-supplier-verbatim">{offer.description}</p>{offer.sourceRef&&<p className="p55-supplier-verbatim">{offer.sourceRef}</p>}</details>
   </dialog>
  </div>;

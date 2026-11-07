@@ -7,7 +7,7 @@ import {bidOwnerStyle} from './bidPresentation0550';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
-import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550} from './SupplierItemSourceText0550';
+import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
 import {supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
@@ -51,7 +51,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
   const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o}/><small>{o.brand}</small>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} data={data}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
@@ -87,6 +87,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
   </div>
   <p>จัดกลุ่มตามระบบในใบเสนอราคาเมื่อมีหลักฐาน · ระบบที่อ้าง Offer ใน Mapping / Working แสดงแยกในแถว · Qty / Unit / Unit Price / Total ใช้ข้อมูลต้นฉบับของ Supplier</p>
   <SupplierTowerBom0550 data={data} onNavigate={onNavigate}/>
+  <SupplierPagaBom0550 data={data} onNavigate={onNavigate}/>
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
    <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs{mode==='company'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+g.key}/></>}</summary>
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>

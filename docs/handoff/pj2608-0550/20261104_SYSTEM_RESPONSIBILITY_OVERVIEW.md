@@ -376,3 +376,34 @@ Working Preview, Vendor, price-summary and bid-completion regressions passed.
 Production webpack compiled with its existing application-size advisory.
 Structural adequacy and commercial acceptance require their existing reviews.
 The owner's Windows workspace has yet to be verified.
+
+## 7-Nov-2026. INDUSTRONIC PAGA native BOM and cabinet components
+
+Vendor07.2, WP.7 and Working10.2 share the existing Supplier component for the
+PAGA BOM. The two originals have 37 and 39 non-NET items. The disclosure opens
+the -002 source first and lets the reader switch original identities. Equipment,
+included entitlements, services and Options use their recorded classifications.
+The same item code can have different meanings between quotes, including 5010.
+
+Native item text resolves by source identity, document number, physical page,
+item code and recorded quantity/unit, with a declared source hash check where
+present. Both original form-feed and numbered-page extractions are supported.
+The source dialog shows P/N and cabinet components with counts per quoted unit.
+Multiplication is displayed only for explicit component counts under the source's
+one-unit note. Unprinted cabinet counts stay unprinted. Existing Source dialogs
+beside MR, Vendor and WP.7 Offer entries use the same reader.
+
+ADR-0550-001 principles 2, 3, 5, 6 and 8–13 govern the shared projection and
+canonical identities. Source quantities, price owners and issue decisions retain
+their existing handling. In the Rev.36 reconstruction, -002 has zero selected
+Working owners. The BOM shows this separately from its source NET. Adopting a
+Working basis and engineering/commercial acceptance follow the existing controls.
+
+All 76 source item sections matched their recorded page/quantity/unit. Native
+reader regressions covered revision, duplicate/missing/changed source, unprinted
+counts, item boundaries and legacy extraction. Supplier revision, Vendor,
+Working Preview, Tower trace, bid completion and price-summary checks passed.
+The isolated browser verified both full item sets, Options, component counts,
+canonical navigation, 390/1440 containment and unchanged saved workspace.
+Production webpack compiled with its existing size advisory. The owner's saved
+Windows workspace and engineering acceptance remain unverified.

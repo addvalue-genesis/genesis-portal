@@ -15,6 +15,37 @@ export function supplierItemSourceText0550(offer){
  const detail=mgwQuoteItem0550(offer)?.detail,terms=offer.quoteEvidence?.terms;
  return [...new Set([detail,...(Array.isArray(terms)?terms:[])].filter(t=>typeof t==='string'&&t.trim()))];
 }
+
+// Native INDUSTRONIC item text. Item numbers are resolved within one source
+// page/revision and checked against its recorded quantity and unit.
+export function supplierQuotedSection0550(data,offer){
+ const row=offer.supplierQuoteRow,evidence=offer.quoteEvidence;
+ if(!offer.id.startsWith('OFFER-PAGA-A20261632')||!row||!evidence)return null;
+ const pageNumber=Number(evidence.locator?.match(/^PDF p(\d+) \/ item /)?.[1]);
+ const source=data?.sourceIntake?.sources?.find(s=>s.id===row.sourceId&&s.documentNo===offer.quoteRef&&s.readState!=='METADATA_ONLY');
+ if(!source?.content||!pageNumber||!/^\d{4,5}$/.test(row.itemCode))return null;
+ const declaredHash=source.note?.match(/\bSHA256 ([a-f0-9]{64})/i)?.[1];
+ if(declaredHash&&declaredHash!==evidence.sourceSha256)return null;
+ const pages=[...source.content.matchAll(/\[PDF PAGE (\d+)\]([^]*?)(?=\[PDF PAGE |$)/g)];
+ const page=pages.length?pages.find(match=>Number(match[1])===pageNumber)?.[2]:source.content.split('\f')[pageNumber-1];
+ if(!page)return null;
+ const matches=[...page.matchAll(new RegExp('^[ \\t]*'+row.itemCode+'[ \\t]+(\\d+(?:\\.\\d{3})*,\\d{2})[ \\t]+(\\S+)[^\\n]*','gm'))];
+ if(matches.length!==1)return null;
+ const match=matches[0],quantity=Number(match[1].replace(/\./g,'').replace(',','.'));
+ if(quantity!==evidence.quotedQuantity||match[2]!==evidence.quotedUnit)return null;
+ const afterHeader=page.slice(match.index+match[0].length);
+ const next=afterHeader.search(/^[ \t]*\d{4,5}[ \t]+/m);
+ const text=(match[0]+(next<0?afterHeader:afterHeader.slice(0,next))).trim();
+ const part=match[0].match(/\b\d{3}-\d{3}-\d{3}(?:\/[A-Za-z0-9]+)?\b/)?.[0]||'';
+ const componentText=text.match(/contains following main components:\s*([^]*?)\(The technical data refers to 1 unit\.\)/)?.[1];
+ const components=componentText?componentText.split(/(?=^[ \t]*(?:\d+x[ \t]|Wallmounted cabinet))/m).flatMap(block=>{
+  const detail=block.trim();
+  if(!detail)return [];
+  const counted=/^(\d+)x\s+([^]*)$/.exec(detail);
+  return [{quantity:counted?Number(counted[1]):null,description:counted?counted[2].trim():detail}];
+ }):[];
+ return {text,part,components,locator:evidence.locator,sourceId:source.id};
+}
 export const supplierItemLabel0550=offer=>offer.description?.trim().split(/\r?\n/,1)[0]||offer.id;
 
 // Read the recorded worksheet excerpts as evidence. Blank fields remain blank

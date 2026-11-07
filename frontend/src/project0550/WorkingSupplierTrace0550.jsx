@@ -4,7 +4,7 @@ import {amount} from './BidControls';
 import {supplierCostProjection0550,supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {mrSupplierLinks0550,requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {activeSupply0550} from './data/workingOffers0550';
-import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550} from './SupplierItemSourceText0550';
+import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
 
 function SourceAmount({quote}){
  const {totals:t,printed}=quote;
@@ -16,7 +16,7 @@ function SourceAmount({quote}){
   {t.base.rates.some(r=>r.currency!=='THB')&&<small>FX {t.base.rates.filter(r=>r.currency!=='THB').map(r=>'1 '+r.currency+' = '+r.rate+' THB').join(' · ')} · {t.fxDate} · {t.fxSource}</small>}
  </span>;
 }
-function SourceQuote({quote:q,onNavigate,initiallyOpen=false,requirement}){
+function SourceQuote({data,quote:q,onNavigate,initiallyOpen=false,requirement}){
  const [open,setOpen]=useState(initiallyOpen),[full,setFull]=useState(false),shown=full?q.items:q.relevantItems;
  const linked=q.items.filter(e=>e.uses.length).length;
  return <details className="p55-panel" open={open} data-working-source-quote={q.title} data-source-identity={q.key} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
@@ -27,7 +27,7 @@ function SourceQuote({quote:q,onNavigate,initiallyOpen=false,requirement}){
    {q.items.length!==q.relevantItems.length&&<button type="button" aria-expanded={full} onClick={()=>setFull(v=>!v)}>{full?(requirement?'ดูเฉพาะรายการที่ผูกกับ MR':'ดูเฉพาะรายการที่เกี่ยวข้องกับระบบนี้'):'ดูรายการทั้งใบ '+q.items.length+' รายการ'}</button>}
    <div className="p55-table-wrap"><table className="p55-table" aria-label={'Source item Working trace '+q.title}><thead><tr><th>Item / รายการต้นฉบับ</th><th>Qty / Unit</th><th>Unit Price</th><th>Total Price ต้นฉบับ</th><th>การจัดสรร / ใช้เรตใน Working</th></tr></thead><tbody>{shown.map(entry=>{
     const o=entry.offer,n=entry.native,towerScope=towerOfferScope0550(o);
-    return <tr key={o.id} data-working-source-item={o.id}><td><strong>{o.supplierQuoteRow?.itemCode&&<small>Item {o.supplierQuoteRow.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} requirement={requirement}/>{n.option&&<small>OPTION ต้นฉบับ · ไม่รวม Base อัตโนมัติ</small>}<small>{n.locator}</small><button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+o.id)}>เปิด Vendor Item {o.supplierQuoteRow?.itemCode||''}</button><small><a href={n.url} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></small><small>{n.basis}</small></td><td>{n.quantity??'OPEN'} {n.unit}</td><td>{amount(n.rate,n.currency)}{(o.unitCost!==n.rate||o.currency!==n.currency)&&<small>เรตที่บันทึกใน Offer: {amount(o.unitCost,o.currency)} / {o.unit} · ต่างจากต้นฉบับ</small>}</td><td>{Number.isFinite(n.total)?amount(n.total,n.currency):n.totalText||'OPEN · ต้นฉบับไม่ระบุยอดแน่นอน'}</td><td>{towerScope&&<div><strong>{towerScope.text}</strong><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+towerScope.id)}>เปิดแถวขอบเขต Working</button></div>}{entry.uses.map(u=><div key={u.line.id}><strong>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'}</strong><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+u.line.id)}>{u.line.description}</button><small>{u.label}</small></div>)}{entry.stale.map(u=><small key={u.line.id}>ฐานจัดสรรเปลี่ยน · ต้องทบทวน {u.line.id}</small>)}{!towerScope&&!entry.uses.length&&!entry.stale.length&&'ยังไม่พบการจัดสรร/ใช้เรตที่เลือก · ไม่ถือว่ารวมแล้ว'}</td></tr>;
+    return <tr key={o.id} data-working-source-item={o.id}><td><strong>{o.supplierQuoteRow?.itemCode&&<small>Item {o.supplierQuoteRow.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} requirement={requirement} data={data}/>{n.option&&<small>OPTION ต้นฉบับ · ไม่รวม Base อัตโนมัติ</small>}<small>{n.locator}</small><button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+o.id)}>เปิด Vendor Item {o.supplierQuoteRow?.itemCode||''}</button><small><a href={n.url} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></small><small>{n.basis}</small></td><td>{n.quantity??'OPEN'} {n.unit}</td><td>{amount(n.rate,n.currency)}{(o.unitCost!==n.rate||o.currency!==n.currency)&&<small>เรตที่บันทึกใน Offer: {amount(o.unitCost,o.currency)} / {o.unit} · ต่างจากต้นฉบับ</small>}</td><td>{Number.isFinite(n.total)?amount(n.total,n.currency):n.totalText||'OPEN · ต้นฉบับไม่ระบุยอดแน่นอน'}</td><td>{towerScope&&<div><strong>{towerScope.text}</strong><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+towerScope.id)}>เปิดแถวขอบเขต Working</button></div>}{entry.uses.map(u=><div key={u.line.id}><strong>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'}</strong><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+u.line.id)}>{u.line.description}</button><small>{u.label}</small></div>)}{entry.stale.map(u=><small key={u.line.id}>ฐานจัดสรรเปลี่ยน · ต้องทบทวน {u.line.id}</small>)}{!towerScope&&!entry.uses.length&&!entry.stale.length&&'ยังไม่พบการจัดสรร/ใช้เรตที่เลือก · ไม่ถือว่ารวมแล้ว'}</td></tr>;
    })}</tbody></table></div>
    <SupplierQuoteBoq0550 offers={shown.map(entry=>entry.offer)}/>
    <details><summary>เจ้าของราคา Working ที่เชื่อมกับใบนี้ · {q.owners.length} รายการ · แยกจากยอด Supplier</summary><ul>{q.owners.map(u=><li key={u.line.id}>{u.line.wbs} · {u.line.description} <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+u.line.id)}>เปิด Working เดิม</button><small>{u.label}</small></li>)}</ul><p>ต้นทุนผสมอาจมีประมาณการงานอื่นเพิ่ม · การจัดสรรหรือแพ็กเกจร่วมไม่ทำให้ยอด Supplier เปลี่ยน และไม่สร้างต้นทุนอีกก้อน</p></details>
@@ -50,7 +50,7 @@ export function WorkingMrSupplierDetails0550({data,line,projection,onNavigate}){
     return <small key={id}>{offer?<button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+id)}>Offer ที่ MR อ้าง · {supplierItemLabel0550(offer)}</button>:'OFFER MISSING · '+id}</small>;
    })}
    {!quotes.length&&<p>ยังไม่พบใบเสนอราคาต้นฉบับที่เชื่อมกับ MR แถวนี้ · ตรวจ Mapping/แพ็กเกจเดิม ไม่ใช้ใบอื่นแทนโดยอัตโนมัติ</p>}
-   {quotes.map(q=><SourceQuote key={q.key} quote={{...q,relevantItems:q.items.filter(entry=>offerIds.has(entry.offer.id))}} onNavigate={onNavigate} requirement={req} initiallyOpen/>)}
+   {quotes.map(q=><SourceQuote key={q.key} data={data} quote={{...q,relevantItems:q.items.filter(entry=>offerIds.has(entry.offer.id))}} onNavigate={onNavigate} requirement={req} initiallyOpen/>)}
   </>}
  </details>;
 }
@@ -71,8 +71,9 @@ export function WorkingSupplierTrace0550({data,systemToken,onNavigate,projection
   {!quotes.length&&<p>ยังไม่มีรายการต้นฉบับในทะเบียน Vendor สำหรับระบบนี้ · Working อาจเป็นราคาอ้างอิง/ประมาณการ หรือ COMPANY จัดหา · ไม่ใช่ต้นทุน Supplier เป็นศูนย์</p>}
   {estimates.length>0&&<details className="p55-panel"><summary>ฐานราคา Working ที่ไม่มี Offer · {estimates.length} รายการ · ไม่ใช่ราคาผู้ขายต้นฉบับ</summary><p>ฐานราคาของระบบแยกจาก Mapping รายข้อ · ต้องตรวจการครอบคลุม MR ก่อนยืนยันรวมแล้ว</p>{estimates.map(l=><div key={l.id}><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+l.id)}>{l.description}</button><small>ต้นทุนต่อหน่วย {amount(l.manualCost,l.currency)} × {l.quantity??'OPEN'} {l.unit}</small><p>{l.sourceRef}</p></div>)}</details>}
   {systemToken==='TEL-TELT'&&<SupplierTowerBom0550 data={data} projection={index} onNavigate={onNavigate}/>}
-  {quotes.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}
-  {candidates.length>0&&<details className="p55-panel"><summary>ใบอ้างอิงจาก Mapping / Working · {candidates.length} ใบ · ยังไม่ใช่ใบเสนอราคาครบระบบนี้</summary><p>เป็นลิงก์ประกอบจาก SI หรือการจัดสรร ไม่ได้เปลี่ยนขอบเขตต้นฉบับของ Supplier และไม่ยืนยันว่ารวมอุปกรณ์ครบระบบ</p>{candidates.map(q=><SourceQuote key={q.key} quote={q} onNavigate={onNavigate}/>)}</details>}
+  {systemToken==='TEL-PAGA'&&<SupplierPagaBom0550 data={data} projection={index} onNavigate={onNavigate}/>}
+  {quotes.map(q=><SourceQuote key={q.key} data={data} quote={q} onNavigate={onNavigate}/>)}
+  {candidates.length>0&&<details className="p55-panel"><summary>ใบอ้างอิงจาก Mapping / Working · {candidates.length} ใบ · ยังไม่ใช่ใบเสนอราคาครบระบบนี้</summary><p>เป็นลิงก์ประกอบจาก SI หรือการจัดสรร ไม่ได้เปลี่ยนขอบเขตต้นฉบับของ Supplier และไม่ยืนยันว่ารวมอุปกรณ์ครบระบบ</p>{candidates.map(q=><SourceQuote key={q.key} data={data} quote={q} onNavigate={onNavigate}/>)}</details>}
   <MrMapping data={data} systemToken={systemToken} onNavigate={onNavigate}/>
   {references.length>0&&<details className="p55-panel"><summary>ฐานราคาอ้างอิงเดิม · {references.length} รายการ · ไม่ใช่ยอดต้นฉบับที่ยืนยันแล้ว</summary><ul>{references.map(e=><li key={e.offer.id}>{e.offer.quoteRef} · {e.offer.description} <button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+e.offer.id)}>เปิดฐานเดิม</button></li>)}</ul></details>}
  </div>;
