@@ -30,6 +30,10 @@ module.exports = {
   resolve: {
     extensions: [".js", ".jsx"]
   },
+  watchOptions: {
+    // Windows can emit events for its paging file when Watchpack watches a drive ancestor.
+    ignored: /^[a-z]:[\\/]pagefile\.sys$/i
+  },
   module: {
     rules: [
       {test: /\.css$/, use: [MiniCssExtractPlugin.loader, "css-loader"]},
