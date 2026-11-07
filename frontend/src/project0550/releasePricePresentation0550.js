@@ -8,13 +8,15 @@ export function releasePricePresentation0550(official){
  for(const group of official.schedule){
   const priced=group.children.filter(line=>Number.isFinite(line.customerUSD));
   const open=group.customerUSD==null&&!group.excluded;
+  const dmr=provisional&&group.code==='A1-11'?priced.filter(line=>line.systemToken==='TEL-DMR'):[];
   notes.set(group.releaseModuleId,{
    reasons:open?[...new Set([
     ...group.problems,
     ...group.children.filter(line=>!Number.isFinite(line.customerUSD)).map(line=>"ราคา USD ยัง OPEN / "+line.id),
     ...(!group.children.length?["ยังไม่มีเจ้าของราคาที่เลือกและผูกกับ Lot นี้"]:[])
    ])]:[],
-   known:provisional&&open?{amount:sumMoney0550(priced.map(line=>line.customerUSD)),priced:priced.length,count:group.children.length}:null
+   known:provisional&&open?{amount:sumMoney0550(priced.map(line=>line.customerUSD)),priced:priced.length,count:group.children.length}:null,
+   dmrKnown:dmr.length?{amount:sumMoney0550(dmr.map(line=>line.customerUSD)),priced:dmr.length}:null
   });
  }
  for(const line of official.lines){

@@ -44,6 +44,14 @@ const {releasePricePresentation0550}=require(root+'/project0550/releasePricePres
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
 const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
+const dmrGroup={code:'A1-11',releaseModuleId:'dmr-lot',customerUSD:null,problems:[],children:[
+ {id:'R10',systemToken:'TEL-DMR',customerUSD:120.10},{id:'DISH-ESTIMATE',systemToken:'TEL-DMR',customerUSD:20.20},
+ {id:'TOWER',systemToken:'TEL-TELT',customerUSD:300},{id:'OPEN',systemToken:'TEL-DMR',customerUSD:null}
+]};
+const dmrView={pricingBasis:'PROVISIONAL_VENDOR',lines:[],schedule:[dmrGroup]};
+assert.deepEqual(releasePricePresentation0550(dmrView).get('dmr-lot').dmrKnown,{amount:140.30,priced:2});
+assert.equal(releasePricePresentation0550(dmrView).get('dmr-lot').known.amount,440.30);
+assert.equal(releasePricePresentation0550({...dmrView,pricingBasis:'OFFICIAL'}).get('dmr-lot').dmrKnown,null);
 const {releaseFullBid0550}=require(root+'/project0550/fullBidInventoryModel0550.js');
 const inventory=releaseFullBid0550(d,m.provisional,D.SYSTEMS),get=token=>inventory.find(r=>r.token===token);
 assert.equal(inventory.length,20);assert.equal(new Set(inventory.map(r=>r.token)).size,20);assert.equal(inventory.flatMap(r=>r.records).length,MR.MR_WORKING_CATALOG_0550.rows.length,'All catalog requirements appear, including unselected/unmapped/COMPANY and B/C');

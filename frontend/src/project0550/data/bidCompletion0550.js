@@ -6,6 +6,7 @@ import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
+import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
@@ -21,8 +22,39 @@ const TOWER_SUPPLY_ROWS = [
  ['REQ-MR-B1-11-ACP-06', '2609.95.2'],
 ];
 const MICROWAVE_ALLOWANCE = 'LINE-BID-DMR-ANTENNA-GAP-0550';
+const MICROWAVE_PACKAGE = 'LINE-CERAGON-ASK-REVA1-BASE';
+const MICROWAVE_DRAFTS = {
+ 'REQDEF-MR-B1-15-APF-01': 'iw1:4066144719:2751717861:6057',
+ 'REQDEF-MR-B1-15-APF-02': 'iw1:2305603546:1944763840:5997',
+ 'REQDEF-MR-B1-15-ACP-01': 'iw1:2824451539:4225883257:6009',
+ 'REQDEF-MR-B1-15-ACP-02': 'iw1:3469904913:3132963819:5997',
+};
 const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
+
+// Continue only the exact prepared MR drafts. A saved edit, review or deletion
+// is authoritative. These links identify price owners without claiming coverage.
+function linkPreparedMicrowaveDrafts0550(data){
+ const workspace=data.integrationWorkspace;
+ const allowance=data.lines.find(line=>line.id===MICROWAVE_ALLOWANCE&&line.selected);
+ if(!workspace||!allowance||cusQuantityPricingProblems0550(data,allowance).length)return data;
+ const allocations=new Map(data.repositoryBasisImport.bidCompletion.rows.map(row=>[row.lineId,row]));
+ const receipt=allocations.get(allowance.id);
+ if(receipt?.kind!=='ESTIMATE'||receipt.inputKey!==lineKey(data,allowance)||receipt.ownerIds.length!==1||receipt.ownerIds[0]!==MICROWAVE_PACKAGE)return data;
+ let changed=false;
+ const requirements=workspace.requirements.map(requirement=>{
+  const fingerprint=MICROWAVE_DRAFTS[requirement.id];
+  if(!fingerprint||integrationFingerprint0550(requirement)!==fingerprint)return requirement;
+  const native=data.lines.find(line=>line.id===requirement.workLineIds[0]&&line.selected);
+  const reference=allocations.get(native?.id);
+  if(reference?.kind!=='PRICE_REFERENCE'||reference.inputKey!==lineKey(data,native)||!reference.ownerIds.includes(MICROWAVE_PACKAGE))return requirement;
+  changed=true;
+  const equipment=requirement.id.endsWith('-01');
+  return {...requirement,workLineIds:[...requirement.workLineIds,MICROWAVE_PACKAGE,...(equipment?[MICROWAVE_ALLOWANCE]:[])],
+   supplierBasis:requirement.supplierBasis+(equipment?' Draft price trace: R10 and separate antenna balance allowance.':' Draft price trace: R10 package reference only. Cable medium and length remain open.')};
+ });
+ return changed?{...data,integrationWorkspace:{...workspace,requirements}}:data;
+}
 
 // Use the approved customer bid quantities and the existing quote owners. New
 // allowances are separate from the original quote; they are not unit quotations.
@@ -67,8 +99,8 @@ function prepareCusQuantityPricing0550(data, policies, today) {
  };
  const microwave=pricedSupply('TEL-DMR');
  const ceragon=['R10','R11','R12'].map(row=>offers.get('OFFER-CERAGON-26-30029-REVA1-E90E86E5-'+row));
- if(current('PHI-0001')&&current('DTS-0010')&&current('SPE-0011')&&current('LIS-0004')&&
-  findings.has('A-SI-R24-MICROWAVE-MR-BASE-DESIGN')&&microwave.length===1&&microwave[0].id==='LINE-CERAGON-ASK-REVA1-BASE'&&
+ const microwaveSourceReady=current('PHI-0001')&&current('DTS-0010')&&current('SPE-0011')&&current('LIS-0004')&&findings.has('A-SI-R24-MICROWAVE-MR-BASE-DESIGN');
+ if(microwaveSourceReady&&microwave.length===1&&microwave[0].id===MICROWAVE_PACKAGE&&
   ceragon.every(o=>o?.currency==='USD'&&o.quoteEvidence?.revision==='RevA1'&&finite(o.quoteEvidence.quotedUnitCost)&&o.quoteEvidence.quotedUnitCost>0)&&microwave[0].offerId===ceragon[0].id){
   const [,alternative,spares]=ceragon, reference=alternative.quoteEvidence.quotedUnitCost, radio=spares.quoteEvidence.quotedUnitCost;
   const basis='Budget allowance for two additional 1.2 m installed dishes and associated RF/mounting hardware, one per site. CERAGON Rev.A1 BoQ F93/G93 includes one dish at each site. Pricing proxy: R11 whole unprotected link USD '+reference+' less R12 two spare radios USD '+radio+', shared across two additional dish assemblies. The residual includes other non-radio material and is a planning reserve, not an antenna unit quote. No separate IDU is included by this allowance.';
@@ -84,7 +116,8 @@ function prepareCusQuantityPricing0550(data, policies, today) {
    'DTS-0008 Rev.B1 p3 comment 9 and sheet 8: VPR-308-001 through VPR-308-098',basis,
    'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
  }
- return changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
+ const prepared=changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
+ return microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared):prepared;
 }
 
 export function cusQuantityPricingProblems0550(data,line){

@@ -275,3 +275,25 @@ This read-only update follows ADR-0550-001 principles 2, 4–6, 8 and 10.
 The existing five B8 owners, Working allowance and Volume I binding are
 preserved. The native Exhibit regression verifies the single COMMON row,
 the converted comparison and separation from customer forms.
+
+## 7-Nov-2026. DMR price trace in 10.7
+
+Reconciled CERAGON Rev.A1 against the Rev.36 source and A preparation pair. The
+existing quote owner supplies the link package. The existing two-dish allowance
+is a separate estimate. Startup links the four exact prepared Appendix 1.5
+requirements to the quote owner and links the allowance only to the two equipment
+requirements. It uses current source identities and price receipts. Edited or
+deleted requirements, stale quote bases, quantities and review decisions retain
+their original handling.
+
+The existing A1-11 Working view shows a DMR-only known subtotal and opens the
+allowance's source offers. Official still requires engineering, scope, AVL,
+deviation and commercial review. The CUS cable length/interface and the Full
+Outdoor versus IDU/ODU scope are open. ADR principles 2, 3, 5, 6, 8–12 apply.
+The Rev.36 audit uses a reconstructed workspace. The owner's Windows workspace
+has yet to be verified.
+The current Rev.36 model and browser checks reconcile the two DMR owners to the
+10.7 subtotal and draft C1. The DMR-specific checks preserve authored changes,
+deletions, stale-quote handling, the Official HOLD and existing export cells.
+The older optional 4-Nov completion fixture reports the same stale-basis check
+failure on the parent. Standard completion, release and native Exhibit tests pass.
