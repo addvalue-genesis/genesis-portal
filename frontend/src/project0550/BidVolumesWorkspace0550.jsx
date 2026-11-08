@@ -17,6 +17,7 @@ import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
 import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
+import {CommissioningBreakdown0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
 import {NATIVE_SUMMARIES_0550,NATIVE_FIELDS_0550,downloadNativeExhibit0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/changeImpact0550';
 
@@ -91,6 +92,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <button type="button" disabled={dirty} onClick={()=>{setShowAllSchedules(true);choose('C3');}}>11.C3 · Two-year Operation Spares</button>
   {A1_OTHERS_PANELS_0550.map(({id,number,title})=><button key={id} type="button" disabled={dirty} onClick={()=>choose(id)}>{number} · A1 Others / {title}</button>)}
  </div>}
+ {volume==='I'&&['A1','C2'].includes(panel)&&<CommissioningBreakdown0550 view={displayView} systems={SYSTEMS} currency={currency} summary={panel==='A1'} model={model} disabled={dirty} onNavigate={go} onOpenC3={()=>{setShowAllSchedules(true);choose('C3');}}/>}
+ {volume==='I'&&panel==='C2'&&<CommissioningSpareQuotes0550 data={data} model={model} onNavigate={go} disabled={dirty}/>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
  {(panel==='overview'||volume==='I'&&['A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>

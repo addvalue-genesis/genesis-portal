@@ -33,6 +33,8 @@ import {BidInheritedBasis} from "./BidInheritedBasis";
 import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550} from "./bidWorkingBasis0550";
 import {OfficialCustomerForm} from "./OfficialCustomerForm";
 import {LicensingCost0550} from "./LicensingCost0550";
+import {CommissioningSpareQuotes0550} from './CommissioningSpares0550';
+import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {SATELLITE_SCOPE_OPTIONS,isSatelliteScope0550,satelliteScopeNote0550} from "./data/satelliteScope0550";
 const companyReference=line=>Boolean(line.mrScopeState?.excluded||line.satelliteScopeState?.excluded);
 const includedPriceReference=line=>Boolean(line.mrScopeState?.covered||line.bidPriceAllocation);
@@ -63,7 +65,8 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  <div className="p55-bid-fields"><Select label="Project pricing basis" value={basisChoice} onChange={setBasisChoice} options={[["","เลือกฐานเดิม"],["Goods / Procured Cost","Goods · นโยบายอุปกรณ์เดิม"],["Professional Service","Professional Service · นโยบายบริการเดิม"]]}/><button type="button" disabled={!basisChoice} onClick={()=>setForm(f=>applyPolicyDraft0550(f,COMMERCIAL_POLICY,basisChoice))}>ใช้ฐานราคากับรายการนี้</button>
  <Select label="Project resource role" value={roleChoice} onChange={setRoleChoice} options={[["","เลือกบทบาทจาก 06"],...CORE_TEAM.map(r=>[r.role,r.role+" · "+r.protectedUsdDay+" USD/MD"]) ]}/><button type="button" disabled={!roleChoice||Boolean(chosenOffer&&(chosenOffer.currency!=="USD"||chosenOffer.unit!=="MD"))||Boolean(!chosenOffer&&form.manualCost!=null&&(form.currency!=="USD"||form.unit!=="MD"))} onClick={()=>setForm(f=>applyRoleDraft0550(f,CORE_TEAM.find(r=>r.role===roleChoice),chosenOffer))}>ใช้เรตขายจาก 06</button></div>
  <p>เรตขายบุคลากรใช้ USD/MD; ถ้า Quote หรือต้นทุนที่กรอกไว้เป็นสกุลเงินหรือหน่วยอื่น ให้ตรวจฐานให้ตรงก่อน · ปุ่มใช้ฐานเปลี่ยนเฉพาะร่างรายการนี้ ยังไม่บันทึกหรืออนุมัติ</p>
- <div className="p55-bid-fields"><Select label="Line system" value={form.systemToken} onChange={v=>setForm(f=>({...f,systemToken:v,satelliteScope:"OPEN",scopeBasis:""}))} options={[["COMMON","COMMON / shared scope"],...SYSTEMS.map(s=>[s.token,s.name])]}/><Select label="Cost owner WBS" value={form.wbs} onChange={v=>field("wbs",v)} options={wbsOptions}/>
+ <div className="p55-bid-fields"><Select label="Line system" value={form.systemToken} onChange={v=>setForm(f=>({...f,systemToken:v,satelliteScope:"OPEN",scopeBasis:""}))} options={[["COMMON","COMMON / shared scope"],...SYSTEMS.map(s=>[s.token,s.name])]}/><Select label="Cost owner WBS" value={form.wbs} onChange={v=>setForm(f=>{const {commissioningPhase,...line}=f;return v==='B5'?{...f,wbs:v}:{...line,wbs:v};})} options={wbsOptions}/>
+ {form.wbs==='B5'&&<Select label="C2 commissioning phase" value={commissioningPhase0550(form)} onChange={v=>setForm(f=>{const {commissioningPhase,...line}=f;return v?{...line,commissioningPhase:v}:line;})} options={[["","OPEN · เลือกช่วงงาน"],...COMMISSIONING_PHASES_0550.map(p=>[p.id,p.title])]}/>}
  <Field label="Line description" value={form.description} onChange={v=>field("description",v)} required/><Field label="Unique scope key" value={form.scopeKey} onChange={v=>field("scopeKey",v)} placeholder="เช่น APF.PAGA.SAT.TelecomEngineer.Campaign1" required/>
  <Select label="Customer form row" value={form.customerRowCode||""} onChange={v=>field("customerRowCode",v)} options={[["","OPEN · suggested "+(suggestedCustomerCode(form)||"เลือกตามขอบเขต")],...CUSTOMER_FORM_0550.rows.filter(r=>r.part===form.wbs[0]).map(r=>[r.code,r.code+" · "+r.description])]}/><Field label="Customer brand / model" value={form.brand||""} onChange={v=>field("brand",v)}/><Field label="Customer remark" value={form.customerRemark||""} onChange={v=>field("customerRemark",v)}/>
  <Field label="Requirement reference" value={form.requirementRef} onChange={v=>field("requirementRef",v)}/><Field label="TAG / site reference" value={form.tagRef} onChange={v=>field("tagRef",v)}/><Field label="Line source / manual basis" value={form.sourceRef} onChange={v=>field("sourceRef",v)} required/>
@@ -180,7 +183,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  const prices=<>
  <p>การจัดสรรต้นทุน / ราคาขาย Working ด้านล่างเป็นอีกชั้นหนึ่ง · ไม่เปลี่ยนยอด Supplier ต้นฉบับ · ประมาณการและงานเพิ่มต้องมีฐานแยก · เจ้าของราคาคิดครั้งเดียว</p>
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
- <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code})}>เตรียมรายการใน {code}</button>
+ <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code,...(code==='B5'?{customerRowCode:'B5'}:{})})}>เตรียมรายการใน {code}</button>
  <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=dmr&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
  const r11Owner=dmr&&r===r11Price;
  const showR11Price=r11Owner&&(provisional||r.reviewState==="REVIEWED_WORKING");
@@ -233,6 +236,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  {code==="B1"&&<p className="p55-callout">TEL-TELT · ส่ง structural calculation, แบบฐานรากและสเปก anchor bolts ก่อนปิดประมูล · คง Part B สำหรับงานออกแบบและควบคุมการติดตั้ง · วันและทีม supervision หน้างานยัง OPEN <a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a></p>}
  {code==="B7"&&<p className="p55-callout">TEL-TELT · B7-D04 ใช้ราคา TSSR Item 6 · Item 7 รอตรวจรายงานดินจาก EPC ก่อนตั้งค่าเจาะสำรวจ</p>}
  {code==="B8"&&<LicensingCost0550 lines={children} onNavigate={onNavigate}/>}
+ {code==='B5'&&<CommissioningSpareQuotes0550 data={data} model={working} onNavigate={onNavigate}/>}
  {code==="C1"&&<p className="p55-callout">TEL-TELT · งานตั้งเสาจริงเป็น CNEEC Option · ก่อสร้างฐานรากอยู่นอก TSI · ดูจุดแบ่งงานกราวด์ รั้ว และปรับพื้นที่ในรายการอ้างอิงด้านล่าง <a href={TOWER_C1_0550}>Priced Breakdown C1</a></p>}
  {dmr?<DmrWorkingSections0550 view={dmrTagCosts} requirements={integration.requirements} offers={data.offers} onNavigate={onNavigate} onOpenSource={onOpenSource}>{prices}</DmrWorkingSections0550>:prices}
  </details>;})}</details>;

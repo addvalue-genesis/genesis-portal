@@ -20,6 +20,8 @@ export const EQUATION_INPUTS = {
  E16:{fields:[f("sessions","Sessions"),f("days","Days/session"),f("trainers","Trainers"),f("Hday","Paid hours/day"),f("prepMH","Preparation MH"),f("closeMH","Closeout MH")],unit:"MH"},
  E17:{fields:[f("THB","THB amount"),f("fx","THB per USD",0.000001)],unit:"USD"},
  E18:{fields:[],rows:[f("qtyInstalled","Installed activity quantity"),f("UMH","MH per installed activity")],unit:"MH"},
+ "B5-SPARE-QTY":{fields:[f("drivers","Consumption events / concurrent teams / OEM lot (1)"),f("perDriver","Spares per event / team / OEM lot"),f("reserve","Separate specified reserve"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"Q_add = max(0, N × Q_per_driver + Q_separate_reserve − Q_included)"},
+ "B5-SPARE-STOCK":{fields:[f("installed","Installed units with the same replaceable Part No."),f("failureRate","OEM failures per unit-hour",Number.MIN_VALUE,1),f("exposureHours","Unreplenished exposure hours",Number.MIN_VALUE),f("coveragePct","Stock sufficiency target (%)",0.000001,99.999999),f("planned","Separate planned consumption"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"λ = N × failure rate × t; S = smallest integer with P(Poisson(λ) ≤ S) ≥ target; Q_add = max(0, Q_planned + S − Q_included)"},
  "PAGA-SPL":{fields:[f("ambient","Ambient noise dBA"),f("margin","Required SNR margin dB")],unit:"dBA",formula:"SPL_required = Ambient_Noise + Required_SNR_Margin"},
  "PAGA-UPS":{fields:[f("loadW","Alarm load W"),f("hours","Autonomy hours"),f("efficiency","Efficiency 0–1",0.000001,1),f("DoD","Depth of discharge 0–1",0.000001,1),f("derating","Derating factor 0–1",0.000001,1)],unit:"Wh",formula:"E_required = P_load × t / (η × DoD × Derating)"},
  "PAGA-AMPLIFIER":{fields:[f("tapW","Total speaker tap load W"),f("lossW","Loop losses W"),f("ratedW","Rated amplifier capacity W",0.000001),f("usable","Usable fraction 0–1",0.000001,1)],unit:"W",formula:"Headroom = Rated × Usable − (Speaker taps + Loop losses)"},
@@ -34,6 +36,15 @@ export const EQUATION_INPUTS = {
 };
 // Equation units remain scientific/model units; bidding uses its existing day code.
 export const bidQuantityUnit0550 = unit => unit === "DAYS" ? "day" : unit;
+function poissonStock(mean,coverage){
+ let probability=Math.exp(-mean),cumulative=probability,reserve=0;
+ while(cumulative<coverage){
+  reserve+=1;
+  probability*=mean/reserve;
+  cumulative+=probability;
+ }
+ return {meanFailures:mean,reserve,coveragePct:100*cumulative};
+}
 export function evaluateServiceEquation(id, inputs={}) {
  const definition=EQUATION_INPUTS[id];
  if(!definition)return {state:"INVALID",value:null,errors:["Unknown equation"],unit:null};
@@ -52,10 +63,15 @@ export function evaluateServiceEquation(id, inputs={}) {
  if(id==="E01"&&inputs.I!==undefined&&inputs.I!==null&&![0,1].includes(inputs.I))errors.push("Applicability must be 0 or 1");
  if(id==="E04"&&Array.isArray(inputs.rows)&&inputs.rows.some(r=>r&&r.I!==null&&r.I!==undefined&&![0,1].includes(r.I)))errors.push("Applicability must be 0 or 1");
  if(id==="E05")for(const key of ["events","crew"])if(inputs[key]!==null&&inputs[key]!==undefined&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(id==="B5-SPARE-QTY")for(const {key} of definition.fields)if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(id==="B5-SPARE-STOCK")for(const key of ["installed","planned","included"])if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(id==="E14"&&inputs.driver>inputs.totalDrivers)errors.push("Driver exceeds total drivers");
  if(["PORT-HEADROOM","LICENSE-HEADROOM","CCTV-STORAGE","FO-LOSS"].includes(id))for(const key of ({"PORT-HEADROOM":["available","connected","reserved"],"LICENSE-HEADROOM":["licensed","required"],"CCTV-STORAGE":["cameras"],"FO-LOSS":["splices","connectors"]}[id]))if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(errors.length||missing.length)return {state:errors.length?"INVALID":"OPEN",value:null,errors:[...errors,...missing.map(k=>"Missing "+k)],unit:definition.unit};
  const x=inputs, sum=fn=>x.rows.reduce((n,r)=>n+fn(r),0);
+ const mean=id==="B5-SPARE-STOCK"?x.installed*x.failureRate*x.exposureHours:null;
+ if(mean>200||id==="B5-SPARE-QTY"&&!Number.isSafeInteger(x.drivers*x.perDriver+x.reserve))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
+ const stock=mean===null?null:poissonStock(mean,x.coveragePct/100);
  const calculations={
   E01:()=>x.I*x.Q*x.UMH*x.F,E02:()=>x.Qdoc*(x.Hinitial+x.Ncycles*x.Hcycle+x.Hfinal),E03:()=>x.months*x.FTE*x.Hmonth,
   E04:()=>sum(r=>r.I*r.UMH*r.F),E05:()=>x.events*x.days*x.crew,E06:()=>x.MHwork/(x.crew*x.Hday*x.eta),
@@ -64,6 +80,8 @@ export function evaluateServiceEquation(id, inputs={}) {
   E11:()=>x.cost*(1+x.markup),E12:()=>x.cost/(1-x.margin),E13:()=>x.sell*(1+x.primeMarkup),
   E14:()=>x.pool*x.driver/x.totalDrivers,E15:()=>x.laborDelta+x.tripDelta+x.OEMDelta,
   E16:()=>x.sessions*x.days*x.trainers*x.Hday+x.prepMH+x.closeMH,E17:()=>x.THB/x.fx,E18:()=>sum(r=>r.qtyInstalled*r.UMH),
+  "B5-SPARE-QTY":()=>Math.max(0,x.drivers*x.perDriver+x.reserve-x.included),
+  "B5-SPARE-STOCK":()=>Math.max(0,x.planned+stock.reserve-x.included),
   "PAGA-SPL":()=>x.ambient+x.margin,"PAGA-UPS":()=>x.loadW*x.hours/(x.efficiency*x.DoD*x.derating),
   "PAGA-AMPLIFIER":()=>x.ratedW*x.usable-x.tapW-x.lossW,"AVAILABILITY":()=>x.MTBF/(x.MTBF+x.MTTR),
   "CCTV-STORAGE":()=>x.cameras*x.Mbps*x.days*86400*x.overhead/(8*1000000*x.usable),
@@ -76,5 +94,5 @@ export function evaluateServiceEquation(id, inputs={}) {
  const value=calculations[id]();
  if(!Number.isFinite(value)||Math.abs(value)>Number.MAX_SAFE_INTEGER||(id==="E05"&&value*x.Hday>Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Result overflow"]};
  return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
-  ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),engineeringAccepted:false};
+  ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),...stock,engineeringAccepted:false};
 }

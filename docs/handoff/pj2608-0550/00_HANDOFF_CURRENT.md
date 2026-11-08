@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [CUS commissioning-spare basis and A1 rows 4–5](20261108_A1_SPARE_PRICING.md). Live C2 uses the existing Working quantity and unit-cost path under STD §7.7.1 and MR Appendix 10. Earlier untouched C2 allowances reopen. A1 references C3 Option pricing separately from Base.
+Latest A1 spare pricing: [CUS commissioning-spare phases, quantity and stock coverage](20261108_A1_SPARE_PRICING.md). 11.C2 reads Working B5 by phase and system. A1 shows 5.1–5.3 as breakdown labels and the separate C3 Option reference. 02.1 runs evidenced quantity and probability-based stock sizing.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 

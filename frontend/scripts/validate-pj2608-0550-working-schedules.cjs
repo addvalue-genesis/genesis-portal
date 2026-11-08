@@ -20,6 +20,33 @@ try{
  const savedDraft=P.saveScheduleAllocationDrafts0550(d,v.allocationPlan,today);validate(savedDraft);assert.equal(savedDraft.bidVolumes.bindings.find(b=>b.id==='TEST-MGW-CCTV').status,'DRAFT');assert.equal(saved(savedDraft).ready,false);assert.deepEqual(savedDraft.lines,d.lines);assert.deepEqual(savedDraft.offers,d.offers);assert.deepEqual(savedDraft.releaseRegister,frozen);assert.deepEqual(P.saveScheduleAllocationDrafts0550(savedDraft,v.allocationPlan,today),savedDraft,'Repeated save does not overwrite existing decisions');
  const categories=structuredClone(d);categories.lines=categories.lines.map(l=>({...l,selected:false}));for(const wbs of ['B1','B2','B3','B4','B5','B6','B7','B8','B9','C1','C2','C3']){const row={...structuredClone(base.lines.find(l=>l.id==='LINE-TEST')),id:'TEST-'+wbs,scopeKey:'TEST-'+wbs,wbs,selected:true};categories.lines.push(row);}
  const cv=preview(categories),byWbs=code=>cv.allocationPlan.find(p=>p.line.wbs===code).proposal;assert.equal(byWbs('B2').schedule,'A1');assert.equal(byWbs('B2').summary,'OTHER','Freight is not silently reclassified as packing');assert.equal(byWbs('C2').schedule,'C4');assert.equal(byWbs('C3').schedule,'C3');assert.equal(byWbs('C1').schedule,'A2');assert.equal(byWbs('B3').summary,'TRAINING');validate(P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today));
+ const {evaluateServiceEquation}=require(root+'/project0550/serviceEquationRuntime.js');
+ const {commissioningBreakdown0550}=require(root+'/project0550/data/commissioningSparePhases0550.js');
+ const stock={installed:10,failureRate:0.001,exposureHours:100,coveragePct:95,planned:2,included:1};
+ const risk=evaluateServiceEquation('B5-SPARE-STOCK',stock);
+ assert.equal(risk.reserve,3);assert.equal(risk.value,4);assert(Math.abs(risk.coveragePct-98.1011843)<1e-6);
+ assert.equal(evaluateServiceEquation('B5-SPARE-STOCK',{...stock,failureRate:null}).state,'OPEN');
+ assert.equal(evaluateServiceEquation('B5-SPARE-STOCK',{...stock,coveragePct:100}).state,'INVALID');
+ assert.equal(evaluateServiceEquation('B5-SPARE-STOCK',{...stock,exposureHours:30000}).state,'INVALID');
+ const qty={drivers:3,perDriver:2,reserve:1,included:2};
+ assert.equal(evaluateServiceEquation('B5-SPARE-QTY',qty).value,5);
+ assert.equal(evaluateServiceEquation('B5-SPARE-QTY',{drivers:1,perDriver:1,reserve:0,included:1}).value,0);
+ assert.equal(evaluateServiceEquation('B5-SPARE-QTY',{...qty,perDriver:1.5}).state,'INVALID');
+ const spares=structuredClone(categories),lineB5=spares.lines.find(l=>l.id==='TEST-B5');
+ Object.assign(lineB5,{commissioningPhase:'PRE_COMMISSIONING',systemToken:'TEL-LAN',customerRowCode:'B5',
+  vendorId:'',offerId:'',calculationId:'TEST-B5-COUNT',resultKey:'value',quantity:null,unit:'Pc',currency:'USD',manualCost:10,sellMode:'MARKUP',markupPct:0,marginPct:null,primePct:0,sellRate:null});
+ delete lineB5.officialReview;
+ spares.calculations.push({id:'TEST-B5-COUNT',title:'Synthetic count',systemToken:'TEL-LAN',equationId:'B5-SPARE-QTY',inputs:qty,sourceRef:'SYNTHETIC quantity evidence'});
+ validate(spares);
+ const spareView=preview(spares),spareBreakdown=commissioningBreakdown0550(spareView,D.SYSTEMS,'USD');
+ assert.equal(spareBreakdown.bySystem.length,D.SYSTEMS.length+1);
+ assert.equal(spareBreakdown.bySystem.find(s=>s.token==='TEL-LAN').rows[0].quantity,5);
+ assert.equal(spareBreakdown.groups[0].knownUSD,50);
+ assert.equal(spareBreakdown.groups[1].knownUSD,null);
+ assert.equal(spareBreakdown.total.knownUSD,50);
+ assert.equal(N.nativeSchedule0550(spareView,'A1').pages[0].values.A1_5_6,'50.00');
+ assert.equal(spareBreakdown.operationRows.length,1,'C3 owner stays in the separate option');
+ assert.deepEqual(spares.releaseRegister,frozen);
  // Receipted SI expenses have one owner, never a fictitious C7 man-hour rate.
  const expense=structuredClone(categories);expense.repositoryBasisImport={...(expense.repositoryBasisImport||{}),tsiActivityBudget:{expenseLineIds:['TEST-B4']}};
  const ep=preview(expense),eb=ep.allocationPlan.find(p=>p.line.id==='TEST-B4').proposal;assert.equal(eb.schedule,'A1');assert.equal(eb.summary,'OTHER');assert.deepEqual(expense.lines,categories.lines);
