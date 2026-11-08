@@ -1,5 +1,13 @@
 # A1 commissioning and operating spare pricing
 
+## Draft C2 forms by system
+
+11.C2 and 11.P preview use the existing 19 system tokens and canonical C2 allocations. The selector opens one system at a time and also offers all systems. Each system has its own draft form set. The native Exhibit C rule still starts a separate form for each Main Equipment No., with continuation sheets for overflow. Systems awaiting allocations show an OPEN form. Existing shared owners appear once under COMMON.
+
+The C2 Word and Print/PDF controls use the chosen system. Full draft Word and HTML include all system sets, and the draft Volume I Excel export uses one C2 tab per system. The screen and exports use the same system grouping. A1 S/N 4 still rolls up the same canonical B5 prices. There is no change to frozen package layout, release gates, saved rows or allocations. ADR 5, 6 and 10–12 apply.
+
+Native Exhibit, controlled release, Working Schedules and production webpack passed. The native test verifies separate LAN and DMR headers even with the same Main Equipment No., independent subforms, selected print HTML/Word, the single-sheet Word page break and unchanged A1 amount. Isolated Chromium on the prepared workspace plus synthetic B5 rows verified the selector, an OPEN PAGA form, selected-only and full Word downloads, system Excel tabs and unchanged Working records. The owner's Windows workspace and a physical printout were outside the test.
+
 ## C2 quantity basis from the existing CUS register
 
 Exhibit C2 Notes 1–3 require a form per Main Equipment No. and define the scope from construction through start-up, testing and PAC. A is the count of an identical part per main equipment item and B is the count of matching main equipment items. A × B is installed population. It does not prescribe spare quantity. Use the quantity required by the applicable CUS clause or supported by the OEM spare list under STD TEL-001 §7.7.1 and MR B1 Appendix 10. The executable `B5-C2-OEM-QTY` in existing 02.1 gives max(0, required − documented same-part/same-duty included quantity). Missing inputs remain OPEN. Capture OEM Part No., availability/lead time and source. Use the existing price/FX path in Working B5. B5-SPARE-QTY can support a documented activity-based takeoff. The Poisson scenario remains a separate comparison.

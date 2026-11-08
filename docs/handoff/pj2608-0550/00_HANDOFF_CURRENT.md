@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [CUS quantity basis and Working LAN review](20261108_A1_SPARE_PRICING.md). 11.C2 uses the existing CUS documents and the source-based B5-C2-OEM-QTY equation. It shows all LAN records, reconciles the two APF packages against CUS and reads B5 by phase and system. A1 shows 5.1–5.3 as breakdown labels and the separate C3 Option reference.
+Latest A1 spare pricing: [C2 forms by system, CUS quantity basis and Working LAN review](20261108_A1_SPARE_PRICING.md). 11.C2 can open or export a draft form set per system. Each set retains the native Main Equipment subdivision. A1 still reads the canonical B5 allocations and shows the separate C3 Option reference.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 
