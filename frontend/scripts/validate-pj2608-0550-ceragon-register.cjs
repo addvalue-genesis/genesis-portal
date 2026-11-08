@@ -41,6 +41,17 @@ assert.strictEqual(Process.prepareBidProcess0550(selected,D.COMMERCIAL_POLICY,to
 const chosenOffers=R.vendorOfferEntries0550(selected);
 assert(!chosenOffers.some(entry=>entry.offer.id===Selection.CERAGON_R10_0550));
 assert(chosenOffers.some(entry=>entry.offer.id===Selection.CERAGON_R11_0550&&entry.offer.quoteEvidence.quotedQuantity===0));
+const historyKey='bid.vendor.offer.'+Selection.CERAGON_R10_0550;
+const historyOnly={...selected,offers:selected.offers.filter(o=>o.vendorId!==family.pack.vendors[0].id||o.id===Selection.CERAGON_R10_0550)};
+for(const workspace of [selected,historyOnly]){
+ const vendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:workspace,onEdit:()=>{}}));
+ const companyStart=vendorHtml.indexOf('data-vnd-group="'+family.pack.vendors[0].id+'"');
+ const history=vendorHtml.indexOf('data-component-key="'+historyKey+'"');
+ assert(companyStart>=0&&history>companyStart,'R10 history is inside the CERAGON company group');
+ assert(!vendorHtml.slice(companyStart,history).includes('</details>'),'CERAGON is still open in the markup at the R10 history');
+ assert.equal(vendorHtml.indexOf('data-component-key="'+historyKey+'"',history+1),-1,'R10 retains one Module ID target');
+ assert(!vendorHtml.includes('data-vnd-offer="'+Selection.CERAGON_R10_0550+'"'),'R10 history stays outside active quote rows');
+}
 const price=W.deriveBidWorkspace(selected,tokens,today).provisional.lines.find(l=>l.id===current.id);
 assert.equal(price.provisionalCostNative,actual.offers.find(o=>o.id===current.offerId).unitCost);
 console.log('PASS CERAGON R11: prior workspace migrates one owner, keeps native option quantity zero, and hides the superseded offer from active views.');

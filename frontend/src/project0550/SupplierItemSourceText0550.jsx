@@ -123,16 +123,17 @@ function TowerBomItem0550({entry,requirements,onNavigate,showPrices}) {
 
 // The two tower quotations and their existing SI/Working links, in one view.
 export function SupplierTowerBom0550({
-  data, projection, onNavigate,
+  data, projection, onNavigate, vendorId,
   requirements=data.integrationWorkspace?.requirements || [],
   showPrices=true, initiallyOpen=false
 }) {
   const [open,setOpen] = useState(initiallyOpen);
   const [view,setView] = useState('supply');
   const index = useMemo(() => open ? projection || supplierCostProjection0550(data) : null, [data,projection,open]);
-  if (!data.offers.some(isTowerSourceItem0550)) return null;
+  const matchesOffer = offer => (!vendorId || offer.vendorId===vendorId) && isTowerSourceItem0550(offer);
+  if (!data.offers.some(matchesOffer)) return null;
   const quotes = (index?.bySystem.get('TEL-TELT') || [])
-    .filter(quote => quote.items.some(entry => isTowerSourceItem0550(entry.offer)))
+    .filter(quote => quote.items.some(entry => matchesOffer(entry.offer)))
     .sort((a,b) => a.title.localeCompare(b.title));
   const mappings = new Map();
   for (const requirement of open ? requirements : []) {
@@ -220,7 +221,7 @@ function pagaBomGroup0550(offer){
 }
 
 export function SupplierPagaBom0550({
-  data,projection,onNavigate,
+  data,projection,onNavigate,vendorId,
   requirements=data.integrationWorkspace?.requirements||[],
   showPrices=true,initiallyOpen=false
 }){
@@ -228,8 +229,9 @@ export function SupplierPagaBom0550({
   const [quoteKey,setQuoteKey]=useState('');
   const [view,setView]=useState('equipment');
   const index=useMemo(()=>open?(projection||supplierCostProjection0550(data)):null,[data,projection,open]);
-  if(!data.offers.some(isPagaBomOffer))return null;
-  const quotes=(index?.bySystem.get('TEL-PAGA')||[]).filter(quote=>quote.items.some(entry=>isPagaBomOffer(entry.offer)));
+  const matchesOffer=offer=>(!vendorId||offer.vendorId===vendorId)&&isPagaBomOffer(offer);
+  if(!data.offers.some(matchesOffer))return null;
+  const quotes=(index?.bySystem.get('TEL-PAGA')||[]).filter(quote=>quote.items.some(entry=>matchesOffer(entry.offer)));
   const quote=quotes.find(candidate=>candidate.key===quoteKey)||quotes.find(candidate=>candidate.title==='A20261632-002')||quotes[0];
   const mappings=new Map();
   for(const requirement of open?requirements:[]){
