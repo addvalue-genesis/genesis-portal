@@ -1,10 +1,31 @@
 import React,{useState} from 'react';
 import {SCHEDULES_0550} from './data/bidVolumes0550';
 import {schedulePriceDiagnostics0550} from './data/scheduleDiagnostics0550';
-import {scheduleViewTHB0550} from './data/scheduleRollup0550';
+import {scheduleBindingTHB0550,scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
 
 const money=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'ยังไม่มีราคา';
 const resultSchedules=SCHEDULES_0550.filter(({id})=>/^C[2-8]$/.test(id));
+
+export function ScheduleParentResults0550({rows,id,system,currency,workingPreview,onNavigate,disabled}){
+ const displayed=currency==='THB'?rows.map(scheduleBindingTHB0550):rows;
+ const treatments=[
+  ['BASE','11.A1 · Base','bid.quotation.A1'],
+  ['OPTION',id==='C3'?'11.A2 · Option (อ้างอิงใน Notes ของ 11.A1)':'11.A2 · Option','bid.quotation.A2'],
+  ['CALLOFF','Call-off · เรตตามการเรียกใช้',null]
+ ];
+ const results=treatments.map(([treatment,label,target])=>({treatment,label,target,...scheduleRollup0550(displayed.filter(row=>row.treatment===treatment))})).filter(result=>result.count);
+ const selected=system&&scheduleRollup0550(displayed.filter(row=>row.line.systemToken===system));
+ const describe=result=>result.priced?currency+' '+money(result.knownUSD)+' · มีราคา '+result.priced+'/'+result.count+' แถว'+(result.open?' · ยอดเฉพาะรายการที่มีราคา':''):'OPEN';
+ return <section className="p55-panel" aria-label={'Schedule '+id+' linked price results'}>
+  <h4>ผลราคา 11.{id} จาก Working ที่เชื่อมกับ A1 / A2</h4>
+  <p>{workingPreview?'Working Preview · ยอดที่มีทั้งโครงการสำหรับ Schedule นี้':'ราคาที่ผ่านการทบทวนทั้งโครงการสำหรับ Schedule นี้'}</p>
+  {results.length?<ul>{results.map(({treatment,label,target,...result})=><li key={treatment}>
+   {target&&onNavigate?<button type="button" disabled={disabled} onClick={()=>onNavigate(target)}>{label}</button>:label}
+   {' · '}<strong>{treatment==='CALLOFF'?result.count+' แถว · ดูเรตต่อหน่วยจาก Working':describe(result)}</strong>
+  </li>)}</ul>:<p><strong>OPEN</strong> · ยังไม่มีรายการจัดลง Schedule นี้</p>}
+  {selected&&<p>ผลเฉพาะระบบ {system} · <strong>{describe(selected)}</strong>{!selected.count&&' · ยังไม่มี Working B5 จัดลงระบบนี้'}</p>}
+ </section>;
+}
 
 export function ScheduleResults0550({view,currency,onOpen,disabled}){
  const display=currency==='THB'?scheduleViewTHB0550(view):view;

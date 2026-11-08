@@ -1,7 +1,7 @@
 import React,{useMemo,useState} from 'react';
 import {a1SummarySlot0550,nativeSchedule0550,nativeExhibitProblems0550,nativeFormCss0550,nativeExhibitHtml0550,downloadNativeExhibit0550} from './exhibitCNative0550';
 import {MgwScheduleSource0550} from './WorkingSchedulePreview0550';
-import {SchedulePriceDiagnostics0550} from './SchedulePriceDiagnostics0550';
+import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './SchedulePriceDiagnostics0550';
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
@@ -66,6 +66,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {groups.length>0&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.group.B5',{workingSystem:selected?.token})}>เตรียมรายการ Working B5</button>}
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
+  {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
    <strong>ตรวจความเสี่ยงคิดซ้ำใน C2 · พบ Lot และรายการราย Part No.</strong>
    <ul>{overlaps.map(({mainEquipment,systemToken,lots,parts})=><li key={mainEquipment?'equipment:'+mainEquipment:'system:'+systemToken}>

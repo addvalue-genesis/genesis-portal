@@ -35,6 +35,21 @@ assert.equal(licencePage.A1_11_6,'100.00');
 assert(licencePage.A1_11_7.includes('Telecom import, radio and operating licence coordination'));
 assert(!N.nativeSchedule0550({...licenceView,workingPreview:false},'A1').pages[0].values.A1_11_7.includes('Telecom import, radio and operating licence coordination'));
 const {LicensingCost0550}=require(root+'/project0550/LicensingCost0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const {ScheduleParentResults0550}=require(root+'/project0550/SchedulePriceDiagnostics0550.jsx');
+const commonC2={...spareBindings[0],line:{...spareBindings[0].line,systemToken:'COMMON'}};
+const linkedC2=renderToStaticMarkup(React.createElement(ScheduleParentResults0550,{rows:[commonC2],id:'C2',system:'TEL-LAN',currency:'THB',workingPreview:true}));
+assert.match(linkedC2,/11\.A1 · Base.*THB 3,200\.00/);
+assert.match(linkedC2,/ผลเฉพาะระบบ TEL-LAN.*OPEN.*ยังไม่มี Working B5/);
+const linkedC3=renderToStaticMarkup(React.createElement(ScheduleParentResults0550,{rows:[spareBindings[1]],id:'C3',currency:'USD',workingPreview:true}));
+assert.match(linkedC3,/11\.A2 · Option.*USD 75\.00/);
+for(const id of ['C4','C5','C6']){
+ const row={...rows.find(r=>r.schedule===id),deliveryTerm:'',amount:172.5};
+ const draft={...view,workingPreview:true,nativeC1:[],scheduleRows:schedule=>schedule===id?[row]:view.scheduleRows(schedule)};
+ const note=new RegExp('Schedule '+id+' Working price: USD 172[.]50.*CIF/FOB allocation OPEN');
+ assert.match(N.nativeSchedule0550(draft,id).html,note);
+ assert.match(Buffer.from(N.buildNativeExhibitDocx0550(draft,id)).toString(),note);
+ assert.doesNotMatch(N.nativeSchedule0550({...draft,workingPreview:false},id).html,note);
+}
 const workingLicences=renderToStaticMarkup(React.createElement(LicensingCost0550,{lines:[licence.line]}));
 const customerLicences=N.nativeExhibitHtml0550(licenceView,'A1');
 assert(workingLicences.includes('2,777.00'));

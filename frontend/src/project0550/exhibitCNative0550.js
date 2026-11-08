@@ -98,7 +98,7 @@ function nativePages(view,id,currency='USD'){
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group});});
  }
  if(['C2','C3','C4'].includes(id)){
   const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows}];
@@ -113,7 +113,7 @@ function nativePages(view,id,currency='USD'){
      set(v,i+4,0,phase.title+' spares');
      for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
     });
-    add(v,main+(pi?' / Continuation '+(pi+1):''),system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:undefined);
+    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,...(system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:{})});
     firstPage=false;
    });
   }
@@ -151,10 +151,10 @@ function renderPage(view,page,format,currency='USD'){
  let partialNote='';
  if(view.workingPreview){
   if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id));
-  if(['C2','C3'].includes(page.id)){
-   const rows=page.spareRows||view.scheduleRows(page.id);
+  if(page.priceRows){
+   const rows=page.priceRows.filter(b=>!b.nonAdditive&&b.treatment!=='CALLOFF');
    if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
-    partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+'.';
+    partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+' (rows on this form).';
     if(rows.some(b=>!term(b)))partialNote+=' CIF/FOB allocation OPEN.';
    }
   }

@@ -1,5 +1,13 @@
 # A1 commissioning and operating spare pricing
 
+## Price trace inside 11.C2–11.C8
+
+Each detail Schedule shows the existing Working amounts by A1 Base and A2 Option. C2 shows the whole-project totals separately from the selected system. C3 stays an A2 Option reference in A1 Notes. Call-off rows are shown as rate references. Draft native C2–C6 sheets show the Working amount for the rows on that sheet when CIF/FOB is unresolved. Existing template price columns still require their delivery basis. ADR 2, 5, 6, 8, 10–12 apply.
+
+Re-read both MGW Q26-063 quotations. Current LAN/PBX/FO PDF p1, APF SN 9.0 row 4 quotes two C9300-48P-A Distribution Switch sets with a PWR-C1-715WAC power supply in each set. Earlier Q26-063 v1.0 PDF pp24–25 mentions PWR-C1-715WAC-P as a spare on the C9300L-24P-4X-A package. The current quotation does not establish a separately supplied C2 spare quantity or unit rate. 11.C2 shows that distinction under the current Offer and Working owner. MR B1 Appendix 10 and STD TEL-001 §7.7.1 remain the basis for the itemized C2 spare schedule.
+
+Production webpack, Working Schedules, and Chromium on the prepared project fixture passed. The browser verified all seven detail pages, the LAN scope separation and C4/C5 draft notes. The Windows IndexedDB and final LAN spare list remain unverified.
+
 ## Preparation for all 19 systems
 
 An empty draft C2 system sheet now shows Pre-commissioning, Commissioning and Start-up preparation rows with OPEN part, quantity, commercial and logistics cells. A system with actual allocations retains its native Main Equipment forms and lists the phases awaiting B5. Draft Word, HTML/PDF and Excel use the same preparation basis. COMMON continues to represent existing shared allocations. The preparation slots are presentation only and never enter Working, 11.M, A1 totals or frozen issue data.
