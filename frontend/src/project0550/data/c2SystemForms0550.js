@@ -1,5 +1,9 @@
 import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './commissioningSparePhases0550';
 
+export function c2PartsDescription0550({line,lineId}){
+ return lineId?.startsWith('LINE-B5-LAN-STARTUP-')?line.description.replace(/^SI estimate · (?=LAN start-up spare · )/,''):line.description;
+}
+
 const legacyProjectLots=new Set(COMMISSIONING_PHASES_0550.map(phase=>phase.legacyId));
 const knownKey=value=>{
  const key=value?.trim().toUpperCase();

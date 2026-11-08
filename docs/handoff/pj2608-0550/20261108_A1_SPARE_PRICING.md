@@ -1,8 +1,16 @@
 # A1 commissioning and operating spare pricing
 
+## C2 customer price columns and price trace
+
+Parts Description contains the spare description. The native draft shows the Working **customer selling price** in Unit Cost and Total Cost. If no unique CIF/FOB basis is saved, each price cell spans both term columns and the form explains the pending allocation. An explicit CIF or FOB continues to use its corresponding subcolumn. Unknown price stays OPEN. The Word/HTML drafts follow the native layout and the Excel draft uses the cleaned description and its existing selling-price columns. Stored Working data, allocation, release approval, and frozen issue artifacts are preserved. ADR 5, 6, 8 and 10–12 apply.
+
+The two LAN lines take USD 281.00 and USD 9,514.00 per complete matching set from MGW Q26-063 LAN/PBX/FO PDF p1, APF SN 8.0 row 1 and SN 9.0 row 5. `B5-SPARE-STOCK` returns one SET each. Working applies E12 (cost ÷ 0.95) and E13 (ADDVALUE sell × 1.20). It converts the unrounded result using the saved 33.6335 THB/USD, rounds the THB total to cents, and exposes the USD equivalent through E17. C2 reads the derived customer amount and its unit rate from 11.M. The THB examples are 11,938.12 and 404,196.78, totaling 416,134.90. Internal procurement, margin, and source assumptions stay in Working.
+
+Chromium on the prepared workspace verified the two price cells per LAN row in both USD and THB, the clean description, the A1 reconciliation, and the saved C2 bindings. Native regressions cover Word, HTML, XLSX, explicit CIF/FOB placement and the strict issue layout. Schedule diagnostics, Working Schedules and controlled issue checks passed. The owner's Windows workspace was outside the test.
+
 ## LAN C2 draft Start-up prices
 
-11.C2 stayed OPEN because the LAN reliability view calculated quantities without creating Working B5 owners or 11.M allocations. Startup preparation now creates the two source-bound `LINE-B5-LAN-STARTUP-*` owners, their `B5-SPARE-STOCK` calculations and DRAFT C2 bindings on the current MGW and MR basis. The native form shows each Working selling amount in its description while the CIF/FOB fields await a customer term. A1 S/N 4 reads the same amounts once. ADR 2, 5, 6, 8, 10–12 apply.
+11.C2 stayed OPEN because the LAN reliability view calculated quantities without creating Working B5 owners or 11.M allocations. Startup preparation now creates the two source-bound `LINE-B5-LAN-STARTUP-*` owners, their `B5-SPARE-STOCK` calculations and DRAFT C2 bindings on the current MGW and MR basis. A1 S/N 4 reads the same amounts once. ADR 2, 5, 6, 8, 10–12 apply.
 
 | Current matching MGW equipment set | Installed | MTBF (h) | Start-up stock (SET) | Cost proxy (USD/SET) | Draft sell (USD) |
 | --- | ---: | ---: | ---: | ---: | ---: |

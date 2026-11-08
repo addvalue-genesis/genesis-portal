@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [LAN C2 draft Start-up prices](20261108_A1_SPARE_PRICING.md). The current MGW equipment-set rates and the LAN stock calculation now feed two Working B5 owners, DRAFT 11.M C2 bindings and USD 12,372.63 in the native 11.C2 LAN form and A1 S/N 4. Pre-commissioning, commissioning and customer delivery basis remain OPEN for the reasons recorded in the checkpoint. The existing B5 editor also supports preparing other systems and phases.
+Latest A1 spare pricing: [C2 customer price columns and price trace](20261108_A1_SPARE_PRICING.md). Unit Cost and Total Cost show the Working customer selling price and span CIF/FOB when allocation is pending. LAN Start-up is USD 12,372.63 in native 11.C2 and A1 S/N 4. Pre-commissioning, commissioning and the delivery basis remain OPEN for the reasons recorded in the checkpoint.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 

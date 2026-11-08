@@ -15,6 +15,9 @@ for(const s of V.SCHEDULES_0550){const result=N.nativeSchedule0550(view,s.id);as
 fs.writeFileSync(path.join(dir,'all.docx'),N.buildNativeExhibitDocx0550(view));fs.writeFileSync(path.join(dir,'all.html'),N.nativeExhibitHtml0550(view));
 assert(N.nativeSchedule0550(view,'A1').html.includes('whiteness'),'Preserve native wording, including source errors');
 const spareBindings=rows.filter(r=>['C2','C3'].includes(r.schedule)).map((r,i)=>({...r,amount:[100,75][i],deliveryTerm:'',line:{...r.line,customerTHB:[3200,2400][i],spareBudget:{rate:0.01,basisTHB:10000}}}));
+const lanDescription='LAN start-up spare · C9105AXI-H complete set';
+spareBindings[0]={...spareBindings[0],lineId:'LINE-B5-LAN-STARTUP-C9105AXI-H',quantity:2,unitPrice:50,
+ line:{...spareBindings[0].line,description:'SI estimate · '+lanDescription}};
 const spareView={...view,workingPreview:true,nativeC1:[],bindings:spareBindings,scheduleRows:id=>spareBindings.filter(r=>r.schedule===id),baseAssigned:100,optionsAssigned:75};
 const a1Spare=N.nativeSchedule0550(spareView,'A1').pages[0].values;
 assert.equal(a1Spare.A1_5_6,'100.00');
@@ -22,14 +25,30 @@ assert.equal(a1Spare.A1_6_6,'OPTION / see Notes');
 assert.match(a1Spare.A1_6_7,/USD 75\.00.*Excluded from Base/);
 assert.match(a1Spare.A1_12_1,/In figures: USD 100\.00/);
 assert.match(N.nativeSchedule0550(spareView,'A2').pages[0].values.A2_6_9,/USD 75\.00/);
-assert.match(N.nativeExhibitHtml0550(spareView,'C2'),/USD 100\.00.*CIF\/FOB allocation OPEN/);
-const draftSpare=N.nativeSchedule0550(spareView,'C2').pages[0].values;
-assert.match(draftSpare.C2_4_0,/Working draft offer: USD .*Total USD 100\.00 · Delivery term OPEN/);
-assert.deepEqual([9,10,11,12].map(column=>draftSpare['C2_4_'+column]),['OPEN','','OPEN','']);
-assert.doesNotMatch(N.nativeSchedule0550({...spareView,workingPreview:false},'C2').pages[0].values.C2_4_0,/Working draft offer/);
+assert.match(N.nativeExhibitHtml0550(spareView,'C2'),/USD 100\.00.*Prices spanning CIF and FOB are pending allocation/);
+const draftSpare=N.nativeSchedule0550(spareView,'C2'),draftValues=draftSpare.pages[0].values;
+const priceCells=page=>[9,10,11,12].map(column=>page.values['C2_4_'+column]);
+assert.equal(draftValues.C2_4_0,lanDescription);
+assert.deepEqual(priceCells(draftSpare.pages[0]),['USD 50.00','','USD 100.00','']);
+assert.match(draftSpare.html,/colspan="2" class="native-c2-draft-price"><p[^>]*>USD 50\.00<\/p><\/td><td colspan="2" class="native-c2-draft-price"><p[^>]*>USD 100\.00/);
+assert.doesNotMatch(draftSpare.html,/SI estimate|Working draft offer/);
+const draftWord=Buffer.from(N.buildNativeExhibitDocx0550(spareView,'C2')).toString();
+assert.match(draftWord,/<w:gridSpan w:val="2"\/>[^]*?<w:t[^>]*>USD 50\.00<\/w:t>/);
+assert.doesNotMatch(draftWord,/SI estimate|Working draft offer/);
+assert.equal(require(root+'/project0550/exportBidVolumes0550').scheduleTable0550(spareView,'C2').rows[0][1],lanDescription);
+const reviewedSpare=N.nativeSchedule0550({...spareView,workingPreview:false},'C2');
+assert.deepEqual(priceCells(reviewedSpare.pages[0]),['OPEN','','OPEN','']);
+assert.equal(reviewedSpare.pages[0].values.C2_4_0,'SI estimate · '+lanDescription,'Preserve the rendering of saved issue descriptions');
+assert.doesNotMatch(reviewedSpare.html,/native-c2-draft-price/);
+for(const [term,expected] of [['CIF',['50.00','','100.00','']],['FOB',['','50.00','','100.00']]]){
+ const confirmed=N.nativeSchedule0550({...spareView,scheduleRows:id=>id==='C2'?[{...spareBindings[0],deliveryTerm:term}]:spareView.scheduleRows(id)},'C2');
+ assert.deepEqual(priceCells(confirmed.pages[0]),expected);
+ assert.doesNotMatch(confirmed.html,/native-c2-draft-price/);
+}
 assert.match(N.nativeExhibitHtml0550(spareView,'C3'),/USD 75\.00.*CIF\/FOB allocation OPEN/);
 assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
 const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
+assert.deepEqual(priceCells(N.nativeSchedule0550(thbView,'C2','THB').pages[0]),['THB 1,600.00','','THB 3,200.00','']);
 assert.match(N.nativeSchedule0550(thbView,'A1','THB').pages[0].values.A1_6_7,/THB 2,400\.00/);
 assert.equal(N.nativeSchedule0550({...spareView,workingPreview:false},'A1').pages[0].values.A1_6_7,'','Reviewed/frozen A1 omits the draft Option reference');
 const licenceId='REQ-MR-ACT-B8-D05',licence={...b,lineId:licenceId,schedule:'A1',summary:'OTHER',treatment:'BASE',amount:100,line:{...b.line,id:licenceId,selected:true,customerTHB:3000,costTHB:2777}};

@@ -7,7 +7,7 @@ import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
-import {c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -40,8 +40,22 @@ function words(n,currency='USD'){
  return (thb?'Thai Baht ':'United States Dollars ')+w(whole)+(cents%100?' and '+w(cents%100)+(thb?' satang':' cents'):'')+' only';
 }
 const blankValues=id=>Object.fromEntries(Object.keys(template.defaults).filter(k=>k.startsWith(id+'_')).map(k=>[k,template.defaults[k]]));
-function fill(id,values,format,currency){
+// The C2 draft spans both term columns without assigning the price to either.
+function mergeC2PriceCells(source,row,column,format){
+ const first=`{{C2_${row}_${column}}}`,second=`{{C2_${row}_${column+1}}}`;
+ if(format==='html')return source.replace(`<td><p>${first}</p></td><td><p>${second}</p></td>`,
+  `<td colspan="2" class="native-c2-draft-price"><p style="text-align:right">${first}</p></td>`);
+ const start=source.lastIndexOf('<w:tc>',source.indexOf(first));
+ const firstEnd=source.indexOf('</w:tc>',source.indexOf(first))+7;
+ const secondEnd=source.indexOf('</w:tc>',source.indexOf(second))+7;
+ const width=/<w:tcW w:w="(\d+)" w:type="dxa"\/>/;
+ const nextWidth=Number(source.slice(firstEnd,secondEnd).match(width)[1]);
+ const merged=source.slice(start,firstEnd).replace(width,(_,w)=>`<w:tcW w:w="${Number(w)+nextWidth}" w:type="dxa"/><w:gridSpan w:val="2"/>`);
+ return source.slice(0,start)+merged+source.slice(secondEnd);
+}
+function fill(id,values,format,currency,draftPriceRows=[]){
  let source=template.schedules[id][format];
+ for(const row of draftPriceRows)for(const column of [9,11])source=mergeC2PriceCells(source,row,column,format);
  if(format==='html'&&currency==='THB'){
   // Replace fixed currency labels in the preview template before adding user values.
   source=source.replace(/Amount in words:\s+United States Dollars?\s*/g,'Amount in words: ')
@@ -106,20 +120,23 @@ function nativePages(view,id,currency='USD'){
    let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
-    const v=blankValues(id);set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
+    const v=blankValues(id),draftPriceRows=[];set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
-     const r=i+4,showDraftRate=id==='C2'&&view.workingPreview&&!term(b)&&!b.nonAdditive&&Number.isFinite(b.amount);
-     const description=showDraftRate?b.line.description+'\nWorking draft offer: '+currency+' '+number(b.unitPrice)+'/'+b.unit+
-      ' · Total '+currency+' '+number(b.amount)+' · Delivery term OPEN':b.line.description;
+     const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description;
      [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
      prices(v,r,9,b);
+     if(id==='C2'&&view.workingPreview&&!term(b)&&!b.nonAdditive&&Number.isFinite(b.amount)){
+      draftPriceRows.push(r);
+      set(v,r,9,Number.isFinite(b.unitPrice)?currency+' '+number(b.unitPrice):'OPEN');
+      set(v,r,11,currency+' '+number(b.amount));
+     }
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
     if(!system.rows.length)pendingPhases.forEach((phase,i)=>{
      set(v,i+4,0,phase.title+' spares');
      for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
     });
-    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,...(system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:{})});
+    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,draftPriceRows,...(system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:{})});
     firstPage=false;
    });
   }
@@ -139,7 +156,7 @@ function nativePages(view,id,currency='USD'){
  return {pages,issues};
 }
 function renderPage(view,page,format,currency='USD'){
- let result=fill(page.id,page.values,format,currency);
+ let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
  if(page.systemToken){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
   const label=escape(heading+(page.spareRows.length?'':' · OPEN — awaiting Working B5 allocations'));
@@ -157,7 +174,7 @@ function renderPage(view,page,format,currency='USD'){
  let partialNote='';
  if(view.workingPreview){
   if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id));
-  if(page.priceRows){
+  if(page.priceRows&&!page.draftPriceRows?.length){
    const rows=page.priceRows.filter(b=>!b.nonAdditive&&b.treatment!=='CALLOFF');
    if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
     partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+' (rows on this form).';
@@ -165,6 +182,8 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
  }
+ if(page.draftPriceRows?.length)partialNote='Prices spanning CIF and FOB are pending allocation.'+
+  (page.priceRows.some(b=>b.line.spareBudget)?' Draft budget allowance; OEM breakdown OPEN.':'');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
