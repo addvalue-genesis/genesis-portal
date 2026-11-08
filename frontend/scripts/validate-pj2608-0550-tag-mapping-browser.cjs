@@ -18,8 +18,23 @@ const server=http.createServer((req,res)=>{
  const ready=()=>page.locator('.p55-bid-save').filter({hasText:/Revision \d/}).waitFor();
  const read=()=>page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,r=db.transaction('workspace').objectStore('workspace').get('active');r.onsuccess=()=>{resolve(r.result);db.close();};};}));
  const jump=async id=>{const search=page.getByLabel('Project Module Search',{exact:true});await search.fill(id);await search.press('Enter');};
+ const openProjection=async(parentId,name)=>{
+  await jump(parentId);
+  const parent=page.locator('[data-component-key="'+parentId+'"]');
+  const disclosure=parent.locator('details:has(> section[aria-label="'+name+'"])');
+  const heading=disclosure.locator(':scope > summary');
+  const section=disclosure.locator(':scope > section');
+  await heading.waitFor({state:'visible'});
+  assert(await section.isHidden(),'Mapping starts collapsed inside '+parentId);
+  await heading.press('Enter');
+  await section.waitFor({state:'visible'});
+  await heading.click();
+  assert(await section.isHidden(),'The heading collapses its own content');
+  await heading.click();
+  return disclosure.getByRole('region',{name,exact:true});
+ };
  await page.goto('http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550');await ready();console.log('QA ready');const before=await read();
- await jump('bid.working-preview.step.7');const panel=page.getByRole('region',{name:'Customer TAG Supplier mapping',exact:true});await panel.waitFor();
+ const panel=await openProjection('bid.working-preview.step.7','Customer TAG Supplier mapping');
  assert.equal(await panel.locator('[data-tag-system]').count(),20);assert((await panel.innerText()).includes('88 เจ้าของต้นทุน'));assert((await panel.innerText()).includes('ขาดฐานตัวเลข 0'));console.log('QA all-system projection');
  await panel.getByLabel('Search customer TAG mapping',{exact:true}).fill('REQDEF-MR-B1-11-APF-08');
  const row=panel.locator('[data-tag-mapping="REQDEF-MR-B1-11-APF-08"]');await row.locator(':scope > summary').click();assert((await row.innerText()).includes('MAP-01 · OPEN'));assert((await row.innerText()).includes('MAP-08 · PASS'));assert.equal(await row.locator('li').count(),10);
@@ -41,7 +56,7 @@ const server=http.createServer((req,res)=>{
  assert.deepEqual(after.integrationWorkspace.requirements.filter(r=>r.id!==req.id),before.integrationWorkspace.requirements.filter(r=>r.id!==req.id));
  await jump('bid.working-preview.step.7');await panel.getByLabel('Search customer TAG mapping',{exact:true}).fill(req.id);if(!await row.evaluate(e=>e.open))await row.locator(':scope > summary').click();assert((await row.innerText()).includes('TAG_CURRENT_SOURCE_OPEN'));assert((await row.innerText()).includes('MAP-08 · PASS'));assert((await row.innerText()).includes('APF-ANT-0001'));
  await page.reload();await ready();await jump('bid.working-preview.requirement.'+req.id);await mapping.waitFor();assert.equal(await tags.locator('[data-tag-binding]').count(),1);assert.deepEqual(await read(),after);console.log('QA durable TAG draft and unchanged money/source/history');
- await jump('bid.budget.official.summary');const summaryPanel=page.getByRole('region',{name:'Customer TAG Supplier mapping summary',exact:true});await summaryPanel.waitFor();assert.equal(await summaryPanel.locator('[data-tag-system]').count(),20);
+ const summaryPanel=await openProjection('bid.budget.official.summary','Customer TAG Supplier mapping summary');assert.equal(await summaryPanel.locator('[data-tag-system]').count(),20);
  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});await summaryPanel.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Contained at '+width);}
  if(process.env.PJ0550_TAG_SCREENSHOT){await page.setViewportSize({width:1440,height:1000});await summaryPanel.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_TAG_SCREENSHOT});}
  await summaryPanel.locator('[data-tag-system="COMMON"]').getByRole('button',{name:'เปิด Working เดิม',exact:true}).click();await page.locator('details[data-component-key="bid.budget.working.lines"][open]').waitFor();

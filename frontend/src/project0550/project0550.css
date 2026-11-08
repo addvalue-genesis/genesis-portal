@@ -1593,6 +1593,8 @@
 .p55-review-toolbar h2 { margin:0; flex:1; }
 .p55-review-fields,.p55-price-group { margin:12px 0; padding:14px; border:1px solid #cddbe7; border-radius:8px; background:#fff; }
 .p55-review-fields>summary,.p55-price-group>summary { cursor:pointer; font-weight:700; color:#064c66; }
+.p55-tag-mapping { margin-block:.5rem; }
+.p55-tag-mapping > summary { cursor:pointer; overflow-wrap:anywhere; }
 .p55-review-fields>summary>.p55-group-total { display:inline-block; margin-left:12px; font-weight:500; }
 .p55-review-fields select[multiple] { width:100%; min-height:120px; }
 .p55-customer-form { min-width:1050px; }
