@@ -25,6 +25,11 @@ try{
  const ep=preview(expense),eb=ep.allocationPlan.find(p=>p.line.id==='TEST-B4').proposal;assert.equal(eb.schedule,'A1');assert.equal(eb.summary,'OTHER');assert.deepEqual(expense.lines,categories.lines);
  const chosen=V.saveBidVolumeRecord0550(expense,'bindings',{...V.blankScheduleBinding0550('TEST-B4'),schedule:'C7',summary:'FIELD_SERVICE',basis:'User allocation kept'},today,false);assert.equal(preview(chosen).bindings.find(b=>b.lineId==='TEST-B4').schedule,'C7','Existing user allocations are never overwritten');
  const noPrice=structuredClone(d);noPrice.lines.find(l=>l.id==='TEST-MGW-CCTV').markupPct=null;assert.equal(preview(noPrice).bindings.find(b=>b.id==='TEST-MGW-CCTV').amount,null);assert.equal(preview(noPrice).mgwSections.find(s=>s.id==='CCTV').offers.length,28,'Source prices remain visible when customer pricing is OPEN');
+ const costOnly=derive(noPrice).lines.find(l=>l.id==='TEST-MGW-CCTV');
+ assert.equal(costOnly.spareProcurementCostTHB,line.provisionalCostTHB,'Known Part A cost still contributes to spare estimates while selling is OPEN');
+ assert.equal(costOnly.provisionalCustomerUSD,null);
+ noPrice.lines.find(l=>l.id==='TEST-MGW-CCTV').quantity=2;
+ assert.equal(derive(noPrice).lines.find(l=>l.id==='TEST-MGW-CCTV').spareProcurementCostTHB,null,'Invalid package quantity remains excluded from the spare basis');
  const oldPreview=preview(base);assert.equal(oldPreview.bindings.find(b=>b.id==='LINE-TEST').amount,5);assert.equal(oldPreview.bindings.find(b=>b.id==='LINE-TEST').suggested,false);assert.deepEqual(base.bidVolumes.bindings,saved(base).proposal.bindings);
  // Mixed known/missing customer prices reproduce the user's C1 → A1 report.
  const partial=structuredClone(d),pending={...structuredClone(d.lines.find(l=>l.id==='TEST-MGW-CCTV')),id:'TEST-OPEN-GOODS',scopeKey:'TEST-OPEN-GOODS',description:'SYNTHETIC required equipment with price OPEN',mgwDetailGroupId:undefined,mgwDetailBasis:undefined,offerId:'',sellMode:'DIRECT',sellRate:null,manualCost:null};delete pending.mgwDetailGroupId;delete pending.mgwDetailBasis;partial.lines.push(pending);validate(partial);

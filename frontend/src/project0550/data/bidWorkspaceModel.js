@@ -163,6 +163,12 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(!nonnegative(costRate))problems.push("Cost rate OPEN");
   const factor=fx(currency);if(factor===null)problems.push("FX source/date/rate OPEN");
   const costNative=finite(quantity)&&nonnegative(costRate)?quantity*costRate:null;
+  const draftBlocker=p=>p!==SPARE_BUDGET_REVIEW_0550&&!isBidScopeWarning0550(p)&&
+   !(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&
+   !["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p);
+  // The spare provision consumes procurement cost, before any sell/Prime checks.
+  const spareProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
+   Math.abs(costNative)<=Number.MAX_SAFE_INTEGER/100&&!problems.some(draftBlocker)?round(costNative*factor):null;
   let addvalueSell=null;
   if(l.sellMode==="DIRECT")addvalueSell=finite(quantity)&&nonnegative(l.sellRate)?eq("E10",{rows:[{id:l.id,quantity,sellRate:l.sellRate}],other:0}):null;
   else if(l.sellMode==="MARKUP")addvalueSell=costNative!==null&&nonnegative(l.markupPct)?eq("E11",{cost:costNative,markup:l.markupPct/100}):null;
@@ -177,21 +183,21 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
   // A sourced DIRECT selling rate is independent of unestablished internal cost.
   // Cost stays null; the strict Working/Official problems above are retained.
-  const provisionalProblems=problems.filter(p=>p!==SPARE_BUDGET_REVIEW_0550&&!isBidScopeWarning0550(p)&&!(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
+  const provisionalProblems=problems.filter(p=>draftBlocker(p)&&!(l.sellMode==="DIRECT"&&p==="Cost rate OPEN"));
   const nativeReady=!retiredMgw&&provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
   const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
   // Keep the established FX/rounding path when available; native USD needs no invented FX.
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
   const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  };
  const equipment=new Map();
  if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){
   for(const line of data.lines)if(line.wbs==='A')equipment.set(line.id,priceLine(line,null));
  }
  const spareCostBasisTHB=sumMoney0550([...equipment.values()]
-  .filter(line=>line.selected&&finite(line.provisionalCostTHB)).map(line=>line.provisionalCostTHB));
+  .map(line=>line.spareProcurementCostTHB).filter(finite));
  const lines=data.lines.map(line=>equipment.get(line.id)??priceLine(line,spareCostBasisTHB));
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
