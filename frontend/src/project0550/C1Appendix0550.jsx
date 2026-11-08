@@ -54,8 +54,11 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
    <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2>
    <table aria-label="Schedule C1 preview"><colgroup><col style={{width:'9%'}}/><col style={{width:'39%'}}/><col style={{width:'7%'}}/><col style={{width:'7%'}}/><col style={{width:'11%'}}/><col style={{width:'11%'}}/><col style={{width:'16%'}}/></colgroup>
     <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB ({currency==='THB'?'THB':'USD or RMB'})</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
-    {projection.groups.map(g=>{const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;return <tbody key={g.id}>
-     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?g.title.toUpperCase():'APPENDIX '+g.id+' · '+g.title.toUpperCase())}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
+    {projection.groups.map(g=>{
+     const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;
+     const heading=g.title.toUpperCase()+(!documentMode&&g.id==='1.1'?' / TELECOM TOWER':'');
+     return <tbody key={g.id}>
+     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
       <tr className="c1-system"><td colSpan={7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td></tr>
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode).map(site=><React.Fragment key={site.name}>
