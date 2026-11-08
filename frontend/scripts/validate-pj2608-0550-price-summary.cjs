@@ -98,6 +98,7 @@ assert([...officialNotes.values()].every(n=>!n.known&&!n.native&&!n.candidates?.
 assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Internal annotations do not change the customer screen/export cells');
 const context=require(root+'/project0550/BidWorkspaceContext.jsx');context.useBidWorkspace=()=>({data:d,model:m,reviewDate:today});
 const {OfficialCustomerForm}=require(root+'/project0550/OfficialCustomerForm.jsx');
+const {amount}=require(root+'/project0550/BidControls.jsx');
 const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{}}));
 assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
@@ -110,6 +111,7 @@ const pagaRow=hierarchy.entries.find(r=>r.key===pagaLine.id);
 const linkedOffer=d.offers.find(o=>o.id===pagaLine.offerId);
 assert(pagaRow&&linkedOffer);
 const storage=globalThis.localStorage;
+let collapsedRelease;
 try {
  globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
   ?JSON.stringify(Object.fromEntries(pagaRow.parents.map(key=>[key,true]))):null};
@@ -118,12 +120,27 @@ try {
  assert(pagaMarkup.includes('Offer ที่ผูกกับ Working · อ้างอิงภายใน'));
  assert(pagaMarkup.includes('>'+linkedOffer.quoteRef+'</button>'),'Show the linked PAGA Offer in 10.7');
  assert(!rowsBefore.find(r=>r.key===pagaLine.id).cells.includes(linkedOffer.quoteRef),'Offer trace is separate from the customer cells');
+ globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
+  ?JSON.stringify({'part:A':false,'part:B':false,'part:C':false}):null};
+ collapsedRelease=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{}}));
 } finally {
  if(storage===undefined)delete globalThis.localStorage;
  else globalThis.localStorage=storage;
 }
 const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
-for(const part of ['A','B','C']){const id='bid.budget.release.part.'+part;assert.equal(registry.filter(r=>r.id===id).length,1);assert(releaseHtml.includes('data-component-key="'+id+'"'));assert(releaseHtml.includes('Copy component ID '+id));}
+const reviewedRelease=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.official,onSource:()=>{}}));
+const partMarkup=(html,id)=>html.split('data-component-key="'+id+'"')[1].split('</tr>')[0];
+for(const {part,usd} of groups){
+ const id='bid.budget.release.part.'+part;
+ assert.equal(registry.filter(r=>r.id===id).length,1);
+ assert(releaseHtml.includes('Copy component ID '+id));
+ const markup=partMarkup(collapsedRelease,id);
+ assert(markup.includes('aria-expanded="false"'));
+ assert(markup.includes(`<td></td><td>${usd.value==null?'OPEN':amount(usd.value,'USD')}</td><td>PROVISIONAL ·`));
+ assert(!partMarkup(reviewedRelease,id).includes('PROVISIONAL ·'));
+ assert.deepEqual(rowsBefore.find(row=>row.kind==='section'&&row.key===part).cells.slice(5),['','','']);
+}
+assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Screen-only part subtotals preserve the export projection');
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
