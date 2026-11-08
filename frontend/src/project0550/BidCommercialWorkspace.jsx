@@ -120,6 +120,28 @@ function PartBScope0550({data,model,onNavigate}){
     {' '}<button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+wifi.id)}>ดู Option ใน 07</button></>}</p>}
  </>;
 }
+function WorkingProposalPlan({rows,lines,onNew,label="Proposal work plan"}){
+ return <div className="p55-table-wrap"><table className="p55-table" aria-label={label}>
+  <thead><tr><th>รายการปลายทาง</th><th>MR / ขอบเขตที่ต้องตรวจ</th><th>รายการที่ผูกแล้ว</th><th>ทำงานต่อ</th></tr></thead>
+  <tbody>{rows.map(row=><tr key={row.code}>
+   <td><strong>{row.code}</strong> · {row.description}</td>
+   <td>{mrBasisForCustomer0550(row)}</td>
+   <td>{lines.filter(line=>line.customerRowCode===row.code).length}</td>
+   <td><button type="button" onClick={()=>onNew({
+    customerRowCode:row.code,
+    systemToken:row.systems.length===1?row.systems[0]:"COMMON",
+    wbs:row.part==="A"?"A":row.code
+   })}>เตรียม {row.code}</button></td>
+  </tr>)}</tbody>
+ </table></div>;
+}
+const mrProposalRank0550=row=>{
+ const index=MR_SUPPLY_ORDER_0550.findIndex(group=>group.systems.some(token=>row.systems.includes(token)));
+ return index===-1?MR_SUPPLY_ORDER_0550.length:index;
+};
+const partAProposalRows0550=CUSTOMER_FORM_0550.rows.filter(row=>row.part==="A")
+ .sort((a,b)=>mrProposalRank0550(a)-mrProposalRank0550(b));
+
 function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew,onNavigate,onOpenSource}){
  const r11Price=model.lines.find(line=>line.id===CERAGON_LINK_OWNER_0550&&line.selected&&line.offerId===CERAGON_R11_0550);
  const r11Quote=r11Price?.offer&&nativeSupplierItem0550(r11Price.offer);
@@ -137,7 +159,19 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  return <details className="p55-price-group" key={part} open={rows.length>0} data-component-key={partId} data-module-number={identity(partId).number} data-bid-owner={part} style={bidOwnerStyle(part)}><summary><BidHeading {...identity(partId)}/><span className="p55-group-total">{workingCountLabel(rows)} · {rows.filter(companyReference).length} อ้างอิงนอกยอด TSI · Selected subtotal {amount(sumOfficial(rows.filter(r=>r.selected),"customerTHB"))}{part==="B"&&<PartBCostTotal0550 rows={rows}/>}</span></summary>
  <div className="p55-review-toolbar" role="group" aria-label={'Working '+part+' expand collapse'}><button type="button" onClick={e=>toggleGroups(e,true)}>+ ขยายทุกหัวข้อ</button><button type="button" onClick={e=>toggleGroups(e,false)}>− หุบทุกหัวข้อ</button></div>
  {part==="B"&&<PartBScope0550 data={data} model={model} onNavigate={onNavigate}/>}
- {part==="A"&&<p>เรียงตาม MR Rev.B1 Appendix 1.1–1.8 · หัวข้ออ้างอิงเป็น working mapping; ขอบเขตและผู้รับผิดชอบต้องตรวจจาก Clause/หน้าในแต่ละรายการ</p>}
+ {part==="A"&&<>
+  <p>เรียงตาม MR Rev.B1 Appendix 1.1–1.8 · หัวข้ออ้างอิงเป็น working mapping; ขอบเขตและผู้รับผิดชอบต้องตรวจจาก Clause/หน้าในแต่ละรายการ</p>
+  <details className="p55-panel p55-bid-module" data-toggle-indicator="true" aria-label="แผนเตรียมรายการปลายทาง Part A">
+   <summary>
+    <span className="p55-module-toggle" aria-hidden="true"><span className="p55-module-toggle__closed">+</span><span className="p55-module-toggle__open">−</span></span>
+    <span className="p55-module-toggle-heading"><strong>แผนเตรียมรายการปลายทาง Part A · {partAProposalRows0550.length} แถว</strong></span>
+   </summary>
+   <div className="p55-bid-content">
+    <p>ใช้แถวในแบบ Release เป็นจุดตั้งต้นเพื่อแตกอุปกรณ์ตาม MR โดยคงรหัสและลำดับเดิมในแบบลูกค้า · ตรวจความครบของขอบเขตที่ 10.3</p>
+    <WorkingProposalPlan rows={partAProposalRows0550} lines={data.lines} onNew={onNew} label="Proposal work plan Part A"/>
+   </div>
+  </details>
+ </>}
  {BID_GROUPS_0550.filter(g=>g.part===part).map(group=>{const code=group.code,children=rows.filter(r=>lineOwner0550(r)===code),pricing=children.filter(r=>!companyReference(r)),references=children.filter(companyReference),groupId="bid.budget.working.group."+code;return <details className="p55-price-group" key={code} open={children.length>0} data-component-key={groupId} data-module-number={group.number} data-bid-owner={code} style={bidOwnerStyle(code)}><summary><BidHeading {...identity(groupId)}/><span className="p55-group-total">{workingCountLabel(children)} · {references.length} อ้างอิงนอกยอด TSI · {amount(sumOfficial(pricing.filter(r=>r.selected),"customerTHB"))}{part==="B"&&<PartBCostTotal0550 rows={pricing}/>}</span></summary>
  <p>{group.mrAppendix?"MR App. "+group.mrAppendix+" · ":""}ปลายทาง: {CUSTOMER_FORM_0550.rows.filter(r=>part==="A"?r.systems.includes(code):r.code===code).map(r=>r.code).join(" / ")||"เลือก Customer row ตามขอบเขต"}</p>
  <p>{satelliteScopeNote0550(code)}</p>
@@ -236,8 +270,8 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  </button>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
- <p>เริ่มจากรายการที่จะเสนอใน Release แล้วแตกอุปกรณ์และกิจกรรม · หมวด A เรียงการทำงานตาม MR; แบบ Release คงรหัสและลำดับเดิม · การเลือกปลายทางยังไม่ใช่ผลตรวจ scope</p>
- <div className="p55-table-wrap"><table className="p55-table" aria-label="Proposal work plan"><thead><tr><th>รายการปลายทาง</th><th>MR / ขอบเขตที่ต้องตรวจ</th><th>รายการที่ผูกแล้ว</th><th>ทำงานต่อ</th></tr></thead><tbody>{[...CUSTOMER_FORM_0550.rows].sort((a,b)=>{const rank=r=>r.part==="A"?Math.min(...MR_SUPPLY_ORDER_0550.map((g,i)=>g.systems.some(t=>r.systems.includes(t))?i:99)):r.part==="B"?100:200;return rank(a)-rank(b);}).map(r=><tr key={r.code}><td><strong>{r.code}</strong> · {r.description}</td><td>{mrBasisForCustomer0550(r)}</td><td>{data.lines.filter(l=>l.customerRowCode===r.code).length}</td><td><button type="button" onClick={()=>startLine({customerRowCode:r.code,systemToken:r.systems.length===1?r.systems[0]:"COMMON",wbs:r.part==="A"?"A":r.code})}>เตรียม {r.code}</button></td></tr>)}</tbody></table></div>
+ <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
+ <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
  <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
  <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module></Module>
  <OfficialCustomerScope/>
