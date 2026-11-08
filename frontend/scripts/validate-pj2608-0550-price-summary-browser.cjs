@@ -109,9 +109,26 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  }
  const radioId='bid.budget.release.line.REQ-MR-B1-11-APF-01',radio=table.locator('[data-component-key="'+radioId+'"]');
  const radioToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07"]');
- assert.equal(await radio.isVisible(),false,'System details are collapsed in the initial overview');
+ const partARow=table.locator('[data-component-key="bid.budget.release.part.A"]'),partAControls=partARow.getByRole('group',{name:'Part A expand collapse'});
+ const appendixToggle=table.locator('[data-release-toggle="mr:1.1"]');
+ const otherParts=table.locator('[data-release-toggle="part:B"],[data-release-toggle="part:C"],[data-release-toggle="part:B:other"],[data-release-toggle="part:C:other"]');
+ const otherStates=await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded')));
+ const subtotal=await partARow.locator('td').nth(6).innerText();
+ assert(await radio.isVisible(),'Part A items are visible in the initial view');
+ await partAControls.getByRole('button',{name:'− หุบรายการ A',exact:true}).click();
+ assert.equal(await radio.isVisible(),false);
+ assert(await partARow.isVisible());
+ assert.equal(await partARow.locator('td').nth(6).innerText(),subtotal);
  if(process.env.PJ0550_SUMMARY_QA_DIR){fs.mkdirSync(process.env.PJ0550_SUMMARY_QA_DIR,{recursive:true});await identity.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'release-mr-collapsed.png')});}
+ await appendixToggle.click();assert(await radio.isVisible(),'Reopening an appendix restores its nested detail state');
+ await appendixToggle.click();assert.equal(await radio.isVisible(),false);
+ await partAControls.getByRole('button',{name:'+ ขยายรายการ A',exact:true}).click();
+ assert(await radio.isVisible());
+ assert.deepEqual(await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded'))),otherStates);
+ await appendixToggle.click();assert.equal(await radio.isVisible(),false);
+ await appendixToggle.click();assert(await radio.isVisible());
  assert.deepEqual(await table.locator('tr.p55-customer-group').evaluateAll(rows=>rows.slice(0,4).map(r=>r.getAttribute('data-component-key'))),['A1-07','A1-08','A1-10','A1-09'].map(c=>'bid.budget.release.customer.'+c));
+ await radioToggle.click();assert.equal(await radio.isVisible(),false);
  await radioToggle.click();assert.equal(await radio.isVisible(),true);
  const siteToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07/site/APF"]');
  await siteToggle.focus();await siteToggle.press('Enter');assert.equal(await radio.isVisible(),false,'Keyboard collapses its own site');

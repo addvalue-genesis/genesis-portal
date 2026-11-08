@@ -1617,6 +1617,7 @@
 .p55-release-mr-site td { background:#f1f5f8; padding-left:36px; }
 .p55-release-mr-system td { background:#edf1f6; padding-left:24px; }
 .p55-release-part-id { display:block; margin-top:6px; }
+.p55-release-part-controls { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
 .p55-customer-section .p55-release-part-id .gns-copy-id code { color:white; }
 .p55-release-full-bid { max-width:100%; min-width:0; padding:12px; background:#fff; color:#173349; }
 .p55-release-full-bid .p55-table { min-width:1150px; }

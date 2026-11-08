@@ -81,7 +81,10 @@ for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
  const ids=hierarchy.entries.filter(r=>r.kind==='line'&&r.parents.includes(control.key)).map(r=>m.provisional.lines.find(l=>l.id===r.key)?.mrRequirementId).filter(Boolean);
  const positions=ids.map(id=>MR.MR_WORKING_CATALOG_0550.rows.findIndex(r=>r.id===id));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
 }
-assert(hierarchy.entries.filter(r=>r.kind==='group').every(r=>r.toggle.defaultOpen===false),'Default overview collapses system details');
+const defaultOpen=new Set(hierarchy.controls.filter(node=>node.defaultOpen).map(node=>node.key));
+const detailRows=hierarchy.entries.filter(row=>row.kind==='line');
+assert(detailRows.some(row=>row.parents[0]==='part:A'));
+assert(detailRows.every(row=>row.parents.every(key=>defaultOpen.has(key))===(row.parents[0]==='part:A')),'Part A shows details by default and Parts B/C retain their defaults');
 assert.equal(hierarchy.entries.filter(r=>r.moduleId==='bid.budget.release.customer.A1-11').length,1,'Cross-appendix Microwave/Tower has one Lot amount/ID');
 assert(hierarchy.entries.some(r=>r.kind==='mr-system'&&r.lotModuleId==='bid.budget.release.customer.A1-11'&&r.parents.includes('mr:1.5')),'Microwave detail remains under its actual Appendix 1.5');
 assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='total').map(r=>r.cells),rowsBefore.filter(r=>r.kind==='total').map(r=>r.cells));

@@ -40,7 +40,7 @@ export function releaseHierarchy0550(official,customerRows){
    entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node});
    for(const segment of category.segments.sort((a,b)=>a.rank-b.rank||a.index-b.index)){
     const {group,rows,anchor,appendices}=segment,parents=[section.key,node.key];
-    const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,false);
+    const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&rows.length>0);
     entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / ")}:{kind:"mr-system",key:system.key,parents,toggle:system,lotModuleId:group.releaseModuleId});
     const sites=new Map();
     for(const row of rows){const requirement=catalog[rank(lines.get(row.key))],site=requirement?.site||"Working / package";if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
