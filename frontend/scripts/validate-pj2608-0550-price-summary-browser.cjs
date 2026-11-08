@@ -15,7 +15,14 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
   assert.deepEqual(await sections.evaluateAll(nodes=>nodes.map(n=>n.dataset.moduleNumber)),expected);
   for(const section of await sections.all())assert(await section.locator(':scope > summary').isVisible(),'Every top-level heading stays visible');
   const working=page.locator('[data-component-key="bid.budget.working.lines"]');
-  assert.equal(await working.locator('[data-component-key="bid.working-preview.particulars"]').count(),1);
+  const children=working.locator(':scope > .p55-bid-content > [data-module-number]');
+  assert.deepEqual(await children.evaluateAll(nodes=>nodes.slice(0,4).map(n=>[n.dataset.moduleNumber,n.dataset.componentKey])),[
+   ['10.2.0','bid.budget.working.lines.principles'],
+   ['10.2.1','bid.budget.working.editor'],
+   ['10.2.2','bid.working-preview'],
+   ['10.2.3','bid.working-preview.particulars']
+  ],'Working modules follow their assigned numbers');
+  assert.equal(await working.locator('[data-component-key="bid.working-preview"]').getByText('10.2.2.1.1 · ตารางระบบและเอกสาร CUS',{exact:true}).count(),1);
   for(let step=1;step<=8;step++)assert.equal(await working.locator('[data-component-key="bid.working-preview.step.'+step+'"]').count(),1);
   assert.equal(await page.locator('[data-component-key="bid.budget.official.summary"]').count(),1);
   assert.equal(await page.locator('[data-component-key="bid.budget.fx"]').count(),1);

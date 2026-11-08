@@ -16,7 +16,6 @@ import {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,dmrTagCostView0550} 
 import {RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OWNER_0550} from "./data/towerLegacyPricing0550";
 import {nativeSupplierItem0550,sourceAmountTHB0550,supplierCostProjection0550} from "./data/supplierCostProjection0550";
 import {WorkingPreview0550} from "./WorkingPreview0550";
-import {WP_NAVIGATION_0550} from "./workingPreviewStages0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
 import {mgwQuoteItem0550,currentSupplierOffers0550,mgwWorkingLineExcluded0550,mgwHistoricalLine0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./data/mgwVendorBasis0550";
 import {MR_WORKING_CATALOG_0550,mrRequirement0550} from "./data/mrWorkingBasis0550";
@@ -264,16 +263,14 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <div className="p55-bid-stages" role="group" aria-label="Bidding pricing stages">{[["working","Working Preview","10.1 / 10.2 · OFF-03 · Source / Cost / Sell"],["budgetary","Budget THB","10.6 · Selected pricing basis"],["released","Release Preview USD","10.7 · Customer form / NOT ISSUED"]].map(([id,label,detail])=><button type="button" key={id} {...bidModuleProps0550({working:"bid.budget.working.lines",budgetary:"bid.budget.budget-thb",released:"bid.budget.release"}[id])} aria-pressed={mode===id} className={mode===id?"is-active":""} onClick={()=>go(id,{working:"bid.budget.working.lines",budgetary:"bid.budget.budget-thb",released:"bid.budget.release"}[id])}><strong>{label}</strong><small>{detail}</small></button>)}</div>
  <Module id="bid.budget.working.sources" open={false} title="ฐานข้อเสนอ — MR / ค่าเริ่มต้น / วิธีคิดจาก 01–08"><p><strong>ฐานขอบเขต: MM-ASK-1A-APF-TEL-MR-0001 Rev.B1</strong> · รูปแบบข้อเสนอ: Release เดิม 8 คอลัมน์ · ตรวจหลักฐานและ revision ใน RFQ-02 ก่อนทบทวนราคา</p><p>นำราคาผู้ขายเดิมเข้า Working แล้ว {data.vendorBasisImport?.importedLineIds.length||0} รายการ · คงรายการที่มีอยู่แล้วในระบบ: {data.vendorBasisImport?.skippedSystems.join(", ")||"ไม่มี"} · MET/NDB จาก Jason เป็นทางเลือกที่ยังไม่เลือกใช้</p><p><strong>VSAT: แยก COMPANY / TSI ก่อนรวมราคา</strong> · COMPANY-supplied ไม่รวมใน Working / Budget / Release; รายการเก่าที่ยังไม่แยกเป็น OPEN · Cabinet, Cable และงานบริการ TSI ยังต้องตรวจให้ครบ · Router รอยืนยันขอบเขต · KU/C Band Internet รอ clarification</p>{mgwReplacementActive0550(data)?<MgwCurrentQuote0550 data={data} onNavigate={onNavigate}/>:<p>MGW Q26-063: {data.offers.filter(mgwQuoteItem0550).length} รายการต้นทาง · เปิดหัวข้อราคาผู้ขายในแต่ละกลุ่มเพื่อเทียบและเลือกเรต · CCTV/LAN มีประเด็นยอดรวมต้นฉบับ</p>}<p><strong>รายการ MR / กิจกรรมที่เตรียม: {data.lines.filter(l=>l.mrRequirementId).length} / {MR_WORKING_CATALOG_0550.rows.length}</strong> · ครบโครงสร้าง 19 ระบบและ B/C · OPEN = ยังขาดฐานราคา/ปริมาณ/ขอบเขต ไม่ใช่ไม่มีรายการ · ข้อมูลเดิมที่บันทึกไว้ยังอยู่</p><BidInheritedBasis onNavigate={onNavigate}/><OfficialSourceImpact onOpenSource={onOpenSource}/>{fxPanel}</Module>
  <Module id="bid.budget.working.lines" title="เตรียมข้อเสนอ A / B / C — ขอบเขต → ปริมาณ → Cost / Sell" open={false}>
- <p>ขั้นตอนภายใน 10.2: Particular → WP.1–WP.8 → รายการ A/B/C → รายละเอียดต้นทุน · ใช้ข้อมูลชุดเดียวกับ Budget และ Release</p>
- <button type="button" disabled={!onNavigate} onClick={()=>onNavigate(WP_NAVIGATION_0550.matrix.id)}>
-  {WP_NAVIGATION_0550.matrix.number} · {WP_NAVIGATION_0550.matrix.title}
- </button>
- <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
+ <p>ลำดับหัวข้อใน 10.2: แก้ไขรายการ Working → Working Preview (WP.1–WP.8) → System Particular → รายการ A/B/C · ใช้ข้อมูลชุดเดียวกับ Budget และ Release</p>
+ <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
+ <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
  <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
- <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module></Module>
+ </Module>
  <OfficialCustomerScope/>
  <Module id="bid.budget.scope-gates" title="OFF-03 · Coverage / gaps ก่อนอนุมัติข้อเสนอ" open={false}><p>Customer rows รอตรวจ: {official.schedule.filter(r=>!r.ready).map(r=>r.code).join(", ")||"ไม่มี"}</p><p>รายการยังไม่ระบุ Customer row: {official.unmapped.length} · แถวรอทบทวน: {official.selected.length-official.reviewedCount}</p><p>MR requirements ยังเปิด: {official.requirementGaps?.length||0} · Import conflicts: {data.mrWorkingImport?.conflicts.join(", ")||"ไม่มี"}</p><p>Engineering/TAG completeness, quote validity, ownership และ customer-form mapping ต้องตรวจครบ · C1 ต้องมีการตัดสินใจและหลักฐาน · Part C แยกเป็น Option · ผลทบทวนนี้เป็น Working review; การอนุมัติและบันทึกส่งลูกค้ายังเป็น HOLD</p></Module>
  <Module id="bid.budget.official.summary" open={true} title="สรุปสถานะและยอดราคา">

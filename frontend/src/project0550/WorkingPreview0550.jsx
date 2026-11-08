@@ -257,9 +257,16 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
   </>;
  }}</Module>;
  return <section ref={root} className="p55-working-preview" data-component-key={WP_NAVIGATION_0550.preview.id} data-module-number={WP_NAVIGATION_0550.preview.number} aria-label="Working Preview 1–8">
-  <aside className="p55-callout" aria-label="A readiness before B"><strong>ฐานข้อมูล A: {bidModel.sourceReadiness?.state||"A_OPEN"}</strong><p>{bidModel.sourceReadiness?.ready?"A ผ่านการตรวจรับและอ่านตามทะเบียนแล้ว · ยังต้องตรวจ SI 1–8 และ Release ต่อ":"ทำงานร่างต่อจากข้อมูลที่มีหลักฐานได้ · A ยังมีรายการรับเอกสาร/อ่าน/ทบทวนค้าง ไม่ได้แปลว่าทุกระบบไม่มีข้อมูล · การออก Issue ยังคงตรวจความพร้อมและอนุมัติตามเกณฑ์เดิม"}</p><button type="button" onClick={()=>onOpenSource("l3.original")}>กลับ A · ตรวจเอกสารที่ RFQ ต้องมี</button></aside>
   <div className="p55-wp-header"><div><h2><BidHeading {...WP_NAVIGATION_0550.preview}/></h2><p>A ลูกค้า ↔ วิเคราะห์ / CAL–RPT / รวมระบบ ↔ B Supplier → Working → Budgetary → Release → Source</p></div></div>
-  <div className="p55-review-toolbar"><Select label="Working Preview system" value={system} onChange={setSystem} options={systemOptions}/><button type="button" onClick={()=>{setExpanded(true);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=true);}}>ขยาย 1–8</button><button type="button" onClick={()=>{setExpanded(false);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=false);}}>หุบ 1–8</button></div>
+  <aside className="p55-callout" aria-label="A readiness before B"><strong>ฐานข้อมูล A: {bidModel.sourceReadiness?.state||"A_OPEN"}</strong><p>{bidModel.sourceReadiness?.ready?"A ผ่านการตรวจรับและอ่านตามทะเบียนแล้ว · ยังต้องตรวจ SI 1–8 และ Release ต่อ":"ทำงานร่างต่อจากข้อมูลที่มีหลักฐานได้ · A ยังมีรายการรับเอกสาร/อ่าน/ทบทวนค้าง ไม่ได้แปลว่าทุกระบบไม่มีข้อมูล · การออก Issue ยังคงตรวจความพร้อมและอนุมัติตามเกณฑ์เดิม"}</p><button type="button" onClick={()=>onOpenSource("l3.original")}>กลับ A · ตรวจเอกสารที่ RFQ ต้องมี</button></aside>
+  <div className="p55-review-toolbar">
+   <Select label="Working Preview system" value={system} onChange={setSystem} options={systemOptions}/>
+   <button type="button" disabled={!onNavigate} onClick={()=>onNavigate(WP_NAVIGATION_0550.matrix.id)}>
+    {WP_NAVIGATION_0550.matrix.number} · {WP_NAVIGATION_0550.matrix.title}
+   </button>
+   <button type="button" onClick={()=>{setExpanded(true);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=true);}}>ขยาย 1–8</button>
+   <button type="button" onClick={()=>{setExpanded(false);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=false);}}>หุบ 1–8</button>
+  </div>
   <div className="p55-wp-status" role="status" aria-live="polite">{saved||`${model.scopes.length} ระบบ/งานร่วม · ${model.requirements.length} requirement records · ${model.proofs.length} derived CAL/RPT · ${model.activities.length} activities/deliverables · ข้อที่ยังไม่อ่าน/วิเคราะห์แสดง OPEN`}</div>
   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าผลวิเคราะห์ SI จากเอกสาร</button>
   <SourceEvidenceSearch0550 onOpenSource={onOpenSource}/>
