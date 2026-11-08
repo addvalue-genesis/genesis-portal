@@ -118,7 +118,7 @@ assert(Selection.ceragonR11ScopeCheck0550(apf,mr,offer,sources.map(s=>({...s,rev
 assert(Selection.ceragonR11ScopeCheck0550(apf,mr,{...offer,quoteEvidence:{...offer.quoteEvidence,sourceSha256:'changed'}},sources,[decision]).every(r=>r.state==='OPEN'&&!r.vendorReference));
 const working=W.deriveBidWorkspace(chosen,tokens,today,integration).provisional;
 assert.equal(working.lines.find(l=>l.id===current.id).provisionalCostNative,price.provisionalCostNative);
-const {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
+const {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,DmrWorkingSections0550,dmrTagCostView0550}=require(root+'/project0550/DmrTagCost0550');
 const costView=dmrTagCostView0550(chosen,integration,working);
 const apfId='REQ-MR-B1-15-APF-01';
 const apfCost=dmrTagCostView0550(chosen,integration,working,apfId);
@@ -170,32 +170,49 @@ const r12=withBoq(chosen.offers.find(o=>o.id===Selection.CERAGON_R12_0550),[
  'BoQ!C66:J66: IP-50CX-7-8w / IP-50CX 7-8GHz Basic Radio ROW / Spares=2',
  'BoQ!C96:J96: SPARE-PART / Spare part / Spares=1',
 ]);
-const workingBoq=(offers,lineId=apfId)=>renderToStaticMarkup(React.createElement(DmrWorkingBoq0550,{
- offers,view:costView,lineId,provisional:true,onNavigate:()=>{},
+const workingBoq=(offers,lineId=apfId,view=costView)=>renderToStaticMarkup(React.createElement(DmrWorkingBoq0550,{
+ offers,view,lineId,onNavigate:()=>{},
 }));
+const nativeRows=html=>[...html.matchAll(/data-supplier-boq-locator="([^"]+)"/g)].map(match=>match[1]);
 const apfBoq=workingBoq([r11,r12]);
-for(const value of ['IP-50CX-7-8w','SL-Capacity-150M','2+0 · ACP','2+0 · APF','Spares',
- 'APF-MR-320-201 · Telecom Tower','APF · สายและ Interface','APF · Qty 0 ตาม BoQ',
- 'APF · OPEN รอผูก TAG / Location','Spares · อ้างอิง R12 / C2','เปิดเจ้าของต้นทุน R11',
- 'Fiber → Switch','DC Power','Grounding','2+0 Installation','ยอดกลุ่มอ้าง R11','เรตราย P/N','มีเงื่อนไขเมื่อจำเป็นต้องใช้ AC/DC',
- 'BOM ที่เสนอใน R11 · APF · 7 P/N ที่มีจำนวน','เสนอใน R11 · 2+0','Qty 0 · ไม่ใช้ที่ไซต์นี้','อะไหล่ R12'])assert(apfBoq.includes(value),value);
-assert.equal((apfBoq.match(/data-supplier-boq-locator="BoQ!C66:J66"/g)||[]).length,1,'R11 and R12 keep their native columns on the same P/N row');
-assert(!apfBoq.includes('IP-20C_DUAL_CPLR_kit_7-8G'),'The selected BOM omits lines exclusive to the main 2+2 option');
-assert(apfBoq.indexOf('UNMAPPED-PART')<apfBoq.indexOf('APF · Qty 0 ตาม BoQ'),'Place the site BOM above reference groups');
-assert(!apfBoq.includes('ACP-MR-320-001'),'The APF module shows the APF mapping only');
-assert.match(workingBoq([r11,r12],'REQ-MR-B1-15-ACP-01'),/ACP-MR-320-001/);
-assert(!workingBoq([r11,withBoq({...r12,quoteEvidence:{...r12.quoteEvidence,sourceSha256:'different'}},r12.quoteEvidence.terms)]).includes('SPARE-PART'));
-assert.match(workingBoq([withBoq(offer,[])]),/ทะเบียน 07 Vendor ยังไม่มีรายละเอียด BoQ/);
-const quotedR11={...r11,quoteEvidence:{...r11.quoteEvidence,quotedUnitCost:29468,quotedTotal:0}};
-const quotedR12={...r12,quoteEvidence:{...r12.quoteEvidence,quotedUnitCost:7190,quotedTotal:7190}};
-const pricedOwner={...costView.owners.get(current.id),costRate:29468,provisionalCostNative:29468};
-const pricedBoq=renderToStaticMarkup(React.createElement(DmrWorkingBoq0550,{
- offers:[quotedR11,quotedR12],view:{...costView,owners:new Map([[current.id,pricedOwner]])},lineId:apfId,provisional:true,
-}));
-assert.match(pricedBoq,/07 Vendor · R11.*?<td>0<small>QTY ในใบเสนอราคา.*?29,468\.00.*?\$0\.00/);
-assert.match(pricedBoq,/Working · R11 ต้นทุนสินค้าทั้งลิงก์ APF–ACP.*?1 Lot.*?29,468\.00/);
-assert.match(pricedBoq,/R12 Spares \/ C2.*?7,190\.00.*?ยอดอะไหล่แยกจาก R11/);
-assert.match(pricedBoq,/ยอดต้นทุนเฉพาะไซต์ \/ TAG.*?OPEN · รอราคาแยกหรือฐานจัดสรร/);
-assert(!pricedBoq.includes('44,202.00')&&!pricedBoq.includes('53,042.40'),'Product cost view does not show sell rates');
+assert.deepEqual(nativeRows(apfBoq),['BoQ!C66:J66','BoQ!C73:J73']);
+for(const value of ['IP-50CX-7-8w','SL-Capacity-150M','2+0 · APF','APF-MR-320-201 · Telecom Tower',
+ '2 รายการ BoQ ที่มี Mapping ถึงแถวนี้','เปิดเจ้าของต้นทุน R11','เปิด R11 ใน 07 Vendor','เปิดข้อกำหนดและ Mapping ของแถวนี้',
+ 'ต้นทุนแยกรายไซต์ / TAG ยัง OPEN'])assert(apfBoq.includes(value),value);
+for(const value of ['2+0 · ACP','Spares','UNMAPPED-PART','ACP-MR-320-001','สายและ Interface','29,468.00'])
+ assert(!apfBoq.includes(value),value);
+const apfCable=workingBoq([r11,r12],'REQ-MR-B1-15-APF-02');
+assert.deepEqual(nativeRows(apfCable),['BoQ!C83:J83','BoQ!C84:J84','BoQ!C89:J89','BoQ!C87:J87']);
+for(const value of ['สายและ Interface','Fiber → Switch','DC Power','Grounding','2+0 Installation','มีเงื่อนไข · เมื่อจำเป็นต้องใช้ AC/DC'])
+ assert(apfCable.includes(value),value);
+assert(!apfCable.includes('2+0 · ACP')&&!apfCable.includes('Spares'));
+const acpBoq=workingBoq([r11,r12],'REQ-MR-B1-15-ACP-01');
+assert.deepEqual(nativeRows(acpBoq),['BoQ!C66:J66','BoQ!C68:J68','BoQ!C73:J73']);
+assert(acpBoq.includes('ACP-MR-320-001')&&!acpBoq.includes('2+0 · APF'));
+assert.deepEqual(nativeRows(workingBoq([r11,r12],'REQ-MR-B1-15-ACP-02')),nativeRows(apfCable));
+assert.equal(workingBoq([withBoq(offer,[])]),'','Do not mount an empty source-only panel');
+assert.equal(workingBoq([r12]),'','Do not replace an absent R11 with another Offer');
+assert.equal(workingBoq([r11],apfId,noPackage),'','A stale reference cannot replace a selected Working owner');
+assert.equal(workingBoq([r11],apfId,{...costView,equipment:[]}),'');
+
+const wrongQuantity=r11.quoteEvidence.terms.map(term=>term.startsWith('BoQ!C66:')?term.replace('APF(alternative)=1','APF(alternative)=3'):term);
+assert.deepEqual(nativeRows(workingBoq([withBoq(r11,wrongQuantity)])),['BoQ!C73:J73']);
+const radio=costView.equipment.find(check=>check.mrLineId===apfId&&check.component==='ODU');
+const ambiguous={...costView,equipment:[...costView.equipment,{...radio,mrLineId:'REQ-MR-B1-15-APF-02'}]};
+assert.equal(workingBoq([r11],apfId,ambiguous),'','Do not show links ambiguous across MR lines');
+
+const {SupplierQuoteBoq0550}=require(root+'/project0550/SupplierItemSourceText0550');
+const fullBoq=renderToStaticMarkup(React.createElement(SupplierQuoteBoq0550,{offers:[r11,r12]}));
+assert.match(fullBoq,/เปรียบเทียบ BoQ ตามไซต์ \/ แบบที่เสนอ · 10 แถว/,'Full source still keeps all native rows and shared R11/R12 P/N');
+const dmrSections=renderToStaticMarkup(React.createElement(DmrWorkingSections0550,{
+ view:costView,requirements:integration.requirements,offers:chosen.offers,onNavigate:()=>{},
+},React.createElement('p',null,'Single price owner table')));
+assert.deepEqual([...dmrSections.matchAll(/data-dmr-working-section="(scope|prices|links)"( open="")?/g)]
+ .map(([,section,open])=>[section,Boolean(open)]),[['scope',false],['prices',true],['links',false]]);
+assert.equal((dmrSections.match(/Single price owner table/g)||[]).length,1);
+assert(!dmrSections.includes('DMR TAG and location cost rows')&&!dmrSections.includes('ต้นทุน Working ตามเจ้าของเดิม'));
+for(const label of ['เปิด Mapping ของ DMR ใน WP.7','เปิด CAL/RPT ของ DMR ใน WP.2',
+ 'เปิดงานค้าง DMR ใน WP.8','เปิด R11 ใน 07 Vendor','11.M · จัดสรรลง Schedule','11.C1 · แบบราคาอุปกรณ์'])
+ assert(dmrSections.includes(label),label);
 assert.deepEqual(chosen,before);
 console.log('PASS DMR R11 SI: site TAG and MR quantities, scoped deviation, cable segments, ACP/APF BoQ, all 24 MR scope bullets, inline ABC cost trace, and unchanged Working price.');

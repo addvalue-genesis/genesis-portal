@@ -149,11 +149,15 @@ function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyD
  </>;
 }
 
-export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
+export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget,navigationSystem}){
  const {data,model:bidModel,busy,change,reviewDate}=useBidWorkspace(),root=useRef(null);
  const [system,setSystem]=useState("ALL"),[expanded,setExpanded]=useState(false),[selected,setSelected]=useState("");
  const [req,setReq]=useState(null),[proof,setProof]=useState(null),[activity,setActivity]=useState(null),[scope,setScope]=useState(null),[saved,setSaved]=useState("");
  const model=bidModel?.integration;
+ const validNavigationSystem=Boolean(navigationSystem&&model?.scopes.some(scope=>scope.id===navigationSystem));
+ useEffect(()=>{
+  if(wpStageForTarget0550(navigationTarget)&&validNavigationSystem)setSystem(navigationSystem);
+ },[navigationTarget,navigationSystem,validNavigationSystem]);
  useEffect(()=>{if(navigationTarget?.startsWith("bid.working-preview.")){const r=model?.requirements.find(r=>navigationTarget==="bid.working-preview.requirement."+r.id);if(r){setSystem(r.systemToken);setSelected(r.id);const keys=Object.keys(blankRequirement0550("REQ"));setReq({...Object.fromEntries(keys.map(k=>[k,r[k]])),...(r.tagBindings!==undefined?{tagBindings:r.tagBindings}:{})});}}},[navigationTarget,Boolean(model)]);
  if(!data||!model)return <p>กำลังเปิด Working Preview…</p>;
  const w=data.integrationWorkspace||emptyIntegration0550(),visible=model.requirements.filter(r=>system==="ALL"||r.systemToken===system),current=visible.find(r=>r.id===selected)||visible[0];

@@ -11,10 +11,10 @@ import {BidKnownPrices0550,BidKnownPriceHeadline0550} from "./BidKnownPrices0550
 import {BidFxBasis0550} from "./BidFxBasis0550";
 import {mgwDetailGroup0550} from "./data/mgwDetailPricing0550";
 import {MgwWorkingQuotes} from "./MgwQuoteViews";
-import {DmrR11WorkingPrice0550,WorkingSupplierTrace0550,WorkingMrSupplierDetails0550} from "./WorkingSupplierTrace0550";
-import {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,dmrTagCostView0550} from "./DmrTagCost0550";
+import {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550} from "./WorkingSupplierTrace0550";
+import {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,DmrWorkingSections0550,dmrTagCostView0550} from "./DmrTagCost0550";
 import {RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OWNER_0550} from "./data/towerLegacyPricing0550";
-import {nativeSupplierItem0550,sourceAmountTHB0550,supplierCostProjection0550} from "./data/supplierCostProjection0550";
+import {sourceAmountTHB0550,supplierCostProjection0550} from "./data/supplierCostProjection0550";
 import {WorkingPreview0550} from "./WorkingPreview0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
 import {mgwQuoteItem0550,currentSupplierOffers0550,mgwWorkingLineExcluded0550,mgwHistoricalLine0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./data/mgwVendorBasis0550";
@@ -143,7 +143,6 @@ const partAProposalRows0550=CUSTOMER_FORM_0550.rows.filter(row=>row.part==="A")
 
 function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew,onNavigate,onOpenSource}){
  const r11Price=model.lines.find(line=>line.id===CERAGON_LINK_OWNER_0550&&line.selected&&line.offerId===CERAGON_R11_0550);
- const r11Quote=r11Price?.offer&&nativeSupplierItem0550(r11Price.offer);
  const provisional=Boolean(model.pricingBasis);
  const supplierSources=useMemo(()=>supplierCostProjection0550(data),[data]);
  const requirementsByLine=useMemo(()=>workingRequirementIndex0550(integration.requirements),[integration.requirements]);
@@ -171,35 +170,32 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
    </div>
   </details>
  </>}
- {BID_GROUPS_0550.filter(g=>g.part===part).map(group=>{const code=group.code,children=rows.filter(r=>lineOwner0550(r)===code),pricing=children.filter(r=>!companyReference(r)),references=children.filter(companyReference),groupId="bid.budget.working.group."+code;return <details className="p55-price-group" key={code} open={children.length>0} data-component-key={groupId} data-module-number={group.number} data-bid-owner={code} style={bidOwnerStyle(code)}><summary><BidHeading {...identity(groupId)}/><span className="p55-group-total">{workingCountLabel(children)} · {references.length} อ้างอิงนอกยอด TSI · {amount(sumOfficial(pricing.filter(r=>r.selected),"customerTHB"))}{part==="B"&&<PartBCostTotal0550 rows={pricing}/>}</span></summary>
- <p>{group.mrAppendix?"MR App. "+group.mrAppendix+" · ":""}ปลายทาง: {CUSTOMER_FORM_0550.rows.filter(r=>part==="A"?r.systems.includes(code):r.code===code).map(r=>r.code).join(" / ")||"เลือก Customer row ตามขอบเขต"}</p>
- <p>{satelliteScopeNote0550(code)}</p>
- {code==="TEL-DMR"&&<DmrTagCost0550 data={data} integration={integration} working={working} costView={dmrTagCosts} onNavigate={onNavigate} onOpenSource={onOpenSource}/>}
- {part==="A"&&<WorkingSupplierTrace0550 data={data} systemToken={code} onNavigate={onNavigate} projection={supplierSources} r11Price={code==="TEL-DMR"?r11Price:undefined} provisional={provisional}/>}
- {part==="A"&&code==="TEL-TELT"&&<p className="p55-callout">{RETIRED_TOWER_BASIS_0550}</p>}
- {code==="B1"&&<p className="p55-callout">TEL-TELT · ส่ง structural calculation, แบบฐานรากและสเปก anchor bolts ก่อนปิดประมูล · คง Part B สำหรับงานออกแบบและควบคุมการติดตั้ง · วันและทีม supervision หน้างานยัง OPEN <a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a></p>}
- {code==="B7"&&<p className="p55-callout">TEL-TELT · B7-D04 ใช้ราคา TSSR Item 6 · Item 7 รอตรวจรายงานดินจาก EPC ก่อนตั้งค่าเจาะสำรวจ</p>}
- {code==="B8"&&<LicensingCost0550 lines={children} onNavigate={onNavigate}/>}
- {code==="C1"&&<p className="p55-callout">TEL-TELT · งานตั้งเสาจริงเป็น CNEEC Option · ก่อสร้างฐานรากอยู่นอก TSI · ดูจุดแบ่งงานกราวด์ รั้ว และปรับพื้นที่ในรายการอ้างอิงด้านล่าง <a href={TOWER_C1_0550}>Priced Breakdown C1</a></p>}
+ {BID_GROUPS_0550.filter(g=>g.part===part).map(group=>{
+ const code=group.code,children=rows.filter(r=>lineOwner0550(r)===code);
+ const pricing=children.filter(r=>!companyReference(r)),references=children.filter(companyReference);
+ const groupId="bid.budget.working.group."+code,dmr=part==="A"&&code==="TEL-DMR";
+ if(dmr&&pricing.includes(r11Price))pricing.sort((a,b)=>Number(b===r11Price)-Number(a===r11Price));
+ const prices=<>
  <p>การจัดสรรต้นทุน / ราคาขาย Working ด้านล่างเป็นอีกชั้นหนึ่ง · ไม่เปลี่ยนยอด Supplier ต้นฉบับ · ประมาณการและงานเพิ่มต้องมีฐานแยก · เจ้าของราคาคิดครั้งเดียว</p>
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code})}>เตรียมรายการใน {code}</button>
- <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=code==="TEL-DMR"&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
- const hasDmrBom=showDmrTags&&r.id.endsWith("-01");
+ <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=dmr&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
+ const r11Owner=dmr&&r===r11Price;
+ const showR11Price=r11Owner&&(provisional||r.reviewState==="REVIEWED_WORKING");
+ const amountClass=r11Owner?"p55-dmr-price-amount":undefined;
  const mrComponents=showDmrTags?[]:r.mrScopeState?.requirement?.components??[];
- const hasMrSupplierDetails=raw?.mrRequirementId&&r.wbs==="A";
+ const hasMrSupplierDetails=!showDmrTags&&raw?.mrRequirementId&&r.wbs==="A";
  const hasDetails=showDmrTags||mrComponents.length>0||Boolean(hasMrSupplierDetails);
- const detailsOpen=lineDetailsOpen.get(r.id)??showDmrTags;
+ const detailsOpen=lineDetailsOpen.get(r.id)??false;
  const detailsId="p55-working-line-details-"+r.id;
  const detailsAction=detailsOpen?"ซ่อนรายการประกอบ":"แสดงรายการประกอบ";
  return <React.Fragment key={r.id}><tr data-component-key={r.sourceModuleId} data-module-number={identity(r.sourceModuleId)?.number} data-bid-owner={code} tabIndex={-1}><td><BidHeading {...identity(r.sourceModuleId)}/>
  {hasDetails&&<button type="button" className="p55-working-line-details-toggle"
   aria-label={detailsAction+"ของ "+r.description} aria-expanded={detailsOpen} aria-controls={detailsId}
-  onClick={()=>setLineDetailsOpen(previous=>new Map(previous).set(r.id,!(previous.get(r.id)??showDmrTags)))}>
+  onClick={()=>setLineDetailsOpen(previous=>new Map(previous).set(r.id,!previous.get(r.id)))}>
   {detailsOpen?"− ":"+ "}{detailsAction}
  </button>}
- <small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small></td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/></td><td>{amount(r.costTHB)}{showDmrTags&&r.id.endsWith("-01")&&Number.isFinite(r11Quote?.rate)&&<small>อ้างเรตสินค้า 07 · {amount(r11Quote.rate,r11Quote.currency)} / Lot APF–ACP</small>}{model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}</td><td>{amount(r.workingSellTHB)}{model.pricingBasis&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong>{amount(r.customerTHB)}</strong>{model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small></td><td>{r.mrScopeState?.covered?"INCLUDED IN OWNER · ไม่บวกซ้ำ":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY จัดหา · ไม่รวมราคา":r.selected?"SELECTED":"NOT SELECTED"} · {r.reviewState}<small>{r.satelliteScopeState?.label}</small><small>{r.scopeBasis}</small>{r.mrScopeState?.covered&&<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.coveredByLineId))}>เปิดเจ้าของราคา</button>}{r.mrScopeState?.candidates.map(c=><button type="button" key={c.id} onClick={()=>onEdit(c)}>ตรวจราคาเดิม · {c.description}</button>)}<small>{r.reviewProblems.join(" · ")}</small><WorkingRequirementTrace0550 requirements={requirementsByLine.get(r.id)} onNavigate={onNavigate}/><button type="button" onClick={()=>onEdit(raw)}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.satelliteScopeState?.excluded&&r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>
- {r===r11Price&&<tr><td colSpan={6}><DmrR11WorkingPrice0550 line={r11Price} provisional={provisional}/></td></tr>}
+ <small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small></td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/></td><td><span className={amountClass}>{amount(r.costTHB)}</span>{showR11Price?<small>{amount(r.provisionalCostNative,r.currency)} · R11</small>:model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}</td><td><span className={amountClass}>{amount(r.workingSellTHB)}</span>{(showR11Price||model.pricingBasis)&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong className={amountClass}>{amount(r.customerTHB)}</strong>{showR11Price?<small>{amount(r.customerUSD,"USD")}{Number.isFinite(r.primePct)&&` · SAMTEL +${r.primePct}%`}</small>:model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}{!r11Owner&&<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small>}</td><td>{r.mrScopeState?.covered?"INCLUDED IN OWNER · ไม่บวกซ้ำ":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY จัดหา · ไม่รวมราคา":r.selected?"SELECTED":"NOT SELECTED"} · {r.reviewState}<small>{r.satelliteScopeState?.label}</small><small>{r.scopeBasis}</small>{r.mrScopeState?.covered&&<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.coveredByLineId))}>เปิดเจ้าของราคา</button>}{r.mrScopeState?.candidates.map(c=><button type="button" key={c.id} onClick={()=>onEdit(c)}>ตรวจราคาเดิม · {c.description}</button>)}<small>{r.reviewProblems.join(" · ")}</small><WorkingRequirementTrace0550 requirements={requirementsByLine.get(r.id)} onNavigate={onNavigate}/><button type="button" onClick={()=>onEdit(raw)}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.satelliteScopeState?.excluded&&r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>
  {hasDetails&&<tr className="p55-working-line-child" hidden={!detailsOpen}>
   <td colSpan={6}>
    <section id={detailsId} className="p55-working-line-details" aria-labelledby={detailsId+"-title"}>
@@ -217,13 +213,26 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
       <strong>ข้อกำหนดลูกค้า (MR)</strong>
       <ul>{mrComponents.map((component,i)=><li key={i}>{component}</li>)}</ul>
      </div>}
-     {hasDmrBom&&<DmrWorkingBoq0550 offers={data.offers} view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} provisional={provisional}/>}
-     {hasMrSupplierDetails&&<WorkingMrSupplierDetails0550 data={data} line={raw} projection={supplierSources} onNavigate={onNavigate} r11Price={r.systemToken==="TEL-DMR"?r11Price:undefined} provisional={provisional}/>}
+     {showDmrTags&&<DmrWorkingBoq0550 offers={data.offers} view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate}/>}
+     {hasMrSupplierDetails&&<WorkingMrSupplierDetails0550 data={data} line={raw} projection={supplierSources} onNavigate={onNavigate}/>}
     </>}
    </section>
   </td>
  </tr>}</React.Fragment>;})}</tbody></table></div>{!pricing.length&&<p>{references.length?"ไม่มีรายการทำราคา TSI ในกลุ่มนี้ · ดูขอบเขต COMPANY ด้านล่าง":"OPEN · ยังไม่มีรายการต้นทาง"}</p>}
  {references.length>0&&<details className="p55-panel" data-company-reference={code}><summary>ข้อมูลอ้างอิงขอบเขต — {code==="C1"?"CNEEC Option / Civil Interface":"COMPANY จัดหา"} · {references.length} รายการ · ไม่รวมข้อเสนอ TSI</summary><p>เก็บไว้ตรวจขอบเขตและเชื่อมกับ MR · ไม่ใช่รายการรอกรอกราคาของ TSI</p><div className="p55-table-wrap"><table className="p55-table" aria-label={code==="C1"?"CNEEC and civil scope references":"COMPANY scope references "+code}><thead><tr><th>รายการอ้างอิง</th><th>ปริมาณ / เอกสาร</th><th>ขอบเขต / Trace</th></tr></thead><tbody>{references.map(r=><tr key={r.id} data-component-key={r.sourceModuleId} data-module-number={identity(r.sourceModuleId)?.number} data-bid-owner={code} tabIndex={-1}><td><BidHeading {...identity(r.sourceModuleId)}/><small>{r.scopeKey}</small></td><td>{r.quantity??"รอยืนยัน"} {r.unit}{r.mrScopeState?.scopeReference?<small><a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a> · <a href={TOWER_C1_0550}>Priced Breakdown C1</a></small>:<><small>{r.requirementRef}</small><small>{r.sourceRef}</small></>}</td><td>{r.mrScopeState?.scopeReference?<><strong>{r.mrScopeState.scopeReference.text}</strong>{r.mrScopeState.scopeReference.items.map(item=><div key={item}><small>Item {item} · {towerSourceScope0550[item]}</small>{data.offers.filter(o=>isTowerSourceItem0550(o)&&o.supplierQuoteRow.itemCode===item).map(o=><button type="button" key={o.id} onClick={()=>onNavigate('bid.vendor.offer.'+o.id)}>เปิด {o.quoteRef} / Item {item}</button>)}</div>)}</>:<><strong>COMPANY จัดหา · ไม่รวมราคา</strong><small>{r.scopeBasis}</small></>}<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.id))}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>)}</tbody></table></div></details>}
+ </>;
+ return <details className="p55-price-group" key={code} open={children.length>0} data-component-key={groupId} data-module-number={group.number} data-bid-owner={code} style={bidOwnerStyle(code)}><summary><BidHeading {...identity(groupId)}/><span className="p55-group-total">{dmr
+  ?<>{pricing.filter(r=>r.selected&&!includedPriceReference(r)).length} แถวเลือกทำราคา · {pricing.filter(includedPriceReference).length} แถวอ้างอิงไม่บวกซ้ำ{references.length>0&&` · ${references.length} แถวนอกยอด TSI`}</>
+  :<>{workingCountLabel(children)} · {references.length} อ้างอิงนอกยอด TSI · {amount(sumOfficial(pricing.filter(r=>r.selected),"customerTHB"))}</>}{part==="B"&&<PartBCostTotal0550 rows={pricing}/>}</span></summary>
+ <p>{group.mrAppendix?"MR App. "+group.mrAppendix+" · ":""}ปลายทาง: {CUSTOMER_FORM_0550.rows.filter(r=>part==="A"?r.systems.includes(code):r.code===code).map(r=>r.code).join(" / ")||"เลือก Customer row ตามขอบเขต"}</p>
+ <p>{satelliteScopeNote0550(code)}</p>
+ {part==="A"&&!dmr&&<WorkingSupplierTrace0550 data={data} systemToken={code} onNavigate={onNavigate} projection={supplierSources}/>}
+ {part==="A"&&code==="TEL-TELT"&&<p className="p55-callout">{RETIRED_TOWER_BASIS_0550}</p>}
+ {code==="B1"&&<p className="p55-callout">TEL-TELT · ส่ง structural calculation, แบบฐานรากและสเปก anchor bolts ก่อนปิดประมูล · คง Part B สำหรับงานออกแบบและควบคุมการติดตั้ง · วันและทีม supervision หน้างานยัง OPEN <a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a></p>}
+ {code==="B7"&&<p className="p55-callout">TEL-TELT · B7-D04 ใช้ราคา TSSR Item 6 · Item 7 รอตรวจรายงานดินจาก EPC ก่อนตั้งค่าเจาะสำรวจ</p>}
+ {code==="B8"&&<LicensingCost0550 lines={children} onNavigate={onNavigate}/>}
+ {code==="C1"&&<p className="p55-callout">TEL-TELT · งานตั้งเสาจริงเป็น CNEEC Option · ก่อสร้างฐานรากอยู่นอก TSI · ดูจุดแบ่งงานกราวด์ รั้ว และปรับพื้นที่ในรายการอ้างอิงด้านล่าง <a href={TOWER_C1_0550}>Priced Breakdown C1</a></p>}
+ {dmr?<DmrWorkingSections0550 view={dmrTagCosts} requirements={integration.requirements} offers={data.offers} onNavigate={onNavigate} onOpenSource={onOpenSource}>{prices}</DmrWorkingSections0550>:prices}
  </details>;})}</details>;
  })}</>;
 }
@@ -238,7 +247,7 @@ function BidProcessResult0550({data,model,onNavigate}){
  <details><summary>งานระดับ process ที่ SI ต้องดำเนินการ · {result.groups.length} กลุ่ม</summary><p>แยกตามสาเหตุและเจ้าของงาน ไม่ใช่จำนวนเรื่องที่ต้องขอผู้บริหารตัดสินใจ</p><div className="p55-table-wrap"><table className="p55-table" aria-label="SI bid process tasks"><thead><tr><th>งาน / ระบบ</th><th>ต้องดำเนินการ</th><th>รายการที่เกี่ยวข้อง</th></tr></thead><tbody>{result.groups.map(g=><tr key={g.id}><td>{g.label}<small>{g.systemToken} / {g.wbs} · ผู้ดำเนินการ {g.role}</small></td><td>{g.action}{g.inputProblems.length>0&&<details><summary>ฐานที่ต้องจัดการ {g.inputProblems.length} ประเภท</summary><ul>{g.inputProblems.map(p=><li key={p}>{p}</li>)}</ul></details>}</td><td>{g.lineIds.length} รายการ <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+g.lineIds[0])}>เปิดงานเดิม</button></td></tr>)}</tbody></table></div></details>
  </section>;
 }
-export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onNavigate}){
+export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem,onOpenSource,onNavigate}){
  const {data,model,change,busy}=useBidWorkspace();
  const editorState=useRef(null);
  const [mode,setMode]=useState("working"),[priceView,setPriceView]=useState("provisional"),[form,setForm]=useState(blankLine),[context,setContext]=useState("official"),[target,setTarget]=useState(null);
@@ -265,7 +274,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <Module id="bid.budget.working.lines" title="เตรียมข้อเสนอ A / B / C — ขอบเขต → ปริมาณ → Cost / Sell" open={false}>
  <p>ลำดับงานใน 10.2: อ่านข้อกำหนดและ System Particular → วิเคราะห์ใน WP.1–WP.8 → เลือกรายการ A/B/C → เปิดรายละเอียดเพื่อแก้ไขและทบทวนราคา</p>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
- <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget}/>
+ <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget} navigationSystem={navigationSystem}/>
  <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>

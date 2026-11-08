@@ -7,47 +7,35 @@ import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 const columns=[['ACP(main)','2+2 · ACP'],['APF(main)','2+2 · APF'],['ACP(alternative)','2+0 · ACP'],['APF(alternative)','2+0 · APF'],['Spares','Spares']];
 const configurations=[['all','เทียบทุกแบบ'],['main','Main 2+2 HSB'],['alternative','Alternative 2+0'],['Spares','Spares']];
 
-function SupplierBoqTable0550({rows,config='all',workingScope}){
+export function SupplierBoqTable0550({rows,config='all',workingSite}){
  const visible=columns.filter(([key])=>rows.some(row=>Object.hasOwn(row.quantities,key))&&(config==='all'||key===config||key.endsWith('('+config+')')));
- const focusedColumn=workingScope&&workingScope.site+'(alternative)';
+ const focusedColumn=workingSite&&workingSite+'(alternative)';
  const groups=new Map();
  for(const row of rows.filter(row=>visible.some(([key])=>Object.hasOwn(row.quantities,key)))){
-  const group=workingScope?.groupFor(row);
+  const group=row.workingGroup;
   const key=group?.key||'all';
-  if(!groups.has(key))groups.set(key,{...group,rows:[]});
+  if(!groups.has(key))groups.set(key,{label:group?.label,rows:[]});
   groups.get(key).rows.push(row);
  }
- const displayGroups=[...groups].sort(([,a],[,b])=>(a.order??0)-(b.order??0));
- const siteRows=workingScope?rows.filter(row=>row.quantities[focusedColumn]>0):[];
  return <div className="p55-table-wrap"><table className="p55-table p55-supplier-boq" aria-label="Supplier BoQ by configuration and site">
-  {workingScope&&<caption>BOM ที่เสนอใน R11 · {workingScope.site} · {siteRows.length} P/N ที่มีจำนวน รวมรายการมีเงื่อนไขตาม BoQ</caption>}
-  <thead><tr><th scope="col">P/N</th><th scope="col">รายการต้นฉบับ</th>{visible.map(([key,label])=><th scope="col" key={key} data-boq-working-site={key===focusedColumn?workingScope.site:undefined}>{label}</th>)}
-   {workingScope&&<><th scope="col">สถานะ BOM · {workingScope.site}</th><th scope="col">เรตราย P/N</th><th scope="col">ฐานต้นทุน</th></>}
+  {workingSite&&<caption>{rows.length} รายการ BoQ ที่มี Mapping ถึงแถวนี้</caption>}
+  <thead><tr><th scope="col">P/N</th><th scope="col">รายการต้นฉบับ</th>{visible.map(([key,label])=><th scope="col" key={key} data-boq-working-site={key===focusedColumn?workingSite:undefined}>{label}</th>)}
+   {workingSite&&<th scope="col">สถานะ BOM · {workingSite}</th>}
    <th scope="col">หมายเหตุ / ต้นทาง</th></tr></thead>
-  <tbody>{displayGroups.map(([key,group])=><React.Fragment key={key}>
-   {group.label&&<tr className="p55-dmr-boq-group"><th colSpan={visible.length+4}>{group.label}</th>
-    <td colSpan={2}>{group.rows.filter(row=>row.quantities[focusedColumn]>0).length} P/N ที่ {workingScope.site}<br/>{group.costBasis}</td></tr>}
+  <tbody>{[...groups].map(([key,group])=><React.Fragment key={key}>
+   {group.label&&<tr className="p55-dmr-boq-group"><th colSpan={visible.length+4}>{group.label}</th></tr>}
    {group.rows.map((row,i)=><tr key={row.locator+':'+i} data-supplier-boq-locator={row.locator}>
-   <td><strong>{row.part}</strong></td><td>{row.description}</td>{visible.map(([key])=><td key={key} className="p55-boq-qty" data-boq-working-site={key===focusedColumn?workingScope.site:undefined}>{row.quantities[key]??'—'}</td>)}
-   {workingScope&&<><td>{workingScope.statusFor(row)}</td><td>{row.quantities[focusedColumn]>0?'ไม่ระบุ':'—'}</td><td>{workingScope.costFor(row)}</td></>}
+   <td><strong>{row.part}</strong></td><td>{row.description}</td>{visible.map(([key])=><td key={key} className="p55-boq-qty" data-boq-working-site={key===focusedColumn?workingSite:undefined}>{row.quantities[key]??'—'}</td>)}
+   {workingSite&&<td>{row.workingStatus}</td>}
    <td>{row.remark&&<span>{row.remark}<br/></span>}<code>{row.locator}</code></td>
   </tr>)}</React.Fragment>)}</tbody>
  </table></div>;
 }
 
-export function SupplierQuoteBoq0550({offers,workingScope}){
+export function SupplierQuoteBoq0550({offers}){
  const [config,setConfig]=useState('all'),[open,setOpen]=useState(false);
  const entries=new Map();
- const excerpts=offers.flatMap(offer=>{
-  const rows=supplierBoqRows0550(offer);
-  if(!workingScope)return rows;
-  return rows.flatMap(row=>{
-   const quantities=Object.fromEntries(Object.entries(row.quantities).filter(([key])=>
-    offer.id===workingScope.configurationOfferId?key.endsWith('(alternative)'):key==='Spares'));
-   return Object.keys(quantities).length?[{...row,quantities}]:[];
-  });
- });
- for(const row of excerpts){
+ for(const row of offers.flatMap(supplierBoqRows0550)){
   const key=JSON.stringify([row.locator,row.part,row.description,row.remark]);
   const prior=entries.get(key);
   if(prior&&Object.keys(row.quantities).some(k=>Object.hasOwn(prior.quantities,k)&&prior.quantities[k]!==row.quantities[k])){
@@ -56,11 +44,6 @@ export function SupplierQuoteBoq0550({offers,workingScope}){
  }
  const rows=[...entries.values()].sort((a,b)=>a.row-b.row);
  const sourceUrl=offers.find(offer=>offer.quoteEvidence?.sourceUrl)?.quoteEvidence.sourceUrl;
- if(workingScope){
-  return rows.some(row=>Object.hasOwn(row.quantities,workingScope.site+'(alternative)'))
-   ? <SupplierBoqTable0550 rows={rows} workingScope={workingScope}/>
-   : <p>OPEN · ทะเบียน 07 Vendor ยังไม่มีรายละเอียด BoQ คอลัมน์ {workingScope.site} สำหรับ R11</p>;
- }
  if(!rows.length)return null;
  return <details className="p55-panel p55-quote-boq" onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>เปรียบเทียบ BoQ ตามไซต์ / แบบที่เสนอ · {rows.length} แถว</summary>
   {open&&<>

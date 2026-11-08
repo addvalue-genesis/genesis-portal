@@ -815,8 +815,6 @@
 .p55-supplier-trace .p55-table button { display: block; margin-top: 4px; text-align: left; }
 .p55-source-amount { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
 .p55-source-amount small { display: block; font-size: 11px; font-weight: 400; margin-top: 3px; }
-.p55-r11-price .p55-metric-grid { grid-template-columns: repeat(auto-fit, minmax(min(155px, 100%), 1fr)); }
-.p55-r11-price button { margin-top: 10px; }
 .p55-table tr[data-tower-price-role] > td:nth-child(3),
 .p55-table tr[data-tower-price-role] > td:nth-child(4),
 .p55-table tr[data-tower-price-role] > td:nth-child(5) { white-space: nowrap; }
@@ -1632,6 +1630,9 @@
 /* Numbered, copyable 0550 presentation: scoped away from frozen history/0553. */
 .p55-bid-presentation { --bid-accent:#526777; --bid-tint:#f0f4f7; grid-template-columns:minmax(0,1fr); }
 .p55-bid-presentation :is(.p55-panel,.p55-price-group,.p55-review-fields,.p55-table-wrap) { min-width:0; max-width:100%; }
+[data-dmr-working-section] { margin-block:.65rem; }
+.p55-dmr-price-amount { white-space:nowrap; }
+[data-dmr-working-section="scope"] .p55-bid-content > ul > li + li { margin-top:.65rem; }
 .p55-working-line-details-toggle { margin-top:.5rem; }
 .p55-working-line-details {
   contain:inline-size;

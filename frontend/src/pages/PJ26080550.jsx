@@ -2171,12 +2171,13 @@ function Project0550Bidding({ lang = "th" }) {
   },[data,model]);
   const moduleIndex=directory.entries;
   const componentNumbers=useMemo(()=>({projectId:"PJ2608-0550",numbers:directory.numbers}),[directory]);
-  const jump=useCallback(m=>{if(technicalDirty)return;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
-  const navigate=useCallback(id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);},[moduleIndex,jump]);
+  const workingSystemTarget=useRef(null);
+  const jump=useCallback((m,workingSystem)=>{if(technicalDirty)return;workingSystemTarget.current=workingSystem;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
+  const navigate=useCallback((id,options)=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m,options?.workingSystem);},[moduleIndex,jump]);
   const openSource=useCallback(id=>jump({id,tab:"documents",area:"A"}),[jump]);
   const legacyBudget=useMemo(()=><LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>,[]);
-  const budgetTarget=useRef(null);
-  if(area==="B"&&activeTab==="budget")budgetTarget.current=navigationTarget;
+  const budgetTarget=useRef({});
+  if(area==="B"&&activeTab==="budget")budgetTarget.current={id:navigationTarget,workingSystem:workingSystemTarget.current};
   useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
   const [pagaEvidence, setPagaEvidence] = useState(null);
 
@@ -2225,7 +2226,7 @@ function Project0550Bidding({ lang = "th" }) {
         {area==="B"&&<div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>}
         {/* Retain the existing Working editor and visited projections across tabs. */}
         <div hidden={area!=="B"||activeTab!=="budget"} data-retained-workspace="budget">
-          <RetainedCommercial0550 onNavigate={navigate} onOpenSource={openSource} navigationTarget={budgetTarget.current} legacy={legacyBudget}/>
+          <RetainedCommercial0550 onNavigate={navigate} onOpenSource={openSource} navigationTarget={budgetTarget.current.id} navigationSystem={budgetTarget.current.workingSystem} legacy={legacyBudget}/>
         </div>
         {area==="B"&&<>
 

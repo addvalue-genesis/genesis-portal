@@ -1,3 +1,7 @@
+Latest DMR Working layout: [TEL-DMR Working sections](20261108_DMR_WORKING_SECTIONS.md). The existing Part A group separates scope status, the one Working price table with MR-level BOM, and source/downstream links. WP.2/7/8 use the existing TEL-DMR filter.
+
+Latest DMR Working presentation: [BOM scoped by Working line](20261108_DMR_BOM_BY_WORKING_LINE.md). APF/ACP Item 01 shows equipment and Item 02 shows cables/interfaces using exact WP.7 references to the selected R11. Full quote evidence is available from 07 Vendor and the system-level trace.
+
 Latest Working presentation: [line components in 10.2](20261108_WORKING_LINE_COMPONENTS.md). Existing pricing rows open one inset child panel for MR/TAG and mapped Vendor evidence, including DMR site BOM. The original Working owner remains the price and Module Search target.
 
 Latest scope and costing update: [MGW LAN/PBX/FO and Part B](20261107_MGW_LAN_PBX_FO_AND_PART_B.md). Existing Working and Budget show ADDVALUE service cost and distinguish shared project activity from the DMR engineering share.
