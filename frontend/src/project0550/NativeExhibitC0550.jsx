@@ -5,7 +5,7 @@ import {SchedulePriceDiagnostics0550} from './SchedulePriceDiagnostics0550';
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
-import {c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 
 const a1DirectRows=[
  [3,'S/N 2 · Inspection and tests'],
@@ -54,6 +54,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
  const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency),[screenView,id,currency]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
+ const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
  const print=()=>{
   const frame=document.createElement('iframe');frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px';
   frame.onload=()=>{frame.contentWindow.focus();frame.contentWindow.print();setTimeout(()=>frame.remove(),60000);};
@@ -64,6 +65,13 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {groups.length>0&&<label>ระบบใน Schedule C2 <select aria-label="C2 system form" value={selected?.token||''} onChange={e=>setSystemChoice(e.target.value)} disabled={disabled}><option value="">แสดงทุกระบบ</option>{groups.map(group=><option key={group.token} value={group.token}>{group.token}{group.name===group.token?'':' · '+group.name} · {group.rows.length||'OPEN'}</option>)}</select></label>}
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
+  {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
+   <strong>ตรวจขอบเขตซ้ำใน C2 · พบ PROJECT (Lot) และรายการราย Part No. ใน Main Equipment เดียวกัน</strong>
+   <ul>{overlaps.map(({mainEquipment,lots,parts})=><li key={mainEquipment}>
+    {mainEquipment} · {lots.map(row=>row.lineId).join(', ')} · Part No. {parts.map(row=>row.partNo+' ('+row.lineId+')').join(', ')}
+    {' '}<button type="button" disabled={disabled} onClick={()=>onAllocate?.(lots[0].lineId)}>ตรวจการจัดหมวด 11.M</button>
+   </li>)}</ul>
+  </div>}
   <details className="p55-c1-internal-diagnostics" open={id!=='C1'}><summary>SI · ตรวจราคา / การจัดหมวดภายใน</summary>
   {id==='A1'&&<A1DirectReview0550 view={screenView} currency={currency} onNavigate={onNavigate} onAllocate={onAllocate} disabled={disabled}/>}
   <SchedulePriceDiagnostics0550 view={screenView} id={id} currency={currency} onNavigate={onNavigate} onAllocate={onAllocate} disabled={disabled}/>

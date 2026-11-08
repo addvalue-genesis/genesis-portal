@@ -95,6 +95,16 @@ assert.equal(c2Forms.pages.length,5);assert.equal(c2Forms.pages.filter(p=>p.syst
 assert.equal(c2Forms.pages.find(p=>p.systemToken==='TEL-LAN').values.C2_4_0,'LAN-ONLY');
 assert.match(c2Forms.html,/TEL-PAGA[^<]*OPEN/);assert.equal((c2Forms.html.match(/SHARED-OWNER/g)||[]).length,1);
 assert.deepEqual(N.nativeExhibitProblems0550(c2,'C2'),[],'Equipment references for separate systems are independent');
+const {c2ProjectLotOverlaps0550}=require(root+'/project0550/data/c2SystemForms0550.js');
+const projectLot={...c2Row('COMMON',' shared-tag ','PROJECT · Commissioning spares'),lineId:'REQ-MR-ACT-B5-D03',unit:'Lot',partNo:''};
+const sparePart={...c2Row('TEL-LAN','SHARED-TAG','Itemized spare'),unit:'Pc',partNo:'PART-001'};
+const overlapRows=[projectLot,sparePart];
+assert.deepEqual(c2ProjectLotOverlaps0550(overlapRows),[{mainEquipment:'shared-tag',lots:[projectLot],parts:[sparePart]}]);
+assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,mainEquipment:'OTHER-TAG'}]),[]);
+assert.deepEqual(c2ProjectLotOverlaps0550(overlapRows.map(row=>({...row,mainEquipment:'OPEN'}))),[]);
+assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,nonAdditive:true}]),[]);
+assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,line:{...sparePart.line,selected:false}}]),[]);
+assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,partNo:'OPEN'}]),[]);
 const c2Lan={...c2,c2SystemToken:'TEL-LAN'};
 assert.doesNotMatch(N.nativeExhibitHtml0550(c2Lan,'C2'),/DMR-ONLY|SHARED-OWNER/);
 const c2Word=Buffer.from(N.buildNativeExhibitDocx0550(c2Lan,'C2')).toString();

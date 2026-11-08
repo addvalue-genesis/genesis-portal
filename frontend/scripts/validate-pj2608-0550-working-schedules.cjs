@@ -37,6 +37,25 @@ try{
  assert.equal(c2Quantity.installedPopulation,48);assert.equal(c2Quantity.value,5);
  assert.equal(evaluateServiceEquation('B5-C2-OEM-QTY',{...c2Inputs,recommended:null}).state,'OPEN');
  assert.equal(evaluateServiceEquation('B5-C2-OEM-QTY',{...c2Inputs,included:6}).value,0);
+ const ratioInputs={mode:'RATIO',populationBasis:'MAIN_EQUIPMENT',A:2,B:20,sparesPerGroup:2,groupSize:10,included:0};
+ const ratioCases=[
+  ['exact multiple',{},'CALCULATED',4,4],
+  ['partial group', {B:21},'CALCULATED',6,6],
+  ['installed parts',{populationBasis:'INSTALLED_PARTS',B:21},'CALCULATED',10,10],
+  ['below one group',{B:1},'CALCULATED',2,2],
+  ['subtract confirmed inclusion',{B:21,included:1},'CALCULATED',5,6],
+  ['included exceeds requirement',{included:5},'CALCULATED',0,4],
+  ['missing population basis',{populationBasis:null},'OPEN',null],
+  ['missing ratio',{sparesPerGroup:null},'OPEN',null],
+  ['invalid group size',{groupSize:0},'INVALID',null],
+  ['fractional spare count',{sparesPerGroup:1.5},'INVALID',null],
+  ['unknown basis',{populationBasis:'PROJECT'},'INVALID',null],
+  ['overflow',{A:1,B:1e12,groupSize:1,sparesPerGroup:1e12},'INVALID',null],
+ ];
+ for(const [label,overrides,state,value,required] of ratioCases){
+  const result=evaluateServiceEquation('B5-C2-OEM-QTY',{...ratioInputs,...overrides});
+  assert.deepEqual([result.state,result.value,result.requiredQuantity],[state,value,required],label);
+ }
  const spares=structuredClone(categories),lineB5=spares.lines.find(l=>l.id==='TEST-B5');
  Object.assign(lineB5,{commissioningPhase:'PRE_COMMISSIONING',systemToken:'TEL-LAN',customerRowCode:'B5',
   vendorId:'',offerId:'',calculationId:'TEST-B5-COUNT',resultKey:'value',quantity:null,unit:'Pc',currency:'USD',manualCost:10,sellMode:'MARKUP',markupPct:0,marginPct:null,primePct:0,sellRate:null});
@@ -56,6 +75,12 @@ try{
  const oemView=preview(spares);
  assert.equal(oemView.scheduleRows('C2')[0].quantity,5);
  assert.equal(N.nativeSchedule0550(oemView,'A1').pages[0].values.A1_5_6,'50.00');
+ spares.calculations[spares.calculations.length-1]={...spares.calculations.at(-1),inputs:{...ratioInputs,B:21}};
+ validate(spares);
+ const ratioView=preview(spares);
+ assert.equal(ratioView.scheduleRows('C2')[0].quantity,6);
+ assert.equal(N.nativeSchedule0550(ratioView,'C2').pages[0].values.C2_4_4,'6');
+ assert.equal(N.nativeSchedule0550(ratioView,'A1').pages[0].values.A1_5_6,'60.00');
  const {lanStockBasis0550}=require(root+'/project0550/data/lanStockBasis0550.js');
  const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
  const lanOffer=(key,part,perSet=1)=>({id:MGW_CURRENT_PREFIX_0550+key,quoteRef:MGW_CURRENT_QUOTE_0550,unit:'SET',quoteEvidence:{

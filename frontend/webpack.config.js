@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {execFileSync} = require("node:child_process");
 
 // This is build identification only. No files are written and no price source is modified.
-// Restart webpack serve after Git Pull to show the new commit version in What's New.
+// Restart webpack serve after Git Pull to refresh the commit embedded in the bundle.
 const currentGitRevision = () => {
   try {
     return execFileSync("git",["rev-parse","--short=12","HEAD"],{
@@ -13,13 +13,15 @@ const currentGitRevision = () => {
     }).trim();
   } catch (_) {return "UNAVAILABLE";}
 };
+const buildRevision = JSON.stringify(currentGitRevision());
 
 module.exports = {
   entry: "./src/index.jsx",
   plugins: [
     new MiniCssExtractPlugin({filename: "bundle.css", chunkFilename: "[id].css"}),
     new webpack.DefinePlugin({
-      __PJ0553_BUILD_REVISION__:JSON.stringify(currentGitRevision())
+      __PJ0553_BUILD_REVISION__:buildRevision,
+      __PJ0550_BUILD_REVISION__:buildRevision
     })
   ],
   output: {

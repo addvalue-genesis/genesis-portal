@@ -1,6 +1,22 @@
 // Executable bindings for the existing 0550 E01–E18 register. No rates or FX defaults.
 import { SERVICE_EQUATIONS } from "./serviceEquationModel";
 const f=(key,label,min=0,max=1e12)=>({key,label,min,max});
+export const C2_OEM_QUANTITY_ID_0550="B5-C2-OEM-QTY";
+export const C2_OEM_POPULATIONS_0550=[
+ ["MAIN_EQUIPMENT","Main equipment items (B)"],
+ ["INSTALLED_PARTS","Identical installed parts (A × B)"]
+];
+const c2Recommended=f("recommended","Required quantity per CUS / OEM spare list");
+const c2RatioFields=[
+ f("sparesPerGroup","Spares per group"),
+ f("groupSize","Equipment items / installed parts per group",1)
+];
+export const C2_OEM_RATIO_FORMULA_0550="Q_required = ceil(population / groupSize) × sparesPerGroup; Q_add = max(0, Q_required − Q_included)";
+export function serviceEquationFields0550(id,inputs){
+ const fields=EQUATION_INPUTS[id].fields;
+ if(id!==C2_OEM_QUANTITY_ID_0550||inputs?.mode!=="RATIO")return fields;
+ return fields.flatMap(field=>field===c2Recommended?c2RatioFields:[field]);
+}
 export const EQUATION_INPUTS = {
  E01:{fields:[f("I","Applicability 0/1",0,1),f("Q","Work objects"),f("UMH","MH per object"),f("F","Factor")],unit:"MH"},
  E02:{fields:[f("Qdoc","Documents"),f("Hinitial","Initial MH/document"),f("Ncycles","Review cycles"),f("Hcycle","MH/review"),f("Hfinal","Final MH/document")],unit:"MH"},
@@ -20,7 +36,7 @@ export const EQUATION_INPUTS = {
  E16:{fields:[f("sessions","Sessions"),f("days","Days/session"),f("trainers","Trainers"),f("Hday","Paid hours/day"),f("prepMH","Preparation MH"),f("closeMH","Closeout MH")],unit:"MH"},
  E17:{fields:[f("THB","THB amount"),f("fx","THB per USD",0.000001)],unit:"USD"},
  E18:{fields:[],rows:[f("qtyInstalled","Installed activity quantity"),f("UMH","MH per installed activity")],unit:"MH"},
- "B5-C2-OEM-QTY":{fields:[f("A","Identical parts per Main Equipment item",1),f("B","Count of matching Main Equipment items",1),f("recommended","Required quantity per CUS / OEM spare list"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"N_installed = A × B; Q_add = max(0, Q_required − Q_included)"},
+ [C2_OEM_QUANTITY_ID_0550]:{fields:[f("A","Identical parts per Main Equipment item",1),f("B","Count of matching Main Equipment items",1),c2Recommended,f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"N_installed = A × B; Q_add = max(0, Q_required − Q_included)"},
  "B5-SPARE-QTY":{fields:[f("drivers","Consumption events / concurrent teams / OEM lot (1)"),f("perDriver","Spares per event / team / OEM lot"),f("reserve","Separate specified reserve"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"Q_add = max(0, N × Q_per_driver + Q_separate_reserve − Q_included)"},
  "B5-SPARE-STOCK":{fields:[f("installed","Installed units with the same replaceable Part No."),f("failureRate","OEM failures per unit-hour",Number.MIN_VALUE,1),f("exposureHours","Unreplenished exposure hours",Number.MIN_VALUE),f("coveragePct","Stock sufficiency target (%)",0.000001,99.999999),f("planned","Separate planned consumption"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"λ = N × failure rate × t; S = smallest integer with P(Poisson(λ) ≤ S) ≥ target; Q_add = max(0, Q_planned + S − Q_included)"},
  "PAGA-SPL":{fields:[f("ambient","Ambient noise dBA"),f("margin","Required SNR margin dB")],unit:"dBA",formula:"SPL_required = Ambient_Noise + Required_SNR_Margin"},
@@ -50,12 +66,18 @@ export function evaluateServiceEquation(id, inputs={}) {
  const definition=EQUATION_INPUTS[id];
  if(!definition)return {state:"INVALID",value:null,errors:["Unknown equation"],unit:null};
  if(!inputs||typeof inputs!=="object"||Array.isArray(inputs))return {state:"INVALID",value:null,errors:["Inputs must be an object"],unit:definition.unit};
- const errors=[],missing=[];
+ const errors=[],missing=[],fields=serviceEquationFields0550(id,inputs);
+ const c2Oem=id===C2_OEM_QUANTITY_ID_0550,ratio=c2Oem&&inputs.mode==="RATIO";
+ if(c2Oem&&inputs.mode!==undefined&&!["DIRECT","RATIO"].includes(inputs.mode))errors.push("Unknown C2 OEM quantity mode");
+ if(ratio){
+  if(inputs.populationBasis==null||inputs.populationBasis==="")missing.push("populationBasis");
+  else if(!C2_OEM_POPULATIONS_0550.some(([key])=>key===inputs.populationBasis))errors.push("Unknown C2 OEM population basis");
+ }
  const check=(spec,obj,prefix="")=>{for(const field of spec){const v=obj?.[field.key],k=prefix+field.key;
   if(v===null||v===undefined||v==="")missing.push(k);
   else if(typeof v!=="number"||!Number.isFinite(v)||v<field.min||v>field.max)errors.push(k+" outside allowed range");
  }};
- check(definition.fields,inputs);
+ check(fields,inputs);
  if(definition.rows){
   if(!Array.isArray(inputs.rows)||!inputs.rows.length)missing.push("rows");
   else if(inputs.rows.length>2000)errors.push("Too many work objects");
@@ -64,15 +86,24 @@ export function evaluateServiceEquation(id, inputs={}) {
  if(id==="E01"&&inputs.I!==undefined&&inputs.I!==null&&![0,1].includes(inputs.I))errors.push("Applicability must be 0 or 1");
  if(id==="E04"&&Array.isArray(inputs.rows)&&inputs.rows.some(r=>r&&r.I!==null&&r.I!==undefined&&![0,1].includes(r.I)))errors.push("Applicability must be 0 or 1");
  if(id==="E05")for(const key of ["events","crew"])if(inputs[key]!==null&&inputs[key]!==undefined&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
- if(["B5-C2-OEM-QTY","B5-SPARE-QTY"].includes(id))for(const {key} of definition.fields)if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(c2Oem||id==="B5-SPARE-QTY")for(const {key} of fields)if(inputs[key]!=null&&!(ratio&&inputs[key]==="")&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(id==="B5-SPARE-STOCK")for(const key of ["installed","planned","included"])if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(id==="E14"&&inputs.driver>inputs.totalDrivers)errors.push("Driver exceeds total drivers");
  if(["PORT-HEADROOM","LICENSE-HEADROOM","CCTV-STORAGE","FO-LOSS"].includes(id))for(const key of ({"PORT-HEADROOM":["available","connected","reserved"],"LICENSE-HEADROOM":["licensed","required"],"CCTV-STORAGE":["cameras"],"FO-LOSS":["splices","connectors"]}[id]))if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(errors.length||missing.length)return {state:errors.length?"INVALID":"OPEN",value:null,errors:[...errors,...missing.map(k=>"Missing "+k)],unit:definition.unit};
  const x=inputs, sum=fn=>x.rows.reduce((n,r)=>n+fn(r),0);
  const mean=id==="B5-SPARE-STOCK"?x.installed*x.failureRate*x.exposureHours:null;
- const installedPopulation=id==="B5-C2-OEM-QTY"?x.A*x.B:null;
+ const installedPopulation=c2Oem?x.A*x.B:null;
  if(mean>200||id==="B5-SPARE-QTY"&&!Number.isSafeInteger(x.drivers*x.perDriver+x.reserve)||installedPopulation!==null&&!Number.isSafeInteger(installedPopulation))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
+ let requiredQuantity=x.recommended;
+ if(ratio){
+  const population=BigInt(x.populationBasis==="MAIN_EQUIPMENT"?x.B:installedPopulation);
+  const groupSize=BigInt(x.groupSize);
+  const groups=(population+groupSize-BigInt(1))/groupSize;
+  const required=groups*BigInt(x.sparesPerGroup);
+  if(required>BigInt(Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
+  requiredQuantity=Number(required);
+ }
  const stock=mean===null?null:poissonStock(mean,x.coveragePct/100);
  const calculations={
   E01:()=>x.I*x.Q*x.UMH*x.F,E02:()=>x.Qdoc*(x.Hinitial+x.Ncycles*x.Hcycle+x.Hfinal),E03:()=>x.months*x.FTE*x.Hmonth,
@@ -82,7 +113,7 @@ export function evaluateServiceEquation(id, inputs={}) {
   E11:()=>x.cost*(1+x.markup),E12:()=>x.cost/(1-x.margin),E13:()=>x.sell*(1+x.primeMarkup),
   E14:()=>x.pool*x.driver/x.totalDrivers,E15:()=>x.laborDelta+x.tripDelta+x.OEMDelta,
   E16:()=>x.sessions*x.days*x.trainers*x.Hday+x.prepMH+x.closeMH,E17:()=>x.THB/x.fx,E18:()=>sum(r=>r.qtyInstalled*r.UMH),
-  "B5-C2-OEM-QTY":()=>Math.max(0,x.recommended-x.included),
+  [C2_OEM_QUANTITY_ID_0550]:()=>Math.max(0,requiredQuantity-x.included),
   "B5-SPARE-QTY":()=>Math.max(0,x.drivers*x.perDriver+x.reserve-x.included),
   "B5-SPARE-STOCK":()=>Math.max(0,x.planned+stock.reserve-x.included),
   "PAGA-SPL":()=>x.ambient+x.margin,"PAGA-UPS":()=>x.loadW*x.hours/(x.efficiency*x.DoD*x.derating),
@@ -96,6 +127,6 @@ export function evaluateServiceEquation(id, inputs={}) {
  };
  const value=calculations[id]();
  if(!Number.isFinite(value)||Math.abs(value)>Number.MAX_SAFE_INTEGER||(id==="E05"&&value*x.Hday>Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Result overflow"]};
- return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
-  ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),...(installedPopulation===null?{}:{installedPopulation}),...stock,engineeringAccepted:false};
+ return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:ratio?C2_OEM_RATIO_FORMULA_0550:SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
+  ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),...(installedPopulation===null?{}:{installedPopulation}),...(ratio?{requiredQuantity}:{}),...stock,engineeringAccepted:false};
 }

@@ -4,6 +4,7 @@ import { BrowserRouter, NavLink, Navigate, Route, Routes, useLocation } from "re
 // This branch is the dedicated 0550 workspace. Other projects remain in their
 // own checkouts/servers; do not open their older bundled copies from this app.
 const PROJECT_ROUTE = "/projects/pj2608-0550";
+const BUILD_COMMIT = typeof __PJ0550_BUILD_REVISION__ === "string" ? __PJ0550_BUILD_REVISION__ : "UNAVAILABLE";
 const PJ26080550 = lazy(() => import("./pages/PJ26080550").then(m => ({default: m.PJ26080550})));
 
 class WorkspaceBoundary extends React.Component {
@@ -47,7 +48,7 @@ export function App() {
         <nav className="genesis-nav" aria-label="Primary navigation">
           <NavLink to={PROJECT_ROUTE} className={navClass}>PJ2608-0550</NavLink>
         </nav>
-        <div className="genesis-tools"><select className="genesis-lang" value={lang} onChange={e => setLang(e.target.value)} aria-label="Language">
+        <div className="genesis-tools"><small aria-label="Build commit" data-build-commit={BUILD_COMMIT}>Build {BUILD_COMMIT}</small><select className="genesis-lang" value={lang} onChange={e => setLang(e.target.value)} aria-label="Language">
           <option value="th">TH</option><option value="en">EN</option>
         </select></div>
       </header>
