@@ -11,11 +11,20 @@ const c2RatioFields=[
  f("sparesPerGroup","Spares per group"),
  f("groupSize","Equipment items / installed parts per group",1)
 ];
-export const C2_OEM_RATIO_FORMULA_0550="Q_required = ceil(population / groupSize) × sparesPerGroup; Q_add = max(0, Q_required − Q_included)";
+export const C2_OEM_ROUNDING_0550=[
+ ["CEIL","CEIL · นับเศษเป็นหนึ่งกลุ่ม"],
+ ["FLOOR","FLOOR · นับเฉพาะกลุ่มเต็ม"]
+];
+export const C2_OEM_RATIO_FORMULA_0550=roundingMode=>
+ "Q_required = "+(roundingMode==="CEIL"?"ceil":roundingMode==="FLOOR"?"floor":"CEIL/FLOOR")+"(population / groupSize) × sparesPerGroup; Q_add = max(0, Q_required − Q_included)";
 export function serviceEquationFields0550(id,inputs){
  const fields=EQUATION_INPUTS[id].fields;
  if(id!==C2_OEM_QUANTITY_ID_0550||inputs?.mode!=="RATIO")return fields;
- return fields.flatMap(field=>field===c2Recommended?c2RatioFields:[field]);
+ return fields.flatMap(field=>{
+  if(field===c2Recommended)return c2RatioFields;
+  if(field.key==="A"&&inputs.populationBasis==="MAIN_EQUIPMENT")return [{...field,optional:true}];
+  return [field];
+ });
 }
 export const EQUATION_INPUTS = {
  E01:{fields:[f("I","Applicability 0/1",0,1),f("Q","Work objects"),f("UMH","MH per object"),f("F","Factor")],unit:"MH"},
@@ -68,13 +77,22 @@ export function evaluateServiceEquation(id, inputs={}) {
  if(!inputs||typeof inputs!=="object"||Array.isArray(inputs))return {state:"INVALID",value:null,errors:["Inputs must be an object"],unit:definition.unit};
  const errors=[],missing=[],fields=serviceEquationFields0550(id,inputs);
  const c2Oem=id===C2_OEM_QUANTITY_ID_0550,ratio=c2Oem&&inputs.mode==="RATIO";
+ // Legacy ratio records used CEIL before these inputs existed.
+ const legacyRounding=ratio&&inputs.roundingMode===undefined&&inputs.roundingSourceRef===undefined;
+ const roundingMode=legacyRounding?"CEIL":inputs.roundingMode;
  if(c2Oem&&inputs.mode!==undefined&&!["DIRECT","RATIO"].includes(inputs.mode))errors.push("Unknown C2 OEM quantity mode");
  if(ratio){
   if(inputs.populationBasis==null||inputs.populationBasis==="")missing.push("populationBasis");
   else if(!C2_OEM_POPULATIONS_0550.some(([key])=>key===inputs.populationBasis))errors.push("Unknown C2 OEM population basis");
+  if(!legacyRounding){
+   if(roundingMode==null||roundingMode==="")missing.push("roundingMode");
+   else if(!C2_OEM_ROUNDING_0550.some(([key])=>key===roundingMode))errors.push("Unknown C2 OEM rounding mode");
+   if(inputs.roundingSourceRef!=null&&typeof inputs.roundingSourceRef!=="string")errors.push("Invalid C2 OEM rounding source");
+   else if(!inputs.roundingSourceRef?.trim())missing.push("roundingSourceRef");
+  }
  }
  const check=(spec,obj,prefix="")=>{for(const field of spec){const v=obj?.[field.key],k=prefix+field.key;
-  if(v===null||v===undefined||v==="")missing.push(k);
+  if(v===null||v===undefined||v===""){if(!field.optional)missing.push(k);}
   else if(typeof v!=="number"||!Number.isFinite(v)||v<field.min||v>field.max)errors.push(k+" outside allowed range");
  }};
  check(fields,inputs);
@@ -93,13 +111,13 @@ export function evaluateServiceEquation(id, inputs={}) {
  if(errors.length||missing.length)return {state:errors.length?"INVALID":"OPEN",value:null,errors:[...errors,...missing.map(k=>"Missing "+k)],unit:definition.unit};
  const x=inputs, sum=fn=>x.rows.reduce((n,r)=>n+fn(r),0);
  const mean=id==="B5-SPARE-STOCK"?x.installed*x.failureRate*x.exposureHours:null;
- const installedPopulation=c2Oem?x.A*x.B:null;
+ const installedPopulation=c2Oem&&Number.isInteger(x.A)?x.A*x.B:null;
  if(mean>200||id==="B5-SPARE-QTY"&&!Number.isSafeInteger(x.drivers*x.perDriver+x.reserve)||installedPopulation!==null&&!Number.isSafeInteger(installedPopulation))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
  let requiredQuantity=x.recommended;
  if(ratio){
   const population=BigInt(x.populationBasis==="MAIN_EQUIPMENT"?x.B:installedPopulation);
   const groupSize=BigInt(x.groupSize);
-  const groups=(population+groupSize-BigInt(1))/groupSize;
+  const groups=roundingMode==="CEIL"?(population+groupSize-BigInt(1))/groupSize:population/groupSize;
   const required=groups*BigInt(x.sparesPerGroup);
   if(required>BigInt(Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
   requiredQuantity=Number(required);
@@ -127,6 +145,6 @@ export function evaluateServiceEquation(id, inputs={}) {
  };
  const value=calculations[id]();
  if(!Number.isFinite(value)||Math.abs(value)>Number.MAX_SAFE_INTEGER||(id==="E05"&&value*x.Hday>Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Result overflow"]};
- return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:ratio?C2_OEM_RATIO_FORMULA_0550:SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
+ return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:ratio?C2_OEM_RATIO_FORMULA_0550(roundingMode):SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
   ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),...(installedPopulation===null?{}:{installedPopulation}),...(ratio?{requiredQuantity}:{}),...stock,engineeringAccepted:false};
 }

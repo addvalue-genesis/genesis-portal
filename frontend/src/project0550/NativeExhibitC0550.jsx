@@ -67,9 +67,9 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
-   <strong>ตรวจขอบเขตซ้ำใน C2 · พบ PROJECT (Lot) และรายการราย Part No. ใน Main Equipment เดียวกัน</strong>
-   <ul>{overlaps.map(({mainEquipment,lots,parts})=><li key={mainEquipment}>
-    {mainEquipment} · {lots.map(row=>row.lineId).join(', ')} · Part No. {parts.map(row=>row.partNo+' ('+row.lineId+')').join(', ')}
+   <strong>ตรวจความเสี่ยงคิดซ้ำใน C2 · พบ Lot และรายการราย Part No.</strong>
+   <ul>{overlaps.map(({mainEquipment,systemToken,lots,parts})=><li key={mainEquipment?'equipment:'+mainEquipment:'system:'+systemToken}>
+    {mainEquipment?'Main Equipment '+mainEquipment:'ระบบ '+systemToken+' · ตรวจขอบเขต Lot ในฟอร์มเดียวกัน'} · {lots.map(row=>row.lineId).join(', ')} · Part No. {parts.map(row=>row.partNo+' ('+row.lineId+')').join(', ')}
     {' '}<button type="button" disabled={disabled} onClick={()=>onAllocate?.(lots[0].lineId)}>ตรวจการจัดหมวด 11.M</button>
    </li>)}</ul>
   </div>}

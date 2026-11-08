@@ -7,17 +7,30 @@ const knownKey=value=>{
 };
 
 export function c2ProjectLotOverlaps0550(rows){
- const equipment=new Map();
+ const equipment=new Map(),systems=new Map();
  for(const row of rows){
-  const key=knownKey(row.mainEquipment);
-  if(!key||!row.line||row.line.selected===false||row.nonAdditive)continue;
+  if(!row.line||row.line.selected===false||row.nonAdditive)continue;
+  const partNo=knownKey(row.partNo);
   const projectLot=row.unit?.trim().toUpperCase()==='LOT'&&
-   (legacyProjectLots.has(row.lineId)||/^PROJECT\s*·/i.test(row.line.description?.trim()));
-  if(!projectLot&&!knownKey(row.partNo))continue;
-  if(!equipment.has(key))equipment.set(key,{mainEquipment:row.mainEquipment.trim(),lots:[],parts:[]});
-  equipment.get(key)[projectLot?'lots':'parts'].push(row);
+   (!partNo||legacyProjectLots.has(row.lineId)||/^PROJECT\s*·/i.test(row.line.description?.trim()));
+  if(!projectLot&&!partNo)continue;
+  const category=projectLot?'lots':'parts';
+  const systemToken=row.line.systemToken||'COMMON';
+  if(!systems.has(systemToken))systems.set(systemToken,{systemToken,lots:[],parts:[]});
+  systems.get(systemToken)[category].push(row);
+  const key=knownKey(row.mainEquipment);
+  if(key){
+   if(!equipment.has(key))equipment.set(key,{mainEquipment:row.mainEquipment.trim(),lots:[],parts:[]});
+   equipment.get(key)[category].push(row);
+  }
  }
- return [...equipment.values()].filter(group=>group.lots.length&&group.parts.length);
+ const matches=group=>group.lots.length>0&&group.parts.length>0;
+ const systemWarnings=[...systems.values()].filter(group=>{
+  if(!matches(group))return false;
+  const keys=new Set([...group.lots,...group.parts].map(row=>knownKey(row.mainEquipment)));
+  return keys.has('')||keys.size>1;
+ });
+ return [...equipment.values()].filter(matches).concat(systemWarnings);
 }
 
 // Draft layout only. Each allocation stays with its existing Working owner.

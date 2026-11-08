@@ -86,8 +86,8 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
    <p>A1 S/N 5 · C3 Option · {operations.count} เจ้าของราคา · {totalText(operations)} <button type="button" disabled={disabled} onClick={onOpenC3}>เปิด 11.C3</button></p>
    {operationRows.length>0&&<ul>{operationRows.map(row=><li key={row.lineId}>{link(workingId(row.lineId),row.line.description)} · {money(row.amount,currency)}{row.line.spareBudget&&' · วงเงินร่าง รอรายการ OEM'}</li>)}</ul>}
   </>:<>
-   <p><strong>B5-C2-OEM-QTY · หลักจาก Exhibit C2 Notes 1–3 / MR Appendix 10 / STD TEL-001 §7.7.1</strong> · แยกตาม Main Equipment No. และ Part No. ถึง PAC · ใช้จำนวนตรงตาม CUS/OEM หรือใช้ฐาน B หรือ A × B เมื่อเอกสารกำหนดอัตราส่วนต่อกลุ่มและให้นับเศษกลุ่มเป็นหนึ่งกลุ่ม</p>
-   <p>แบบอัตราส่วน · จำนวนที่ต้องมี = ceil(จำนวนฐาน ÷ ขนาดกลุ่ม) × อะไหล่ต่อกลุ่ม · ทั้งสองแบบคิดจำนวนจัดหาเพิ่มจากจำนวนที่ต้องมี หักจำนวนของ Part No. และงานเดียวกันที่ยืนยันว่ารวมไว้ โดยมีค่าต่ำสุดเป็น 0</p>
+   <p><strong>B5-C2-OEM-QTY · หลักจาก Exhibit C2 Notes 1–3 / MR Appendix 10 / STD TEL-001 §7.7.1</strong> · แยกตาม Main Equipment No. และ Part No. ถึง PAC · ใช้จำนวนตรงตาม CUS/OEM หรือใช้ฐาน B หรือ A × B เมื่อเอกสารกำหนดอัตราส่วนต่อกลุ่ม</p>
+   <p>แบบอัตราส่วน · เลือก CEIL เพื่อนับเศษเป็นหนึ่งกลุ่ม หรือ FLOOR เพื่อนับเฉพาะกลุ่มเต็มตามเอกสาร CUS/OEM จากนั้นคูณอะไหล่ต่อกลุ่มและหักจำนวนที่ยืนยันว่ารวมไว้สำหรับ Part No. และงานเดียวกัน โดยมีค่าต่ำสุดเป็น 0</p>
    <p><strong>B5-SPARE-QTY</strong> · ใช้แตกจำนวนตามขั้นตอน OEM หรือ ITP เมื่อมีจำนวนรอบ/ทีมและจำนวนใช้ต่อรอบ · ตรวจยอดกับรายการ OEM ก่อนตั้งราคา</p>
    <p><strong>B5-SPARE-STOCK</strong> · แบบทดลองประเมินความพอใช้ของสต็อกเผื่อเสีย · ค่าเฉลี่ยการเสีย = จำนวนติดตั้ง × อัตราเสียต่อชั่วโมง × ชั่วโมงที่เติมไม่ได้ · จำนวนตาม CUS และ OEM เป็นฐาน C2</p>
    <p>Working คำนวณราคาขายด้วย E10 / E11 / E12 ตามวิธีขาย ตามด้วย E13 และ E17 ตาม FX ของโครงการ</p>
@@ -98,7 +98,7 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
     {bySystem.map(system=><tr key={system.token}><th scope="row">{system.name} <small>{system.token}</small></th>{[...COMMISSIONING_PHASES_0550.map(p=>p.id),''].map(phase=>{const rows=system.rows.filter(row=>commissioningPhase0550(row.line)===phase);return <td key={phase}>{rows.length?rows.map(row=>{const line=working.get(row.lineId),rate=line?.costRate;return <div key={row.lineId}>
       {link(workingId(row.lineId),row.line.description)}<small>{row.partNo||'Part No. OPEN'} · {row.quantity??'Qty OPEN'} {row.unit} × {money(rate,line?.currency)} · ราคาขาย {money(row.amount,currency)}</small>
       {line?.result?.installedPopulation!==undefined&&<small>Interchangeability A × B · ติดตั้ง {line.result.installedPopulation} ชิ้น</small>}
-      {line?.result?.requiredQuantity!==undefined&&<small>อัตราส่วน OEM · ฐาน {line.calculation?.inputs.populationBasis==='MAIN_EQUIPMENT'?'B':'A × B'} · ต้องมี {line.result.requiredQuantity} ชิ้นก่อนหักจำนวนที่รวมไว้</small>}
+      {line?.result?.requiredQuantity!==undefined&&<small>อัตราส่วน OEM · ฐาน {line.calculation?.inputs.populationBasis==='MAIN_EQUIPMENT'?'B':'A × B'} · {line.calculation?.inputs.roundingMode||'CEIL (รายการเดิม)'} · ต้องมี {line.result.requiredQuantity} ชิ้นก่อนหักจำนวนที่รวมไว้{line.calculation?.inputs.roundingSourceRef&&' · '+line.calculation.inputs.roundingSourceRef}</small>}
       {line?.result?.reserve!==undefined&&<small>เผื่อเสีย {line.result.reserve} · โอกาสพอใช้ {line.result.coveragePct.toFixed(4)}%</small>}
       {line?.calculationId&&link('bid.engineering.calculation.'+line.calculationId,'เปิดสมการปริมาณ')}{line?.offerId&&link(offerId(line.offerId),'เปิดใบเสนอราคา')}
      </div>;}):phase?'OPEN · ตรวจขอบเขต OEM':'—'}</td>;})}</tr>)}

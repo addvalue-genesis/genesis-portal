@@ -105,6 +105,14 @@ assert.deepEqual(c2ProjectLotOverlaps0550(overlapRows.map(row=>({...row,mainEqui
 assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,nonAdditive:true}]),[]);
 assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,line:{...sparePart.line,selected:false}}]),[]);
 assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,{...sparePart,partNo:'OPEN'}]),[]);
+const commonLot={...projectLot,mainEquipment:'OPEN'};
+const commonPart={...sparePart,line:{...sparePart.line,systemToken:'COMMON'}};
+assert.deepEqual(c2ProjectLotOverlaps0550([commonLot,commonPart]),[{systemToken:'COMMON',lots:[commonLot],parts:[commonPart]}]);
+assert.deepEqual(c2ProjectLotOverlaps0550([commonLot,sparePart]),[],'A project Lot is not assigned to every system form');
+assert.deepEqual(c2ProjectLotOverlaps0550([projectLot,commonPart]),[{mainEquipment:'shared-tag',lots:[projectLot],parts:[commonPart]}],'An exact match only warns once');
+const lanLot={...c2Row('TEL-LAN','OTHER-TAG','System bulk allowance'),unit:'Lot',partNo:''};
+assert.deepEqual(c2ProjectLotOverlaps0550([lanLot,sparePart]),[{systemToken:'TEL-LAN',lots:[lanLot],parts:[sparePart]}]);
+assert.deepEqual(c2ProjectLotOverlaps0550([{...lanLot,partNo:'KIT-001'},sparePart]),[],'An OEM Lot with its own Part No. is an itemized row');
 const c2Lan={...c2,c2SystemToken:'TEL-LAN'};
 assert.doesNotMatch(N.nativeExhibitHtml0550(c2Lan,'C2'),/DMR-ONLY|SHARED-OWNER/);
 const c2Word=Buffer.from(N.buildNativeExhibitDocx0550(c2Lan,'C2')).toString();

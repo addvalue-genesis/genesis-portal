@@ -56,6 +56,27 @@ try{
   const result=evaluateServiceEquation('B5-C2-OEM-QTY',{...ratioInputs,...overrides});
   assert.deepEqual([result.state,result.value,result.requiredQuantity],[state,value,required],label);
  }
+ const explicitRatio={...ratioInputs,A:null,B:21,included:1,roundingSourceRef:'Synthetic OEM Rev.1 p.12 §4'};
+ const roundingCases=[
+  ['ceil remainder without A',{roundingMode:'CEIL'},'CALCULATED',5,6],
+  ['floor remainder without A',{roundingMode:'FLOOR'},'CALCULATED',3,4],
+  ['floor below one group',{roundingMode:'FLOOR',B:9,included:0},'CALCULATED',0,0],
+  ['floor exact group',{roundingMode:'FLOOR',B:20},'CALCULATED',3,4],
+  ['A is required for installed parts',{roundingMode:'FLOOR',populationBasis:'INSTALLED_PARTS'},'OPEN',null],
+  ['floor installed parts',{roundingMode:'FLOOR',populationBasis:'INSTALLED_PARTS',A:2},'CALCULATED',7,8],
+  ['missing rounding choice',{roundingMode:''},'OPEN',null],
+  ['missing source',{roundingMode:'CEIL',roundingSourceRef:'  '},'OPEN',null],
+  ['source without mode',{},'OPEN',null],
+  ['invalid rounding choice',{roundingMode:'ROUND'},'INVALID',null],
+  ['invalid rounding reference type',{roundingMode:'CEIL',roundingSourceRef:12},'INVALID',null],
+ ];
+ for(const [label,overrides,state,value,required] of roundingCases){
+  const result=evaluateServiceEquation('B5-C2-OEM-QTY',{...explicitRatio,...overrides});
+  assert.deepEqual([result.state,result.value,result.requiredQuantity],[state,value,required],label);
+ }
+ const floor=evaluateServiceEquation('B5-C2-OEM-QTY',{...explicitRatio,roundingMode:'FLOOR'});
+ assert.match(floor.formula,/floor\(/);
+ assert.equal(floor.installedPopulation,undefined);
  const spares=structuredClone(categories),lineB5=spares.lines.find(l=>l.id==='TEST-B5');
  Object.assign(lineB5,{commissioningPhase:'PRE_COMMISSIONING',systemToken:'TEL-LAN',customerRowCode:'B5',
   vendorId:'',offerId:'',calculationId:'TEST-B5-COUNT',resultKey:'value',quantity:null,unit:'Pc',currency:'USD',manualCost:10,sellMode:'MARKUP',markupPct:0,marginPct:null,primePct:0,sellRate:null});
@@ -81,6 +102,11 @@ try{
  assert.equal(ratioView.scheduleRows('C2')[0].quantity,6);
  assert.equal(N.nativeSchedule0550(ratioView,'C2').pages[0].values.C2_4_4,'6');
  assert.equal(N.nativeSchedule0550(ratioView,'A1').pages[0].values.A1_5_6,'60.00');
+ spares.calculations[spares.calculations.length-1]={...spares.calculations.at(-1),inputs:{...explicitRatio,roundingMode:'FLOOR'}};
+ validate(spares);
+ const floorView=preview(spares);
+ assert.equal(N.nativeSchedule0550(floorView,'C2').pages[0].values.C2_4_4,'3');
+ assert.equal(N.nativeSchedule0550(floorView,'A1').pages[0].values.A1_5_6,'30.00');
  const {lanStockBasis0550}=require(root+'/project0550/data/lanStockBasis0550.js');
  const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
  const lanOffer=(key,part,perSet=1)=>({id:MGW_CURRENT_PREFIX_0550+key,quoteRef:MGW_CURRENT_QUOTE_0550,unit:'SET',quoteEvidence:{
