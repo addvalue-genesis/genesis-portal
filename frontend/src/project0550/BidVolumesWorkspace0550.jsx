@@ -16,7 +16,7 @@ import {WorkingScheduleStatus0550,ScheduleAllocationCrosswalk0550} from './Worki
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
-import {LicensingCost0550} from './LicensingCost0550';
+import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
 import {NATIVE_SUMMARIES_0550,NATIVE_FIELDS_0550,downloadNativeExhibit0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/changeImpact0550';
 
@@ -73,7 +73,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
  useEffect(()=>{if(!dirty)return;const warn=e=>{e.preventDefault();e.returnValue='';};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn);},[dirty]);
  if(!view)return <p>กำลังเปิดชุดข้อเสนอ…</p>;
  const choose=id=>{if(dirty){setMessage('บันทึกหรือยกเลิกร่างก่อนเปลี่ยนแท็บ');return;}setPanel(id);setBindingId('');setDeviationId('');};
- const panels=volume==='I'?[['overview','11.0 Overview / Cross-check'],['cover','11.1 Power of Attorney / Undertaking'],...visibleSchedules.map(s=>[s.id,'11.'+s.id+' / '+s.title]),['D','11.D Supporting Breakdown'],['mapping','11.M Schedule allocation'],['preview','11.P Preview / Export']]:[['overview','13.0 Overview'],...QUALIFICATIONS_0550.map(q=>[q.id,'13.'+q.id+' / '+q.title]),['deviations','13.D Commercial Deviations'],['preview','13.P Preview / Export']];
+ const panels=volume==='I'?[['overview','11.0 Overview / Cross-check'],['cover','11.1 Power of Attorney / Undertaking'],...visibleSchedules.map(s=>[s.id,'11.'+s.id+' / '+s.title]),['D','11.D Supporting Breakdown'],...A1_OTHERS_PANELS_0550.map(({id,number,title})=>[id,number+' '+title]),['mapping','11.M Schedule allocation'],['preview','11.P Preview / Export']]:[['overview','13.0 Overview'],...QUALIFICATIONS_0550.map(q=>[q.id,'13.'+q.id+' / '+q.title]),['deviations','13.D Commercial Deviations'],['preview','13.P Preview / Export']];
  const changeScheduleScope=value=>{if(dirty)return;const all=value==='ALL';setShowAllSchedules(all);if(!all&&SCHEDULES_0550.some(s=>s.id===panel)&&!quotationSchedules0550().some(s=>s.id===panel))choose('C1');};
  const key=(volume==='I'?'I.':'III.')+panel,record=view.getRecord(key),schedule=SCHEDULES_0550.find(s=>s.id===panel),table=schedule?scheduleTable0550(view,panel):null;
  const go=id=>{if(!dirty)onNavigate?.(id);};
@@ -85,10 +85,16 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <label>Schedule ที่แสดง<select aria-label="Schedules shown" value={showAllSchedules?'ALL':'C1_C2'} disabled={dirty} onChange={e=>changeScheduleScope(e.target.value)}><option value="C1_C2">แสดงเฉพาะ C1 และ C2</option><option value="ALL">แสดง Schedule ทั้งหมด</option></select></label><p>A / A1 / A2 และตาราง C เดิมแสดงครบเป็นค่าเริ่มต้น · A1 รับยอด Base และ A2 รับยอด Option จาก Working / Schedule allocation ชุดเดิม · เลือกดูเฉพาะ C1/C2 ได้ · ปุ่ม Export ทั้งชุดยังรวมทุก Schedule</p><Select label="Schedule price view" value={showWorking?'WORKING':'REVIEWED'} onChange={v=>{if(!dirty)setShowWorking(v==='WORKING');}} rows={[["WORKING","Working Preview · แสดงรายการ/ราคาที่มี พร้อมหมวดแนะนำ"],["REVIEWED","เฉพาะข้อมูลที่บันทึกและราคาทบทวนแล้ว"]]}/>{showWorking&&<WorkingScheduleStatus0550 onNavigate={go} view={preview} disabled={dirty||busy} onSave={saveSuggested} onAllocate={()=>choose('mapping')}/>}</>}
  <nav className="p55-technical-tabs" aria-label={'Volume '+volume+' sections'}>{panels.map(([id,label])=><button key={id} type="button" aria-pressed={panel===id} title={label} onClick={()=>choose(id)}>{volume==='I'&&SCHEDULES_0550.some(s=>s.id===id)?'11.'+id:label}</button>)}</nav><p role="status">{message}</p>
  <section className="p55-panel" data-component-key={prefix+'.'+panel}><ComponentCopyId projectId="PJ2608-0550" componentKey={prefix+'.'+panel}/>
- {volume==='I'&&panel==='A1'&&<button type="button" disabled={dirty} onClick={()=>choose('D')}>11.D · Breakdown for S/N 2</button>}
+ {volume==='I'&&panel==='A1'&&<div className="p55-review-toolbar">
+  <button type="button" disabled={dirty} onClick={()=>choose('D')}>11.D · Breakdown for S/N 2</button>
+  {A1_OTHERS_PANELS_0550.map(({id,number,title})=><button key={id} type="button" disabled={dirty} onClick={()=>choose(id)}>{number} · A1 Others / {title}</button>)}
+ </div>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
  {(panel==='overview'||volume==='I'&&['A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
- {volume==='I'&&panel==='A1'&&<LicensingCost0550 lines={model.lines} schedule={displayView} currency={currency} onNavigate={go} disabled={dirty}/>}
+ {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>
+  <button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button>
+  <A1OthersBreakdown0550 panel={panel} view={displayView} currency={currency} onNavigate={go} disabled={dirty}/>
+ </>}
  {panel==='overview'&&<>{volume==='III'&&<QualificationChecklist0550 view={view} onOpen={choose}/>}
  {volume==='III'&&ceragonR11Selected0550(data)&&<div className="p55-panel">
   <h3>DMR APF–ACP · R11 / Technical deviation review</h3>

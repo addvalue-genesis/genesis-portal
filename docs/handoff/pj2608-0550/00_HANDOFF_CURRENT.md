@@ -1,3 +1,5 @@
+Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
+
 Latest DMR Working layout: [TEL-DMR Working sections](20261108_DMR_WORKING_SECTIONS.md). The existing Part A group separates scope status, the one Working price table with MR-level BOM, and source/downstream links. WP.2/7/8 use the existing TEL-DMR filter.
 
 Latest DMR Working presentation: [BOM scoped by Working line](20261108_DMR_BOM_BY_WORKING_LINE.md). APF/ACP Item 01 shows equipment and Item 02 shows cables/interfaces using exact WP.7 references to the selected R11. Full quote evidence is available from 07 Vendor and the system-level trace.

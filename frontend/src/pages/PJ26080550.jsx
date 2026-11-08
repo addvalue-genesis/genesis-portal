@@ -53,6 +53,7 @@ import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
 import {BidVolumesWorkspace0550,InputImpact0550} from "../project0550/BidVolumesWorkspace0550";
+import {A1_OTHERS_PANELS_0550} from "../project0550/A1OthersBreakdown0550";
 import {SCHEDULES_0550,QUALIFICATIONS_0550} from "../project0550/data/bidVolumes0550";
 const TABS = BID_TABS;
 const LegacyIdentityContext = createContext(false);
@@ -2127,7 +2128,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...Array.from({length:54},(_,i)=>({id:"bid.documents.controlled-source-inventory.mr.page."+(i+1),number:"A.1",title:"MR B1 / PDF "+(i+1)+(i>=2?" / printed "+(i-1):" / front matter"),area:"A",tab:"documents"})),
     {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
     ...TECHNICAL_PANELS_0550.map((s,i)=>({id:"bid.technical."+s.id,title:"12 Volume II / "+s.title,number:s.id==="vdrl"?"12.V":s.id==="preview"?"12.P":"12."+i,tab:"technical"})),
-    ...[{id:"overview",number:"11.0",title:"Overview"},{id:"cover",number:"11.1",title:"Power of Attorney"},...SCHEDULES_0550.map(s=>({...s,number:"11."+s.id})),{id:"D",number:"11.D",title:"Supporting Breakdown / A1 S/N 2"},{id:"mapping",number:"11.M",title:"Schedule allocation"},{id:"preview",number:"11.P",title:"Export"}].map(s=>({id:"bid.quotation."+s.id,title:s.title,number:s.number,tab:"quotation"})),
+    ...[{id:"overview",number:"11.0",title:"Overview"},{id:"cover",number:"11.1",title:"Power of Attorney"},...SCHEDULES_0550.map(s=>({...s,number:"11."+s.id})),{id:"D",number:"11.D",title:"Supporting Breakdown / A1 S/N 2"},...A1_OTHERS_PANELS_0550,{id:"mapping",number:"11.M",title:"Schedule allocation"},{id:"preview",number:"11.P",title:"Export"}].map(s=>({id:"bid.quotation."+s.id,title:s.title,number:s.number,tab:"quotation"})),
     ...[{id:"overview",number:"13.0",title:"Overview"},...QUALIFICATIONS_0550.map(q=>({...q,number:"13."+q.id})),{id:"deviations",number:"13.D",title:"Commercial Deviations"},{id:"preview",number:"13.P",title:"Export"}].map(s=>({id:"bid.commercial."+s.id,title:s.title,number:s.number,tab:"commercial"})),
     ...(data?.lines||[]).map(l=>({id:"bid.quotation.line."+l.id,title:"11.M Schedule / "+l.description,number:"11.M",tab:"quotation"})),
     ...[...new Set([...SYSTEMS.map(s=>s.token),"COMMON",...(model?.integration?.requirements||[]).map(r=>r.systemToken)])].flatMap(token=>TECHNICAL_PANELS_0550.filter(s=>!["overview","vdrl","preview"].includes(s.id)).map(s=>({id:"bid.technical."+s.id+".system."+token,title:"12 / "+token+" / "+s.title,tab:"technical"}))),
