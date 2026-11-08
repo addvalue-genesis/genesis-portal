@@ -298,7 +298,18 @@ const navigation=moduleDirectory0550(navigationEntries);
 assert.equal(navigation.entries.length,new Set(navigationEntries.map(item=>item.id)).size);
 assert.equal(new Set(navigation.numbers.values()).size,navigation.entries.length);
 assert.equal(navigation.numbers.get('bid.budget.working.lines'),'10.2');
-assert.equal(navigation.numbers.get('bid.budget.working.editor'),'10.2.1');
+assert.equal(navigation.numbers.get('bid.working-preview.particulars'),'10.2.1');
+assert.equal(navigation.numbers.get('bid.budget.working.editor'),'10.2.3');
+assert.equal(navigation.numbers.get('bid.budget.working.editor.review'),'10.2.3.1');
+assert.deepEqual(navigation.children.get('bid.budget.working.lines').map(item=>item.id),[
+ 'bid.budget.working.lines.principles',
+ 'bid.working-preview.particulars',
+ 'bid.working-preview',
+ 'bid.budget.working.part.A',
+ 'bid.budget.working.part.B',
+ 'bid.budget.working.part.C',
+ 'bid.budget.working.editor'
+]);
 assert.equal(navigation.numbers.get('bid.working-preview.step.1'),'10.2.2.1');
 assert.equal(navigation.entries.find(item=>item.id==='bid.working-preview.step.1').legacyNumber,'WP.1');
 assert.equal(navigation.numbers.get(WP_NAVIGATION_0550.locations.id),'10.2.2.1.1.2');

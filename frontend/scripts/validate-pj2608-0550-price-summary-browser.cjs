@@ -16,12 +16,15 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
   for(const section of await sections.all())assert(await section.locator(':scope > summary').isVisible(),'Every top-level heading stays visible');
   const working=page.locator('[data-component-key="bid.budget.working.lines"]');
   const children=working.locator(':scope > .p55-bid-content > [data-module-number]');
-  assert.deepEqual(await children.evaluateAll(nodes=>nodes.slice(0,4).map(n=>[n.dataset.moduleNumber,n.dataset.componentKey])),[
+  assert.deepEqual(await children.evaluateAll(nodes=>nodes.map(n=>[n.dataset.moduleNumber,n.dataset.componentKey])),[
    ['10.2.0','bid.budget.working.lines.principles'],
-   ['10.2.1','bid.budget.working.editor'],
+   ['10.2.1','bid.working-preview.particulars'],
    ['10.2.2','bid.working-preview'],
-   ['10.2.3','bid.working-preview.particulars']
-  ],'Working modules follow their assigned numbers');
+   ['10.2.A','bid.budget.working.part.A'],
+   ['10.2.B','bid.budget.working.part.B'],
+   ['10.2.C','bid.budget.working.part.C'],
+   ['10.2.3','bid.budget.working.editor']
+  ],'Working follows document reading, SI review, scope selection and line editing');
   assert.equal(await working.locator('[data-component-key="bid.working-preview"]').getByText('10.2.2.1.1 · ตารางระบบและเอกสาร CUS',{exact:true}).count(),1);
   for(let step=1;step<=8;step++)assert.equal(await working.locator('[data-component-key="bid.working-preview.step.'+step+'"]').count(),1);
   assert.equal(await page.locator('[data-component-key="bid.budget.official.summary"]').count(),1);

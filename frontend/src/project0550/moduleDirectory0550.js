@@ -67,6 +67,15 @@ export function moduleDirectory0550(entries) {
    used.add(item.number);
   }
   siblings.sort((a,b) => compare(a.number,b.number));
+  // A workflow can place a tool after a group whose headings use WBS letters.
+  for (const item of siblings.filter(entry => entry.sortAfterId)) {
+   const from = siblings.indexOf(item);
+   const after = siblings.findIndex(entry => entry.id === item.sortAfterId);
+   if (from < after) {
+    siblings.splice(from,1);
+    siblings.splice(after,0,item);
+   }
+  }
   for (const item of siblings) {
    item.level = level;
    ordered.push(item);

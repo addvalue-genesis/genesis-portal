@@ -95,7 +95,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   const copiedGroup=await page.evaluate(()=>navigator.clipboard.readText());assert.equal(copiedGroup,'PJ2608-0550 / bid.budget.working.group.B4');
   await fill('Project Module Search',copiedGroup);await page.getByLabel('Project Module Search').press('Enter');await page.waitForFunction(()=>document.querySelector('[data-component-key="bid.budget.working.group.B4"]').open);
   assert.equal(await groupB4.getAttribute('data-module-focused'),'true');
-  await fill('Project Module Search','10.2.1.0');await page.getByLabel('Project Module Search').press('Enter');await page.getByRole('table',{name:'หลักการ 10.2.1',exact:true}).waitFor();
+  await fill('Project Module Search','10.2.3.0');await page.getByLabel('Project Module Search').press('Enter');await page.getByRole('table',{name:'หลักการ 10.2.3',exact:true}).waitFor();
   const budget=page.getByTestId('bid-commercial');
   assert.equal(await budget.locator('[data-module-number]').evaluateAll(nodes=>nodes.filter(n=>![...n.querySelectorAll('.gns-copy-id button')].some(b=>b.getAttribute('aria-label')==='Copy component ID '+n.getAttribute('data-component-key'))).length),0,'Every numbered module must expose its own Copy ID');
   await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Module IDs must wrap; tables must scroll inside panels');await page.setViewportSize({width:1440,height:1000});

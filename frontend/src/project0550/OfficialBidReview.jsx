@@ -2,7 +2,7 @@ import React,{useState} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {BidHeading} from "./BidModulePresentation";
-import {bidOwnerStyle,lineOwner0550,customerOwner0550} from "./bidPresentation0550";
+import {bidOwnerStyle,lineOwner0550,customerOwner0550,bidSection0550} from "./bidPresentation0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {BUDGETARY_SUBMISSION} from "./data";
 import {PackageComparison,SourceLink} from "./ControlledSourceInventory";
@@ -22,7 +22,8 @@ function EvidenceFields({value,onChange,prefix}){
 }
 export function OfficialLineReviewFields({value,onChange}){
  const {data}=useBidWorkspace(),r=value||blankOfficialReview();
- return <details className="p55-review-fields" open data-component-key="bid.budget.working.editor.review" data-module-number="10.2.1.1"><summary><BidHeading id="bid.budget.working.editor.review"/></summary>
+ const id="bid.budget.working.editor.review";
+ return <details className="p55-review-fields" open data-component-key={id} data-module-number={bidSection0550(id).number}><summary><BidHeading id={id}/></summary>
  <div className="p55-bid-fields"><Select label="Official decision" value={r.decision} onChange={v=>onChange({...r,decision:v})} options={[["OPEN","OPEN · รอตรวจ"],["KEEP","KEEP · ตรวจแล้วใช้ต่อ"],["RECALCULATE","RECALCULATE · คำนวณใหม่"],["ADD","ADD · เพิ่มตามข้อกำหนด"],["REMOVE","REMOVE · ยกเลิกพร้อมเหตุผล"]]}/><Select label="RFQ comparison" value={r.comparisonId} onChange={v=>onChange({...r,comparisonId:v})} options={[["","อ้างข้อกำหนดโดยตรง"],...(data.sourceIntake?.packageComparisons||[]).map(c=>[c.id,c.title+" · "+c.basis])]}/><Field label="Engineering / quantity / ownership basis" value={r.engineeringBasis} onChange={v=>onChange({...r,engineeringBasis:v})}/><Field label="Cost / commercial / Incoterm / warranty basis" value={r.commercialBasis} onChange={v=>onChange({...r,commercialBasis:v})}/></div>
  <EvidenceFields prefix="Line review" value={r} onChange={onChange}/>
  <p>บันทึกผลทบทวนสำหรับข้อมูลชุดนี้ · การเปลี่ยน Qty / Quote / Formula / FX / หลักฐาน จะทำให้กลับเป็น STALE · เป็นผลทบทวนภายใน ไม่ใช่การอนุมัติส่งลูกค้า</p>
