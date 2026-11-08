@@ -20,16 +20,27 @@ export function releaseHierarchy0550(official,customerRows){
    if(!buckets.has(key))buckets.set(key,{key,appendix,rank:appendix?catalog.findIndex(r=>r.wbs==="A"&&appendixOf(r)===appendix):Infinity,segments:[]});
    return buckets.get(key);
   };
+  if(part==="A"){
+   for(const {appendix} of MR_SUPPLY_ORDER_0550){
+    if(appendix!=="1.0")bucket(categoryFor(appendix),appendix);
+   }
+  }
   for(const [index,group] of official.schedule.filter(g=>g.part===part).entries()){
    const rows=customerRows.filter(row=>row.kind==="line"&&lines.get(row.key)?.customerRowCode===group.code).sort((a,b)=>rank(lines.get(a.key))-rank(lines.get(b.key)));
    const references=rows.map(row=>catalog[rank(lines.get(row.key))]).filter(Boolean);
-   const basis=(references.length?references:catalog.filter(row=>row.wbs===part&&group.systems.includes(row.systemToken))).sort((a,b)=>positions.get(a.id)-positions.get(b.id));
-   const appendices=[...new Set(basis.map(appendixOf).filter(Boolean))];
-   const firstAppendix=part==="A"?appendixOf(basis[0]):"",anchor=categoryFor(firstAppendix);
-   const segments=new Map([[anchor,{appendix:firstAppendix,rows:[]}]]);
+   const groupCatalog=catalog.filter(row=>row.wbs===part&&group.systems.includes(row.systemToken));
+   const basis=references.length?references:groupCatalog;
+   const appendixBasis=part==="A"?[...basis,...groupCatalog].sort((a,b)=>positions.get(a.id)-positions.get(b.id)):basis;
+   const appendices=[...new Set(appendixBasis.map(appendixOf).filter(Boolean))];
+   const firstAppendix=part==="A"?(appendixOf(basis[0])||appendices[0]||""):"",anchor=categoryFor(firstAppendix);
+   const segments=new Map();
+   if(part==="A")for(const appendix of appendices)segments.set(categoryFor(appendix),{appendix,rows:[]});
+   segments.set(anchor,{appendix:firstAppendix,rows:[]});
    for(const row of rows){
-    // An item without an Appendix stays with its Lot. Its own MR reference is unchanged.
-    const requirement=catalog[rank(lines.get(row.key))],appendix=part==="A"?(appendixOf(requirement)||firstAppendix):"",key=categoryFor(appendix);
+    const line=lines.get(row.key),requirement=catalog[rank(line)];
+    // Locate a package by its system within the Lot's known appendices. Keep its native reference separate.
+    const systemAppendix=part==="A"&&!requirement&&MR_SUPPLY_ORDER_0550.find(grouping=>appendices.includes(grouping.appendix)&&grouping.systems.includes(line?.systemToken))?.appendix;
+    const appendix=part==="A"?(appendixOf(requirement)||systemAppendix||firstAppendix):"",key=categoryFor(appendix);
     if(!segments.has(key))segments.set(key,{appendix,rows:[]});
     segments.get(key).rows.push({...row,mrReference:requirement?.reference||""});
    }
@@ -47,10 +58,13 @@ export function releaseHierarchy0550(official,customerRows){
     entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node,appendixRef,description});
     parents.push(node.key);
    }
+   if(!category.segments.length)entries.push({kind:"mr-empty",key:category.key+"/empty",parents,description:"ยังไม่มี Lot ที่เชื่อมกับ Appendix นี้ใน Release"});
    for(const segment of category.segments.sort((a,b)=>a.rank-b.rank||a.index-b.index)){
     const {group,rows,anchor,appendices}=segment;
-    const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&rows.length>0);
-    entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / ")}:{kind:"mr-system",key:system.key,parents,toggle:system,lotModuleId:group.releaseModuleId});
+    const showEmpty=part==="A"&&Boolean(category.appendix)&&!rows.length;
+    const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&(rows.length>0||showEmpty));
+    entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / ")}:{kind:"mr-system",key:system.key,parents,toggle:system,lotCode:group.code,lotModuleId:group.releaseModuleId});
+    if(showEmpty)entries.push({kind:"mr-empty",key:system.key+"/empty",parents:[...parents,system.key],description:"ยังไม่มีรายการย่อยของ Lot นี้ใน Appendix ในมุมมอง Release"});
     const sites=new Map();
     for(const row of rows){const requirement=catalog[rank(lines.get(row.key))],site=requirement?.site||(part==="A"?"":"Working / package");if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
     for(const [site,siteRows] of sites){

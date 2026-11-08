@@ -1620,14 +1620,15 @@
 .p55-release-mr-site td { background:#f1f5f8; }
 .p55-release-mr-site td[colspan="8"] { padding-left:36px; }
 .p55-release-lot-site td { vertical-align:middle; }
-.p55-release-lot-site td:nth-child(2) { font-weight:600; white-space:nowrap; }
+.p55-release-lot-site td:nth-child(2),.p55-release-mr-system td:nth-child(2) { font-weight:600; white-space:nowrap; }
 .p55-release-lot-site td:nth-child(3),.p55-release-lot-item td:nth-child(3) { position:relative; }
 .p55-release-lot-site td:nth-child(3) { padding-left:26px; }
 .p55-release-lot-item td:nth-child(3) { padding-left:50px; }
 .p55-release-lot-site td:nth-child(3)::before,.p55-release-lot-item td:nth-child(3)::before {
  content:""; position:absolute; inset-block:0; left:14px; border-left:2px solid #b7cbd9; pointer-events:none;
 }
-.p55-release-mr-system td { background:#edf1f6; padding-left:24px; }
+.p55-release-mr-system td { background:#edf1f6; }
+.p55-release-mr-empty td[colspan] { padding-left:26px; color:#415c70; }
 .p55-release-part-id { display:block; margin-top:6px; }
 .p55-release-part-controls { display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; }
 .p55-customer-section .p55-release-part-id .gns-copy-id code { color:white; }

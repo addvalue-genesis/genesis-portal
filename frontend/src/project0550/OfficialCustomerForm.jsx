@@ -81,6 +81,12 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   <button type="button" onClick={()=>togglePartA(false)}>− หุบรายการ A</button>
  </div>;
  const toggleButton=(node,label=node.label)=><button type="button" className="p55-release-toggle" data-release-toggle={node.key} aria-expanded={isOpen(node.key)} aria-label={(isOpen(node.key)?"หุบ ":"ขยาย ")+node.label} onClick={()=>toggle(node)}><span aria-hidden="true">{isOpen(node.key)?"−":"+"}</span>{label&&" "+label}</button>;
+ const revealLot=lotId=>{
+  const entry=hierarchy.entries.find(row=>row.moduleId===lotId);
+  if(!entry)return;
+  setExpanded(old=>({...old,...Object.fromEntries(entry.parents.map(key=>[key,true]))}));
+  requestAnimationFrame(()=>document.querySelector('[data-component-key="'+lotId+'"]')?.scrollIntoView({block:"center"}));
+ };
  return <Module id="bid.budget.release" open={open} title={provisional?"REL-04 · ราคาที่เลือก / ประมาณการ — PROVISIONAL / NOT ISSUED":"REL-04 · Official customer form — Review Draft / NOT ISSUED"}>
  {children}
  <div className="p55-review-toolbar"><button type="button" onClick={()=>exportOfficialCustomerXlsx(official)}>{provisional?"Export REL-04 · Provisional Draft XLSX":"Export REL-04 · Official Draft XLSX"}</button><a href={CUSTOMER_FORM_0550.sourceUrl} target="_blank" rel="noopener noreferrer">แบบอ้างอิง 8 คอลัมน์</a></div>
@@ -112,7 +118,16 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
     <td colSpan={5}/>
    </tr>;
   }
-  if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}{r.lotModuleId&&<small>ขอบเขตต่อเนื่องจาก Lot เดิม · ไม่บวกราคารวมซ้ำ <button type="button" onClick={()=>{const entry=hierarchy.entries.find(row=>row.moduleId===r.lotModuleId);setExpanded(old=>({...old,...Object.fromEntries(entry.parents.map(key=>[key,true]))}));requestAnimationFrame(()=>document.querySelector('[data-component-key="'+r.lotModuleId+'"]')?.scrollIntoView({block:"center"}));}}>ดูยอด Lot</button></small>}</td></tr>;
+  if(r.kind==="mr-system"){
+   return <tr key={r.key} hidden={hidden} className="p55-release-mr-system">
+    <td/>
+    <td>Lot {r.lotCode}</td>
+    <td>{toggleButton(r.toggle)}<small>ขอบเขตต่อเนื่องจาก Lot เดิม <button type="button" onClick={()=>revealLot(r.lotModuleId)}>ดูยอด Lot</button></small></td>
+    <td colSpan={5}/>
+   </tr>;
+  }
+  if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
+  if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
   return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<PriceNotes note={notes.get(r.moduleId)} onSource={onSource}/>}</td>)}</tr>;
  })}</tbody></table></div>
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>

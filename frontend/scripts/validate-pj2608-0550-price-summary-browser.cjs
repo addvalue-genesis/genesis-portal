@@ -115,6 +115,7 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  const otherParts=table.locator('[data-release-toggle="part:B"],[data-release-toggle="part:C"],[data-release-toggle="part:B:other"],[data-release-toggle="part:C:other"]');
  const otherStates=await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded')));
  const subtotal=await partARow.locator('td').nth(6).innerText();
+ assert.deepEqual(await table.locator('tr.p55-release-appendix td:nth-child(2)').allInnerTexts(),Array.from({length:8},(_,i)=>'MR App. 1.'+(i+1)));
  assert(await radio.isVisible(),'Part A items are visible in the initial view');
  assert.deepEqual(await appendixRow.locator('td').allInnerTexts(),['−','MR App. 1.1','VHF and MF/HF','']);
  assert.equal(await appendixToggle.getAttribute('aria-label'),'หุบ MR App. 1.1 · VHF and MF/HF');
@@ -129,6 +130,9 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  assert(await radio.isVisible());
  assert.equal(await table.locator('[data-release-toggle="working:A"]').count(),0);
  assert(await table.locator('[data-component-key="bid.budget.release.line.LINE-LEGACY-TEL-PAGA-1"]').isVisible(),'Package price row remains visible under its Lot');
+ const microwaveLot=table.locator('[data-release-toggle="bid.budget.release.customer.A1-11/appendix/1.5"]').locator('xpath=ancestor::tr');
+ assert.equal(await microwaveLot.locator('td').nth(1).innerText(),'Lot A1-11');
+ assert(await microwaveLot.locator('td').nth(2).getByRole('button',{name:'ดูยอด Lot',exact:true}).isVisible());
  assert.deepEqual(await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded'))),otherStates);
  await appendixToggle.click();assert.equal(await radio.isVisible(),false);
  await appendixToggle.click();assert(await radio.isVisible());
