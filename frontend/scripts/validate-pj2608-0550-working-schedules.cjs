@@ -32,6 +32,11 @@ try{
  assert.equal(evaluateServiceEquation('B5-SPARE-QTY',qty).value,5);
  assert.equal(evaluateServiceEquation('B5-SPARE-QTY',{drivers:1,perDriver:1,reserve:0,included:1}).value,0);
  assert.equal(evaluateServiceEquation('B5-SPARE-QTY',{...qty,perDriver:1.5}).state,'INVALID');
+ const c2Inputs={A:2,B:24,recommended:6,included:1};
+ const c2Quantity=evaluateServiceEquation('B5-C2-OEM-QTY',c2Inputs);
+ assert.equal(c2Quantity.installedPopulation,48);assert.equal(c2Quantity.value,5);
+ assert.equal(evaluateServiceEquation('B5-C2-OEM-QTY',{...c2Inputs,recommended:null}).state,'OPEN');
+ assert.equal(evaluateServiceEquation('B5-C2-OEM-QTY',{...c2Inputs,included:6}).value,0);
  const spares=structuredClone(categories),lineB5=spares.lines.find(l=>l.id==='TEST-B5');
  Object.assign(lineB5,{commissioningPhase:'PRE_COMMISSIONING',systemToken:'TEL-LAN',customerRowCode:'B5',
   vendorId:'',offerId:'',calculationId:'TEST-B5-COUNT',resultKey:'value',quantity:null,unit:'Pc',currency:'USD',manualCost:10,sellMode:'MARKUP',markupPct:0,marginPct:null,primePct:0,sellRate:null});
@@ -47,6 +52,22 @@ try{
  assert.equal(N.nativeSchedule0550(spareView,'A1').pages[0].values.A1_5_6,'50.00');
  assert.equal(spareBreakdown.operationRows.length,1,'C3 owner stays in the separate option');
  assert.deepEqual(spares.releaseRegister,frozen);
+ spares.calculations[spares.calculations.length-1]={...spares.calculations.at(-1),equationId:'B5-C2-OEM-QTY',inputs:c2Inputs};
+ const oemView=preview(spares);
+ assert.equal(oemView.scheduleRows('C2')[0].quantity,5);
+ assert.equal(N.nativeSchedule0550(oemView,'A1').pages[0].values.A1_5_6,'50.00');
+ const {lanStockBasis0550}=require(root+'/project0550/data/lanStockBasis0550.js');
+ const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+ const lanOffer=(key,part,perSet=1)=>({id:MGW_CURRENT_PREFIX_0550+key,quoteRef:MGW_CURRENT_QUOTE_0550,unit:'SET',quoteEvidence:{
+  sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,systemTokens:['TEL-LAN'],quotedQuantity:99,terms:[`~ ${perSet} × Cisco hardware | ${part} | SET`]}});
+ const lanA=lanOffer('TEST-APF','C9200-48P-A',2),lanB=lanOffer('TEST-ACP','C9200-48P-A');
+ const ap=lanOffer('TEST-AP','C9105AXI-H'),core=lanOffer('TEST-CORE','C9500-48Y4C-A');
+ const lanLine=(id,offer,quantity,patch={})=>({id,offerId:offer?.id,wbs:'A',systemToken:'TEL-LAN',unit:'SET',quantity,selected:true,...patch});
+ const lanData={offers:[lanA,lanB,ap,core]},lanLines=[lanLine('SW-A',lanA,3),lanLine('SW-B',lanB,1),lanLine('AP',ap,9),lanLine('REF',lanA,3,{bidPriceAllocation:{}}),lanLine('CABLE',null,null,{unit:'m'}),lanLine('OLD',null,3,{historicalMgwPackage:true})];
+ const lan=lanStockBasis0550(lanData,{lines:lanLines});
+ assert.equal(lan.rows.length,6);assert.equal(lan.rows.find(row=>row.line.id==='OLD').selected,false);assert.equal(lan.unlinked[0].offer.id,core.id);assert.deepEqual(lan.stock.map(s=>s.count),[7,9]);
+ assert.deepEqual(lanStockBasis0550(lanData,{lines:lanLines.filter(l=>l.id!=='SW-A')}).stock.map(s=>s.count),[1,9]);
+ assert.equal(lanStockBasis0550(lanData,{lines:[...lanLines,lanLine('DUPLICATE',lanA,3)]}).stock[0].count,null);
  // Receipted SI expenses have one owner, never a fictitious C7 man-hour rate.
  const expense=structuredClone(categories);expense.repositoryBasisImport={...(expense.repositoryBasisImport||{}),tsiActivityBudget:{expenseLineIds:['TEST-B4']}};
  const ep=preview(expense),eb=ep.allocationPlan.find(p=>p.line.id==='TEST-B4').proposal;assert.equal(eb.schedule,'A1');assert.equal(eb.summary,'OTHER');assert.deepEqual(expense.lines,categories.lines);
