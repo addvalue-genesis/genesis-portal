@@ -7,6 +7,9 @@ import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
+import {lanStockBasis0550} from './lanStockBasis0550';
+import {evaluateServiceEquation} from '../serviceEquationRuntime';
+import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550';
 import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 import {CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
@@ -106,6 +109,11 @@ const MICROWAVE_DRAFTS = {
 const MICROWAVE_LINK_REPORT = 'https://drive.google.com/file/d/1hGcBbwgqPR1DhbsfUzSrtc43E-FS8cS8/view';
 const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
+const lanC2PartNumbers=['C9105AXI-H','C9200-48P-A'];
+const lanC2LineId=partNo=>'LINE-B5-LAN-STARTUP-'+partNo;
+const lanC2EstimateIds=new Set(lanC2PartNumbers.map(lanC2LineId));
+const lanC2Overlap=data=>data.lines.some(line=>line.selected&&line.wbs==='B5'&&!lanC2EstimateIds.has(line.id)&&
+ (line.systemToken==='TEL-LAN'||line.systemToken==='COMMON'&&(line.offerId||line.calculationId||finite(line.manualCost)||finite(line.sellRate))));
 
 // Continue only the exact prepared MR drafts. A saved edit, review or deletion
 // is authoritative. These links identify price owners without claiming coverage.
@@ -284,13 +292,65 @@ function prepareCusQuantityPricing0550(data, policies, today) {
    'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
  }
  const prepared=changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
- return ceragonR11Selected0550(prepared)?reconcileCeragonR11(prepared):microwaveSourceReady?linkPreparedMicrowaveDrafts0550(prepared,mrCandidates[0]):prepared;
+ const withLan=prepareLanC2Budget0550(prepared,goods,mrCandidates[0],today);
+ return ceragonR11Selected0550(withLan)?reconcileCeragonR11(withLan):microwaveSourceReady?linkPreparedMicrowaveDrafts0550(withLan,mrCandidates[0]):withLan;
+}
+
+function prepareLanC2Budget0550(data,goods,mr,today){
+ if(lanC2Overlap(data))return data;
+ const receipt=data.repositoryBasisImport.bidCompletion,{rows,stock,unlinked}=lanStockBasis0550(data,{lines:data.lines});
+ let next=data;
+ const additions=[];
+ for(const partNo of lanC2PartNumbers){
+  const id=lanC2LineId(partNo),calculationId='CAL-B5-LAN-STARTUP-'+partNo;
+  if(data.lines.some(line=>line.id===id)||receipt.rows.some(row=>row.lineId===id)||
+   data.calculations.some(calculation=>calculation.id===calculationId)||data.bidVolumes?.bindings.some(binding=>binding.lineId===id))continue;
+  const population=stock.find(item=>item.partNo===partNo);
+  const owners=rows.filter(row=>row.partNo===partNo&&row.selected);
+  const reference=owners[0]?.offer,rate=reference?.unitCost;
+  if(!population?.count||unlinked.some(row=>row.partNo===partNo)||!finite(rate)||rate<=0||
+   owners.some(({installed,perSet,offer})=>!installed||perSet!==1||offer.currency!=='USD'||offer.unit!=='SET'||
+    offer.quoteEvidence.classification!=='RATE'||offer.unitCost!==rate||offer.quoteEvidence.quotedUnitCost!==rate))continue;
+  const inputs={installed:population.count,failureRate:1/population.mtbf,exposureHours:720,coveragePct:99,planned:0,included:0};
+  const result=evaluateServiceEquation('B5-SPARE-STOCK',inputs);
+  if(result.state!=='CALCULATED'||result.value<=0)continue;
+  const requirementRef='MR Rev.B1 Appendix 10 / 10008-STD-6-TEL-001 R00 §7.7.1 / Exhibit C2 Note 3';
+  const basis='SI startup stock estimate through PAC. One project stock pool, 30 days without replenishment, 99% stock sufficiency. '+
+   'Installed population '+population.count+'; OEM MTBF '+population.mtbf+' h; '+population.locator+' '+population.source+
+   '. No separate spare inclusion is credited pending confirmation. Cost proxy: complete matching MGW equipment set, USD '+rate+
+   '/SET, '+reference.sourceRef+'. Confirm dedicated spare supply and customer delivery basis.';
+  const calculation={id:calculationId,title:'LAN start-up reserve · '+partNo,systemToken:'TEL-LAN',equationId:'B5-SPARE-STOCK',inputs,sourceRef:basis};
+  const line={id,systemToken:'TEL-LAN',wbs:'B5',description:'SI estimate · LAN start-up spare · '+partNo+' complete set',
+   scopeKey:id,tagRef:'TEL-LAN project startup stock pool',requirementRef,sourceRef:basis+'\n'+requirementRef,
+   vendorId:'',offerId:'',calculationId,resultKey:'value',quantity:null,unit:'SET',currency:'USD',manualCost:rate,
+   sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B5',
+   customerRemark:'Draft startup spare allowance based on the complete MGW equipment-set rate. Delivery term and formal spare quote remain open.',
+   brand:'Cisco',commissioningPhase:'START_UP'};
+  next={...next,lines:[...next.lines,line],calculations:[...next.calculations,calculation]};
+  const offerIds=owners.map(row=>row.offer.id),ownerIds=owners.map(row=>row.line.id);
+  additions.push({lineId:id,kind:'ESTIMATE',basis,offerIds,ownerIds,inputKey:lineKey(next,line),
+   sourceKey:sourceKey(next,offerIds),ownerKeys:owners.map(row=>ownerKey(next,row.line))});
+  next=saveBidVolumeRecord0550(next,'bindings',{...blankScheduleBinding0550(id),schedule:'C2',summary:'COMMISSIONING_SPARES',
+   sourceIds:[mr.id],locator:'MR Rev.B1 Appendix 10 / '+reference.quoteEvidence.locator,
+   basis:'SI draft · one project stock pool through PAC · equipment TAG and delivery pending',
+   partNo,interchangeA:'1',interchangeB:String(population.count)},today,false);
+ }
+ return additions.length?{...next,repositoryBasisImport:{...next.repositoryBasisImport,bidCompletion:{...receipt,rows:[...receipt.rows,...additions]}}}:data;
 }
 
 export function cusQuantityPricingProblems0550(data,line){
- if(!cusPriceIds.has(line.id))return [];
+ const lanEstimate=lanC2EstimateIds.has(line.id);
+ if(!cusPriceIds.has(line.id)&&!lanEstimate)return [];
  const row=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id&&['QUOTED','ESTIMATE'].includes(r.kind));
  if(!row||row.inputKey!==lineKey(data,line))return [];
+ if(lanEstimate&&lanC2Overlap(data))return ['LAN_C2_SCOPE_OVERLAP: reconcile the startup stock estimate with the existing B5 owner'];
+ if(lanEstimate){
+  const partNo=lanC2PartNumbers.find(part=>lanC2LineId(part)===line.id);
+  const {rows,unlinked}=lanStockBasis0550(data,{lines:data.lines});
+  const owners=rows.filter(item=>item.partNo===partNo&&item.selected);
+  if(unlinked.some(item=>item.partNo===partNo)||owners.length!==row.ownerIds.length||
+   owners.some(item=>!item.installed||!row.ownerIds.includes(item.line.id)))return ['LAN_C2_POPULATION_STALE: reconcile the current LAN installed population'];
+ }
  const current=row.sourceKey===sourceKey(data,row.offerIds)&&row.ownerIds.every((id,i)=>{
   const owner=data.lines.find(l=>l.id===id);
   return owner?.selected&&ownerKey(data,owner)===row.ownerKeys[i];

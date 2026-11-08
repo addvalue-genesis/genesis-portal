@@ -6,6 +6,7 @@ import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
 import {c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 
 const a1DirectRows=[
  [3,'S/N 2 · Inspection and tests'],
@@ -14,6 +15,18 @@ const a1DirectRows=[
  [11,'Others (Please specify)'],
 ];
 const money=value=>Number.isFinite(value)?value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
+
+function LanC2Open0550({rows}){
+ const phases=new Set(rows.map(row=>commissioningPhase0550(row.line)));
+ const pre=!phases.has('PRE_COMMISSIONING'),commissioning=!phases.has('COMMISSIONING');
+ return (pre||commissioning)&&<section className="p55-panel" aria-label="LAN C2 missing phase inputs">
+  <h4>ข้อมูลที่ยังขาดสำหรับ LAN C2</h4>
+  <ul>
+   {pre&&<li>Pre-commissioning · OPEN · ยังไม่พบรายการและจำนวนวัสดุที่ต้องใช้ตาม ITP หรือแผนเตรียมระบบ LAN</li>}
+   {commissioning&&<li>Commissioning · OPEN · MGW Q26-063 ยังไม่แยกรายการอะไหล่ที่ใช้ทดสอบและเดินระบบถึง PAC พร้อมจำนวนที่รวมในแพ็กเกจแล้ว</li>}
+  </ul>
+ </section>;
+}
 
 function A1DirectReview0550({view,currency,onNavigate,onAllocate,disabled}){
  const direct=view.bindings.filter(b=>b.line&&b.schedule==='A1'&&b.treatment==='BASE');
@@ -67,6 +80,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
+  {view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
    <strong>ตรวจความเสี่ยงคิดซ้ำใน C2 · พบ Lot และรายการราย Part No.</strong>
    <ul>{overlaps.map(({mainEquipment,systemToken,lots,parts})=><li key={mainEquipment?'equipment:'+mainEquipment:'system:'+systemToken}>

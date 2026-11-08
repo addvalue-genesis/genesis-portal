@@ -1,5 +1,21 @@
 # A1 commissioning and operating spare pricing
 
+## LAN C2 draft Start-up prices
+
+11.C2 stayed OPEN because the LAN reliability view calculated quantities without creating Working B5 owners or 11.M allocations. Startup preparation now creates the two source-bound `LINE-B5-LAN-STARTUP-*` owners, their `B5-SPARE-STOCK` calculations and DRAFT C2 bindings on the current MGW and MR basis. The native form shows each Working selling amount in its description while the CIF/FOB fields await a customer term. A1 S/N 4 reads the same amounts once. ADR 2, 5, 6, 8, 10–12 apply.
+
+| Current matching MGW equipment set | Installed | MTBF (h) | Start-up stock (SET) | Cost proxy (USD/SET) | Draft sell (USD) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Cisco C9105AXI-H | 27 | 614,054 | 1 | 281.00 | 354.95 |
+| Cisco C9200-48P-A | 24 | 375,570 | 1 | 9,514.00 | 12,017.68 |
+| Total | | | 2 | | 12,372.63 |
+
+The quantity basis is one compatible project stock pool, 720 hours with no replenishment and 99% probability of sufficient stock, with no planned consumption or unconfirmed spare inclusion credited. The cost basis is the complete matching installed equipment SET from Q26-063 LAN/PBX/FO, using the existing Goods sell policy. Q26-063 has no dedicated commissioning spare quantity or rate for either model. Existing edited/deleted budget owners are preserved. Overlapping Working B5 scope or a changed supporting Offer or installed population invalidates the unchanged estimate.
+
+Pre-commissioning awaits the LAN ITP material list and quantities. Commissioning awaits the OEM parts consumed during testing through PAC and the quantity already included. The two Start-up entries remain DRAFT with Main Equipment TAG, delivery, weight, origin, shipping and customer CIF/FOB unresolved. The earlier C9300L spare does not establish applicability to C9300-48P-A, and the 9800-L licence/capacity comparison remains OPEN. No frozen issue is changed.
+
+Production webpack and isolated Chromium on the prepared project with the current MGW register passed. Chromium verified the two native C2 row amounts, A1 S/N 4, cause-level LAN OPEN notes, existing C3–C8 results and both sets of saved Working, calculation and C2 binding records in IndexedDB. Model checks confirmed duplicate, stale source, edited/deleted and frozen issue behavior. The owner's Windows workspace was outside the test.
+
 ## Price trace inside 11.C2–11.C8
 
 Each detail Schedule shows the existing Working amounts by A1 Base and A2 Option. C2 shows the whole-project totals separately from the selected system. C3 stays an A2 Option reference in A1 Notes. Call-off rows are shown as rate references. Draft native C2–C6 sheets show the Working amount for the rows on that sheet when CIF/FOB is unresolved. Existing template price columns still require their delivery basis. ADR 2, 5, 6, 8, 10–12 apply.

@@ -33,7 +33,7 @@ export function lanStockBasis0550(data,model){
   const canCount=selected&&!duplicate&&Number.isSafeInteger(line.quantity)&&line.quantity>0&&['U','Pc','SET'].includes(line.unit)&&line.unit===offer?.unit&&Number.isSafeInteger(line.quantity*item.perSet)&&item.perSet>0;
   const installed=canCount?line.quantity*item.perSet:null;
   if(selected&&item.reliability){
-   const group=stock.get(item.partNo)||{name:'LAN · Cisco '+item.partNo,...item.reliability,count:0};
+   const group=stock.get(item.partNo)||{partNo:item.partNo,name:'LAN · Cisco '+item.partNo,...item.reliability,count:0};
    group.count=group.count===null||installed===null?null:group.count+installed;
    stock.set(item.partNo,group);
   }

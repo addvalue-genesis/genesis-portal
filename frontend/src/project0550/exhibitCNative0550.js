@@ -107,7 +107,13 @@ function nativePages(view,id,currency='USD'){
    const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
     const v=blankValues(id);set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
-    group.forEach((b,i)=>{const r=i+4;[b.line.description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));prices(v,r,9,b);});
+    group.forEach((b,i)=>{
+     const r=i+4,showDraftRate=id==='C2'&&view.workingPreview&&!term(b)&&!b.nonAdditive&&Number.isFinite(b.amount);
+     const description=showDraftRate?b.line.description+'\nWorking draft offer: '+currency+' '+number(b.unitPrice)+'/'+b.unit+
+      ' · Total '+currency+' '+number(b.amount)+' · Delivery term OPEN':b.line.description;
+     [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
+     prices(v,r,9,b);
+    });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
     if(!system.rows.length)pendingPhases.forEach((phase,i)=>{
      set(v,i+4,0,phase.title+' spares');
