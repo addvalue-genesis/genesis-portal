@@ -75,6 +75,7 @@ const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({
 const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
 assert.deepEqual(canonical(retained),canonical(rowsBefore),'Every projected row, ID, quantity, unit, amount and remark retained exactly once');
 assert.equal(new Set(hierarchy.controls.map(n=>n.key)).size,hierarchy.controls.length,'Unique UI expansion keys');
+assert(!hierarchy.controls.some(node=>node.key==='working:A'||(node.parents[0]==='part:A'&&node.label.includes('Working / package'))),'Part A has no standalone Working/package headings');
 assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='mr-category').slice(0,8).map(r=>r.key),['mr:1.1','mr:1.2','mr:1.3','mr:1.4','mr:1.5','mr:1.6','mr:1.7','mr:1.8']);
 assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='group').slice(0,4).map(r=>r.key),['A1-07','A1-08','A1-10','A1-09'],'Actual MR first occurrence puts MF/HF before Aeronautical');
 for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
@@ -112,6 +113,9 @@ const pagaLine=m.provisional.lines.find(l=>l.id==='LINE-LEGACY-TEL-PAGA-1');
 const pagaRow=hierarchy.entries.find(r=>r.key===pagaLine.id);
 const linkedOffer=d.offers.find(o=>o.id===pagaLine.offerId);
 assert(pagaRow&&linkedOffer);
+const pagaLot=m.provisional.schedule.find(group=>group.code===pagaLine.customerRowCode);
+assert.equal(pagaRow.parents.at(-1),pagaLot.releaseModuleId,'Package row stays directly under its existing customer Lot');
+assert.equal(pagaRow.mrReference,'','Display placement does not invent a row-level MR reference');
 const storage=globalThis.localStorage;
 let collapsedRelease;
 try {

@@ -28,28 +28,38 @@ export function releaseHierarchy0550(official,customerRows){
    const firstAppendix=part==="A"?appendixOf(basis[0]):"",anchor=categoryFor(firstAppendix);
    const segments=new Map([[anchor,{appendix:firstAppendix,rows:[]}]]);
    for(const row of rows){
-    const requirement=catalog[rank(lines.get(row.key))],appendix=part==="A"?appendixOf(requirement):"",key=categoryFor(appendix);
+    // An item without an Appendix stays with its Lot. Its own MR reference is unchanged.
+    const requirement=catalog[rank(lines.get(row.key))],appendix=part==="A"?(appendixOf(requirement)||firstAppendix):"",key=categoryFor(appendix);
     if(!segments.has(key))segments.set(key,{appendix,rows:[]});
     segments.get(key).rows.push({...row,mrReference:requirement?.reference||""});
    }
    for(const [key,segment] of segments)bucket(key,segment.appendix).segments.push({group,index,...segment,anchor:key===anchor,appendices,rank:segment.rows.length?Math.min(...segment.rows.map(row=>rank(lines.get(row.key)))):positions.get(basis[0]?.id)??Infinity});
   }
   for(const category of [...buckets.values()].sort((a,b)=>a.rank-b.rank)){
-   const appendixRef=category.appendix?"MR App. "+category.appendix:"";
-   const description=category.appendix
-    ? MR_SUPPLY_ORDER_0550.find(g=>g.appendix===category.appendix)?.title||"รายการตาม MR"
-    : part==="A"?"Working / package · แยกจากรายการ MR ในทะเบียน":"รายการบริการ / Options ตามแบบลูกค้า";
-   const label=appendixRef?appendixRef+" · "+description:description;
-   const node=heading(category.key,label,[section.key]);
-   entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node,appendixRef,description});
+   const parents=[section.key];
+   if(part!=="A"||category.appendix){
+    const appendixRef=category.appendix?"MR App. "+category.appendix:"";
+    const description=category.appendix
+     ? MR_SUPPLY_ORDER_0550.find(g=>g.appendix===category.appendix)?.title||"รายการตาม MR"
+     : "รายการบริการ / Options ตามแบบลูกค้า";
+    const label=appendixRef?appendixRef+" · "+description:description;
+    const node=heading(category.key,label,[section.key]);
+    entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node,appendixRef,description});
+    parents.push(node.key);
+   }
    for(const segment of category.segments.sort((a,b)=>a.rank-b.rank||a.index-b.index)){
-    const {group,rows,anchor,appendices}=segment,parents=[section.key,node.key];
+    const {group,rows,anchor,appendices}=segment;
     const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&rows.length>0);
     entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / ")}:{kind:"mr-system",key:system.key,parents,toggle:system,lotModuleId:group.releaseModuleId});
     const sites=new Map();
-    for(const row of rows){const requirement=catalog[rank(lines.get(row.key))],site=requirement?.site||"Working / package";if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
+    for(const row of rows){const requirement=catalog[rank(lines.get(row.key))],site=requirement?.site||(part==="A"?"":"Working / package");if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
     for(const [site,siteRows] of sites){
-     const siteNode=heading(system.key+"/site/"+site,site+" · "+siteRows.length+" รายการ",[...parents,system.key]);
+     const siteParents=[...parents,system.key];
+     if(!site){
+      entries.push(...siteRows.map(row=>({...row,parents:siteParents})));
+      continue;
+     }
+     const siteNode=heading(system.key+"/site/"+site,site+" · "+siteRows.length+" รายการ",siteParents);
      entries.push({kind:"mr-site",key:siteNode.key,parents:siteNode.parents,toggle:siteNode});
      entries.push(...siteRows.map(row=>({...row,parents:[...siteNode.parents,siteNode.key]})));
     }

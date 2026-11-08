@@ -127,6 +127,8 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  await appendixToggle.click();assert.equal(await radio.isVisible(),false);
  await partAControls.getByRole('button',{name:'+ ขยายรายการ A',exact:true}).click();
  assert(await radio.isVisible());
+ assert.equal(await table.locator('[data-release-toggle="working:A"]').count(),0);
+ assert(await table.locator('[data-component-key="bid.budget.release.line.LINE-LEGACY-TEL-PAGA-1"]').isVisible(),'Package price row remains visible under its Lot');
  assert.deepEqual(await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded'))),otherStates);
  await appendixToggle.click();assert.equal(await radio.isVisible(),false);
  await appendixToggle.click();assert(await radio.isVisible());
