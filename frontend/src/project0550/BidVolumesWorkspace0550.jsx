@@ -15,6 +15,7 @@ import {deriveBidVolumeWorkingPreview0550,saveScheduleAllocationDrafts0550} from
 import {WorkingScheduleStatus0550,ScheduleAllocationCrosswalk0550} from './WorkingSchedulePreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
+import {ScheduleResults0550} from './SchedulePriceDiagnostics0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
 import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
 import {CommissioningBreakdown0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
@@ -86,6 +87,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <label>Schedule ที่แสดง<select aria-label="Schedules shown" value={showAllSchedules?'ALL':'C1_C2'} disabled={dirty} onChange={e=>changeScheduleScope(e.target.value)}><option value="C1_C2">แสดงเฉพาะ C1 และ C2</option><option value="ALL">แสดง Schedule ทั้งหมด</option></select></label><p>A / A1 / A2 และตาราง C เดิมแสดงครบเป็นค่าเริ่มต้น · A1 รับยอด Base และ A2 รับยอด Option จาก Working / Schedule allocation ชุดเดิม · เลือกดูเฉพาะ C1/C2 ได้ · ปุ่ม Export ทั้งชุดยังรวมทุก Schedule</p><Select label="Schedule price view" value={showWorking?'WORKING':'REVIEWED'} onChange={v=>{if(!dirty)setShowWorking(v==='WORKING');}} rows={[["WORKING","Working Preview · แสดงรายการ/ราคาที่มี พร้อมหมวดแนะนำ"],["REVIEWED","เฉพาะข้อมูลที่บันทึกและราคาทบทวนแล้ว"]]}/>{showWorking&&<WorkingScheduleStatus0550 onNavigate={go} view={preview} disabled={dirty||busy} onSave={saveSuggested} onAllocate={()=>choose('mapping')}/>}</>}
  <nav className="p55-technical-tabs" aria-label={'Volume '+volume+' sections'}>{panels.map(([id,label])=><button key={id} type="button" aria-pressed={panel===id} title={label} onClick={()=>choose(id)}>{volume==='I'&&SCHEDULES_0550.some(s=>s.id===id)?'11.'+id:label}</button>)}</nav><p role="status">{message}</p>
  <section className="p55-panel" data-component-key={prefix+'.'+panel}><ComponentCopyId projectId="PJ2608-0550" componentKey={prefix+'.'+panel}/>
+ {volume==='I'&&['A1','overview','preview'].includes(panel)&&<ScheduleResults0550 view={displayView} currency={currency} disabled={dirty} onOpen={id=>{setShowAllSchedules(true);choose(id);}}/>}
  {volume==='I'&&panel==='A1'&&<div className="p55-review-toolbar">
   <button type="button" disabled={dirty} onClick={()=>choose('D')}>11.D · Breakdown for S/N 2</button>
   <button type="button" disabled={dirty} onClick={()=>choose('C2')}>11.C2 · Commissioning Spares</button>

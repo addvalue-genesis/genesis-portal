@@ -1,7 +1,40 @@
 import React,{useState} from 'react';
+import {SCHEDULES_0550} from './data/bidVolumes0550';
 import {schedulePriceDiagnostics0550} from './data/scheduleDiagnostics0550';
+import {scheduleViewTHB0550} from './data/scheduleRollup0550';
 
 const money=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'ยังไม่มีราคา';
+const resultSchedules=SCHEDULES_0550.filter(({id})=>/^C[2-8]$/.test(id));
+
+export function ScheduleResults0550({view,currency,onOpen,disabled}){
+ const display=currency==='THB'?scheduleViewTHB0550(view):view;
+ return <section className="p55-panel" aria-label="11.C2–11.C8 Schedule results">
+  <h3>ผลราคา 11.C2–11.C8</h3>
+  <p>{view.workingPreview?'Working Preview · ยอดขายจาก Working ที่มีในแต่ละ Schedule ก่อนลงช่องราคาในแบบฟอร์ม':'เฉพาะรายการที่บันทึกและราคาที่ผ่านการทบทวน'}</p>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="C2–C8 price results">
+   <thead><tr><th>Schedule</th><th>แถวมีราคา / ทั้งหมด</th><th>ยอดที่มี {currency}</th><th>ข้อมูลที่ยังขาด</th></tr></thead>
+   <tbody>{resultSchedules.map(({id,title})=>{
+    const d=schedulePriceDiagnostics0550(display,id);
+    const gaps=[];
+    if(!d.count)gaps.push('ยังไม่มีรายการ Working จัดลง Schedule');
+    if(d.quantityOpen)gaps.push('จำนวน OPEN '+d.quantityOpen+' แถว');
+    if(d.open)gaps.push('ราคา OPEN '+d.open+' แถว');
+    if(d.columnOpen)gaps.push('CIF/FOB OPEN '+d.columnOpen+' แถว');
+    if(id==='C7'){
+     const hoursOpen=d.rows.filter(row=>row.unit!=='MH'||!Number.isFinite(row.quantity)).length;
+     if(hoursOpen)gaps.push('ฐานชั่วโมงในฟอร์ม OPEN '+hoursOpen+' แถว');
+    }
+    return <tr key={id}>
+     <th scope="row"><button type="button" disabled={disabled} onClick={()=>onOpen(id)}>เปิด 11.{id}</button> {title}</th>
+     <td>{d.priced} / {d.count}</td>
+     <td>{d.priced?<><strong>{money(d.knownUSD)}</strong>{d.open>0&&<small>ยอดเฉพาะรายการที่มีราคา</small>}{d.rows.some(row=>row.binding.line.spareBudget)&&<small>รวมงบประมาณร่าง</small>}</>:'OPEN'}</td>
+     <td>{gaps.join(' · ')||'ดูรายละเอียดในแบบฟอร์ม'}</td>
+    </tr>;
+   })}</tbody>
+  </table></div>
+ </section>;
+}
+
 export function SchedulePriceDiagnostics0550({view,id,currency='USD',onNavigate,onAllocate,disabled}){
  const [open,setOpen]=useState(false),d=schedulePriceDiagnostics0550(view,id);
  if(!/^C[1-8]$|^A[12]$/.test(id))return null;
