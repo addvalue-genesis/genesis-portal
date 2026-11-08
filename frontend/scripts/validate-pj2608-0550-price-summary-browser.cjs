@@ -111,10 +111,13 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  const radioToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07"]');
  const partARow=table.locator('[data-component-key="bid.budget.release.part.A"]'),partAControls=partARow.getByRole('group',{name:'Part A expand collapse'});
  const appendixToggle=table.locator('[data-release-toggle="mr:1.1"]');
+ const appendixRow=appendixToggle.locator('xpath=ancestor::tr');
  const otherParts=table.locator('[data-release-toggle="part:B"],[data-release-toggle="part:C"],[data-release-toggle="part:B:other"],[data-release-toggle="part:C:other"]');
  const otherStates=await otherParts.evaluateAll(nodes=>nodes.map(node=>node.getAttribute('aria-expanded')));
  const subtotal=await partARow.locator('td').nth(6).innerText();
  assert(await radio.isVisible(),'Part A items are visible in the initial view');
+ assert.deepEqual(await appendixRow.locator('td').allInnerTexts(),['−','MR App. 1.1','VHF and MF/HF','']);
+ assert.equal(await appendixToggle.getAttribute('aria-label'),'หุบ MR App. 1.1 · VHF and MF/HF');
  await partAControls.getByRole('button',{name:'− หุบรายการ A',exact:true}).click();
  assert.equal(await radio.isVisible(),false);
  assert(await partARow.isVisible());

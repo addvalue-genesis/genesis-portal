@@ -35,9 +35,13 @@ export function releaseHierarchy0550(official,customerRows){
    for(const [key,segment] of segments)bucket(key,segment.appendix).segments.push({group,index,...segment,anchor:key===anchor,appendices,rank:segment.rows.length?Math.min(...segment.rows.map(row=>rank(lines.get(row.key)))):positions.get(basis[0]?.id)??Infinity});
   }
   for(const category of [...buckets.values()].sort((a,b)=>a.rank-b.rank)){
-   const label=category.appendix?"MR App. "+category.appendix+" · "+(MR_SUPPLY_ORDER_0550.find(g=>g.appendix===category.appendix)?.title||"รายการตาม MR"):part==="A"?"Working / package · แยกจากรายการ MR ในทะเบียน":"รายการบริการ / Options ตามแบบลูกค้า";
+   const appendixRef=category.appendix?"MR App. "+category.appendix:"";
+   const description=category.appendix
+    ? MR_SUPPLY_ORDER_0550.find(g=>g.appendix===category.appendix)?.title||"รายการตาม MR"
+    : part==="A"?"Working / package · แยกจากรายการ MR ในทะเบียน":"รายการบริการ / Options ตามแบบลูกค้า";
+   const label=appendixRef?appendixRef+" · "+description:description;
    const node=heading(category.key,label,[section.key]);
-   entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node});
+   entries.push({kind:"mr-category",key:node.key,parents:node.parents,toggle:node,appendixRef,description});
    for(const segment of category.segments.sort((a,b)=>a.rank-b.rank||a.index-b.index)){
     const {group,rows,anchor,appendices}=segment,parents=[section.key,node.key];
     const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&rows.length>0);

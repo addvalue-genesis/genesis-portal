@@ -1614,6 +1614,9 @@
 .p55-release-toggle { font-weight:700; text-align:left; }
 .p55-release-toggle>span { display:inline-block; min-width:18px; font-size:18px; }
 .p55-release-mr-category td { background:#dce9f3; color:#173349; border-top:2px solid #587b98; }
+.p55-release-appendix td { vertical-align:middle; }
+.p55-release-appendix td:nth-child(2) { white-space:nowrap; }
+.p55-bid-content .p55-release-appendix .p55-release-toggle { margin:0; padding:3px 6px; }
 .p55-release-mr-site td { background:#f1f5f8; padding-left:36px; }
 .p55-release-mr-system td { background:#edf1f6; padding-left:24px; }
 .p55-release-part-id { display:block; margin-top:6px; }

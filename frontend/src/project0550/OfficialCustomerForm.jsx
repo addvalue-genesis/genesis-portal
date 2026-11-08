@@ -80,7 +80,7 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   <button type="button" onClick={()=>togglePartA(true)}>+ ขยายรายการ A</button>
   <button type="button" onClick={()=>togglePartA(false)}>− หุบรายการ A</button>
  </div>;
- const toggleButton=node=><button type="button" className="p55-release-toggle" data-release-toggle={node.key} aria-expanded={isOpen(node.key)} aria-label={(isOpen(node.key)?"หุบ ":"ขยาย ")+node.label} onClick={()=>toggle(node)}><span aria-hidden="true">{isOpen(node.key)?"−":"+"}</span> {node.label}</button>;
+ const toggleButton=(node,label=node.label)=><button type="button" className="p55-release-toggle" data-release-toggle={node.key} aria-expanded={isOpen(node.key)} aria-label={(isOpen(node.key)?"หุบ ":"ขยาย ")+node.label} onClick={()=>toggle(node)}><span aria-hidden="true">{isOpen(node.key)?"−":"+"}</span>{label&&" "+label}</button>;
  return <Module id="bid.budget.release" open={open} title={provisional?"REL-04 · ราคาที่เลือก / ประมาณการ — PROVISIONAL / NOT ISSUED":"REL-04 · Official customer form — Review Draft / NOT ISSUED"}>
  {children}
  <div className="p55-review-toolbar"><button type="button" onClick={()=>exportOfficialCustomerXlsx(official)}>{provisional?"Export REL-04 · Provisional Draft XLSX":"Export REL-04 · Official Draft XLSX"}</button><a href={CUSTOMER_FORM_0550.sourceUrl} target="_blank" rel="noopener noreferrer">แบบอ้างอิง 8 คอลัมน์</a></div>
@@ -94,6 +94,14 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   if(partPrice){
    cells[6]=partPrice.value??"OPEN";
    cells[7]=partPrice.value==null?"PROVISIONAL · ยังไม่มียอด USD ที่คำนวณได้":`PROVISIONAL · ยอดเฉพาะรายการที่มีราคา (${partPrice.priced}/${partPrice.priced+partPrice.missing} เจ้าของราคา)`;
+  }
+  if(r.kind==="mr-category"&&r.parents[0]==="part:A"){
+   return <tr key={r.key} hidden={hidden} className="p55-release-mr-category p55-release-appendix">
+    <td>{toggleButton(r.toggle,"")}</td>
+    <td>{r.appendixRef}</td>
+    <td><strong>{r.description}</strong></td>
+    <td colSpan={5}/>
+   </tr>;
   }
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}{r.lotModuleId&&<small>ขอบเขตต่อเนื่องจาก Lot เดิม · ไม่บวกราคารวมซ้ำ <button type="button" onClick={()=>{const entry=hierarchy.entries.find(row=>row.moduleId===r.lotModuleId);setExpanded(old=>({...old,...Object.fromEntries(entry.parents.map(key=>[key,true]))}));requestAnimationFrame(()=>document.querySelector('[data-component-key="'+r.lotModuleId+'"]')?.scrollIntoView({block:"center"}));}}>ดูยอด Lot</button></small>}</td></tr>;
   return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<PriceNotes note={notes.get(r.moduleId)} onSource={onSource}/>}</td>)}</tr>;
