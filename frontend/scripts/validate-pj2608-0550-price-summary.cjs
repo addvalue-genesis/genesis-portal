@@ -103,8 +103,7 @@ const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,
 assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
 assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
-assert(releaseHtml.includes('Full Bid systems'));for(const row of inventory)assert(releaseHtml.includes('data-full-bid-system="'+row.token+'"'));assert(releaseHtml.includes('MR-B1-11-APF-05'));
-assert(releaseHtml.includes('MR อ้างอิง / Revision / หน้า / Appendix'));assert(releaseHtml.includes(MR.MR_WORKING_CATALOG_0550.document));
+assert(!releaseHtml.includes('Part A Full Bid inventory'),'The duplicate inventory is absent from the Release preview');
 // Expand the PAGA detail in the SSR harness as the user does in REL-04.
 const pagaLine=m.provisional.lines.find(l=>l.id==='LINE-LEGACY-TEL-PAGA-1');
 const pagaRow=hierarchy.entries.find(r=>r.key===pagaLine.id);
@@ -116,6 +115,7 @@ try {
  globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
   ?JSON.stringify(Object.fromEntries(pagaRow.parents.map(key=>[key,true]))):null};
  const expanded=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{},onNavigate:()=>{}}));
+ assert(!expanded.includes('Part A Full Bid inventory'),'Expanding Part A keeps only the price hierarchy');
  const pagaMarkup=expanded.split('data-component-key="'+pagaRow.moduleId+'"')[1].split('</tr>')[0];
  assert(pagaMarkup.includes('Offer ที่ผูกกับ Working · อ้างอิงภายใน'));
  assert(pagaMarkup.includes('>'+linkedOffer.quoteRef+'</button>'),'Show the linked PAGA Offer in 10.7');
@@ -144,4 +144,4 @@ assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Screen-only par
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
-console.log('PASS 0550 summary/release: Full/Bid 19 systems + COMMON, all source requirements including unmapped/unselected/COMPANY, split equipment/services obligations, unresolved/new scope retained, actual source page order, MR hierarchy/cross-appendix Lot once, copyable IDs, Official gates and unchanged export cells/financial/history records.');
+console.log('PASS 0550 summary/release: no duplicate Full/Bid table in 10.7, inventory model retains 19 systems + COMMON, all source requirements including unmapped/unselected/COMPANY, split equipment/services obligations, unresolved/new scope retained, actual source page order, MR hierarchy/cross-appendix Lot once, copyable IDs, Official gates and unchanged export cells/financial/history records.');
