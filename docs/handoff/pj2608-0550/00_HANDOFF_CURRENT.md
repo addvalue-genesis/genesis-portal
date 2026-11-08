@@ -1,3 +1,5 @@
+Latest Working presentation: [line components in 10.2](20261108_WORKING_LINE_COMPONENTS.md). Existing pricing rows open one inset child panel for MR/TAG and mapped Vendor evidence, including DMR site BOM. The original Working owner remains the price and Module Search target.
+
 Latest scope and costing update: [MGW LAN/PBX/FO and Part B](20261107_MGW_LAN_PBX_FO_AND_PART_B.md). Existing Working and Budget show ADDVALUE service cost and distinguish shared project activity from the DMR engineering share.
 
 Latest scope decision: [TEL-TELT foundation and installation tender boundary](20261105_TELT_CIVIL_SCOPE_BOUNDARY.md). C1-D04 is a CNEEC option reference, C1-D05 separates excluded foundation construction and open site interfaces, and Part B retains design and TSSR.

@@ -146,7 +146,7 @@ export function DmrTagCostRows0550({view,lineId,onNavigate,onOpenSource=onNaviga
  return [...equipment,...additional].map(r=>{
   const isEquipment=Boolean(r.component);
   const title=r.tag?(r.source?r.tag:`TAG รอยืนยัน · ${r.tag}`):r.component||r.itemName;
-  return <tr key={r.id||r.title} className="p55-dmr-cost-reference" data-dmr-tag-parent={lineId} data-dmr-tag={r.tag}>
+  return <tr key={r.id||r.title} data-dmr-tag-parent={lineId} data-dmr-tag={r.tag}>
    <td><strong>{title}</strong><small>{r.tag?r.component:r.title||'รายการประกอบ / อ้างอิง MR'} · {r.site}</small>
     {r.location&&<small>{r.location}</small>}
     {r.routes?.map(route=><small key={route.title}>{route.title}{route.endpoints&&` · ${route.endpoints}`}</small>)}</td>
@@ -158,7 +158,6 @@ export function DmrTagCostRows0550({view,lineId,onNavigate,onOpenSource=onNaviga
    </>:<>{r.requirement}<small>{r.reference}</small></>}
     {r.source&&onOpenSource&&<button type="button" onClick={()=>onOpenSource('bid.documents.source.'+r.source.id)}>DTS · {r.source.locator.split(' / ').at(-1)}</button>}</td>
    <td>{r.fullOutdoorIdu?'IDU แยก 0 ตัวตามแบบที่เลือก':r.packageRef?'อ้างแพ็กเกจ R11':r.workLineIds.length?'อ้างเจ้าของต้นทุน':'OPEN'}</td>
-   <td>—</td><td>—</td>
    <td><strong>{r.label||'ตรวจขอบเขต / เจ้าของต้นทุน'}</strong><small>{r.reason||r.action}</small>
     {r.workLineIds.map(id=>onNavigate&&<button key={id} type="button" onClick={()=>onNavigate(workRoute+id)}>
      {id===CERAGON_LINK_OWNER_0550?'เปิดเจ้าของต้นทุน R11':view.owners.get(id)?.description||id}</button>)}</td>

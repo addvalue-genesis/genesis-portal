@@ -1630,8 +1630,26 @@
 /* Numbered, copyable 0550 presentation: scoped away from frozen history/0553. */
 .p55-bid-presentation { --bid-accent:#526777; --bid-tint:#f0f4f7; grid-template-columns:minmax(0,1fr); }
 .p55-bid-presentation :is(.p55-panel,.p55-price-group,.p55-review-fields,.p55-table-wrap) { min-width:0; max-width:100%; }
-.p55-table tr.p55-dmr-cost-reference > td { background:var(--bid-tint,#f4f8fc); }
-.p55-table tr.p55-dmr-cost-reference > td:first-child { padding-left:1.5rem; }
+.p55-working-line-details-toggle { margin-top:.5rem; }
+.p55-working-line-details {
+  contain:inline-size;
+  border:1px solid #c8d3df;
+  border-inline-start:3px solid var(--bid-accent);
+  border-radius:6px;
+  padding:.75rem;
+  background:#f8fafc;
+}
+.p55-working-line-details > h4 { margin:0; color:#173349; }
+.p55-working-line-details > p { margin:.25rem 0 .75rem; color:var(--p55-muted); }
+.p55-working-line-details > * + :is(details,section) { margin-top:.75rem; }
+.p55-working-component-table { min-width:36rem; }
+.p55-working-component-table > caption {
+  padding:.55rem .7rem;
+  background:#fff;
+  color:#173349;
+  text-align:left;
+  font-weight:700;
+}
 .p55-table .p55-dmr-boq-group > th,
 .p55-table [data-boq-working-site] { background:var(--bid-tint,#e6f0fc); }
 .p55-supplier-boq > caption { padding:.55rem .7rem; text-align:left; font-weight:700; }
@@ -1649,6 +1667,18 @@
 .p55-bid-presentation [data-bid-owner] .p55-table>thead>tr>th { background:var(--bid-tint); color:#173349; border-color:var(--bid-accent); }
 .p55-bid-presentation [data-bid-owner] .p55-table>tbody>tr>td,
 .p55-bid-presentation .p55-table>tbody>tr[data-bid-owner]>td { background:color-mix(in srgb,var(--bid-tint) 55%,white); border-color:color-mix(in srgb,var(--bid-accent) 30%,white); }
+.p55-bid-presentation .p55-table > tbody > tr.p55-working-line-child > td {
+  background:#fff;
+  padding:.5rem .75rem .9rem clamp(1rem, 3vw, 2rem);
+}
+.p55-bid-presentation [data-bid-owner] .p55-working-component-table > thead > tr > th {
+  background:#eaf0f6;
+  border-color:#d3dce6;
+}
+.p55-bid-presentation [data-bid-owner] .p55-working-component-table > tbody > tr > td {
+  background:transparent;
+  border-color:#d3dce6;
+}
 .p55-bid-presentation .p55-customer-form>tbody>tr.p55-customer-section>td { background:var(--bid-accent); color:white; }
 .p55-group-total { display:block; margin-top:8px; padding:5px 8px; color:var(--bid-accent); background:var(--bid-tint); font-weight:700; }
 .p55-module-principles { margin:12px 0; padding:10px; border:1px dashed #8b9da9; border-radius:6px; background:#f6f8fa; }

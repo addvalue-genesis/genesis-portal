@@ -1,6 +1,6 @@
 {
   "schema": "pj2608-0550-handoff/2.0",
-  "updatedDate": "2026-11-07",
+  "updatedDate": "2026-11-08",
   "repo": "addvalue-genesis/genesis-portal",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "pr": 53,
@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261107_MGW_LAN_PBX_FO_AND_PART_B.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261108_WORKING_LINE_COMPONENTS.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261108_WORKING_LINE_COMPONENTS.md",
     "docs/handoff/pj2608-0550/20261107_MGW_LAN_PBX_FO_AND_PART_B.md",
     "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
     "docs/handoff/pj2608-0550/20261105_TELT_CIVIL_SCOPE_BOUNDARY.md",

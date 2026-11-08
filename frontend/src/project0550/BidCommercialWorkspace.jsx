@@ -127,13 +127,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  const supplierSources=useMemo(()=>supplierCostProjection0550(data),[data]);
  const requirementsByLine=useMemo(()=>workingRequirementIndex0550(integration.requirements),[integration.requirements]);
  const dmrTagCosts=useMemo(()=>dmrTagCostView0550(data,integration,working),[data,integration,working]);
- const [collapsedDmrDetails,setCollapsedDmrDetails]=useState(()=>new Set());
- const toggleDmrDetails=id=>setCollapsedDmrDetails(previous=>{
-  const next=new Set(previous);
-  if(next.has(id))next.delete(id);
-  else next.add(id);
-  return next;
- });
+ const [lineDetailsOpen,setLineDetailsOpen]=useState(()=>new Map());
  const identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  // Match existing native disclosure/navigation behaviour. Limit the command to
  // this Part's direct groups; retain other Parts and nested reading choices.
@@ -158,12 +152,44 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code})}>เตรียมรายการใน {code}</button>
  <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=code==="TEL-DMR"&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
- const hasDmrBom=showDmrTags&&r.id.endsWith("-01"),bomOpen=!collapsedDmrDetails.has(r.id),bomId="p55-working-bom-"+r.id;
- return <React.Fragment key={r.id}><tr data-component-key={r.sourceModuleId} data-module-number={identity(r.sourceModuleId)?.number} data-bid-owner={code} tabIndex={-1}><td><BidHeading {...identity(r.sourceModuleId)}/>{hasDmrBom&&<button type="button" aria-label={`รายการประกอบและ BOM ของ ${r.description}`} aria-expanded={bomOpen} aria-controls={bomId} onClick={()=>toggleDmrDetails(r.id)}>{bomOpen?"− พับรายการ":"+ กางรายการ"}</button>}<small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small></td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/></td><td>{amount(r.costTHB)}{showDmrTags&&r.id.endsWith("-01")&&Number.isFinite(r11Quote?.rate)&&<small>อ้างเรตสินค้า 07 · {amount(r11Quote.rate,r11Quote.currency)} / Lot APF–ACP</small>}{model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}</td><td>{amount(r.workingSellTHB)}{model.pricingBasis&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong>{amount(r.customerTHB)}</strong>{model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small></td><td>{r.mrScopeState?.covered?"INCLUDED IN OWNER · ไม่บวกซ้ำ":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY จัดหา · ไม่รวมราคา":r.selected?"SELECTED":"NOT SELECTED"} · {r.reviewState}<small>{r.satelliteScopeState?.label}</small><small>{r.scopeBasis}</small>{!showDmrTags&&r.mrScopeState?.requirement?.components.length>0&&<details><summary>รายการประกอบตาม MR · รวมใน package</summary><ul>{r.mrScopeState.requirement.components.map((c,i)=><li key={i}>{c}</li>)}</ul></details>}{r.mrScopeState?.covered&&<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.coveredByLineId))}>เปิดเจ้าของราคา</button>}{r.mrScopeState?.candidates.map(c=><button type="button" key={c.id} onClick={()=>onEdit(c)}>ตรวจราคาเดิม · {c.description}</button>)}<small>{r.reviewProblems.join(" · ")}</small><WorkingRequirementTrace0550 requirements={requirementsByLine.get(r.id)} onNavigate={onNavigate}/><button type="button" onClick={()=>onEdit(raw)}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.satelliteScopeState?.excluded&&r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>
+ const hasDmrBom=showDmrTags&&r.id.endsWith("-01");
+ const mrComponents=showDmrTags?[]:r.mrScopeState?.requirement?.components??[];
+ const hasMrSupplierDetails=raw?.mrRequirementId&&r.wbs==="A";
+ const hasDetails=showDmrTags||mrComponents.length>0||Boolean(hasMrSupplierDetails);
+ const detailsOpen=lineDetailsOpen.get(r.id)??showDmrTags;
+ const detailsId="p55-working-line-details-"+r.id;
+ const detailsAction=detailsOpen?"ซ่อนรายการประกอบ":"แสดงรายการประกอบ";
+ return <React.Fragment key={r.id}><tr data-component-key={r.sourceModuleId} data-module-number={identity(r.sourceModuleId)?.number} data-bid-owner={code} tabIndex={-1}><td><BidHeading {...identity(r.sourceModuleId)}/>
+ {hasDetails&&<button type="button" className="p55-working-line-details-toggle"
+  aria-label={detailsAction+"ของ "+r.description} aria-expanded={detailsOpen} aria-controls={detailsId}
+  onClick={()=>setLineDetailsOpen(previous=>new Map(previous).set(r.id,!(previous.get(r.id)??showDmrTags)))}>
+  {detailsOpen?"− ":"+ "}{detailsAction}
+ </button>}
+ <small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small></td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/></td><td>{amount(r.costTHB)}{showDmrTags&&r.id.endsWith("-01")&&Number.isFinite(r11Quote?.rate)&&<small>อ้างเรตสินค้า 07 · {amount(r11Quote.rate,r11Quote.currency)} / Lot APF–ACP</small>}{model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}</td><td>{amount(r.workingSellTHB)}{model.pricingBasis&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong>{amount(r.customerTHB)}</strong>{model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small></td><td>{r.mrScopeState?.covered?"INCLUDED IN OWNER · ไม่บวกซ้ำ":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY จัดหา · ไม่รวมราคา":r.selected?"SELECTED":"NOT SELECTED"} · {r.reviewState}<small>{r.satelliteScopeState?.label}</small><small>{r.scopeBasis}</small>{r.mrScopeState?.covered&&<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.coveredByLineId))}>เปิดเจ้าของราคา</button>}{r.mrScopeState?.candidates.map(c=><button type="button" key={c.id} onClick={()=>onEdit(c)}>ตรวจราคาเดิม · {c.description}</button>)}<small>{r.reviewProblems.join(" · ")}</small><WorkingRequirementTrace0550 requirements={requirementsByLine.get(r.id)} onNavigate={onNavigate}/><button type="button" onClick={()=>onEdit(raw)}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.satelliteScopeState?.excluded&&r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>
  {r===r11Price&&<tr><td colSpan={6}><DmrR11WorkingPrice0550 line={r11Price} provisional={provisional}/></td></tr>}
- {showDmrTags&&(!hasDmrBom||bomOpen)&&<DmrTagCostRows0550 view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/>}
- {hasDmrBom&&<tr id={bomId} hidden={!bomOpen}><td colSpan={6}>{bomOpen&&<DmrWorkingBoq0550 offers={data.offers} view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} provisional={provisional}/>}</td></tr>}
- {raw?.mrRequirementId&&r.wbs==="A"&&<tr data-working-supplier-detail={r.id}><td colSpan={6}><WorkingMrSupplierDetails0550 data={data} line={raw} projection={supplierSources} onNavigate={onNavigate} r11Price={r.systemToken==="TEL-DMR"?r11Price:undefined} provisional={provisional}/></td></tr>}</React.Fragment>;})}</tbody></table></div>{!pricing.length&&<p>{references.length?"ไม่มีรายการทำราคา TSI ในกลุ่มนี้ · ดูขอบเขต COMPANY ด้านล่าง":"OPEN · ยังไม่มีรายการต้นทาง"}</p>}
+ {hasDetails&&<tr className="p55-working-line-child" hidden={!detailsOpen}>
+  <td colSpan={6}>
+   <section id={detailsId} className="p55-working-line-details" aria-labelledby={detailsId+"-title"}>
+    <h4 id={detailsId+"-title"}>รายการประกอบของ {r.description}</h4>
+    {detailsOpen&&<>
+     <p>ใช้ตรวจขอบเขตและอ้างอิงฐานต้นทุน ยอด Working คิดจากแถวเจ้าของต้นทุนเพียงครั้งเดียว</p>
+     {showDmrTags&&<div className="p55-table-wrap">
+      <table className="p55-table p55-working-component-table">
+       <caption>ข้อกำหนดลูกค้า (MR / DTS) เทียบกับข้อเสนอผู้ขาย</caption>
+       <thead><tr><th scope="col">TAG / อุปกรณ์</th><th scope="col">จำนวน / ต้นทาง</th><th scope="col">ฐานต้นทุน</th><th scope="col">สถานะ / หลักฐาน</th></tr></thead>
+       <tbody><DmrTagCostRows0550 view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/></tbody>
+      </table>
+     </div>}
+     {mrComponents.length>0&&<div>
+      <strong>ข้อกำหนดลูกค้า (MR)</strong>
+      <ul>{mrComponents.map((component,i)=><li key={i}>{component}</li>)}</ul>
+     </div>}
+     {hasDmrBom&&<DmrWorkingBoq0550 offers={data.offers} view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} provisional={provisional}/>}
+     {hasMrSupplierDetails&&<WorkingMrSupplierDetails0550 data={data} line={raw} projection={supplierSources} onNavigate={onNavigate} r11Price={r.systemToken==="TEL-DMR"?r11Price:undefined} provisional={provisional}/>}
+    </>}
+   </section>
+  </td>
+ </tr>}</React.Fragment>;})}</tbody></table></div>{!pricing.length&&<p>{references.length?"ไม่มีรายการทำราคา TSI ในกลุ่มนี้ · ดูขอบเขต COMPANY ด้านล่าง":"OPEN · ยังไม่มีรายการต้นทาง"}</p>}
  {references.length>0&&<details className="p55-panel" data-company-reference={code}><summary>ข้อมูลอ้างอิงขอบเขต — {code==="C1"?"CNEEC Option / Civil Interface":"COMPANY จัดหา"} · {references.length} รายการ · ไม่รวมข้อเสนอ TSI</summary><p>เก็บไว้ตรวจขอบเขตและเชื่อมกับ MR · ไม่ใช่รายการรอกรอกราคาของ TSI</p><div className="p55-table-wrap"><table className="p55-table" aria-label={code==="C1"?"CNEEC and civil scope references":"COMPANY scope references "+code}><thead><tr><th>รายการอ้างอิง</th><th>ปริมาณ / เอกสาร</th><th>ขอบเขต / Trace</th></tr></thead><tbody>{references.map(r=><tr key={r.id} data-component-key={r.sourceModuleId} data-module-number={identity(r.sourceModuleId)?.number} data-bid-owner={code} tabIndex={-1}><td><BidHeading {...identity(r.sourceModuleId)}/><small>{r.scopeKey}</small></td><td>{r.quantity??"รอยืนยัน"} {r.unit}{r.mrScopeState?.scopeReference?<small><a href={TOWER_MR_0550}>MR §1.3(i)</a> · <a href={TOWER_LIS_0550}>LIS Item 14</a> · <a href={TOWER_C1_0550}>Priced Breakdown C1</a></small>:<><small>{r.requirementRef}</small><small>{r.sourceRef}</small></>}</td><td>{r.mrScopeState?.scopeReference?<><strong>{r.mrScopeState.scopeReference.text}</strong>{r.mrScopeState.scopeReference.items.map(item=><div key={item}><small>Item {item} · {towerSourceScope0550[item]}</small>{data.offers.filter(o=>isTowerSourceItem0550(o)&&o.supplierQuoteRow.itemCode===item).map(o=><button type="button" key={o.id} onClick={()=>onNavigate('bid.vendor.offer.'+o.id)}>เปิด {o.quoteRef} / Item {item}</button>)}</div>)}</>:<><strong>COMPANY จัดหา · ไม่รวมราคา</strong><small>{r.scopeBasis}</small></>}<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.id))}>แก้ไข / ทบทวน</button><button type="button" onClick={()=>onRelease(r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>)}</tbody></table></div></details>}
  </details>;})}</details>;
  })}</>;
