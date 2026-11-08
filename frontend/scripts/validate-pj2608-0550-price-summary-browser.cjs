@@ -136,6 +136,15 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  await radioToggle.click();assert.equal(await radio.isVisible(),false);
  await radioToggle.click();assert.equal(await radio.isVisible(),true);
  const siteToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07/site/APF"]');
+ const siteRow=siteToggle.locator('xpath=ancestor::tr');
+ const marineSite=table.locator('[data-release-toggle="bid.budget.release.customer.A1-08/site/APF"]').locator('xpath=ancestor::tr');
+ assert.equal(await siteRow.locator('td').nth(1).innerText(),'Lot A1-07');
+ assert.equal(await marineSite.locator('td').nth(1).innerText(),'Lot A1-08');
+ assert(await siteRow.locator('td').nth(2).getByRole('button',{name:/A1-07 · APF/}).isVisible());
+ const descriptionIndent=row=>row.locator('td').nth(2).evaluate(cell=>parseFloat(getComputedStyle(cell).paddingLeft));
+ assert(await descriptionIndent(radio)>await descriptionIndent(siteRow),'Items are nested deeper than their site headings');
+ await radioToggle.click();assert.equal(await siteRow.isVisible(),false);assert(await marineSite.isVisible());
+ await radioToggle.click();assert(await siteRow.isVisible());
  await siteToggle.focus();await siteToggle.press('Enter');assert.equal(await radio.isVisible(),false,'Keyboard collapses its own site');
  await siteToggle.press('Enter');assert.equal(await radio.isVisible(),true);
  await release.getByRole('group',{name:'Release expand collapse'}).getByRole('button',{name:'− หุบทั้งหมด',exact:true}).click();

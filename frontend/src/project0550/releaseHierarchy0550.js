@@ -59,8 +59,9 @@ export function releaseHierarchy0550(official,customerRows){
       entries.push(...siteRows.map(row=>({...row,parents:siteParents})));
       continue;
      }
-     const siteNode=heading(system.key+"/site/"+site,site+" · "+siteRows.length+" รายการ",siteParents);
-     entries.push({kind:"mr-site",key:siteNode.key,parents:siteNode.parents,toggle:siteNode});
+     const siteLabel=site+" · "+siteRows.length+" รายการ";
+     const siteNode=heading(system.key+"/site/"+site,part==="A"?group.code+" · "+siteLabel:siteLabel,siteParents);
+     entries.push({kind:"mr-site",key:siteNode.key,parents:siteNode.parents,toggle:siteNode,lotCode:group.code,siteLabel});
      entries.push(...siteRows.map(row=>({...row,parents:[...siteNode.parents,siteNode.key]})));
     }
    }
