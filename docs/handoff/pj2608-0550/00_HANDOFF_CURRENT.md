@@ -1,3 +1,5 @@
+Latest A1 spare pricing: [11.A1 lines 4–5 and C2/C3](20261108_A1_SPARE_PRICING.md). Working Preview refreshes the existing spare allowances against the known current Part A cost and references C3 Option pricing in A1 without adding it to Base.
+
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 
 Latest DMR Working layout: [TEL-DMR Working sections](20261108_DMR_WORKING_SECTIONS.md). The existing Part A group separates scope status, the one Working price table with MR-level BOM, and source/downstream links. WP.2/7/8 use the existing TEL-DMR filter.

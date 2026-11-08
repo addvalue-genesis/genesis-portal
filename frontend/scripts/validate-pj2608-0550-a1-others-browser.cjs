@@ -41,6 +41,10 @@ const server=http.createServer((req,res)=>{
    const line=othersSeed.lines.find(l=>l.id===id);assert(line);
    Object.assign(line,{selected:index<4,quantity:2,unit:index===0?'MH':'Lot',currency:'USD',manualCost:5,sellMode:'DIRECT',sellRate:(index+1)*10,primePct:0,calculationId:'',offerId:'',coveredByLineId:'',sourceRef:'SYNTHETIC OTHERS TEST'});
   }
+  for(const [id,sellRate] of [['REQ-MR-ACT-B5-D01',100],['REQ-MR-ACT-C3-D02',75]]){
+   const line=othersSeed.lines.find(l=>l.id===id);assert(line);
+   Object.assign(line,{selected:true,quantity:1,unit:'Lot',currency:'USD',manualCost:50,sellMode:'DIRECT',sellRate,primePct:0,calculationId:'',offerId:'',coveredByLineId:'',sourceRef:'SYNTHETIC SPARES TEST'});
+  }
   Object.assign(othersSeed.fx,{thbPerUSD:32.5,source:'SYNTHETIC OTHERS FX',date:'2026-11-05'});
   await write(othersSeed);await page.reload();await ready();
   await page.getByRole('navigation',{name:'PJ2608-0550 sections'}).getByRole('button',{name:'Quotation',exact:true}).click();
@@ -59,12 +63,22 @@ const server=http.createServer((req,res)=>{
    assert.equal(await F.locator('tfoot td').first().innerText(),fTotal);
    await page.getByRole('button',{name:'เปิด 11.A1 · ยอดรวม 1 Lot',exact:true}).click();
   }
+  const c2Row=a1.getByRole('row').filter({hasText:'Pre-commissioning, Commissioning Spare parts'});
+  const c3Row=a1.getByRole('row').filter({hasText:'Two years Operation Spare parts'});
+  assert.match(await c2Row.innerText(),/3,250\.00/);
+  assert.match(await c3Row.innerText(),/THB 2,437\.50.*Excluded from Base/);
+  await page.getByRole('button',{name:'11.C2 · Commissioning Spares',exact:true}).click();
+  assert.match(await page.locator('[data-native-schedule="C2"]').innerText(),/Schedule C2 Working price: THB 3,250\.00/);
+  await page.getByRole('button',{name:'11.A1',exact:true}).click();
+  await page.getByRole('button',{name:'11.C3 · Two-year Operation Spares',exact:true}).click();
+  assert.match(await page.locator('[data-native-schedule="C3"]').innerText(),/Schedule C3 Working price: THB 2,437\.50/);
+  await page.getByRole('button',{name:'11.A1',exact:true}).click();
   await page.getByRole('button',{name:'11.F · A1 Others / Insurance Breakdown',exact:true}).click();
   await page.getByLabel('Schedule price view').selectOption('REVIEWED');
   assert.equal(await F.locator('tfoot td').first().innerText(),'OPEN','Unreviewed Working prices stay out of Reviewed view');
   assert.deepEqual(await read(),storedOthers,'11.E/F leave prices, allocations and history intact');
   assert.deepEqual(errors,[]);
-  console.log('PASS 11.E/F: licence, freight, cargo and personnel partition, USD/THB A1 tie-out, no non-selected duplicate, Module Search and read-only Reviewed separation.');
+  console.log('PASS 11.A1: C2 Base and C3 Option reference, existing C2/C3 navigation, 11.E/F currency tie-out, Module Search and read-only Reviewed separation.');
 
  }finally{
   if(browser)await browser.close();

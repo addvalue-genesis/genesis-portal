@@ -16,6 +16,12 @@ const value=v=>v===null||v===undefined||v===''?'OPEN':String(v);
 const sum=rows=>sumMoney0550(rows.map(b=>b.amount));
 const shownSum=(view,rows)=>view.workingPreview?scheduleRollup0550(rows).knownUSD:sum(rows);
 const subtotalNote=(view,rows)=>view.workingPreview?rollupNote0550(scheduleRollup0550(rows)):'';
+const sparePriceNote=(rows,currency)=>{
+ const subtotal=scheduleRollup0550(rows);
+ const status=subtotal.open?'; '+subtotal.priced+'/'+subtotal.count+' priced; '+subtotal.open+' OPEN':'';
+ const basis=rows.some(b=>b.line.spareBudget)?' / Draft budget allowance; OEM breakdown OPEN':'';
+ return Number.isFinite(subtotal.knownUSD)?currency+' '+number(subtotal.knownUSD)+status+basis:'OPEN'+status;
+};
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||'';
 const term=customerPriceColumn0550;
@@ -68,6 +74,21 @@ function nativePages(view,id,currency='USD'){
     set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
    }
    if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
+   if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
+   if(!base&&r===6&&view.workingPreview&&terms.has(''))v.A2_6_9+=' / Option price before CIF/FOB allocation: '+sparePriceNote(bs,currency);
+  }
+  if(base&&view.workingPreview){
+   if(!groups.has(5)){
+    set(v,5,5,'OPEN');set(v,5,6,'OPEN');
+    set(v,5,7,'No Base price allocated to Form C-2; see Working and 11.M.');
+   }
+   // The native A1 note excludes 2-year spares. Expose the Option amount as
+   // a reference in Notes only, without adding it to any Base price cell.
+   const operation=view.scheduleRows('C3').filter(b=>b.treatment==='OPTION'&&!b.nonAdditive);
+   set(v,6,6,operation.some(b=>Number.isFinite(b.amount))?'OPTION / see Notes':'OPEN');
+   set(v,6,7,eligible.some(b=>b.schedule==='C3')
+    ?'OPEN / A saved Base allocation for Form C-3 conflicts with the A1 scope note. Review 11.M.'
+    :'Option reference (A2 / Form C-3): '+sparePriceNote(operation,currency)+' / Excluded from Base.');
   }
   if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
   else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?currency+' '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs),currency):'OPEN'));}
@@ -107,7 +128,17 @@ function renderPage(view,page,format,currency='USD'){
   if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>${escape(note)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
   else result+=`<p class="native-response">${escape(note)}</p>`;
  }
- const partialNote=view.workingPreview&&['C1','C7','C8'].includes(page.id)?subtotalNote(view,view.scheduleRows(page.id)):'';
+ let partialNote='';
+ if(view.workingPreview){
+  if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id));
+  if(['C2','C3'].includes(page.id)){
+   const rows=view.scheduleRows(page.id);
+   if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
+    partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+'.';
+    if(rows.some(b=>!term(b)))partialNote+=' CIF/FOB allocation OPEN.';
+   }
+  }
+ }
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');

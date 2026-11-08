@@ -1,4 +1,4 @@
-import {mgwCurrentOffer0550,mgwCurrentIncluded0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
 import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
@@ -12,7 +12,7 @@ import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationR
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {mgwDependentEstimateOpen0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -85,6 +85,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
  return data;
 }
+const SPARE_BUDGET_REVIEW_0550="SPARE_BUDGET_REVIEW: Draft allowance from known current Part A costs. Verify OEM parts and deduct confirmed package inclusions.";
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
  data=reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(data));
  const towerSurveyOpen=towerSurveyReviewPending0550(data);
@@ -94,7 +95,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
  const counts=new Map();data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
- const lines=data.lines.map(l=>{
+ const priceLine=(l,spareCostBasisTHB)=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
   const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
@@ -132,9 +133,19 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
    costRate=null;
    problems.push(retiredMgw?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550);
   }
+  let spareBudget;
   if(mgwDependentEstimateOpen0550(data,l)){
-   costRate=null;
-   problems.push('MGW_DEPENDENT_ESTIMATE_OPEN: ตรวจฐานประมาณการหลังเปลี่ยนขอบเขตและต้นทุน MGW');
+   const rate=spareBudgetRate0550(l.id);
+   // The existing receipt check only allows an untouched generated estimate.
+   // This calculation uses current cost owners and is a draft price basis only.
+   if(selected&&rate&&spareCostBasisTHB>0){
+    spareBudget={rate,basisTHB:spareCostBasisTHB};
+    costRate=round(spareCostBasisTHB*rate);
+    problems.push(SPARE_BUDGET_REVIEW_0550);
+   }else{
+    costRate=null;
+    problems.push('MGW_DEPENDENT_ESTIMATE_OPEN: ตรวจฐานประมาณการหลังเปลี่ยนขอบเขตและต้นทุน MGW');
+   }
   }
   if(mgwProjectWideLineConflict0550(l,offer)){
    costRate=null;
@@ -166,15 +177,22 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
   // A sourced DIRECT selling rate is independent of unestablished internal cost.
   // Cost stays null; the strict Working/Official problems above are retained.
-  const provisionalProblems=problems.filter(p=>!isBidScopeWarning0550(p)&&!(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
+  const provisionalProblems=problems.filter(p=>p!==SPARE_BUDGET_REVIEW_0550&&!isBidScopeWarning0550(p)&&!(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
   const nativeReady=!retiredMgw&&provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
   const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
   // Keep the established FX/rounding path when available; native USD needs no invented FX.
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
   const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  return {...l,...provisional,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
- });
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+ };
+ const equipment=new Map();
+ if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){
+  for(const line of data.lines)if(line.wbs==='A')equipment.set(line.id,priceLine(line,null));
+ }
+ const spareCostBasisTHB=sumMoney0550([...equipment.values()]
+  .filter(line=>line.selected&&finite(line.provisionalCostTHB)).map(line=>line.provisionalCostTHB));
+ const lines=data.lines.map(line=>equipment.get(line.id)??priceLine(line,spareCostBasisTHB));
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
  const sum=(rows,key)=>sumMoney0550(rows.map(r=>r[key]));

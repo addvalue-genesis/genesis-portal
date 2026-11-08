@@ -87,6 +87,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
  <section className="p55-panel" data-component-key={prefix+'.'+panel}><ComponentCopyId projectId="PJ2608-0550" componentKey={prefix+'.'+panel}/>
  {volume==='I'&&panel==='A1'&&<div className="p55-review-toolbar">
   <button type="button" disabled={dirty} onClick={()=>choose('D')}>11.D · Breakdown for S/N 2</button>
+  <button type="button" disabled={dirty} onClick={()=>choose('C2')}>11.C2 · Commissioning Spares</button>
+  <button type="button" disabled={dirty} onClick={()=>{setShowAllSchedules(true);choose('C3');}}>11.C3 · Two-year Operation Spares</button>
   {A1_OTHERS_PANELS_0550.map(({id,number,title})=><button key={id} type="button" disabled={dirty} onClick={()=>choose(id)}>{number} · A1 Others / {title}</button>)}
  </div>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}

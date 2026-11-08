@@ -14,6 +14,20 @@ const dir=process.env.PJ0550_NATIVE_OUTPUT||path.join(os.tmpdir(),'0550-native-e
 for(const s of V.SCHEDULES_0550){const result=N.nativeSchedule0550(view,s.id);assert(result.html.replace(/<[^>]+>/g,'').includes('SCHEDULE '+s.id));assert(!result.html.includes('{{'));fs.writeFileSync(path.join(dir,s.id+'.html'),N.nativeExhibitHtml0550(view,s.id));fs.writeFileSync(path.join(dir,s.id+'.docx'),N.buildNativeExhibitDocx0550(view,s.id));}
 fs.writeFileSync(path.join(dir,'all.docx'),N.buildNativeExhibitDocx0550(view));fs.writeFileSync(path.join(dir,'all.html'),N.nativeExhibitHtml0550(view));
 assert(N.nativeSchedule0550(view,'A1').html.includes('whiteness'),'Preserve native wording, including source errors');
+const spareBindings=rows.filter(r=>['C2','C3'].includes(r.schedule)).map((r,i)=>({...r,amount:[100,75][i],deliveryTerm:'',line:{...r.line,customerTHB:[3200,2400][i],spareBudget:{rate:0.01,basisTHB:10000}}}));
+const spareView={...view,workingPreview:true,nativeC1:[],bindings:spareBindings,scheduleRows:id=>spareBindings.filter(r=>r.schedule===id),baseAssigned:100,optionsAssigned:75};
+const a1Spare=N.nativeSchedule0550(spareView,'A1').pages[0].values;
+assert.equal(a1Spare.A1_5_6,'100.00');
+assert.equal(a1Spare.A1_6_6,'OPTION / see Notes');
+assert.match(a1Spare.A1_6_7,/USD 75\.00.*Excluded from Base/);
+assert.match(a1Spare.A1_12_1,/In figures: USD 100\.00/);
+assert.match(N.nativeSchedule0550(spareView,'A2').pages[0].values.A2_6_9,/USD 75\.00/);
+assert.match(N.nativeExhibitHtml0550(spareView,'C2'),/USD 100\.00.*CIF\/FOB allocation OPEN/);
+assert.match(N.nativeExhibitHtml0550(spareView,'C3'),/USD 75\.00.*CIF\/FOB allocation OPEN/);
+assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
+const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
+assert.match(N.nativeSchedule0550(thbView,'A1','THB').pages[0].values.A1_6_7,/THB 2,400\.00/);
+assert.equal(N.nativeSchedule0550({...spareView,workingPreview:false},'A1').pages[0].values.A1_6_7,'','Reviewed/frozen A1 omits the draft Option reference');
 const licenceId='REQ-MR-ACT-B8-D05',licence={...b,lineId:licenceId,schedule:'A1',summary:'OTHER',treatment:'BASE',amount:100,line:{...b.line,id:licenceId,selected:true,customerTHB:3000,costTHB:2777}};
 const licenceView={...view,workingPreview:true,bindings:[licence],baseAssigned:100};
 const licencePage=N.nativeSchedule0550(licenceView,'A1').pages[0].values;

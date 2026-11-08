@@ -15,10 +15,15 @@ export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
 const prefix='BID WORKING ESTIMATE / '+BID_COMPLETION_VERSION_0550;
+const spareBudgetRates = new Map([
+ ['B5-D01',0.02], ['B5-D02',0.01], ['B5-D03',0.01],
+ ['C3-D02',0.02], ['C3-D03',0.01],
+]);
+export const spareBudgetRate0550=lineId=>spareBudgetRates.get(lineId.replace(/^REQ-MR-ACT-/,''));
 const mgwDependentEstimateIds=new Set([
  'REQ-MR-ACT-B2-D01','REQ-MR-ACT-B2-D02','REQ-MR-ACT-B2-D04','REQ-MR-ACT-B3-D01',
- 'LINE-BID-OEM-TRAINING-TRAVEL-0550','REQ-MR-ACT-B5-D01','REQ-MR-ACT-B5-D02','REQ-MR-ACT-B5-D03',
- 'REQ-MR-ACT-B9-D01','REQ-MR-ACT-C2-D03','REQ-MR-ACT-C3-D02','REQ-MR-ACT-C3-D03','REQ-MR-WARRANTY',
+ 'LINE-BID-OEM-TRAINING-TRAVEL-0550','REQ-MR-ACT-B9-D01','REQ-MR-ACT-C2-D03','REQ-MR-WARRANTY',
+ ...[...spareBudgetRates.keys()].map(code=>'REQ-MR-ACT-'+code),
 ]);
 export function mgwDependentEstimateOpen0550(data,line){
  if(!mgwReplacementActive0550(data)||!mgwDependentEstimateIds.has(line.id))return false;
@@ -452,9 +457,9 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  }
  reference('B3-D05',['LINE-TSI-BUDGET-AIRFARE','REQ-MR-ACT-B4-D08','LINE-TSI-BUDGET-PERDIEM','LINE-TSI-BUDGET-GROUND'],'TSI trainer travel is included in the versioned shared trip pool, whose basis expressly includes operation/maintenance training. Additional OEM travel is covered by a separate allowance below, not assumed included in this pool.');
  // Spare provisions are budgets, not fabricated itemized/OEM-approved lists.
- estimate('B5-D01','THB',supplyCost*0.02,'Startup spare provision2% of selected PartA procurement cost. Explicit monetary allowance pending OEM itemized recommendation; not an approved quantity list and not PartC long-term spares.');
- estimate('B5-D02','THB',supplyCost*0.01,'Precommissioning spare provision1% of selected PartA procurement cost; separate consumable/testing loss pool, no item from startup provision recharged. Estimated allowance, not an OEM quote.');
- estimate('B5-D03','THB',supplyCost*0.01,'Commissioning spare provision1% of selected PartA procurement cost; separate cutover/startup event pool. Before procurement, replace provision by itemized vendor rates and deduct all proven package inclusions.');
+ estimate('B5-D01','THB',supplyCost*spareBudgetRates.get('B5-D01'),'Startup spare provision2% of selected PartA procurement cost. Explicit monetary allowance pending OEM itemized recommendation; not an approved quantity list and not PartC long-term spares.');
+ estimate('B5-D02','THB',supplyCost*spareBudgetRates.get('B5-D02'),'Precommissioning spare provision1% of selected PartA procurement cost; separate consumable/testing loss pool, no item from startup provision recharged. Estimated allowance, not an OEM quote.');
+ estimate('B5-D03','THB',supplyCost*spareBudgetRates.get('B5-D03'),'Commissioning spare provision1% of selected PartA procurement cost; separate cutover/startup event pool. Before procurement, replace provision by itemized vendor rates and deduct all proven package inclusions.');
  estimate('B6-D01','THB',5*75000,'Special-tool allowance5 families (RF, FO, network, NDB, mechanical/site) × budget THB75000/family. Explicit estimate; excludes purchased test equipment, calibration, software and tools already in equipment packages.');
  estimate('B6-D02','THB',100000,'Supplementary proprietary/software licence provision THB100000, excluding INTRON-X service tool already described in the selected INDUSTRONIC package. Budget estimate for unconfirmed additional licences; not evidence of licence entitlement.');
  estimate('B6-D03','THB',3*10*7500,'Test equipment rental/adapters:3 campaigns ×10 days × estimated THB7500/day. Rental, not purchase; excludes special tools above and instruments provided by existing OEM packages.');
@@ -477,8 +482,8 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  set('REQ-MR-ACT-C2-D02',{quantity:1,unit:'Lot',currency:'USD',manualCost:null,sellRate:null,offerId:spare[0].id,vendorId:spare[0].vendorId,...goods},'QUOTED','Proposed capital-spare option: one original CERAGON spare package containing2ODUs and source-listed accessories. This quote is not an OEM-certified ten-year complete spare list.',[spare[0].id]);
  estimate('C2-D03','THB',nonMicrowave*0.06,'Ten-year capital-spare OPTION provision6% of selected non-microwave PartA procurement cost. Microwave is excluded from this percentage because its quoted spare package is a separate owner. Explicit allowance, not an itemized/approved capital-spare list.');
  reference('C3-D01',['REQ-MR-ACT-C3-D02','REQ-MR-ACT-C3-D03'],'Two-year spare-list/summary is non-additive; the consumable and routine-replacement provisions below are distinct from capital spares. Final OEM list remains a deliverable.');
- estimate('C3-D02','THB',supplyCost*0.02,'Two-year normal-operation consumable OPTION provision2% of selected PartA procurement cost. Consumables only; no capital replacement assemblies or commissioning consumption are included again. Estimate pending OEM list.');
- estimate('C3-D03','THB',supplyCost*0.01,'Two-year routine-replacement OPTION provision1% of selected PartA procurement cost. Excludes consumables above and ten-year capital assemblies. Estimate pending itemized OEM recommendations.');
+ estimate('C3-D02','THB',supplyCost*spareBudgetRates.get('C3-D02'),'Two-year normal-operation consumable OPTION provision2% of selected PartA procurement cost. Consumables only; no capital replacement assemblies or commissioning consumption are included again. Estimate pending OEM list.');
+ estimate('C3-D03','THB',supplyCost*spareBudgetRates.get('C3-D03'),'Two-year routine-replacement OPTION provision1% of selected PartA procurement cost. Excludes consumables above and ten-year capital assemblies. Estimate pending itemized OEM recommendations.');
  set('REQ-MR-WARRANTY',{quantity:1,unit:'Lot',currency:'THB',manualCost:roundMoney0550(supplyCost*0.0075),sellMode:'DIRECT',sellRate:roundMoney0550(supplyCost*0.0075),marginPct:null,primePct:0},'ESTIMATE','Residual warranty cash reserve0.75% of selected PartA procurement cost, excluding existing90-day support labour and pass-through OEM warranty. Explicit budget reserve, not a duplicated support campaign or confirmation of warranty compliance.');
  // Estimate internal labour separately from protected selling rates. This does
  // not infer a cost by reversing the selling margin or claim a payroll quote.
