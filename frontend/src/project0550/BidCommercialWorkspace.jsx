@@ -42,6 +42,20 @@ const includedPriceReference=line=>Boolean(line.mrScopeState?.covered||line.bidP
 const workingCountLabel=rows=>`${rows.filter(r=>!companyReference(r)&&!includedPriceReference(r)).length} รายการเจ้าของราคา / ตรวจขอบเขต · ${rows.filter(r=>!companyReference(r)&&includedPriceReference(r)).length} อ้างอิงราคาไม่บวกซ้ำ`;
 const blankLine=()=>({id:"",systemToken:"COMMON",wbs:"A",description:"",scopeKey:"",tagRef:"",requirementRef:"",sourceRef:"",vendorId:"",offerId:"",calculationId:"",resultKey:"value",quantity:null,unit:"Lot",currency:"THB",manualCost:null,sellMode:"DIRECT",sellRate:null,markupPct:null,marginPct:null,primePct:null,selected:true});
 const wbsOptions=BID_WBS.map(code=>[code,code+" · "+(code==="A"?"Equipment":[...BUDGETARY_ESTIMATE.partB,...BUDGETARY_ESTIMATE.partC].find(r=>r.code===code)?.description||code)]);
+function B5Preparation0550({lines,initialSystem,onNew}){
+ const [system,setSystem]=useState(SYSTEMS[0].token);
+ useEffect(()=>{if(SYSTEMS.some(s=>s.token===initialSystem))setSystem(initialSystem);},[initialSystem]);
+ const selected=lines.filter(line=>line.selected&&line.systemToken===system&&!includedPriceReference(line));
+ return <section aria-label="Prepare B5 by system">
+  <h4>เตรียมอะไหล่ C2 · {SYSTEMS.length} ระบบ</h4>
+  <Select label="ระบบสำหรับเตรียม Working B5" value={system} onChange={setSystem} options={SYSTEMS.map(s=>[s.token,s.token+' · '+s.name])}/>
+  <p>เลือกระบบและช่วงงานเพื่อเปิดร่าง B5 แล้วกรอกชื่ออะไหล่ หลักฐาน จำนวนและราคาต่อหน่วย ระบุ Part No. และ Main Equipment No. ใน 11.M</p>
+  <div className="p55-review-toolbar">{COMMISSIONING_PHASES_0550.map(phase=>{
+   const count=selected.filter(line=>commissioningPhase0550(line)===phase.id).length;
+   return <div key={phase.id}><button type="button" onClick={()=>onNew({systemToken:system,wbs:'B5',customerRowCode:'B5',commissioningPhase:phase.id,unit:'Pc',requirementRef:'MM-ASK-1A-APF-TEL-MR-0001 B1 Appendix 10 / STD TEL-001 §7.7.1'})}>เตรียม {phase.title}</button><small>{count?count+' รายการ Working ที่เลือก':'OPEN · รอรายการ Working'}</small></div>;
+  })}</div>
+ </section>;
+}
 function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  // Retain the unsaved editor value when the Official/History context unmounts
  // this form, without propagating every keystroke into the large parent view.
@@ -147,7 +161,7 @@ const mrProposalRank0550=row=>{
 const partAProposalRows0550=CUSTOMER_FORM_0550.rows.filter(row=>row.part==="A")
  .sort((a,b)=>mrProposalRank0550(a)-mrProposalRank0550(b));
 
-function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew,onNavigate,onOpenSource}){
+function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew,onNavigate,onOpenSource,preparationSystem}){
  const r11Price=model.lines.find(line=>line.id===CERAGON_LINK_OWNER_0550&&line.selected&&line.offerId===CERAGON_R11_0550);
  const provisional=Boolean(model.pricingBasis);
  const supplierSources=useMemo(()=>supplierCostProjection0550(data),[data]);
@@ -186,6 +200,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
  {code==='TEL-LAN'&&<LanCusStandards0550 data={data} onNavigate={onNavigate}/>}
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code,...(code==='B5'?{customerRowCode:'B5'}:{})})}>เตรียมรายการใน {code}</button>
+ {code==='B5'&&<B5Preparation0550 lines={pricing} initialSystem={preparationSystem} onNew={onNew}/>}
  <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=dmr&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
  const r11Owner=dmr&&r===r11Price;
  const showR11Price=r11Owner&&(provisional||r.reviewState==="REVIEWED_WORKING");
@@ -283,7 +298,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <p>ลำดับงานใน 10.2: อ่านข้อกำหนดและ System Particular → วิเคราะห์ใน WP.1–WP.8 → เลือกรายการ A/B/C → เปิดรายละเอียดเพื่อแก้ไขและทบทวนราคา</p>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget} navigationSystem={navigationSystem}/>
- <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
+ <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
  <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module>

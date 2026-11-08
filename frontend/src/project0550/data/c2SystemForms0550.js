@@ -1,4 +1,4 @@
-import {COMMISSIONING_PHASES_0550} from './commissioningSparePhases0550';
+import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './commissioningSparePhases0550';
 
 const legacyProjectLots=new Set(COMMISSIONING_PHASES_0550.map(phase=>phase.legacyId));
 const knownKey=value=>{
@@ -28,5 +28,9 @@ export function c2SystemGroups0550(view){
   if(!groups.has(token))groups.set(token,{token,name:token,rows:[]});
   groups.get(token).rows.push(row);
  }
- return [...groups.values()].filter(group=>!view.c2SystemToken||group.token===view.c2SystemToken);
+ return [...groups.values()].filter(group=>!view.c2SystemToken||group.token===view.c2SystemToken).map(group=>{
+  const phases=new Set(group.rows.map(row=>row.line&&commissioningPhase0550(row.line)));
+  const pendingPhases=group.token==='COMMON'?[]:COMMISSIONING_PHASES_0550.filter(phase=>!phases.has(phase.id));
+  return {...group,pendingPhases};
+ });
 }

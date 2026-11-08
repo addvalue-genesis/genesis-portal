@@ -114,6 +114,18 @@ const {bidVolumeSheets0550}=require(root+'/project0550/exportBidVolumes0550.js')
 const c2Sheets=bidVolumeSheets0550(c2,'I').filter(sheet=>sheet.name.startsWith('C2 '));
 assert.deepEqual(c2Sheets.map(s=>s.name),[...c2Systems.map(s=>'C2 '+s.token),'C2 COMMON']);
 assert.equal(c2Sheets.find(s=>s.name==='C2 TEL-DMR').rows.length,2);
+const blankC2={...c2,c2Systems:D.SYSTEMS,scheduleRows:id=>id==='C2'?[]:view.scheduleRows(id)};
+const preparedC2=N.nativeSchedule0550(blankC2,'C2');
+const phaseLabels=['Pre-commissioning spares','Commissioning spares','Start-up spares'];
+assert.equal(preparedC2.pages.length,19);
+for(const page of preparedC2.pages){
+ assert.deepEqual([4,5,6].map(row=>page.values['C2_'+row+'_0']),phaseLabels);
+ assert([4,5,6].every(row=>[1,4,9,10,11,12].every(col=>page.values['C2_'+row+'_'+col]==='OPEN')));
+}
+assert(bidVolumeSheets0550(blankC2,'I').filter(s=>s.name.startsWith('C2 ')).every(s=>s.rows.length===3&&s.rows.every(r=>r[5]==='OPEN'&&r[12]==='OPEN')));
+assert.equal(N.nativeExhibitProblems0550(blankC2,'C2').length,0);
+assert(N.nativeSchedule0550(view,'C2').html.includes('SYNTHETIC C2 equipment/service'));
+assert.doesNotMatch(N.nativeSchedule0550(view,'C2').html,/Pre-commissioning spares/);
 assert.equal(N.nativeSchedule0550(c2Lan,'A1').pages[0].values.A1_5_6,'20.00','Filtering a C2 sheet preserves the A1 total');
 const fob={...view,scheduleRows:id=>id==='C5'?[{...b,deliveryTerm:'FOB Shanghai'}]:view.scheduleRows(id)},fobPage=N.nativeSchedule0550(fob,'C5').pages[0];assert.equal(fobPage.values.C5_2_4,'');assert.equal(fobPage.values.C5_2_5,'5.00');assert.equal(fobPage.values.C5_2_6,'');assert.equal(fobPage.values.C5_2_7,'5.00');
 const unknown={...view,scheduleRows:id=>id==='C5'?[{...b,deliveryTerm:'TBC'}]:view.scheduleRows(id)};assert(N.nativeSchedule0550(unknown,'C5').issues.length);assert.equal(N.nativeSchedule0550(unknown,'C5').pages[0].values.C5_2_4,'OPEN');

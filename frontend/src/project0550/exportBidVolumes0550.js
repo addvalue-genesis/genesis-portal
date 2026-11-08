@@ -26,7 +26,12 @@ export function scheduleTable0550(view,id){
 export function bidVolumeSheets0550(view,volume){
  if(volume==='I')return [{name:'Cover',heads:['Document','Response'],rows:[['Document No.',view.proposal.documentNo||'OPEN'],['Revision',view.proposal.revision],['Power of Attorney / Undertaking',view.getRecord('I.cover').content||'OPEN']]},...SCHEDULES_0550.flatMap(s=>{
   const note=view.getRecord('I.'+s.id).content||(s.id==='C1'&&view.c1LayoutVersion===C1_APPENDIX_LAYOUT_0550?'':'OPEN — response / applicability not reviewed');
-  if(s.id==='C2'&&view.c2Systems)return c2SystemGroups0550(view).map(group=>({name:'C2 '+group.token,...scheduleTable0550({...view,scheduleRows:()=>group.rows},'C2'),note:group.name+' / '+note}));
+  if(s.id==='C2'&&view.c2Systems)return c2SystemGroups0550(view).map(group=>{
+   const table=scheduleTable0550({...view,scheduleRows:()=>group.rows},'C2');
+   const rows=table.rows.length?table.rows:group.pendingPhases.map(phase=>table.heads.map((_,i)=>i===1?phase.title+' spares':'OPEN'));
+   const pending=group.pendingPhases.length?' / Awaiting Working B5: '+group.pendingPhases.map(phase=>phase.title).join(', '):'';
+   return {name:'C2 '+group.token,heads:table.heads,rows,note:group.name+' / '+note+pending};
+  });
   return [{name:'Schedule '+s.id,...scheduleTable0550(view,s.id),note}];
  })];
  if(volume==='VDRL')return [{name:'VDRL',heads:['Document No.','Title','System','Submission phase','Invitation sections','Owner','Due date','Deliverable reference','Review'],rows:view.vdrl.map(r=>[r.documentNo,r.title,r.systemToken,r.phase,r.sectionIds.join(', '),r.owner,r.dueOn,r.deliverableRef,r.state])}];

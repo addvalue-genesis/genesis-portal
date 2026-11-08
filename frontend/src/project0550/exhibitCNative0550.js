@@ -103,11 +103,18 @@ function nativePages(view,id,currency='USD'){
  if(['C2','C3','C4'].includes(id)){
   const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows}];
   for(const system of systems){
+   let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
     const v=blankValues(id);set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{const r=i+4;[b.line.description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));prices(v,r,9,b);});
-    add(v,main+(pi?' / Continuation '+(pi+1):''),system.token?{systemToken:system.token,systemName:system.name,spareRows:group}:undefined);
+    const pendingPhases=firstPage?system.pendingPhases||[]:[];
+    if(!system.rows.length)pendingPhases.forEach((phase,i)=>{
+     set(v,i+4,0,phase.title+' spares');
+     for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
+    });
+    add(v,main+(pi?' / Continuation '+(pi+1):''),system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:undefined);
+    firstPage=false;
    });
   }
  }
@@ -152,6 +159,7 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
  }
+ if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');

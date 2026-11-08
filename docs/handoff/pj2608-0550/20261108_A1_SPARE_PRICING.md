@@ -1,5 +1,15 @@
 # A1 commissioning and operating spare pricing
 
+## Preparation for all 19 systems
+
+An empty draft C2 system sheet now shows Pre-commissioning, Commissioning and Start-up preparation rows with OPEN part, quantity, commercial and logistics cells. A system with actual allocations retains its native Main Equipment forms and lists the phases awaiting B5. Draft Word, HTML/PDF and Excel use the same preparation basis. COMMON continues to represent existing shared allocations. The preparation slots are presentation only and never enter Working, 11.M, A1 totals or frozen issue data.
+
+From 11.C2, `เตรียมรายการ Working B5` opens the existing B5 group with the chosen system. The B5 preparation picker supports all 19 systems and three phases. Each action uses the existing Working editor, prefilling system, phase, B5 customer row, piece unit and the general CUS reference. Actual scope, Part No., quantity, price and equipment allocation still need evidence and entry. No new module, automatic save or manufactured cost owner is introduced. ADR 5, 6 and 10–12 apply.
+
+The preparation is integrated on top of `96fa2a3`. It retains its C2 Project Lot overlap warning and both OEM quantity modes. DIRECT uses the documented requirement and reports A × B separately. RATIO selects B or A × B according to the OEM source, rounds up the number of groups before multiplying by spares per group, then deducts confirmed included parts. C2 displays the ratio basis and required quantity for linked calculations. No OEM ratio is assumed for prepared phases. For example, 21 units at two spares per group of ten gives six required, or five extra when one is included.
+
+Native Exhibit, controlled release, Working Schedules and production webpack passed. Native regression checks all 19 empty system forms, all three OPEN rows per form and Excel, the unchanged A1 roll-up and historical outputs. Isolated Chromium verifies OPEN Word export, missing phases for an allocated system and C2 → B5 → editor with the selected system/phase, blank quantity/cost and unchanged saved B5 rows. The owner's Windows workspace was outside the test.
+
 ## Draft C2 forms by system
 
 11.C2 and 11.P preview use the existing 19 system tokens and canonical C2 allocations. The selector opens one system at a time and also offers all systems. Each system has its own draft form set. The native Exhibit C rule still starts a separate form for each Main Equipment No., with continuation sheets for overflow. Systems awaiting allocations show an OPEN form. Existing shared owners appear once under COMMON.

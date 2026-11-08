@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [C2 forms by system, CUS quantity basis and Working LAN review](20261108_A1_SPARE_PRICING.md). 11.C2 can open or export a draft form set per system. Each set retains the native Main Equipment subdivision. A1 still reads the canonical B5 allocations and shows the separate C3 Option reference.
+Latest A1 spare pricing: [C2 and B5 preparation for all systems](20261108_A1_SPARE_PRICING.md). 11.C2 has draft forms by system and three OPEN preparation phases where rows are pending. The existing B5 editor can start a draft for any system and phase. A1 still reads the canonical B5 allocations and shows the separate C3 Option reference.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 
