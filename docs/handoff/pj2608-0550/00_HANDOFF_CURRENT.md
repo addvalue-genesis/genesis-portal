@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [11.A1 lines 4–5 and C2/C3](20261108_A1_SPARE_PRICING.md). Working Preview refreshes the existing spare allowances against the known current Part A cost and references C3 Option pricing in A1 without adding it to Base.
+Latest A1 spare pricing: [CUS commissioning-spare basis and A1 rows 4–5](20261108_A1_SPARE_PRICING.md). Live C2 uses the existing Working quantity and unit-cost path under STD §7.7.1 and MR Appendix 10. Earlier untouched C2 allowances reopen. A1 references C3 Option pricing separately from Base.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 

@@ -15,6 +15,9 @@ export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
 const prefix='BID WORKING ESTIMATE / '+BID_COMPLETION_VERSION_0550;
+const legacyCommissioningSpareIds=new Set(['REQ-MR-ACT-B5-D01','REQ-MR-ACT-B5-D02','REQ-MR-ACT-B5-D03']);
+// Keep the historic rates for frozen issue verification. Live preparation
+// removes the generated commissioning allowance before deriving prices.
 const spareBudgetRates = new Map([
  ['B5-D01',0.02], ['B5-D02',0.01], ['B5-D03',0.01],
  ['C3-D02',0.02], ['C3-D03',0.01],
@@ -355,10 +358,28 @@ export function reconcileTowerTenderScope0550(data){
  if(!receiptChanged&&lines.every((line,i)=>line===data.lines[i]))return data;
  return {...data,lines,...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{})};
 }
+function retireCommissioningSpareEstimates0550(data,receipt){
+ const retired=new Set();
+ const lines=data.lines.map(line=>{
+  if(!legacyCommissioningSpareIds.has(line.id))return line;
+  const row=receipt.rows.find(r=>r.lineId===line.id);
+  const {officialReview,...working}=line;
+  if(row?.kind!=='ESTIMATE'||row.inputKey!==lineKey(data,working))return line;
+  retired.add(line.id);
+  return {...line,quantity:null,manualCost:null,sellRate:null,
+   sourceRef:line.requirementRef+' / MR Rev.B1 Appendix 10 / 10008-STD-6-TEL-001 §7.7.1',
+   customerRemark:'OPEN: OEM part number, required quantity and quoted unit price. Reconcile items included in the selected equipment package.'};
+ });
+ if(!retired.size)return data;
+ const bidCompletion={...receipt,rows:receipt.rows.filter(r=>!retired.has(r.lineId))};
+ return {...data,lines,repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion}};
+}
+
 export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(today<'2026-11-04')return data;
  data=reconcileCeragonR11(data);
- if(data.repositoryBasisImport?.bidCompletion?.version===BID_COMPLETION_VERSION_0550)return prepareCusQuantityPricing0550(data,policies,today);
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ if(receipt?.version===BID_COMPLETION_VERSION_0550)return prepareCusQuantityPricing0550(retireCommissioningSpareEstimates0550(data,receipt),policies,today);
  // Wait for the actual project evidence. A repository seed is not the user's DATA.
  const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
  const currentMR=sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)),mr=currentMR.length===1?currentMR[0]:null;
@@ -457,9 +478,6 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  }
  reference('B3-D05',['LINE-TSI-BUDGET-AIRFARE','REQ-MR-ACT-B4-D08','LINE-TSI-BUDGET-PERDIEM','LINE-TSI-BUDGET-GROUND'],'TSI trainer travel is included in the versioned shared trip pool, whose basis expressly includes operation/maintenance training. Additional OEM travel is covered by a separate allowance below, not assumed included in this pool.');
  // Spare provisions are budgets, not fabricated itemized/OEM-approved lists.
- estimate('B5-D01','THB',supplyCost*spareBudgetRates.get('B5-D01'),'Startup spare provision2% of selected PartA procurement cost. Explicit monetary allowance pending OEM itemized recommendation; not an approved quantity list and not PartC long-term spares.');
- estimate('B5-D02','THB',supplyCost*spareBudgetRates.get('B5-D02'),'Precommissioning spare provision1% of selected PartA procurement cost; separate consumable/testing loss pool, no item from startup provision recharged. Estimated allowance, not an OEM quote.');
- estimate('B5-D03','THB',supplyCost*spareBudgetRates.get('B5-D03'),'Commissioning spare provision1% of selected PartA procurement cost; separate cutover/startup event pool. Before procurement, replace provision by itemized vendor rates and deduct all proven package inclusions.');
  estimate('B6-D01','THB',5*75000,'Special-tool allowance5 families (RF, FO, network, NDB, mechanical/site) × budget THB75000/family. Explicit estimate; excludes purchased test equipment, calibration, software and tools already in equipment packages.');
  estimate('B6-D02','THB',100000,'Supplementary proprietary/software licence provision THB100000, excluding INTRON-X service tool already described in the selected INDUSTRONIC package. Budget estimate for unconfirmed additional licences; not evidence of licence entitlement.');
  estimate('B6-D03','THB',3*10*7500,'Test equipment rental/adapters:3 campaigns ×10 days × estimated THB7500/day. Rental, not purchase; excludes special tools above and instruments provided by existing OEM packages.');

@@ -40,8 +40,10 @@ if(process.argv[2]){
  assert.equal(C.prepareBidCompletion0550(prepared,options(prepared),today),prepared,'Repeated preparation is the exact same object');assert.equal(C.bidCompletionBasisChanged0550(prepared),false);
  for(const key of Object.keys(data).filter(k=>!['lines','repositoryBasisImport'].includes(k)))assert.equal(hash(prepared[key]),hash(data[key]),'Original quote/FX/source/calculation/engineering/history preserved / '+key);
  const model=B.deriveBidWorkspace(prepared,tokens,today),result=P.deriveBidProcess0550(prepared,model,D.SYSTEMS),receipt=prepared.repositoryBasisImport.bidCompletion;
- for(const part of result.parts){const pending=part.part==='A'?2:0;assert.equal(part.pending,pending,part.part+' outstanding price owners');assert.equal(part.missingCost,pending,part.part+' outstanding costs');}
- assert.deepEqual(model.provisional.requirementGaps.map(g=>g.id).sort(),['MR-B1-11-ACP-06','MR-B1-11-APF-08']);assert.equal(model.provisional.unmapped.length,0);
+ const commissioningIds=['MR-ACT-B5-D01','MR-ACT-B5-D02','MR-ACT-B5-D03'];
+ for(const part of result.parts){const pending=part.part==='A'?2:part.part==='B'?commissioningIds.length:0;assert.equal(part.pending,pending,part.part+' outstanding price owners');assert.equal(part.missingCost,pending,part.part+' outstanding costs');}
+ assert.deepEqual(model.provisional.requirementGaps.map(g=>g.id).sort(),[...commissioningIds,'MR-B1-11-ACP-06','MR-B1-11-APF-08']);assert.equal(model.provisional.unmapped.length,0);
+ assert(commissioningIds.every(id=>!receipt.rows.some(row=>row.lineId==='REQ-'+id)),'CUS commissioning spares must not be seeded with a budget percentage');
  assert.equal(model.provisional.baseTHB,null);assert.equal(model.provisional.baseUSD,null);assert(Number.isFinite(model.provisional.knownTHB));assert(Number.isFinite(model.provisional.optionsUSD));assert.equal(model.official.baseUSD,null,'Budget preparation does not approve engineering or issue');
  // Every previously priced customer amount is retained, including protected sell
  // rates. Only missing internal cost may receive its labelled planning estimate.
