@@ -118,7 +118,8 @@ const {amount}=require(root+'/project0550/BidControls.jsx');
 const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{}}));
 assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
-assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
+assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('DRAFT / NOT ISSUED'));
+assert(!releaseHtml.includes('HOLD / NOT ISSUED'));assert(releaseHtml.includes('ออกและตรวจเอกสารร่าง Schedule A และ C1–C8'));
 assert(!releaseHtml.includes('Part A Full Bid inventory'),'The duplicate inventory is absent from the Release preview');
 // Expand the PAGA detail in the SSR harness as the user does in REL-04.
 const pagaLine=m.provisional.lines.find(l=>l.id==='LINE-LEGACY-TEL-PAGA-1');

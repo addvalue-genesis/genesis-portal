@@ -28,7 +28,7 @@ export function ReleaseIssueControls0550({provisional=false,onNavigate,onOpenSou
   <p>Frozen exports เก็บไฟล์พร้อม SHA-256 ก่อนดาวน์โหลด · กรอกผู้บันทึกและเหตุผลในฉบับราคาอ้างอิงก่อน · ไฟล์ที่สร้างจากตารางประวัติไม่ยืนยันว่าเป็นต้นฉบับที่เคยส่ง</p>
   <p role="status">{baseline.message}</p>
   <h3>ตรวจความพร้อม / อนุมัติ / ตรึงฉบับ / หลักฐานการส่ง</h3>
-  <p><strong>{c.state}</strong> · {c.issues.length} ฉบับที่ตรึงแล้ว · {c.transmittals.length} หลักฐานการส่ง · การกรอกชื่อผู้อนุมัติเป็นบันทึกภายใน ไม่ใช่ลายเซ็นหรือการยืนยันตัวตน</p>
+  <p><strong>{c.state==='HOLD'?'ตรวจรายการค้างสำหรับฉบับลูกค้าด้านล่าง':c.state}</strong> · {c.issues.length} ฉบับที่ตรึงแล้ว · {c.transmittals.length} หลักฐานการส่ง · การกรอกชื่อผู้อนุมัติเป็นบันทึกภายใน ไม่ใช่ลายเซ็นหรือการยืนยันตัวตน</p>
   <ReleasePunchList0550 punch={punch} onNavigate={onNavigate} onOpenSource={onOpenSource}/>
   <button type="button" disabled={busy} onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,preparedOn:reviewDate,state:c.state,checks:c.problems,backlog,punchList:{schema:punch.schema,stages:punch.stages,gateRows:punch.gateRows,items:punch.items}},`PJ2608-0550_Release_Review_R${data.revision}.json`)}>Export Internal Release Review / รายการที่ต้องปิด</button>
   <details><summary>บันทึกอนุมัติและตรึงราคาฉบับปัจจุบัน</summary>

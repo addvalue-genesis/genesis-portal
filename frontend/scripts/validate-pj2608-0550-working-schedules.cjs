@@ -152,6 +152,21 @@ try{
  assert.equal(a1.pages[0].values.A1_2_6,line.provisionalCustomerUSD.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));assert(a1.pages[0].values.A1_2_7.includes('1/2 priced; 1 OPEN'));assert(c1.html.includes('KNOWN SUBTOTAL ONLY'));assert(a1.pages[0].values.A1_12_1.includes('In figures: USD OPEN'));assert.equal(pv.baseAssigned,null);assert(!pv.ready);
  const sheets=require(root+'/project0550/exportBidVolumes0550.js').scheduleTable0550(pv,'A1');assert.equal(sheets.rows.find(r=>r[0]==='GOODS')[4],roll.knownUSD);assert(sheets.rows.find(r=>r[0]==='GOODS')[5].includes('KNOWN SUBTOTAL ONLY'));
  const doc=N.buildNativeExhibitDocx0550(pv,'A1');assert(Buffer.from(doc).toString().includes('KNOWN SUBTOTAL ONLY'));assert.equal(saved(partial).baseAssigned,null,'Reviewed path remains strict');assert(!N.nativeSchedule0550(saved(partial),'A1').html.includes('KNOWN SUBTOTAL ONLY'));assert.deepEqual(partial.releaseRegister,frozen);
+ const draft=require(root+'/project0550/releaseScheduleDrafts0550.js');
+ const releaseView=draft.releaseScheduleDraftView0550(partial,derive(partial),D.SYSTEMS,today);
+ const releaseDocs=draft.releaseScheduleChecks0550(releaseView);
+ assert.deepEqual(releaseDocs.map(d=>d.id),['A','C1','C2','C3','C4','C5','C6','C7','C8']);
+ assert(releaseDocs[0].amounts.some(a=>a.treatment==='BASE'&&a.knownUSD>0));
+ assert(N.nativeSchedule0550(releaseView,'A').html.includes('Draft subtotals of priced allocations only'));
+ const completeDraftA=Buffer.from(N.buildNativeExhibitDocx0550({...releaseView,baseAssigned:100,optionsAssigned:75},'A')).toString();
+ const draftAText=completeDraftA.match(/<w:document\b[\s\S]*?<\/w:document>/)[0].replace(/<[^>]+>/g,'');
+ assert.match(draftAText,/United States Dollars 100\.00 .*United States Dollar one hundred only/);
+ assert.match(draftAText,/United States Dollar 75\.00 .*United States Dollar seventy five only/);
+ assert(releaseDocs.find(d=>d.id==='C1').checks.some(check=>check.refs.includes('TEST-OPEN-GOODS')));
+ const openC8={...releaseView,getRecord:id=>id==='I.C8'?{state:'OPEN'}:releaseView.getRecord(id)};
+ assert(draft.releaseScheduleChecks0550(openC8).find(d=>d.id==='C8').checks.some(check=>check.label.includes('Purchaser facilities')));
+ assert(Buffer.from(draft.releaseScheduleArchive0550(releaseDocs)).includes('PJ2608-0550_Schedule-C8_DRAFT.docx'));
+ assert.deepEqual(partial.releaseRegister,frozen);
  const allMissing=require(root+'/project0550/data/scheduleRollup0550.js').scheduleRollup0550([{id:'OPEN',amount:null}]);assert.equal(allMissing.knownUSD,null,'No price is not zero');assert.equal(require(root+'/project0550/data/scheduleRollup0550.js').scheduleRollup0550([{id:'ZERO',amount:0}]).knownUSD,0,'Explicit zero is retained');
  // The existing 11.M grid now explains canonical links and reconciliation.
  const crossBefore=JSON.stringify(partial),pm=derive(partial),sv=saved(partial),cross=P.scheduleCrosswalk0550(partial,pm,sv,pv);

@@ -12,6 +12,7 @@ import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {releasePricePresentation0550} from "./releasePricePresentation0550";
 import {releaseHierarchy0550} from "./releaseHierarchy0550";
+import {ReleaseScheduleDrafts0550} from "./ReleaseScheduleDrafts0550";
 
 const EXPANSION_KEY="GENESIS.PJ2608-0550.release.expanded.v1";
 const loadExpansion=()=>{try{const value=JSON.parse(globalThis.localStorage?.getItem(EXPANSION_KEY)||"{}");return value&&typeof value==="object"&&!Array.isArray(value)?Object.fromEntries(Object.entries(value).slice(0,1000).filter(([key,v])=>key.length<250&&typeof v==="boolean")):{};}catch{return {};}};
@@ -23,6 +24,7 @@ function PriceNotes({note,onSource}){
   {note.known&&<p><strong>{note.known.priced?"ราคาย่อยที่คำนวณได้: "+amount(note.known.amount,"USD"):"ยังไม่มีราคาย่อย USD ที่คำนวณได้"}</strong><small>มีราคา {note.known.priced}/{note.known.count} เจ้าของราคา · ยังไม่ใช่ยอด Lot ครบขอบเขต · ไม่บวกเพิ่มจากรายละเอียด</small></p>}
   {note.native&&<p>ราคา Customer ต้นทาง · PROVISIONAL: <strong>{amount(note.native.amount,note.native.currency)}</strong><small>ยังไม่ใช่ราคา USD ที่พร้อมใช้</small></p>}
   {note.owner&&<button type="button" onClick={()=>onSource(note.owner.sourceModuleId)}>เปิดเจ้าของราคารวม · {note.owner.description}</button>}
+  {note.checks?.length>0&&<div><strong>ประเด็นที่ต้องตรวจ</strong><ul>{note.checks.map(check=><li key={check}>{check}</li>)}</ul></div>}
   {note.reasons?.length>0&&<><p><strong>OPEN:</strong> {note.reasons[0]}</p><details><summary>เหตุผลที่ยังเป็น OPEN ({note.reasons.length})</summary><ul>{note.reasons.map(reason=><li key={reason}>{reason}</li>)}</ul></details></>}
   {note.candidates?.length>0&&<details><summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({note.candidates.length})</summary><p>ยังไม่จัดสรรราคา package นี้เข้าแถว MR — ต้องตรวจขอบเขตและเจ้าของราคาก่อน ไม่แบ่งราคาหรือบวกซ้ำอัตโนมัติ</p>{note.candidates.map(c=><p key={c.id}><button type="button" onClick={()=>onSource(c.sourceModuleId)}>ตรวจ package · {c.description}</button><small>ราคา Customer ต้นทาง · PROVISIONAL: {amount(c.provisionalCustomerNative,c.currency)} · {c.offer?.quoteRef||c.sourceRef}</small></p>)}</details>}
  </div>;
@@ -90,8 +92,9 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
  return <Module id="bid.budget.release" open={open} title={provisional?"REL-04 · ราคาที่เลือก / ประมาณการ — PROVISIONAL / NOT ISSUED":"REL-04 · Official customer form — Review Draft / NOT ISSUED"}>
  {children}
  <div className="p55-review-toolbar"><button type="button" onClick={()=>exportOfficialCustomerXlsx(official)}>{provisional?"Export REL-04 · Provisional Draft XLSX":"Export REL-04 · Official Draft XLSX"}</button><a href={CUSTOMER_FORM_0550.sourceUrl} target="_blank" rel="noopener noreferrer">แบบอ้างอิง 8 คอลัมน์</a></div>
- <p>Working R{official.revision} · USD · HOLD · {provisional?"ใช้ราคาที่เลือกและประมาณการ Working; ยอดเป็นขอบเขตรายการที่มีราคาเท่านั้น":"ใช้ราคา OFF-03 ที่ตรวจทั้งรายการและขอบเขต Customer row แล้ว"} · แถวย่อยรวมอยู่ในยอด Lot จึงไม่บวกซ้ำ · รูปแบบอ้างอิงยังต้องตรวจการใช้กับ Tender รอบนี้</p>
- <div className="p55-release-table-identity" role="region" aria-label="Release table Module ID"><strong>10.7 · รายละเอียดข้อเสนอตาม MR</strong><span>PJ2608-0550 / <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.budget.release"/></span><small>{provisional?"ราคา Working · PROVISIONAL":"ราคา Official · ผ่านทบทวนเท่านั้น"} · USD · HOLD / NOT ISSUED</small>{provisional&&<strong>ราคาที่คำนวณได้ A+B+C: {amount(official.knownUSD,"USD")} / {amount(official.knownTHB,"THB")} · มีราคา {official.selected.filter(l=>Number.isFinite(l.customerUSD)).length}/{official.selected.length} เจ้าของราคา · ยังไม่ใช่ยอดครบโครงการ; Part C แยกจาก Base</strong>}</div>
+ <p>Working R{official.revision} · USD · {provisional?"แสดงราคาและประมาณการที่มี พร้อมสิ่งที่ยังต้องตรวจแยกรายการ":"ใช้ราคา OFF-03 ที่ตรวจทั้งรายการและขอบเขต Customer row แล้ว"} · แถวย่อยรวมอยู่ในยอด Lot จึงไม่บวกซ้ำ</p>
+ <div className="p55-release-table-identity" role="region" aria-label="Release table Module ID"><strong>10.7 · รายละเอียดข้อเสนอตาม MR</strong><span>PJ2608-0550 / <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.budget.release"/></span><small>{provisional?"ราคา Working · PROVISIONAL":"ราคา Official · ผ่านทบทวนเท่านั้น"} · USD · DRAFT / NOT ISSUED</small>{provisional&&<strong>ราคาที่คำนวณได้ A+B+C: {amount(official.knownUSD,"USD")} / {amount(official.knownTHB,"THB")} · มีราคา {official.selected.filter(l=>Number.isFinite(l.customerUSD)).length}/{official.selected.length} เจ้าของราคา · ยังไม่ใช่ยอดครบโครงการ; Part C แยกจาก Base</strong>}</div>
+ <ReleaseScheduleDrafts0550 onNavigate={onNavigate}/>
  <div className="p55-review-toolbar" role="group" aria-label="Release expand collapse"><button type="button" onClick={()=>toggleAll(true)}>+ ขยายทั้งหมด</button><button type="button" onClick={()=>toggleAll(false)}>− หุบทั้งหมด</button><span>เรียงหัวระบบตามตำแหน่งแรกใน MR · ภายในเรียง Appendix / สถานที่ / รายการตามทะเบียน MR · แบบ Excel คงลำดับลูกค้า</span></div>
  <div className="p55-table-wrap"><table className="p55-table p55-customer-form" aria-label="Official customer form"><thead><tr>{CUSTOMER_FORM_0550.columns.map(c=><th key={c}>{c}</th>)}</tr></thead><tbody>{hierarchy.entries.map(r=>{
   const hidden=r.parents.some(key=>!isOpen(key)),rowId=r.moduleId||r.sectionModuleId;

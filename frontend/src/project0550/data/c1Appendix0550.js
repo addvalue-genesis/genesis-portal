@@ -223,14 +223,19 @@ export function c1AppendixHtml0550(view){
 // exports remain byte-identical unless this version is explicitly selected.
 export function c1AppendixWord0550(view){
  const c1=deriveC1Appendix0550(view),legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550,e=escape;
- const p=text=>`<w:p><w:r><w:t xml:space="preserve">${e(text)}</w:t></w:r></w:p>`;
- const row=(values,header=false,span=false)=>`<w:tr><w:trPr>${header?'<w:tblHeader/>':'<w:cantSplit/>'}</w:trPr>${values.map((v,i)=>`<w:tc><w:tcPr>${span&&i===0?'<w:gridSpan w:val="7"/>':''}</w:tcPr>${p(v)}</w:tc>`).join('')}</w:tr>`;
- const headerCell=(text,properties='')=>`<w:tc><w:tcPr>${properties}<w:shd w:fill="EAF2F6"/></w:tcPr>${p(text)}</w:tc>`;
+ const draft=view.workingPreview&&!legacy;
+ const p=(text,cell=false)=>`<w:p>${draft&&cell?'<w:pPr><w:spacing w:before="18" w:after="18" w:line="220" w:lineRule="auto"/></w:pPr>':''}<w:r>${draft&&cell?'<w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>':''}<w:t xml:space="preserve">${e(text)}</w:t></w:r></w:p>`;
+ const row=(values,header=false,span=false)=>`<w:tr><w:trPr>${header?'<w:tblHeader/>':'<w:cantSplit/>'}</w:trPr>${values.map((v,i)=>`<w:tc><w:tcPr>${span&&i===0?'<w:gridSpan w:val="7"/>':''}</w:tcPr>${p(v,true)}</w:tc>`).join('')}</w:tr>`;
+ const note=text=>draft?row([text],false,true):row(['',text,'','','','','']);
+ const headerCell=(text,properties='')=>`<w:tc><w:tcPr>${properties}<w:shd w:fill="EAF2F6"/></w:tcPr>${p(text,true)}</w:tc>`;
  const header='<w:tr><w:trPr><w:tblHeader/></w:trPr>'+['SN','Item Description','Unit','Qty.'].map(t=>headerCell(t,'<w:vMerge w:val="restart"/>')).join('')+headerCell('CIF or FOB (USD or RMB)','<w:gridSpan w:val="2"/>')+headerCell('Notes','<w:vMerge w:val="restart"/>')+'</w:tr><w:tr><w:trPr><w:tblHeader/></w:trPr>'+Array.from({length:4},()=>headerCell('','<w:vMerge/>')).join('')+headerCell('Unit Rates')+headerCell('Total Price')+headerCell('','<w:vMerge/>')+'</w:tr>';
- let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+(legacy?[600,4200,700,700,1100,1100,1600]:[900,3900,700,700,1100,1100,1600]).map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
+ const widths=legacy?[600,4200,700,700,1100,1100,1600]:draft?[1130,5480,710,720,1420,1420,2800]:[900,3900,700,700,1100,1100,1600];
+ let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
-  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=row(['',r.intro,'','','','','']);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—',c.note||'']);});for(const note of r.notes||[])xml+=row(['',note,'','','','','']);}}}
+  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—',c.note||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
   xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount),'']);
  }
- return xml+row(['TOTAL — BASE SCOPE OF SUPPLY','','','','',c1Display0550(c1.amount),''])+'</w:tbl>'+p(view.getRecord('I.C1').content||'')+p('Schedule C1');
+ const priced=draft?scheduleRollup0550(view.scheduleRows('C1')):null;
+ const subtotal=priced?.priced?p('Priced items subtotal only: USD '+c1Display0550(priced.knownUSD)+' ('+priced.priced+'/'+priced.count+' owners priced).'):'';
+ return xml+row(['TOTAL — BASE SCOPE OF SUPPLY','','','','',c1Display0550(c1.amount),''])+'</w:tbl>'+subtotal+p(view.getRecord('I.C1').content||'')+p('Schedule C1');
 }

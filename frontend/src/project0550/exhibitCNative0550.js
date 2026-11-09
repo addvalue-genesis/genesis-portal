@@ -168,8 +168,17 @@ function renderPage(view,page,format,currency='USD'){
   result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
  if(page.id==='A'){
-  const vals=['OPEN','OPEN',number(view.baseAssigned),words(view.baseAssigned,currency),number(view.optionsAssigned),words(view.optionsAssigned,currency)];let i=0;
-  result=result.replace(/_{5,}/g,()=>escape(vals[i++]||'OPEN'));
+  const draftWords=amount=>words(amount,currency).replace(/^(?:United States Dollars|Thai Baht) /,'').replace(/ only$/,'');
+  if(view.workingPreview&&format==='xml'){
+   // Word splits two of the native blanks across adjacent runs.
+   result=result.replace(/_{5,}(?:<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t\b[^>]*>_{5,})+/g,'_____');
+  }
+  const wording=view.workingPreview?draftWords:amount=>words(amount,currency);
+  const vals=['OPEN','OPEN',number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
+  result=result.replace(/_{5,}/g,(match,offset)=>escape(vals[i++]||'OPEN')+
+   (view.workingPreview&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
+  if(view.workingPreview)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
+   .replace(/\b(OPEN)only\b/g,'$1 only');
  }
  if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
   const note='[1] Component quantities follow the MGW package basis stored in Working; MR reconciliation remains pending. Included components form part of their parent package amount and are not charged again.';
@@ -178,7 +187,17 @@ function renderPage(view,page,format,currency='USD'){
  }
  let partialNote='';
  if(view.workingPreview){
-  if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id));
+  if(page.id==='A'){
+   const available=['BASE','OPTION'].map(treatment=>{
+    const rollup=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===treatment));
+    return treatment+': '+(rollup.priced?currency+' '+number(rollup.knownUSD)+' ('+rollup.priced+'/'+rollup.count+' allocated owners priced)':'OPEN');
+   });
+   partialNote='Draft subtotals of priced allocations only. '+available.join(' / ')+'. Review A1, A2 and the Schedule allocations for remaining scope.';
+  }
+  if(/^C[2-8]$/.test(page.id)&&!page.systemToken&&!view.scheduleRows(page.id).length){
+   partialNote='OPEN. Confirm applicable scope and allocate the supporting Working items.';
+  }
+  if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id))||partialNote;
   if(page.priceRows&&(page.id!=='C2'||!page.draftPriceRows?.length)){
    const rows=page.priceRows.filter(b=>!b.nonAdditive&&b.treatment!=='CALLOFF');
    if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
@@ -230,13 +249,22 @@ export function nativeExhibitHtml0550(view,only,includeCover=false){
 }
 export function buildNativeExhibitDocx0550(view,only){
  if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
- const blocks=Object.fromEntries(Object.keys(template.schedules).map(id=>[id,nativePages(view,id).pages.map(page=>renderPage(view,page,'xml')).join('')]));
- if(isC1Appendix0550(view))blocks.C1=c1AppendixWord0550(view);
- let xml=template.document.replace(/\{\{SCHEDULE_(\w+)_XML\}\}/g,(_,id)=>blocks[id]);
+ const ids=only?[only]:Object.keys(template.schedules);
+ const trailingBreak=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/;
+ const trailingParagraph=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<\/w:p>$/;
+ const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
+  ?c1AppendixWord0550(view):nativePages(view,id).pages.map((page,index)=>{
+   const xml=renderPage(view,page,'xml');
+   if(!only||!view.workingPreview)return xml;
+   const content=xml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>
+    /<w:t\b[^>]*>\s*[^\s<]|<w:(?:drawing|object|br|sectPr)\b/.test(paragraph)?paragraph:'');
+   return index?content.replace(/^(<w:p\b[^>]*><w:pPr>(?:<w:keepNext\/>)?)/,'$1<w:pageBreakBefore/>'):content;
+  }).join('')]));
+ let xml=template.document.replace(/\{\{SCHEDULE_(\w+)_XML\}\}/g,(_,id)=>blocks[id]??'');
  if(only){
   // Retain the native final landscape section, logo relationships and styles.
   const start=xml.indexOf('<w:body>')+8,end=xml.lastIndexOf('<w:sectPr');
-  const block=only==='C2'&&view.c2Systems?blocks[only].replace(/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/,''):blocks[only];
+  const block=only==='C2'&&view.c2Systems?blocks[only].replace(trailingBreak,''):blocks[only];
   xml=xml.slice(0,start)+block+xml.slice(end);
  }
  if(view.workingPreview)xml=xml.replace(/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/g,table=>{
