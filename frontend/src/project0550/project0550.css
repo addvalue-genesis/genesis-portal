@@ -1983,12 +1983,29 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-schematic-workspace :is(.p55-bid-module,.p55-bid-content,.p55-table-wrap) { min-width: 0; max-width: 100%; }
 .p55-schematic-quantities .p55-review-toolbar label { display: grid; max-width: 100%; gap: .15rem; }
 .p55-schematic-quantities select { min-width: 0; max-width: 100%; }
-.p55-schematic-quantities .p55-table { table-layout: auto; }
-.p55-schematic-quantities .p55-table thead tr:nth-child(2) th { min-width: 8.5rem; padding: .4rem; }
-.p55-schematic-quantities .p55-table tbody th { min-width: 10rem; text-align: left; }
-.p55-schematic-quantities .p55-table tbody td { vertical-align: top; padding: .2rem; }
-.p55-schematic-quantities .p55-table td button { display: grid; width: 100%; gap: .15rem; padding: .3rem; text-align: left; font-size: .75rem; line-height: 1.35; }
-.p55-schematic-quantities .p55-table td button span { overflow-wrap: anywhere; }
+.p55-bom-filters { margin: .75rem 0; }
+.p55-bom-filters select { padding: .35rem .5rem; border: 1px solid #b8cbdc; border-radius: 4px; }
+.p55-bom-overview .p55-table { min-width: 0; }
+.p55-bom-overview tbody th { text-align: left; }
+.p55-bom-total :is(th,td) { background: #e9f3f8; font-weight: 700; }
+.p55-bom-sites { display: grid; gap: 1rem; margin-top: 1rem; }
+.p55-bom-site { padding: .75rem; border: 1px solid #b8cbdc; border-radius: .45rem; }
+.p55-bom-site h4 { margin: 0 0 .55rem; font-size: 1rem; }
+.p55-schematic-evidence h5 { margin: .15rem 0 .45rem; font-size: .9rem; }
+.p55-schematic-evidence .p55-table { min-width: 0; }
+.p55-schematic-evidence :is(th,td) { vertical-align: top; overflow-wrap: anywhere; }
+.p55-schematic-evidence .p55-bom-count { width: 7.5rem; text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.p55-bom-components,.p55-bom-native-text { margin: .3rem 0; white-space: pre-line; }
+.p55-bom-components { padding-left: 1rem; font-size: .82rem; }
+.p55-bom-components li { margin-bottom: .1rem; }
+.p55-schematic-evidence details summary { cursor: pointer; font-size: .8rem; color: #1b536d; }
+.p55-bom-locations { margin: 1rem 0; padding: .65rem .8rem; border: 1px solid #b8cbdc; border-radius: .45rem; }
+.p55-bom-locations > summary { cursor: pointer; font-weight: 700; }
+.p55-bom-location-grid .p55-table { table-layout: auto; }
+.p55-bom-location-grid .p55-table thead tr:nth-child(2) th { min-width: 8.5rem; padding: .4rem; }
+.p55-bom-location-grid .p55-table tbody th { min-width: 10rem; text-align: left; }
+.p55-bom-location-grid .p55-table tbody td { vertical-align: top; padding: .2rem; }
+.p55-bom-location-grid .p55-table td button { display: grid; width: 100%; gap: .15rem; padding: .3rem; text-align: left; font-size: .75rem; line-height: 1.35; overflow-wrap: anywhere; }
 .p55-schematic-quantities .p55-phi-marker { color: #206453; }
 .p55-schematic-dialog { width: min(70rem, calc(100vw - 2rem)); max-width: none; }
 .p55-schematic-evidence { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
