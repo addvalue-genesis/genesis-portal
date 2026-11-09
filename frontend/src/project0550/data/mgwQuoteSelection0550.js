@@ -116,3 +116,44 @@ export function mgwCurrentRequirementTrace0550(data,requirementId){
  const mr=requirementId.slice('REQDEF-'.length);
  return data.offers.filter(offer=>mgwCurrentMr0550(offer).includes(mr));
 }
+
+// Bidder decision for the APF control-building cabinet in this source revision.
+export const APF_LAN_BID_BASIS_0550='APF-LAN-MR9-MGW-20261110';
+const apfLanMr='MR-B1-13-APF-09';
+const apfLanPricedItems=[
+ ['LAN-APF-9-01','A1-01',1], ['LAN-APF-9-02','A1-01',2],
+ ['LAN-APF-9-04','A1-01',2], ['LAN-APF-9-05','A1-01',1],
+ ['LAN-APF-9-06','A1-01',3], ['LAN-APF-9-07','A1-01',2],
+ ['PABX-APF-9-01','A1-04',1],
+];
+
+export function apfLanBidReference0550(data,prices){
+ if(!mgwReplacementActive0550(data))return null;
+ const parent=data.lines.find(line=>line.id==='REQ-'+apfLanMr);
+ if(!parent?.selected||parent.mrRequirementId!==apfLanMr||parent.systemToken!=='TEL-LAN'||
+  parent.wbs!=='A'||parent.customerRowCode!=='A1-01'||parent.quantity!==1||parent.unit!=='Lot'||
+  parent.responsibility!=='TSI'||!parent.scopeBasis?.trim()||!parent.requirementRef?.trim()||parent.offerId||parent.calculationId||parent.coveredByLineId||parent.mgwDetailGroupId||
+  parent.manualCost!==null||parent.sellRate!==null)return null;
+ const currentOffers=new Map(data.offers.filter(mgwLanPbxFoOffer0550).map(offer=>[mgwCurrentItemKey0550(offer),offer]));
+ const core=currentOffers.get('LAN-APF-9-03');
+ if(!mgwCurrentIncluded0550(core)||core.quoteEvidence.quotedQuantity!==2||core.unit!=='SET')return null;
+ const ownerFor=(key,code,quantity)=>{
+  const offer=currentOffers.get(key);
+  if(!offer||offer.quoteEvidence.classification!=='RATE'||offer.quoteEvidence.quotedQuantity!==quantity)return null;
+  const owners=prices.filter(row=>row.selected&&row.wbs==='A'&&row.offerId===offer.id);
+  const [owner]=owners;
+  return owners.length===1&&owner.customerRowCode===code&&owner.quantity===quantity&&owner.unit===offer.unit&&
+   Number.isFinite(owner.customerUSD)?owner:null;
+ };
+ const owners=apfLanPricedItems.map(args=>ownerFor(...args));
+ const field=ownerFor('PABX-APF-7-01','A1-04',3);
+ if(owners.some(owner=>!owner)||!field)return null;
+ const rackOptics=['LAN-APF-9-04','LAN-APF-9-05'].every(key=>currentOffers.get(key).quoteEvidence.terms?.some(term=>/\bSFP-10G-LR\b/.test(term)));
+ const fieldConverter=currentOffers.get('PABX-APF-7-01').quoteEvidence.terms?.some(term=>/\bTL-SG2105P\b/.test(term));
+ if(!rackOptics||!fieldConverter)return null;
+ return {
+  basisId:APF_LAN_BID_BASIS_0550,kind:'PRICE_REFERENCE',lineId:parent.id,ownerIds:owners.map(owner=>owner.id),
+  offerIds:[core.id,...owners.map(owner=>owner.offerId)],fieldLineId:field.id,
+  basis:'ใช้ชุดเสนอ MGW สำหรับฐานประมูล APF MR 9.0 ตามข้อสรุปผู้จัดทำราคา 10 พ.ย. 2026',
+ };
+}

@@ -1,4 +1,5 @@
 import {bidCompletionReferences0550} from "./bidCompletion0550";
+import {APF_LAN_BID_BASIS_0550,apfLanBidReference0550} from "./mgwQuoteSelection0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroupBasis0550} from "./mgwDetailPricing0550";
 import form from "./customerForm0550.json";
@@ -101,8 +102,15 @@ export function deriveProvisionalPricing(data,calculated){
  const calculatedPrices=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
   calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:r.mrScopeState?.covered?"INCLUDED_IN_OWNER":r.mrScopeState?.scopeReference?r.mrScopeState.scopeReference.label:r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY_SUPPLY":r.mrScopeState?.problems.length||r.satelliteScopeState?.problems.length?"SCOPE OPEN":"PROVISIONAL — รอทบทวน",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ฐานราคาที่เลือกก่อนออกข้อเสนอจริง"]}));
  const references=bidCompletionReferences0550(data,calculatedPrices);
+ const lanReference=apfLanBidReference0550(data,calculatedPrices);
+ if(lanReference)references.set(lanReference.lineId,lanReference);
  for(const r of calculatedPrices)if(r.mrScopeState?.covered&&references.has(r.coveredByLineId))references.set(r.id,{...references.get(r.coveredByLineId),lineId:r.id});
- const lines=calculatedPrices.map(r=>references.has(r.id)?{...r,selected:false,reviewState:"BID_PACKAGE_REFERENCE",bidPriceAllocation:references.get(r.id)}:r);
+ const lines=calculatedPrices.map(r=>{
+  const reference=references.get(r.id);
+  if(!reference)return r;
+  return {...r,selected:false,reviewState:"BID_PACKAGE_REFERENCE",bidPriceAllocation:reference,
+   reviewProblems:reference.basisId===APF_LAN_BID_BASIS_0550?[]:r.reviewProblems};
+ });
  const selected=lines.filter(r=>r.selected),unmapped=selected.filter(r=>!mappingValid(r));
  const pricingGaps=(calculated.requirementGaps||[]).filter(g=>!references.has("REQ-"+g.id));
  const schedule=form.rows.map(t=>{

@@ -164,4 +164,42 @@ assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Screen-only par
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
+// The APF cabinet is a tender scope reference when its exact, selected
+// supplier rows already carry the price. An unselected owner reopens the gap.
+const {deriveProvisionalPricing}=require(root+'/project0550/data/officialPricing0550.js');
+const {APF_LAN_BID_BASIS_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,
+ MGW_CURRENT_SOURCE_HASH_0550,MGW_SUPERSEDED_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+const apfParent={...d.lines.find(line=>line.id==='REQ-MR-B1-13-APF-09')};
+const apfSources=[
+ ['LAN-APF-9-01',1,'Lot','A1-01'],['LAN-APF-9-02',2,'SET','A1-01'],
+ ['LAN-APF-9-03',2,'SET','A1-01'],['LAN-APF-9-04',2,'SET','A1-01'],
+ ['LAN-APF-9-05',1,'SET','A1-01'],['LAN-APF-9-06',3,'SET','A1-01'],
+ ['LAN-APF-9-07',2,'SET','A1-01'],['PABX-APF-9-01',1,'U','A1-04'],
+ ['PABX-APF-7-01',3,'SET','A1-04'],
+].map(([id,quantity,unit,code])=>{
+ const included=id==='LAN-APF-9-03';
+ const offer={id:MGW_CURRENT_PREFIX_0550+id,quoteRef:MGW_CURRENT_QUOTE_0550,unit,quoteEvidence:{
+  sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,classification:'RATE',
+  quotedQuantity:quantity,quotedTotalText:included?'Included':'',quotedUnitCost:included?null:1,
+  terms:id==='PABX-APF-7-01'?['TL-SG2105P']:['SFP-10G-LR'],
+ }};
+ const line=included?null:{id,wbs:'A',offerId:offer.id,quantity,unit,selected:true,customerRowCode:code,
+  problems:['Quote date/validity missing'],provisionalCustomerUSD:quantity};
+ return {offer,line};
+});
+const apfLines=[{...apfParent,problems:['Cost rate OPEN']},...apfSources.map(row=>row.line).filter(Boolean)];
+const apfData={...d,lines:apfLines,offers:apfSources.map(row=>row.offer),mgwDetailPricingImport:{decision:MGW_SUPERSEDED_0550}};
+const apfCalc={lines:apfLines,requirementGaps:[{id:apfParent.mrRequirementId,code:'A1-01'}]};
+const apfBefore=JSON.stringify(apfData),apfView=deriveProvisionalPricing(apfData,apfCalc);
+const apfRef=apfView.lines.find(line=>line.id===apfParent.id);
+assert.equal(apfRef.bidPriceAllocation?.basisId,APF_LAN_BID_BASIS_0550);
+assert.equal(apfRef.selected,false);
+assert.deepEqual(apfView.requirementGaps,[]);
+assert.deepEqual(apfView.selected.map(line=>[line.id,line.customerUSD]),apfLines.slice(1).map(line=>[line.id,line.provisionalCustomerUSD]));
+assert.equal(JSON.stringify(apfData),apfBefore);
+assert.equal(apfView.releaseAllowed,false);
+const missingAccess=apfLines.map(line=>line.id==='LAN-APF-9-05'?{...line,selected:false}:line);
+assert.deepEqual(deriveProvisionalPricing(apfData,{...apfCalc,lines:missingAccess}).requirementGaps,apfCalc.requirementGaps);
+const editedParent={...apfData,lines:apfLines.map(line=>line.id===apfParent.id?{...line,manualCost:1}:line)};
+assert.deepEqual(deriveProvisionalPricing(editedParent,apfCalc).requirementGaps,apfCalc.requirementGaps);
 console.log('PASS 0550 summary/release: no duplicate Full/Bid table in 10.7, inventory model retains 19 systems + COMMON, all source requirements including unmapped/unselected/COMPANY, split equipment/services obligations, unresolved/new scope retained, actual source page order, MR hierarchy/cross-appendix Lot once, copyable IDs, Official gates and unchanged export cells/financial/history records.');

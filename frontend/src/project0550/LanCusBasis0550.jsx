@@ -1,5 +1,5 @@
 import React from 'react';
-import {mgwCurrentOffer0550,MGW_CURRENT_PREFIX_0550} from './data/mgwQuoteSelection0550';
+import {APF_LAN_BID_BASIS_0550,mgwCurrentOffer0550,MGW_CURRENT_PREFIX_0550} from './data/mgwQuoteSelection0550';
 import {lanStockBasis0550} from './data/lanStockBasis0550';
 import {evaluateServiceEquation} from './serviceEquationRuntime';
 
@@ -104,6 +104,18 @@ export function LanCusSpareCoverage0550({data,model,onNavigate,disabled=false}){
 }
 
 export function LanCusLine0550({data,line,offer,onNavigate,showQuote=false}){
+ const allocation=line.bidPriceAllocation;
+ if(allocation?.basisId===APF_LAN_BID_BASIS_0550)return <details>
+  <summary>MGW · ขอบเขตเสนอแล้วสำหรับ Working A</summary>
+  <p>{allocation.basis} · Core 2 ชุดระบุ Included · Distribution 2 ชุดและ Access 1 ชุดพร้อม SFP ใช้เจ้าของราคาเดิม</p>
+  <p>Media Converter ฝั่งสนามอยู่ในชุดโทรศัพท์ Ex · การจัดพอร์ตและคู่ SFP สำหรับ Tie-In 3 ลิงก์ให้ทบทวนใน SI</p>
+  <button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+MGW_CURRENT_PREFIX_0550+'LAN-APF-9-03')}>ดู Core Switch · Included</button>
+  {allocation.ownerIds.map(id=><button key={id} type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+id)}>
+   {data.lines.find(row=>row.id===id)?.description||id}
+  </button>)}
+  <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+allocation.fieldLineId)}>โทรศัพท์ Ex · Media Converter</button>
+  <button type="button" onClick={()=>onNavigate?.('bid.working-preview.step.7',{workingSystem:'TEL-LAN'})}>ตรวจ Tie-In ใน SI WP.7</button>
+ </details>;
  const key=offer?.id.slice(MGW_CURRENT_PREFIX_0550.length);
  if(!mgwCurrentOffer0550(offer)||!['LAN-APF-9-02','LAN-APF-9-07'].includes(key)||line.id!=='LINE-MGW-CURRENT-'+key)return null;
  const firewall=key==='LAN-APF-9-02';
