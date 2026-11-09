@@ -100,7 +100,7 @@ export function schematicLanBom0550(required,offers,place){
     kind==='ODF Panel'?'VND เสนอ Fiber Patch Panel ต้องยืนยันว่าครอบคลุม ODF ที่ระบุใน MR':
     !compatible?'รอยืนยันหน่วยหรือจำนวนอุปกรณ์หลักต่อชุดจาก VND':'รอยืนยันจำนวนเสนอ';
    results.push({
-    key:mr.id+'|'+kind,label:cabinet?'จำนวนตู้':kind,packageLabel,packagePlace:cabinetPlace,packageSource:mr,
+    key:mr.id+'|'+kind,label:cabinet?'จำนวนตู้':kind,rackQuantity:cabinet,packageLabel,packagePlace:cabinetPlace,packageSource:mr,
     mrBasis:each!==undefined&&mr.quantity>1?each+' Ea × '+mr.quantity+' ตู้ตาม MR':'',
     required:requiredQty===null?[]:[{...mr,description:cabinet?mr.description:kind,quantity:requiredQty,unit:mrUnit}],
     tieInBasis:isApfConverter?apfExPhoneTieIn:undefined,tieInOffers,

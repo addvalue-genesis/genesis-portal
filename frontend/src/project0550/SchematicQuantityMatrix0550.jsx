@@ -85,6 +85,20 @@ function VendorBom0550({offers,onNavigate}){
 const coverageLabel={SHORT:'ขาดตาม MR',EXCESS:'เสนอเกิน MR',OPEN:'รอตรวจ',MATCH:'จำนวนตรง'};
 const displayQty=(value,unit)=>Number.isFinite(value)?quantity(value,unit):'—';
 
+function LanRackQuantity0550({groups}){
+ const sites=groups.map(({site,results})=>({site,racks:results.filter(row=>row.rackQuantity)}))
+  .filter(group=>group.racks.length);
+ const racks=sites.flatMap(group=>group.racks);
+ const required=racks.reduce((sum,row)=>sum+row.requiredQty,0);
+ const offered=racks.reduce((sum,row)=>sum+(row.offeredQty??0),0);
+ const closed=racks.length===6&&required===13&&racks.every(row=>row.status==='MATCH');
+ return <div className="p55-note" role="group" aria-label="ผลตรวจจำนวน LAN Rack Cabinet">
+  <strong>{closed?'CLOSED':'OPEN'} · LAN Rack Cabinet ตาม MR{closed&&' · '+offered+'/'+required+' ตู้'}</strong>
+  {closed&&<div>{sites.map(({site,racks})=>site+' '+racks.reduce((sum,row)=>sum+row.requiredQty,0)).join(' · ')}</div>}
+  <div>ผลเฉพาะจำนวนตู้ · ตรวจตำแหน่งราย TAG และ BOM ภายในตู้แยกใน SI</div>
+ </div>;
+}
+
 function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate,workingLines=[]}){
  const rows=groups.flatMap(group=>group.results.filter(row=>showMatched||row.status!=='MATCH').map(row=>({...row,site:group.site})));
  if(!rows.length)return <p>{groups.some(group=>group.results.length)?'รายการที่เทียบได้มีจำนวนตรงตาม MR':'ยังไม่มีรายการที่ตรวจได้ในขอบเขตนี้'}</p>;
@@ -287,6 +301,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
    <p className="p55-note">ชุดใบเสนอราคานี้มีรายการที่ยังไม่ระบุไซต์ <button type="button" onClick={()=>setSiteFilter(NO_SITE_0550)}>ดูรายการไม่ระบุไซต์</button></p>}
   <section className="p55-coverage" aria-label="ผลตรวจความครบถ้วน">
    <h4>ผลตรวจตาม MR · {system.name}</h4>
+   {mgw&&system.token==='TEL-LAN'&&siteFilter===ALL_SITES&&<LanRackQuantity0550 groups={groups}/>}
    <div className="p55-coverage-summary">{Object.entries(coverageLabel).map(([status,label])=><span key={status} data-coverage-status={status}>
     <strong>{results.filter(row=>row.status===status).length}</strong> {label}
    </span>)}</div>

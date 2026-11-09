@@ -9,3 +9,9 @@
 ADR-0550-001 principles 2–6 and 8–12 apply. The projection keeps supplier evidence, prices, saved selections and engineering decisions independent of the duplicate pricing check.
 
 Verification covered the copied R0 workspace, the Working Part A Chromium view, the price summary, schematic quantities, controlled commercial issue, and the production build. Selected-owner amounts and the Official projection matched the pre-change output in R0. Deselecting an owner or changing the Included Core source restored the Working gap.
+
+## LAN Rack Cabinet quantity disposition
+
+The bid preparer confirmed closure of the cabinet count for the six MR Rev.B1 Appendix 1.3 packages against MGW Q26-063 LAN/PBX/FO. APF 9, ACP 2, ABV01 1 and AMS01 1 give **13/13** cabinets. This corrects the earlier total of 12.
+
+The existing 05.3 LAN view displays the quantity disposition for all sites from the same MR and original MGW comparison rows. The display returns to OPEN if a cabinet package no longer matches. Cabinet location by TAG, rack contents, and interfaces remain separate SI checks. This projection follows ADR-0550-001 principles 2–4, 6 and 9–12.
