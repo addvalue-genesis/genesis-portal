@@ -61,9 +61,9 @@ export function LazyNativeExhibitC0550(props){
 
 export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,lanScope,disabled=false}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
- const [systemChoice,setSystemChoice]=useState(null);
+ const [systemChoice,setSystemChoice]=useState('');
  const groups=useMemo(()=>id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[],[id,view]);
- const selected=groups.find(group=>group.token===systemChoice)||(systemChoice===''?null:groups.find(group=>group.rows.length)||groups[0]);
+ const selected=groups.find(group=>group.token===systemChoice);
  const unresolved=useMemo(()=>groups.length?view.scheduleRows('C2').filter(row=>!c2HasSystem0550(row)):[],[view,groups]);
  const formView=useMemo(()=>groups.length?{...view,c2SystemToken:selected?.token,
   scheduleRows:schedule=>schedule==='C2'?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)}:view,[view,groups,selected]);

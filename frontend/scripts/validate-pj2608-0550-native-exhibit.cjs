@@ -142,6 +142,8 @@ const {NativeExhibitC0550}=require(root+'/project0550/NativeExhibitC0550.jsx');
 const c2Screen=require('react-dom/server').renderToStaticMarkup(require('react').createElement(NativeExhibitC0550,{view:c2,id:'C2'}));
 assert.match(c2Screen,/C2 rows awaiting system assignment.*SHARED-OWNER.*UNKNOWN-SYSTEM/s);
 assert.doesNotMatch(c2Screen,/<option[^>]*value="COMMON"/);
+assert.match(c2Screen,/<option value="" selected="">แสดงทุกระบบ<\/option>/);
+assert.equal((c2Screen.match(/data-c2-system=/g)||[]).length,c2Forms.pages.length,'C2 initially renders every system form');
 const {commissioningBreakdown0550}=require(root+'/project0550/data/commissioningSparePhases0550.js');
 const c2Breakdown=commissioningBreakdown0550(c2,c2Systems,'USD');
 assert.equal(c2Breakdown.total.count,c2Rows.length);
