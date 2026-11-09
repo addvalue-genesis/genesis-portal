@@ -228,10 +228,10 @@ function renderPage(view,page,format,currency='USD'){
    });
    partialNote='Draft subtotals of priced allocations only. '+available.join(' / ')+'. Review A1, A2 and the Schedule allocations for remaining scope.';
   }
-  if(page.id==='A2'){
-   const options=view.bindings.filter(b=>b.line&&b.treatment==='OPTION');
-   const subtotal=scheduleRollup0550(options);
-   if(subtotal.priced)partialNote='Option Working subtotal (priced items): '+currency+' '+number(subtotal.knownUSD)+
+  if(page.id==='A1'||page.id==='A2'){
+   const base=page.id==='A1';
+   const subtotal=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===(base?'BASE':'OPTION')));
+   if(subtotal.priced)partialNote=(base?'Base':'Option')+' Working subtotal (priced items): '+currency+' '+number(subtotal.knownUSD)+
     ' ('+subtotal.priced+'/'+subtotal.count+' priced'+(subtotal.open?', '+subtotal.open+' OPEN':'')+').';
   }
   if(/^C[2-8]$/.test(page.id)&&!page.systemToken&&!view.scheduleRows(page.id).length){

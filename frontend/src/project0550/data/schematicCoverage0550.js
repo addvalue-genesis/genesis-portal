@@ -9,7 +9,7 @@ const nativeUnit=value=>{
  return {set:'set',sets:'set',ea:'pc',each:'pc',pcs:'pc',pc:'pc',m:'m',pair:'pair',pairs:'pair'}[unit];
 };
 const knownQuantity=n=>Number.isFinite(n)&&n>=0;
-const compareOrder={SHORT:0,EXCESS:1,OPEN:2,MATCH:3};
+const compareOrder={SHORT:0,EXCESS:1,OPEN:2,TIE_IN:3,MATCH:4};
 const unitFor=(rows,read)=>{
  const units=new Set(rows.map(row=>nativeUnit(read(row))||read(row)));
  return units.size===1?[...units][0]:null;
@@ -72,6 +72,7 @@ export function schematicCoverage0550(required,offers,{building=false,hasUnlocat
    results.push({...group,mrUnit,vndUnit,requiredQty:cus.length===1?total(cus,row=>row.quantity):null,
     offeredQty:vnd.length===1?total(vnd,row=>row.native.quantity):null,status:'OPEN',
     reason:building?'รอยืนยัน TAG หรือจำนวนที่จัดสรรถึงตำแหน่งนี้':
+     cus.length===1&&/^MR-B1-18-APF-(19|20)$/.test(cus[0].id)?'รอใบเสนอราคาสาย · ใช้ข้อกำหนด CUS ขอราคาจากผู้ขายสายได้':
      cus.length?'ยังไม่พบรายการ VND ที่จับคู่ได้':'ยังไม่พบข้อกำหนด MR ที่จับคู่ได้'});
    continue;
   }

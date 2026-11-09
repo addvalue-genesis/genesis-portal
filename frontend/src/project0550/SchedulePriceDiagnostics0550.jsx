@@ -6,7 +6,7 @@ import {a1InspectionRows0550} from './A1InspectionBreakdown0550';
 import {a1OthersRows0550,A1_OTHERS_PANELS_0550} from './A1OthersBreakdown0550';
 
 const money=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'ยังไม่มีราคา';
-const resultSchedules=SCHEDULES_0550.filter(({id})=>/^C[2-8]$/.test(id));
+const resultSchedules=SCHEDULES_0550.filter(({id})=>/^C[1-8]$/.test(id));
 const supportingSchedules=[{id:'D',title:'Inspection and Tests'},...A1_OTHERS_PANELS_0550];
 
 export function ScheduleParentResults0550({rows,id,system,currency,workingPreview,onNavigate,disabled}){
@@ -32,12 +32,21 @@ export function ScheduleParentResults0550({rows,id,system,currency,workingPrevie
 
 export function ScheduleResults0550({view,currency,onOpen,disabled}){
  const display=currency==='THB'?scheduleViewTHB0550(view):view;
- return <section className="p55-panel" aria-label="11.C2–11.C8 Schedule results">
-  <h3>ผลราคา 11.C2–11.C8 และรายละเอียด 11.D–11.F</h3>
+ return <section className="p55-panel" aria-label="Volume I Schedule price results">
+  <h3>ผลราคา 11.A1–A2, 11.C1–C8 และรายละเอียด 11.D–11.F</h3>
   <p>{view.workingPreview?'Working Preview · ยอดขายจาก Working ที่มีในแต่ละ Schedule':'เฉพาะรายการที่บันทึกและราคาที่ผ่านการทบทวน'} · D–F แจกแจงยอดใน A1</p>
-  <div className="p55-table-wrap"><table className="p55-table" aria-label="C2–C8 price results">
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="Volume I price results">
    <thead><tr><th>Schedule</th><th>แถวมีราคา / ทั้งหมด</th><th>ยอดที่มี {currency}</th><th>ข้อมูลที่ยังขาด</th></tr></thead>
-   <tbody>{resultSchedules.map(({id,title})=>{
+   <tbody>{[['A1','BASE'],['A2','OPTION']].map(([id,treatment])=>{
+    const result=scheduleRollup0550(display.bindings.filter(b=>b.line&&b.treatment===treatment));
+    const total=treatment==='BASE'?display.baseAssigned:display.optionsAssigned;
+    return <tr key={id}>
+     <th scope="row"><button type="button" disabled={disabled} onClick={()=>onOpen(id)}>เปิด 11.{id}</button> {treatment}</th>
+     <td>{result.priced} / {result.count}</td>
+     <td>{result.priced?money(result.knownUSD):'OPEN'}</td>
+     <td>{!Number.isFinite(total)?'ยอดสัญญา OPEN · แสดงยอดเฉพาะรายการที่มีราคา':'ดูรายละเอียดในแบบฟอร์ม'}</td>
+    </tr>;
+   })}{resultSchedules.map(({id,title})=>{
     const d=schedulePriceDiagnostics0550(display,id);
     const gaps=[];
     if(!d.count)gaps.push('ยังไม่มีรายการ Working จัดลง Schedule');

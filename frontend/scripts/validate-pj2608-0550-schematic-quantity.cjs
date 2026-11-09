@@ -81,7 +81,7 @@ const {MGW_CURRENT_BATCH_0550,MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW
 const cabinetOffer=(sn,index,name,count,unit,term,section='LAN')=>({
  ...quote(MGW_CURRENT_PREFIX_0550+section+'-APF-'+sn+'-0'+index,'APF · '+name,
   'PDF p1 / '+section+' / APF / SN '+sn+'.0 / row '+index,count,{
-   systemTokens:[section==='FO'?'TEL-FO':section==='PABX'?'TEL-IPP':'TEL-LAN'],sourceId:MGW_CURRENT_BATCH_0550,
+   systemTokens:[section==='FO'?'TEL-FO':section==='PABX'?(sn===9?'TEL-PABX':'TEL-IPP'):'TEL-LAN'],sourceId:MGW_CURRENT_BATCH_0550,
    sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,quotedUnit:unit,terms:[term],
   }),
  quoteRef:MGW_CURRENT_QUOTE_0550,
@@ -112,6 +112,19 @@ assert.equal(converter.offers.length,0,'The field package cannot satisfy the rac
 assert.equal(converter.tieInOffers[0].offer.id,MGW_CURRENT_PREFIX_0550+'PABX-APF-7-01');
 assert.match(converter.tieInBasis,/JB-304-001.*TPH-304-001/);
 assert.equal(lanChecks.flatMap(row=>[...row.offers,...(row.tieInOffers||[])]).length,lan.offered.length,'Each offer appears once in LAN comparison or related evidence');
+const server=cabinetOffer(9,1,'PABX Server',1,'Not stated','~ 1 x Dell R250 4*3.5 E-2334G /16G/2*2T SATA Server','PABX');
+const withTieIn=schematicQuantityMatrix0550({...input,offers:[...lan.offered.map(row=>row.offer).map(offer=>
+ offer.id.endsWith('LAN-APF-9-05')?{...offer,quoteEvidence:{...offer.quoteEvidence,terms:[...offer.quoteEvidence.terms,'~ 2 x 10G SFP+ Module | SFP-10G-LR']}}:offer),server]});
+const apfEvidence=withTieIn.offered;
+const compareEvidence=offers=>schematicCoverage0550(lanMr,offers.filter(row=>row.system==='TEL-LAN'),{packageOffers:offers});
+const checked=compareEvidence(apfEvidence);
+assert.deepEqual(compared(bom(checked,9,'IP PBX Server')),[1,1,0,'MATCH']);
+assert.equal(bom(checked,9,'IP PBX Server').offers[0].native.unit,'Not stated','Original VND unit is preserved');
+assert.deepEqual(compared(bom(checked,9,'Media Converter')),[3,null,null,'TIE_IN']);
+assert.equal(bom(checked,9,'Media Converter').tieInOffers.length,2);
+assert.deepEqual(compared(bom(compareEvidence(apfEvidence.filter(row=>!row.offer.id.endsWith('LAN-APF-9-05'))),9,'Media Converter')),[3,null,null,'OPEN']);
+const withoutBom=apfEvidence.map(row=>row.offer.id===server.id?{...row,offer:{...row.offer,quoteEvidence:{...row.offer.quoteEvidence,terms:[]}}}:row);
+assert.deepEqual(compared(bom(compareEvidence(withoutBom),9,'IP PBX Server')),[1,1,null,'OPEN']);
 const control='Control Building';
 const cabinetChecks=compareLan(lanMr.filter(row=>row.building===control),lanVnd.filter(row=>row.building===control),
  {building:true,place:control,hasUnlocatedOffer:true});

@@ -1,4 +1,4 @@
-import {mgwCurrentDirectMr0550,mgwCurrentMr0550,mgwLanPbxFoOffer0550,mgwCctvEntOffer0550} from './mgwQuoteSelection0550';
+import {mgwCurrentDirectMr0550,mgwCurrentItemKey0550,mgwCurrentMr0550,mgwLanPbxFoOffer0550,mgwCctvEntOffer0550} from './mgwQuoteSelection0550';
 
 const kinds=[
  ['Cabinet',/^LAN (?:System )?Cabinet\b/i],
@@ -43,7 +43,15 @@ function fieldConverterOffers(offers){
   if(row.site!=='APF'||row.system!=='TEL-IPP'||row.native.option||row.multipleSystems||
    mgwCurrentDirectMr0550(row.offer)!=='MR-B1-13-APF-07')return [];
   const tieInTerm=row.offer.quoteEvidence.terms?.find(term=>/media\s+conv(?:e)?rter/i.test(term));
-  return tieInTerm?[{...row,tieInTerm}]:[];
+  return tieInTerm?[{...row,tieInTerm,tieInSide:'ฝั่งสนาม'}]:[];
+ });
+}
+
+function rackOpticOffers(offers){
+ return offers.flatMap(row=>{
+  if(!mgwLanPbxFoOffer0550(row.offer)||!['LAN-APF-9-04','LAN-APF-9-05'].includes(mgwCurrentItemKey0550(row.offer)))return [];
+  const tieInTerm=row.offer.quoteEvidence.terms?.find(term=>/\bSFP-10G-LR\b/.test(term));
+  return tieInTerm?[{...row,tieInTerm,tieInSide:'ฝั่งตู้ · Switch BOM'}]:[];
  });
 }
 
@@ -87,12 +95,21 @@ export function schematicLanBom0550(required,offers,place){
    const single=matches.length===1?matches[0]:null;
    const offeredQty=single&&hasQuantity(single.native.quantity)?single.native.quantity:null;
    const mrUnit=cabinet?'Lot':'Ea';
-   const compatible=single&&kind!=='ODF Panel'&&canCompareUnits(kind,single);
+   const serverTerm=kind==='IP PBX Server'&&single?.native.unit==='Not stated'&&
+    mgwCurrentDirectMr0550(single.offer)==='MR-B1-13-APF-09-PBX'&&
+    single.offer.quoteEvidence.terms?.find(term=>/^~\s*1\s*[x×]\s*Dell\s+R250\b.*\bServer\b/i.test(term));
+   const compatible=serverTerm||single&&kind!=='ODF Panel'&&canCompareUnits(kind,single);
    const delta=requiredQty!==null&&offeredQty!==null&&compatible?offeredQty-requiredQty:null;
    const isApfConverter=mr.id==='MR-B1-13-APF-09'&&kind==='Media Converter';
-   const tieInOffers=isApfConverter?fieldConverterOffers(offers):[];
-   const status=delta===null?'OPEN':delta<0?'SHORT':delta>0?'EXCESS':'MATCH';
-   const reason=delta!==null?(single.native.totalText==='Included'?'ระบุ Included ใน VND':''):
+   const field=isApfConverter?fieldConverterOffers(offers):[];
+   const optics=isApfConverter?rackOpticOffers(packageOffers):[];
+   const tieInOffers=[...field,...optics];
+   const sfpBasis=!matches.length&&field.length===1&&field[0].native.quantity===requiredQty&&
+    optics.some(row=>mgwCurrentItemKey0550(row.offer)==='LAN-APF-9-05');
+   const status=sfpBasis?'TIE_IN':delta===null?'OPEN':delta<0?'SHORT':delta>0?'EXCESS':'MATCH';
+   const reason=sfpBasis?'ใช้ SFP ในชุด LAN เป็นฐานประมูล · SI ยืนยันพอร์ตและ 1G optics ฝั่งตู้ให้ครบ 3 ลิงก์':
+    serverTerm?'นับจาก BOM · '+serverTerm+' · ช่องหน่วยในใบราคาเว้นว่าง':
+    delta!==null?(single.native.totalText==='Included'?'ระบุ Included ใน VND':''):
     !matches.length&&isApfConverter?'รอยืนยัน Media Converter ฝั่งตู้ APF LAN ตาม MR 9.0':
     !matches.length?'ยังไม่พบรายการในชุด VND ที่ผูกกับตู้นี้':
     matches.length>1?'มีหลายบรรทัดเสนอ ต้องแยกจำนวนก่อนเทียบ':
@@ -104,7 +121,7 @@ export function schematicLanBom0550(required,offers,place){
     mrBasis:each!==undefined&&mr.quantity>1?each+' Ea × '+mr.quantity+' ตู้ตาม MR':'',
     required:requiredQty===null?[]:[{...mr,description:cabinet?mr.description:kind,quantity:requiredQty,unit:mrUnit}],
     tieInBasis:isApfConverter?apfExPhoneTieIn:undefined,tieInOffers,
-    offers:matches,requiredQty,offeredQty,mrUnit,vndUnit:single?.native.unit,unit:mrUnit,delta,status,reason,
+    offers:matches,requiredQty,offeredQty,mrUnit,vndUnit:serverTerm?'Ea (BOM)':single?.native.unit,unit:mrUnit,delta,status,reason,
    });
   }
  }

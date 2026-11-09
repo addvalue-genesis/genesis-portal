@@ -9,7 +9,14 @@ const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>
 export function scheduleTable0550(view,id){
  if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
  const rows=view.scheduleRows(id);
- if(id==='A')return {heads:['Description','Amount (USD)','Notes'],rows:[['Base Scope',view.baseAssigned,'A1 — mapped canonical Working only'],['Optional Scope',view.optionsAssigned,'A2 — excluded from Base'],['Initial Contract Price','OPEN','Confirm ordered options and contract scope; do not add options automatically.']]};
+ if(id==='A'){
+  const rows=[['Base Scope',view.baseAssigned,'A1 — mapped canonical Working only'],['Optional Scope',view.optionsAssigned,'A2 — excluded from Base'],['Initial Contract Price','OPEN','Confirm ordered options and contract scope; do not add options automatically.']];
+  if(view.workingPreview)for(const treatment of ['BASE','OPTION']){
+   const subtotal=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===treatment));
+   if(subtotal.priced)rows.push(['Working Draft — '+treatment+' priced items subtotal',subtotal.knownUSD,subtotal.priced+'/'+subtotal.count+' allocated owners priced']);
+  }
+  return {heads:['Description','Amount (USD)','Notes'],rows};
+ }
  if(['A1','A2'].includes(id)){
   const part=id==='A1'?'BASE':'OPTION',groups=new Map();
   for(const b of view.bindings.filter(b=>b.line&&b.treatment===part)){const key=b.summary||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}

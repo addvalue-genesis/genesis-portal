@@ -12,7 +12,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
  const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
- const draftSubtotal=!documentMode&&projection.amount===null
+ const screenSubtotal=!view.workingPreview&&!documentMode&&projection.amount===null
   ?sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite))
   :null;
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
@@ -73,7 +73,9 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
      </React.Fragment>)}
      {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td><td className="number">{c1Display0550(g.amount)}</td><td/></tr>}
     </tbody>;})}
-    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount??draftSubtotal)}</td><td>{draftSubtotal!==null?'Priced items subtotal':''}</td></tr></tfoot>
+    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount??screenSubtotal)}</td><td>{screenSubtotal!==null?'Priced items subtotal':''}</td></tr>
+     {projection.amount===null&&Number.isFinite(projection.pricedItemsSubtotal)&&<tr><td colSpan={5}>WORKING DRAFT — PRICED ITEMS SUBTOTAL</td><td className="number">{c1Display0550(projection.pricedItemsSubtotal)}</td><td>ยอดเฉพาะรายการที่มีราคา</td></tr>}
+    </tfoot>
    </table>
    {view.getRecord('I.C1').content&&<p>{view.getRecord('I.C1').content}</p>}
    <footer>Schedule C1 · {view.proposal.documentNo} / {view.proposal.revision}</footer>

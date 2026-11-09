@@ -147,6 +147,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of rows){
   const owned=r.priceOwners||[];
   if(owned.length){r.amount=money(owned.map(b=>b.amount));const check=displayPriceCheck0550(r.amount,r.quantity);r.unitPrice=check.matches?check.unitPrice:null;if(Number.isFinite(r.amount)&&!check.matches)problems.push('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+r.key);}
+  if(view.workingPreview&&/^MR-B1-18-APF-(19|20)$/.test(r.key)&&r.raw&&!r.raw.offerId&&!Number.isFinite(r.amount)){
+   r.note=[r.note,'Cable supplier quote pending',r.quantity>0?'':'Cable length to be confirmed'].filter(Boolean).join(' · ');
+  }
   r.priceOwners=owned;
  }
  const duplicateNames=new Map();
@@ -172,7 +175,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
  }
  const amount=money(bindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));
  if(Number.isFinite(amount)&&amount!==rendered)problems.push('C1_OWNER_TOTAL_MISMATCH');
- return {groups,rows:displayRows,amount:problems.length?null:amount,knownOwnerAmount:amount,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};
+ const priced=scheduleRollup0550(bindings);
+ const pricedItemsSubtotal=view.workingPreview&&!legacy&&priced.priced?priced.knownUSD:null;
+ return {groups,rows:displayRows,amount:problems.length?null:amount,knownOwnerAmount:amount,pricedItemsSubtotal,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};
 }
 
 // Interactive overview only. Do not replace strict customer/export subtotals or
@@ -203,6 +208,7 @@ export function c1AppendixTable0550(view){
  if(view.c1LayoutVersion!==C1_APPENDIX_LAYOUT_LEGACY_0550)group('Currency: USD');
  for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount,'']);}
  rows.push(['','TOTAL — BASE SCOPE OF SUPPLY','','','',p.amount,'']);
+ if(p.amount===null&&Number.isFinite(p.pricedItemsSubtotal))rows.push(['','WORKING DRAFT — PRICED ITEMS SUBTOTAL','','','',p.pricedItemsSubtotal,'Open items excluded']);
  return {heads:['SN','Item Description','Unit','Qty.','CIF or FOB (USD or RMB) — Unit Rates','CIF or FOB (USD or RMB) — Total Price','Notes'],rows};
 }
 export function c1AppendixHtml0550(view){
@@ -223,7 +229,9 @@ export function c1AppendixHtml0550(view){
  }
  const label=/^AUTHORIZED COPY\s*\//.test(view.outputLabel||'')?view.outputLabel:'DRAFT — NOT FOR SUBMISSION';
  const response=view.getRecord('I.C1').content||'';
- return `<article class="p55-c1-document" data-native-schedule="C1"><div class="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span>${legacy?'':'<span>Currency: USD</span>'}<span>${escape(label)}</span></div><h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2><table aria-label="Schedule C1 preview"><colgroup><col style="width:${legacy?6:9}%"><col style="width:${legacy?42:39}%"><col style="width:7%"><col style="width:7%"><col style="width:11%"><col style="width:11%"><col style="width:16%"></colgroup>${head}<tbody>${html}</tbody><tfoot><tr><td colspan="5">TOTAL — BASE SCOPE OF SUPPLY</td>${cell(c1Display0550(c1.amount),'number')}${cell('')}</tr></tfoot></table>${response?'<p>'+escape(response)+'</p>':''}<footer>Schedule C1 · ${escape(view.proposal.documentNo||'')} / ${escape(view.proposal.revision)}</footer></article>`;
+ const draftSubtotal=c1.amount===null&&Number.isFinite(c1.pricedItemsSubtotal)
+  ?'<tr><td colspan="5">WORKING DRAFT — PRICED ITEMS SUBTOTAL</td>'+cell(c1Display0550(c1.pricedItemsSubtotal),'number')+cell('Open items excluded')+'</tr>':'';
+ return `<article class="p55-c1-document" data-native-schedule="C1"><div class="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span>${legacy?'':'<span>Currency: USD</span>'}<span>${escape(label)}</span></div><h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2><table aria-label="Schedule C1 preview"><colgroup><col style="width:${legacy?6:9}%"><col style="width:${legacy?42:39}%"><col style="width:7%"><col style="width:7%"><col style="width:11%"><col style="width:11%"><col style="width:16%"></colgroup>${head}<tbody>${html}</tbody><tfoot><tr><td colspan="5">TOTAL — BASE SCOPE OF SUPPLY</td>${cell(c1Display0550(c1.amount),'number')}${cell('')}</tr>${draftSubtotal}</tfoot></table>${response?'<p>'+escape(response)+'</p>':''}<footer>Schedule C1 · ${escape(view.proposal.documentNo||'')} / ${escape(view.proposal.revision)}</footer></article>`;
 }
 
 // The new layout uses the same seven customer columns in Word. Legacy native

@@ -82,7 +82,7 @@ function VendorBom0550({offers,onNavigate}){
  </table></div>:<p>ยังไม่พบรายการเสนอสำหรับไซต์นี้ในชุดที่เลือก</p>;
 }
 
-const coverageLabel={SHORT:'ขาดตาม MR',EXCESS:'เสนอเกิน MR',OPEN:'รอตรวจ',MATCH:'จำนวนตรง'};
+const coverageLabel={SHORT:'ขาดตาม MR',EXCESS:'เสนอเกิน MR',OPEN:'รอตรวจ',TIE_IN:'มีฐานเสนอ · ตรวจ Tie-In ใน SI',MATCH:'จำนวนตรง'};
 const displayQty=(value,unit)=>Number.isFinite(value)?quantity(value,unit):'—';
 
 function LanRackQuantity0550({groups}){
@@ -119,7 +119,7 @@ function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate,workingLi
      {row.required.map(item=><div key={item.id}><small>MR · {item.description} · {quantity(item.quantity,item.unit)} · {item.locator}</small>
       <SourceButton0550 source={item.source} onOpenSource={onOpenSource}/></div>)}
      {[...row.offers,...(row.tieInOffers||[])].map(item=><div key={item.offer.id}>
-      <small>{item.tieInTerm?'VND · Tie-In ฝั่งสนาม':'VND'} · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
+      <small>{item.tieInSide?'VND · Tie-In '+item.tieInSide:'VND'} · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
       {item.tieInTerm&&<small>{item.tieInTerm}</small>}
       {schematicOfferMrRefs0550(item).length>0&&<small>MR ที่เกี่ยวข้อง · {schematicOfferMrRefs0550(item).join(' / ')}</small>}
       {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+item.offer.id)}>เปิด Offer ใน 07 VND</button>}
@@ -302,7 +302,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
   <section className="p55-coverage" aria-label="ผลตรวจความครบถ้วน">
    <h4>ผลตรวจตาม MR · {system.name}</h4>
    {mgw&&system.token==='TEL-LAN'&&siteFilter===ALL_SITES&&<LanRackQuantity0550 groups={groups}/>}
-   <div className="p55-coverage-summary">{Object.entries(coverageLabel).map(([status,label])=><span key={status} data-coverage-status={status}>
+   <div className="p55-coverage-summary">{Object.entries(coverageLabel).filter(([status])=>status!=='TIE_IN'||results.some(row=>row.status===status)).map(([status,label])=><span key={status} data-coverage-status={status}>
     <strong>{results.filter(row=>row.status===status).length}</strong> {label}
    </span>)}</div>
    <p className="p55-note">นับเป็นกลุ่มตรวจตามไซต์ · จำนวนตรงยังต้องผ่านการตรวจสเปกและ TAG ใน SI</p>

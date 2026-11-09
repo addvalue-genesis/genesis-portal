@@ -15,3 +15,9 @@ Verification covered the copied R0 workspace, the Working Part A Chromium view, 
 The bid preparer confirmed closure of the cabinet count for the six MR Rev.B1 Appendix 1.3 packages against MGW Q26-063 LAN/PBX/FO. APF 9, ACP 2, ABV01 1 and AMS01 1 give **13/13** cabinets. This corrects the earlier total of 12.
 
 The existing 05.3 LAN view displays the quantity disposition for all sites from the same MR and original MGW comparison rows. The display returns to OPEN if a cabinet package no longer matches. Cabinet location by TAG, rack contents, and interfaces remain separate SI checks. This projection follows ADR-0550-001 principles 2–4, 6 and 9–12.
+
+## APF PBX, SFP tie-in and Volume I draft prices
+
+05.3 counts one APF PABX server from the Dell R250 BOM while preserving the blank source unit. The selected Part A PABX owner continues to supply the C1 price. The Media Converter row shows the SFP tie-in basis when the current switch optics and Ex-phone package are both present. The three rack-side 1G paths still need SI verification.
+
+APF CAT6A and armored CAT6A stay in the draft C1 with cable supplier pricing and, where absent, length pending. Volume I shows priced allocations in the existing A1/A2 and C1–C8 result table. C1 separates the known subtotal from the complete contract total in the screen, HTML and XLSX. The draft Word, HTML and XLSX package use the existing Working owners. These changes apply ADR-0550-001 principles 2–6, 8–12 and 14. The copied R0 package and the native exhibit, schematic, Working and controlled issue validators were checked.
