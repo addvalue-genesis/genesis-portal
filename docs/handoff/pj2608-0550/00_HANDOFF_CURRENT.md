@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [C2 customer price columns and price trace](20261108_A1_SPARE_PRICING.md). Unit Cost and Total Cost show the Working customer selling price and span CIF/FOB when allocation is pending. LAN Start-up is USD 12,372.63 in native 11.C2 and A1 S/N 4. Pre-commissioning, commissioning and the delivery basis remain OPEN for the reasons recorded in the checkpoint.
+Latest A1 spare pricing: [TEL-LAN customer equipment coverage in WP.5 and C2](20261108_A1_SPARE_PRICING.md). The shared table traces ten CUS equipment checks to existing Working owners, stock results and saved B5 allocations. LAN Start-up is USD 12,372.63 in native 11.C2 and A1 S/N 4. The evidence gaps are recorded by equipment and phase in the checkpoint.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 

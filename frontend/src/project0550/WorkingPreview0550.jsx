@@ -1,6 +1,7 @@
 import {ControlledTagMapping0550,RequirementTagBindings0550} from './ControlledTagMapping0550';
 import {bidStudyDelivery0550,bidRequirementOwners0550,bidRequirementPackageReferences0550} from "./data/bidProcess0550";
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
+import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 import {AvlMappingSummary0550} from "./AvlReconciliation0550";
 import React,{useState,useRef,useEffect} from "react";
 import {useBidWorkspace,downloadBidFile} from "./BidWorkspaceContext";
@@ -86,7 +87,7 @@ function BidRequirementBasis0550({requirement,model,delivery,onNavigate}){
  {delivery&&<small>รายงานระดับระบบตาม SDRL {delivery.code}: {delivery.dueCode} / หลัง PO {delivery.weeksAfterOrder} สัปดาห์ · จัดงานและค่าใช้จ่ายตามขอบเขตรายงาน; ตรวจงานจัดทำแยกจากงานทบทวนใน B1</small>}
  {!delivery&&<small>ตรวจวิธีตอบและกำหนดส่งตาม RFQ · การไม่มี Proof ไม่ทำให้ปริมาณ × เรตที่มีอยู่คำนวณไม่ได้</small>}</>;
 }
-function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,workingById,rawById,delivery,onNavigate}){
+function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,workingById,rawById,delivery,onNavigate,children}){
  const [open,setOpen]=useState(initiallyOpen);
  return <details className="p55-wp-quantity-group" data-wp-quantity-system={token} open={open}
   onToggle={event=>{if(event.target===event.currentTarget)setOpen(event.currentTarget.open);}}>
@@ -97,7 +98,7 @@ function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,
    </span>
    <strong>{title} · {requirements.length} ข้อกำหนด</strong>
   </summary>
-  {open&&<div className="p55-table-wrap">
+  {open&&<>{children}<div className="p55-table-wrap">
    <table className="p55-table" aria-label="Physical requirement Working allocation">
     <thead><tr><th>Requirement</th><th>Working / required quantity</th><th>Owner / proof</th></tr></thead>
     <tbody>{requirements.map(requirement=><tr key={requirement.id} data-bid-requirement={requirement.id}>
@@ -117,7 +118,7 @@ function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,
      </td>
     </tr>)}</tbody>
    </table>
-  </div>}
+  </div></>}
  </details>;
 }
 
@@ -142,10 +143,12 @@ function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyD
    <button type="button" onClick={()=>onNavigate("bid.working-preview.step.4")}>เปิด WP.4 · จัด Mapping</button>
   </div>
   {groups.size===0&&<p>ยังไม่มีข้อกำหนดที่มีรหัสอ้างอิง Working ในมุมมองนี้</p>}
-  {scopes.filter(scope=>groups.has(scope.id)).map(({id})=><WorkingQuantityGroup0550
+  {scopes.filter(scope=>groups.has(scope.id)||(scope.id==='TEL-LAN'&&['ALL','TEL-LAN'].includes(system))).map(({id})=><WorkingQuantityGroup0550
    key={id} token={id} title={id==="COMMON"?"งานร่วม · COMMON":names(id)}
-   requirements={groups.get(id)} initiallyOpen={system!=="ALL"} model={model}
-   workingById={workingById} rawById={rawById} delivery={studyDeliveries.get(id)} onNavigate={onNavigate}/>)}
+   requirements={groups.get(id)||[]} initiallyOpen={system!=="ALL"} model={model}
+   workingById={workingById} rawById={rawById} delivery={studyDeliveries.get(id)} onNavigate={onNavigate}>
+   {id==='TEL-LAN'&&<LanCusSpareCoverage0550 data={data} model={model} onNavigate={onNavigate}/>}
+  </WorkingQuantityGroup0550>)}
  </>;
 }
 

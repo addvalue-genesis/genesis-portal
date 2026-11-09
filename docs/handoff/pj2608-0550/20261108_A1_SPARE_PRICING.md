@@ -1,5 +1,13 @@
 # A1 commissioning and operating spare pricing
 
+## TEL-LAN customer equipment coverage in WP.5 and C2
+
+The shared coverage table starts with ten customer equipment checks from MR B1 Appendix 1.3, PHI B1 Table 7-7, SPE-0002 B1 §7.3 and DTS-0001 B1. It splits IT and OT Firewall and includes the Router and Media Converter. It then shows the actual selected Working owners, the available 30-day/99% stock result and any saved C2 B5 allocation matched by Part No. WP.5 TEL-LAN and 11.C2 TEL-LAN both open the table with source and Working links. The two firewall rows reference the same unsplit Working lines. The Router points to TEL-VSAT and the Media Converter points to cabinet evidence pending a component-level quantity. The table does not assign additional cost owners or treat an installed package as proof that spares are included.
+
+The four calculable reserves are unchanged. The AP and Access Switch remain the two priced Start-up B5 allocations. The Distribution Switch result is zero for random-failure stock, while planned parts still need review. The Controller reserve is one with the MR/Working quantity and DTS licence capacity checks pending. Core Switch, Firewall, Industrial Switch and Media Converter still need their named evidence checks. The AP draft also retains its DTS 6 GHz and Substation applicability checks. Pre-commissioning and Commissioning continue to require ITP/OEM evidence. The displayed scope does not modify the commercial issue or add lines to the customer form.
+
+Production webpack, Working Preview 1–8 and continuity checks passed. Chromium with the prepared project workspace verified ten coverage rows, the C2 to WP.5 navigation and identical coverage results, USD and THB row pricing, A1 reconciliation and saved C2 bindings. The owner's Windows workspace was outside the test.
+
 ## C2 customer price columns and price trace
 
 Parts Description contains the spare description. The native draft shows the Working **customer selling price** in Unit Cost and Total Cost. If no unique CIF/FOB basis is saved, each price cell spans both term columns and the form explains the pending allocation. An explicit CIF or FOB continues to use its corresponding subcolumn. Unknown price stays OPEN. The Word/HTML drafts follow the native layout and the Excel draft uses the cleaned description and its existing selling-price columns. Stored Working data, allocation, release approval, and frozen issue artifacts are preserved. ADR 5, 6, 8 and 10–12 apply.

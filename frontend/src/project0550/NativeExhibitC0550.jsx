@@ -7,6 +7,7 @@ import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
 import {c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
+import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 
 const a1DirectRows=[
  [3,'S/N 2 · Inspection and tests'],
@@ -58,7 +59,7 @@ export function LazyNativeExhibitC0550(props){
  return <details open={open} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>{props.label}</summary>{open&&<NativeExhibitC0550 {...props}/>}</details>;
 }
 
-export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,disabled=false}){
+export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,lanScope,disabled=false}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState(null);
  const groups=useMemo(()=>id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[],[id,view]);
@@ -81,6 +82,10 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
+  {selected?.token==='TEL-LAN'&&lanScope&&<details className="p55-panel"><summary>ตรวจความครบถ้วนจาก CUS → Working B5 → C2</summary>
+   <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.working-preview.step.5',{workingSystem:'TEL-LAN'})}>เปิด WP.5 · TEL-LAN</button>
+   <LanCusSpareCoverage0550 {...lanScope} onNavigate={onNavigate} disabled={disabled}/>
+  </details>}
   {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
    <strong>ตรวจความเสี่ยงคิดซ้ำใน C2 · พบ Lot และรายการราย Part No.</strong>
    <ul>{overlaps.map(({mainEquipment,systemToken,lots,parts})=><li key={mainEquipment?'equipment:'+mainEquipment:'system:'+systemToken}>
