@@ -1,4 +1,4 @@
-import {mgwCurrentMr0550,mgwLanPbxFoOffer0550,mgwCctvEntOffer0550} from './mgwQuoteSelection0550';
+import {mgwCurrentDirectMr0550,mgwCurrentMr0550,mgwLanPbxFoOffer0550,mgwCctvEntOffer0550} from './mgwQuoteSelection0550';
 
 const kinds=[
  ['Cabinet',/^LAN (?:System )?Cabinet\b/i],
@@ -33,6 +33,18 @@ function relatedToCabinet(row,id){
  const refs=mgwCurrentMr0550(row.offer);
  if(mgwLanPbxFoOffer0550(row.offer))return refs.includes(id)||row.system==='TEL-PABX'&&refs.includes(id+'-PBX');
  return row.system==='TEL-CCTV'&&mgwCctvEntOffer0550(row.offer)&&refs.includes(id+'-NVR');
+}
+
+// BLD-0002 C5 sheets 2 and 11 show different ends of the same three Ex-phone links.
+const apfExPhoneTieIn='CUS BLD-0002 Rev.C5 Sheets 2/11 · LAN-307-351 → UTP PATCH PANEL-3 → Media Converter ฝั่งตู้ → ODF-300 / FO → JB-304-001 ถึง -003 → TPH-304-001 ถึง -003';
+
+function fieldConverterOffers(offers){
+ return offers.flatMap(row=>{
+  if(row.site!=='APF'||row.system!=='TEL-IPP'||row.native.option||row.multipleSystems||
+   mgwCurrentDirectMr0550(row.offer)!=='MR-B1-13-APF-07')return [];
+  const tieInTerm=row.offer.quoteEvidence.terms?.find(term=>/media\s+conv(?:e)?rter/i.test(term));
+  return tieInTerm?[{...row,tieInTerm}]:[];
+ });
 }
 
 function canCompareUnits(item,offer){
@@ -77,8 +89,11 @@ export function schematicLanBom0550(required,offers,place){
    const mrUnit=cabinet?'Lot':'Ea';
    const compatible=single&&kind!=='ODF Panel'&&canCompareUnits(kind,single);
    const delta=requiredQty!==null&&offeredQty!==null&&compatible?offeredQty-requiredQty:null;
+   const isApfConverter=mr.id==='MR-B1-13-APF-09'&&kind==='Media Converter';
+   const tieInOffers=isApfConverter?fieldConverterOffers(offers):[];
    const status=delta===null?'OPEN':delta<0?'SHORT':delta>0?'EXCESS':'MATCH';
    const reason=delta!==null?(single.native.totalText==='Included'?'ระบุ Included ใน VND':''):
+    !matches.length&&isApfConverter?'รอยืนยัน Media Converter ฝั่งตู้ APF LAN ตาม MR 9.0':
     !matches.length?'ยังไม่พบรายการในชุด VND ที่ผูกกับตู้นี้':
     matches.length>1?'มีหลายบรรทัดเสนอ ต้องแยกจำนวนก่อนเทียบ':
     requiredQty===null?'MR ตู้นี้ไม่ได้ระบุจำนวนแยกสำหรับรายการนี้':
@@ -88,6 +103,7 @@ export function schematicLanBom0550(required,offers,place){
     key:mr.id+'|'+kind,label:cabinet?'จำนวนตู้':kind,packageLabel,packagePlace:cabinetPlace,packageSource:mr,
     mrBasis:each!==undefined&&mr.quantity>1?each+' Ea × '+mr.quantity+' ตู้ตาม MR':'',
     required:requiredQty===null?[]:[{...mr,description:cabinet?mr.description:kind,quantity:requiredQty,unit:mrUnit}],
+    tieInBasis:isApfConverter?apfExPhoneTieIn:undefined,tieInOffers,
     offers:matches,requiredQty,offeredQty,mrUnit,vndUnit:single?.native.unit,unit:mrUnit,delta,status,reason,
    });
   }

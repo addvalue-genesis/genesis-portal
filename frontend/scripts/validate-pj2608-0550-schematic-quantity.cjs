@@ -81,7 +81,7 @@ const {MGW_CURRENT_BATCH_0550,MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW
 const cabinetOffer=(sn,index,name,count,unit,term,section='LAN')=>({
  ...quote(MGW_CURRENT_PREFIX_0550+section+'-APF-'+sn+'-0'+index,'APF · '+name,
   'PDF p1 / '+section+' / APF / SN '+sn+'.0 / row '+index,count,{
-   systemTokens:[section==='FO'?'TEL-FO':'TEL-LAN'],sourceId:MGW_CURRENT_BATCH_0550,
+   systemTokens:[section==='FO'?'TEL-FO':section==='PABX'?'TEL-IPP':'TEL-LAN'],sourceId:MGW_CURRENT_BATCH_0550,
    sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,quotedUnit:unit,terms:[term],
   }),
  quoteRef:MGW_CURRENT_QUOTE_0550,
@@ -93,6 +93,7 @@ const lan=schematicQuantityMatrix0550({...input,offers:[
  cabinetOffer(10,2,'Access Switch L3',16,'Set','~ 1 x PoE+ Switch'),
  cabinetOffer(10,3,'24 Ports CAT6A Patch Panel',32,'Set','~ Discrete distribution module Panel, 24 port'),
  cabinetOffer(10,1,'24 Ports Fiber Patch Panel',8,'Set','~ 1 x Fiber Optic Patch Panel','FO'),
+ cabinetOffer(7,1,'Ex-Proof Telephone',3,'Set','~ 1 x Ethernet Media Convrter, 1G SPF Uplink','PABX'),
 ]});
 const lanMr=lan.required.filter(row=>row.system==='TEL-LAN'&&row.site==='APF');
 const lanVnd=lan.offered.filter(row=>row.system==='TEL-LAN');
@@ -106,7 +107,11 @@ assert.deepEqual(compared(bom(lanChecks,10,'Access Switch')),[16,16,0,'MATCH']);
 assert.deepEqual(compared(bom(lanChecks,10,'UTP Patch Panel')),[16,32,16,'EXCESS']);
 assert.deepEqual(compared(bom(lanChecks,10,'FO Patch Panel')),[8,8,0,'MATCH']);
 assert.deepEqual(compared(bom(lanChecks,9,'Media Converter')),[3,null,null,'OPEN']);
-assert.equal(lanChecks.flatMap(row=>row.offers).length,lan.offered.length,'Each offer appears once in LAN comparison');
+const converter=bom(lanChecks,9,'Media Converter');
+assert.equal(converter.offers.length,0,'The field package cannot satisfy the rack-side quantity');
+assert.equal(converter.tieInOffers[0].offer.id,MGW_CURRENT_PREFIX_0550+'PABX-APF-7-01');
+assert.match(converter.tieInBasis,/JB-304-001.*TPH-304-001/);
+assert.equal(lanChecks.flatMap(row=>[...row.offers,...(row.tieInOffers||[])]).length,lan.offered.length,'Each offer appears once in LAN comparison or related evidence');
 const control='Control Building';
 const cabinetChecks=compareLan(lanMr.filter(row=>row.building===control),lanVnd.filter(row=>row.building===control),
  {building:true,place:control,hasUnlocatedOffer:true});

@@ -94,14 +94,19 @@ function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate,workingLi
    <td><strong>{row.site} · {row.label}</strong>
     {row.packageLabel&&<small>{row.packageLabel} · {row.packagePlace}</small>}
     {row.mrBasis&&<small>ฐาน MR · {row.mrBasis}</small>}
-    <details><summary>หลักฐาน MR {row.packageSource?1:row.required.length} · VND {row.offers.length}</summary>
+    <details><summary>หลักฐาน MR {row.packageSource?1:row.required.length} · VND {row.offers.length}
+     {row.tieInOffers?.length>0&&' · Tie-In '+row.tieInOffers.length}
+    </summary>
+     {row.tieInBasis&&<small>{row.tieInBasis}</small>}
      {row.packageSource&&!row.required.length&&<div>
       <small>MR · {row.packageSource.locator}</small>
       <SourceButton0550 source={row.packageSource.source} onOpenSource={onOpenSource}/>
      </div>}
      {row.required.map(item=><div key={item.id}><small>MR · {item.description} · {quantity(item.quantity,item.unit)} · {item.locator}</small>
       <SourceButton0550 source={item.source} onOpenSource={onOpenSource}/></div>)}
-     {row.offers.map(item=><div key={item.offer.id}><small>VND · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
+     {[...row.offers,...(row.tieInOffers||[])].map(item=><div key={item.offer.id}>
+      <small>{item.tieInTerm?'VND · Tie-In ฝั่งสนาม':'VND'} · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
+      {item.tieInTerm&&<small>{item.tieInTerm}</small>}
       {schematicOfferMrRefs0550(item).length>0&&<small>MR ที่เกี่ยวข้อง · {schematicOfferMrRefs0550(item).join(' / ')}</small>}
       {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+item.offer.id)}>เปิด Offer ใน 07 VND</button>}
       {workingLines.filter(line=>line.wbs==='A'&&line.selected&&line.offerId===item.offer.id).map(line=><div key={line.id}>
