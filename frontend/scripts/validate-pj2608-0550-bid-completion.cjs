@@ -35,19 +35,19 @@ assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
 }
 {
  const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=require(src+'/project0550/data/mgwQuoteSelection0550.js');
- const date='2026-11-08',offerId=MGW_CURRENT_PREFIX_0550+'LAN-APF-8-01',lineId='LINE-B5-LAN-STARTUP-C9105AXI-H';
+ const date='2026-11-08',offerId=MGW_CURRENT_PREFIX_0550+'LAN-APF-9-05',lineId='LINE-B5-LAN-STARTUP-C9200-48P-A';
  const offer={id:offerId,quoteRef:MGW_CURRENT_QUOTE_0550,sourceRef:'Synthetic quote p1',currency:'USD',unit:'SET',unitCost:281,
   quoteEvidence:{sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,classification:'RATE',quotedUnitCost:281,
-   systemTokens:['TEL-LAN'],terms:['~ 1 x Cisco access point | C9105AXI-H'],locator:'PDF p1'}};
- const installed={id:'TEST-INSTALLED-AP',systemToken:'TEL-LAN',wbs:'A',offerId,selected:true,quantity:27,unit:'SET'};
+   systemTokens:['TEL-LAN'],terms:['~ 1 x Cisco access switch | C9200-48P-A'],locator:'PDF p1'}};
+ const installed={id:'TEST-INSTALLED-ACCESS',systemToken:'TEL-LAN',wbs:'A',offerId,selected:true,quantity:24,unit:'SET'};
  const fixture={...empty,lines:[installed],offers:[offer],
   repositoryBasisImport:{bidCompletion:{version:C.BID_COMPLETION_VERSION_0550,rows:[],basisLineIds:[]}},
   sourceIntake:{sources:[{id:'TEST-CURRENT-MR',documentNo:'MM-ASK-1A-APF-TEL-MR-0001',revision:'B1',authority:'CURRENT_TENDER',content:'Synthetic MR'}]}};
  const prepare=data=>C.prepareBidCompletion0550(data,options(data),date);
  const prepared=prepare(fixture),line=prepared.lines.find(l=>l.id===lineId),binding=prepared.bidVolumes.bindings.find(b=>b.lineId===lineId);
  assert.equal(line.manualCost,281);assert.equal(line.unit,'SET');assert.equal(line.offerId,'','Installed offer remains linked to its Part A owner');
- assert.deepEqual(prepared.calculations.find(c=>c.id===line.calculationId).inputs,{installed:27,failureRate:1/614054,exposureHours:720,coveragePct:99,planned:0,included:0});
- assert.deepEqual([binding.schedule,binding.status,binding.partNo,binding.interchangeB,binding.deliveryTerm],['C2','DRAFT','C9105AXI-H','27','']);
+ assert.deepEqual(prepared.calculations.find(c=>c.id===line.calculationId).inputs,{installed:24,failureRate:1/375570,exposureHours:720,coveragePct:99,planned:0,included:0});
+ assert.deepEqual([binding.schedule,binding.status,binding.partNo,binding.interchangeB,binding.deliveryTerm],['C2','DRAFT','C9200-48P-A','24','']);
  assert.deepEqual(C.cusQuantityPricingProblems0550(prepared,line),[]);
  assert.equal(prepare(prepared),prepared);
  const edited={...prepared,offers:[{...offer,unitCost:282}]};
@@ -56,6 +56,20 @@ assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
  assert.equal(prepare(duplicate),duplicate,'Ambiguous installed owner cannot seed a spare estimate');
  const removed={...prepared,lines:[installed]};
  assert.equal(prepare(removed),removed,'A deleted estimate is not recreated');
+ const controllerOffer={...offer,id:MGW_CURRENT_PREFIX_0550+'LAN-APF-9-07',unitCost:12253,
+  quoteEvidence:{...offer.quoteEvidence,quotedUnitCost:12253,terms:['~ 1 x Cisco wireless controller | 9800-L-C-K9']}};
+ const controllerLine={...installed,id:'TEST-INSTALLED-WLC',offerId:controllerOffer.id,quantity:2};
+ const cusSource=(no,content)=>({id:'TEST-'+no,documentNo:'MM-ASK-1A-APF-TEL-'+no,revision:'B1',authority:'CURRENT_TENDER',content});
+ const controllerFixture={...fixture,lines:[controllerLine],offers:[controllerOffer]};
+ assert.equal(prepare(controllerFixture),controllerFixture,'A quote alone cannot seed the controller');
+ const spe=cusSource('SPE-0002','High Availability: N+1 Redundancy or Controller High Availability');
+ const dts=cusSource('DTS-0001','Access points support (MIN) 200');
+ const ready=prepare({...controllerFixture,sourceIntake:{sources:[...fixture.sourceIntake.sources,spe,dts]}});
+ const controller=ready.lines.find(l=>l.id==='LINE-B5-LAN-STARTUP-9800-L-C-K9');
+ assert.equal(controller.manualCost,12253);
+ assert.deepEqual(ready.bidVolumes.bindings.find(b=>b.lineId===controller.id).sourceIds,['TEST-CURRENT-MR',spe.id,dts.id]);
+ assert.deepEqual(C.cusQuantityPricingProblems0550(ready,controller),[]);
+ assert.match(C.cusQuantityPricingProblems0550({...ready,sourceIntake:{sources:[spe]}},controller)[0],/LAN_C2_CONTROLLER_CUS_BASIS_OPEN/);
 }
 if(process.argv[2]){
  const original=JSON.parse(fs.readFileSync(process.argv[2],'utf8')),data=P.prepareBidProcess0550(retireLegacyTowerPricing0550(original),D.COMMERCIAL_POLICY,today),before=hash(data),beforeModel=B.deriveBidWorkspace(data,tokens,today);

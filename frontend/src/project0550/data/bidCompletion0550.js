@@ -109,11 +109,21 @@ const MICROWAVE_DRAFTS = {
 const MICROWAVE_LINK_REPORT = 'https://drive.google.com/file/d/1hGcBbwgqPR1DhbsfUzSrtc43E-FS8cS8/view';
 const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
-const lanC2PartNumbers=['C9105AXI-H','C9200-48P-A'];
+const lanLegacyAp='C9105AXI-H',lanController='9800-L-C-K9';
+const lanC2PartNumbers=['C9200-48P-A',lanController];
 const lanC2LineId=partNo=>'LINE-B5-LAN-STARTUP-'+partNo;
-const lanC2EstimateIds=new Set(lanC2PartNumbers.map(lanC2LineId));
+const lanC2EstimateIds=new Set([lanLegacyAp,...lanC2PartNumbers].map(lanC2LineId));
 const lanC2Overlap=data=>data.lines.some(line=>line.selected&&line.wbs==='B5'&&!lanC2EstimateIds.has(line.id)&&
  (line.systemToken==='TEL-LAN'||line.systemToken==='COMMON'&&(line.offerId||line.calculationId||finite(line.manualCost)||finite(line.sellRate))));
+const lanControllerCusBasis='SPE-0002 B1 §7.3.4 requires N+1 or controller HA; DTS-0001 B1 sheet 10 requires 200 AP, 2,000 clients and 5 Gbps. '+
+ 'Cisco rates the 9800-L hardware for 250 AP, 5,000 clients and 5 Gbps (Table 9, https://www.cisco.com/c/en/us/products/collateral/wireless/catalyst-9800-series-wireless-controllers/datasheet-c78-742434.html). '+
+ 'Working holds two controllers as a provisional HA basis. The quote includes a 50-AP licence per set; verify entitlement, failover and the final spare configuration before issue.';
+const lanControllerCusReady=(spe,dts)=>/High Availability:\s*N\+1 Redundancy or Controller High Availability/i.test(spe?.content||'')&&
+ /Access points support\s*\(MIN\)\s*200\b/i.test(dts?.content||'');
+const currentTenderSources=data=>{
+ const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
+ return no=>sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-'+no&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id));
+};
 
 // Continue only the exact prepared MR drafts. A saved edit, review or deletion
 // is authoritative. These links identify price owners without claiming coverage.
@@ -234,8 +244,7 @@ function reconcileCeragonR11(data){
 function prepareCusQuantityPricing0550(data, policies, today) {
  const receipt=data.repositoryBasisImport?.bidCompletion;
  if(!receipt||today<'2026-11-07')return data;
- const sources=data.sourceIntake?.sources||[], replaced=new Set(sources.flatMap(s=>s.replaces||[]));
- const candidates=no=>sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-'+no&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id));
+ const candidates=currentTenderSources(data);
  const current=no=>candidates(no).length===1;
  const mrCandidates=candidates('MR-0001');
  if(mrCandidates.length!==1)return data;
@@ -292,20 +301,29 @@ function prepareCusQuantityPricing0550(data, policies, today) {
    'Offer 98 handhelds total, including the MOGE Office TAG. Map site assignment and verify subscriber entitlement against the final list.',[handheld.id]);
  }
  const prepared=changed?{...data,lines:[...lines.values()],repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:[...rows.values()]}}}:data;
- const withLan=prepareLanC2Budget0550(prepared,goods,mrCandidates[0],today);
+ const [lanSpe]=current('SPE-0002')?candidates('SPE-0002'):[],[lanDts]=current('DTS-0001')?candidates('DTS-0001'):[];
+ const withLan=prepareLanC2Budget0550(prepared,goods,mrCandidates[0],lanSpe,lanDts,today);
  return ceragonR11Selected0550(withLan)?reconcileCeragonR11(withLan):microwaveSourceReady?linkPreparedMicrowaveDrafts0550(withLan,mrCandidates[0]):withLan;
 }
 
-function prepareLanC2Budget0550(data,goods,mr,today){
- if(lanC2Overlap(data))return data;
+function prepareLanC2Budget0550(data,goods,mr,spe,dts,today){
  const receipt=data.repositoryBasisImport.bidCompletion,{rows,stock,unlinked}=lanStockBasis0550(data,{lines:data.lines});
  let next=data;
+ const apId=lanC2LineId(lanLegacyAp),ap=data.lines.find(line=>line.id===apId&&line.selected);
+ const apReceipt=receipt.rows.find(row=>row.lineId===apId&&row.kind==='ESTIMATE');
+ if(ap&&apReceipt?.inputKey===lineKey(data,ap)&&/Radios support\s+2\.4,\s*5 GHz and 6 GHz/i.test(dts?.content||'')){
+  const reason='DTS-0001 B1 sheet 9 requires 6 GHz. Cisco C9105AXI has 2.4/5 GHz radios. Reprice the C2 spare against a matching AP or an approved deviation.';
+  next={...data,lines:data.lines.map(line=>line.id===apId?{...line,selected:false,customerRemark:reason}:line)};
+ }
+ if(lanC2Overlap(next))return next;
  const additions=[];
  for(const partNo of lanC2PartNumbers){
   const id=lanC2LineId(partNo),calculationId='CAL-B5-LAN-STARTUP-'+partNo;
   if(data.lines.some(line=>line.id===id)||receipt.rows.some(row=>row.lineId===id)||
    data.calculations.some(calculation=>calculation.id===calculationId)||data.bidVolumes?.bindings.some(binding=>binding.lineId===id))continue;
   const population=stock.find(item=>item.partNo===partNo);
+  const controller=partNo===lanController;
+  if(controller&&(population?.count!==2||!lanControllerCusReady(spe,dts)))continue;
   const owners=rows.filter(row=>row.partNo===partNo&&row.selected);
   const reference=owners[0]?.offer,rate=reference?.unitCost;
   if(!population?.count||unlinked.some(row=>row.partNo===partNo)||!finite(rate)||rate<=0||
@@ -314,28 +332,29 @@ function prepareLanC2Budget0550(data,goods,mr,today){
   const inputs={installed:population.count,failureRate:1/population.mtbf,exposureHours:720,coveragePct:99,planned:0,included:0};
   const result=evaluateServiceEquation('B5-SPARE-STOCK',inputs);
   if(result.state!=='CALCULATED'||result.value<=0)continue;
-  const requirementRef='MR Rev.B1 Appendix 10 / 10008-STD-6-TEL-001 R00 §7.7.1 / Exhibit C2 Note 3';
+  const requirementRef='MR Rev.B1 Appendix 10 / 10008-STD-6-TEL-001 R00 §7.7.1 / Exhibit C2 Note 3'+
+   (controller?' / SPE-0002 B1 §7.3.4 / DTS-0001 B1 sheet 10':'');
   const basis='SI startup stock estimate through PAC. One project stock pool, 30 days without replenishment, 99% stock sufficiency. '+
    'Installed population '+population.count+'; OEM MTBF '+population.mtbf+' h; '+population.locator+' '+population.source+
    '. No separate spare inclusion is credited pending confirmation. Cost proxy: complete matching MGW equipment set, USD '+rate+
-   '/SET, '+reference.sourceRef+'. Confirm dedicated spare supply and customer delivery basis.';
+   '/SET, '+reference.sourceRef+'. Confirm dedicated spare supply and customer delivery basis.'+(controller?' '+lanControllerCusBasis:'');
   const calculation={id:calculationId,title:'LAN start-up reserve · '+partNo,systemToken:'TEL-LAN',equationId:'B5-SPARE-STOCK',inputs,sourceRef:basis};
   const line={id,systemToken:'TEL-LAN',wbs:'B5',description:'SI estimate · LAN start-up spare · '+partNo+' complete set',
    scopeKey:id,tagRef:'TEL-LAN project startup stock pool',requirementRef,sourceRef:basis+'\n'+requirementRef,
    vendorId:'',offerId:'',calculationId,resultKey:'value',quantity:null,unit:'SET',currency:'USD',manualCost:rate,
    sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B5',
-   customerRemark:'Draft startup spare allowance based on the complete MGW equipment-set rate. Delivery term and formal spare quote remain open.',
+   customerRemark:controller?'Draft controller reserve. Confirm AP licence, HA configuration and dedicated spare supply before issue.':'Draft startup spare allowance based on the complete MGW equipment-set rate. Delivery term and formal spare quote remain open.',
    brand:'Cisco',commissioningPhase:'START_UP'};
   next={...next,lines:[...next.lines,line],calculations:[...next.calculations,calculation]};
   const offerIds=owners.map(row=>row.offer.id),ownerIds=owners.map(row=>row.line.id);
   additions.push({lineId:id,kind:'ESTIMATE',basis,offerIds,ownerIds,inputKey:lineKey(next,line),
    sourceKey:sourceKey(next,offerIds),ownerKeys:owners.map(row=>ownerKey(next,row.line))});
   next=saveBidVolumeRecord0550(next,'bindings',{...blankScheduleBinding0550(id),schedule:'C2',summary:'COMMISSIONING_SPARES',
-   sourceIds:[mr.id],locator:'MR Rev.B1 Appendix 10 / '+reference.quoteEvidence.locator,
+   sourceIds:[mr.id,...(controller?[spe.id,dts.id]:[])],locator:(controller?'SPE-0002 B1 §7.3.4 / DTS-0001 B1 sheet 10 / ':'')+'MR Rev.B1 Appendix 10 / '+reference.quoteEvidence.locator,
    basis:'SI draft · one project stock pool through PAC · equipment TAG and delivery pending',
    partNo,interchangeA:'1',interchangeB:String(population.count)},today,false);
  }
- return additions.length?{...next,repositoryBasisImport:{...next.repositoryBasisImport,bidCompletion:{...receipt,rows:[...receipt.rows,...additions]}}}:data;
+ return additions.length?{...next,repositoryBasisImport:{...next.repositoryBasisImport,bidCompletion:{...receipt,rows:[...receipt.rows,...additions]}}}:next;
 }
 
 export function cusQuantityPricingProblems0550(data,line){
@@ -345,7 +364,13 @@ export function cusQuantityPricingProblems0550(data,line){
  if(!row||row.inputKey!==lineKey(data,line))return [];
  if(lanEstimate&&lanC2Overlap(data))return ['LAN_C2_SCOPE_OVERLAP: reconcile the startup stock estimate with the existing B5 owner'];
  if(lanEstimate){
-  const partNo=lanC2PartNumbers.find(part=>lanC2LineId(part)===line.id);
+  const partNo=line.id.slice(lanC2LineId('').length);
+  if(partNo===lanController){
+   const candidates=currentTenderSources(data),spe=candidates('SPE-0002'),dts=candidates('DTS-0001');
+   const binding=data.bidVolumes?.bindings.find(binding=>binding.lineId===line.id&&binding.schedule==='C2');
+   if(spe.length!==1||dts.length!==1||!lanControllerCusReady(spe[0],dts[0])||
+    ![spe[0].id,dts[0].id].every(id=>binding?.sourceIds.includes(id)))return ['LAN_C2_CONTROLLER_CUS_BASIS_OPEN: review the current HA and AP-capacity requirements'];
+  }
   const {rows,unlinked}=lanStockBasis0550(data,{lines:data.lines});
   const owners=rows.filter(item=>item.partNo===partNo&&item.selected);
   if(unlinked.some(item=>item.partNo===partNo)||owners.length!==row.ownerIds.length||
