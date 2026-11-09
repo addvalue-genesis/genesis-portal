@@ -17,7 +17,7 @@ export function SchematicWorkspace({onOpenSystem,navigationTarget,onNavigate,onO
  const components=BUDGETARY_ESTIMATE.partA.find(s=>s.token===system)?.components||[];
  return <div className="p55-stack p55-schematic-workspace"><Module id="bid.schematic.canvas" title="Overall / Schematic per system">
  <SchematicQuantityMatrix0550 sourceIntake={data.sourceIntake} offers={data.offers} vendors={data.vendors}
-  systems={SYSTEMS} onNavigate={onNavigate} onOpenSource={onOpenSource}/>
+  systems={SYSTEMS} workingLines={data.lines} onNavigate={onNavigate} onOpenSource={onOpenSource}/>
  <Select label="Schematic system" value={system} onChange={setSystem} options={[["ALL","Overall — all registered system nodes"],...SYSTEMS.map(s=>[s.token,s.name])]}/>
  <p>ตำแหน่งวาดเพื่อให้อ่านง่าย ไม่ใช่ตำแหน่งภูมิศาสตร์ ระยะสาย หรือผลคำนวณ RF เส้นเชื่อมแสดงเฉพาะรายการที่ลงทะเบียนพร้อม source reference</p>
  {nodes.length?<div className="p55-table-wrap"><svg viewBox={`0 0 940 ${Math.max(240,Math.ceil(nodes.length/3)*130+45)}`} role="img" aria-label="0550 registered schematic" style={{width:"100%",minWidth:650}}>

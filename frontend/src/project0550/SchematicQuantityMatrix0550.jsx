@@ -2,12 +2,13 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {PHI_BUILDINGS_0550} from './data/apfPhiMatrix0550';
 import {MGW_CURRENT_MATRIX_0550,NO_SITE_0550,SITE_ONLY_0550,schematicQuantityGroups0550,schematicQuantityMatrix0550,schematicSystemDocs0550} from './data/schematicQuantityMatrix0550';
 import {supplierItemSourceText0550} from './data/supplierCostProjection0550';
+import {MGW_CCTV_ENT_SECTIONS_0550} from './data/mgwQuoteSelection0550';
+import {schematicCoverage0550,schematicOfferMrRefs0550} from './data/schematicCoverage0550';
 
 const ALL_LOCATIONS='รวมไซต์';
 const ALL_SITES='ALL';
 const format=number=>Number.isFinite(number)?number.toLocaleString('en-US',{maximumFractionDigits:6}):'OPEN';
 const quantity=(number,unit)=>[format(number),unit].filter(Boolean).join(' ');
-const byBasis=(tags,basis)=>tags.filter(tag=>tag.basis===basis);
 const sourceName=source=>[source.documentNo||source.title,source.revision].filter(Boolean).join(' · ');
 const at=(rows,place)=>place===ALL_LOCATIONS?rows:rows.filter(row=>(row.building||SITE_ONLY_0550)===place);
 
@@ -18,13 +19,6 @@ function SourceButton0550({source,onOpenSource}){
 function Count0550({label,groups,rows}){
  return <span>{label&&<><b>{label}</b>{' '}</>}{groups.length?groups.slice(0,2).map(g=>quantity(g.quantity,g.unit)+' '+g.label).join(' · '):rows?'ดูรายการ':'—'}
   {groups.length>2&&' +'+(groups.length-2)+' กลุ่ม'}</span>;
-}
-
-function TagCount0550({label,tags}){
- const primary=tags.filter(tag=>['Camera','IP Phone','Access Point'].includes(tag.type));
- const rest=tags.length-primary.length;
- return <span><b>{label}</b> {primary.length?primary.length+' '+primary[0].type+' TAG'+(rest?' +'+rest+' TAG':''):tags.length?tags.length+' TAG':'—'}
-  {tags.some(tag=>tag.conflict)&&' · มีข้อขัดแย้ง'}</span>;
 }
 
 function TagTable0550({tags,onOpenSource}){
@@ -85,9 +79,64 @@ function VendorBom0550({offers,onNavigate}){
  </table></div>:<p>ยังไม่พบรายการเสนอสำหรับไซต์นี้ในชุดที่เลือก</p>;
 }
 
-function CellEvidence0550({cell,onOpenSource,onNavigate}){
+const coverageLabel={SHORT:'ขาดตาม MR',EXCESS:'เสนอเกิน MR',OPEN:'รอตรวจ',MATCH:'จำนวนตรง'};
+const displayQty=(value,unit)=>Number.isFinite(value)?quantity(value,unit):'—';
+const previewItems=items=>items.slice(0,2).map(item=>item.description).join(' / ')+(items.length>2?' +'+(items.length-2)+' แถว':'');
+
+function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate}){
+ const rows=groups.flatMap(group=>group.results.filter(row=>showMatched||row.status!=='MATCH').map(row=>({...row,site:group.site})));
+ if(!rows.length)return <p>{groups.some(group=>group.results.length)?'รายการที่เทียบได้มีจำนวนตรงตาม MR':'ยังไม่มีรายการที่ตรวจได้ในขอบเขตนี้'}</p>;
+ return <div className="p55-table-wrap"><table className="p55-table" aria-label="ผลเทียบจำนวนตาม MR">
+  <thead><tr><th>ไซต์ / รายการ</th><th>MR</th><th>VND</th><th>ผลต่าง VND − MR</th><th>สถานะ</th></tr></thead>
+  <tbody>{rows.map(row=><tr key={row.site+'|'+row.key} data-coverage-status={row.status}>
+   <td><strong>{row.site} · {row.label}</strong>
+    {row.key==='unmatched'&&row.required.length>0&&<small>MR · {previewItems(row.required)}</small>}
+    {row.key==='unmatched'&&row.offers.length>0&&<small>VND · {previewItems(row.offers)}</small>}
+    <details><summary>หลักฐาน MR {row.required.length} · VND {row.offers.length}</summary>
+     {row.required.map(item=><div key={item.id}><small>MR · {item.description} · {quantity(item.quantity,item.unit)} · {item.locator}</small>
+      <SourceButton0550 source={item.source} onOpenSource={onOpenSource}/></div>)}
+     {row.offers.map(item=><div key={item.offer.id}><small>VND · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
+      {schematicOfferMrRefs0550(item).length>0&&<small>MR ที่เกี่ยวข้อง · {schematicOfferMrRefs0550(item).join(' / ')}</small>}
+      {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+item.offer.id)}>เปิด Offer ใน 07 VND</button>}</div>)}
+    </details>
+   </td>
+   <td>{displayQty(row.requiredQty,row.mrUnit)}</td><td>{displayQty(row.offeredQty,row.vndUnit)}</td>
+   <td>{Number.isFinite(row.delta)?(row.delta>0?'+':'')+quantity(row.delta,row.unit):'—'}</td>
+   <td><strong>{coverageLabel[row.status]}</strong>{row.reason&&<small>{row.reason}</small>}</td>
+  </tr>)}</tbody>
+ </table></div>;
+}
+
+function TraceLinks0550({system,cell,workingLines,onNavigate}){
+ if(!onNavigate)return null;
+ const ids=new Set(cell.required.map(row=>row.id)),offerIds=new Set(cell.offers.map(row=>row.offer.id));
+ const linked=workingLines.filter(line=>line.selected&&(ids.has(line.mrRequirementId)||offerIds.has(line.offerId)));
+ return <div className="p55-bom-trace">
+  <strong>เปิดงานที่เกี่ยวข้อง</strong>
+  <div className="p55-review-toolbar">
+   <button type="button" onClick={()=>onNavigate('bid.working-preview.step.5',{workingSystem:system})}>SI WP.5 · BOM</button>
+   <button type="button" onClick={()=>onNavigate('bid.working-preview.step.7',{workingSystem:system})}>SI WP.7 · Mapping</button>
+   {['A','B','C'].map(part=><button type="button" key={part} onClick={()=>onNavigate('bid.budget.working.part.'+part)}>Working Part {part}</button>)}
+  </div>
+  {linked.length>0&&<details><summary>Working Line ที่ผูกกับ MR / Offer ในตำแหน่งนี้ ({linked.length})</summary>
+   {linked.map(line=><button type="button" key={line.id} onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>
+    {line.wbs} · {line.description}
+   </button>)}
+  </details>}
+ </div>;
+}
+
+function CellEvidence0550({cell,onOpenSource,onNavigate,workingLines}){
  const {required,tags,offers,docs,phi}=cell;
- return <div className="p55-schematic-evidence">
+ return <>
+  {cell.siteOnlyNotice&&<p className="p55-note">ใบเสนอราคามีรายการที่ระบุเพียงระดับไซต์ เปิดโหนดระดับไซต์เพื่อดูรายการเหล่านั้น</p>}
+  <TraceLinks0550 system={cell.system} cell={cell} workingLines={workingLines} onNavigate={onNavigate}/>
+  <CoverageTable0550 groups={[{site:cell.site,results:cell.results}]} showMatched onOpenSource={onOpenSource} onNavigate={onNavigate}/>
+  <section className="p55-location-quote" aria-label="รายการที่เสนอในตำแหน่งนี้">
+   <h4>VND · รายการและจำนวนที่เสนอ</h4>
+   <VendorBom0550 offers={offers} onNavigate={onNavigate}/>
+  </section>
+  <details className="p55-bom-locations"><summary>CUS · BOM, TAG และเอกสารต้นทาง</summary>
   <section aria-label="CUS MR DTS SPE LIS">
    <h4>CUS · MR / DTS / SPE / LIS</h4>
    {phi&&<p>PHI Table {phi.table} · {phi.labels.join(' / ')} <SourceButton0550 source={phi.source} onOpenSource={onOpenSource}/></p>}
@@ -98,11 +147,8 @@ function CellEvidence0550({cell,onOpenSource,onNavigate}){
     <ul>{docs.map(doc=><li key={doc.id}><SourceButton0550 source={doc} onOpenSource={onOpenSource}/></li>)}</ul>
    </details>}
   </section>
-  <section aria-label="VND Quotation and BOM">
-   <h4>VND · Quotation / BOM</h4>
-   <VendorBom0550 offers={offers} onNavigate={onNavigate}/>
-  </section>
- </div>;
+  </details>
+ </>;
 }
 
 function SystemBom0550({groups,quoteName,onOpenSource,onNavigate}){
@@ -135,11 +181,28 @@ function SystemBom0550({groups,quoteName,onOpenSource,onNavigate}){
  </>;
 }
 
-export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems,onNavigate,onOpenSource}){
+function LocationDiagram0550({site,cells,onSelect}){
+ const [root,...locations]=cells;
+ const node=(cell,label)=> <button type="button" aria-haspopup="dialog" onClick={()=>onSelect(cell)}>
+  <strong>{label}</strong>
+  <small>MR {cell.required.length?cell.required.length+' แถว':'—'} · VND {cell.offers.length?cell.offers.length+' แถว':'—'}</small>
+  {['DTS','LIS','LIS อ้างอิง'].map(basis=>{
+   const count=cell.tags.filter(tag=>tag.basis===basis).length;
+   return count>0&&<small key={basis}>{basis} · {count} TAG</small>;
+  })}
+  {cell.phi&&<small>PHI Table {cell.phi.table}</small>}
+ </button>;
+ return <div className="p55-location-diagram" role="group" aria-label={'ผังตำแหน่ง '+site}>
+  <div className="p55-location-root">{node(root,site+' · รวมไซต์')}</div>
+  {locations.length>0&&<ul>{locations.map(cell=><li key={cell.place}>{node(cell,cell.place)}</li>)}</ul>}
+ </div>;
+}
+
+export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems,workingLines=[],onNavigate,onOpenSource}){
  const model=useMemo(()=>schematicQuantityMatrix0550({sourceIntake,offers,vendors}),[sourceIntake,offers,vendors]);
  const systemOptions=[...systems,{token:'COMMON',name:'Common / TAG ที่ยังไม่ระบุระบบ'}];
  const [token,setToken]=useState('TEL-CCTV'),[siteFilter,setSiteFilter]=useState(ALL_SITES);
- const [locationSite,setLocationSite]=useState('APF'),[locationsOpen,setLocationsOpen]=useState(false);
+ const [locationSite,setLocationSite]=useState('APF'),[showMatched,setShowMatched]=useState(false);
  const [quote,setQuote]=useState(MGW_CURRENT_MATRIX_0550),[selection,setSelection]=useState(null);
  const dialog=useRef(null);
  useEffect(()=>{if(selection&&!dialog.current.open)dialog.current.showModal();},[selection]);
@@ -153,18 +216,32 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
  const quoteName=mgw?'MGW · Q26-063':model.quoteOptions.get(selectedQuote);
  const quoteRows=model.offered.filter(o=>o.system===system.token&&(mgw?o.mgwCurrent:o.quoteKey===selectedQuote));
  const mrRows=model.required.filter(r=>r.system===system.token);
- const groups=(siteFilter===ALL_SITES?model.sites:[siteFilter]).map(siteKey=>({
-  site:siteKey,required:mrRows.filter(r=>r.site===siteKey),offers:quoteRows.filter(o=>o.site===siteKey),
- })).filter(group=>group.required.length||group.offers.length);
+ const expectedCameras=MGW_CCTV_ENT_SECTIONS_0550.find(section=>section.system==='TEL-CCTV').count;
+ const currentCameraRows=system.token==='TEL-CCTV'?quoteRows.filter(row=>row.mgwCurrent).length:0;
+ const completeCameraRegister=currentCameraRows===expectedCameras;
+ const partialCameraRegister=currentCameraRows>0&&!completeCameraRegister;
+ const noSite=quoteRows.some(row=>row.site===NO_SITE_0550&&!row.native.option&&!row.multipleSystems);
+ const groups=(siteFilter===ALL_SITES?model.sites:[siteFilter]).map(siteKey=>{
+  const required=mrRows.filter(r=>r.site===siteKey),offers=quoteRows.filter(o=>o.site===siteKey);
+  return {site:siteKey,required,offers,results:schematicCoverage0550(required,offers,{
+   hasUnlocatedOffer:noSite&&siteKey!==NO_SITE_0550,completeCameraRegister,partialCameraRegister,
+  })};
+ }).filter(group=>group.required.length||group.offers.length);
+ const results=groups.flatMap(group=>group.results);
  const tags=model.tags.filter(t=>t.system===system.token&&t.site===site);
  const marks=(phi?.rows||[]).filter(r=>r.token===system.token);
  const docs=schematicSystemDocs0550(model.specs,system.token);
  const locationMr=mrRows.filter(r=>r.site===site),locationVnd=quoteRows.filter(o=>o.site===site);
- const cells=locationsOpen?columns.map((place,i)=>{
+ const siteOnlyOffer=locationVnd.some(row=>!row.building&&!row.native.option&&!row.multipleSystems);
+ const siteOnlyMr=locationMr.some(row=>!row.building&&row.responsibility!=='COMPANY');
+ const cells=columns.map((place,i)=>{
   const labels=marks.filter(mark=>i===0||mark.location===i-1).map(mark=>mark.label);
-  return {place,required:at(locationMr,place),offers:at(locationVnd,place),
-   tags:at(tags,place),docs,phi:labels.length?{source:model.phi.source,table:phi.table,labels:[...new Set(labels)]}:null};
- }):[];
+  const required=at(locationMr,place),offers=at(locationVnd,place),isBuilding=scope.includes(place);
+  return {place,site,system:system.token,name:system.name,required,offers,tags:at(tags,place),docs,
+   results:schematicCoverage0550(required,offers,{building:place!==ALL_LOCATIONS,completeCameraRegister,partialCameraRegister,
+    hasUnlocatedOffer:place===SITE_ONLY_0550||noSite&&site!==NO_SITE_0550||isBuilding&&(siteOnlyOffer||siteOnlyMr)}),
+   siteOnlyNotice:isBuilding&&siteOnlyOffer,phi:labels.length?{source:model.phi.source,table:phi.table,labels:[...new Set(labels)]}:null};
+ }).filter(cell=>cell.place===ALL_LOCATIONS||cell.required.length||cell.offers.length||cell.tags.length||cell.phi);
  const closeAnd=action=>action&&((...args)=>{dialog.current.close();action(...args);});
  return <section className="p55-schematic-quantities" aria-label="BOM รายระบบและจำนวนเสนอ">
   <h3>BOM รายระบบ · จำนวนที่ต้องการและจำนวนเสนอ</h3>
@@ -186,44 +263,29 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
   <p className="p55-note">จำนวนเสนอใช้หน่วยในใบเสนอราคา · แถว Option และรายการใช้ร่วมแสดงใน BOM แยกจากยอดสรุป</p>
   {siteFilter!==ALL_SITES&&siteFilter!==NO_SITE_0550&&quoteRows.some(o=>o.site===NO_SITE_0550)&&
    <p className="p55-note">ชุดใบเสนอราคานี้มีรายการที่ยังไม่ระบุไซต์ <button type="button" onClick={()=>setSiteFilter(NO_SITE_0550)}>ดูรายการไม่ระบุไซต์</button></p>}
-  <SystemBom0550 groups={groups} quoteName={quoteName} onOpenSource={onOpenSource} onNavigate={onNavigate}/>
-  <details className="p55-bom-locations" onToggle={event=>setLocationsOpen(event.currentTarget.open)}>
-   <summary>ตำแหน่งอาคารและ TAG · DTS / LIS / SPE</summary>
-   {locationsOpen&&<div className="p55-source-matrix p55-bom-location-grid">
-    {siteFilter===ALL_SITES&&<label>ไซต์ในตารางตำแหน่ง <select aria-label="ไซต์ในตารางตำแหน่ง" value={locationSite} onChange={event=>setLocationSite(event.target.value)}>
-     {model.sites.map(value=><option key={value} value={value}>{value}</option>)}
-    </select></label>}
-    <p className="p55-note">{phi?.rows.length?<>■ ขอบเขตตำแหน่งตาม PHI Table {phi.table} · </>:null}
-     กดช่องเพื่อดู TAG และเอกสารต้นทาง · จำนวนที่ทราบเพียงระดับไซต์อยู่ในคอลัมน์ท้าย</p>
-    <div className="p55-table-wrap" tabIndex={0} aria-label="เลื่อนตารางจำนวนและ TAG">
-   <table className="p55-table" aria-label={'ระบบ × ตำแหน่ง '+site}>
-    <thead><tr><th rowSpan={2} scope="col">ระบบ</th><th colSpan={columns.length} scope="colgroup">{site}</th></tr>
-     <tr>{columns.map(place=><th scope="col" key={place}>{place}</th>)}</tr>
-    </thead>
-    <tbody><tr>
-     <th scope="row">{system.name}</th>
-     {cells.map(cell=>{
-      const dts=byBasis(cell.tags,'DTS'),lis=byBasis(cell.tags,'LIS'),reference=byBasis(cell.tags,'LIS อ้างอิง');
-      const hasData=cell.required.length||cell.offers.length||cell.tags.length||cell.phi;
-      const hasDocs=cell.place===ALL_LOCATIONS&&cell.docs.some(doc=>!doc.documentNo.endsWith('-LIS-0004'));
-      return <td key={cell.place} data-location={cell.place}>{hasData||hasDocs?<button type="button" aria-haspopup="dialog"
-       aria-label={system.name+' · '+cell.place+' · เปิดจำนวนและ TAG'} onClick={()=>setSelection({...cell,name:system.name})}>
-       {cell.phi&&<span className="p55-phi-marker">■ PHI</span>}
-       {(cell.required.length>0||cell.place===ALL_LOCATIONS)&&<Count0550 label="MR" groups={schematicQuantityGroups0550(cell.required)} rows={cell.required.length}/>}
-       {(dts.length>0||cell.place===ALL_LOCATIONS)&&<TagCount0550 label="DTS" tags={dts}/>}
-       {(lis.length>0||cell.place===ALL_LOCATIONS)&&<TagCount0550 label="LIS" tags={lis}/>}
-       {reference.length>0&&<TagCount0550 label="LIS อ้างอิง" tags={reference}/>}
-       {(cell.offers.length>0||cell.place===ALL_LOCATIONS)&&<Count0550 label="VND" groups={schematicQuantityGroups0550(cell.offers,true)} rows={cell.offers.length}/>}
-      </button>:'—'}</td>;
-     })}
-    </tr></tbody>
-   </table>
-    </div>
-   </div>}
+  <section className="p55-coverage" aria-label="ผลตรวจความครบถ้วน">
+   <h4>ผลตรวจตาม MR · {system.name}</h4>
+   <div className="p55-coverage-summary">{Object.entries(coverageLabel).map(([status,label])=><span key={status} data-coverage-status={status}>
+    <strong>{results.filter(row=>row.status===status).length}</strong> {label}
+   </span>)}</div>
+   <p className="p55-note">นับเป็นกลุ่มตรวจตามไซต์ · จำนวนตรงยังต้องผ่านการตรวจสเปกและ TAG ใน SI</p>
+   <label><input type="checkbox" checked={showMatched} onChange={event=>setShowMatched(event.target.checked)}/> แสดงรายการที่จำนวนตรงด้วย</label>
+   <CoverageTable0550 groups={groups} showMatched={showMatched} onOpenSource={onOpenSource} onNavigate={onNavigate}/>
+  </section>
+  <section className="p55-bom-locations" aria-label="ผังตำแหน่งและข้อเสนอ">
+   <h4>ผังตำแหน่ง · กดชื่อเพื่อดูข้อเสนอ</h4>
+   {siteFilter===ALL_SITES&&<label>ไซต์ในผัง <select aria-label="ไซต์ในผัง" value={locationSite} onChange={event=>setLocationSite(event.target.value)}>
+    {model.sites.map(value=><option key={value} value={value}>{value}</option>)}
+   </select></label>}
+   <p className="p55-note">จัดกลุ่มตามไซต์และตำแหน่งในหลักฐาน · เส้นแสดงการจัดกลุ่มสถานที่</p>
+   <LocationDiagram0550 site={site} cells={cells} onSelect={setSelection}/>
+  </section>
+  <details className="p55-bom-locations"><summary>เปิด BOM ต้นฉบับ CUS / VND ทุกแถว</summary>
+   <SystemBom0550 groups={groups} quoteName={quoteName} onOpenSource={onOpenSource} onNavigate={onNavigate}/>
   </details>
   <dialog ref={dialog} className="p55-source-matrix-dialog p55-schematic-dialog" aria-labelledby="p55-schematic-cell-title" onClose={()=>setSelection(null)}>
-   <header><h3 id="p55-schematic-cell-title">{selection?.name} · {site} · {selection?.place}</h3><form method="dialog"><button autoFocus>ปิด</button></form></header>
-   {selection&&<CellEvidence0550 cell={selection} onOpenSource={closeAnd(onOpenSource)} onNavigate={closeAnd(onNavigate)}/>}
+   <header><h3 id="p55-schematic-cell-title">{selection?.name} · {selection?.site} · {selection?.place}</h3><form method="dialog"><button autoFocus>ปิด</button></form></header>
+   {selection&&<CellEvidence0550 cell={selection} workingLines={workingLines} onOpenSource={closeAnd(onOpenSource)} onNavigate={closeAnd(onNavigate)}/>}
   </dialog>
  </section>;
 }

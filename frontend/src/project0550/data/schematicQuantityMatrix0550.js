@@ -37,6 +37,9 @@ const locationAliases={
 };
 function building(site,text){
  const matches=(PHI_BUILDINGS_0550[site]||[]).filter(place=>locationAliases[place].test(text));
+ // The APF monitor clause names Control Room and Security Building together.
+ // A recognized building name cannot own a combined, undistributed quantity.
+ if(site==='APF'&&/\bcontrol room\b/i.test(text)&&matches.some(place=>place!=='Control Building'))return null;
  if(site==='ACP'&&combinedOffice.test(text)&&matches.length===2&&matches.includes('Guard House Building'))return 'Office/Guard House Building';
  return matches.length===1?matches[0]:null;
 }

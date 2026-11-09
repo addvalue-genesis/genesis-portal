@@ -7,6 +7,7 @@ require.extensions['.js']=(module,file)=>file.startsWith(src+path.sep)?module._c
 }).code,file):previous(module,file);
 
 const {schematicQuantityMatrix0550,schematicQuantityGroups0550,NO_SITE_0550}=require(src+'/project0550/data/schematicQuantityMatrix0550');
+const {schematicCoverage0550}=require(src+'/project0550/data/schematicCoverage0550');
 const source=(id,documentNo,content,authority='CURRENT_TENDER')=>({
  id,documentNo,revision:'B1',content,authority,readState:'TEXT_READ',replaces:[]
 });
@@ -29,14 +30,19 @@ const native=quote('native','APF · Fixed Camera CAM-317-201','PDF p1 / CCTV / A
 const duplicate={...native,id:'native-duplicate'};
 const unknown=quote('unknown','Fixed Camera','PDF p1 / CCTV / SN 2',3);
 const option=quote('option','APF · Fixed Camera','PDF p1 / CCTV / APF / SN 3',5,{classification:'OPTION'});
-const input={sourceIntake:{sources,findings:[],milestones:[]},offers:[native,duplicate,unknown,option],vendors:[]};
+const monitor=quote('monitor','APF · CCTV Workstation','PDF p1 / CCTV / APF / SN 4',2,{
+ terms:['CCTV monitor 27" and 70" will be installed in Control room and Security Building']
+});
+const input={sourceIntake:{sources,findings:[],milestones:[]},offers:[native,duplicate,unknown,option,monitor],vendors:[]};
 const before=JSON.stringify(input),result=schematicQuantityMatrix0550(input);
 
-assert.equal(result.offered.length,3,'Identical original locators count once');
+assert.equal(result.offered.length,4,'Identical original locators count once');
 assert.equal(result.offered.find(x=>x.offer.id==='native').native.quantity,2);
 assert.equal(result.offered.find(x=>x.offer.id==='native').building,null,'A site-only supplier quantity is not spread over buildings');
 assert.deepEqual(result.offered.find(x=>x.offer.id==='native').exactTags,['CAM-317-201']);
 assert.equal(result.offered.find(x=>x.offer.id==='unknown').site,NO_SITE_0550);
+assert.equal(result.offered.find(x=>x.offer.id==='monitor').building,null,'Combined room and building quantities stay at site level');
+assert.equal(result.required.find(x=>x.id==='MR-B1-13-APF-12').building,null);
 assert.equal(schematicQuantityGroups0550(result.offered.filter(x=>x.site==='APF'),true)[0].quantity,2,'Option is separate');
 const apf=result.tags.filter(x=>x.site==='APF'&&x.basis==='DTS');
 assert.equal(apf.length,2);
@@ -50,4 +56,24 @@ assert.equal(schematicQuantityGroups0550(result.required.filter(x=>x.site==='APF
 assert.deepEqual(schematicQuantityMatrix0550({...input,lines:[{quantity:9999}],fx:{thbPerUSD:1},integrationWorkspace:{requirements:[]}}),result);
 assert.equal(schematicQuantityMatrix0550({...input,sourceIntake:{...input.sourceIntake,sources:sources.map(s=>s.id==='mr'?{...s,revision:'B2'}:s)}}).required.length,0);
 assert.equal(JSON.stringify(input),before);
+const cameraMr=result.required.filter(row=>row.site==='APF'&&row.system==='TEL-CCTV'&&row.type==='Camera');
+const station=(description,quantity)=>({
+ system:'TEL-CCTV',type:'Camera',description,quoteKey:'Q26-063',
+ offer:{},native:{quantity,unit:'Sets'},multipleSystems:false,
+});
+const cameraVnd=[station('Hazardous Area PTZ Camera Station',20),station('Hazardous Area FIXED Camera',2),
+ station('Fixed Lens Type Bullet Camera',6),station('Fixed Lens Type Dome Camera',30),station('PTZ Dome Camera',5)];
+const gaps=schematicCoverage0550(cameraMr,cameraVnd,{completeCameraRegister:true});
+assert.deepEqual(gaps.filter(row=>row.delta!==0).map(row=>[row.label,row.status,row.delta]),[
+ ['Ex PTZ','SHORT',-2],['Ex Fixed','EXCESS',2],
+]);
+assert(!schematicCoverage0550(cameraMr,cameraVnd).some(row=>row.status==='EXCESS'),'Incomplete evidence cannot infer a zero side');
+assert(!schematicCoverage0550(cameraMr,cameraVnd,{partialCameraRegister:true}).some(row=>Number.isFinite(row.delta)));
+assert(!schematicCoverage0550(cameraMr,[]).some(row=>row.status==='SHORT'),'Missing quote is not a zero quantity');
+assert(!schematicCoverage0550(cameraMr,cameraVnd,{building:true,hasUnlocatedOffer:true}).some(row=>Number.isFinite(row.delta)),
+ 'Quantities still at site level cannot be allocated to the building');
+assert.equal(schematicCoverage0550(cameraMr,[cameraVnd[0],{...cameraVnd[0],quoteKey:'another revision'}])
+ .find(row=>row.label==='Ex PTZ').status,'OPEN');
+assert.equal(schematicCoverage0550(cameraMr,[cameraVnd[0],{...cameraVnd[0],native:{quantity:2,unit:'PC'}}])
+ .find(row=>row.label==='Ex PTZ').offeredQty,null,'Mixed units cannot be added');
 console.log('PASS 05.3 CUS/VND quantities, TAG deduplication/conflicts, exact quote TAGs, source revisions, site-only scope and no Working inputs.');
