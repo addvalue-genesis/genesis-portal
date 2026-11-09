@@ -2,7 +2,7 @@ import React,{useMemo,useState} from 'react';
 import {useBidWorkspace} from './BidWorkspaceContext';
 import {SYSTEMS} from './data';
 import {downloadNativeExhibit0550} from './exhibitCNative0550';
-import {draftSubtotal0550,releaseScheduleArchive0550,releaseScheduleChecks0550,releaseScheduleDraftView0550} from './releaseScheduleDrafts0550';
+import {draftSubtotal0550,releaseScheduleArchive0550,releaseScheduleChecks0550,releaseScheduleDraftView0550} from './releaseScheduleDrafts0550.js';
 
 export function ReleaseScheduleDrafts0550({onNavigate}){
  const {data,model,reviewDate}=useBidWorkspace();
