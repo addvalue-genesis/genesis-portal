@@ -40,22 +40,22 @@ function words(n,currency='USD'){
  return (thb?'Thai Baht ':'United States Dollars ')+w(whole)+(cents%100?' and '+w(cents%100)+(thb?' satang':' cents'):'')+' only';
 }
 const blankValues=id=>Object.fromEntries(Object.keys(template.defaults).filter(k=>k.startsWith(id+'_')).map(k=>[k,template.defaults[k]]));
-// The C2 draft spans both term columns without assigning the price to either.
-function mergeC2PriceCells(source,row,column,format){
- const first=`{{C2_${row}_${column}}}`,second=`{{C2_${row}_${column+1}}}`;
+// Draft price cells span both term columns until a delivery basis is assigned.
+function mergeDraftPriceCells(source,id,row,column,format){
+ const first=`{{${id}_${row}_${column}}}`,second=`{{${id}_${row}_${column+1}}}`;
  if(format==='html')return source.replace(`<td><p>${first}</p></td><td><p>${second}</p></td>`,
   `<td colspan="2" class="native-c2-draft-price"><p style="text-align:right">${first}</p></td>`);
  const start=source.lastIndexOf('<w:tc>',source.indexOf(first));
  const firstEnd=source.indexOf('</w:tc>',source.indexOf(first))+7;
  const secondEnd=source.indexOf('</w:tc>',source.indexOf(second))+7;
- const width=/<w:tcW w:w="(\d+)" w:type="dxa"\/>/;
+ const width=/<w:tcW w:w="(\d+)" w:type="(dxa|pct)"\/>/;
  const nextWidth=Number(source.slice(firstEnd,secondEnd).match(width)[1]);
- const merged=source.slice(start,firstEnd).replace(width,(_,w)=>`<w:tcW w:w="${Number(w)+nextWidth}" w:type="dxa"/><w:gridSpan w:val="2"/>`);
+ const merged=source.slice(start,firstEnd).replace(width,(_,w,type)=>`<w:tcW w:w="${Number(w)+nextWidth}" w:type="${type}"/><w:gridSpan w:val="2"/>`);
  return source.slice(0,start)+merged+source.slice(secondEnd);
 }
 function fill(id,values,format,currency,draftPriceRows=[]){
  let source=template.schedules[id][format];
- for(const row of draftPriceRows)for(const column of [9,11])source=mergeC2PriceCells(source,row,column,format);
+ for(const [row,firstColumn] of draftPriceRows)for(const column of [firstColumn,firstColumn+2])source=mergeDraftPriceCells(source,id,row,column,format);
  if(format==='html'&&currency==='THB'){
   // Replace fixed currency labels in the preview template before adding user values.
   source=source.replace(/Amount in words:\s+United States Dollars?\s*/g,'Amount in words: ')
@@ -72,7 +72,17 @@ function nativePages(view,id,currency='USD'){
  const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
- const prices=(v,r,start,b)=>{const t=term(b);set(v,r,start,t==='CIF'?number(b.unitPrice):'');set(v,r,start+1,t==='FOB'?number(b.unitPrice):'');set(v,r,start+2,t==='CIF'?number(b.amount):'');set(v,r,start+3,t==='FOB'?number(b.amount):'');if(!t){set(v,r,start,'OPEN');set(v,r,start+2,'OPEN');issues.push('Customer CIF/FOB term OPEN: '+b.lineId);}};
+ const prices=(v,r,start,b,draftPriceRows)=>{
+  const t=term(b);
+  set(v,r,start,t==='CIF'?number(b.unitPrice):'');set(v,r,start+1,t==='FOB'?number(b.unitPrice):'');
+  set(v,r,start+2,t==='CIF'?number(b.amount):'');set(v,r,start+3,t==='FOB'?number(b.amount):'');
+  if(t)return;
+  issues.push('Customer CIF/FOB term OPEN: '+b.lineId);
+  const show=view.workingPreview&&!b.nonAdditive&&Number.isFinite(b.amount);
+  if(show)draftPriceRows.push([r,start]);
+  set(v,r,start,show&&Number.isFinite(b.unitPrice)?currency+' '+number(b.unitPrice):'OPEN');
+  set(v,r,start+2,show?currency+' '+number(b.amount):'OPEN');
+ };
  if(id==='A'){add();return {pages,issues};}
  if(id==='A1'||id==='A2'){
   const v=blankValues(id),base=id==='A1',part=base?'BASE':'OPTION',eligible=view.bindings.filter(b=>b.line&&b.treatment===part);
@@ -112,7 +122,7 @@ function nativePages(view,id,currency='USD'){
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group});});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
  }
  if(['C2','C3','C4'].includes(id)){
   const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows}];
@@ -124,12 +134,7 @@ function nativePages(view,id,currency='USD'){
     group.forEach((b,i)=>{
      const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description;
      [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
-     prices(v,r,9,b);
-     if(id==='C2'&&view.workingPreview&&!term(b)&&!b.nonAdditive&&Number.isFinite(b.amount)){
-      draftPriceRows.push(r);
-      set(v,r,9,Number.isFinite(b.unitPrice)?currency+' '+number(b.unitPrice):'OPEN');
-      set(v,r,11,currency+' '+number(b.amount));
-     }
+     prices(v,r,9,b,draftPriceRows);
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
     if(!system.rows.length)pendingPhases.forEach((phase,i)=>{
@@ -174,7 +179,7 @@ function renderPage(view,page,format,currency='USD'){
  let partialNote='';
  if(view.workingPreview){
   if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id));
-  if(page.priceRows&&!page.draftPriceRows?.length){
+  if(page.priceRows&&(page.id!=='C2'||!page.draftPriceRows?.length)){
    const rows=page.priceRows.filter(b=>!b.nonAdditive&&b.treatment!=='CALLOFF');
    if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
     partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+' (rows on this form).';
@@ -182,8 +187,8 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
  }
- if(page.draftPriceRows?.length)partialNote='Prices spanning CIF and FOB are pending allocation.'+
-  (page.priceRows.some(b=>b.line.spareBudget)?' Draft budget allowance; OEM breakdown OPEN.':'');
+ if(page.draftPriceRows?.length)partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
+  (page.id==='C2'&&page.priceRows.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;

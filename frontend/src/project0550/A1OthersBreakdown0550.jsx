@@ -14,6 +14,8 @@ const money=value=>Number.isFinite(value)?value.toLocaleString('en-US',{minimumF
 const isInsurance=b=>b.line.wbs==='B9'||b.lineId==='REQ-MR-ACT-B2-D04';
 const isLicence=b=>b.line.wbs==='B8'||isLicensingCostLine0550(b.lineId);
 const isLicenceFee=b=>b.lineId==='REQ-MR-ACT-B8-D05';
+export const a1OthersRows0550=(view,panel)=>view.bindings.filter(b=>b.line&&b.treatment==='BASE'&&!b.nonAdditive&&
+ a1SummarySlot0550(b)===othersSlot&&isInsurance(b)===(panel==='F'));
 
 const comparisons={
  E:[
@@ -43,13 +45,13 @@ function Comparison0550({panel}){
 export function A1OthersBreakdown0550({panel,view,currency,onNavigate,disabled}){
  const {number,title}=A1_OTHERS_PANELS_0550.find(p=>p.id===panel);
  const insurance=panel==='F';
- const rows=view.bindings.filter(b=>b.line&&b.treatment==='BASE'&&!b.nonAdditive&&a1SummarySlot0550(b)===othersSlot);
+ const rows=a1OthersRows0550(view,panel);
  const activeRows=currency==='THB'?rows.map(scheduleBindingTHB0550):rows;
  const groups=insurance
-  ?[['Insurance',activeRows.filter(isInsurance)]]
-  :[['Import / Operating Licence and Type Approval · Application Services',activeRows.filter(b=>!isInsurance(b)&&isLicence(b)&&!isLicenceFee(b))],
-    ['Authority and Agent Fees · Working Allowance',activeRows.filter(b=>!isInsurance(b)&&isLicenceFee(b))],
-    ['Other Costs',activeRows.filter(b=>!isInsurance(b)&&!isLicence(b))]];
+  ?[['Insurance',activeRows]]
+  :[['Import / Operating Licence and Type Approval · Application Services',activeRows.filter(b=>isLicence(b)&&!isLicenceFee(b))],
+    ['Authority and Agent Fees · Working Allowance',activeRows.filter(isLicenceFee)],
+    ['Other Costs',activeRows.filter(b=>!isLicence(b))]];
  const subtotal=scheduleRollup0550(groups.flatMap(([,items])=>items));
  const total=view.workingPreview?subtotal.knownUSD:subtotal.totalUSD;
  return <article aria-label={title}>

@@ -4,9 +4,10 @@ import {scheduleBindingTHB0550,scheduleRollup0550} from './data/scheduleRollup05
 
 const inspectionSlot=a1SummarySlot0550({schedule:'A1',summary:'INSPECTION'});
 const money=value=>Number.isFinite(value)?value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
+export const a1InspectionRows0550=view=>view.bindings.filter(b=>b.line&&b.treatment==='BASE'&&!b.nonAdditive&&a1SummarySlot0550(b)===inspectionSlot);
 
 export function A1InspectionBreakdown0550({view,currency}){
- const bindings=view.bindings.filter(b=>b.line&&b.treatment==='BASE'&&!b.nonAdditive&&a1SummarySlot0550(b)===inspectionSlot);
+ const bindings=a1InspectionRows0550(view);
  const rows=currency==='THB'?bindings.map(scheduleBindingTHB0550):bindings;
  const subtotal=scheduleRollup0550(rows);
  const amount=view.workingPreview?subtotal.knownUSD:subtotal.totalUSD;

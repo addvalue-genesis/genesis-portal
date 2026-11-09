@@ -20,6 +20,20 @@ try{
  const savedDraft=P.saveScheduleAllocationDrafts0550(d,v.allocationPlan,today);validate(savedDraft);assert.equal(savedDraft.bidVolumes.bindings.find(b=>b.id==='TEST-MGW-CCTV').status,'DRAFT');assert.equal(saved(savedDraft).ready,false);assert.deepEqual(savedDraft.lines,d.lines);assert.deepEqual(savedDraft.offers,d.offers);assert.deepEqual(savedDraft.releaseRegister,frozen);assert.deepEqual(P.saveScheduleAllocationDrafts0550(savedDraft,v.allocationPlan,today),savedDraft,'Repeated save does not overwrite existing decisions');
  const categories=structuredClone(d);categories.lines=categories.lines.map(l=>({...l,selected:false}));for(const wbs of ['B1','B2','B3','B4','B5','B6','B7','B8','B9','C1','C2','C3']){const row={...structuredClone(base.lines.find(l=>l.id==='LINE-TEST')),id:'TEST-'+wbs,scopeKey:'TEST-'+wbs,wbs,selected:true};categories.lines.push(row);}
  const cv=preview(categories),byWbs=code=>cv.allocationPlan.find(p=>p.line.wbs===code).proposal;assert.equal(byWbs('B2').schedule,'A1');assert.equal(byWbs('B2').summary,'OTHER','Freight is not silently reclassified as packing');assert.equal(byWbs('C2').schedule,'C4');assert.equal(byWbs('C3').schedule,'C3');assert.equal(byWbs('C1').schedule,'A2');assert.equal(byWbs('B3').summary,'TRAINING');validate(P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today));
+ const source=(id,replaces=[])=>({id,documentNo:'TEST-MR',revision:'B1',authority:'CURRENT_TENDER',readState:'TEXT_READ',content:'Synthetic source',replaces});
+ const volumeCandidates=['TEST-B6','TEST-B7','TEST-B5'].map(id=>({...categories.lines.find(l=>l.id===id),quantity:1,customerUSD:10}));
+ const volumeInput={...categories,repositoryBasisImport:{bidCompletion:{}},sourceIntake:{sources:[source('TEST-OLD'),source('TEST-NEW',['TEST-OLD'])]},
+  integrationWorkspace:{...I.emptyIntegration0550(),requirements:[{...I.blankRequirement0550('TEST-VOLUME-REQ'),workLineIds:volumeCandidates.map(l=>l.id),sourceIds:['TEST-OLD']}]}};
+ const applyVolume=input=>P.preparePricedVolumeDrafts0550(input,()=>({provisional:{selected:volumeCandidates}}),today);
+ const volumeDraft=applyVolume(volumeInput);
+ assert.deepEqual(volumeDraft.repositoryBasisImport.pricedVolumeDraftIds,['TEST-B6']);
+ const savedTool=volumeDraft.bidVolumes.bindings.find(b=>b.lineId==='TEST-B6');
+ assert.deepEqual([savedTool.schedule,savedTool.status,savedTool.sourceIds],['C5','DRAFT',['TEST-NEW']]);
+ assert.equal(volumeDraft.lines,volumeInput.lines);
+ assert.equal(applyVolume(volumeDraft),volumeDraft);
+ const removedDraft={...volumeDraft,bidVolumes:{...volumeDraft.bidVolumes,bindings:volumeDraft.bidVolumes.bindings.filter(b=>b.lineId!=='TEST-B6')}};
+ assert.equal(applyVolume(removedDraft),removedDraft);
+ assert.equal(P.scheduleAllocationPlan0550(removedDraft,{unallocated:volumeCandidates})[0].proposal,null);
  const {evaluateServiceEquation}=require(root+'/project0550/serviceEquationRuntime.js');
  const {commissioningBreakdown0550}=require(root+'/project0550/data/commissioningSparePhases0550.js');
  const stock={installed:10,failureRate:0.001,exposureHours:100,coveragePct:95,planned:2,included:1};

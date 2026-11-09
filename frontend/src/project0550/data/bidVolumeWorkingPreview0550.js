@@ -80,7 +80,9 @@ export function scheduleHoursFromCalculation0550(data,line){
 }
 export function scheduleAllocationPlan0550(data,savedView){
  const requirements=integrationRequirements0550(data),knownSources=new Set((data.sourceIntake?.sources||[]).map(s=>s.id));
+ const previouslySaved=new Set(data.repositoryBasisImport?.pricedVolumeDraftIds||[]);
  return savedView.unallocated.map(line=>{
+  if(previouslySaved.has(line.id))return {line,proposal:null,reason:'The previous draft was removed. Select a destination in 11.M to restore it.'};
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
   if(!raw||!base)return {line,proposal:null,reason:'No source category rule; SI must decide the destination'};
   let [schedule,summary,reason]=base;
@@ -111,6 +113,41 @@ export function saveScheduleAllocationDrafts0550(data,plan,today){
  }
  return next;
 }
+// Keep a receipt for each automatically saved identity so deletions stay authored.
+export function preparePricedVolumeDrafts0550(data,pricing,today){
+ const receipt=data.repositoryBasisImport;
+ if(!receipt?.bidCompletion)return data;
+ const recorded=new Set(receipt.pricedVolumeDraftIds||[]);
+ const bindings=data.bidVolumes?.bindings||[],bound=new Set(bindings.map(b=>b.lineId));
+ const capacity=Math.min(2000-bindings.length,2000-recorded.size);
+ if(capacity<=0)return data;
+ const sources=data.sourceIntake?.sources||[],bySource=new Map(sources.map(s=>[s.id,s]));
+ const replaced=new Set(sources.flatMap(s=>s.replaces||[]));
+ const current=sources.filter(s=>s.authority==='CURRENT_TENDER'&&s.content&&s.readState!=='METADATA_ONLY'&&!replaced.has(s.id));
+ const currentIds=new Set(current.map(s=>s.id));
+ const sourceId=id=>{
+  if(currentIds.has(id))return id;
+  const prior=bySource.get(id);
+  if(!prior?.documentNo)return null;
+  const successors=current.filter(s=>s.documentNo===prior.documentNo&&s.revision===prior.revision&&s.replaces?.includes(id));
+  return successors.length===1?successors[0].id:null;
+ };
+ const unallocated=pricing().provisional.selected.filter(line=>
+  !bound.has(line.id)&&!recorded.has(line.id)&&Number.isFinite(line.customerUSD)&&line.quantity>0);
+ const plan=scheduleAllocationPlan0550(data,{unallocated}).filter(({line,proposal})=>{
+  if(!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
+  if(['C3','C4','C5'].includes(proposal.schedule))return true;
+  if(proposal.schedule==='C7')return ['B3','B4'].includes(line.wbs);
+  return proposal.schedule==='A1'&&['INSPECTION','OTHER'].includes(proposal.summary);
+ }).map(entry=>({...entry,proposal:{...entry.proposal,sourceIds:[...new Set(entry.proposal.sourceIds.map(sourceId))]}}))
+  .filter(({proposal})=>proposal.sourceIds.every(Boolean)).slice(0,capacity);
+ const next=saveScheduleAllocationDrafts0550(data,plan,today);
+ if(next===data)return data;
+ const saved=new Set(next.bidVolumes.bindings.map(b=>b.lineId));
+ for(const {line} of plan)if(saved.has(line.id))recorded.add(line.id);
+ return {...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded]}};
+}
+
 export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,savedView){
  // A prepared bid-package reference is not another financial owner. Keep its
  // scope review OPEN; exclude only that explicit reference from draft arithmetic.
@@ -129,6 +166,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const projected=deriveBidVolumes0550(previewData,{...model,official:{...model.official,lines}},systems,today);
  const bindings=projected.bindings.map(b=>({...b,priceBasis:priceBasis.get(b.lineId),suggested:proposed.some(p=>p.line.id===b.lineId)}));
  const priced=projected.active.filter(l=>Number.isFinite(l.customerUSD)),unknown=projected.active.filter(l=>!Number.isFinite(l.customerUSD));
+ const autoDrafts=new Set(data.repositoryBasisImport?.pricedVolumeDraftIds||[]);
  const nativeC1=[];
  for(const binding of bindings.filter(b=>b.schedule==='C1'&&b.line)){
   nativeC1.push(binding);
@@ -141,7 +179,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  }
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:currentSupplierOffers0550(data).filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
  return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
-  previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,suggested:proposed.length,unresolved:plan.length-proposed.length,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
+  previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:proposed.length,unresolved:plan.length-proposed.length,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),
  };

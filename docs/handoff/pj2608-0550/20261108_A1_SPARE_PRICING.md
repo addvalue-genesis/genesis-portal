@@ -1,5 +1,15 @@
 # A1 commissioning and operating spare pricing
 
+## Volume I takes the available priced Working rows
+
+Existing 11.C2–C6 draft Word, HTML and screen forms show known Working selling rates and amounts in the price cells. Prices span the two term columns until the customer CIF/FOB basis is saved. C7 continues to use the existing hours calculation or an OPEN hour basis. 11.0, A1 and 11.P show C2–C8 plus the D/E/F supporting subtotals and a direct route to 11.M. D uses A1 inspection and E/F partition A1 Others without double counting. C6 and C8 still have no eligible Working allocation in the checked data.
+
+Startup preparation applies the existing allocation rules to priced, selected and unbound rows with source evidence in C3–C5, B3/B4 for C7, and A1 inspection and Others. It saves only DRAFT bindings, preserves authored bindings and records handled identities so a removed draft stays removed. Source substitution is limited to one explicitly registered, readable, current replacement of the same document number and revision. Uncertain C7 site survey proposals and unresolved references remain separate for review. Existing C2 draft bindings still come from the LAN preparation. Commercial and engineering review remain separate from this save path.
+
+The prepared project replay persisted 38 additional draft bindings, for 40 saved active allocations, with the same draft A1/A2 amounts before and after the allocation save. It verified current source references, idempotence, deletion preservation, price and FX ownership, and HOLD for reviewed issue.
+
+Production Chromium with the prepared project verified the 38 added bindings in IndexedDB and their visibility through 11.M, the 11.0 links, native C2–C6 price cells, C7/C8 and the D–F breakdowns. The bootstrapped draft USD totals were C2 27,495.15, C3 38,581.93, C4 12,942.00, C5 27,228.48, C7 209,862.47, D 20,999.96, E 239,423.50 and F 3,746.26. C6/C8 showed no allocated Working rows. The owner's Windows IndexedDB was outside the test.
+
 ## TEL-LAN C2 reassessment against the nine CUS groups
 
 SPE-0002 B1 §7.3.4 requires N+1 or controller high availability and DTS-0001 B1 sheet 10 requires 200 AP, 2,000 clients and 5 Gbps. The Cisco 9800-L data sheet Table 9 confirms hardware capacity of 250 AP, 5,000 clients and 5 Gbps. MR Appendix 1.3 APF item 9 lists one controller. The two selected Working sets are used as the provisional HA design basis. The 30-day/99% calculation gives one spare. Working B5 uses the existing MGW Q26-063 APF SN 9.0 row 7 rate of USD 12,253/SET as a complete-set cost proxy. E12/E13 yield USD 15,477.47, added via a DRAFT C2 binding linked to the current MR, SPE and DTS. The 50-AP licence shown in the quote, HA entitlement and dedicated spare configuration require review. A missing or superseded CUS basis holds the automatic controller price OPEN.

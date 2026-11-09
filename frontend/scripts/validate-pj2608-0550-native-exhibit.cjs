@@ -46,6 +46,7 @@ for(const [term,expected] of [['CIF',['50.00','','100.00','']],['FOB',['','50.00
  assert.doesNotMatch(confirmed.html,/native-c2-draft-price/);
 }
 assert.match(N.nativeExhibitHtml0550(spareView,'C3'),/USD 75\.00.*CIF\/FOB allocation OPEN/);
+assert.match(N.nativeSchedule0550(spareView,'C3').html,/class="native-c2-draft-price"><p[^>]*>USD 75\.00/);
 assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
 const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
 assert.deepEqual(priceCells(N.nativeSchedule0550(thbView,'C2','THB').pages[0]),['THB 1,600.00','','THB 3,200.00','']);
@@ -70,6 +71,7 @@ for(const id of ['C4','C5','C6']){
  const draft={...view,workingPreview:true,nativeC1:[],scheduleRows:schedule=>schedule===id?[row]:view.scheduleRows(schedule)};
  const note=new RegExp('Schedule '+id+' Working price: USD 172[.]50.*CIF/FOB allocation OPEN');
  assert.match(N.nativeSchedule0550(draft,id).html,note);
+ assert.match(N.nativeSchedule0550(draft,id).html,/class="native-c2-draft-price"><p[^>]*>USD 172\.50/);
  assert.match(Buffer.from(N.buildNativeExhibitDocx0550(draft,id)).toString(),note);
  assert.doesNotMatch(N.nativeSchedule0550({...draft,workingPreview:false},id).html,note);
 }

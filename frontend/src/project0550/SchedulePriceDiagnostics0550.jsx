@@ -2,9 +2,12 @@ import React,{useState} from 'react';
 import {SCHEDULES_0550} from './data/bidVolumes0550';
 import {schedulePriceDiagnostics0550} from './data/scheduleDiagnostics0550';
 import {scheduleBindingTHB0550,scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
+import {a1InspectionRows0550} from './A1InspectionBreakdown0550';
+import {a1OthersRows0550,A1_OTHERS_PANELS_0550} from './A1OthersBreakdown0550';
 
 const money=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'ยังไม่มีราคา';
 const resultSchedules=SCHEDULES_0550.filter(({id})=>/^C[2-8]$/.test(id));
+const supportingSchedules=[{id:'D',title:'Inspection and Tests'},...A1_OTHERS_PANELS_0550];
 
 export function ScheduleParentResults0550({rows,id,system,currency,workingPreview,onNavigate,disabled}){
  const displayed=currency==='THB'?rows.map(scheduleBindingTHB0550):rows;
@@ -30,8 +33,8 @@ export function ScheduleParentResults0550({rows,id,system,currency,workingPrevie
 export function ScheduleResults0550({view,currency,onOpen,disabled}){
  const display=currency==='THB'?scheduleViewTHB0550(view):view;
  return <section className="p55-panel" aria-label="11.C2–11.C8 Schedule results">
-  <h3>ผลราคา 11.C2–11.C8</h3>
-  <p>{view.workingPreview?'Working Preview · ยอดขายจาก Working ที่มีในแต่ละ Schedule ก่อนลงช่องราคาในแบบฟอร์ม':'เฉพาะรายการที่บันทึกและราคาที่ผ่านการทบทวน'}</p>
+  <h3>ผลราคา 11.C2–11.C8 และรายละเอียด 11.D–11.F</h3>
+  <p>{view.workingPreview?'Working Preview · ยอดขายจาก Working ที่มีในแต่ละ Schedule':'เฉพาะรายการที่บันทึกและราคาที่ผ่านการทบทวน'} · D–F แจกแจงยอดใน A1</p>
   <div className="p55-table-wrap"><table className="p55-table" aria-label="C2–C8 price results">
    <thead><tr><th>Schedule</th><th>แถวมีราคา / ทั้งหมด</th><th>ยอดที่มี {currency}</th><th>ข้อมูลที่ยังขาด</th></tr></thead>
    <tbody>{resultSchedules.map(({id,title})=>{
@@ -51,8 +54,17 @@ export function ScheduleResults0550({view,currency,onOpen,disabled}){
      <td>{d.priced?<><strong>{money(d.knownUSD)}</strong>{d.open>0&&<small>ยอดเฉพาะรายการที่มีราคา</small>}{d.rows.some(row=>row.binding.line.spareBudget)&&<small>รวมงบประมาณร่าง</small>}</>:'OPEN'}</td>
      <td>{gaps.join(' · ')||'ดูรายละเอียดในแบบฟอร์ม'}</td>
     </tr>;
+   })}{supportingSchedules.map(({id,title})=>{
+    const rows=id==='D'?a1InspectionRows0550(display):a1OthersRows0550(display,id),result=scheduleRollup0550(rows);
+    return <tr key={id}>
+     <th scope="row"><button type="button" disabled={disabled} onClick={()=>onOpen(id)}>เปิด 11.{id}</button> {title}</th>
+     <td>{result.priced} / {result.count}</td>
+     <td>{result.priced?money(result.knownUSD):'OPEN'}</td>
+     <td>{result.open?result.open+' แถวราคา OPEN':result.count?'ดูรายละเอียด A1':'ยังไม่มีรายการจัดสรร'}</td>
+    </tr>;
    })}</tbody>
   </table></div>
+  <button type="button" disabled={disabled} onClick={()=>onOpen('mapping')}>เปิด 11.M · ตรวจ Working และการจัดรายการ</button>
  </section>;
 }
 
@@ -62,7 +74,7 @@ export function SchedulePriceDiagnostics0550({view,id,currency='USD',onNavigate,
  return <section className="p55-panel" aria-label={'Schedule '+id+' price diagnostics'}>
   <h4>ต้นทางราคา Schedule {id}</h4>
   {id==='C2'&&<p>ฐาน CUS · 10008-STD-6-TEL-001 R00 §7.7.1 และ MR Rev.B1 Appendix 10 · คิดต้นทุนจากผลรวมจำนวนอะไหล่ที่ต้องจัดหาเพิ่ม × ราคาต่อหน่วยของแต่ละ OEM Part No. รายการที่อยู่ในราคาแพ็กเกจแล้วให้ตามรอยไปยังเจ้าของราคาเดิม <button type="button" disabled={disabled} onClick={()=>onNavigate?.('l3.original')}>เปิด CUS</button></p>}
-  {d.rows.length?<><p>{d.count} เจ้าของราคาจาก Working · มีราคา {d.priced} · ยังไม่มีราคา {d.open} · ยังไม่มีจำนวน {d.quantityOpen}</p><p><strong>{d.priced?'ยอดราคาที่มี '+currency+' '+money(d.knownUSD):'Working ต้นทางยังไม่มีราคาที่แสดงได้'}</strong>{d.priced>0&&d.open>0?' · เป็นยอดเฉพาะรายการที่มีราคา':''} · {view.workingPreview?'Working Preview / ยังไม่อนุมัติ':'มุมมองราคาที่ทบทวน'}</p>{d.columnOpen>0&&<p>อีก {d.columnOpen} แถวยังไม่กำหนด CIF / FOB · {id==='C2'&&view.workingPreview?'ราคาขายที่คำนวณแล้วแสดงคร่อมสองช่องจนกว่าจะกำหนดเงื่อนไขลูกค้าที่ 11.M':'ตรวจจำนวนและราคาที่ Working และกำหนดเงื่อนไขลูกค้าที่ 11.M'}</p>}</>:<p>ยังไม่มีแถว Working จัดลง Schedule นี้ · ตารางว่างยังไม่ใช่ราคา 0 หรือผลยืนยันว่าไม่เกี่ยวข้อง</p>}
+  {d.rows.length?<><p>{d.count} เจ้าของราคาจาก Working · มีราคา {d.priced} · ยังไม่มีราคา {d.open} · ยังไม่มีจำนวน {d.quantityOpen}</p><p><strong>{d.priced?'ยอดราคาที่มี '+currency+' '+money(d.knownUSD):'Working ต้นทางยังไม่มีราคาที่แสดงได้'}</strong>{d.priced>0&&d.open>0?' · เป็นยอดเฉพาะรายการที่มีราคา':''} · {view.workingPreview?'Working Preview / ยังไม่อนุมัติ':'มุมมองราคาที่ทบทวน'}</p>{d.columnOpen>0&&<p>อีก {d.columnOpen} แถวยังไม่กำหนด CIF / FOB · {['C2','C3','C4','C5','C6'].includes(id)&&view.workingPreview?'ราคาขายที่คำนวณแล้วแสดงคร่อมสองช่องจนกว่าจะกำหนดเงื่อนไขลูกค้าที่ 11.M':'ตรวจจำนวนและราคาที่ Working และกำหนดเงื่อนไขลูกค้าที่ 11.M'}</p>}</>:<p>ยังไม่มีแถว Working จัดลง Schedule นี้ · ตารางว่างยังไม่ใช่ราคา 0 หรือผลยืนยันว่าไม่เกี่ยวข้อง</p>}
   {id==='C6'&&<p>ตรวจวัสดุเติมครั้งแรกและวัสดุสิ้นเปลืองตามอุปกรณ์ที่เลือก พร้อม Specification และเจ้าของราคา · ไม่ย้ายอะไหล่สองปี C3 มาแทนโดยอัตโนมัติ</p>}
   {id==='C8'&&<p>ใช้สำหรับบริการ/สิ่งอำนวยความสะดวกแก่ COMPANY / PURCHASER · ค่าเดินทางและเบี้ยเลี้ยงทีม SI ที่คิดไว้แล้วต้องมีเจ้าของราคาเดียว และไม่ถูกนำมาคิดซ้ำที่นี่</p>}
   <div className="p55-review-toolbar"><button type="button" disabled={disabled} onClick={()=>onAllocate?.()}>ตรวจการจัดรายการ 11.M</button><button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.working-preview.step.7')}>ตรวจ MR ↔ Supplier / SI</button></div>

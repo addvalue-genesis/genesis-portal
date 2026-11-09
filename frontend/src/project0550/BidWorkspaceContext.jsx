@@ -24,7 +24,14 @@ import {prepareRepositoryBidBasis0550,prepareAuthorizedEurThb0550} from "./data/
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550} from "./data/tsiActivityBudget0550";
 import {CORE_TEAM} from "./data";
 import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
+import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550";
 const Context=createContext(null);
+const systemTokens0550=SYSTEMS.map(s=>s.token);
+function prepareQuotation0550(data,today,loadedWorkspace){
+ const priced=prepareBidCompletion0550(data,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(data,systemTokens0550,today)},today);
+ const working=priced===loadedWorkspace?applyDirectSupplierMarkup0550(priced):priced;
+ return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
+}
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export function BidWorkspaceProvider({children}){
@@ -50,12 +57,8 @@ export function BidWorkspaceProvider({children}){
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
-   const prepared=prepareBidCompletion0550(processed,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(processed,SYSTEMS.map(s=>s.token),reviewDate)},reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata and authorised TSI estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
-   else{
-    const withMarkup=applyDirectSupplierMarkup0550(current);
-    if(withMarkup!==current)current=await saveProject0550Bid(withMarkup,current.revision,"Apply ADDVALUE direct supplier markup");
-   }
+   const prepared=prepareQuotation0550(processed,reviewDate,current);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
@@ -65,7 +68,7 @@ export function BidWorkspaceProvider({children}){
    try{
     const bundle=await fetchAutomaticVendorRegisters0550(),plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
     const processed=prepareBidProcess0550(prepareMgwCurrentWorking0550(plan.workspace,COMMERCIAL_POLICY,reviewDate),COMMERCIAL_POLICY,reviewDate);
-    const priced=prepareBidCompletion0550(processed,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(processed,SYSTEMS.map(s=>s.token),reviewDate)},reviewDate);
+    const priced=prepareQuotation0550(processed,reviewDate);
     if(priced!==current)current=await saveProject0550Bid(priced,current.revision,"Load prepared Vendor registers and execute source-bound bid preparation / "+bundle.packages.map(p=>p.batchId).join(", "));
     setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));
    }catch(e){current=await loadProject0550Bid();setData(current);setVendorSync(vendorRegisterSyncFailure0550(e.message,current));}
@@ -74,7 +77,7 @@ export function BidWorkspaceProvider({children}){
     const bundle=result.bundle,intake=bundle.sourceIntake,selected=selectAutomaticSourceWorkspace0550(current,bundle,SYSTEMS.map(s=>s.token));
     const currentSources=prepareMgwCurrentWorking0550(selected.workspace,COMMERCIAL_POLICY,reviewDate);
     const sourceDraft=prepareSystemAvlDeviations0550(currentSources,deriveIntegration0550(currentSources,SYSTEMS,reviewDate));
-    const sourced=prepareBidCompletion0550(sourceDraft,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(sourceDraft,SYSTEMS.map(s=>s.token),reviewDate)},reviewDate);
+    const sourced=prepareQuotation0550(sourceDraft,reviewDate);
     if(sourced!==current)current=await saveProject0550Bid(sourced,current.revision,"Load canonical source/A preparation and reconcile system AVL drafts / "+intake.batchId);
     const messages={APPLIED:"โหลดข้อมูล JSON และชุดเตรียม A ให้ B ใช้แล้วอัตโนมัติ",PRESERVED_EDITS:"โหลดชุดเตรียม A แล้ว โดยคงรายการที่คุณแก้ไขไว้",ADOPTED:"ใช้ชุดเตรียม A ที่บันทึกไว้แล้ว โดยคงงานที่แก้ไขและรายการที่ลบไว้",CURRENT:"ข้อมูล JSON และชุดเตรียม A ใน workspace เป็นชุดปัจจุบันแล้ว",NOT_FOUND:"โหลดทะเบียน JSON แล้ว แต่ยังไม่พบชุดเตรียม A ที่ตรงกันใน DATA",LOCAL_NEWER:"ข้อมูลที่บันทึกอยู่ใหม่กว่าชุดบน Drive จึงเก็บข้อมูลเดิมไว้"};
     setData(current);setSourceSync({state:selected.state,message:messages[selected.preparationState],preparationState:selected.preparationState,preparationStats:selected.stats,batchId:current.sourceIntake?.batchId});
@@ -107,7 +110,7 @@ export function BidWorkspaceProvider({children}){
      let current=await loadProject0550Bid();
      const plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
      const processed=prepareBidProcess0550(prepareMgwCurrentWorking0550(plan.workspace,COMMERCIAL_POLICY,reviewDate),COMMERCIAL_POLICY,reviewDate);
-    const priced=prepareBidCompletion0550(processed,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(processed,SYSTEMS.map(s=>s.token),reviewDate)},reviewDate);
+    const priced=prepareQuotation0550(processed,reviewDate);
      if(priced!==current)current=await saveProject0550Bid(priced,current.revision,"Load prepared Vendor registers and execute source-bound bid preparation / "+bundle.packages.map(p=>p.batchId).join(", "));
      if(active){if(plan.changed||current.revision!==data.revision)setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));}
     }finally{lock.current=false;setBusy(false);}

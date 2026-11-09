@@ -1,4 +1,4 @@
-Latest A1 spare pricing: [TEL-LAN C2 reassessment against the nine CUS groups](20261108_A1_SPARE_PRICING.md). The Controller joins Access Switch as a draft B5 allocation. The incompatible original AP estimate is held from the draft. WP.5 and C2 show equipment-specific evidence and conditional stock calculations. The tested A1 S/N 4 known C2 subtotal is USD 27,495.15.
+Latest Volume I update: [Available priced Working rows](20261108_A1_SPARE_PRICING.md). The native C2–C6 draft price cells, the C2–C8 and D–F overview, and automatic 11.M DRAFT allocation use existing Working amounts. The checked data prepared 38 additional drafts. C6/C8 still need source scope and allocations. The tested LAN C2 subtotal is USD 27,495.15.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.
 
