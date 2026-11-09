@@ -19,7 +19,7 @@ export function selectedPagaOffer0550(data){
  const offers=ids.map(id=>data.offers.find(o=>o.id===id));
  // The selected package and its additive OEM components share one manufacturer
  // decision. Mixed OEMs or quote bases must be reconciled explicitly.
- if(offers.some(o=>!o||o.quoteRef.trim()!=="A20261632"||(o.brand.trim()?o.brand.trim().toUpperCase()!=="INDUSTRONIC":!hasIndustronic(data.vendors.find(v=>v.id===o.vendorId)?.name))))return null;
+ if(offers.some(o=>!o||!['A20261632','A20261632-002'].includes(o.quoteRef.trim())||o.quoteRef.trim()!==offers[0]?.quoteRef.trim()||(o.brand.trim()?o.brand.trim().toUpperCase()!=="INDUSTRONIC":!hasIndustronic(data.vendors.find(v=>v.id===o.vendorId)?.name))))return null;
  return {offer:offers[0],offers,lines};
 }
 
@@ -42,8 +42,8 @@ export function preparePagaAvlDeviation0550(data){
   reference:"MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / customer AVL Annex 2_1",sourceIds:[b.sourceId],sourceLocator:b.locator,sourceExcerpt:b.excerpt,
   need:"Request acceptance of selected INDUSTRONIC INTRON-X outside the PAGA AVL category.",criteria:"Customer acceptance of the proposed manufacturer with a recorded decision and supporting evidence.",
   interfaceBasis:"Manufacturer acceptance only; no technical/system adequacy is certified by this record.",offerIds:[offer.id],
-  supplierSourceIds:["DRV-1kLVdiDP4FZwEJjAIE9sGW0h2qowx1bik"],supplierLocator:"A20261632 / PAGA INTRON-X / p4-7",
-  supplierExcerpt:"",supplierBasis:"Selected OEM offer A20261632; original quote retained in Vendor Offers.",responsibility:"TSI",
+  supplierSourceIds:[offer.quoteEvidence?.sourceId||"DRV-1kLVdiDP4FZwEJjAIE9sGW0h2qowx1bik"],supplierLocator:offer.quoteRef+" / "+(offer.quoteEvidence?.locator||"PAGA INTRON-X / p4-7"),
+  supplierExcerpt:"",supplierBasis:"Selected OEM offer "+offer.quoteRef+"; original quote retained in Vendor Offers.",responsibility:"TSI",
   reason:"Selected INDUSTRONIC is not listed in this PAGA category. Existing IND deviation draft is the preparation basis.",
   workLineIds:selected.lines.map(l=>l.id),proofMode:"NOT_REQUIRED"};
  const avl={...blankAvlCheck0550(b.avlId),requirementId:b.requirementId,offerId:offer.id,manufacturer:"INDUSTRONIC",model:"INTRON-X / PAGA System",
@@ -53,7 +53,7 @@ export function preparePagaAvlDeviation0550(data){
   mrRef:"MM-ASK-1A-APF-TEL-MR-0001 / Telecommunication & Security System",vendorQuoteRef:offer.quoteRef,sn:"1",
   contractorDocument:b.locator,
   vendorDeviation:"Request COMPANY approval to use INDUSTRONIC INTRON-X for the PAGA system. INDUSTRONIC is not included in the referenced AVL category, which lists GAI-Tronics.",
-  justification:"INDUSTRONIC is the selected PAGA manufacturer under Offer A20261632. Refer to the technical offer and relevant datasheets. The existing IND deviation draft references manufacturer pre-qualification; verify and link that attachment before issue. No full technical compliance or customer acceptance is asserted by this request.",
+  justification:"INDUSTRONIC is the selected PAGA manufacturer under Offer "+offer.quoteRef+". Refer to the technical offer and relevant datasheets. The existing IND deviation draft references manufacturer pre-qualification; verify and link that attachment before issue. No full technical compliance or customer acceptance is asserted by this request.",
   vendorResponse1:"Preparation basis: Attachment 3 TechnicalDeviationsListTemplate-IND.xlsx / SN 1 / Annex-2. "+b.existingDraftUrl,
   templateStatus:"DRAFT - request for manufacturer approval",finalClosure:""};
  return {...data,integrationWorkspace:{...w,requirements:[...w.requirements,requirement],avlChecks:[...w.avlChecks,avl],deviations:[...w.deviations,deviation]}};

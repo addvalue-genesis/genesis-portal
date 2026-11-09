@@ -18,7 +18,7 @@ import {SourceReadingMatrix0550} from "./SourceReadingMatrix0550";
 import {SystemConstraints0550} from "./SystemConstraints0550";
 import {BidPunch0550} from "./BidPunch0550";
 import {punchTaskRoute0550,punchProofDraft0550,punchActivityDraft0550} from "./data/bidPunch0550";
-import {preparePagaRevisionMapping0550,pagaRevisionRequirementDraft0550} from "./data/supplierRevision0550";
+import {preparePagaRevisionMapping0550,pagaRevisionRequirementDraft0550,pagaRevisionSelected0550} from "./data/supplierRevision0550";
 import {SupplierItemSourceText0550,SupplierTowerBom0550,SupplierPagaBom0550} from "./SupplierItemSourceText0550";
 import {supplierBoqRows0550,supplierItemLabel0550} from "./data/supplierCostProjection0550";
 import {requirementSupplierOfferIds0550} from "./data/mrSupplierLinks0550";
@@ -30,21 +30,22 @@ function Note({children}){return <p className="p55-note">{children}</p>;}
 function PagaRevisionMapping({data,requirements,onEdit,onNavigate,onOpenSource}){
  const view=preparePagaRevisionMapping0550(data,requirements);
  if(!view)return <Note>PAGA A20261632-002 · รอทะเบียน Vendor และใบเสนอราคาต้นทางจาก DATA</Note>;
- const {net,source,rows,selected}=view;
+ const {net,source,rows,selected}=view,selectedRevision=pagaRevisionSelected0550(data);
  const deliveryTerm=net.quoteEvidence?.terms?.find(term=>/^FCA\b/i.test(term));
  const quotedPanels=rows[0].offer?.supplierQuoteRow.quantity;
  const requiredPanels=rows.slice(0,2).reduce((total,row)=>total+(row.mr?.quantity||0),0);
  return <details className="p55-panel" open>
   <summary>PAGA A20261632-002 · ร่าง Mapping ก่อนทบทวน A1-05</summary>
-  <p>NET จากใบเสนอราคา {amount(net.unitCost,net.currency)} / {net.unit} · ใช้หนึ่งเจ้าของราคาเมื่อรับขอบเขตและฐานพาณิชย์แล้ว</p>
+  <p>NET จากใบเสนอราคา {amount(net.unitCost,net.currency)} / {net.unit} · {selectedRevision?"ใช้หนึ่งเจ้าของราคาใน Working A1-05 แล้ว · ตรวจขอบเขตราย TAG ต่อ":"ตรวจเจ้าของราคาเดิมก่อนใช้ฉบับนี้"}</p>
   {deliveryTerm&&<Note>{deliveryTerm} · ตรวจเงื่อนไขขนส่งก่อนเปลี่ยนฐานราคาขายลูกค้า</Note>}
-  {source?<button type="button" onClick={()=>onOpenSource("bid.documents.source."+source.id)}>เปิดใบเสนอราคาต้นทาง</button>:<Note>ยังไม่พบข้อความต้นฉบับใน A · ตรวจ Source Intake จาก DATA</Note>}
+  {source?<button type="button" onClick={()=>onOpenSource("bid.documents.source."+source.id)}>เปิดหลักฐาน VND ในทะเบียนเอกสาร</button>:<Note>ยังไม่พบข้อความต้นฉบับใน A · ตรวจ Source Intake จาก DATA</Note>}
   <button type="button" onClick={()=>onNavigate("bid.vendor.offer."+net.id)}>เปิด NET ใน B07</button>
   <button type="button" onClick={()=>onNavigate("bid.budget.working.group.TEL-PAGA")}>เปิด Working PAGA</button>
   <button type="button" onClick={()=>onNavigate("bid.quotation.mapping")}>เปิด Schedule allocation 11.M</button>
   <button type="button" onClick={()=>onNavigate("bid.budget.release.customer.A1-05")}>เปิด A1-05 ใน Release</button>
   <p>Access Panel · MR {requiredPanels} SET / Supplier {quotedPanels??"OPEN"} U · ตรวจ TAG / ตำแหน่งและความเทียบเท่าของหน่วยก่อนจัดสรร</p>
   <p>XBC · ตรวจวงจร APF และ ACP ตามแบบ ส่วนประกอบที่อยู่ใน NET ใช้เป็นหลักฐานของเจ้าของราคาเดียว</p>
+  <p>Item 20030 ระบุ Controller Redundancy Activation 4 รายการ · ตรวจ Hardware, topology, ตำแหน่ง TAG และ Failover test</p>
   <div className="p55-table-wrap"><table className="p55-table" aria-label="PAGA revision mapping">
    <thead><tr><th>ข้อกำหนด MR</th><th>หลักฐานจากใบเสนอราคา</th><th>ตรวจ Mapping</th></tr></thead>
    <tbody>{rows.map(row=>{

@@ -1,3 +1,4 @@
+import {pagaRevisionNet0550} from './supplierRevision0550';
 import {mgwCurrentOffer0550,mgwCurrentMr0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
@@ -125,8 +126,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(targets.length===1){const target=targets[0];charged.add(b.lineId);target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
   const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id;
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
+  const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
-   description:mgwCurrentOffer0550(b.line.offer)?b.line.description:(systemNames[token]||'Equipment')+' — supply package',quantity:b.quantity,unit:b.unit,
+   description:mgwCurrentOffer0550(b.line.offer)||paga?b.line.description:(systemNames[token]||'Equipment')+' — supply package',quantity:b.quantity,unit:b.unit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:supplement?b.line.offer.quoteEvidence.terms.filter(t=>t.startsWith('BOM: ')).map(t=>c1Component0550(t.slice(5).replace(/^(\d+) x /,'$1 Ea. '))):[],
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
@@ -134,6 +136,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(supplement)for(const mrId of mgwCurrentMr0550(b.line.offer)){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
    candidatePackages.get(mrId).push(item.key);
+  }
+  if(paga)for(const mrId of ['MR-B1-14-APF-01','MR-B1-14-ACP-01','MR-B1-14-APF-05','MR-B1-14-ACP-05']){
+   if(requirements.some(r=>r.id==='REQDEF-'+mrId&&r.workLineIds.includes(b.lineId)&&r.offerIds.some(id=>id.startsWith('OFFER-PAGA-'+b.line.offer.quoteRef+'-')))){
+    candidatePackages.set(mrId,[...(candidatePackages.get(mrId)||[]),item.key]);
+   }
   }
   targets.forEach(t=>{t.packageKeys=(t.packageKeys||[]).concat(item.key);});
  }

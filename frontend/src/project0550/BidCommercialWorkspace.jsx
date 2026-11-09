@@ -1,3 +1,4 @@
+import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,ceragonR11Selected0550,DMR_PART_B_0550} from './data/ceragonSelection0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {mgwCurrentOffer0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./data/mgwQuoteSelection0550";
@@ -176,6 +177,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  const rows=model.lines.filter(r=>r.wbs[0]===part&&!r.historicalMgwPackage&&r.id!==RETIRED_TOWER_OWNER_0550),partId="bid.budget.working.part."+part;
  return <details className="p55-price-group" key={part} open={rows.length>0} data-component-key={partId} data-module-number={identity(partId).number} data-bid-owner={part} style={bidOwnerStyle(part)}><summary><BidHeading {...identity(partId)}/><span className="p55-group-total">{workingCountLabel(rows)} · {rows.filter(companyReference).length} อ้างอิงนอกยอด TSI · Selected subtotal {amount(sumOfficial(rows.filter(r=>r.selected),"customerTHB"))}{part==="B"&&<PartBCostTotal0550 rows={rows}/>}</span></summary>
  <div className="p55-review-toolbar" role="group" aria-label={'Working '+part+' expand collapse'}><button type="button" onClick={e=>toggleGroups(e,true)}>+ ขยายทุกหัวข้อ</button><button type="button" onClick={e=>toggleGroups(e,false)}>− หุบทุกหัวข้อ</button></div>
+ <PagaQuoteScope0550 data={data} section={part} onNavigate={onNavigate}/>
  {part==="B"&&<PartBScope0550 data={data} model={model} onNavigate={onNavigate}/>}
  {part==="A"&&<>
   <p>เรียงตาม MR Rev.B1 Appendix 1.1–1.8 · หัวข้ออ้างอิงเป็น working mapping; ขอบเขตและผู้รับผิดชอบต้องตรวจจาก Clause/หน้าในแต่ละรายการ</p>
@@ -317,6 +319,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Budget THB lines"><thead><tr><th>Customer row / WBS</th><th>Description</th><th>Qty / unit</th><th>ต้นทุน Working THB</th><th>Customer THB</th><th>Trace</th></tr></thead><tbody>{official.selected.map(r=><tr key={r.id} data-component-key={"bid.budget.budget-thb.line."+r.id} data-module-number={identity("bid.budget.budget-thb.line."+r.id)?.number} data-bid-owner={lineOwner0550(r)} style={bidOwnerStyle(lineOwner0550(r))}><td>{r.customerRowCode||"OPEN"} / {r.wbs}</td><td><BidHeading {...identity("bid.budget.budget-thb.line."+r.id)}/></td><td>{r.quantity??"OPEN"} {r.unit}</td><td>{amount(r.costTHB)}</td><td>{amount(r.customerTHB)}</td><td>{r.reviewState}<button type="button" onClick={()=>go("working",r.sourceModuleId)}>กลับ Source</button></td></tr>)}</tbody></table></div>
  </Module>
  <OfficialCustomerForm onNavigate={onNavigate} onOpenSource={onOpenSource} official={official} open={false} navigationTarget={target} onSource={id=>go("working",id)}>
+ <PagaQuoteScope0550 data={data} section="release" onNavigate={onNavigate}/>
  <section className="p55-panel"><strong>Volume II · Technical Proposal</strong><p>ชุดเทคนิคใช้ Requirements / CAL–RPT / Supplier / Working ร่วมกัน สถานะเอกสารเทคนิคต้องตรวจแยกจากการอนุมัติราคานี้</p><button type="button" onClick={()=>onNavigate?.("bid.technical.overview")}>เปิด Volume II · Technical Proposal</button></section>
  </OfficialCustomerForm>
  <OfficialHistoryComparison/>

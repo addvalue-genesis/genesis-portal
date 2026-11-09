@@ -1,3 +1,5 @@
+Latest bid update: [PAGA revised quotation through the bid package](20261109_PAGA_REVISION_BID_CHAIN.md). A1-05 uses one A20261632-002 NET Lot with CUS, VND, SI, draft Release and Volumes 11–14 references. The two MGW supplements are in the established project DATA folder.
+
 Latest MGW update: [CCTV and Entertainment quotation V1.2](20261109_MGW_CCTV_ENT_QUOTATION.md). The 42 equipment rows feed 07, Working A, draft 10.7, 11.A/A1/C1 and 11.M. The discrepancy in the CCTV printed subtotal and the outstanding evidence by schedule are tracked in TC Rev.05.
 
 Latest draft quotation output: [Schedule A and C1–C8](20261109_DRAFT_SCHEDULE_A_C1_C8.md). Existing 10.7 exports nine Word forms plus a per-document review using available Working prices and actual open fields.

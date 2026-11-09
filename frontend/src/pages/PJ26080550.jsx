@@ -39,6 +39,7 @@ import {ComponentCopyId,ComponentNumbersContext} from "../common/ui/ComponentCop
 import {moduleDirectory0550,moduleDirectoryText0550} from "../project0550/moduleDirectory0550";
 import {BidWorkspaceProvider,useBidWorkspace} from "../project0550/BidWorkspaceContext";
 import {SiOperatingPrinciples0550} from "../project0550/SiOperatingPrinciples0550";
+import {PagaQuoteScope0550} from "../project0550/PagaQuoteScope0550";
 import {BidCommercialWorkspace} from "../project0550/BidCommercialWorkspace";
 import {EquationWorkbench} from "../project0550/EquationWorkbench";
 import {DeviationWorkspace0550} from "../project0550/ParticularDeviationWorkspace0550";
@@ -2222,7 +2223,7 @@ function Project0550Bidding({ lang = "th" }) {
         <BidSaveStatus/>
         {technicalDirty&&<p className="p55-panel" role="status">มีร่างชุดข้อเสนอที่ยังไม่บันทึก · บันทึกหรือยกเลิกก่อนเปลี่ยนแท็บ/พื้นที่ทำงาน</p>}
         <ProjectModuleSearch0550 directory={directory} onJump={jump}/>
-        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / อ่านข้อกำหนดตาม MR</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></section>}
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / อ่านข้อกำหนดตาม MR</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><PagaQuoteScope0550 data={data} section="A" onNavigate={navigate}/><DocumentsView navigationTarget={navigationTarget} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></section>}
         {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · {data?.releaseRegister?.issues.length||0} authorized snapshots · {data?.releaseRegister?.transmittals.length||0} recorded transmittals.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>}
         {/* Retain the existing Working editor and visited projections across tabs. */}

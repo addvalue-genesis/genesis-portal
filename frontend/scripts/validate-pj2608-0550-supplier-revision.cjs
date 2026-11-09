@@ -39,6 +39,30 @@ const data={...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),vendors:[vendor]
  assert.equal(R.pagaRevisionRequirementDraft0550(mapping.rows[3],quote),null);
  assert.equal(R.preparePagaRevisionMapping0550({...draftData,offers:[...offers,{...offers[3],id:'duplicate'}]},requirements).rows[0].offer,undefined);
  assert.deepEqual(draftData,beforeMapping);
+ const actualNet={...revisionNet,quoteEvidence:{...revisionNet.quoteEvidence,sourceId,sourceUrl:quote.url,quotedCurrency:'EUR',quotedTotal:100}};
+ const completeQuote={...quote,content:quote.content.replace('2011 1,00 U Other item\n','')};
+ const items=[item('1010',4),item('2010',5),...['11010','22030','23010','24010','18020'].map(code=>item(code,8))];
+ items[2].supplierQuoteRow.quantity=4;
+ const legacy=[1,2,3].map(n=>({...oldLine,id:'LINE-LEGACY-TEL-PAGA-'+n,scopeKey:'VENDOR-BASIS.LEGACY-TEL-PAGA-'+n,
+  offerId:'OFFER-LEGACY-TEL-PAGA-'+n,unit:n===2?'Pc':'Lot'}));
+ const active={...draftData,offers:[actualNet,...items],lines:legacy,sourceIntake:{...intake,sources:[source,completeQuote]},
+  repositoryBasisImport:{bidProcess:{ceragonHandled:true}}};
+ const updated=R.preparePagaRevisionPricing0550(active,'2026-11-09');
+ assert.equal(updated.lines[0].id,legacy[0].id);
+ assert.equal(updated.lines[0].offerId,actualNet.id);
+ assert.deepEqual(updated.lines.map(l=>l.selected),[true,false,false]);
+ assert.deepEqual(updated.offers,active.offers);
+ assert.equal(R.preparePagaRevisionPricing0550(updated,'2026-11-09'),updated);
+ const edited={...active,lines:[legacy[0],{...legacy[1],quantity:2},legacy[2]]};
+ assert.equal(R.preparePagaRevisionPricing0550(edited,'2026-11-09'),edited);
+ const deselected={...active,lines:[{...legacy[0],selected:false},legacy[1],legacy[2]]};
+ assert.equal(R.preparePagaRevisionPricing0550(deselected,'2026-11-09'),deselected);
+ const missing={...active,offers:active.offers.filter(o=>o.supplierQuoteRow.itemCode!=='18020')};
+ assert.equal(R.preparePagaRevisionPricing0550(missing,'2026-11-09'),missing);
+ const expired={...active,offers:[{...actualNet,validUntil:'2026-11-08'},...items]};
+ assert.equal(R.preparePagaRevisionPricing0550(expired,'2026-11-09'),expired);
+ console.log('PASS PAGA revision pricing: one active NET, no duplicated panel/XBC, existing identities and user edits preserved.');
+
 }
 const pack={schema:R.SUPPLIER_REVISION_SCHEMA_0550,projectId:'PJ2608-0550',batchId:'SYNTHETIC-REVISION',preparedOn:'2026-11-03',coverageNote:'Synthetic only',commercialTotals:{gross:125,discountable:125,discount:25,net:100,discountPercent:20},sourceIntake:{...intake,batchId:'PJ2608-0550-SOURCE-INTAKE-REV12-20261103',reviewedOn:'2026-11-03',sources:[source,{...source,id:'SYNTHETIC-SUPPLIER',documentNo:'SYNTHETIC-REV2',authority:'INTERNAL_REFERENCE'}]},predecessorSourceKey:I.integrationFingerprint0550(intake),vendor,offers:[net,detail],line,requirements:[{...base,supplierBasis:'New revision evidence; acceptance OPEN'}, {...I.blankRequirement0550('REQ-TAG-SYNTHETIC','TEL-PAGA'),site:'APF',sourceIds:[source.id],sourceExcerpt:source.content,offerIds:[detail.id],supplierSourceIds:['SYNTHETIC-SUPPLIER'],workLineIds:[line.id]}],particulars:[],expectedRequirements:[{id:base.id,basisKey:I.integrationFingerprint0550(base)}]};
 const before=JSON.stringify(data),result=R.planSupplierRevision0550(data,pack,tokens),next=result.workspace;

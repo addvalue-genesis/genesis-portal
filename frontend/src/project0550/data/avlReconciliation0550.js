@@ -45,7 +45,7 @@ export function deriveAvlReconciliation0550(data,integration){
   const token=scope.id,reqs=requirements.filter(r=>r.systemToken===token),lines=data.lines.filter(l=>l.systemToken===token&&activeSupply0550(l)&&l.wbs==='A');
   const chosenIds=uniq([...lines.flatMap(l=>workingOffers0550(data,l).map(o=>o.id)),...reqs.filter(r=>r.disposition!=='NOT_APPLICABLE'&&r.responsibility!=='COMPANY').flatMap(r=>r.offerIds)]);
   const applicable=currentSupplierOffers0550(data,token);
-  const chosen=applicable.filter(o=>chosenIds.includes(o.id));
+  const chosen=applicable.filter(o=>chosenIds.includes(o.id)&&(token==='TEL-PAGA'||o.id!=='OFFER-PAGA-A20261632-002-22030'));
   const offered=applicable.filter(o=>mgwOfferSystemTokens0550(o).includes(token)&&mgwQuoteItem0550(o)?.wbs==='A'&&!chosenIds.includes(o.id));
   const chosenKnown=chosen.some(o=>!unknown(o.brand));
   // Explicit Working allocations remain visible; competing catalogue offers are

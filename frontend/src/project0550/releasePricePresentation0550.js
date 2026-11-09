@@ -1,3 +1,4 @@
+import {pagaRevisionNet0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
 import {sumMoney0550} from "./data/money0550";
 import {mgwSupplementOpen0550} from "./data/mgwQuoteSelection0550";
 
@@ -16,7 +17,7 @@ export function releasePricePresentation0550(official){
     ...group.children.filter(line=>!Number.isFinite(line.customerUSD)).map(line=>"ราคา USD ยัง OPEN / "+line.id),
     ...(!group.children.length?["ยังไม่มีเจ้าของราคาที่เลือกและผูกกับ Lot นี้"]:[])
    ])]:[],
-   checks:provisional?[...new Set(group.children.map(line=>mgwSupplementOpen0550(line.offer,line.systemToken)).filter(Boolean))]:[],
+   checks:provisional?[...new Set(group.children.map(line=>pagaRevisionNet0550(line.offer)?PAGA_REVISION_OPEN_0550:mgwSupplementOpen0550(line.offer,line.systemToken)).filter(Boolean))]:[],
    known:provisional&&open?{amount:sumMoney0550(priced.map(line=>line.customerUSD)),priced:priced.length,count:group.children.length}:null,
    dmrKnown:dmr.length?{amount:sumMoney0550(dmr.map(line=>line.customerUSD)),priced:dmr.length}:null
   });

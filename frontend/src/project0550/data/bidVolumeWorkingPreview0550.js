@@ -1,3 +1,4 @@
+import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550} from './supplierRevision0550';
 import {evaluateServiceEquation} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
@@ -46,6 +47,7 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   const customerMapped=mappingValid(raw),reasons=[];
   // These annotations identify work to inspect; they do not decide applicability.
   const advisories=[];
+  if(pagaRevisionNet0550(line?.offer))advisories.push(line.offer.quoteRef+' · '+PAGA_REVISION_INCLUDED_0550);
   if(mgwCctvEntOffer0550(line?.offer)){
    const candidates=mgwCurrentMr0550(line.offer);
    if(candidates.length)advisories.push('MR candidate / '+candidates.join(' / '));
@@ -103,7 +105,8 @@ export function scheduleAllocationPlan0550(data,savedView){
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-003'){schedule='A1';summary='INSPECTION';reason='MGW bundled Integration/Assembly/Inspection/FAT → proposed A1 Inspection; retain full bundle scope for review';}
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-004'){schedule='A1';summary='PACKING';reason='MGW expressly bundled Packing/Marking/Delivery → proposed A1 Packing; one owner, no split or duplicate freight';}
   }
-  const sourceIds=[...new Set([...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)).flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
+  const offer=data.offers.find(o=>o.id===raw.offerId);
+  const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)).flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
   const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
   const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
   return {line,proposal,reason};

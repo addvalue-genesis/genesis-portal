@@ -1,3 +1,4 @@
+import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
 import {SCHEDULES_0550,deriveBidVolumes0550} from './data/bidVolumes0550';
 import {deriveBidVolumeWorkingPreview0550} from './data/bidVolumeWorkingPreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
@@ -20,6 +21,13 @@ export function releaseScheduleDraftView0550(data,model,systems,today){
 }
 
 export function releaseScheduleChecks0550(view){
+ const paga=view.bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer));
+ const pagaChecks={
+  C2:'PAGA item 18020 is one commissioning kit included in the A1-05 NET. Verify additional OEM spares and recommended quantities.',
+  C3:'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
+  C5:'Separate additional PAGA special tools from the kit included in A1-05.',
+  C7:'PAGA OEM FAT at Wertheim is included in A1-05. Confirm field service, SAT and training separately.'
+ };
  return RELEASE_DRAFT_FORMS_0550.map(({id,title})=>{
   const rows=id==='A'?view.bindings.filter(b=>b.line):view.scheduleRows(id);
   const unassigned=id==='C2'?rows.filter(b=>!c2HasSystem0550(b)):[];
@@ -33,11 +41,13 @@ export function releaseScheduleChecks0550(view){
    if(!checks.has(label))checks.set(label,new Set());
    if(ref)checks.get(label).add(ref);
   };
+  if(paga&&pagaChecks[id])add(pagaChecks[id],paga.lineId);
   const record=view.getRecord('I.'+id);
   if(record.state!=='REVIEWED')add('Schedule response / disposition awaits review');
   for(const b of printed){
    const supplementCheck=mgwSupplementOpen0550(b.line.offer,b.line.systemToken);
    if(supplementCheck)add(supplementCheck,b.lineId);
+   if(pagaRevisionNet0550(b.line.offer))add(PAGA_REVISION_INCLUDED_0550+' '+PAGA_REVISION_OPEN_0550,b.lineId);
   }
   if(id==='A'){
    if(!record.nativeFields?.agreementNo?.trim())add('Agreement / Contract No. OPEN');

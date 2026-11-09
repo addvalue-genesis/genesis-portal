@@ -6,8 +6,84 @@ import {validateSourceIntake} from './sourceIntakeModel';
 import {selectAutomaticSource} from './sourceAutoLoad';
 import {validateBidWorkspace} from './bidWorkspaceModel';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
+import {activeSupplyLine0550} from './supplyProposalDraft0550';
 export const SUPPLIER_REVISION_SCHEMA_0550='genesis.0550.supplier-revision.v1';
-const PAGA_REVISION='A20261632-002';
+export const PAGA_REVISION='A20261632-002';
+const PAGA_NET_ID='OFFER-PAGA-'+PAGA_REVISION+'-NET';
+const PAGA_OWNER='LINE-LEGACY-TEL-PAGA-1';
+const PAGA_PREDECESSORS=['OFFER-LEGACY-TEL-PAGA-1','OFFER-LEGACY-TEL-PAGA-2','OFFER-LEGACY-TEL-PAGA-3'];
+export const PAGA_REVISION_INCLUDED_0550='NET includes OEM documentation/project management (22030), FAT at Wertheim (23010), packing (24010) and one commissioning kit (18020).';
+export const PAGA_REVISION_OPEN_0550='Confirm fourth access panel TAG, XBC circuits, controller/switch architecture and failover. The quoted controller redundancy activations require hardware/TAG and test verification. Separate freight, insurance, duties, ID IE site services/SAT, training and additional spares require their own basis.';
+export const pagaRevisionNet0550=offer=>offer?.id===PAGA_NET_ID&&offer.quoteRef===PAGA_REVISION&&
+ offer.supplierQuoteRow?.classification==='NET_PACKAGE'&&offer.supplierQuoteRow.parentOfferId===offer.id&&
+ offer.quoteEvidence?.sourceId===offer.supplierQuoteRow.sourceId&&offer.quoteEvidence?.quotedCurrency==='EUR'&&
+ offer.currency==='EUR'&&offer.unit==='Lot'&&offer.supplierQuoteRow.quantity===1&&
+ Number.isFinite(offer.unitCost)&&offer.unitCost>0&&offer.unitCost===offer.quoteEvidence.quotedTotal;
+export function pagaRevisionSelected0550(data){
+ const net=data?.offers.find(pagaRevisionNet0550);
+ if(!net)return null;
+ const owners=data.lines.map(activeSupplyLine0550).filter(line=>line.selected&&line.wbs==='A'&&line.systemToken==='TEL-PAGA'&&line.offerId===net.id);
+ return owners.length===1?{net,owner:owners[0]}:null;
+}
+
+export function pagaRevisionItems0550(data,net){
+ return data.offers.filter(offer=>offer.id!==net.id&&offer.quoteRef===net.quoteRef&&offer.vendorId===net.vendorId&&
+  offer.supplierQuoteRow?.parentOfferId===net.id&&offer.supplierQuoteRow.sourceId===net.supplierQuoteRow.sourceId&&
+  offer.quoteEvidence?.sourceSha256===net.quoteEvidence.sourceSha256);
+}
+
+export function preparePagaRevisionPricing0550(data,today){
+ const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
+ if(today<'2026-11-09'||!receipt||receipt.pagaRevisionHandled)return data;
+ const net=data.offers.find(pagaRevisionNet0550);
+ if(!net||!net.date||net.date>today||!net.validUntil||net.validUntil<today)return data;
+ const integration=data.integrationWorkspace;
+ const review=preparePagaRevisionMapping0550(data,integration?.requirements||[]);
+ if(!review?.source||review.rows.some(row=>!row.excerpt)||review.source.url!==net.quoteEvidence.sourceUrl||
+  data.sourceIntake.sources.some(s=>s.replaces?.includes(review.source.id)))return data;
+ const items=pagaRevisionItems0550(data,net);
+ if(!['11010','22030','23010','24010','18020'].every(code=>items.some(o=>o.supplierQuoteRow.itemCode===code&&o.supplierQuoteRow.classification==='BASE_PRICE'))||
+  !items.some(o=>o.supplierQuoteRow.itemCode==='11010'&&o.supplierQuoteRow.quantity===4))return data;
+ const eligible=line=>line.id.startsWith('LINE-LEGACY-TEL-PAGA-')&&
+  line.offerId==='OFFER-LEGACY-TEL-PAGA-'+line.id.split('-').at(-1)&&
+  line.scopeKey==='VENDOR-BASIS.LEGACY-TEL-PAGA-'+line.id.split('-').at(-1)&&
+  line.vendorId===net.vendorId&&line.quantity===1&&line.currency==='EUR'&&
+  line.unit===(line.id.endsWith('-2')?'Pc':'Lot')&&!line.calculationId&&!line.supplyDraft&&!line.officialReview&&
+  line.manualCost===null&&line.sellRate===null&&line.customerRowCode==='A1-05';
+ const owners=data.lines.filter(line=>line.selected&&line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&
+  (line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate)));
+ const base=owners.find(line=>line.id===PAGA_OWNER);
+ if(!base||owners.some(line=>!PAGA_PREDECESSORS.includes(line.offerId)||!eligible(line)))return data;
+ const nextLines=data.lines.map(line=>{
+  if(line===base)return {...line,offerId:net.id,description:'INDUSTRONIC INTRON-X · '+PAGA_REVISION+' · NET package',
+   requirementRef:'MR Rev.B1 Appendix 1.4 / priced PAGA package; allocation of remaining MR items pending.',
+   sourceRef:net.sourceRef+' / one NET Lot. '+PAGA_REVISION_INCLUDED_0550,
+   customerRemark:'PAGA package with the OEM services and packing stated in the offer. Final technical scope subject to review.'};
+  return owners.includes(line)?{...line,selected:false}:line;
+ });
+ const matches=new Map(review.rows.filter(row=>row.requirement?.offerIds.includes(row.offer.id)).map(row=>[row.requirement.id,row]));
+ const retiredIds=new Set(owners.filter(line=>line!==base).map(line=>line.id));
+ const requirements=integration?.requirements.map(r=>{
+  if(!matches.has(r.id)||r.status!=='DRAFT'||r.reviewer||r.basisKey||r.responsibility!=='TSI'||r.disposition!=='REQUIRED'||
+   !r.workLineIds.includes(base.id)||!r.workLineIds.some(id=>retiredIds.has(id)))return r;
+  return {...r,workLineIds:r.workLineIds.filter(id=>!retiredIds.has(id))};
+ });
+ const activation=items.find(o=>o.supplierQuoteRow.itemCode==='20030'&&o.supplierQuoteRow.classification==='INCLUDED_REFERENCE');
+ const deviations=integration?.deviations.map(d=>{
+  if(!activation||!review.source.content.includes('ACT-Controller Redundancy')||d.id!=='DEV-EPC-PAGA-REDUNDANCY'||
+   d.status!=='DRAFT'||d.workflowStatus!=='DRAFT'||d.approvalDecision!=='PENDING'||d.basisKey||d.reviewer||
+   d.offerIds.join(', ')!==PAGA_PREDECESSORS.join(', ')||d.vendorQuoteRef!==d.offerIds.join(', ')||
+   d.vendorResponse1||d.companyResponse||d.resolution||d.finalClosure||d.approvalSourceIds.length||
+   d.vendorDeviation!=='The current quoted base is not declared to include optional controller/switch redundancy. TSI recommended solution includes the required failure-tolerant architecture; additional selection/coverage/cost approval is required before any compliance claim or price change.'||
+   d.contractorResponse1!=='Current INDUSTRONIC base quote has optional controller/network redundancy distinct from N+1 amplifiers.')return d;
+  return {...d,offerIds:[net.id,activation.id],vendorQuoteRef:net.quoteRef,
+   vendorDeviation:'Controller redundancy activation is listed. Confirm the offered failure-tolerant controller and network architecture against PHI Rev.B1 §7.3.4.',
+   justification:'Supplier item 20030 lists '+activation.supplierQuoteRow.quantity+' controller redundancy activations. Licences are part of the NET package. Reconcile hardware, topology, TAG allocation and failover evidence before claiming compliance.',
+   contractorResponse1:'Verify redundancy across APF and ACP. Confirm the physical controller/switch arrangement, power separation and the planned failover tests.'};
+ });
+ return {...data,lines:nextLines,...(integration?{integrationWorkspace:{...integration,requirements,deviations}}:{}),
+  repositoryBasisImport:{...repo,bidProcess:{...receipt,pagaRevisionHandled:true}}};
+}
 const PAGA_MAPPING_ITEMS=[
  {mrId:'MR-B1-14-APF-05',item:'11010',label:'APF Access Panel',evidence:/^\s*11010\s+.*302-053-000.*$/m},
  {mrId:'MR-B1-14-ACP-05',item:'11010',label:'ACP Access Panel',evidence:/^\s*11010\s+.*302-053-000.*$/m},
@@ -18,7 +94,7 @@ const PAGA_MAPPING_ITEMS=[
 // Existing WP.7 uses the imported private quote and the native source text.
 // Item numbers alone cannot establish scope across quotation revisions.
 export function preparePagaRevisionMapping0550(data,requirements){
- const net=data.offers.find(o=>o.id==='OFFER-PAGA-A20261632-002-NET');
+ const net=data.offers.find(o=>o.id===PAGA_NET_ID);
  if(net?.quoteRef!==PAGA_REVISION||net.supplierQuoteRow?.classification!=='NET_PACKAGE'||net.supplierQuoteRow.parentOfferId!==net.id)return null;
  const sourceId=net.supplierQuoteRow.sourceId;
  const sources=data.sourceIntake?.sources||[];

@@ -90,7 +90,7 @@ export function prepareBidProcess0550(data,policies,today){
   ceragonHandled=true;
  }
  if(previous&&!changed&&ceragonHandled===previous.ceragonHandled)return data;
- return {...data,lines,repositoryBasisImport:{...data.repositoryBasisImport,bidProcess:{version:BID_PROCESS_VERSION_0550,preparedOn:today,controlLineIds,ceragonHandled}}};
+ return {...data,lines,repositoryBasisImport:{...data.repositoryBasisImport,bidProcess:{...previous,version:BID_PROCESS_VERSION_0550,preparedOn:today,controlLineIds,ceragonHandled}}};
 }
 // Adopt the authorised 2+0 offer against the existing whole-link owner.
 // A deleted, deselected or independently edited commercial basis stays authored.

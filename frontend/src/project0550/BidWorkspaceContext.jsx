@@ -7,6 +7,7 @@ import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepa
 import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
 import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
+import {preparePagaRevisionPricing0550} from './data/supplierRevision0550';
 import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
@@ -28,8 +29,11 @@ import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550"
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today,loadedWorkspace){
- const priced=prepareBidCompletion0550(data,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(data,systemTokens0550,today)},today);
- const working=priced===loadedWorkspace?applyDirectSupplierMarkup0550(priced):priced;
+ const revised=preparePagaRevisionPricing0550(data,today);
+ const avl=preparePagaAvlDeviation0550(revised);
+ const based=revised===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
+ const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
+ const working=priced===loadedWorkspace||revised!==data?applyDirectSupplierMarkup0550(priced):priced;
  return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
 }
 export const useBidWorkspace=()=>useContext(Context);
