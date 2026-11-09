@@ -15,7 +15,7 @@ export function commissioningBreakdown0550(view,systems,currency){
  const rows=selected.scheduleRows('C2').filter(row=>row.line&&row.treatment==='BASE'&&!row.nonAdditive);
  const groups=COMMISSIONING_PHASES_0550.map(phase=>({...phase,...scheduleRollup0550(rows.filter(row=>commissioningPhase0550(row.line)===phase.id))}));
  const unclassified=rows.filter(row=>!commissioningPhase0550(row.line));
- const bySystem=[...systems,{token:'COMMON',name:'COMMON / shared scope'}].map(system=>({
+ const bySystem=systems.filter(system=>system.token!=='COMMON').map(system=>({
   ...system,rows:rows.filter(row=>row.line.systemToken===system.token),
  }));
  const operationRows=selected.scheduleRows('C3').filter(row=>row.line&&row.treatment==='OPTION'&&!row.nonAdditive);

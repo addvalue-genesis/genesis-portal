@@ -5,7 +5,7 @@ import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './Schedule
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
-import {c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c2HasSystem0550,c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 
@@ -63,8 +63,10 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState(null);
  const groups=useMemo(()=>id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[],[id,view]);
- const selected=groups.find(group=>group.token===systemChoice)||(systemChoice===''?null:groups.find(group=>group.token!=='COMMON'&&group.rows.length)||groups[0]);
- const formView=useMemo(()=>selected?{...view,c2SystemToken:selected.token,scheduleRows:schedule=>schedule==='C2'?selected.rows:view.scheduleRows(schedule)}:view,[view,selected]);
+ const selected=groups.find(group=>group.token===systemChoice)||(systemChoice===''?null:groups.find(group=>group.rows.length)||groups[0]);
+ const unresolved=useMemo(()=>groups.length?view.scheduleRows('C2').filter(row=>!c2HasSystem0550(row)):[],[view,groups]);
+ const formView=useMemo(()=>groups.length?{...view,c2SystemToken:selected?.token,
+  scheduleRows:schedule=>schedule==='C2'?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)}:view,[view,groups,selected]);
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
  const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency),[screenView,id,currency]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
@@ -94,6 +96,14 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
    </li>)}</ul>
   </div>}
   <details className="p55-c1-internal-diagnostics" open={id!=='C1'}><summary>SI · ตรวจราคา / การจัดหมวดภายใน</summary>
+  {unresolved.length>0&&<section className="p55-native-issues" aria-label="C2 rows awaiting system assignment">
+   <h4>รายการ C2 รอระบุระบบ · {unresolved.length} แถว</h4>
+   <p>เก็บรายการ Working เดิมไว้ตรวจทานใน SI ยอดทั้งโครงการยังอ้างอิงรายการเดิม เมื่อยืนยันระบบและ Main Equipment No. แล้วให้จัดลงฟอร์มของระบบนั้น</p>
+   <ul>{unresolved.map(row=><li key={row.lineId}>{row.line.description}{' '}
+    <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.line.'+row.lineId)}>เปิด Working</button>{' '}
+    <button type="button" disabled={disabled} onClick={()=>onAllocate?.(row.lineId)}>ตรวจการจัดหมวด 11.M</button>
+   </li>)}</ul>
+  </section>}
   {id==='A1'&&<A1DirectReview0550 view={screenView} currency={currency} onNavigate={onNavigate} onAllocate={onAllocate} disabled={disabled}/>}
   <SchedulePriceDiagnostics0550 view={screenView} id={id} currency={currency} onNavigate={onNavigate} onAllocate={onAllocate} disabled={disabled}/>
   {view.unallocated.length>0&&<p className="p55-native-issues">Working อีก {view.unallocated.length} รายการยังไม่ได้ระบุช่องปลายทาง <button type="button" onClick={()=>onAllocate?.()}>จัดรายการลงแบบฟอร์ม 11.M</button></p>}

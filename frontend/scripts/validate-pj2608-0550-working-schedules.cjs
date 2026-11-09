@@ -98,7 +98,8 @@ try{
  spares.calculations.push({id:'TEST-B5-COUNT',title:'Synthetic count',systemToken:'TEL-LAN',equationId:'B5-SPARE-QTY',inputs:qty,sourceRef:'SYNTHETIC quantity evidence'});
  validate(spares);
  const spareView=preview(spares),spareBreakdown=commissioningBreakdown0550(spareView,D.SYSTEMS,'USD');
- assert.equal(spareBreakdown.bySystem.length,D.SYSTEMS.length+1);
+ assert.equal(spareBreakdown.bySystem.length,D.SYSTEMS.length);
+ assert(!spareBreakdown.bySystem.some(system=>system.token==='COMMON'));
  assert.equal(spareBreakdown.bySystem.find(s=>s.token==='TEL-LAN').rows[0].quantity,5);
  assert.equal(spareBreakdown.groups[0].knownUSD,50);
  assert.equal(spareBreakdown.groups[1].knownUSD,null);
