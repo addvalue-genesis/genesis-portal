@@ -1,5 +1,5 @@
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
-import {mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
+import {mgwCctvEntOffer0550,mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
 import {CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
 import {QualificationChecklist0550,QualificationResponse0550} from './QualificationChecklist0550';
@@ -37,6 +37,20 @@ const metNdbScheduleNotes={
  D:'รอขอบเขตและราคางาน Inspection, iFAT/FAT และหลักฐานทดสอบ · TQ-027 / 029 / 032',
  E:'ตรวจขอบเขตใบอนุญาต NDB ผู้รับผิดชอบ และค่าใช้จ่ายส่งมอบ · TQ-029 / 032',
  F:'รอเงื่อนไขส่งมอบ จุดโอนความเสี่ยง และประกันที่ MGW รวมไว้ · TQ-032',
+};
+const cctvEntScheduleNotes={
+ B:'ใบ V1.2 ระบุราคาอุปกรณ์ ฐานงวดชำระเงิน เงื่อนไขการค้า และการส่งมอบยังต้องยืนยัน',
+ C2:'ตรวจรายการและจำนวนอะไหล่ Commissioning / Start-up ที่ OEM แนะนำ',
+ C3:'แยกประมาณการ Working ออกจากรายการและราคาอะไหล่สองปีที่ต้องขอจาก OEM',
+ C4:'ตรวจรายการและราคา Capital Spares',
+ C5:'ตรวจรายการและราคา Special Tools',
+ C6:'ตรวจ Consumables และขอบเขต First Filling',
+ C7:'ตรวจ Site Service, SAT และ Training รวมคน-ชั่วโมงกับระยะเวลา',
+ C8:'ตรวจ Facilities และ Services ที่ผู้ซื้อต้องจัดหา',
+ D:'ตรวจขอบเขต Inspection / iFAT / FAT และค่าใช้จ่ายของผู้รับผิดชอบ',
+ E:'ตรวจใบอนุญาต ค่าใช้จ่ายและความรับผิดชอบในการส่งมอบ',
+ F:'ตรวจประกันและจุดโอนความเสี่ยงตาม Incoterm',
+ mapping:'เจ้าของราคา Working A1-06 (CCTV) และ A1-12 (Entertainment) ผูก C1 ตามรายการ ผู้รับผิดชอบและขอบเขตที่ค้างแสดงรายแถว',
 };
 const options=(rows,label)=>rows.map(r=>[r.id,label(r)]);
 function Input({label,value,onChange,multiline=false,type='text',...props}){return <label>{label}{multiline?<textarea rows={4} maxLength={12000} aria-label={label} value={value??''} onChange={e=>onChange(e.target.value)} {...props}/>:<input aria-label={label} type={type} value={value??''} onChange={e=>onChange(type==='number'?(e.target.value===''?null:Number(e.target.value)):e.target.value)} {...props}/>}</label>;}
@@ -112,7 +126,9 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
- {(panel==='overview'||volume==='I'&&['A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
+ {volume==='I'&&cctvEntScheduleNotes[panel]&&data.offers.some(mgwCctvEntOffer0550)&&
+  <p className="p55-note"><strong>MGW CCTV / Entertainment V1.2 · ตรวจเพิ่มเติม</strong> · {cctvEntScheduleNotes[panel]}</p>}
+ {(panel==='overview'||volume==='I'&&['A','A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>
   <button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button>
   <A1OthersBreakdown0550 panel={panel} view={displayView} currency={currency} onNavigate={go} disabled={dirty}/>

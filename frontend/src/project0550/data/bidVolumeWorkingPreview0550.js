@@ -7,6 +7,7 @@ import {mappingValid} from './officialPricing0550';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
+import {mgwCctvEntOffer0550,mgwCurrentMr0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 
 const rules={
@@ -45,6 +46,11 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   const customerMapped=mappingValid(raw),reasons=[];
   // These annotations identify work to inspect; they do not decide applicability.
   const advisories=[];
+  if(mgwCctvEntOffer0550(line?.offer)){
+   const candidates=mgwCurrentMr0550(line.offer);
+   if(candidates.length)advisories.push('MR candidate / '+candidates.join(' / '));
+   advisories.push(mgwSupplementOpen0550(line.offer,line.systemToken));
+  }
   if(mr?.note.includes(' / CALL-OFF.'))advisories.push('ทะเบียนเดิมระบุ CALL-OFF · ตรวจขอบเขตและ Base/Option ก่อนทบทวน');
   if(raw.mrRequirementId==='MR-ACT-B8-D05')advisories.push('แยกค่าธรรมเนียมออกจากงานสนับสนุนเอกสาร · ยืนยันผู้รับผิดชอบ');
   if([raw.responsibility,...reqs.map(r=>r.responsibility)].includes('CLARIFICATION'))advisories.push('ผู้รับผิดชอบ / ขอบเขตยัง CLARIFICATION');

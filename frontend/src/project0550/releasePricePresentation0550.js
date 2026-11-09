@@ -1,5 +1,5 @@
 import {sumMoney0550} from "./data/money0550";
-import {mgwMetNdbOffer0550,MGW_MET_NDB_OPEN_0550} from "./data/mgwQuoteSelection0550";
+import {mgwSupplementOpen0550} from "./data/mgwQuoteSelection0550";
 
 // Internal screen annotations only. Customer cells, exports and saved prices
 // continue to use officialCustomerRows and the canonical Working model.
@@ -16,8 +16,7 @@ export function releasePricePresentation0550(official){
     ...group.children.filter(line=>!Number.isFinite(line.customerUSD)).map(line=>"ราคา USD ยัง OPEN / "+line.id),
     ...(!group.children.length?["ยังไม่มีเจ้าของราคาที่เลือกและผูกกับ Lot นี้"]:[])
    ])]:[],
-   checks:provisional?[...new Set(group.children.filter(line=>mgwMetNdbOffer0550(line.offer))
-    .map(line=>MGW_MET_NDB_OPEN_0550[line.systemToken]).filter(Boolean))]:[],
+   checks:provisional?[...new Set(group.children.map(line=>mgwSupplementOpen0550(line.offer,line.systemToken)).filter(Boolean))]:[],
    known:provisional&&open?{amount:sumMoney0550(priced.map(line=>line.customerUSD)),priced:priced.length,count:group.children.length}:null,
    dmrKnown:dmr.length?{amount:sumMoney0550(dmr.map(line=>line.customerUSD)),priced:dmr.length}:null
   });

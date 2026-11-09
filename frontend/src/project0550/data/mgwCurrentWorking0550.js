@@ -3,11 +3,11 @@ import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
 import {mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {
  MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_SUPERSEDED_0550,
- mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwMetNdbOffer0550,
+ mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
-const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15'};
+const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12'};
 
 export function prepareMgwCurrentWorking0550(data,policies,today){
  const receipt=data.mgwDetailPricingImport;
@@ -46,11 +46,11 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   if(lines.some(l=>l.id===id||l.offerId===offer.id))continue;
   const quotedRefs=mgwCurrentMr0550(offer);
   const occupied=lines.some(l=>l.selected&&l.wbs==='A'&&l.systemToken===systemToken&&
-   (mgwMetNdbOffer0550(offer)||quotedRefs.includes(l.mrRequirementId)||!l.mrRequirementId&&l.customerRowCode===customerRowCode)&&
+   (mgwSupplementOffer0550(offer)||quotedRefs.includes(l.mrRequirementId)||!l.mrRequirementId&&l.customerRowCode===customerRowCode)&&
    !next.offers.some(o=>o.id===l.offerId&&mgwCurrentOffer0550(o))&&
    (l.offerId||l.mgwDetailGroupId||l.calculationId||Number.isFinite(l.manualCost)||Number.isFinite(l.sellRate)));
   if(occupied){conflicts.push(id+' / existing price owner retained; reconcile quoted scope');continue;}
-  lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:mgwMetNdbOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0],
+  lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0],
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs});

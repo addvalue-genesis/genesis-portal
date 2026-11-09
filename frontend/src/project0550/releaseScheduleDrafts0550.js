@@ -3,7 +3,7 @@ import {deriveBidVolumeWorkingPreview0550} from './data/bidVolumeWorkingPreview0
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {c2HasSystem0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {scheduleRollup0550} from './data/scheduleRollup0550';
-import {mgwMetNdbOffer0550,MGW_MET_NDB_OPEN_0550} from './data/mgwQuoteSelection0550';
+import {mgwSupplementOpen0550} from './data/mgwQuoteSelection0550';
 import {buildNativeExhibitDocx0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 
@@ -35,6 +35,10 @@ export function releaseScheduleChecks0550(view){
   };
   const record=view.getRecord('I.'+id);
   if(record.state!=='REVIEWED')add('Schedule response / disposition awaits review');
+  for(const b of printed){
+   const supplementCheck=mgwSupplementOpen0550(b.line.offer,b.line.systemToken);
+   if(supplementCheck)add(supplementCheck,b.lineId);
+  }
   if(id==='A'){
    if(!record.nativeFields?.agreementNo?.trim())add('Agreement / Contract No. OPEN');
    if(!view.proposal.documentNo?.trim())add('Quotation document number OPEN');
@@ -57,7 +61,6 @@ export function releaseScheduleChecks0550(view){
     }
     for(const issue of b.line.problems||[])add(issue.split(' / ')[0],b.lineId);
     if(b.line.spareBudget)add('Draft spare allowance. Confirm OEM parts, quantity and rate.',b.lineId);
-    if(mgwMetNdbOffer0550(b.line.offer))add(MGW_MET_NDB_OPEN_0550[b.line.systemToken],b.lineId);
    }
    for(const b of unassigned)add('C2 row needs a named system before printing',b.lineId);
    if(id==='C2')for(const system of c2SystemGroups0550(formView)){
