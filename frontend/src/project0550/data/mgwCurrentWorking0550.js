@@ -2,12 +2,12 @@ import {policyDefaults0550} from '../bidWorkingBasis0550';
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
 import {mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCH_0550, MGW_CURRENT_PREFIX_0550, MGW_SUPERSEDED_0550,
- mgwCurrentDirectMr0550, mgwCurrentMr0550, mgwCurrentOffer0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_SUPERSEDED_0550,
+ mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwMetNdbOffer0550,
 } from './mgwQuoteSelection0550';
 
-const applied = 'Current Working prepared / '+MGW_CURRENT_BATCH_0550;
-const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13'};
+const applied = batchId=>'Current Working prepared / '+batchId;
+const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15'};
 
 export function prepareMgwCurrentWorking0550(data,policies,today){
  const receipt=data.mgwDetailPricingImport;
@@ -17,13 +17,15 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  let next=decision===receipt.decision?data:{...data,mgwDetailPricingImport:{...receipt,decision}};
  const retired=next.lines.map(line=>line.selected&&mgwHistoricalLine0550(next,line)?{...line,selected:false}:line);
  if(retired.some((line,i)=>line!==next.lines[i]))next={...next,lines:retired};
- if(decision.includes(applied)||!(next.supplierRevisionImports||[]).some(r=>r.batchId===MGW_CURRENT_BATCH_0550))return next;
+ const batches=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
+  (next.supplierRevisionImports||[]).some(r=>r.batchId===id));
+ if(!batches.length)return next;
 
  const policy=policyDefaults0550(policies,'Goods / Procured Cost');
  if(!policy)return next;
  const lines=[...next.lines],defaults=new Map(importMrWorkingBasis0550({lines:[]},policies,today).lines.map(l=>[l.id,l]));
  const conflicts=[...receipt.conflicts];
- for(const offer of next.offers.filter(mgwCurrentOffer0550)){
+ for(const offer of next.offers.filter(o=>mgwCurrentOffer0550(o)&&batches.includes(o.quoteEvidence.sourceId))){
   const e=offer.quoteEvidence,[systemToken]=e.systemTokens,customerRowCode=codeBySystem[systemToken];
   if(!customerRowCode||e.classification!=='RATE'||!Number.isFinite(offer.unitCost))continue;
   const mr=mgwCurrentDirectMr0550(offer);
@@ -40,18 +42,18 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    }else if(line?.offerId!==offer.id)conflicts.push(id+' / current MGW Offer awaits Working reconciliation');
    continue;
   }
-  const id='LINE-MGW-CURRENT-'+offer.id.slice(MGW_CURRENT_PREFIX_0550.length);
+  const key=mgwCurrentItemKey0550(offer),id='LINE-MGW-CURRENT-'+key;
   if(lines.some(l=>l.id===id||l.offerId===offer.id))continue;
   const quotedRefs=mgwCurrentMr0550(offer);
   const occupied=lines.some(l=>l.selected&&l.wbs==='A'&&l.systemToken===systemToken&&
-   (quotedRefs.includes(l.mrRequirementId)||!l.mrRequirementId&&l.customerRowCode===customerRowCode)&&
+   (mgwMetNdbOffer0550(offer)||quotedRefs.includes(l.mrRequirementId)||!l.mrRequirementId&&l.customerRowCode===customerRowCode)&&
    !next.offers.some(o=>o.id===l.offerId&&mgwCurrentOffer0550(o))&&
    (l.offerId||l.mgwDetailGroupId||l.calculationId||Number.isFinite(l.manualCost)||Number.isFinite(l.sellRate)));
   if(occupied){conflicts.push(id+' / existing price owner retained; reconcile quoted scope');continue;}
-  lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:offer.description.split(' · ')[0],
+  lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:mgwMetNdbOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0],
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs});
  }
- return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,decision:decision+'\n'+applied,conflicts}};
+ return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,decision:[decision,...batches.map(applied)].join('\n'),conflicts}};
 }

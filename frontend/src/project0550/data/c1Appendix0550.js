@@ -1,4 +1,4 @@
-import {mgwCurrentOffer0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwCurrentMr0550,mgwMetNdbOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -115,7 +115,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  });
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
- const charged=new Set(),extra=[],pendingOwners=[];
+ const charged=new Set(),extra=[],pendingOwners=[],candidatePackages=new Map();
  for(const {binding:b,usdPriced} of byOwner.values()){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   const targets=ownerUse.get(b.lineId)||[];
@@ -124,10 +124,17 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
   if(targets.length===1){const target=targets[0];charged.add(b.lineId);target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
   const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id;
+  const metNdb=!legacy&&mgwMetNdbOffer0550(b.line.offer);
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
    description:mgwCurrentOffer0550(b.line.offer)?b.line.description:(systemNames[token]||'Equipment')+' — supply package',quantity:b.quantity,unit:b.unit,
-   amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',components:[],ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
+   amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
+   components:metNdb?b.line.offer.quoteEvidence.terms.filter(t=>t.startsWith('BOM: ')).map(t=>c1Component0550(t.slice(5).replace(/^(\d+) x /,'$1 Ea. '))):[],
+   ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
   extra.push(item);charged.add(b.lineId);
+  if(metNdb)for(const mrId of mgwCurrentMr0550(b.line.offer)){
+   if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
+   candidatePackages.get(mrId).push(item.key);
+  }
   targets.forEach(t=>{t.packageKeys=(t.packageKeys||[]).concat(item.key);});
  }
  for(const r of rows){
@@ -152,6 +159,10 @@ export function deriveC1Appendix0550(view,currency='USD'){
  }
  const byKey=new Map(displayRows.map(r=>[r.key,r]));
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
+ for(const r of displayRows){
+  const candidates=candidatePackages.get(r.key);
+  if(candidates?.length&&!r.excluded)r.note=[r.note,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+ }
  const amount=money(bindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));
  if(Number.isFinite(amount)&&amount!==rendered)problems.push('C1_OWNER_TOTAL_MISMATCH');
  return {groups,rows:displayRows,amount:problems.length?null:amount,knownOwnerAmount:amount,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};

@@ -1,3 +1,5 @@
+Latest MGW update: [MET/NDB supplementary quotation](20261109_MGW_MET_NDB_QUOTATION.md). Seven source-priced equipment rows feed Working A, draft 10.7, Volume I A/A1/C1 and 11.M. Scope and commercial gaps are listed by schedule and in TC Rev.04. Existing LAN/PBX/FO remains independent.
+
 Latest Volume I update: [Available priced Working rows](20261108_A1_SPARE_PRICING.md). The native C2–C6 draft price cells, the C2–C8 and D–F overview, and automatic 11.M DRAFT allocation use existing Working amounts. The checked data prepared 38 additional drafts. C6/C8 still need source scope and allocations. The tested LAN C2 subtotal is USD 27,495.15.
 
 Latest A1 Others detail: [11.E licences and other costs / 11.F insurance](20261108_A1_OTHERS_BREAKDOWN.md). Volume I partitions the existing A1 Others price owners for internal review and compares open scope against 0553.

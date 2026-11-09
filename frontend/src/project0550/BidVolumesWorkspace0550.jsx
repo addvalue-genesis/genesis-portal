@@ -1,4 +1,5 @@
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
+import {mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
 import {CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
 import {QualificationChecklist0550,QualificationResponse0550} from './QualificationChecklist0550';
@@ -24,6 +25,19 @@ import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/
 
 // Display focus only; canonical schedules, allocations and full-package exports stay complete.
 export function quotationSchedules0550(showAll=false){return SCHEDULES_0550.filter(s=>showAll||s.id==='C1'||s.id==='C2');}
+const metNdbScheduleNotes={
+ B:'เงื่อนไขชำระเงิน งวดส่งมอบ และ Incoterm ยังรอใบเสนอราคาที่แก้ไข · TQ-032',
+ C2:'ขอรายการอะไหล่และจำนวน OEM แยก Pre-commissioning / Commissioning / Start-up · TQ-031',
+ C3:'ขอรายการและราคาอะไหล่ใช้งานสองปี · TQ-023 / 031',
+ C4:'ขอรายการและราคา Capital Spares · TQ-023',
+ C5:'ขอรายการและราคา Special Tools · TQ-023',
+ C6:'ขอขอบเขต First Filling / Consumables และเหตุผลหากไม่เกี่ยวข้อง · TQ-023',
+ C7:'รอขอบเขต ราคา และระยะเวลา Site Service / SAT / Training · TQ-023 / 027 / 029',
+ C8:'รอระบุ Facilities และ Services ที่ผู้ซื้อต้องจัดหา · TQ-023',
+ D:'รอขอบเขตและราคางาน Inspection, iFAT/FAT และหลักฐานทดสอบ · TQ-027 / 029 / 032',
+ E:'ตรวจขอบเขตใบอนุญาต NDB ผู้รับผิดชอบ และค่าใช้จ่ายส่งมอบ · TQ-029 / 032',
+ F:'รอเงื่อนไขส่งมอบ จุดโอนความเสี่ยง และประกันที่ MGW รวมไว้ · TQ-032',
+};
 const options=(rows,label)=>rows.map(r=>[r.id,label(r)]);
 function Input({label,value,onChange,multiline=false,type='text',...props}){return <label>{label}{multiline?<textarea rows={4} maxLength={12000} aria-label={label} value={value??''} onChange={e=>onChange(e.target.value)} {...props}/>:<input aria-label={label} type={type} value={value??''} onChange={e=>onChange(type==='number'?(e.target.value===''?null:Number(e.target.value)):e.target.value)} {...props}/>}</label>;}
 function Select({label,value,onChange,rows,multiple=false}){const available=[...rows];for(const id of multiple?value||[]:[value])if(id&&!available.some(([key])=>key===id))available.push([id,'MISSING / '+id]);return <label>{label}<select aria-label={label} multiple={multiple} value={value} onChange={e=>onChange(multiple?Array.from(e.target.selectedOptions,o=>o.value):e.target.value)}>{!multiple&&<option value="">เลือก / OPEN</option>}{available.map(([id,title])=><option value={id} key={id}>{title}</option>)}</select></label>;}
@@ -96,6 +110,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
  </div>}
  {volume==='I'&&panel==='A1'&&<CommissioningBreakdown0550 view={displayView} systems={SYSTEMS} currency={currency} summary model={model} disabled={dirty} onNavigate={go} onOpenC3={()=>{setShowAllSchedules(true);choose('C3');}}/>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
+ {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
+  <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
  {(panel==='overview'||volume==='I'&&['A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>
   <button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button>
