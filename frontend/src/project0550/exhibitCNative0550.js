@@ -168,7 +168,10 @@ function renderPage(view,page,format,currency='USD'){
   result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
  if(page.id==='A'){
-  const draftWords=amount=>words(amount,currency).replace(/^(?:United States Dollars|Thai Baht) /,'').replace(/ only$/,'');
+  const draftWords=amount=>{
+   const text=words(amount,currency).replace(/ only$/,'');
+   return currency==='THB'?text:text.replace(/^United States Dollars /,'');
+  };
   if(view.workingPreview&&format==='xml'){
    // Word splits two of the native blanks across adjacent runs.
    result=result.replace(/_{5,}(?:<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t\b[^>]*>_{5,})+/g,'_____');
