@@ -187,8 +187,9 @@ export function schematicQuantityMatrix0550({sourceIntake,offers=[],vendors=[]})
   });
  });
  const specs=sources.filter(s=>current(s)&&(/-SPE-\d+$|-DTS-\d+$/.test(s.documentNo)||s.documentNo.endsWith('-LIS-0004')));
+ const drawingSources=sources.filter(s=>/-(?:BLD|LAY|DTS|SPE)-\d+$/.test(s.documentNo));
  const sites=unique([...knownSites,...required.map(r=>r.site),...tags.map(t=>t.site),...offered.map(o=>o.site)]);
- return {required,tags,offered,specs,sites,quoteOptions,mrSources,phi:phiLocationMatrix0550(sources)};
+ return {required,tags,offered,specs,sites,quoteOptions,mrSources,drawingSources,phi:phiLocationMatrix0550(sources)};
 }
 
 export function schematicSystemDocs0550(specs,system){

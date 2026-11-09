@@ -2024,3 +2024,20 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-schematic-evidence li { margin-bottom: .45rem; overflow-wrap: anywhere; }
 .p55-schematic-evidence small { display: block; }
 @media (max-width: 760px) { .p55-schematic-evidence { grid-template-columns: 1fr; } }
+
+.p55-drawing-panel { background: #fff; }
+.p55-drawing-panel summary { cursor: pointer; font-weight: 700; }
+.p55-drawing-detail { margin: .65rem 0; padding: .65rem; border: 1px solid #c5d9e4; border-radius: .4rem; }
+.p55-drawing-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,17rem),1fr)); gap: .5rem; margin: .5rem 0; }
+.p55-drawing-ref { padding: .4rem .55rem; border-left: 3px solid #74a5bf; background: #f2f8fb; overflow-wrap: anywhere; }
+.p55-drawing-ref small { display: block; }
+.p55-drawing-ref a,.p55-drawing-ref button { margin: .35rem .45rem 0 0; }
+.p55-drawing-scroll { overflow-x: auto; }
+.p55-drawing-topology { position: relative; display: grid; align-items: center; }
+.p55-drawing-topology > svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.p55-drawing-topology line { stroke: #678fa7; stroke-width: 2; vector-effect: non-scaling-stroke; }
+.p55-drawing-topology > button,.p55-drawing-topology > div { position: relative; margin: .35rem 1rem; padding: .45rem .55rem; min-height: 3.2rem; border: 1px solid #7d9daf; border-radius: .35rem; background: #f4f9fc; color: #183d52; text-align: center; }
+.p55-drawing-topology > button { cursor: pointer; }
+.p55-drawing-topology > button[aria-pressed="true"] { background: #ddf2ee; border-color: #3c8f82; }
+.p55-drawing-topology small { display: block; }
+.p55-rack-components { margin: .6rem 0; padding-left: 1.3rem; }

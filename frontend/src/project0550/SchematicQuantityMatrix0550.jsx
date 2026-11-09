@@ -5,6 +5,9 @@ import {supplierItemSourceText0550} from './data/supplierCostProjection0550';
 import {MGW_CCTV_ENT_SECTIONS_0550} from './data/mgwQuoteSelection0550';
 import {schematicCoverage0550,schematicOfferMrRefs0550} from './data/schematicCoverage0550';
 
+import {SchematicDrawings0550} from './SchematicDrawings0550';
+import {schematicDrawings0550} from './data/schematicDrawings0550';
+
 const ALL_LOCATIONS='รวมไซต์';
 const ALL_SITES='ALL';
 const format=number=>Number.isFinite(number)?number.toLocaleString('en-US',{maximumFractionDigits:6}):'OPEN';
@@ -214,7 +217,10 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
  const selectedQuote=model.quoteOptions.has(quote)?quote:MGW_CURRENT_MATRIX_0550;
  const mgw=selectedQuote===MGW_CURRENT_MATRIX_0550;
  const quoteName=mgw?'MGW · Q26-063':model.quoteOptions.get(selectedQuote);
- const quoteRows=model.offered.filter(o=>o.system===system.token&&(mgw?o.mgwCurrent:o.quoteKey===selectedQuote));
+ const selectedOffers=model.offered.filter(o=>mgw?o.mgwCurrent:o.quoteKey===selectedQuote);
+ const quoteRows=selectedOffers.filter(o=>o.system===system.token);
+ const drawingView=schematicDrawings0550(system.token,site);
+ const drawingProps={sources:model.drawingSources,quoteRows:selectedOffers,workingLines,onOpenSource,onNavigate};
  const mrRows=model.required.filter(r=>r.system===system.token);
  const expectedCameras=MGW_CCTV_ENT_SECTIONS_0550.find(section=>section.system==='TEL-CCTV').count;
  const currentCameraRows=system.token==='TEL-CCTV'?quoteRows.filter(row=>row.mgwCurrent).length:0;
@@ -241,7 +247,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
    results:schematicCoverage0550(required,offers,{building:place!==ALL_LOCATIONS,completeCameraRegister,partialCameraRegister,
     hasUnlocatedOffer:place===SITE_ONLY_0550||noSite&&site!==NO_SITE_0550||isBuilding&&(siteOnlyOffer||siteOnlyMr)}),
    siteOnlyNotice:isBuilding&&siteOnlyOffer,phi:labels.length?{source:model.phi.source,table:phi.table,labels:[...new Set(labels)]}:null};
- }).filter(cell=>cell.place===ALL_LOCATIONS||cell.required.length||cell.offers.length||cell.tags.length||cell.phi);
+ }).filter(cell=>cell.place===ALL_LOCATIONS||cell.required.length||cell.offers.length||cell.tags.length||cell.phi||schematicDrawings0550(system.token,site,cell.place).cabinets.length||drawingView.topology?.place===cell.place);
  const closeAnd=action=>action&&((...args)=>{dialog.current.close();action(...args);});
  return <section className="p55-schematic-quantities" aria-label="BOM รายระบบและจำนวนเสนอ">
   <h3>BOM รายระบบ · จำนวนที่ต้องการและจำนวนเสนอ</h3>
@@ -280,12 +286,18 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
    <p className="p55-note">จัดกลุ่มตามไซต์และตำแหน่งในหลักฐาน · เส้นแสดงการจัดกลุ่มสถานที่</p>
    <LocationDiagram0550 site={site} cells={cells} onSelect={setSelection}/>
   </section>
+  <SchematicDrawings0550 key={system.token+'|'+site} view={drawingView} site={site} {...drawingProps}/>
   <details className="p55-bom-locations"><summary>เปิด BOM ต้นฉบับ CUS / VND ทุกแถว</summary>
    <SystemBom0550 groups={groups} quoteName={quoteName} onOpenSource={onOpenSource} onNavigate={onNavigate}/>
   </details>
   <dialog ref={dialog} className="p55-source-matrix-dialog p55-schematic-dialog" aria-labelledby="p55-schematic-cell-title" onClose={()=>setSelection(null)}>
    <header><h3 id="p55-schematic-cell-title">{selection?.name} · {selection?.site} · {selection?.place}</h3><form method="dialog"><button autoFocus>ปิด</button></form></header>
-   {selection&&<CellEvidence0550 cell={selection} workingLines={workingLines} onOpenSource={closeAnd(onOpenSource)} onNavigate={closeAnd(onNavigate)}/>}
+   {selection&&<>
+    <SchematicDrawings0550 {...drawingProps} site={selection.site} place={selection.place===ALL_LOCATIONS?undefined:selection.place}
+     view={schematicDrawings0550(selection.system,selection.site,selection.place===ALL_LOCATIONS?undefined:selection.place)}
+     onOpenSource={closeAnd(onOpenSource)} onNavigate={closeAnd(onNavigate)}/>
+    <CellEvidence0550 cell={selection} workingLines={workingLines} onOpenSource={closeAnd(onOpenSource)} onNavigate={closeAnd(onNavigate)}/>
+   </>}
   </dialog>
  </section>;
 }
