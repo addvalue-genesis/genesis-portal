@@ -19,7 +19,7 @@ const tagPattern=/^(?:[A-Z][A-Z0-9]*-)+\d{3,}(?:-\d{2,})?[A-Z]?(?:\s*\/\s*\d{3,}
 const combinedOffice=/office\s*\/\s*guard\s*house/i;
 
 const locationAliases={
- 'Control Building':/\bcontrol building\b/i,
+ 'Control Building':/\b(?:control building|instrument\s*(?:&|and)\s*telecom room)\b/i,
  'Office Building':/\boffice building\b/i,
  'Office/Guard House Building':/\boffice building\b|office\s*\/\s*guard\s*house/i,
  'Catering Building':/\bcatering(?: building)?\b/i,

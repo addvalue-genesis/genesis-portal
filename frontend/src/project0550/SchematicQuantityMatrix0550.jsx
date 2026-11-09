@@ -84,26 +84,34 @@ function VendorBom0550({offers,onNavigate}){
 
 const coverageLabel={SHORT:'ขาดตาม MR',EXCESS:'เสนอเกิน MR',OPEN:'รอตรวจ',MATCH:'จำนวนตรง'};
 const displayQty=(value,unit)=>Number.isFinite(value)?quantity(value,unit):'—';
-const previewItems=items=>items.slice(0,2).map(item=>item.description).join(' / ')+(items.length>2?' +'+(items.length-2)+' แถว':'');
 
-function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate}){
+function CoverageTable0550({groups,showMatched,onOpenSource,onNavigate,workingLines=[]}){
  const rows=groups.flatMap(group=>group.results.filter(row=>showMatched||row.status!=='MATCH').map(row=>({...row,site:group.site})));
  if(!rows.length)return <p>{groups.some(group=>group.results.length)?'รายการที่เทียบได้มีจำนวนตรงตาม MR':'ยังไม่มีรายการที่ตรวจได้ในขอบเขตนี้'}</p>;
  return <div className="p55-table-wrap"><table className="p55-table" aria-label="ผลเทียบจำนวนตาม MR">
   <thead><tr><th>ไซต์ / รายการ</th><th>MR</th><th>VND</th><th>ผลต่าง VND − MR</th><th>สถานะ</th></tr></thead>
   <tbody>{rows.map(row=><tr key={row.site+'|'+row.key} data-coverage-status={row.status}>
    <td><strong>{row.site} · {row.label}</strong>
-    {row.key==='unmatched'&&row.required.length>0&&<small>MR · {previewItems(row.required)}</small>}
-    {row.key==='unmatched'&&row.offers.length>0&&<small>VND · {previewItems(row.offers)}</small>}
-    <details><summary>หลักฐาน MR {row.required.length} · VND {row.offers.length}</summary>
+    {row.packageLabel&&<small>{row.packageLabel} · {row.packagePlace}</small>}
+    {row.mrBasis&&<small>ฐาน MR · {row.mrBasis}</small>}
+    <details><summary>หลักฐาน MR {row.packageSource?1:row.required.length} · VND {row.offers.length}</summary>
+     {row.packageSource&&!row.required.length&&<div>
+      <small>MR · {row.packageSource.locator}</small>
+      <SourceButton0550 source={row.packageSource.source} onOpenSource={onOpenSource}/>
+     </div>}
      {row.required.map(item=><div key={item.id}><small>MR · {item.description} · {quantity(item.quantity,item.unit)} · {item.locator}</small>
       <SourceButton0550 source={item.source} onOpenSource={onOpenSource}/></div>)}
      {row.offers.map(item=><div key={item.offer.id}><small>VND · {item.description} · {quantity(item.native.quantity,item.native.unit)} · {item.native.locator}</small>
       {schematicOfferMrRefs0550(item).length>0&&<small>MR ที่เกี่ยวข้อง · {schematicOfferMrRefs0550(item).join(' / ')}</small>}
-      {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+item.offer.id)}>เปิด Offer ใน 07 VND</button>}</div>)}
+      {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+item.offer.id)}>เปิด Offer ใน 07 VND</button>}
+      {workingLines.filter(line=>line.wbs==='A'&&line.selected&&line.offerId===item.offer.id).map(line=><div key={line.id}>
+       <small>เลือกใช้ใน Working Part A · {quantity(line.quantity,line.unit)}</small>
+       {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>เปิด Working Part A</button>}
+      </div>)}
+     </div>)}
     </details>
    </td>
-   <td>{displayQty(row.requiredQty,row.mrUnit)}</td><td>{displayQty(row.offeredQty,row.vndUnit)}</td>
+   <td>{displayQty(row.requiredQty,row.mrUnit)}{row.required.length===1&&row.required[0].quantityText&&<small>{row.required[0].quantityText}</small>}</td><td>{displayQty(row.offeredQty,row.vndUnit)}</td>
    <td>{Number.isFinite(row.delta)?(row.delta>0?'+':'')+quantity(row.delta,row.unit):'—'}</td>
    <td><strong>{coverageLabel[row.status]}</strong>{row.reason&&<small>{row.reason}</small>}</td>
   </tr>)}</tbody>
@@ -134,7 +142,7 @@ function CellEvidence0550({cell,onOpenSource,onNavigate,workingLines}){
  return <>
   {cell.siteOnlyNotice&&<p className="p55-note">ใบเสนอราคามีรายการที่ระบุเพียงระดับไซต์ เปิดโหนดระดับไซต์เพื่อดูรายการเหล่านั้น</p>}
   <TraceLinks0550 system={cell.system} cell={cell} workingLines={workingLines} onNavigate={onNavigate}/>
-  <CoverageTable0550 groups={[{site:cell.site,results:cell.results}]} showMatched onOpenSource={onOpenSource} onNavigate={onNavigate}/>
+  <CoverageTable0550 groups={[{site:cell.site,results:cell.results}]} showMatched onOpenSource={onOpenSource} onNavigate={onNavigate} workingLines={workingLines}/>
   <section className="p55-location-quote" aria-label="รายการที่เสนอในตำแหน่งนี้">
    <h4>VND · รายการและจำนวนที่เสนอ</h4>
    <VendorBom0550 offers={offers} onNavigate={onNavigate}/>
@@ -231,6 +239,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
   const required=mrRows.filter(r=>r.site===siteKey),offers=quoteRows.filter(o=>o.site===siteKey);
   return {site:siteKey,required,offers,results:schematicCoverage0550(required,offers,{
    hasUnlocatedOffer:noSite&&siteKey!==NO_SITE_0550,completeCameraRegister,partialCameraRegister,
+   packageOffers:selectedOffers.filter(row=>row.site===siteKey),
   })};
  }).filter(group=>group.required.length||group.offers.length);
  const results=groups.flatMap(group=>group.results);
@@ -238,6 +247,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
  const marks=(phi?.rows||[]).filter(r=>r.token===system.token);
  const docs=schematicSystemDocs0550(model.specs,system.token);
  const locationMr=mrRows.filter(r=>r.site===site),locationVnd=quoteRows.filter(o=>o.site===site);
+ const locationPackageOffers=selectedOffers.filter(row=>row.site===site);
  const siteOnlyOffer=locationVnd.some(row=>!row.building&&!row.native.option&&!row.multipleSystems);
  const siteOnlyMr=locationMr.some(row=>!row.building&&row.responsibility!=='COMPANY');
  const cells=columns.map((place,i)=>{
@@ -245,6 +255,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
   const required=at(locationMr,place),offers=at(locationVnd,place),isBuilding=scope.includes(place);
   return {place,site,system:system.token,name:system.name,required,offers,tags:at(tags,place),docs,
    results:schematicCoverage0550(required,offers,{building:place!==ALL_LOCATIONS,completeCameraRegister,partialCameraRegister,
+    place:isBuilding?place:undefined,packageOffers:locationPackageOffers,
     hasUnlocatedOffer:place===SITE_ONLY_0550||noSite&&site!==NO_SITE_0550||isBuilding&&(siteOnlyOffer||siteOnlyMr)}),
    siteOnlyNotice:isBuilding&&siteOnlyOffer,phi:labels.length?{source:model.phi.source,table:phi.table,labels:[...new Set(labels)]}:null};
  }).filter(cell=>cell.place===ALL_LOCATIONS||cell.required.length||cell.offers.length||cell.tags.length||cell.phi||schematicDrawings0550(system.token,site,cell.place).cabinets.length||drawingView.topology?.place===cell.place);
@@ -276,7 +287,7 @@ export function SchematicQuantityMatrix0550({sourceIntake,offers,vendors,systems
    </span>)}</div>
    <p className="p55-note">นับเป็นกลุ่มตรวจตามไซต์ · จำนวนตรงยังต้องผ่านการตรวจสเปกและ TAG ใน SI</p>
    <label><input type="checkbox" checked={showMatched} onChange={event=>setShowMatched(event.target.checked)}/> แสดงรายการที่จำนวนตรงด้วย</label>
-   <CoverageTable0550 groups={groups} showMatched={showMatched} onOpenSource={onOpenSource} onNavigate={onNavigate}/>
+   <CoverageTable0550 groups={groups} showMatched={showMatched} onOpenSource={onOpenSource} onNavigate={onNavigate} workingLines={workingLines}/>
   </section>
   <section className="p55-bom-locations" aria-label="ผังตำแหน่งและข้อเสนอ">
    <h4>ผังตำแหน่ง · กดชื่อเพื่อดูข้อเสนอ</h4>

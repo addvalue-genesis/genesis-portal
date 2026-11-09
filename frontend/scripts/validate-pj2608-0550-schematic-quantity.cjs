@@ -76,4 +76,40 @@ assert.equal(schematicCoverage0550(cameraMr,[cameraVnd[0],{...cameraVnd[0],quote
  .find(row=>row.label==='Ex PTZ').status,'OPEN');
 assert.equal(schematicCoverage0550(cameraMr,[cameraVnd[0],{...cameraVnd[0],native:{quantity:2,unit:'PC'}}])
  .find(row=>row.label==='Ex PTZ').offeredQty,null,'Mixed units cannot be added');
-console.log('PASS 05.3 CUS/VND quantities, TAG deduplication/conflicts, exact quote TAGs, source revisions, site-only scope and no Working inputs.');
+const {MGW_CURRENT_BATCH_0550,MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_SOURCE_HASH_0550}=
+ require(src+'/project0550/data/mgwQuoteSelection0550');
+const cabinetOffer=(sn,index,name,count,unit,term,section='LAN')=>({
+ ...quote(MGW_CURRENT_PREFIX_0550+section+'-APF-'+sn+'-0'+index,'APF · '+name,
+  'PDF p1 / '+section+' / APF / SN '+sn+'.0 / row '+index,count,{
+   systemTokens:[section==='FO'?'TEL-FO':'TEL-LAN'],sourceId:MGW_CURRENT_BATCH_0550,
+   sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,quotedUnit:unit,terms:[term],
+  }),
+ quoteRef:MGW_CURRENT_QUOTE_0550,
+});
+const lan=schematicQuantityMatrix0550({...input,offers:[
+ cabinetOffer(9,1,'LAN Cabinet, IP54',1,'Lot','Installed in Instrument & Telecom Room'),
+ cabinetOffer(9,5,'Access Switch L3',1,'Set','~ 1 x PoE+ Switch'),
+ cabinetOffer(10,1,'LAN Cabinet, IP54',8,'Lot','Multi-building cabinet package'),
+ cabinetOffer(10,2,'Access Switch L3',16,'Set','~ 1 x PoE+ Switch'),
+ cabinetOffer(10,3,'24 Ports CAT6A Patch Panel',32,'Set','~ Discrete distribution module Panel, 24 port'),
+ cabinetOffer(10,1,'24 Ports Fiber Patch Panel',8,'Set','~ 1 x Fiber Optic Patch Panel','FO'),
+]});
+const lanMr=lan.required.filter(row=>row.system==='TEL-LAN'&&row.site==='APF');
+const lanVnd=lan.offered.filter(row=>row.system==='TEL-LAN');
+const compareLan=(mrRows,vndRows,options)=>schematicCoverage0550(mrRows,vndRows,{packageOffers:lan.offered,...options});
+const lanChecks=compareLan(lanMr,lanVnd);
+const bom=(rows,sn,label)=>rows.find(row=>row.packageLabel==='MR '+sn+'.0 · LAN Cabinet'&&row.label===label);
+const compared=row=>[row.requiredQty,row.offeredQty,row.delta,row.status];
+assert.deepEqual(compared(bom(lanChecks,9,'จำนวนตู้')),[1,1,0,'MATCH']);
+assert.deepEqual(compared(bom(lanChecks,10,'จำนวนตู้')),[8,8,0,'MATCH']);
+assert.deepEqual(compared(bom(lanChecks,10,'Access Switch')),[16,16,0,'MATCH']);
+assert.deepEqual(compared(bom(lanChecks,10,'UTP Patch Panel')),[16,32,16,'EXCESS']);
+assert.deepEqual(compared(bom(lanChecks,10,'FO Patch Panel')),[8,8,0,'MATCH']);
+assert.deepEqual(compared(bom(lanChecks,9,'Media Converter')),[3,null,null,'OPEN']);
+assert.equal(lanChecks.flatMap(row=>row.offers).length,lan.offered.length,'Each offer appears once in LAN comparison');
+const control='Control Building';
+const cabinetChecks=compareLan(lanMr.filter(row=>row.building===control),lanVnd.filter(row=>row.building===control),
+ {building:true,place:control,hasUnlocatedOffer:true});
+assert.deepEqual(compared(bom(cabinetChecks,9,'Access Switch')),[1,1,0,'MATCH']);
+assert(!bom(cabinetChecks,10,'Access Switch'),'An eight-building package stays at site level');
+console.log('PASS 05.3 CUS/VND quantities, TAG deduplication/conflicts, exact quote TAGs, source revisions, site-only scope LAN cabinet BOM reconciliation and no Working inputs.');

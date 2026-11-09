@@ -1,6 +1,8 @@
 import Decimal from 'decimal.js';
 import {mgwCurrentDirectMr0550,mgwCurrentMr0550} from './mgwQuoteSelection0550';
 
+import {schematicLanBom0550} from './schematicLanBom0550';
+
 const normalized=name=>name.toLowerCase().replace(/\s+/g,' ').trim();
 const nativeUnit=value=>{
  const unit=normalized(value||'').replace(/\.$/,'');
@@ -42,29 +44,35 @@ function total(rows,read){
 
 // Source quantities only. Comparison is scoped to one site/location and uses
 // native units. A source candidate or a matching count does not approve scope.
-export function schematicCoverage0550(required,offers,{building=false,hasUnlocatedOffer=false,completeCameraRegister=false,partialCameraRegister=false}={}){
+export function schematicCoverage0550(required,offers,{building=false,hasUnlocatedOffer=false,completeCameraRegister=false,partialCameraRegister=false,packageOffers=offers,place}={}){
  const mr=required.filter(row=>row.responsibility!=='COMPANY');
  const base=offers.filter(row=>!row.native.option&&!row.multipleSystems);
- const aliases=new Set(base.map(row=>mgwCurrentDirectMr0550(row.offer)).filter(id=>id&&mr.some(row=>row.id===id)));
- const byKey=new Map(),reviewMr=[],reviewVnd=[],sourceOptions=offers.filter(row=>row.native.option||row.multipleSystems);
+ const packages=(!building||place)?schematicLanBom0550(mr,packageOffers,place):{results:[],usedMr:new Set(),usedOffers:new Set()};
+ const regularMr=mr.filter(row=>!packages.usedMr.has(row.id));
+ const regularOffers=base.filter(row=>!packages.usedOffers.has(row.offer.id));
+ const aliases=new Set(regularOffers.map(row=>mgwCurrentDirectMr0550(row.offer)).filter(id=>id&&regularMr.some(row=>row.id===id)));
+ const byKey=new Map(),sourceOptions=offers.filter(row=>row.native.option||row.multipleSystems);
  const add=(row,side)=>{
-  const {key,label}=itemKey(row,side,mr,aliases);
+  const {key,label}=itemKey(row,side,regularMr,aliases);
   if(!byKey.has(key))byKey.set(key,{key,label,required:[],offers:[]});
   byKey.get(key)[side==='CUS'?'required':'offers'].push(row);
  };
- mr.forEach(row=>add(row,'CUS'));
- base.forEach(row=>add(row,'VND'));
+ regularMr.forEach(row=>add(row,'CUS'));
+ regularOffers.forEach(row=>add(row,'VND'));
  const hasCameraScope=mr.some(row=>cameraKind(row.description))&&base.some(row=>cameraKind(row.description))&&
   [...mr,...base].every(row=>row.type!=='Camera'||cameraKind(row.description));
- const results=[];
+ const results=[...packages.results];
  for(const group of byKey.values()){
   const {key,required:cus,offers:vnd}=group;
   const camera=key.startsWith('camera:');
   const paired=cus.length>0&&vnd.length>0;
   const canUseZero=camera&&hasCameraScope&&completeCameraRegister&&!building&&!hasUnlocatedOffer;
   if(!paired&&!canUseZero){
-   reviewMr.push(...cus);
-   reviewVnd.push(...vnd);
+   const mrUnit=unitFor(cus,row=>row.unit),vndUnit=unitFor(vnd,row=>row.native.unit);
+   results.push({...group,mrUnit,vndUnit,requiredQty:cus.length===1?total(cus,row=>row.quantity):null,
+    offeredQty:vnd.length===1?total(vnd,row=>row.native.quantity):null,status:'OPEN',
+    reason:building?'รอยืนยัน TAG หรือจำนวนที่จัดสรรถึงตำแหน่งนี้':
+     cus.length?'ยังไม่พบรายการ VND ที่จับคู่ได้':'ยังไม่พบข้อกำหนด MR ที่จับคู่ได้'});
    continue;
   }
   const mrUnit=unitFor(cus,row=>row.unit),vndUnit=unitFor(vnd,row=>row.native.unit);
@@ -82,12 +90,6 @@ export function schematicCoverage0550(required,offers,{building=false,hasUnlocat
    reason:canCompare?'':hasUnlocatedOffer?'มีรายการที่ยังไม่จัดสรรถึงตำแหน่งนี้':incompleteCamera?'ทะเบียนใบเสนอราคา CCTV ยังมาไม่ครบฉบับ':
     !sameUnit?'ตรวจหน่วยหรือส่วนประกอบในแพ็กเกจ':
     revisions.size>1?'มีหลายใบเสนอราคาในรายการเดียวกัน':'ตรวจจำนวนและขอบเขตในต้นฉบับ'});
- }
- // Keep multi-item packages and unrelated lines explicit without reusing any
- // offered quantity across several MR requirements.
- if(reviewMr.length||reviewVnd.length){
-  results.push({key:'unmatched',label:'รายการที่ยังจับคู่ไม่ได้',required:reviewMr,offers:reviewVnd,status:'OPEN',
-   reason:building?'ตรวจ TAG และรายการที่ผู้ขายระบุไว้ระดับไซต์':'ตรวจรายการที่ยังไม่พบคู่ และแยก BOM ภายในแพ็กเกจก่อนคิดผลต่าง'});
  }
  if(sourceOptions.length){
   results.push({key:'optional',label:'Option / รายการใช้ร่วม',required:[],offers:sourceOptions,status:'OPEN',
