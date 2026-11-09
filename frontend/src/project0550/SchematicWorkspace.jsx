@@ -4,7 +4,8 @@ import {newId} from "./data/bidWorkspaceModel";
 import {SYSTEMS,BUDGETARY_ESTIMATE} from "./data";
 import {Module,Field,Select,Save} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-export function SchematicWorkspace({onOpenSystem,navigationTarget}){
+import {SchematicQuantityMatrix0550} from "./SchematicQuantityMatrix0550";
+export function SchematicWorkspace({onOpenSystem,navigationTarget,onNavigate,onOpenSource}){
  const {data,put,busy}=useBidWorkspace();
  const [system,setSystem]=useState("ALL");
  useEffect(()=>{if(navigationTarget?.startsWith("bid.schematic."))setSystem("ALL");},[navigationTarget]);
@@ -14,7 +15,9 @@ export function SchematicWorkspace({onOpenSystem,navigationTarget}){
  const nodes=data.nodes.filter(n=>system==="ALL"||n.systemToken===system),ids=new Set(nodes.map(n=>n.id)),edges=data.edges.filter(e=>ids.has(e.from)&&ids.has(e.to));
  const positions=new Map(nodes.map((n,i)=>[n.id,{x:40+(i%3)*300,y:45+Math.floor(i/3)*130}]));
  const components=BUDGETARY_ESTIMATE.partA.find(s=>s.token===system)?.components||[];
- return <div className="p55-stack"><Module id="bid.schematic.canvas" title="Overall / Schematic per system">
+ return <div className="p55-stack p55-schematic-workspace"><Module id="bid.schematic.canvas" title="Overall / Schematic per system">
+ <SchematicQuantityMatrix0550 sourceIntake={data.sourceIntake} offers={data.offers} vendors={data.vendors}
+  systems={SYSTEMS} onNavigate={onNavigate} onOpenSource={onOpenSource}/>
  <Select label="Schematic system" value={system} onChange={setSystem} options={[["ALL","Overall — all registered system nodes"],...SYSTEMS.map(s=>[s.token,s.name])]}/>
  <p>ตำแหน่งวาดเพื่อให้อ่านง่าย ไม่ใช่ตำแหน่งภูมิศาสตร์ ระยะสาย หรือผลคำนวณ RF เส้นเชื่อมแสดงเฉพาะรายการที่ลงทะเบียนพร้อม source reference</p>
  {nodes.length?<div className="p55-table-wrap"><svg viewBox={`0 0 940 ${Math.max(240,Math.ceil(nodes.length/3)*130+45)}`} role="img" aria-label="0550 registered schematic" style={{width:"100%",minWidth:650}}>

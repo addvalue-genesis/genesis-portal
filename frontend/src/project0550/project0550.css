@@ -1978,3 +1978,21 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-paga-bom .p55-bom-group th{background:var(--bid-tint,#edf3f7);text-align:left}
 .p55-paga-bom .p55-bom-quantity{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .p55-paga-bom td{vertical-align:top;overflow-wrap:anywhere}
+
+.p55-schematic-workspace { grid-template-columns: minmax(0,1fr); }
+.p55-schematic-workspace :is(.p55-bid-module,.p55-bid-content,.p55-table-wrap) { min-width: 0; max-width: 100%; }
+.p55-schematic-quantities .p55-review-toolbar label { display: grid; max-width: 100%; gap: .15rem; }
+.p55-schematic-quantities select { min-width: 0; max-width: 100%; }
+.p55-schematic-quantities .p55-table { table-layout: auto; }
+.p55-schematic-quantities .p55-table thead tr:nth-child(2) th { min-width: 8.5rem; padding: .4rem; }
+.p55-schematic-quantities .p55-table tbody th { min-width: 10rem; text-align: left; }
+.p55-schematic-quantities .p55-table tbody td { vertical-align: top; padding: .2rem; }
+.p55-schematic-quantities .p55-table td button { display: grid; width: 100%; gap: .15rem; padding: .3rem; text-align: left; font-size: .75rem; line-height: 1.35; }
+.p55-schematic-quantities .p55-table td button span { overflow-wrap: anywhere; }
+.p55-schematic-quantities .p55-phi-marker { color: #206453; }
+.p55-schematic-dialog { width: min(70rem, calc(100vw - 2rem)); max-width: none; }
+.p55-schematic-evidence { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; }
+.p55-schematic-evidence section { min-width: 0; }
+.p55-schematic-evidence li { margin-bottom: .45rem; overflow-wrap: anywhere; }
+.p55-schematic-evidence small { display: block; }
+@media (max-width: 760px) { .p55-schematic-evidence { grid-template-columns: 1fr; } }

@@ -44,6 +44,10 @@ const profiles = {
  "TEL-FO": [13, 12, 13], "TEL-TELT": [14], "TEL-ES": [12, 11, 12, 12], "TEL-MET": [15, 13, 14],
 };
 const documentNo = (family, n) => apf + family + "-" + String(n).padStart(4, "0");
+export const sourceSystemSpecs0550 = token => {
+ const [,dts,spe]=profiles[token==="TEL-IPP"?"TEL-PABX":token]||[];
+ return [dts&&documentNo("DTS",dts),spe&&documentNo("SPE",spe)].filter(Boolean);
+};
 const microwaveReferences = [
  [apf + "BOD-0001", ""],
  [apf + "LIS-0004", "Interface Matrix · Item 12"],

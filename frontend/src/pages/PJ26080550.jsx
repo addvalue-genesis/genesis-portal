@@ -2237,7 +2237,7 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
           {activeTab === "execution" ? <><button type="button" onClick={()=>jump({id:"bid.engineering.equations",tab:"engineering"})}>เปิดสมการกลาง / ผลคำนวณที่ใช้ใน Working</button><ExecutionView /></> : null}
-          {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
+          {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onNavigate={navigate} onOpenSource={openSource} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
 
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace navigationTarget={navigationTarget} onNavigate={navigate}/></> : null}

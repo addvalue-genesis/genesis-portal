@@ -2,6 +2,12 @@ const PHI = "MM-ASK-1A-APF-TEL-PHI-0001";
 export const APF_BUILDINGS_0550 = ["Control Building","Office Building","Catering Building",
  "Accommodation Building","Work House & Work Shop","Guard House","Store","Security Building",
  "Fire/Safety Building","Process / Utility Area"];
+export const PHI_BUILDINGS_0550 = {
+ APF:APF_BUILDINGS_0550,
+ ABV01:["E&I Shelter","Process / Utility Area"],
+ AMS01:["E&I Shelter","Process / Utility Area","MOGE PLC"],
+ ACP:["Office/Guard House Building","Guard House Building","Process / Utility Area","E&I Cabin"],
+};
 const firstPage = [
  ["TEL-LAN","Network (LAN)"], ["TEL-VSAT","VSAT"], ["TEL-LAN-VCS","Video Conference"],
  ["TEL-PABX","IP Telephony"], ["TEL-PAGA","PAGA"], ["TEL-CCTV","CCTV Camera"],
@@ -17,10 +23,10 @@ const secondPage = [
 const marks = line => [...line.matchAll(/[◼■]/g)].map(mark => mark.index);
 const starts = (line, label) => line.trimStart().startsWith(label);
 
-function readRows(lines, layout, anchor) {
+function readRows(lines, layout, anchor, count=APF_BUILDINGS_0550.length) {
  const centers = marks(lines.find(line => starts(line, anchor)) || "");
  // A flattened or tab-delimited pass loses the locations of empty cells.
- if (centers.length !== APF_BUILDINGS_0550.length ||
+ if (centers.length !== count ||
      centers.some((center, i) => i && center - centers[i - 1] < 5)) return null;
  const result = [];
  for (const [token, label] of layout) {
@@ -28,7 +34,7 @@ function readRows(lines, layout, anchor) {
   if (i < 0) return null;
   const own = marks(lines[i]);
   const continuation = lines[i + 1] || "";
-  const positions = own.length ? own : /^\s*[◼■]\s*$/.test(continuation) ? marks(continuation) : [];
+  const positions = /^\s*(?:[◼■]\s*)+$/.test(continuation) ? [...own,...marks(continuation)] : own;
   if (!positions.length) return null;
   for (const position of positions) {
    const distances = centers.map(center => Math.abs(position - center));
@@ -71,4 +77,24 @@ export function apfPhiMatrix0550(sources) {
   locations.get(row.location).push(row);
  }
  return {source, candidates, rows:bySystem};
+}
+
+export function phiLocationMatrix0550(sources) {
+ const apf=apfPhiMatrix0550(sources),source=apf.source;
+ const result={APF:{table:"7-3",rows:[...apf.rows.values()].flatMap(columns=>[...columns.values()].flat())}};
+ if(!source)return {source,sites:result};
+ const common=[["TEL-LAN","Network (LAN)"],["TEL-IPP","IP Telephony"],["TEL-CCTV","CCTV"],["TEL-FO","Fiber Optic Cable"]];
+ const small=source.content.match(/Table 7-4\s+Telecommunication System for ABV01 and AMS01([\s\S]*?)Table 7-5/gi)||[];
+ const acp=source.content.match(/Table 7-5\s+Telecommunication System for ACP([\s\S]*?)7\.3\.1\s+Network System/gi)||[];
+ const read=(tables,layout,count)=>tables.map(body=>readRows(body.split(/\r?\n/),layout,"Fiber Optic Cable",count)).find(Boolean)||[];
+ const remote=read(small,common,5);
+ result.ABV01={table:"7-4",rows:remote.filter(r=>r.location<2)};
+ result.AMS01={table:"7-4",rows:remote.filter(r=>r.location>=2).map(r=>({...r,location:r.location-2}))};
+ result.ACP={table:"7-5",rows:read(acp,[
+  ...common.map(([token,label])=>[token,token==="TEL-CCTV"?"CCTV Camera":label]),
+  ["TEL-CCTV","CCTV Monitoring"],["TEL-CCTV","CCTV Management / Record"],["TEL-PAGA","Public Address and General"],
+  ["TEL-RADIO-DTRS","VHF DMR Radio"],["TEL-RADIO-MARINE","VHF-FM Marine Radio"],
+  ["TEL-RADIO-SSB","MF/HF SSB Radio"],["TEL-VSAT-KU","KU Band Internet Service"],["TEL-MET","Meteorological"],
+ ],4)};
+ return {source,sites:result};
 }
