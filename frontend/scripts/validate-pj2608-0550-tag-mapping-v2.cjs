@@ -24,6 +24,25 @@ assert(T.tagBindingProblems0550(d,req,[{...binding,offerIds:['UNRELATED']}]).som
 assert(T.tagBindingProblems0550(d,req,[{...binding,workLineIds:['UNRELATED']}]).some(p=>p.startsWith('TAG_WORKING_LINK_OPEN')));
 const beforeKey=I.integrationRecordBasis0550(d,'requirements',req),tagged={...req,tagBindings:[binding]},next={...d,integrationWorkspace:{...d.integrationWorkspace,requirements:[tagged]}};assert.notEqual(I.integrationRecordBasis0550(next,'requirements',tagged),beforeKey);
 const graph=G.buildChangeGraph0550(next,{integration:{requirements:[tagged]}}),affected=G.affectedRecords0550(graph,'S:'+source.id);assert(affected.some(n=>n.id==='TAG:REQ-QA:TAGMAP-QA'));assert(affected.some(n=>n.id==='L:OWNER'));assert(affected.some(n=>n.id==='REL'));assert(!affected.some(n=>/frozen|history/i.test(n.id)));
+const {supplierQuantityComparison0550}=require(src+'/project0550/data/supplierQuantityComparison0550.js');
+const quantityFixture=B.emptyBidWorkspace(D.DATA_LAYER_META.datasetId);
+const cctvMr='MR-B1-13-APF-01',vendorOffer={id:'OFFER-QTY-QA',vendorId:'VENDOR-QA',description:'QA quantity only',
+ quoteEvidence:{locator:'QA p1 / item 1',quotedQuantity:19,quotedUnit:'Sets',systemTokens:['TEL-CCTV']}};
+const cctvRequirement={...I.blankRequirement0550('REQDEF-'+cctvMr,'TEL-CCTV'),site:'APF',responsibility:'TSI',offerIds:[vendorOffer.id],workLineIds:['WORK-QTY-QA']};
+const working={id:'WORK-QTY-QA',quantity:21,unit:'SET',selected:true};
+const quantityModel={provisional:{selected:[working]}};
+const quantityReport=(offer,requirements=[cctvRequirement])=>supplierQuantityComparison0550(
+ {...quantityFixture,offers:[offer],integrationWorkspace:{...I.emptyIntegration0550(),requirements}},quantityModel,{requirements}
+).rows.find(r=>r.mr.id===cctvMr);
+const comparison=quantityReport(vendorOffer);
+assert.equal(comparison.mr.quantity,20);
+assert.equal(comparison.offers[0].native.quantity,19);
+assert.equal(comparison.working[0].quantity,21);
+assert.equal(comparison.offers[0].delta,-1);
+assert.equal(quantityReport({...vendorOffer,quoteEvidence:{...vendorOffer.quoteEvidence,quotedUnit:'Pc'}}).offers[0].status,'UNIT_REVIEW');
+const shared=quantityReport(vendorOffer,[cctvRequirement,{...cctvRequirement,id:'REQDEF-MR-B1-13-APF-02'}]).offers[0];
+assert.equal(shared.status,'SCOPE_REVIEW');assert.equal(shared.delta,null);
+assert.equal(quantityReport({...vendorOffer,quoteEvidence:{...vendorOffer.quoteEvidence,classification:'OPTION'}}).offers[0].delta,null);
 if(process.argv[2]){
  const actual=JSON.parse(fs.readFileSync(process.argv[2])),raw=JSON.stringify(actual),tokens=D.SYSTEMS.map(s=>s.token),integration=I.deriveIntegration0550(actual,D.SYSTEMS,'2026-11-05'),model={...B.deriveBidWorkspace(actual,tokens,'2026-11-05',integration),integration},prices=JSON.stringify(model.provisional),customer=JSON.stringify(O.officialCustomerRows(model.provisional));
  const report=P.deriveControlledTagMapping0550(actual,model,D.SYSTEMS,'2026-11-05');assert.equal(report.systems.length,20);assert.equal(report.uniqueOwners,model.provisional.selected.length);assert.equal(report.priceOpen,0);assert.equal(report.issueAuthorized,false);assert(report.catalogue.length>0);assert(report.catalogue.some(t=>t.authority==='HISTORICAL'));assert.equal(report.rows.find(r=>r.id==='REQDEF-MR-B1-11-APF-08').links.length,0,'APF site is not silently migrated into a TAG');
