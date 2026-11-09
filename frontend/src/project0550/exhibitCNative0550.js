@@ -43,8 +43,11 @@ const blankValues=id=>Object.fromEntries(Object.keys(template.defaults).filter(k
 // Draft price cells span both term columns until a delivery basis is assigned.
 function mergeDraftPriceCells(source,id,row,column,format){
  const first=`{{${id}_${row}_${column}}}`,second=`{{${id}_${row}_${column+1}}}`;
- if(format==='html')return source.replace(`<td><p>${first}</p></td><td><p>${second}</p></td>`,
-  `<td colspan="2" class="native-c2-draft-price"><p style="text-align:right">${first}</p></td>`);
+ if(format==='html'){
+  const start=id==='A2'?'<td><p style="text-align:center">':'<td><p>';
+  const cell=placeholder=>start+placeholder+'</p></td>';
+  return source.replace(cell(first)+cell(second),`<td colspan="2" class="native-c2-draft-price"><p style="text-align:right">${first}</p></td>`);
+ }
  const start=source.lastIndexOf('<w:tc>',source.indexOf(first));
  const firstEnd=source.indexOf('</w:tc>',source.indexOf(first))+7;
  const secondEnd=source.indexOf('</w:tc>',source.indexOf(second))+7;
@@ -86,6 +89,7 @@ function nativePages(view,id,currency='USD'){
  if(id==='A'){add();return {pages,issues};}
  if(id==='A1'||id==='A2'){
   const v=blankValues(id),base=id==='A1',part=base?'BASE':'OPTION',eligible=view.bindings.filter(b=>b.line&&b.treatment===part);
+  const draftPriceRows=[];
   const slot=base?a1SummarySlot0550:b=>b.schedule==='C4'?3:b.schedule==='C7'?4:b.schedule==='C6'?5:b.schedule==='C3'?6:7;
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
@@ -95,12 +99,36 @@ function nativePages(view,id,currency='USD'){
     if(r===6||r===7)set(v,r,1,bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
     if(r===4){set(v,r,3,'MD');set(v,r,4,value(diemQty));if(!diemQty||terms.size>1)issues.push('A2 DIEM quantity/rate basis OPEN');}
-    for(const [t,rate,total] of [['CIF',5,7],['FOB',6,8]]){const selected=bs.filter(b=>term(b)===t);if(selected.length){set(v,r,rate,r===4?diemQty>0&&terms.size===1?number(sum(selected)/diemQty):'OPEN':number(sum(selected)));set(v,r,total,number(sum(selected)));}}
-    set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
+    const rollup=view.workingPreview?scheduleRollup0550(bs):null,assigned=[];
+    for(const [t,rate,total] of [['CIF',5,7],['FOB',6,8]]){
+     const selected=bs.filter(b=>term(b)===t);
+     if(!selected.length)continue;
+     const termAmount=shownSum(view,selected);
+     set(v,r,rate,r===4?diemQty>0&&terms.size===1&&Number.isFinite(termAmount)?number(termAmount/diemQty):'OPEN':number(termAmount));
+     set(v,r,total,number(termAmount));
+     if(Number.isFinite(termAmount))assigned.push(t+' '+currency+' '+number(termAmount));
+    }
+    const notes=[];
+    if(!view.workingPreview||r!==6&&r!==7)notes.push(view.workingPreview&&bs.length>3?bs.length+' quoted items':bs.map(b=>b.line.description).join('; '));
+    if(terms.has('')){
+     issues.push('A2 customer term OPEN');
+     if(view.workingPreview&&Number.isFinite(amount)){
+      draftPriceRows.push([r,5]);
+      const rate=r!==4?amount:diemQty>0&&!rollup.open&&terms.size===1?amount/diemQty:null;
+      set(v,r,5,Number.isFinite(rate)?currency+' '+number(rate):'OPEN');
+      set(v,r,6,'');
+      set(v,r,7,currency+' '+number(amount));
+      set(v,r,8,'');
+      notes.push('Draft price · CIF/FOB pending');
+      if(assigned.length)notes.push('Assigned portions of this subtotal: '+assigned.join(' / '));
+     }else{set(v,r,5,'OPEN');set(v,r,7,'OPEN');notes.push('Customer CIF/FOB term OPEN');}
+    }
+    if(rollup?.open)notes.push(rollup.priced+'/'+rollup.count+' priced, '+rollup.open+' OPEN');
+    if(view.workingPreview&&bs.some(b=>b.line.spareBudget))notes.push('Draft budget allowance / OEM breakdown OPEN');
+    set(v,r,9,notes.join(' / '));
    }
    if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
    if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
-   if(!base&&r===6&&view.workingPreview&&terms.has(''))v.A2_6_9+=' / Option price before CIF/FOB allocation: '+sparePriceNote(bs,currency);
   }
   if(base&&view.workingPreview){
    if(!groups.has(5)){
@@ -116,8 +144,11 @@ function nativePages(view,id,currency='USD'){
     :'Option reference (A2 / Form C-3): '+sparePriceNote(operation,currency)+' / Excluded from Base.');
   }
   if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
-  else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?currency+' '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs),currency):'OPEN'));}
-  add(v);return {pages,issues};
+  else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
+   const bs=eligible.filter(b=>term(b)===t),total=sum(bs),pending=eligible.some(b=>!term(b));
+   set(v,r,2,'In figures: '+(pending?'OPEN':bs.length?currency+' '+number(total):'OPEN')+'\nIn Words: '+(view.workingPreview&&pending?'OPEN':words(total,currency)));
+  }
+  add(v,'',draftPriceRows.length?{draftPriceRows}:undefined);return {pages,issues};
  }
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
@@ -196,6 +227,12 @@ function renderPage(view,page,format,currency='USD'){
     return treatment+': '+(rollup.priced?currency+' '+number(rollup.knownUSD)+' ('+rollup.priced+'/'+rollup.count+' allocated owners priced)':'OPEN');
    });
    partialNote='Draft subtotals of priced allocations only. '+available.join(' / ')+'. Review A1, A2 and the Schedule allocations for remaining scope.';
+  }
+  if(page.id==='A2'){
+   const options=view.bindings.filter(b=>b.line&&b.treatment==='OPTION');
+   const subtotal=scheduleRollup0550(options);
+   if(subtotal.priced)partialNote='Option Working subtotal (priced items): '+currency+' '+number(subtotal.knownUSD)+
+    ' ('+subtotal.priced+'/'+subtotal.count+' priced'+(subtotal.open?', '+subtotal.open+' OPEN':'')+').';
   }
   if(/^C[2-8]$/.test(page.id)&&!page.systemToken&&!view.scheduleRows(page.id).length){
    partialNote='OPEN. Confirm applicable scope and allocate the supporting Working items.';
