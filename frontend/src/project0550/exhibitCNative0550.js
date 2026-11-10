@@ -74,7 +74,7 @@ function fill(id,values,format,currency,draftPriceRows=[]){
   return escape(v).replace(/\n/g,format==='xml'?'</w:t><w:br/><w:t xml:space="preserve">':'<br>');
  });
 }
-function nativePages(view,id,currency='USD'){
+function nativePages(view,id,currency='USD',c2References){
  const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
@@ -176,8 +176,26 @@ function nativePages(view,id,currency='USD'){
   chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
  }
  if(['C2','C3','C4'].includes(id)){
-  const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows}];
+  const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view,c2References):[{rows}];
   for(const system of systems){
+   if(system.draftRows?.length){
+    chunks(system.draftRows,7).forEach((references,pi)=>{
+     const v=blankValues(id),draftPriceRows=[];
+     set(v,0,2,'OPEN');
+     set(v,1,1,'Internal reference · 07 Vendor / 10.2 Working A/B/C · C2 allocation OPEN');
+     references.forEach((reference,i)=>{
+      const r=i+4;
+      set(v,r,0,[reference.description,reference.note,reference.source].filter(Boolean).join('\n'));
+      set(v,r,1,reference.partNo|| (reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN'));
+      set(v,r,4,Number.isFinite(reference.quantity)?[reference.quantity,reference.unit].filter(Boolean).join(' '):'OPEN');
+      set(v,r,9,Number.isFinite(reference.unitCost)?reference.currency+' '+number(reference.unitCost):'OPEN');
+      set(v,r,11,Number.isFinite(reference.totalCost)?reference.currency+' '+number(reference.totalCost):'OPEN');
+      draftPriceRows.push([r,9]);
+     });
+     add(v,pi?'Reference continuation '+(pi+1):'Source cost reference',{systemToken:system.token,systemName:system.name,systemStatus:system.status,draftPriceRows});
+    });
+    continue;
+   }
    let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
@@ -268,7 +286,8 @@ function renderPage(view,page,format,currency='USD'){
  }
  if(page.systemToken){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
-  const label=escape(heading+(page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
+  const label=escape(heading+(page.systemStatus==='DRAFT_FROM_EXISTING'?' · DRAFT — source costs for SI reference':
+   page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
   result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
  if(page.id==='A'){
@@ -346,7 +365,7 @@ function renderPage(view,page,format,currency='USD'){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
  }
- if(page.draftPriceRows?.length)partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
+ if(page.draftPriceRows?.length&&page.systemStatus!=='DRAFT_FROM_EXISTING')partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
   (page.id==='C2'&&page.priceRows.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
@@ -357,9 +376,9 @@ function renderPage(view,page,format,currency='USD'){
 }
 const logo='data:image/png;base64,'+template.binary['word/media/image1.png'];
 export const nativeFormCss0550=`.p55-native-paper{box-sizing:border-box;width:1120px;max-width:none;min-height:720px;background:white;color:#000;padding:28px 40px;margin:0 auto 24px;font:13px Arial,sans-serif;box-shadow:0 1px 8px #0002}.p55-native-paper *{box-sizing:border-box}.p55-native-paper header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid black;margin-bottom:24px;font-size:11px}.p55-native-paper header img{width:100px;height:auto}.p55-native-paper h2{font:bold 15px Arial;text-align:center;color:#000;margin:18px 0 22px}.p55-native-paper p{margin:0;white-space:pre-wrap;line-height:1.2}.p55-native-paper>p{margin:10px 0}.p55-native-paper table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;color:#000;font:12px Arial}.p55-native-paper td{border:1px solid #000;padding:3px 4px;vertical-align:middle;overflow-wrap:break-word;line-height:1.12;min-height:23px}.p55-native-paper tr{height:23px;break-inside:avoid}.p55-native-paper thead td{text-align:center;font-weight:bold;background:#fff}.p55-native-paper footer{display:flex;justify-content:space-between;border-top:1px solid #000;margin-top:24px;padding-top:4px;font:10px 'Times New Roman',serif}.p55-native-paper .native-status{font:10px Arial;text-align:right;margin:4px 0;color:#555}.p55-native-paper .native-response{margin-top:14px}.p55-native-scroll{max-width:100%;overflow:auto;background:#e8edf2;padding:18px 12px}.p55-native-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.p55-native-help{font-size:13px}.p55-native-issues{color:#8a4200}@media print{body{margin:0}.p55-native-paper{width:auto;min-height:0;box-shadow:none;margin:0;padding:0;break-before:page}.p55-native-paper:first-child{break-before:auto}.p55-native-paper table{font-size:10px}.p55-native-paper header img{width:85px}thead{display:table-header-group}@page{size:A4 landscape;margin:12mm}}`;
-export function nativeSchedule0550(view,id,currency='USD'){
+export function nativeSchedule0550(view,id,currency='USD',c2References){
  if(id==='C1'&&isC1Appendix0550(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
- const {pages,issues}=nativePages(view,id,currency),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
+ const {pages,issues}=nativePages(view,id,currency,c2References),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
  const sourceLabel=id==='B'&&paymentSchedule0550(view)?'Schedule B · Current tender':'Source page '+template.schedules[id].page+' of 18';
  const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${sourceLabel}${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
  return {html,issues,pages};

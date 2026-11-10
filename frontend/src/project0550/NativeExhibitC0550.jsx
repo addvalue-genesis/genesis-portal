@@ -5,7 +5,7 @@ import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './Schedule
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
-import {c2HasSystem0550,c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c2DraftRowsFromExisting0550,c2HasSystem0550,c2ProjectLotOverlaps0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 
@@ -59,16 +59,17 @@ export function LazyNativeExhibitC0550(props){
  return <details open={open} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>{props.label}</summary>{open&&<NativeExhibitC0550 {...props}/>}</details>;
 }
 
-export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,lanScope,disabled=false}){
+export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,c2Scope,disabled=false}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
- const groups=useMemo(()=>id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[],[id,view]);
+ const references=useMemo(()=>id==='C2'&&view.workingPreview&&c2Scope?c2DraftRowsFromExisting0550(c2Scope.data,c2Scope.model):undefined,[id,view.workingPreview,c2Scope]);
+ const groups=useMemo(()=>id==='C2'&&view.c2Systems?c2SystemGroups0550(view,references):[],[id,view,references]);
  const selected=groups.find(group=>group.token===systemChoice);
  const unresolved=useMemo(()=>groups.length?view.scheduleRows('C2').filter(row=>!c2HasSystem0550(row)):[],[view,groups]);
  const formView=useMemo(()=>groups.length?{...view,c2SystemToken:selected?.token,
   scheduleRows:schedule=>schedule==='C2'?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)}:view,[view,groups,selected]);
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
- const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency),[screenView,id,currency]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
+ const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency,references),[screenView,id,currency,references]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
  const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
  const print=()=>{
@@ -78,15 +79,16 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  };
  return <section aria-label={'Native Exhibit C Schedule '+id}>
   <style>{nativeFormCss0550}</style>
-  {groups.length>0&&<label>ระบบใน Schedule C2 <select aria-label="C2 system form" value={selected?.token||''} onChange={e=>setSystemChoice(e.target.value)} disabled={disabled}><option value="">แสดงทุกระบบ</option>{groups.map(group=><option key={group.token} value={group.token}>{group.token}{group.name===group.token?'':' · '+group.name} · {group.rows.length||'OPEN'}</option>)}</select></label>}
+  {groups.length>0&&<label>ระบบใน Schedule C2 <select aria-label="C2 system form" value={selected?.token||''} onChange={e=>setSystemChoice(e.target.value)} disabled={disabled}><option value="">แสดงทุกระบบ</option>{groups.map(group=><option key={group.token} value={group.token}>{group.token}{group.name===group.token?'':' · '+group.name} · {group.rows.length||(group.draftRows.length?'Draft reference':'OPEN')}</option>)}</select></label>}
   {groups.length>0&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.group.B5',{workingSystem:selected?.token})}>เตรียมรายการ Working B5</button>}
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
-  {selected?.token==='TEL-LAN'&&lanScope&&<details className="p55-panel"><summary>ตรวจความครบถ้วนจาก CUS → Working B5 → C2</summary>
+  {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference แสดงต้นทุนตามสกุลเงินต้นทางในฟอร์มบนจอเพื่อให้ SI ตรวจรายการ · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}
+  {selected?.token==='TEL-LAN'&&c2Scope&&<details className="p55-panel"><summary>ตรวจความครบถ้วนจาก CUS → Working B5 → C2</summary>
    <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.working-preview.step.5',{workingSystem:'TEL-LAN'})}>เปิด WP.5 · TEL-LAN</button>
-   <LanCusSpareCoverage0550 {...lanScope} onNavigate={onNavigate} disabled={disabled}/>
+   <LanCusSpareCoverage0550 {...c2Scope} onNavigate={onNavigate} disabled={disabled}/>
   </details>}
   {overlaps.length>0&&<div role="alert" className="p55-native-issues" aria-label="C2 Project Lot overlap">
    <strong>ตรวจความเสี่ยงคิดซ้ำใน C2 · พบ Lot และรายการราย Part No.</strong>

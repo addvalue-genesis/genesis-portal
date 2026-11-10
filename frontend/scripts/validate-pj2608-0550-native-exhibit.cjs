@@ -226,6 +226,47 @@ const preparedC2=N.nativeSchedule0550(blankC2,'C2');
 const phaseLabels=['Pre-commissioning spares','Commissioning spares','Start-up spares'];
 assert.equal(preparedC2.pages.length,19);
 assert(preparedC2.pages.every(page=>page.systemStatus==='AWAITING_B5'));
+const {c2DraftRowsFromExisting0550}=require(root+'/project0550/data/c2SystemForms0550.js');
+const {CERAGON_R12_0550}=require(root+'/project0550/data/ceragonSelection0550.js');
+const quote=(id,systemToken,description,quotedQuantity,quotedUnitCost)=>({
+ id,description,quoteRef:'SOURCE-'+id,unit:'Pc',currency:'EUR',unitCost:quotedUnitCost,
+ quoteEvidence:{systemTokens:[systemToken],quotedQuantity,quotedUnit:'Pc',quotedUnitCost,quotedCurrency:'EUR',classification:'RATE'},
+});
+const offerKit={...quote('KIT','TEL-PAGA','INTRON-X commissioning kit',1,160),supplierQuoteRow:{itemCode:'18020',parentOfferId:'NET',classification:'BASE_PRICE'}};
+const oldKit={...offerKit,id:'OLD-KIT',supplierQuoteRow:{...offerKit.supplierQuoteRow,parentOfferId:'OLD-NET'}};
+const r12=quote(CERAGON_R12_0550,'TEL-DMR','Spares - Main ODU',1,7190);
+const unpriced=quote('OPEN-SPARES','TEL-PAGA','Pre-commissioning spares',null,null);
+const refsData={offers:[offerKit,oldKit,r12,unpriced,quote('LABOUR','TEL-PAGA','Commissioning Engineer',1,10)],vendors:[],lines:[]};
+const refsModel={lines:[
+ {id:'PAGA-NET-WORKING',offerId:'NET',wbs:'A',systemToken:'TEL-PAGA',selected:true},
+ {id:'C3-PAGA',description:'Two-year spares working estimate',wbs:'C3',systemToken:'TEL-PAGA',selected:true,quantity:2,unit:'Pc',costRate:31,currency:'USD'},
+ {id:'B5-WORKING',description:'Working spare',wbs:'B5',systemToken:'TEL-LAN',selected:true,quantity:1,unit:'Pc',costRate:199,currency:'USD'},
+]};
+const beforeReferences=JSON.stringify([refsData,refsModel,c2.bindings]);
+const references=c2DraftRowsFromExisting0550(refsData,refsModel);
+assert.equal(JSON.stringify([refsData,refsModel,c2.bindings]),beforeReferences);
+const screenC2=N.nativeSchedule0550(c2,'C2','USD',references);
+const pagaReferences=screenC2.pages.find(p=>p.systemToken==='TEL-PAGA');
+assert.equal(pagaReferences.systemStatus,'DRAFT_FROM_EXISTING');
+assert.match(screenC2.html,/INTRON-X commissioning kit.*Included in supplier NET package/s);
+assert.match(screenC2.html,/Working C · C3-PAGA/);
+assert.match(screenC2.html,/EUR 160\.00/);
+assert.doesNotMatch(screenC2.html,/OLD-KIT|Commissioning Engineer|SOURCE-OPEN-SPARES.*?EUR 0\.00/s);
+assert.equal(pagaReferences.values.C2_6_4,'OPEN');
+assert.equal(pagaReferences.values.C2_6_9,'OPEN');
+assert.equal(screenC2.pages.find(p=>p.systemToken==='TEL-LAN').values.C2_4_0,'LAN-ONLY');
+const blankWithRefs=N.nativeSchedule0550(blankC2,'C2','USD',references);
+assert.match(blankWithRefs.html,/Spares - Main ODU.*Capital spares · Schedule C4/s);
+const allSpareRows=Array.from({length:8},(_,i)=>({...references.get('TEL-LAN')[0],description:'SPARE-REF-'+i}));
+const multiPage=N.nativeSchedule0550(blankC2,'C2','USD',new Map([['TEL-LAN',allSpareRows]]));
+assert.equal(multiPage.pages.filter(p=>p.systemToken==='TEL-LAN').length,2);
+assert.match(multiPage.html,/SPARE-REF-7/);
+assert.doesNotMatch(N.nativeExhibitHtml0550(c2,'C2'),/INTRON-X commissioning kit|EUR 160\.00|source costs for SI reference/);
+assert.doesNotMatch(Buffer.from(N.buildNativeExhibitDocx0550(c2,'C2')).toString(),/INTRON-X commissioning kit|EUR 160\.00|source costs for SI reference/);
+const c2Props={id:'C2',c2Scope:{data:refsData,model:refsModel}};
+const referenceScreen=workingPreview=>renderToStaticMarkup(React.createElement(NativeExhibitC0550,{...c2Props,view:{...c2,workingPreview}}));
+assert.match(referenceScreen(true),/Draft reference.*INTRON-X commissioning kit/s);
+assert.doesNotMatch(referenceScreen(false),/INTRON-X commissioning kit/);
 const {CommissioningBreakdown0550}=require(root+'/project0550/CommissioningSpares0550.jsx');
 const coverageScreen=renderToStaticMarkup(React.createElement(CommissioningBreakdown0550,{
  view:blankC2,systems:D.SYSTEMS,currency:'USD',model:{lines:[

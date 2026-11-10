@@ -90,6 +90,7 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
    <p>A1 S/N 5 · C3 Option · {operations.count} เจ้าของราคา · {totalText(operations)} <button type="button" disabled={disabled} onClick={onOpenC3}>เปิด 11.C3</button></p>
    {operationRows.length>0&&<ul>{operationRows.map(row=><li key={row.lineId}>{link(workingId(row.lineId),row.line.description)} · {money(row.amount,currency)}{row.line.spareBudget&&' · วงเงินร่าง รอรายการ OEM'}</li>)}</ul>}
   </>:<>
+   <p>Draft reference ในฟอร์มด้านบนใช้ตรวจต้นทุนและขอบเขตจาก 07 Vendor / 10.2 Working · ตารางด้านล่างแสดงรายการที่จัดลง C2 และยอดขายของรายการเหล่านั้น</p>
    <p><strong>B5-C2-OEM-QTY · หลักจาก Exhibit C2 Notes 1–3 / MR Appendix 10 / STD TEL-001 §7.7.1</strong> · แยกตาม Main Equipment No. และ Part No. ถึง PAC · ใช้จำนวนตรงตาม CUS/OEM หรือใช้ฐาน B หรือ A × B เมื่อเอกสารกำหนดอัตราส่วนต่อกลุ่ม</p>
    <p>แบบอัตราส่วน · เลือก CEIL เพื่อนับเศษเป็นหนึ่งกลุ่ม หรือ FLOOR เพื่อนับเฉพาะกลุ่มเต็มตามเอกสาร CUS/OEM จากนั้นคูณอะไหล่ต่อกลุ่มและหักจำนวนที่ยืนยันว่ารวมไว้สำหรับ Part No. และงานเดียวกัน โดยมีค่าต่ำสุดเป็น 0</p>
    <p><strong>B5-SPARE-QTY</strong> · ใช้แตกจำนวนตามขั้นตอน OEM หรือ ITP เมื่อมีจำนวนรอบ/ทีมและจำนวนใช้ต่อรอบ · ตรวจยอดกับรายการ OEM ก่อนตั้งราคา</p>
