@@ -40,6 +40,7 @@ export function c2ProjectLotOverlaps0550(rows){
 export const c2HasSystem0550=row=>Boolean(row.line?.systemToken&&row.line.systemToken!=='COMMON');
 
 // Draft layout only. A project-level Working allowance is not a system spare form.
+// Always include every non-COMMON system, even when no B5 rows are allocated yet.
 export function c2SystemGroups0550(view){
  const groups=new Map((view.c2Systems||[]).filter(({token})=>token!=='COMMON').map(({token,name})=>[token,{token,name,rows:[]}]));
  for(const row of view.scheduleRows('C2')){
@@ -51,6 +52,6 @@ export function c2SystemGroups0550(view){
  return [...groups.values()].filter(group=>!view.c2SystemToken||group.token===view.c2SystemToken).map(group=>{
   const phases=new Set(group.rows.map(row=>row.line&&commissioningPhase0550(row.line)));
   const pendingPhases=COMMISSIONING_PHASES_0550.filter(phase=>!phases.has(phase.id));
-  return {...group,pendingPhases};
+  return {...group,status:group.rows.length?'HAS_ROWS':'AWAITING_B5',pendingPhases};
  });
 }

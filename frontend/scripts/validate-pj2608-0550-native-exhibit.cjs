@@ -176,6 +176,8 @@ const c2={...view,c2Systems,bindings:[...rows.filter(r=>r.schedule!=='C2'),...c2
 const c2Forms=N.nativeSchedule0550(c2,'C2');
 assert.equal(c2Forms.pages.length,4);assert.equal(c2Forms.pages.filter(p=>p.systemToken==='TEL-DMR').length,2);
 assert.equal(c2Forms.pages.find(p=>p.systemToken==='TEL-LAN').values.C2_4_0,'LAN-ONLY');
+assert.equal(c2Forms.pages.find(p=>p.systemToken==='TEL-LAN').systemStatus,'HAS_ROWS');
+assert.equal(c2Forms.pages.find(p=>p.systemToken==='TEL-PAGA').systemStatus,'AWAITING_B5');
 assert.match(c2Forms.html,/TEL-PAGA[^<]*OPEN/);
 assert.doesNotMatch(c2Forms.html,/SHARED-OWNER|UNKNOWN-SYSTEM|System: COMMON/);
 const c2AllWord=Buffer.from(N.buildNativeExhibitDocx0550(c2,'C2')).toString();
@@ -223,6 +225,7 @@ const blankC2={...c2,c2Systems:D.SYSTEMS,scheduleRows:id=>id==='C2'?[]:view.sche
 const preparedC2=N.nativeSchedule0550(blankC2,'C2');
 const phaseLabels=['Pre-commissioning spares','Commissioning spares','Start-up spares'];
 assert.equal(preparedC2.pages.length,19);
+assert(preparedC2.pages.every(page=>page.systemStatus==='AWAITING_B5'));
 const {CommissioningBreakdown0550}=require(root+'/project0550/CommissioningSpares0550.jsx');
 const coverageScreen=renderToStaticMarkup(React.createElement(CommissioningBreakdown0550,{
  view:blankC2,systems:D.SYSTEMS,currency:'USD',model:{lines:[

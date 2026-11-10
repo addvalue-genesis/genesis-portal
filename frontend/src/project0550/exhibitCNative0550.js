@@ -188,11 +188,11 @@ function nativePages(view,id,currency='USD'){
      prices(v,r,9,b,draftPriceRows);
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
-    if(!system.rows.length)pendingPhases.forEach((phase,i)=>{
+    if(system.status==='AWAITING_B5')pendingPhases.forEach((phase,i)=>{
      set(v,i+4,0,phase.title+' spares');
      for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
     });
-    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,draftPriceRows,...(system.token?{systemToken:system.token,systemName:system.name,spareRows:group,pendingPhases}:{})});
+    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,draftPriceRows,...(system.token?{systemToken:system.token,systemName:system.name,systemStatus:system.status,spareRows:group,pendingPhases}:{})});
     firstPage=false;
    });
   }
@@ -268,7 +268,7 @@ function renderPage(view,page,format,currency='USD'){
  }
  if(page.systemToken){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
-  const label=escape(heading+(page.spareRows.length?'':' · OPEN — awaiting Working B5 allocations'));
+  const label=escape(heading+(page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
   result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
  if(page.id==='A'){
