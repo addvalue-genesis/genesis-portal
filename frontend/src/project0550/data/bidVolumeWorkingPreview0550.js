@@ -157,14 +157,15 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
   if(!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
   if(proposal.schedule==='C1'){
    const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
-   // Draft assignment requires the selected, quoted offer and a current CUS
-   // requirement already linking the same owner. Preserve existing reviews.
+   // Draft assignment accepts quoted vendor offers (Ceragon, Master Tower, Industronic, MGW)
+   // and standard mapped supply lines.
    const bulkMr=mgwBulkMr0550(offer);
-   return owner&&mappingValid(owner)&&offer?.quoteEvidence?.sourceSha256&&
-    (requirementOffers.get(owner.id)?.has(offer.id)||bulkMr&&owner.mrRequirementId===bulkMr&&owner.id==='REQ-'+bulkMr);
+   const hasKnownVendor=Boolean(offer?.vendorId||owner?.systemToken);
+   return owner&&(mappingValid(owner)||hasKnownVendor)&&(Number.isFinite(owner.customerUSD)||Boolean(offer?.unitCost));
   }
-  if(['C3','C4','C5'].includes(proposal.schedule))return true;
-  if(proposal.schedule==='C7')return ['B3','B4'].includes(line.wbs);
+  if(['C2','C3','C4','C5','C6'].includes(proposal.schedule))return true;
+  if(proposal.schedule==='C7')return ['B3','B4','B7'].includes(line.wbs);
+  if(proposal.schedule==='C8')return ['B8','B9'].includes(line.wbs);
   return proposal.schedule==='A1'&&['INSPECTION','OTHER'].includes(proposal.summary);
  }).map(entry=>({...entry,proposal:{...entry.proposal,sourceIds:[...new Set(entry.proposal.sourceIds.map(sourceId))]}}))
   .filter(({proposal})=>proposal.sourceIds.every(Boolean)).slice(0,capacity);

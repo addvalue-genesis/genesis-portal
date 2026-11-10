@@ -124,11 +124,13 @@ export function deriveC1Appendix0550(view,currency='USD'){
   // not an additional customer supply package. Keep its canonical owner intact.
   if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
   if(targets.length===1){const target=targets[0];charged.add(b.lineId);target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
-  const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id;
+  const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||(token==='TEL-DMR'?'1.5':token==='TEL-TELT'?'1.1':token==='TEL-PAGA'?'1.4':undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
   const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
+  const vendorName=b.line?.offer?.vendorId||'';
+  const itemDescription=b.line?.description||(systemNames[token]||'Equipment')+' — supply package';
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
-   description:mgwCurrentOffer0550(b.line.offer)||paga?b.line.description:(systemNames[token]||'Equipment')+' — supply package',quantity:b.quantity,unit:b.unit,
+   description:itemDescription,quantity:b.quantity,unit:b.unit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:supplement?b.line.offer.quoteEvidence.terms.filter(t=>t.startsWith('BOM: ')).map(t=>c1Component0550(t.slice(5).replace(/^(\d+) x /,'$1 Ea. '))):[],
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
@@ -165,7 +167,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const group of groups){
   let mrNumber=0,packageNumber=0;const systems=new Map();group.rows.forEach(r=>{const system=legacy?r.system:mrScopeNames[group.id]||r.system;if(!systems.has(system))systems.set(system,new Map());const sites=systems.get(system);if(!sites.has(r.site))sites.set(r.site,[]);sites.get(r.site).push(r);});
   group.systems=[...systems].map(([name,sites])=>({name,sites:[...sites].map(([name,items])=>({name,rows:items.map(r=>{const item={...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};displayRows.push(item);return item;})}))}));
-  group.amount=group.rows.some(r=>r.kind==='MR'&&!r.excluded&&(!r.ownerIds.length||!(r.quantity>0)))?null:money(group.rows.filter(r=>r.priceOwners?.length||r.kind==='PACKAGE').map(r=>r.amount));
+  group.amount=view.workingPreview?money(group.rows.filter(r=>r.priceOwners?.length||r.kind==='PACKAGE').map(r=>r.amount)):(group.rows.some(r=>r.kind==='MR'&&!r.excluded&&(!r.ownerIds.length||!(r.quantity>0)))?null:money(group.rows.filter(r=>r.priceOwners?.length||r.kind==='PACKAGE').map(r=>r.amount)));
  }
  const byKey=new Map(displayRows.map(r=>[r.key,r]));
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
@@ -177,7 +179,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(Number.isFinite(amount)&&amount!==rendered)problems.push('C1_OWNER_TOTAL_MISMATCH');
  const priced=scheduleRollup0550(bindings);
  const pricedItemsSubtotal=view.workingPreview&&!legacy&&priced.priced?priced.knownUSD:null;
- return {groups,rows:displayRows,amount:problems.length?null:amount,knownOwnerAmount:amount,pricedItemsSubtotal,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};
+ return {groups,rows:displayRows,amount:view.workingPreview&&Number.isFinite(amount)?amount:(problems.length?null:amount),knownOwnerAmount:amount,pricedItemsSubtotal,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};
 }
 
 // Interactive overview only. Do not replace strict customer/export subtotals or
