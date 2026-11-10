@@ -1,4 +1,4 @@
-import {mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
+import {mgwBulkMr0550,mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
 import {ceragonSupersededOffer0550} from "./ceragonSelection0550";
 import catalog from "./mgwQuote0550.json";
 import procurement from "./procurementScope0550.json";
@@ -36,6 +36,9 @@ export function supplierOfferExcluded0550(data,offer,systemToken){
 }
 export const currentSupplierOffers0550=(data,systemToken)=>data.offers.filter(o=>o.id!==RETIRED_TOWER_OFFER_0550&&!ceragonSupersededOffer0550(data,o.id)&&!supplierOfferExcluded0550(data,o,systemToken));
 export function mgwWorkingLineExcluded0550(data,line,offer=data.offers?.find(o=>o.id===line.offerId)){
+ // MR bulk supply is an independent cost owner, including field cables used by PAGA.
+ const bulkMr=mgwBulkMr0550(offer);
+ if(bulkMr&&line.wbs==='A'&&line.customerRowCode==='A1-13'&&line.mrRequirementId===bulkMr&&line.id==='REQ-'+bulkMr)return false;
  const ownerIsMgw=Boolean(line.mgwDetailGroupId)||isMgwVendor(data.vendors?.find(v=>v.id===line.vendorId))||isMgwOffer(data,offer);
  return mgwHistoricalLine0550(data,line,offer)||mgwGroupExcluded0550(line.mgwDetailGroupId)||supplierOfferExcluded0550(data,offer,line.systemToken)||
   ownerIsMgw&&(excludedSystems.has(line.systemToken)||procurement.mgw.excludedCustomerRowCodes.includes(line.customerRowCode));

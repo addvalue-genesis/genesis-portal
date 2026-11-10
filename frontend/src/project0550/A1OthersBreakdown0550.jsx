@@ -61,6 +61,9 @@ export function A1OthersBreakdown0550({panel,view,currency,onNavigate,disabled})
   <h4>Schedule A1 · Others (Please specify) · 1 Lot</h4>
   <p>11.E และ 11.F แสดงรายละเอียดของยอด 1 Lot เดียวกันจาก Working และ 11.M</p>
   {basis?.delivery&&<p>Exhibit C Schedule A1 · {basis.delivery.text}</p>}
+  {view.mgwBulkSupply&&<p>{insurance
+   ?'FO / Bulk supply in C1 changes the draft cargo value. Reconcile the insured value and B2-D04 against the shipment and insurer quotation.'
+   :'FO / Bulk supply in C1 requires a separate check of shipment documents and customs fees under the current CIF Yangon basis.'}</p>}
   {evidence&&<p>{insurance
    ?'Purchase Agreement · All-Risk Cargo ขั้นต่ำ 110% ของมูลค่าสินค้าตามสัญญาหรือ PO · เทียบฐานทุนประกันกับ B2-D04 และใช้เบี้ยจากใบเสนอจริงเมื่อได้รับ'
    :'Exhibit A Annex 6 §5 · VENDOR จัดทำเอกสาร Import Licence (PL submission) · แยกงานยื่นเอกสารออกจากค่าธรรมเนียมและผู้ชำระจริง'}

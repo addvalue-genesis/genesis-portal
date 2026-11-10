@@ -22,7 +22,8 @@ export function validateVendorQuoteEvidence0550(e,systems){
  for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
  if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
  if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
- if(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<0||e.quotedQuantity===0&&e.classification!=='OPTION'||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification))fail('invalid quotation quantity/classification');
+ const unquantified=e.quotedQuantity===null&&e.quotedUnitCost===null&&e.quotedTotal===null&&e.classification==='RATE';
+ if(!unquantified&&(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<0||e.quotedQuantity===0&&e.classification!=='OPTION'||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification)))fail('invalid quotation quantity/classification');
  if(!['THB','USD','EUR'].includes(e.quotedCurrency)||e.quotedUnitCost!==null&&(!Number.isFinite(e.quotedUnitCost)||e.quotedUnitCost<0||e.quotedUnitCost>1e12))fail('invalid native quotation rate/currency');
  if(e.quotedTotal!==undefined&&e.quotedTotal!==null&&(!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||e.quotedTotal>1e12))fail('invalid original line total');
  if(e.originBatchId!==undefined&&(typeof e.originBatchId!=='string'||!/^[\w.-]{1,100}$/.test(e.originBatchId)))fail('invalid origin batch');

@@ -8,7 +8,7 @@ import {mappingValid} from './officialPricing0550';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
-import {mgwCctvEntOffer0550,mgwCurrentMr0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
+import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 
 const rules={
@@ -48,7 +48,7 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   // These annotations identify work to inspect; they do not decide applicability.
   const advisories=[];
   if(pagaRevisionNet0550(line?.offer))advisories.push(line.offer.quoteRef+' · '+PAGA_REVISION_INCLUDED_0550);
-  if(mgwCctvEntOffer0550(line?.offer)){
+  if(mgwCctvEntOffer0550(line?.offer)||mgwBulkOffer0550(line?.offer)){
    const candidates=mgwCurrentMr0550(line.offer);
    if(candidates.length)advisories.push('MR candidate / '+candidates.join(' / '));
    advisories.push(mgwSupplementOpen0550(line.offer,line.systemToken));
@@ -106,7 +106,8 @@ export function scheduleAllocationPlan0550(data,savedView){
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-004'){schedule='A1';summary='PACKING';reason='MGW expressly bundled Packing/Marking/Delivery → proposed A1 Packing; one owner, no split or duplicate freight';}
   }
   const offer=data.offers.find(o=>o.id===raw.offerId);
-  const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)).flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
+  const bulkMr=mgwBulkMr0550(offer);
+  const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)||bulkMr&&r.id==='REQDEF-'+bulkMr&&r.disposition!=='NOT_APPLICABLE').flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
   const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
   const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
   return {line,proposal,reason};
@@ -158,8 +159,9 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
    const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
    // Draft assignment requires the selected, quoted offer and a current CUS
    // requirement already linking the same owner. Preserve existing reviews.
+   const bulkMr=mgwBulkMr0550(offer);
    return owner&&mappingValid(owner)&&offer?.quoteEvidence?.sourceSha256&&
-    requirementOffers.get(owner.id)?.has(offer.id);
+    (requirementOffers.get(owner.id)?.has(offer.id)||bulkMr&&owner.mrRequirementId===bulkMr&&owner.id==='REQ-'+bulkMr);
   }
   if(['C3','C4','C5'].includes(proposal.schedule))return true;
   if(proposal.schedule==='C7')return ['B3','B4'].includes(line.wbs);
@@ -203,7 +205,8 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
   }
  }
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:currentSupplierOffers0550(data).filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
- return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+ const mgwBulkSupply=bindings.some(b=>b.schedule==='C1'&&Number.isFinite(b.amount)&&mgwBulkOffer0550(b.line?.offer));
+ return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:proposed.length,unresolved:plan.length-proposed.length,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),

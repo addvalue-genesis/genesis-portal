@@ -21,7 +21,15 @@ export const MGW_CCTV_ENT_0550 = {
  prefix:'OFFER-MGW-Q26-063-CCTV-ENT-',
  sha256:'58ae566cb865834c90e03f82322b6bbbb5538b39e6835b2dbb1c411a57b54894',
 };
-export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId];
+export const MGW_BULK_0550 = {
+ quoteRef:'Q26-063 Bulk Material',
+ batchId:'0550-MGW-Q26-063-BULK-20261110',
+ prefix:'OFFER-MGW-Q26-063-BULK-',
+ sha256:'8b49afa5fe02de7d717a16f58377a813ad7b19d30657c7b7b430c29fe655dd1e',
+};
+const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
+export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
+export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [
  {system:'TEL-CCTV',label:'CCTV',count:28,
@@ -87,12 +95,22 @@ export const mgwCctvEntOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_CC
  offer.quoteEvidence.sourceId===MGW_CCTV_ENT_0550.batchId && offer.quoteEvidence.sourceSha256===MGW_CCTV_ENT_0550.sha256 &&
  Object.hasOwn(cctvEntMr,offer.id.slice(MGW_CCTV_ENT_0550.prefix.length)));
 export const mgwSupplementOffer0550 = offer => mgwMetNdbOffer0550(offer)||mgwCctvEntOffer0550(offer);
+export function mgwBulkMr0550(offer){
+ if(offer?.quoteRef!==MGW_BULK_0550.quoteRef||offer.quoteEvidence?.sourceId!==MGW_BULK_0550.batchId||
+  offer.quoteEvidence.sourceSha256!==MGW_BULK_0550.sha256||!offer.id.startsWith(MGW_BULK_0550.prefix))return null;
+ const item=/^([1-4])-(\d{2})$/.exec(offer.id.slice(MGW_BULK_0550.prefix.length));
+ if(!item)return null;
+ const [site,count]=bulkSections[Number(item[1])-1];
+ return Number(item[2])>0&&Number(item[2])<=count?'MR-B1-18-'+site+'-'+item[2]:null;
+}
+export const mgwBulkOffer0550 = offer => Boolean(mgwBulkMr0550(offer));
 export const mgwSupplementOpen0550 = (offer,system) => mgwMetNdbOffer0550(offer)?MGW_MET_NDB_OPEN_0550[system]:
- mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:undefined;
-export const mgwCurrentOffer0550 = offer => mgwLanPbxFoOffer0550(offer)||mgwSupplementOffer0550(offer);
+ mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:
+ mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:undefined;
+export const mgwCurrentOffer0550 = offer => mgwLanPbxFoOffer0550(offer)||mgwSupplementOffer0550(offer)||mgwBulkOffer0550(offer);
 export function mgwCurrentItemKey0550(offer){
  const prefix=mgwMetNdbOffer0550(offer)?MGW_MET_NDB_0550.prefix:
-  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_0550.prefix:MGW_CURRENT_PREFIX_0550;
+  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_0550.prefix:mgwBulkOffer0550(offer)?MGW_BULK_0550.prefix:MGW_CURRENT_PREFIX_0550;
  return offer.id.slice(prefix.length);
 }
 export const mgwCurrentIncluded0550 = offer => mgwCurrentOffer0550(offer) &&
@@ -102,6 +120,8 @@ export const mgwOfferSourcePending0550 = data => mgwReplacementActive0550(data) 
 export const mgwCurrentDirectMr0550 = offer => mgwLanPbxFoOffer0550(offer)?directMr[mgwCurrentItemKey0550(offer)]:undefined;
 export function mgwCurrentMr0550(offer){
  if(!mgwCurrentOffer0550(offer))return [];
+ const bulkMr=mgwBulkMr0550(offer);
+ if(bulkMr)return [bulkMr];
  if(mgwMetNdbOffer0550(offer))return metNdbMr[mgwCurrentItemKey0550(offer)];
  if(mgwCctvEntOffer0550(offer))return cctvEntMr[mgwCurrentItemKey0550(offer)].map(id=>'MR-B1-'+id);
  const direct=mgwCurrentDirectMr0550(offer);

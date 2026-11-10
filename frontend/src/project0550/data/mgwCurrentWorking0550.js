@@ -1,13 +1,17 @@
 import {policyDefaults0550} from '../bidWorkingBasis0550';
-import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
+import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {
  MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_SUPERSEDED_0550,
- mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwSupplementOffer0550,
+ mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
 const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12'};
+const nativeMr=new Map(MR_WORKING_CATALOG_0550.rows.map(row=>[row.id,row]));
+const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Object.keys(original).length&&
+ Object.keys(original).every(key=>original[key]===line[key]);
+const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
 
 export function prepareMgwCurrentWorking0550(data,policies,today){
  const receipt=data.mgwDetailPricingImport;
@@ -24,6 +28,9 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  const policy=policyDefaults0550(policies,'Goods / Procured Cost');
  if(!policy)return next;
  const lines=[...next.lines],defaults=new Map(importMrWorkingBasis0550({lines:[]},policies,today).lines.map(l=>[l.id,l]));
+ const offers=new Map(next.offers.map(o=>[o.id,o]));
+ const otherBulkOwner=lines.some(l=>l.selected&&l.wbs==='A'&&!l.mrRequirementId&&l.systemToken==='TEL-FO'&&
+  hasPrice(l)&&!mgwLanPbxFoOffer0550(offers.get(l.offerId)));
  const conflicts=[...receipt.conflicts];
  for(const offer of next.offers.filter(o=>mgwCurrentOffer0550(o)&&batches.includes(o.quoteEvidence.sourceId))){
   const e=offer.quoteEvidence,[systemToken]=e.systemTokens,customerRowCode=codeBySystem[systemToken];
@@ -33,11 +40,30 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   const customerRemark='Quoted item only. Scope, technical verification and commercial terms remain open.';
   const inputs={...policy,vendorId:offer.vendorId,offerId:offer.id,currency:offer.currency,unit:offer.unit,
    manualCost:null,sellRate:null,brand:offer.brand,sourceRef,customerRemark};
+  const bulkMr=mgwBulkMr0550(offer);
+  if(bulkMr){
+   const id='REQ-'+bulkMr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
+   if(line?.offerId===offer.id)continue;
+   if(bulkMr==='MR-B1-18-APF-18'){
+    conflicts.push(id+' / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)');
+    continue;
+   }
+   const quotedLength=nativeMr.get(bulkMr)?.note.match(/^Source quantity: (\d+);/)?.[1];
+   const sameBasis=quotedLength&&Number(quotedLength)===e.quotedQuantity&&original?.unit==='m'&&offer.unit==='m'&&e.quotedUnit==='m'&&
+    offer.currency==='USD'&&e.quotedCurrency==='USD'&&offer.unitCost===e.quotedUnitCost&&Number.isFinite(e.quotedTotal)&&
+    Math.round(e.quotedQuantity*offer.unitCost*100)===Math.round(e.quotedTotal*100);
+   const competingOwner=otherBulkOwner||lines.some(l=>l.id!==id&&l.selected&&
+    (l.offerId===offer.id||l.mrRequirementId===bulkMr||l.scopeKey===original?.scopeKey));
+   if(unchanged(line,original)&&line.selected&&!line.coveredByLineId&&sameBasis&&!competingOwner){
+    const scopeNote='Cable material supply only; quantity in metres per supplier quote. Confirm route, terminations, MTO and delivery before release.';
+    lines[index]={...line,...inputs,quantity:e.quotedQuantity,customerRowCode:line.systemToken==='TEL-LAN'?'A1-01':'A1-13',
+     sourceRef:line.sourceRef+'\n'+sourceRef,customerRemark:scopeNote,coverageBasis:MGW_BASIS_REVIEW_0550};
+   }else conflicts.push(id+' / current MGW Offer awaits Working reconciliation (saved owner, quantity basis or overlapping cable scope)');
+   continue;
+  }
   if(mr){
    const id='REQ-'+mr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
-   const untouched=line&&original&&Object.keys(line).length===Object.keys(original).length&&
-    Object.keys(original).every(key=>original[key]===line[key]);
-   if(untouched&&line.selected&&line.quantity===e.quotedQuantity&&line.unit===offer.unit){
+   if(unchanged(line,original)&&line.selected&&line.quantity===e.quotedQuantity&&line.unit===offer.unit){
     lines[index]={...line,...inputs,sourceRef:line.sourceRef+'\n'+sourceRef,coveredByLineId:'',coverageBasis:MGW_BASIS_REVIEW_0550};
    }else if(line?.offerId!==offer.id)conflicts.push(id+' / current MGW Offer awaits Working reconciliation');
    continue;
