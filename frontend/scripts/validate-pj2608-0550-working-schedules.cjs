@@ -26,14 +26,19 @@ try{
   integrationWorkspace:{...I.emptyIntegration0550(),requirements:[{...I.blankRequirement0550('TEST-VOLUME-REQ'),workLineIds:volumeCandidates.map(l=>l.id),sourceIds:['TEST-OLD']}]}};
  const applyVolume=input=>P.preparePricedVolumeDrafts0550(input,()=>({provisional:{selected:volumeCandidates}}),today);
  const volumeDraft=applyVolume(volumeInput);
- assert.deepEqual(volumeDraft.repositoryBasisImport.pricedVolumeDraftIds,['TEST-B6']);
- const savedTool=volumeDraft.bidVolumes.bindings.find(b=>b.lineId==='TEST-B6');
- assert.deepEqual([savedTool.schedule,savedTool.status,savedTool.sourceIds],['C5','DRAFT',['TEST-NEW']]);
+ assert.deepEqual(volumeDraft.repositoryBasisImport.pricedVolumeDraftIds,['TEST-B6','TEST-B7','TEST-B5']);
+ for(const [id,schedule] of [['TEST-B6','C5'],['TEST-B7','C7'],['TEST-B5','C2']]){
+  const binding=volumeDraft.bidVolumes.bindings.find(b=>b.lineId===id);
+  assert.deepEqual([binding.schedule,binding.status,binding.sourceIds],[schedule,'DRAFT',['TEST-NEW']]);
+ }
  assert.equal(volumeDraft.lines,volumeInput.lines);
  assert.equal(applyVolume(volumeDraft),volumeDraft);
- const removedDraft={...volumeDraft,bidVolumes:{...volumeDraft.bidVolumes,bindings:volumeDraft.bidVolumes.bindings.filter(b=>b.lineId!=='TEST-B6')}};
+ const removedDraft={...volumeDraft,bidVolumes:{...volumeDraft.bidVolumes,bindings:volumeDraft.bidVolumes.bindings.filter(b=>b.lineId!=='TEST-B5')}};
  assert.equal(applyVolume(removedDraft),removedDraft);
- assert.equal(P.scheduleAllocationPlan0550(removedDraft,{unallocated:volumeCandidates})[0].proposal,null);
+ assert.equal(P.scheduleAllocationPlan0550(removedDraft,{unallocated:volumeCandidates.filter(l=>l.id==='TEST-B5')})[0].proposal,null);
+ const noEvidence={...volumeInput,sourceIntake:{sources:[]}};
+ assert.equal(applyVolume(noEvidence),noEvidence);
+ assert.equal(P.scheduleAllocationPlan0550(noEvidence,{unallocated:volumeCandidates.filter(l=>l.id==='TEST-B5')})[0].proposal.schedule,'C2');
  const {evaluateServiceEquation}=require(root+'/project0550/serviceEquationRuntime.js');
  const {commissioningBreakdown0550}=require(root+'/project0550/data/commissioningSparePhases0550.js');
  const stock={installed:10,failureRate:0.001,exposureHours:100,coveragePct:95,planned:2,included:1};

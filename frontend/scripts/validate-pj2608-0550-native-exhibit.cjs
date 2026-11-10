@@ -223,6 +223,16 @@ const blankC2={...c2,c2Systems:D.SYSTEMS,scheduleRows:id=>id==='C2'?[]:view.sche
 const preparedC2=N.nativeSchedule0550(blankC2,'C2');
 const phaseLabels=['Pre-commissioning spares','Commissioning spares','Start-up spares'];
 assert.equal(preparedC2.pages.length,19);
+const {CommissioningBreakdown0550}=require(root+'/project0550/CommissioningSpares0550.jsx');
+const coverageScreen=renderToStaticMarkup(React.createElement(CommissioningBreakdown0550,{
+ view:blankC2,systems:D.SYSTEMS,currency:'USD',model:{lines:[
+  {id:'PENDING-LAN',systemToken:'TEL-LAN',wbs:'B5',selected:true,description:'LAN pending allocation'},
+  {id:'UNSELECTED-DMR',systemToken:'TEL-DMR',wbs:'B5',selected:false},
+ ]},
+}));
+assert.match(coverageScreen,/TEL-LAN.*มี Working B5 รอตรวจการจัดลง C2.*LAN pending allocation/s);
+assert.match(coverageScreen,/TEL-DMR.*ยังไม่ได้เลือกรายการ Working B5/s);
+assert.match(coverageScreen,/TEL-PAGA.*ยังไม่มีรายการ Working B5/s);
 for(const page of preparedC2.pages){
  assert.deepEqual([4,5,6].map(row=>page.values['C2_'+row+'_0']),phaseLabels);
  assert([4,5,6].every(row=>[1,4,9,10,11,12].every(col=>page.values['C2_'+row+'_'+col]==='OPEN')));

@@ -37,14 +37,14 @@ export function c2ProjectLotOverlaps0550(rows){
  return [...equipment.values()].filter(matches).concat(systemWarnings);
 }
 
-export const c2HasSystem0550=row=>Boolean(row.line?.systemToken);
+export const c2HasSystem0550=row=>Boolean(row.line?.systemToken&&row.line.systemToken!=='COMMON');
 
 // Draft layout only. A project-level Working allowance is not a system spare form.
 export function c2SystemGroups0550(view){
- const groups=new Map((view.c2Systems||[]).map(({token,name})=>[token,{token,name,rows:[]}]));
+ const groups=new Map((view.c2Systems||[]).filter(({token})=>token!=='COMMON').map(({token,name})=>[token,{token,name,rows:[]}]));
  for(const row of view.scheduleRows('C2')){
   if(!c2HasSystem0550(row))continue;
-  const token=row.line.systemToken||'COMMON';
+  const token=row.line.systemToken;
   if(!groups.has(token))groups.set(token,{token,name:token,rows:[]});
   groups.get(token).rows.push(row);
  }

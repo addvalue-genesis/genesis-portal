@@ -72,9 +72,10 @@ export function CommissioningSpareQuotes0550({data,model,onNavigate,disabled}){
  </section>;
 }
 
-export function CommissioningBreakdown0550({view,systems,currency,summary,onNavigate,disabled,onOpenC3,model}){
+export function CommissioningBreakdown0550({view,systems,currency,summary,onNavigate,onAllocate,disabled,onOpenC3,model}){
  const {groups,bySystem,unclassified,total,operations,operationRows}=commissioningBreakdown0550(view,systems,currency);
  const working=new Map(model.lines.map(line=>[line.id,line]));
+ const b5Lines=model.lines.filter(line=>line.wbs==='B5'&&!line.mrScopeState?.covered&&!line.mrScopeState?.excluded&&!line.satelliteScopeState?.excluded&&!line.bidPriceAllocation);
  const link=(id,label)=> <Trace id={id} label={label} disabled={disabled} onNavigate={onNavigate}/>;
  const totalText=rollup=>subtotal(rollup,currency);
  return <section className="p55-panel" aria-label={summary?'A1 commissioning spare breakdown':'C2 Working phase breakdown'}>
@@ -98,13 +99,21 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
    <p>ยอดขายที่มีของ C2 · {totalText(total)} · {total.priced}/{total.count} แถวมีราคา {unclassified.count>0&&<>· {unclassified.count} แถวรอระบุช่วงงาน</>}</p>
    <div className="p55-review-toolbar">{link(b5Id,'Working B5 · เจ้าของราคา')}{link('bid.working-preview.step.5','WP.5 · ปริมาณ')}{link('bid.working-preview.step.7','WP.7 · Supplier mapping')}{link('bid.engineering.equations','สมการ GENESIS')}{link('bid.quotation.mapping','11.M · จัดลง Schedule')}</div>
    <div className="p55-table-wrap"><table className="p55-table" aria-label="C2 coverage by system"><thead><tr><th>ระบบ</th>{COMMISSIONING_PHASES_0550.map(phase=><th key={phase.id}>{phase.number} · {phase.title}</th>)}<th>รายการรอระบุช่วงงาน</th></tr></thead><tbody>
-    {bySystem.map(system=><tr key={system.token}><th scope="row">{system.name} <small>{system.token}</small></th>{[...COMMISSIONING_PHASES_0550.map(p=>p.id),''].map(phase=>{const rows=system.rows.filter(row=>commissioningPhase0550(row.line)===phase);return <td key={phase}>{rows.length?rows.map(row=>{const line=working.get(row.lineId),rate=line?.costRate;return <div key={row.lineId}>
+    {bySystem.map(system=>{
+     const candidates=b5Lines.filter(line=>line.systemToken===system.token);
+     const pending=candidates.filter(line=>line.selected&&!system.rows.some(row=>row.lineId===line.id));
+     return <tr key={system.token}><th scope="row">{system.name} <small>{system.token}</small>
+      {!system.rows.length&&<small>{!candidates.length?'OPEN · ยังไม่มีรายการ Working B5':pending.length?'OPEN · มี Working B5 รอตรวจการจัดลง C2':'OPEN · ยังไม่ได้เลือกรายการ Working B5'}</small>}
+      {!system.rows.length&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.(b5Id,{workingSystem:system.token})}>เปิด Working B5</button>}
+      {pending.length>0&&<details><summary>ตรวจ 11.M · {pending.length} รายการ</summary><ul>{pending.map(line=><li key={line.id}><button type="button" disabled={disabled} onClick={()=>onAllocate?.(line.id)}>{line.description}</button></li>)}</ul></details>}
+     </th>{[...COMMISSIONING_PHASES_0550.map(p=>p.id),''].map(phase=>{const rows=system.rows.filter(row=>commissioningPhase0550(row.line)===phase);return <td key={phase}>{rows.length?rows.map(row=>{const line=working.get(row.lineId),rate=line?.costRate;return <div key={row.lineId}>
       {link(workingId(row.lineId),row.line.description)}<small>{row.partNo||'Part No. OPEN'} · {row.quantity??'Qty OPEN'} {row.unit} × {money(rate,line?.currency)} · ราคาขาย {money(row.amount,currency)}</small>
       {line?.result?.installedPopulation!==undefined&&<small>Interchangeability A × B · ติดตั้ง {line.result.installedPopulation} ชิ้น</small>}
       {line?.result?.requiredQuantity!==undefined&&<small>อัตราส่วน OEM · ฐาน {line.calculation?.inputs.populationBasis==='MAIN_EQUIPMENT'?'B':'A × B'} · {line.calculation?.inputs.roundingMode||'CEIL (รายการเดิม)'} · ต้องมี {line.result.requiredQuantity} ชิ้นก่อนหักจำนวนที่รวมไว้{line.calculation?.inputs.roundingSourceRef&&' · '+line.calculation.inputs.roundingSourceRef}</small>}
       {line?.result?.reserve!==undefined&&<small>เผื่อเสีย {line.result.reserve} · โอกาสพอใช้ {line.result.coveragePct.toFixed(4)}%</small>}
       {line?.calculationId&&link('bid.engineering.calculation.'+line.calculationId,'เปิดสมการปริมาณ')}{line?.offerId&&link(offerId(line.offerId),'เปิดใบเสนอราคา')}
-     </div>;}):phase?'OPEN · ตรวจขอบเขต OEM':'—'}</td>;})}</tr>)}
+     </div>;}):phase?'OPEN · ตรวจขอบเขต OEM':'—'}</td>;})}</tr>;
+    })}
    </tbody></table></div>
   </>}
  </section>;
