@@ -8,6 +8,7 @@ import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {paymentSchedule0550} from './data/bidVolumes0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -24,7 +25,8 @@ const sparePriceNote=(rows,currency)=>{
  return Number.isFinite(subtotal.knownUSD)?currency+' '+number(subtotal.knownUSD)+status+basis:'OPEN'+status;
 };
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
-const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||'';
+const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||
+ (view.workingPreview&&id==='C7'&&name==='trainingPeriodDays'&&view.tenderScheduleBasis?.training?String(view.tenderScheduleBasis.training.days):'');
 const term=customerPriceColumn0550;
 const normalize=s=>String(s||'').trim().toUpperCase();
 const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',OFFICE:'OFFICE','IN-CITY TRANSPORTATION':'TRANSPORT','AIRPORT PICK-UP & DROP-OFF':'AIRPORT','OFFICE CONSUMABLES':'OFFICE_CONSUMABLES','WORKING LAUNCH':'WORKING_LUNCH'};
@@ -150,7 +152,10 @@ function nativePages(view,id,currency='USD'){
   }
   add(v,'',draftPriceRows.length?{draftPriceRows}:undefined);return {pages,issues};
  }
- if(id==='B'||id==='C'){add();return {pages,issues};}
+ if(id==='B'||id==='C'){
+  if(id==='B'&&paymentSchedule0550(view)&&!paymentSchedule0550(view).rows.length)issues.push('Current tender payment milestones OPEN');
+  add();return {pages,issues};
+ }
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
   chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
@@ -191,8 +196,28 @@ function nativePages(view,id,currency='USD'){
  }
  return {pages,issues};
 }
+function paymentTable(rows,format){
+ if(format==='xml'){
+  const grid=[1900,10700,1900].map(width=>'<w:gridCol w:w="'+width+'"/>').join('');
+  const borders=['top','left','bottom','right','insideH','insideV'].map(edge=>'<w:'+edge+' w:val="single"/>').join('');
+  const body=rows.map(row=>'<w:tr>'+row.map(cell=>{
+   const paragraphs=cell.split('\n').map(line=>'<w:p><w:r><w:t xml:space="preserve">'+escape(line)+'</w:t></w:r></w:p>').join('');
+   return '<w:tc>'+paragraphs+'</w:tc>';
+  }).join('')+'</w:tr>').join('');
+  return '<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/><w:tblBorders>'+borders+
+   '</w:tblBorders></w:tblPr><w:tblGrid>'+grid+'</w:tblGrid>'+body+'</w:tbl>';
+ }
+ const row=cells=>'<tr>'+cells.map(cell=>'<td>'+escape(cell).replace(/\n/g,'<br>')+'</td>').join('')+'</tr>';
+ return '<table><thead>'+row(rows[0])+'</thead><tbody>'+rows.slice(1).map(row).join('')+'</tbody></table>';
+}
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
+ const payment=page.id==='B'&&paymentSchedule0550(view);
+ if(payment){
+  const rows=payment.rows.length?[['No.','Payment Terms','Percentage of Initial Contract Price for Base Scope of Supply'],...payment.rows,['Total','','100.00%']]:
+   [['OPEN','Confirm the current tender payment schedule before issue.','']];
+  result=result.replace(format==='xml'?/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/:/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/,()=>paymentTable(rows,format));
+ }
  if(page.systemToken){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
   const label=escape(heading+(page.spareRows.length?'':' · OPEN — awaiting Working B5 allocations'));
@@ -238,6 +263,10 @@ function renderPage(view,page,format,currency='USD'){
    partialNote='OPEN. Confirm applicable scope and allocate the supporting Working items.';
   }
   if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id))||partialNote;
+  const training=view.tenderScheduleBasis?.training;
+  if(page.id==='C7'&&training&&!view.getRecord('I.C7').nativeFields?.trainingPeriodDays?.trim()){
+   partialNote=[partialNote,`Tender planning basis: estimated ${training.days} course days for ${training.trainees} trainees (Exhibit A Annex 7). Confirm trainer hours, duration and rates separately.`].filter(Boolean).join(' ');
+  }
   if(page.priceRows&&(page.id!=='C2'||!page.draftPriceRows?.length)){
    const rows=page.priceRows.filter(b=>!b.nonAdditive&&b.treatment!=='CALLOFF');
    if(rows.some(b=>b.line.spareBudget)||rows.some(b=>!term(b)&&Number.isFinite(b.amount))){
@@ -260,7 +289,8 @@ export const nativeFormCss0550=`.p55-native-paper{box-sizing:border-box;width:11
 export function nativeSchedule0550(view,id,currency='USD'){
  if(id==='C1'&&isC1Appendix0550(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
  const {pages,issues}=nativePages(view,id,currency),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
- const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>Source page ${template.schedules[id].page} of 18${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
+ const sourceLabel=id==='B'&&paymentSchedule0550(view)?'Schedule B · Current tender':'Source page '+template.schedules[id].page+' of 18';
+ const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${sourceLabel}${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
  return {html,issues,pages};
 }
 export function nativeExhibitProblems0550(view,only){

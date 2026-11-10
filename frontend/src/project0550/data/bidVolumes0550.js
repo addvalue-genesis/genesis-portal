@@ -42,6 +42,43 @@ const trim=v=>typeof v==='string'&&v.trim();
 // or first save. Nonempty changes remain part of the existing basis fingerprint.
 const clean=r=>Object.fromEntries(Object.entries(r).filter(([k,v])=>!['reviewer','reviewedOn','status','basisKey'].includes(k)&&!(k==='nativeFields'&&!Object.keys(v||{}).length)&&!(['vendorEquipmentNo','referenceDrawings'].includes(k)&&!v)));
 const sources=(data,ids)=>(ids||[]).map(id=>data.sourceIntake?.sources.find(s=>s.id===id)||{id,missing:true});
+export const CURRENT_PAYMENT_NATIVE_0550='exhibit-c-schedule-b-rev1.v4';
+export const paymentSchedule0550=view=>view.nativeExhibitVersion===CURRENT_PAYMENT_NATIVE_0550
+ ?view.tenderScheduleBasis?.payment||{rows:[]}
+ :view.nativeExhibitVersion?null:view.tenderScheduleBasis?.payment;
+export function tenderScheduleBasis0550(data){
+ const all=data.sourceIntake?.sources||[],replaced=new Set(all.flatMap(s=>s.replaces||[]));
+ const current=all.filter(s=>s.authority==='CURRENT_TENDER'&&!replaced.has(s.id));
+ const commercial=current.filter(s=>/Exhibit C[- –]+Commercial Terms/i.test(s.title||'')&&Number(s.title.match(/\brev[. -]*(\d+)/i)?.[1])>0);
+ const c=commercial.length===1&&commercial[0].readState==='TEXT_READ'?commercial[0]:null;
+ let payment=null;
+ if(commercial.length){
+  const lines=(c?.content||'').split(/\r?\n/).map(l=>l.match(/^\d+:\s*(.*?)\s*$/)?.[1]).filter(Boolean);
+  const schedule=lines.indexOf('SCHEDULE B - PAYMENT TERMS AND SCHEDULE');
+  const start=schedule<0?-1:lines.indexOf('Down Payment',schedule),end=lines.findIndex((l,i)=>i>start&&l==='TOTAL');
+  const headings=['Down Payment',...Array.from({length:6},(_,i)=>'Milestone No.'+(i+1))];
+  const rows=[];let i=start,valid=start>=0&&end>start&&lines[end+1]==='100.00%';
+  while(valid&&i<end){
+   const name=lines[i++],terms=[];
+   while(i<end&&!/^\d+(?:\.\d+)?%$/.test(lines[i])&&!headings.includes(lines[i])){
+    const term=lines[i++];if(!term.startsWith('[DELETED]'))terms.push(term.replace(/^\[RED\]\s*/,''));
+   }
+   valid=terms.length>0&&/^\d+(?:\.\d+)?%$/.test(lines[i]||'')&&name===headings[rows.length];
+   if(valid)rows.push([name,terms.join('\n'),lines[i++]]);
+  }
+  const complete=valid&&rows.length===headings.length&&sumMoney0550(rows.map(r=>Number.parseFloat(r[2])))===100;
+  payment={sourceId:c?.id||'',sourceTitle:c?.title?.split(' / ').at(-1)||'',rows:complete?rows:[]};
+ }
+ const annex=current.filter(s=>s.readState==='TEXT_READ'&&/Training of Operator Personnel/i.test(s.title||''));
+ const course=annex.length===1&&(annex[0].content||'').match(/Telecommunication System and Fiber Optic\s+- Operation and Maintenance Course\s+([1-9]\d*)\s+As per CONTRACT\s+([1-9]\d*)\b/i);
+ const training=course?{days:Number(course[2]),trainees:Number(course[1]),sourceId:annex[0].id}:null;
+ const delivery=c?.content?.match(/Overseas Manufacturers shall apply CIF Yangon, Myanmar, Incoterms® 2020; Manufacturers within China shall apply FOB any major port in China, Incoterms® 2020\./)?.[0];
+ const packing=current.filter(s=>s.readState==='TEXT_READ'&&/Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(s.title||''));
+ const importLicence=packing.length===1&&/IMPORT LICENSE APPLICATION \(PL SUBMISSION\) PROVIDED BY VENDOR/.test(packing[0].content||'')?{sourceId:packing[0].id}:null;
+ const agreements=current.filter(s=>s.readState==='TEXT_READ'&&/Purchase Agreement.*\.docx$/i.test(s.title||''));
+ const cargo=agreements.length===1&&/All-Risk Cargo Insurance[^.]{0,450}one hundred ten percent \(110%\) value of supplies under the AGREEMENT or each Purchase Order/.test(agreements[0].content||'')?{sourceId:agreements[0].id}:null;
+ return {payment,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,importLicence,cargo};
+}
 const currentSourceProblems=(data,ids,locator)=>{
  const problems=[];if(!ids.length||!trim(locator))problems.push('SOURCE_LOCATOR_OPEN');
  for(const s of sources(data,ids))if(s.missing||s.readState==='METADATA_ONLY'||['HISTORICAL','REPLACED_COPY','UNCONFIRMED'].includes(s.authority)||(data.sourceIntake?.sources||[]).some(n=>n.replaces?.includes(s.id)))problems.push('SOURCE_UNREAD_MISSING_OR_REPLACED / '+s.id);
@@ -148,7 +185,7 @@ export function deriveBidVolumes0550(data,model,systems,today){
  if(consistency.length)problems.push('VOLUME_I_II_OR_TECHNICAL_DEVIATION_OPEN');
  if(getRecord('II.vdrl-scope').state!=='REVIEWED'||!vdrl.length||vdrl.some(r=>r.problems.length)||vdrlGaps.length)problems.push('VDRL_WITH_BID_COVERAGE_OPEN');
  if(QUALIFICATIONS_0550.some(q=>getRecord('III.'+q.id).state!=='REVIEWED')||commercialDeviations.some(r=>r.problems.length))problems.push('VOLUME_III_OPEN');
- return {proposal:p,records,getRecord,bindings,active,available,unallocated,technical,technicalRequired,vdrl,vdrlGaps,commercialDeviations,consistency,scheduleRows,baseAssigned,optionsAssigned,priceProblems,problems:[...new Set(problems)],ready:problems.length===0,state:problems.length?'HOLD':'REVIEWED_PACKAGE_NOT_ISSUED',c1Context:{lines:data.lines,requirements:model.integration?.requirements||[]}};
+ return {proposal:p,records,getRecord,bindings,active,available,unallocated,technical,technicalRequired,vdrl,vdrlGaps,commercialDeviations,consistency,scheduleRows,baseAssigned,optionsAssigned,priceProblems,problems:[...new Set(problems)],ready:problems.length===0,state:problems.length?'HOLD':'REVIEWED_PACKAGE_NOT_ISSUED',c1Context:{lines:data.lines,requirements:model.integration?.requirements||[]},tenderScheduleBasis:tenderScheduleBasis0550(data)};
 }
 
 export function validateBidVolumes0550(data){

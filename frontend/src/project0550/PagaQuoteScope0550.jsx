@@ -1,5 +1,5 @@
 import React from 'react';
-import {PAGA_REVISION,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550,pagaRevisionSelected0550} from './data/supplierRevision0550';
+import {PAGA_REVISION,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550,pagaRevisionSelected0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 
 const scopeNotes={
  A:'Working A1-05 ใช้ NET 1 Lot อ้างอิง MR Rev.B1 Appendix 1.4 และ WP.7 · Access Panel 4 ตัวตามใบเสนอราคา · ตรวจ TAG ตัวที่สี่กับ MR และวงจร XBC ที่ APF/ACP',
@@ -24,6 +24,8 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  const selected=pagaRevisionSelected0550(data);
  if(!selected)return null;
  const {net,owner}=selected;
+ const spares=section==='C3'?pagaTwoYearSpareEvidence0550(data,net):null;
+ const training=['C7','mapping'].includes(section)?pagaTrainingOption0550(data,net):null;
  const mr=(data.sourceIntake?.sources||[]).find(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER');
  const terms=net.quoteEvidence.terms.filter(term=>/^(FCA|Advance payment|Validity|Lead time|Warranty)/i.test(term));
  const links=[
@@ -35,7 +37,9 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  ];
  return <aside className="p55-panel" aria-label="PAGA current quote scope">
   <h4>PAGA · INDUSTRONIC {PAGA_REVISION} · Working Draft</h4>
-  <p>{scopeNotes[section]||PAGA_REVISION_INCLUDED_0550}</p>
+  <p>{spares?`OEM SP2 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจรายการซ้ำกับ Commissioning Kit และตัดสินใจ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNotes[section]||PAGA_REVISION_INCLUDED_0550}</p>
+  {spares&&onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+(spares.recommended[0]||spares.options[0]).id)}>07 · เปิดหลักฐาน SP2</button>}
+  {training&&<p>A20261632-002 · Item 23060 · Onshore Training คิดตามจริงแยกจาก NET · รอวัน/ชั่วโมงผู้สอนและค่าใช้จ่าย</p>}
   {section==='commercial'&&<><p>เงื่อนไขจัดซื้อ OEM · {terms.join(' · ')}</p><p>เทียบกับ Schedule B และเงื่อนไขของลูกค้าก่อนบันทึก Commercial Deviation · เอกสารคุณสมบัติและผล AVL ตรวจใน 13 และ 14</p></>}
   {section==='release'&&<p>{PAGA_REVISION_OPEN_0550}</p>}
   {onNavigate&&<div className="p55-review-toolbar">{links.map(([id,label])=><button type="button" key={id} disabled={disabled} onClick={()=>onNavigate(id)}>{label}</button>)}</div>}

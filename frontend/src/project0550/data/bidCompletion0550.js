@@ -13,6 +13,7 @@ import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550
 import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
 import {CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import {pagaRevisionSelected0550,pagaTrainingOption0550} from './supplierRevision0550';
 import procurement from './procurementScope0550.json';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
@@ -40,6 +41,18 @@ const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);
 const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
+function reconcilePagaTrainingEstimate0550(data,receipt){
+ const line=data.lines.find(l=>l.id==='REQ-MR-ACT-B3-D01'),row=receipt.rows.find(r=>r.lineId===line?.id);
+ const old='Excludes INDUSTRONIC training already inside selected PAGA package and existing TSI operator/maintenance training.';
+ if(row?.kind!=='ESTIMATE'||!row.basis.includes(old)||row.inputKey!==lineKey(data,line))return data;
+ const option=pagaTrainingOption0550(data,pagaRevisionSelected0550(data)?.net);
+ if(!option)return data;
+ const basis='Excludes TSI operator/maintenance training. INDUSTRONIC A20261632-002 item 23060 (p16) is an Onshore Option at actual cost. PAGA OEM training, trainer days and reimbursables require a separate basis.';
+ const updated={...line,sourceRef:line.sourceRef.replace(old,basis),customerRemark:line.customerRemark.replace(old,basis)};
+ const offerIds=[...new Set([...row.offerIds,option.id])];
+ const amended={...row,basis:row.basis.replace(old,basis),inputKey:lineKey(data,updated),offerIds,sourceKey:sourceKey(data,offerIds)};
+ return {...data,lines:data.lines.map(l=>l===line?updated:l),repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:receipt.rows.map(r=>r===row?amended:r)}}};
+}
 const directMarkupSystems=new Map(procurement.directProcurement.flatMap(system=>
  system.suppliers.filter(supplier=>supplier.useDirectMarkup).flatMap(supplier=>
   supplier.vendorIds.map(id=>[id,system.quotedSystemToken]))));
@@ -464,7 +477,10 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(today<'2026-11-04')return data;
  data=reconcileCeragonR11(data);
  const receipt=data.repositoryBasisImport?.bidCompletion;
- if(receipt?.version===BID_COMPLETION_VERSION_0550)return prepareCusQuantityPricing0550(retireCommissioningSpareEstimates0550(data,receipt),policies,today);
+ if(receipt?.version===BID_COMPLETION_VERSION_0550){
+  const prepared=retireCommissioningSpareEstimates0550(data,receipt);
+  return prepareCusQuantityPricing0550(reconcilePagaTrainingEstimate0550(prepared,prepared.repositoryBasisImport.bidCompletion),policies,today);
+ }
  // Wait for the actual project evidence. A repository seed is not the user's DATA.
  const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
  const currentMR=sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)),mr=currentMR.length===1?currentMR[0]:null;
@@ -556,7 +572,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  estimate('B2-D03','THB',4*25000,'Forwarder/consolidation administration allowance4 shipments × THB25000; excludes carrier freight, origin handling, customs duties and statutory fees. No forwarder quotation received.');
  estimate('B2-D04','THB',supplyCost*1.1*0.004,'Cargo premium budget only: known selected PartA procurement cost ×110% insured-value assumption ×0.4% premium assumption. Not an insurer offer or confirmation of cover; duties/deductibles excluded. This is the sole cargo-premium owner.');
  reference('B2-D05',['REQ-MR-ACT-B2-D01','REQ-MR-ACT-B2-D02','REQ-MR-ACT-B2-D03'],'Route/Incoterm normalization is SI process work, not another freight purchase. Current bid scenarioCIF Yangon; RFQ FCA/FOB differences remain disclosed.');
- estimate('B3-D01','USD',13*1000,'Additional OEM product training budget13 trainer-MD × USD1000/MD: MGW10MD and microwave3MD planning assumptions. Excludes INDUSTRONIC training already inside selected PAGA package and existing TSI operator/maintenance training. Supplier course/duration confirmation remains required.');
+ estimate('B3-D01','USD',13*1000,'Additional OEM product training budget13 trainer-MD × USD1000/MD: MGW10MD and microwave3MD planning assumptions. Excludes existing TSI operator/maintenance training. Obtain separate evidence for INDUSTRONIC onshore training scope, hours and rates. Supplier course/duration confirmation remains required.');
  if(rows.some(r=>r.lineId==='REQ-MR-ACT-B3-D01')){
   const id='LINE-BID-OEM-TRAINING-TRAVEL-0550';
   if(at(id)<0){const template=lines[at('REQ-MR-ACT-B3-D01')];lines.push({...template,id,mrRequirementId:undefined,description:'ประมาณการ · Additional OEM trainer travel / lodging',scopeKey:'BID.OEM.TRAINING.TRAVEL',currency:'THB',manualCost:4*(40000+6*3500),sourceRef:prefix+' / '+today+' / Additional OEM training travel:4 trips × (THB40000 return transport +6 days ×THB3500 lodging/per diem). Explicit budget assumptions; no overlap with the TSI-only shared travel pool. No OEM travel quotation.',customerRemark:'Estimated additional OEM travel; reconcile trip origin, duration and reimbursables.'});delete lines[lines.length-1].mrRequirementId;rows.push({lineId:id,kind:'ESTIMATE',basis:'4 additional OEM trips × (THB40000 transport +6 days ×THB3500 lodging/per diem); TSI shared trips excluded.',offerIds:[],ownerIds:[]});}

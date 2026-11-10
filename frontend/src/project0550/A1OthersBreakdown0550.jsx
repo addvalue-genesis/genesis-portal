@@ -45,6 +45,7 @@ function Comparison0550({panel}){
 export function A1OthersBreakdown0550({panel,view,currency,onNavigate,disabled}){
  const {number,title}=A1_OTHERS_PANELS_0550.find(p=>p.id===panel);
  const insurance=panel==='F';
+ const basis=view.tenderScheduleBasis,evidence=insurance?basis?.cargo:basis?.importLicence;
  const rows=a1OthersRows0550(view,panel);
  const activeRows=currency==='THB'?rows.map(scheduleBindingTHB0550):rows;
  const groups=insurance
@@ -59,6 +60,11 @@ export function A1OthersBreakdown0550({panel,view,currency,onNavigate,disabled})
   <p><strong>DRAFT — NOT FOR SUBMISSION</strong></p>
   <h4>Schedule A1 · Others (Please specify) · 1 Lot</h4>
   <p>11.E และ 11.F แสดงรายละเอียดของยอด 1 Lot เดียวกันจาก Working และ 11.M</p>
+  {basis?.delivery&&<p>Exhibit C Schedule A1 · {basis.delivery.text}</p>}
+  {evidence&&<p>{insurance
+   ?'Purchase Agreement · All-Risk Cargo ขั้นต่ำ 110% ของมูลค่าสินค้าตามสัญญาหรือ PO · เทียบฐานทุนประกันกับ B2-D04 และใช้เบี้ยจากใบเสนอจริงเมื่อได้รับ'
+   :'Exhibit A Annex 6 §5 · VENDOR จัดทำเอกสาร Import Licence (PL submission) · แยกงานยื่นเอกสารออกจากค่าธรรมเนียมและผู้ชำระจริง'}
+   {' '}<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.documents.source.'+evidence.sourceId)}>เปิดเอกสารอ้างอิง</button></p>}
   <p>{insurance
    ?'ใช้คอลัมน์ Qty, Unit, Unit Price, Total และ Notes จาก 11.C1 / 11.C8 แยกประกันสินค้า ประกันโครงการ ประกันบุคลากร และ Medevac ตามหน่วยที่ใช้ใน Working'
    :'ใช้โครงรายการและเรตจาก 11.C1 แยกแรงงานเตรียมและติดตามคำขอตามแนว 11.C7 และค่าใช้จ่ายต่อหน่วยจริงตามแนว 11.C8'}</p>

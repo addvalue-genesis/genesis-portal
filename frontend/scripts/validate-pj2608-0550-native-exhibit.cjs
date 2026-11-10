@@ -222,6 +222,26 @@ const native=P.freezeBidPackageOutput0550(fixture,derive(fixture),'NATIVE-TEST',
 const historical=P.freezeBidPackageOutput0550(fixture,derive(fixture),'OLD-TEST',today,{legacy:true});P.validateFrozenBidPackage0550(historical);assert(!historical.docxI);assert(!historical.htmlI.includes('p55-native-paper'));
 const auth={id:'OLD-TEST',number:'OLD-TEST',authorizedBy:'TEST',authorizedOn:today,authorizationRef:'SYNTHETIC',customerFormConfirmed:true},oldIssue=R.prepareReleaseIssue0550(fixture,derive(fixture),auth,today);oldIssue.releaseRegister.issues[0].bidPackage=historical;R.validateReleaseTransition0550(fixture,oldIssue,today,derive,{restore:true});assert.throws(()=>R.validateReleaseTransition0550(fixture,oldIssue,today,derive),/requires frozen native/);
 const historicalV2=P.freezeBidPackageOutput0550(fixture,derive(fixture),'OLD-TEST',today,{nativeExhibitVersion:'exhibit-c-rev0.v2'});P.validateFrozenBidPackage0550(historicalV2);const restoredV2=structuredClone(oldIssue);restoredV2.releaseRegister.issues[0].bidPackage=historicalV2;R.validateReleaseTransition0550(fixture,restoredV2,today,derive,{restore:true});assert.throws(()=>R.validateReleaseTransition0550(fixture,restoredV2,today,derive),/current C1 Appendix/);assert.equal(native.nativeExhibitVersion,'exhibit-c-rev0.v3');
+const paymentLines=['SCHEDULE B - PAYMENT TERMS AND SCHEDULE','Down Payment','Guarantees','10%','Milestone No.1','Updated engineering evidence','[DELETED] old trigger','5%',
+ 'Milestone No.2','Updated MDDR','15%','Milestone No.3','Copy of B/L or AWB','30%','Milestone No.4','Site receipt','20%',
+ 'Milestone No.5','PAC','10%','Milestone No.6','FAC','10%','TOTAL','100.00%'];
+const currentCommercial={...fixture.sourceIntake.sources[0],id:'SYNTHETIC-EXHIBIT-C-REV1',documentNo:'SYNTHETIC-CURRENT-COMMERCIAL',revision:'1',url:'https://example.test/current-commercial',replaces:[],title:'Exhibit C-Commercial Terms rev-1-nan.docx',authority:'CURRENT_TENDER',readState:'TEXT_READ',
+ content:paymentLines.map((s,i)=>(100+i)+': '+s).join('\n')};
+const reviewBindings=data=>data.bidVolumes.bindings.reduce((d,b)=>V.saveBidVolumeRecord0550(d,'bindings',b,today,true),data);
+const withCurrent=reviewBindings({...fixture,sourceIntake:{...fixture.sourceIntake,sources:[...fixture.sourceIntake.sources,currentCommercial]}});
+const reviewedModel=derive(fixture);
+const currentView=V.deriveBidVolumes0550(withCurrent,reviewedModel,D.SYSTEMS,today);
+assert.deepEqual(currentView.problems,[]);
+const updatedNative=P.freezeBidPackageOutput0550(withCurrent,reviewedModel,'NATIVE-TEST',today);
+P.validateFrozenBidPackage0550(updatedNative);
+assert.equal(updatedNative.nativeExhibitVersion,V.CURRENT_PAYMENT_NATIVE_0550);
+assert.match(updatedNative.htmlI,/Updated MDDR/);
+assert.match(Buffer.from(updatedNative.docxI,'base64').toString(),/Updated engineering evidence/);
+assert.doesNotMatch(updatedNative.htmlI,/old trigger/);
+assert.match(updatedNative.I.find(s=>s.name==='Schedule B').rows[3][1],/Copy of B\/L or AWB/);
+assert.deepEqual(P.freezeBidPackageOutput0550(withCurrent,reviewedModel,'NATIVE-TEST',today,{nativeExhibitVersion:native.nativeExhibitVersion}),native);
+const unread=reviewBindings({...withCurrent,sourceIntake:{...withCurrent.sourceIntake,sources:withCurrent.sourceIntake.sources.map(s=>s===currentCommercial?{...s,readState:'METADATA_ONLY'}:s)}});
+assert.throws(()=>P.freezeBidPackageOutput0550(unread,reviewedModel,'NATIVE-TEST',today),/Native Exhibit C has unresolved response slots/);
 assert.equal(JSON.stringify(fixture),before);console.log('PASS native Exhibit C: all 13 source forms, merged headers/notes, canonical numbers and unchanged inputs, CIF/FOB placement, overflow without dropped rows, per-equipment spares forms, escaped Word/HTML, legacy schema/reviews/history restore, new exact frozen native Word. Synthetic exports: '+dir);
 
 if(!process.env.PJ0550_VOLUME_FIXTURE)fs.rmSync(fixtureFile,{force:true});

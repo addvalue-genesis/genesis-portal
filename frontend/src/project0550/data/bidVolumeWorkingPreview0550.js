@@ -134,6 +134,15 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
  const replaced=new Set(sources.flatMap(s=>s.replaces||[]));
  const current=sources.filter(s=>s.authority==='CURRENT_TENDER'&&s.content&&s.readState!=='METADATA_ONLY'&&!replaced.has(s.id));
  const currentIds=new Set(current.map(s=>s.id));
+ const lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
+ const requirementOffers=new Map();
+ for(const requirement of integrationRequirements0550(data)){
+  if(requirement.disposition==='NOT_APPLICABLE'||!requirement.sourceIds.some(id=>currentIds.has(id)))continue;
+  for(const id of requirement.workLineIds){
+   if(!requirementOffers.has(id))requirementOffers.set(id,new Set());
+   for(const offerId of requirement.offerIds)requirementOffers.get(id).add(offerId);
+  }
+ }
  const sourceId=id=>{
   if(currentIds.has(id))return id;
   const prior=bySource.get(id);
@@ -145,6 +154,13 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
   !bound.has(line.id)&&!recorded.has(line.id)&&Number.isFinite(line.customerUSD)&&line.quantity>0);
  const plan=scheduleAllocationPlan0550(data,{unallocated}).filter(({line,proposal})=>{
   if(!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
+  if(proposal.schedule==='C1'){
+   const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
+   // Draft assignment requires the selected, quoted offer and a current CUS
+   // requirement already linking the same owner. Preserve existing reviews.
+   return owner&&mappingValid(owner)&&offer?.quoteEvidence?.sourceSha256&&
+    requirementOffers.get(owner.id)?.has(offer.id);
+  }
   if(['C3','C4','C5'].includes(proposal.schedule))return true;
   if(proposal.schedule==='C7')return ['B3','B4'].includes(line.wbs);
   return proposal.schedule==='A1'&&['INSPECTION','OTHER'].includes(proposal.summary);

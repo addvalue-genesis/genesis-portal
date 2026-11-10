@@ -32,6 +32,23 @@ export function pagaRevisionItems0550(data,net){
   offer.quoteEvidence?.sourceSha256===net.quoteEvidence.sourceSha256);
 }
 
+export function pagaTrainingOption0550(data,net){
+ if(!net)return null;
+ const item=pagaRevisionItems0550(data,net).find(o=>o.supplierQuoteRow.itemCode==='23060'&&o.supplierQuoteRow.classification==='OPTION');
+ const sources=data.sourceIntake?.sources||[],source=sources.find(s=>s.id===item?.quoteEvidence?.sourceId);
+ return source&&!sources.some(s=>s.replaces?.includes(source.id))&&
+  /23060[\s\S]{0,340}At actual costs[\s\S]{0,340}Commissioning, training/i.test(source.content||'')?item:null;
+}
+
+export function pagaTwoYearSpareEvidence0550(data,net){
+ if(!net)return null;
+ const rows=data.offers.filter(o=>o.vendorId===net.vendorId&&o.quoteEvidence?.revision==='SP2'&&
+  o.quoteEvidence.fileName==='A20261632_002SP2.pdf'&&o.quoteEvidence.systemTokens.includes('TEL-PAGA'));
+ if(!rows.length||new Set(rows.map(o=>o.quoteEvidence.sourceSha256)).size!==1)return null;
+ const recommended=rows.filter(o=>o.quoteEvidence.classification==='RATE'&&Number.isFinite(o.quoteEvidence.quotedTotal));
+ return {recommended,options:rows.filter(o=>o.quoteEvidence.classification==='OPTION')};
+}
+
 export function preparePagaRevisionPricing0550(data,today){
  const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
  if(today<'2026-11-09'||!receipt||receipt.pagaRevisionHandled)return data;

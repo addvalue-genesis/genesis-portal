@@ -1,4 +1,4 @@
-import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
+import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 import {SCHEDULES_0550,deriveBidVolumes0550} from './data/bidVolumes0550';
 import {deriveBidVolumeWorkingPreview0550} from './data/bidVolumeWorkingPreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
@@ -17,14 +17,16 @@ export const draftSubtotal0550=result=>result.priced
 export function releaseScheduleDraftView0550(data,model,systems,today){
  const saved=deriveBidVolumes0550(data,model,systems,today);
  const draft=deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved);
- return {...draft,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550,c2Systems:systems};
+ const pagaNet=draft.bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer))?.line.offer;
+ return {...draft,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550,c2Systems:systems,pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet)};
 }
 
 export function releaseScheduleChecks0550(view){
  const paga=view.bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer));
  const pagaChecks={
   C2:'PAGA item 18020 is one commissioning kit included in the A1-05 NET. Verify additional OEM spares and recommended quantities.',
-  C3:'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
+  C3:view.pagaSpares?`PAGA SP2 records ${view.pagaSpares.recommended.length} recommended spare lines with supplier prices. Reconcile the kit overlap and Base/Option treatment before replacing the Working allowance.`:
+   'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
   C5:'Separate additional PAGA special tools from the kit included in A1-05.',
   C7:'PAGA OEM FAT at Wertheim is included in A1-05. Confirm field service, SAT and training separately.'
  };

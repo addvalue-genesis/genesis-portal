@@ -1,7 +1,7 @@
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {nativeExhibitHtml0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
-import {SCHEDULES_0550,QUALIFICATIONS_0550} from './data/bidVolumes0550';
+import {SCHEDULES_0550,QUALIFICATIONS_0550,paymentSchedule0550} from './data/bidVolumes0550';
 import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
@@ -22,7 +22,11 @@ export function scheduleTable0550(view,id){
   for(const b of view.bindings.filter(b=>b.line&&b.treatment===part)){const key=b.summary||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}
   return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...[...groups].map(([name,bs])=>[name,'Lot',1,view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')+(view.workingPreview?' / '+rollupNote0550(scheduleRollup0550(bs)):'')]),['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
  }
- if(id==='B')return {heads:['Payment milestone','Percentage / response'],rows:[['Advance','10%'],['Engineering approval','5%'],['Major materials PO','15%'],['Ready for shipment / FAT / B/L or AWB','30%'],['Site receipt','20%'],['PAC','10%'],['FAC','10%'],['BIDDER response',view.getRecord('I.B').content||'OPEN']]};
+ if(id==='B'){
+  const payment=paymentSchedule0550(view),response=view.getRecord('I.B').content||'OPEN';
+  if(payment)return {heads:['Payment milestone','Payment terms','Percentage'],rows:[...(payment.rows.length?payment.rows:[['OPEN','Confirm the current tender payment schedule before issue.','']]),['BIDDER response',response,'']]};
+  return {heads:['Payment milestone','Percentage / response'],rows:[['Advance','10%'],['Engineering approval','5%'],['Major materials PO','15%'],['Ready for shipment / FAT / B/L or AWB','30%'],['Site receipt','20%'],['PAC','10%'],['FAC','10%'],['BIDDER response',response]]};
+ }
  if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};
  if(['C2','C3','C4'].includes(id))return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:rows.map(b=>[b.mainEquipment,id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description,b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount])};
  if(id==='C7')return {heads:['Service / Personnel Category','Total Hours (h)','Rate (USD/h)','Total (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit==='MH'?b.quantity:'OPEN',b.unit==='MH'?b.unitPrice:'OPEN',b.amount,b.unit==='MH'?b.treatment:'Man-hour basis OPEN / '+b.treatment])};
