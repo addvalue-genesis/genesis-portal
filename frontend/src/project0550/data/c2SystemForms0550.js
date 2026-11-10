@@ -1,5 +1,6 @@
 import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './commissioningSparePhases0550';
 import {CERAGON_R12_0550} from './ceragonSelection0550';
+import {mgwCurrentOffer0550} from './mgwQuoteSelection0550';
 import {roundMoney0550} from './money0550';
 import {vendorOfferEntries0550,vendorQuoteRowTreatment0550} from './vendorRegister0550';
 
@@ -44,12 +45,14 @@ export const c2HasSystem0550=row=>Boolean(row.line?.systemToken&&row.line.system
 
 const spareDescription=description=>/\bspares?\b|\bcommissioning kit\b/i.test(description||'');
 const spareWbs=new Set(['B5','C2','C3']);
+const isMgwReferenceOffer=offer=>Boolean(offer?.mgwQuoteLineId)||mgwCurrentOffer0550(offer);
 const spareReferenceNote=(line,offer,treatment)=>{
  if(offer?.id===CERAGON_R12_0550||line?.wbs==='C2'||/\bcapital spares?\b/i.test(offer?.description||''))return 'Capital spares · Schedule C4';
  if(line?.wbs==='C3'||offer?.quoteEvidence?.revision==='SP2'||/\b(?:two[- ]year|operation(?:al)?) spares?\b/i.test(offer?.description||''))return 'Operation spares · Schedule C3';
  if(offer?.supplierQuoteRow?.parentOfferId&&offer.supplierQuoteRow.parentOfferId!==offer.id&&treatment!=='OPTION')return 'Included in supplier NET package';
  if(treatment==='REFERENCE')return 'Supplier reference / included item';
  if(treatment==='OPTION')return 'Supplier option';
+ if(isMgwReferenceOffer(offer))return 'MGW equipment / service · Draft reference for C2 · not allocated';
  return 'C2 allocation OPEN';
 };
 
@@ -95,7 +98,9 @@ export function c2DraftRowsFromExisting0550(data,model){
  for(const {offer,sourceSystemTokens} of offerEntries){
   const sourceRow=offer.supplierQuoteRow;
   const kit=sourceRow?.itemCode==='18020'&&sourceSystemTokens.includes('TEL-PAGA');
-  if(!kit&&!spareDescription(offer.description))continue;
+  const isSpare=spareDescription(offer.description);
+  const isMgwForSystem=isMgwReferenceOffer(offer)&&sourceSystemTokens.length>0;
+  if(!kit&&!isSpare&&!isMgwForSystem)continue;
   if(kit&&selectedKits.has(offer.vendorId)&&!activeOffers.has(sourceRow.parentOfferId))continue;
   for(const token of sourceSystemTokens)addReference(token,offer);
  }

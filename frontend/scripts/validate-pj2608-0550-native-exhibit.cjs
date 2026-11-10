@@ -236,7 +236,14 @@ const offerKit={...quote('KIT','TEL-PAGA','INTRON-X commissioning kit',1,160),su
 const oldKit={...offerKit,id:'OLD-KIT',supplierQuoteRow:{...offerKit.supplierQuoteRow,parentOfferId:'OLD-NET'}};
 const r12=quote(CERAGON_R12_0550,'TEL-DMR','Spares - Main ODU',1,7190);
 const unpriced=quote('OPEN-SPARES','TEL-PAGA','Pre-commissioning spares',null,null);
-const refsData={offers:[offerKit,oldKit,r12,unpriced,quote('LABOUR','TEL-PAGA','Commissioning Engineer',1,10)],vendors:[],lines:[]};
+const mgwEquipment={...quote('MGW-CCTV-TEST','TEL-CCTV','CCTV camera assembly',2,123),mgwQuoteLineId:'MGW-CCTV-TEST'};
+const mgwService={...quote('MGW-SERVICE-TEST','TEL-CCTV','System inspection',1,45),mgwQuoteLineId:'MGW-SERVICE-TEST'};
+const mgwCommon={...quote('MGW-COMMON-TEST','COMMON','Shared project service',1,99),mgwQuoteLineId:'MGW-COMMON-TEST'};
+const {MGW_MET_NDB_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+const mgwRegisterOffer=quote(MGW_MET_NDB_0550.prefix+'NDB-APF-01','TEL-NDB','NDB antenna assembly',1,83);
+mgwRegisterOffer.quoteRef=MGW_MET_NDB_0550.quoteRef;
+Object.assign(mgwRegisterOffer.quoteEvidence,{sourceId:MGW_MET_NDB_0550.batchId,sourceSha256:MGW_MET_NDB_0550.sha256});
+const refsData={offers:[offerKit,oldKit,r12,unpriced,mgwEquipment,mgwService,mgwCommon,mgwRegisterOffer,quote('LABOUR','TEL-PAGA','Commissioning Engineer',1,10)],vendors:[],lines:[]};
 const refsModel={lines:[
  {id:'PAGA-NET-WORKING',offerId:'NET',wbs:'A',systemToken:'TEL-PAGA',selected:true},
  {id:'C3-PAGA',description:'Two-year spares working estimate',wbs:'C3',systemToken:'TEL-PAGA',selected:true,quantity:2,unit:'Pc',costRate:31,currency:'USD'},
@@ -257,6 +264,14 @@ assert.equal(pagaReferences.values.C2_6_9,'OPEN');
 assert.equal(screenC2.pages.find(p=>p.systemToken==='TEL-LAN').values.C2_4_0,'LAN-ONLY');
 const blankWithRefs=N.nativeSchedule0550(blankC2,'C2','USD',references);
 assert.match(blankWithRefs.html,/Spares - Main ODU.*Capital spares · Schedule C4/s);
+const mgwReference=blankWithRefs.pages.find(p=>p.systemToken==='TEL-CCTV');
+assert.equal(mgwReference.systemStatus,'DRAFT_FROM_EXISTING');
+assert.match(mgwReference.values.C2_4_0,/CCTV camera assembly.*Draft reference for C2 · not allocated/s);
+assert.equal(mgwReference.values.C2_4_11,'EUR 246.00');
+assert.match(mgwReference.values.C2_5_0,/System inspection.*not allocated/s);
+assert.match(blankWithRefs.pages.find(p=>p.systemToken==='TEL-NDB').values.C2_4_0,/NDB antenna assembly.*not allocated/s);
+assert.doesNotMatch(blankWithRefs.html,/Shared project service/);
+assert.doesNotMatch(N.nativeExhibitHtml0550(blankC2,'C2'),/CCTV camera assembly|System inspection|NDB antenna assembly/);
 const allSpareRows=Array.from({length:8},(_,i)=>({...references.get('TEL-LAN')[0],description:'SPARE-REF-'+i}));
 const multiPage=N.nativeSchedule0550(blankC2,'C2','USD',new Map([['TEL-LAN',allSpareRows]]));
 assert.equal(multiPage.pages.filter(p=>p.systemToken==='TEL-LAN').length,2);
