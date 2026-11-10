@@ -10,6 +10,7 @@ import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
 import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
+import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -32,6 +33,7 @@ const rules={
 export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView){
  const working=new Map(model.lines.map(l=>[l.id,l])),official=new Map(model.official.lines.map(l=>[l.id,l]));
  const saved=new Map(savedView.bindings.map(b=>[b.lineId,b])),display=new Map(displayView.bindings.map(b=>[b.lineId,b]));
+ const pendingC2=new Map((displayView.allocationPlan||[]).filter(entry=>!entry.proposal&&entry.line.wbs==='B5').map(entry=>[entry.line.id,entry.reason]));
  const catalog=new Map(MR_WORKING_CATALOG_0550.rows.map(r=>[r.id,r]));
  const sources=new Set((data.sourceIntake?.sources||[]).map(s=>s.id));
  const requirements=model.integration?.requirements||integrationRequirements0550(data),byRequirement=new Map(requirements.map(r=>[r.id,r])),byLine=new Map();
@@ -60,7 +62,7 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   if(scope==='SELECTED'){
    if(!reqs.length||reqs.some(q=>!q.sourceIds?.length||q.sourceIds.some(id=>!sources.has(id))))reasons.push('ข้อกำหนดบางข้อยังไม่ผูกไฟล์ต้นฉบับที่พบใน A');
    if(!customerMapped)reasons.push('ยังไม่ผูก Customer row ที่ใช้ได้ใน 10.7');
-   if(!binding)reasons.push(shown?.suggested?'Schedule เป็นร่างแนะนำ ยังไม่บันทึก':'ยังไม่จัดลง Schedule');
+   if(!binding)reasons.push(shown?.suggested?'Schedule เป็นร่างแนะนำ ยังไม่บันทึก':pendingC2.get(raw.id)||'ยังไม่จัดลง Schedule');
    else if(binding.state!=='REVIEWED')reasons.push('การจัด Schedule ยัง '+binding.state);
    if(!Number.isFinite(reviewed?.customerUSD))reasons.push('ราคา / การทบทวน 10.7 ยัง OPEN');
    reasons.push(...advisories);
@@ -86,9 +88,10 @@ export function scheduleHoursFromCalculation0550(data,line){
  const c=data.calculations.find(c=>c.id===line?.calculationId);
  return line?.unit==='MD'&&line.resultKey==='MD'&&c?.equationId==='E05'&&c.sourceRef.trim()&&[line.systemToken,'COMMON'].includes(c.systemToken)&&evaluateServiceEquation(c.equationId,c.inputs).state==='CALCULATED'&&c.inputs.Hday>0&&c.inputs.Hday<=24?{hoursPerDay:c.inputs.Hday,calculationId:c.id}:null;
 }
-export function scheduleAllocationPlan0550(data,savedView){
+export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView.unallocated){
  const requirements=integrationRequirements0550(data),knownSources=new Set((data.sourceIntake?.sources||[]).map(s=>s.id));
  const previouslySaved=new Set(data.repositoryBasisImport?.pricedVolumeDraftIds||[]);
+ const workingById=new Map(workingLines.map(line=>[line.id,line]));
  return savedView.unallocated.map(line=>{
   if(previouslySaved.has(line.id))return {line,proposal:null,reason:'The previous draft was removed. Select a destination in 11.M to restore it.'};
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
@@ -105,12 +108,18 @@ export function scheduleAllocationPlan0550(data,savedView){
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-003'){schedule='A1';summary='INSPECTION';reason='MGW bundled Integration/Assembly/Inspection/FAT → proposed A1 Inspection; retain full bundle scope for review';}
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-004'){schedule='A1';summary='PACKING';reason='MGW expressly bundled Packing/Marking/Delivery → proposed A1 Packing; one owner, no split or duplicate freight';}
   }
+  // Keep project-level allowances in the SI projection. Only named, priced
+  // B5 owners can enter a system form through a new suggested allocation.
+  if(schedule==='C2'&&raw.systemToken!=='COMMON'){
+   const problems=c2WorkingAllocationProblems0550(workingById.get(raw.id));
+   if(problems.length)return {line,proposal:null,reason:'C2 OPEN · '+problems.join(' / ')};
+  }
   const offer=data.offers.find(o=>o.id===raw.offerId);
   const bulkMr=mgwBulkMr0550(offer);
   const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)||bulkMr&&r.id==='REQDEF-'+bulkMr&&r.disposition!=='NOT_APPLICABLE').flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
   const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
   const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
-  return {line,proposal,reason};
+  return {line,proposal,reason,previewOnly:schedule==='C2'&&raw.systemToken==='COMMON'};
  });
 }
 export function saveScheduleAllocationDrafts0550(data,plan,today){
@@ -118,7 +127,7 @@ export function saveScheduleAllocationDrafts0550(data,plan,today){
  for(const entry of plan){
   const row=entry.proposal,raw=data.lines.find(l=>l.id===row?.lineId);
   // Existing user allocations, deleted/unselected lines and issued history stay.
-  if(!row||!raw?.selected||next.bidVolumes?.bindings.some(b=>b.lineId===row.lineId))continue;
+  if(!row||entry.previewOnly||!raw?.selected||next.bidVolumes?.bindings.some(b=>b.lineId===row.lineId))continue;
   next=saveBidVolumeRecord0550(next,'bindings',row,today,false);
  }
  return next;
@@ -153,8 +162,8 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
  };
  const unallocated=pricing().provisional.selected.filter(line=>
   !bound.has(line.id)&&!recorded.has(line.id)&&Number.isFinite(line.customerUSD)&&line.quantity>0);
- const plan=scheduleAllocationPlan0550(data,{unallocated}).filter(({line,proposal})=>{
-  if(!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
+ const plan=scheduleAllocationPlan0550(data,{unallocated}).filter(({line,proposal,previewOnly})=>{
+  if(previewOnly||!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
   if(proposal.schedule==='C1'){
    const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
    // Draft assignment accepts quoted vendor offers (Ceragon, Master Tower, Industronic, MGW)
@@ -181,7 +190,8 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  // scope review OPEN; exclude only that explicit reference from draft arithmetic.
  const references=new Map((model.provisional?.lines||[]).filter(l=>l.bidPriceAllocation).map(l=>[l.id,l.bidPriceAllocation]));
  const draftSaved={...savedView,unallocated:savedView.unallocated.filter(l=>!references.has(l.id))};
- const plan=scheduleAllocationPlan0550(data,draftSaved),proposed=plan.filter(p=>p.proposal),priceBasis=new Map();
+ const plan=scheduleAllocationPlan0550(data,draftSaved,model.provisional?.lines||model.lines),proposed=plan.filter(p=>p.proposal),priceBasis=new Map();
+ const saveableCount=proposed.filter(p=>!p.previewOnly).length;
  const lines=model.official.lines.map(line=>{
   const working=model.lines.find(l=>l.id===line.id),reviewed=Number.isFinite(line.customerUSD),current=Number.isFinite(working?.customerUSD),provisional=Number.isFinite(working?.provisionalCustomerUSD);
   const basis=reviewed?'REVIEWED_WORKING':current?'WORKING_PENDING_REVIEW':provisional?(working?.sellBasisState==='WORKING_SELL_KNOWN_COST_UNESTABLISHED'?'WORKING_SELL_COST_PENDING':'PROVISIONAL_VENDOR'):'PRICE_OPEN';priceBasis.set(line.id,basis);
@@ -209,7 +219,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const mgwBulkSupply=bindings.some(b=>b.schedule==='C1'&&Number.isFinite(b.amount)&&mgwBulkOffer0550(b.line?.offer));
  const pagaNet=bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer))?.line.offer;
  return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
-  previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:proposed.length,unresolved:plan.length-proposed.length,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
+  previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),
  };

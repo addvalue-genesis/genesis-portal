@@ -19,9 +19,14 @@ try{
  const changed=structuredClone(d);changed.offers.find(o=>o.mgwQuoteLineId===G.mgwDetailGroup0550('CCTV').rowIds[0]).unitCost+=10;assert(preview(changed).previewStats.knownUSD>v.previewStats.knownUSD);assert.deepEqual(changed.releaseRegister,frozen);
  const savedDraft=P.saveScheduleAllocationDrafts0550(d,v.allocationPlan,today);validate(savedDraft);assert.equal(savedDraft.bidVolumes.bindings.find(b=>b.id==='TEST-MGW-CCTV').status,'DRAFT');assert.equal(saved(savedDraft).ready,false);assert.deepEqual(savedDraft.lines,d.lines);assert.deepEqual(savedDraft.offers,d.offers);assert.deepEqual(savedDraft.releaseRegister,frozen);assert.deepEqual(P.saveScheduleAllocationDrafts0550(savedDraft,v.allocationPlan,today),savedDraft,'Repeated save does not overwrite existing decisions');
  const categories=structuredClone(d);categories.lines=categories.lines.map(l=>({...l,selected:false}));for(const wbs of ['B1','B2','B3','B4','B5','B6','B7','B8','B9','C1','C2','C3']){const row={...structuredClone(base.lines.find(l=>l.id==='LINE-TEST')),id:'TEST-'+wbs,scopeKey:'TEST-'+wbs,wbs,selected:true};categories.lines.push(row);}
+ const namedB5=categories.lines.find(l=>l.id==='TEST-B5');
+ Object.assign(namedB5,{systemToken:'TEL-LAN-VCS',customerRowCode:'B5',commissioningPhase:'START_UP',
+  quantity:3,unit:'Pc',currency:'USD',vendorId:'',offerId:'',manualCost:12,sellMode:'MARKUP',markupPct:25,primePct:0});
+ delete namedB5.officialReview;
  const cv=preview(categories),byWbs=code=>cv.allocationPlan.find(p=>p.line.wbs===code).proposal;assert.equal(byWbs('B2').schedule,'A1');assert.equal(byWbs('B2').summary,'OTHER','Freight is not silently reclassified as packing');assert.equal(byWbs('C2').schedule,'C4');assert.equal(byWbs('C3').schedule,'C3');assert.equal(byWbs('C1').schedule,'A2');assert.equal(byWbs('B3').summary,'TRAINING');validate(P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today));
  const source=(id,replaces=[])=>({id,documentNo:'TEST-MR',revision:'B1',authority:'CURRENT_TENDER',readState:'TEXT_READ',content:'Synthetic source',replaces});
- const volumeCandidates=['TEST-B6','TEST-B7','TEST-B5'].map(id=>({...categories.lines.find(l=>l.id===id),quantity:1,customerUSD:10}));
+ const computedB5=derive(categories).provisional.lines.find(l=>l.id===namedB5.id);
+ const volumeCandidates=['TEST-B6','TEST-B7'].map(id=>({...categories.lines.find(l=>l.id===id),quantity:1,customerUSD:10})).concat(computedB5);
  const volumeInput={...categories,repositoryBasisImport:{bidCompletion:{}},sourceIntake:{sources:[source('TEST-OLD'),source('TEST-NEW',['TEST-OLD'])]},
   integrationWorkspace:{...I.emptyIntegration0550(),requirements:[{...I.blankRequirement0550('TEST-VOLUME-REQ'),workLineIds:volumeCandidates.map(l=>l.id),sourceIds:['TEST-OLD']}]}};
  const applyVolume=input=>P.preparePricedVolumeDrafts0550(input,()=>({provisional:{selected:volumeCandidates}}),today);
@@ -39,6 +44,33 @@ try{
  const noEvidence={...volumeInput,sourceIntake:{sources:[]}};
  assert.equal(applyVolume(noEvidence),noEvidence);
  assert.equal(P.scheduleAllocationPlan0550(noEvidence,{unallocated:volumeCandidates.filter(l=>l.id==='TEST-B5')})[0].proposal.schedule,'C2');
+ const {releaseScheduleDraftView0550,releaseScheduleChecks0550}=require(root+'/project0550/releaseScheduleDrafts0550.js');
+ const committed=P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today);
+ const c2Draft=releaseScheduleDraftView0550(committed,derive(committed),D.SYSTEMS,today);
+ const [c2Row]=c2Draft.scheduleRows('C2');
+ assert.deepEqual([c2Row.line.systemToken,c2Row.line.commissioningPhase,c2Row.quantity,c2Row.unit,c2Row.line.costRate,c2Row.line.provisionalCostNative,c2Row.amount],
+  ['TEL-LAN-VCS','START_UP',3,'Pc',12,36,45]);
+ const releaseC2=releaseScheduleChecks0550(c2Draft).find(doc=>doc.id==='C2');
+ const c2Page=N.nativeSchedule0550(releaseC2.formView,'C2').pages.find(page=>page.systemToken==='TEL-LAN-VCS');
+ assert.deepEqual([4,9,11].map(col=>c2Page.values['C2_4_'+col]),['3','USD 15.00','USD 45.00']);
+ assert.deepEqual(committed.releaseRegister,frozen);
+ const offered=structuredClone(categories),offerLine=offered.lines.find(l=>l.id===namedB5.id);
+ offered.offers.push({...base.offers[0],id:'TEST-OEM-SPARE',unit:'Pc',currency:'USD',unitCost:20});
+ Object.assign(offerLine,{offerId:'TEST-OEM-SPARE',vendorId:base.offers[0].vendorId,manualCost:null});
+ assert.deepEqual(preview(offered).scheduleRows('C2').map(row=>[row.quantity,row.unit,row.line.costRate,row.amount]),[[3,'Pc',20,75]]);
+ const common={...categories,lines:categories.lines.map(line=>line.id===namedB5.id?{...line,systemToken:'COMMON'}:line)};
+ const commonDraft=preview(common);
+ assert.equal(commonDraft.scheduleRows('C2')[0].line.systemToken,'COMMON','Legacy project allowance remains visible for SI');
+ assert(!P.saveScheduleAllocationDrafts0550(common,commonDraft.allocationPlan,today).bidVolumes.bindings.some(binding=>binding.lineId===namedB5.id));
+ for(const [overrides,reason] of [[{commissioningPhase:undefined},'ระบุช่วงงาน'],[{quantity:null},'ระบุจำนวนและหน่วย'],
+  [{manualCost:null,sellMode:'DIRECT',sellRate:15},'ระบุต้นทุนจาก Offer'],[{primePct:null},'ตรวจฐานราคาขายและ FX']]){
+  const incomplete={...categories,lines:categories.lines.map(line=>line.id===namedB5.id?{...line,...overrides}:line)};
+  const projection=preview(incomplete);
+  assert(!projection.scheduleRows('C2').length);
+  const entry=projection.allocationPlan.find(p=>p.line.id===namedB5.id);
+  assert.equal(entry.proposal,null);
+  assert(entry.reason.includes(reason));
+ }
  const {evaluateServiceEquation}=require(root+'/project0550/serviceEquationRuntime.js');
  const {commissioningBreakdown0550}=require(root+'/project0550/data/commissioningSparePhases0550.js');
  const stock={installed:10,failureRate:0.001,exposureHours:100,coveragePct:95,planned:2,included:1};

@@ -107,7 +107,10 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
       {!system.rows.length&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.(b5Id,{workingSystem:system.token})}>เปิด Working B5</button>}
       {pending.length>0&&<details><summary>ตรวจ 11.M · {pending.length} รายการ</summary><ul>{pending.map(line=><li key={line.id}><button type="button" disabled={disabled} onClick={()=>onAllocate?.(line.id)}>{line.description}</button></li>)}</ul></details>}
      </th>{[...COMMISSIONING_PHASES_0550.map(p=>p.id),''].map(phase=>{const rows=system.rows.filter(row=>commissioningPhase0550(row.line)===phase);return <td key={phase}>{rows.length?rows.map(row=>{const line=working.get(row.lineId),rate=line?.costRate;return <div key={row.lineId}>
-      {link(workingId(row.lineId),row.line.description)}<small>{row.partNo||'Part No. OPEN'} · {row.quantity??'Qty OPEN'} {row.unit} × {money(rate,line?.currency)} · ราคาขาย {money(row.amount,currency)}</small>
+      {link(workingId(row.lineId),row.line.description)}
+      <small>{row.partNo||'Part No. OPEN'} · Qty {row.quantity??'OPEN'} {row.unit}</small>
+      <small>Unit Cost {money(rate,line?.currency)} · Total Cost {money(line?.provisionalCostNative,line?.currency)}</small>
+      <small>ราคาขายลูกค้า {money(row.amount,currency)}</small>
       {line?.result?.installedPopulation!==undefined&&<small>Interchangeability A × B · ติดตั้ง {line.result.installedPopulation} ชิ้น</small>}
       {line?.result?.requiredQuantity!==undefined&&<small>อัตราส่วน OEM · ฐาน {line.calculation?.inputs.populationBasis==='MAIN_EQUIPMENT'?'B':'A × B'} · {line.calculation?.inputs.roundingMode||'CEIL (รายการเดิม)'} · ต้องมี {line.result.requiredQuantity} ชิ้นก่อนหักจำนวนที่รวมไว้{line.calculation?.inputs.roundingSourceRef&&' · '+line.calculation.inputs.roundingSourceRef}</small>}
       {line?.result?.reserve!==undefined&&<small>เผื่อเสีย {line.result.reserve} · โอกาสพอใช้ {line.result.coveragePct.toFixed(4)}%</small>}
