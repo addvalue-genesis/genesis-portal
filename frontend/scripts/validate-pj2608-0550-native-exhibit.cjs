@@ -44,6 +44,10 @@ assert.deepEqual(optionCells(optionCase(openOption),6),['OPEN','','OPEN','']);
 const assigned=optionCase({...c3,deliveryTerm:'CIF'},fobOption);
 assert.deepEqual(optionCells(assigned,6),['75.00','25.00','75.00','25.00']);
 assert.doesNotMatch(assigned.html,/native-c2-draft-price/);
+assert.match(assigned.html,/Contract Price for Optional Scope/);
+const incompleteAssigned=N.nativeSchedule0550({...spareView,optionsAssigned:null,bindings:[{...c3,deliveryTerm:'CIF'},
+ {...fobOption,amount:null}]},'A2');
+assert.equal(incompleteAssigned.pages[0].values.A2_8_2,'In figures: OPEN\nIn Words: OPEN');
 const diem={...c3,lineId:'OPTION-DIEM',schedule:'C7',amount:75,line:{...c3.line,unit:'MD',quantity:3}};
 assert.deepEqual(optionCells(optionCase(diem),4),['USD 25.00','','USD 75.00','']);
 assert.deepEqual(optionCells(optionCase({...diem,line:{...diem.line,quantity:null}}),4),['OPEN','','USD 75.00','']);
@@ -145,6 +149,22 @@ assert(!customerLicences.includes('200,000.00'));
 assert(!customerLicences.includes('Official licence fee responsibility'));
 const movedLicenceView={...licenceView,bindings:[{...licence,schedule:'C7'}]};
 assert.equal(N.nativeSchedule0550(movedLicenceView,'A1').pages[0].values.A1_11_6,'');
+const c7Rows=Array.from({length:5},(_,i)=>({...rows.find(r=>r.schedule==='C7'),lineId:'SERVICE-'+i,amount:100,
+ hoursPerDay:8,treatment:i===4?'OPTION':'BASE'}));
+const c8Calloff=rows.find(r=>r.schedule==='C8');
+const draftServices={...view,workingPreview:true,bindings:[...c7Rows,c8Calloff],tenderScheduleBasis:{siteHours:10,facilitiesConflict:{sourceId:'TEST'}},
+ scheduleRows:id=>id==='C7'?c7Rows:id==='C8'?[c8Calloff]:[]};
+const c7Native=N.nativeSchedule0550(draftServices,'C7');
+assert.equal(c7Native.pages.length,2);
+assert.match(c7Native.html,/Page 1 of 2 subtotal/);
+assert.match(c7Native.html,/Base \/ A1: USD 400\.00.*Option \/ A2: USD 100\.00/);
+assert.match(c7Native.html,/tender site day of 10 hours/);
+assert.equal(N.nativeSchedule0550(draftServices,'A1').pages[0].values.A1_8_6,'400.00');
+const c8Native=N.nativeSchedule0550(draftServices,'C8');
+assert.match(c8Native.html,/omit C8/);
+assert.equal(c8Native.pages[0].values.C8_1_5,'');
+assert.equal(c8Native.pages[0].values.C8_6_1,'Call-off rates only');
+assert.match(Buffer.from(N.buildNativeExhibitDocx0550(draftServices,'C7')).toString(),/Page 2 of 2 subtotal/);
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};
 const extra=N.nativeSchedule0550(overflow,'C1');assert.equal(extra.pages.length,2);assert(extra.html.includes('OVERFLOW-35'));assert.equal((extra.html.match(/OVERFLOW-/g)||[]).length,35);assert(extra.html.includes('Continuation 2'));

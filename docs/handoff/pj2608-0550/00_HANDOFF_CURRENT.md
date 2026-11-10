@@ -1,3 +1,5 @@
+Latest Exhibit C draft update: [Schedule OPEN reconciliation](20261110_EXHIBIT_C_OPEN_RECONCILIATION.md). C7 distinguishes page subtotals from its A1 Base and A2 Option amounts. The draft review identifies the current C8 cross-reference conflict, retains missing price and allocation inputs, and exports A1 and A2 alongside A and C1–C8.
+
 Latest Working A update: [APF LAN MR 9.0 bid price reference](20261110_APF_LAN_WORKING_BASIS.md). MGW switch and optical-interface evidence links to the selected owners and the original Included Core line. The Ex-phone tie-in remains an SI review.
 
 Latest bid update: [PAGA revised quotation through the bid package](20261109_PAGA_REVISION_BID_CHAIN.md). A1-05 uses one A20261632-002 NET Lot with CUS, VND, SI, draft Release and Volumes 11–14 references. The two MGW supplements are in the established project DATA folder.

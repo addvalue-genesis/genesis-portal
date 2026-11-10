@@ -1,14 +1,14 @@
-import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
+import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
 import {SCHEDULES_0550,deriveBidVolumes0550} from './data/bidVolumes0550';
 import {deriveBidVolumeWorkingPreview0550} from './data/bidVolumeWorkingPreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {c2HasSystem0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {scheduleRollup0550} from './data/scheduleRollup0550';
 import {mgwSupplementOpen0550} from './data/mgwQuoteSelection0550';
-import {buildNativeExhibitDocx0550,nativeExhibitProblems0550} from './exhibitCNative0550';
+import {a1SummarySlot0550,buildNativeExhibitDocx0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 
-export const RELEASE_DRAFT_FORMS_0550=SCHEDULES_0550.filter(({id})=>id==='A'||/^C[1-8]$/.test(id));
+export const RELEASE_DRAFT_FORMS_0550=SCHEDULES_0550.filter(({id})=>/^A[12]?$|^C[1-8]$/.test(id));
 const dollars=value=>value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
 export const draftSubtotal0550=result=>result.priced
  ?'USD '+dollars(result.knownUSD)+' · '+result.priced+'/'+result.count+' priced'
@@ -17,8 +17,7 @@ export const draftSubtotal0550=result=>result.priced
 export function releaseScheduleDraftView0550(data,model,systems,today){
  const saved=deriveBidVolumes0550(data,model,systems,today);
  const draft=deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved);
- const pagaNet=draft.bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer))?.line.offer;
- return {...draft,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550,c2Systems:systems,pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet)};
+ return {...draft,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550,c2Systems:systems};
 }
 
 export function releaseScheduleChecks0550(view){
@@ -31,7 +30,8 @@ export function releaseScheduleChecks0550(view){
   C7:'PAGA OEM FAT at Wertheim is included in A1-05. Confirm field service, SAT and training separately.'
  };
  return RELEASE_DRAFT_FORMS_0550.map(({id,title})=>{
-  const rows=id==='A'?view.bindings.filter(b=>b.line):view.scheduleRows(id);
+  const treatment=id==='A1'?'BASE':id==='A2'?'OPTION':null;
+  const rows=id==='A'||treatment?view.bindings.filter(b=>b.line&&(!treatment||b.treatment===treatment)):view.scheduleRows(id);
   const unassigned=id==='C2'?rows.filter(b=>!c2HasSystem0550(b)):[];
   const printed=id==='C2'?rows.filter(c2HasSystem0550):rows;
   const formView=id==='C2'?{...view,scheduleRows:code=>code==='C2'?printed:view.scheduleRows(code)}:view;
@@ -62,6 +62,8 @@ export function releaseScheduleChecks0550(view){
    }
    for(const line of view.unallocated)add('Working owner awaiting Schedule allocation',line.id);
   }else{
+   if(id==='A1'&&!printed.some(b=>a1SummarySlot0550(b)===4))add('Confirm packing scope and Working owner, excluding packing already included in equipment packages.');
+   if(id==='A1'&&!printed.some(b=>a1SummarySlot0550(b)===9))add('Confirm C8 facilities form and whether any facilities are included in Base.');
    if(!printed.length&&record.state!=='REVIEWED')add('No Working rows on this form. Confirm scope and allocation.');
    for(const issue of nativeExhibitProblems0550(formView,id)){
     const [label,ref]=issue.slice(id.length+3).split(/ \/ |: (?=[\w.-]+$)/,2);
@@ -80,6 +82,11 @@ export function releaseScheduleChecks0550(view){
    }
    if(id==='C6'&&!printed.length&&record.state!=='REVIEWED')add('Confirm first-filling and consumable specification, quantity and owner.');
    if(id==='C7')for(const b of printed.filter(b=>b.unit!=='MH'||!Number.isFinite(b.quantity)))add('Service / training man-hours OPEN',b.lineId);
+   if(id==='C7'&&view.tenderScheduleBasis?.siteHours){
+    for(const b of printed.filter(b=>b.summary==='FIELD_SERVICE'&&b.hoursPerDay>0&&b.hoursPerDay!==view.tenderScheduleBasis.siteHours)){
+     add('Reconcile Working hours per day with the tender site day',b.lineId);
+    }
+   }
    if(id==='C8')for(const b of printed.filter(b=>b.treatment==='CALLOFF'))add('Call-off unit rate. Exclude from contract subtotals.',b.lineId);
    if(id==='C8'&&!printed.length&&record.state!=='REVIEWED')add('Confirm Purchaser facilities and the Base or call-off treatment.');
   }

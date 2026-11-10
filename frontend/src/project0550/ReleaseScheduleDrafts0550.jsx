@@ -12,14 +12,14 @@ export function ReleaseScheduleDrafts0550({onNavigate}){
  const download=()=>{
   const url=URL.createObjectURL(new Blob([releaseScheduleArchive0550(documents)],{type:'application/zip'}));
   const link=document.createElement('a');
-  link.href=url;link.download='PJ2608-0550_A_C1-C8_DRAFT_R'+data.revision+'.zip';link.click();
+  link.href=url;link.download='PJ2608-0550_A-A2_C1-C8_DRAFT_R'+data.revision+'.zip';link.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
  };
  return <details className="p55-panel" onToggle={event=>{if(event.target===event.currentTarget)setOpen(event.currentTarget.open);}}>
   <summary>ออกและตรวจเอกสารร่าง Schedule A และ C1–C8</summary>
   {documents.length>0&&<>
    <p>ออกได้จาก Working ปัจจุบัน · ยอดที่เห็นเป็นเฉพาะรายการที่มีราคา · ดูรายการที่ต้องตรวจแยกตามเอกสาร</p>
-   <button type="button" onClick={download}>ดาวน์โหลด Word 9 แบบพร้อมรายการตรวจ (.zip)</button>
+   <button type="button" onClick={download}>ดาวน์โหลด Word {documents.length} แบบ รวม A1 และ A2 พร้อมรายการตรวจ (.zip)</button>
    <div className="p55-table-wrap"><table className="p55-table" aria-label="Draft Schedule review">
     <thead><tr><th>แบบฟอร์ม</th><th>ราคาจาก Working</th><th>รายการที่ต้องตรวจ</th><th>เปิดหรือส่งออก</th></tr></thead>
     <tbody>{documents.map(({id,title,amounts,checks,formView})=><tr key={id}>

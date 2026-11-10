@@ -27,6 +27,7 @@ const sparePriceNote=(rows,currency)=>{
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||
  (view.workingPreview&&id==='C7'&&name==='trainingPeriodDays'&&view.tenderScheduleBasis?.training?String(view.tenderScheduleBasis.training.days):'');
+const facilitiesFormCheck='Exhibit C Rev.1 §3 refers to a call-off facilities form as C-7. Its contents list C7 as Field Services and Training and omit C8. Confirm the applicable form with the Purchaser.';
 const term=customerPriceColumn0550;
 const normalize=s=>String(s||'').trim().toUpperCase();
 const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',OFFICE:'OFFICE','IN-CITY TRANSPORTATION':'TRANSPORT','AIRPORT PICK-UP & DROP-OFF':'AIRPORT','OFFICE CONSUMABLES':'OFFICE_CONSUMABLES','WORKING LAUNCH':'WORKING_LUNCH'};
@@ -133,6 +134,19 @@ function nativePages(view,id,currency='USD'){
    if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
   }
   if(base&&view.workingPreview){
+   if(!groups.has(4)){
+    set(v,4,6,'OPEN');
+    set(v,4,7,(view.pagaNet?'PAGA OEM packing (item 24010) is included in A1-05. ':'')+'Confirm remaining packing scope and its Working owner before adding a separate amount.');
+   }
+   if(!groups.has(8)){
+    set(v,8,5,'');set(v,8,6,'OPEN');set(v,8,7,'Confirm the C7 allocation and site service period.');
+   }else if(!field(view,'C7','sitePeriodDays').trim()){
+    set(v,8,5,'Site service period to confirm');
+   }
+   if(!groups.has(9)){
+    set(v,9,5,'');set(v,9,6,view.tenderScheduleBasis?.facilitiesConflict?'See C8':'OPEN');
+    set(v,9,7,view.tenderScheduleBasis?.facilitiesConflict?'Call-off form and any Base exceptions require confirmation. See C8.':'Confirm facilities scope, days and rates in C8.');
+   }
    if(!groups.has(5)){
     set(v,5,5,'OPEN');set(v,5,6,'OPEN');
     set(v,5,7,'No Base price allocated to Form C-2; see Working and 11.M.');
@@ -147,7 +161,8 @@ function nativePages(view,id,currency='USD'){
   }
   if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
   else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
-   const bs=eligible.filter(b=>term(b)===t),total=sum(bs),pending=eligible.some(b=>!term(b));
+   const bs=eligible.filter(b=>term(b)===t),total=sum(bs);
+   const pending=eligible.some(b=>!term(b))||view.workingPreview&&!Number.isFinite(view.optionsAssigned);
    set(v,r,2,'In figures: '+(pending?'OPEN':bs.length?currency+' '+number(total):'OPEN')+'\nIn Words: '+(view.workingPreview&&pending?'OPEN':words(total,currency)));
   }
   add(v,'',draftPriceRows.length?{draftPriceRows}:undefined);return {pages,issues};
@@ -186,13 +201,42 @@ function nativePages(view,id,currency='USD'){
   const site=rows.filter(b=>role(b)==='FIELD_SERVICE'),training=rows.filter(b=>role(b)==='TRAINING'),unknown=rows.filter(b=>!['FIELD_SERVICE','TRAINING'].includes(role(b)));
   for(const b of unknown)issues.push('Select Site Service / Training in allocation: '+b.lineId);
   const count=Math.max(1,Math.ceil(site.length/4),Math.ceil(training.length/4));
-  for(let p=0;p<count;p++){const v=blankValues(id);for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){const group=bs.slice(p*4,(p+1)*4);group.forEach((b,i)=>{set(v,start+i,2,b.line.description);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));});set(v,subtotal,1,number(shownSum(view,group)));}set(v,11,1,unknown.length?'OPEN':number(shownSum(view,[...site.slice(p*4,(p+1)*4),...training.slice(p*4,(p+1)*4)])));set(v,1,6,value(field(view,id,'sitePeriodDays'))+' days');set(v,6,6,value(field(view,id,'trainingPeriodDays'))+' days');add(v,p?'Continuation '+(p+1):'');}
+  for(let p=0;p<count;p++){
+   const v=blankValues(id),pageRows=[];
+   for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){
+    const group=bs.slice(p*4,(p+1)*4);pageRows.push(...group);
+    group.forEach((b,i)=>{
+     const name=b.line.description+(view.workingPreview&&b.treatment==='OPTION'?' (Option / A2)':'');
+     set(v,start+i,2,name);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');
+     set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));
+    });
+    set(v,subtotal,1,number(shownSum(view,group)));
+   }
+   set(v,11,1,unknown.length&&!view.workingPreview?'OPEN':number(shownSum(view,pageRows)));
+   const siteDays=field(view,id,'sitePeriodDays'),trainingDays=field(view,id,'trainingPeriodDays');
+   set(v,1,6,view.workingPreview&&!siteDays.trim()?'Site service period to confirm':value(siteDays)+' days');
+   set(v,6,6,view.workingPreview&&!trainingDays.trim()?'Training period to confirm':value(trainingDays)+' days');
+   add(v,p?'Continuation '+(p+1):'',view.workingPreview?{pageNumber:p+1,pageCount:count}:undefined);
+  }
  }
  if(id==='C8'){
   const v=blankValues(id),rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
+  if(view.workingPreview&&view.tenderScheduleBasis?.facilitiesConflict)issues.push(facilitiesFormCheck);
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
-  for(const [key,r] of Object.entries(rowMap)){const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null,amount=shownSum(view,bs);set(v,r,3,key==='AIRPORT'?'':value(qty));set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');set(v,r,5,number(amount));set(v,r,6,bs.map(b=>b.line.description+' / '+b.treatment).join('; '));if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);}
-  set(v,6,1,rows.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,rows)));add(v);
+  for(const [key,r] of Object.entries(rowMap)){
+   const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;
+   const assigned=view.workingPreview?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
+   const qty=assigned.length&&assigned.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?assigned.reduce((n,b)=>n+b.quantity,0):null;
+   set(v,r,3,key==='AIRPORT'||!assigned.length?'':value(qty));
+   set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
+   set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
+   set(v,r,6,bs.map(b=>b.line.description+' / '+(b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
+   if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
+  }
+  const assigned=view.workingPreview?rows.filter(b=>b.treatment!=='CALLOFF'):rows;
+  const ratesOnly=view.workingPreview&&rows.length&&!assigned.length;
+  set(v,6,1,ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,assigned)));
+  add(v);
  }
  return {pages,issues};
 }
@@ -212,6 +256,10 @@ function paymentTable(rows,format){
 }
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
+ if(view.workingPreview&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
+ if(view.workingPreview&&page.id==='C7'&&page.pageCount>1){
+  result=result.replace('TOTAL (Sub-total 1.0+2.0)',`Page ${page.pageNumber} of ${page.pageCount} subtotal`);
+ }
  const payment=page.id==='B'&&paymentSchedule0550(view);
  if(payment){
   const rows=payment.rows.length?[['No.','Payment Terms','Percentage of Initial Contract Price for Base Scope of Supply'],...payment.rows,['Total','','100.00%']]:
@@ -258,13 +306,30 @@ function renderPage(view,page,format,currency='USD'){
    const subtotal=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===(base?'BASE':'OPTION')));
    if(subtotal.priced)partialNote=(base?'Base':'Option')+' Working subtotal (priced items): '+currency+' '+number(subtotal.knownUSD)+
     ' ('+subtotal.priced+'/'+subtotal.count+' priced'+(subtotal.open?', '+subtotal.open+' OPEN':'')+').';
+   if(!base&&view.tenderScheduleBasis?.delivery)partialNote=[partialNote,view.tenderScheduleBasis.delivery.text].filter(Boolean).join(' ');
   }
   if(/^C[2-8]$/.test(page.id)&&!page.systemToken&&!view.scheduleRows(page.id).length){
    partialNote='OPEN. Confirm applicable scope and allocate the supporting Working items.';
   }
-  if(['C1','C7','C8'].includes(page.id))partialNote=subtotalNote(view,view.scheduleRows(page.id))||partialNote;
+  if(page.id==='C1')partialNote=subtotalNote(view,view.scheduleRows(page.id))||partialNote;
+  if(page.id==='C7'&&page.pageNumber===1){
+   const rows=view.scheduleRows('C7');
+   const totals=['BASE','OPTION'].map(treatment=>{
+    const rollup=scheduleRollup0550(rows.filter(b=>b.treatment===treatment));
+    return rollup.count?`${treatment==='BASE'?'Base / A1':'Option / A2'}: ${rollup.priced?currency+' '+number(rollup.knownUSD):'OPEN'} (${rollup.priced}/${rollup.count} priced${rollup.open?', '+rollup.open+' OPEN':''}).`:'';
+   }).filter(Boolean);
+   if(totals.length)partialNote='C7 Working subtotal across all pages (priced items): '+totals.join(' ');
+   const hours=view.tenderScheduleBasis?.siteHours;
+   if(hours&&rows.some(b=>role(b)==='FIELD_SERVICE'&&b.hoursPerDay>0&&b.hoursPerDay!==hours)){
+    partialNote+=' Reconcile the Working man-hour basis with the tender site day of '+hours+' hours. Confirm calendar days from the site programme.';
+   }
+  }
+  if(page.id==='C8'){
+   partialNote=subtotalNote(view,view.scheduleRows('C8').filter(b=>b.treatment!=='CALLOFF'))||partialNote;
+   if(view.tenderScheduleBasis?.facilitiesConflict)partialNote=[partialNote,facilitiesFormCheck].filter(Boolean).join(' ');
+  }
   const training=view.tenderScheduleBasis?.training;
-  if(page.id==='C7'&&training&&!view.getRecord('I.C7').nativeFields?.trainingPeriodDays?.trim()){
+  if(page.id==='C7'&&page.pageNumber===1&&training&&!view.getRecord('I.C7').nativeFields?.trainingPeriodDays?.trim()){
    partialNote=[partialNote,`Tender planning basis: estimated ${training.days} course days for ${training.trainees} trainees (Exhibit A Annex 7). Confirm trainer hours, duration and rates separately.`].filter(Boolean).join(' ');
   }
   if(page.priceRows&&(page.id!=='C2'||!page.draftPriceRows?.length)){
@@ -273,6 +338,12 @@ function renderPage(view,page,format,currency='USD'){
     partialNote='Schedule '+page.id+' Working price: '+sparePriceNote(rows,currency)+' (rows on this form).';
     if(rows.some(b=>!term(b)))partialNote+=' CIF/FOB allocation OPEN.';
    }
+  }
+  if(page.id==='C2'&&page.systemToken==='TEL-PAGA'&&view.pagaNet){
+   partialNote=[partialNote,'INDUSTRONIC A20261632-002 item 18020: one commissioning kit included in A1-05. Confirm additional spares by equipment and phase.'].filter(Boolean).join(' ');
+  }
+  if(page.id==='C3'&&view.pagaSpares?.recommended.length){
+   partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
  }
  if(page.draftPriceRows?.length)partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+

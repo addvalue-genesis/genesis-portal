@@ -73,11 +73,16 @@ export function tenderScheduleBasis0550(data){
  const course=annex.length===1&&(annex[0].content||'').match(/Telecommunication System and Fiber Optic\s+- Operation and Maintenance Course\s+([1-9]\d*)\s+As per CONTRACT\s+([1-9]\d*)\b/i);
  const training=course?{days:Number(course[2]),trainees:Number(course[1]),sourceId:annex[0].id}:null;
  const delivery=c?.content?.match(/Overseas Manufacturers shall apply CIF Yangon, Myanmar, Incoterms® 2020; Manufacturers within China shall apply FOB any major port in China, Incoterms® 2020\./)?.[0];
+ const siteHours=c?.content?.match(/Normal Working Time is ten \(10\) hours per day\./i)?10:null;
+ const contents=c?.content?.match(/Table of Contents\s+([\s\S]*?)\n\s*GENERAL PROVISIONS/i)?.[1];
+ const facilitiesConflict=contents&&/^SCHEDULE C7[^\n]*FIELD SERVICES AND TRAINING/im.test(contents)&&
+  !/^SCHEDULE C8\b/im.test(contents)&&/on call-off basis\. The prices, rates and sums provided in Schedule C-7 Services and Facilities for COMPANY and PURCHASER/.test(c.content)
+  ?{sourceId:c.id}:null;
  const packing=current.filter(s=>s.readState==='TEXT_READ'&&/Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(s.title||''));
  const importLicence=packing.length===1&&/IMPORT LICENSE APPLICATION \(PL SUBMISSION\) PROVIDED BY VENDOR/.test(packing[0].content||'')?{sourceId:packing[0].id}:null;
  const agreements=current.filter(s=>s.readState==='TEXT_READ'&&/Purchase Agreement.*\.docx$/i.test(s.title||''));
  const cargo=agreements.length===1&&/All-Risk Cargo Insurance[^.]{0,450}one hundred ten percent \(110%\) value of supplies under the AGREEMENT or each Purchase Order/.test(agreements[0].content||'')?{sourceId:agreements[0].id}:null;
- return {payment,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,importLicence,cargo};
+ return {payment,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,siteHours,facilitiesConflict,importLicence,cargo};
 }
 const currentSourceProblems=(data,ids,locator)=>{
  const problems=[];if(!ids.length||!trim(locator))problems.push('SOURCE_LOCATOR_OPEN');

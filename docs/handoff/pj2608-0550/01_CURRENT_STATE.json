@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261110_APF_LAN_WORKING_BASIS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261110_EXHIBIT_C_OPEN_RECONCILIATION.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261110_EXHIBIT_C_OPEN_RECONCILIATION.md",
     "docs/handoff/pj2608-0550/20261110_APF_LAN_WORKING_BASIS.md",
     "docs/handoff/pj2608-0550/20261109_PAGA_REVISION_BID_CHAIN.md",
     "docs/handoff/pj2608-0550/20261109_MGW_CCTV_ENT_QUOTATION.md",

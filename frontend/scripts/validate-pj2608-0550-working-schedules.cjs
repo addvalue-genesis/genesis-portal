@@ -155,7 +155,7 @@ try{
  const draft=require(root+'/project0550/releaseScheduleDrafts0550.js');
  const releaseView=draft.releaseScheduleDraftView0550(partial,derive(partial),D.SYSTEMS,today);
  const releaseDocs=draft.releaseScheduleChecks0550(releaseView);
- assert.deepEqual(releaseDocs.map(d=>d.id),['A','C1','C2','C3','C4','C5','C6','C7','C8']);
+ assert.deepEqual(releaseDocs.map(d=>d.id),['A','A1','A2','C1','C2','C3','C4','C5','C6','C7','C8']);
  assert(releaseDocs[0].amounts.some(a=>a.treatment==='BASE'&&a.knownUSD>0));
  assert(N.nativeSchedule0550(releaseView,'A').html.includes('Draft subtotals of priced allocations only'));
  const completeDraftA=Buffer.from(N.buildNativeExhibitDocx0550({...releaseView,baseAssigned:100,optionsAssigned:75},'A')).toString();
@@ -165,7 +165,8 @@ try{
  assert(releaseDocs.find(d=>d.id==='C1').checks.some(check=>check.refs.includes('TEST-OPEN-GOODS')));
  const openC8={...releaseView,getRecord:id=>id==='I.C8'?{state:'OPEN'}:releaseView.getRecord(id)};
  assert(draft.releaseScheduleChecks0550(openC8).find(d=>d.id==='C8').checks.some(check=>check.label.includes('Purchaser facilities')));
- assert(Buffer.from(draft.releaseScheduleArchive0550(releaseDocs)).includes('PJ2608-0550_Schedule-C8_DRAFT.docx'));
+ const draftArchive=Buffer.from(draft.releaseScheduleArchive0550(releaseDocs));
+ for(const id of ['A1','A2','C8'])assert(draftArchive.includes(`PJ2608-0550_Schedule-${id}_DRAFT.docx`));
  assert.deepEqual(partial.releaseRegister,frozen);
  const allMissing=require(root+'/project0550/data/scheduleRollup0550.js').scheduleRollup0550([{id:'OPEN',amount:null}]);assert.equal(allMissing.knownUSD,null,'No price is not zero');assert.equal(require(root+'/project0550/data/scheduleRollup0550.js').scheduleRollup0550([{id:'ZERO',amount:0}]).knownUSD,0,'Explicit zero is retained');
  // The existing 11.M grid now explains canonical links and reconciliation.
