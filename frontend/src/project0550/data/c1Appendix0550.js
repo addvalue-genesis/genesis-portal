@@ -147,7 +147,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of rows){
   const owned=r.priceOwners||[];
   if(owned.length){r.amount=money(owned.map(b=>b.amount));const check=displayPriceCheck0550(r.amount,r.quantity);r.unitPrice=check.matches?check.unitPrice:null;if(Number.isFinite(r.amount)&&!check.matches)problems.push('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+r.key);}
-  if(view.workingPreview&&/^MR-B1-18-APF-(19|20)$/.test(r.key)&&r.raw&&!r.raw.offerId&&!Number.isFinite(r.amount)){
+  if(!legacy&&view.workingPreview&&!r.excluded&&/^MR-B1-18-APF-(19|20)$/.test(r.key)&&r.raw&&!r.raw.offerId&&!Number.isFinite(r.amount)){
    r.note=[r.note,'Cable supplier quote pending',r.quantity>0?'':'Cable length to be confirmed'].filter(Boolean).join(' · ');
   }
   r.priceOwners=owned;

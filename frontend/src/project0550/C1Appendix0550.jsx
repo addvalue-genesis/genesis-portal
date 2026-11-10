@@ -12,9 +12,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
  const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
- const screenSubtotal=!view.workingPreview&&!documentMode&&projection.amount===null
-  ?sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite))
-  :null;
+ const screenSubtotal=projection.amount!==null?null:view.workingPreview?projection.pricedItemsSubtotal:
+  documentMode?null:sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite));
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
  const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
  const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
@@ -73,9 +72,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
      </React.Fragment>)}
      {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td><td className="number">{c1Display0550(g.amount)}</td><td/></tr>}
     </tbody>;})}
-    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount??screenSubtotal)}</td><td>{screenSubtotal!==null?'Priced items subtotal':''}</td></tr>
-     {projection.amount===null&&Number.isFinite(projection.pricedItemsSubtotal)&&<tr><td colSpan={5}>WORKING DRAFT — PRICED ITEMS SUBTOTAL</td><td className="number">{c1Display0550(projection.pricedItemsSubtotal)}</td><td>ยอดเฉพาะรายการที่มีราคา</td></tr>}
-    </tfoot>
+    <tfoot><tr><td colSpan={5}>{screenSubtotal===null?'TOTAL — BASE SCOPE OF SUPPLY':'BASE SCOPE OF SUPPLY'}</td><td className="number">{c1Display0550(projection.amount??screenSubtotal)}</td><td>{screenSubtotal!==null?'Priced items subtotal':''}</td></tr></tfoot>
    </table>
    {view.getRecord('I.C1').content&&<p>{view.getRecord('I.C1').content}</p>}
    <footer>Schedule C1 · {view.proposal.documentNo} / {view.proposal.revision}</footer>
