@@ -1,6 +1,6 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
-import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwReplacementActive0550} from "./data/mgwQuoteSelection0550";
+import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550,mgwReplacementActive0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
@@ -83,7 +83,8 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
   const currentMr=mgwCurrentMr0550(o);
   const selected=entry.working.filter(activeSupply0550),referenceSelected=entry.referenceWorking.filter(activeSupply0550);
   const allocated=entry.allocatedWorking.filter(u=>u.current&&activeSupply0550(u.line)),stale=entry.allocatedWorking.filter(u=>!u.current);
-  const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
+  const sourceQty=mgwRadioDtrsOffer0550(o)&&e.classification==='OPTION'?'TBD':e?.quotedQuantity??s?.quantity??r?.quantity;
+  const sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} data={data}/><small>{o.brand}</small>

@@ -75,3 +75,53 @@ for(const rate of [null,0,-1,NaN,Infinity])assert.throws(()=>FX.prepareFxBasis05
 const raw=clone(d);raw.fx=fx;validate(raw);const converted=derive(raw);assert(converted.lines.filter(l=>l.id.startsWith('LINE-LEGACY-TEL-PAGA')).every(l=>l.provisionalCustomerUSD>0));assert.equal(converted.provisional.baseUSD,null,'FX conversion does not approve scope');assert.deepEqual(raw.lines,d.lines);assert.deepEqual(raw.offers,d.offers);
 if(process.env.PJ0550_MGW_PRICED_FIXTURE)fs.writeFileSync(process.env.PJ0550_MGW_PRICED_FIXTURE,JSON.stringify(d,null,2));
 console.log('PASS MGW detail pricing / FX: 108 active quote rows in 18 disjoint groups; DMR and PAGA excluded from live MGW selection and price; legacy evidence retained; DTRS remains; 17 draft owners USD2,560,753 cost; corrected MGW radio selection and USD255500 other charges, old Jason deselected not deleted; CCTV/LAN detail basis, live canonical rates and stale-review dependency, duplicate prevention, preserved MR/vendor choices, unknown on-site remains null; direct/cross currency conversion and same schema; no engineering/release promotion.');
+
+// Current DTRS uses the original RADIO lots through the normal Vendor and
+// Working paths. Historic quote tests above deliberately use the old date.
+const radioDate='2026-11-11',radioSelection=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+const current=require(root+'/project0550/data/mgwCurrentWorking0550.js');
+const integration=require(root+'/project0550/data/integrationWorkspace0550.js');
+const radioBase={...d,fx:{thbPerUSD:31.5,thbPerEUR:36,source:'Synthetic test',date:radioDate}};
+const activate=input=>current.prepareMgwCurrentWorking0550(current.prepareMgwRadioDtrsRegister0550(input,tokens,radioDate),D.COMMERCIAL_POLICY,radioDate);
+const radio=activate(radioBase);validate(radio);
+const radioOffers=radio.offers.filter(radioSelection.mgwRadioDtrsOffer0550);
+assert.deepEqual(radioOffers.map(o=>[o.unitCost,o.quoteEvidence.quotedUnit,radioSelection.mgwCurrentMr0550(o)]),
+ [[113259,'Lot',['MR-B1-11-ACP-01']],[360036,'Lot',['MR-B1-11-APF-01']],[null,'Lot',[]],[3524,'Not stated',[]]]);
+assert.equal(radioOffers[2].quoteEvidence.classification,'OPTION');
+assert(!radioOffers[1].quoteEvidence.terms[0].includes('PMPN4296'));
+assert(Q.supplierOfferExcluded0550(radio,radioOffers[0],'TEL-PAGA'));
+assert(Q.mgwWorkingLineExcluded0550(radio,{vendorId:radioOffers[0].vendorId,offerId:radioOffers[0].id,systemToken:'TEL-PAGA',customerRowCode:'A1-05'}));
+assert(!radio.lines.find(l=>l.mgwDetailGroupId==='RADIO-DTRS').selected);
+const radioRequirements=integration.deriveIntegration0550(radio,D.SYSTEMS,radioDate);
+const radioModel={...W.deriveBidWorkspace(radio,tokens,radioDate,radioRequirements),integration:radioRequirements};
+const radioOwners=radioModel.lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
+assert.deepEqual(radioOwners.map(l=>[l.tagRef,l.costRate]),[['ACP',113259],['APF',360036]]);
+for(const line of radioOwners){
+ const req=radioRequirements.requirements.find(r=>r.id==='REQDEF-'+radioSelection.mgwCurrentMr0550(line.offer)[0]);
+ assert(req.workLineIds.includes(line.id)&&req.offerIds.includes(line.offerId)&&req.state==='OPEN');
+ assert(Number.isFinite(line.provisionalCustomerUSD)&&line.problems.some(p=>p.startsWith('Quote expired')));
+}
+const volumes=require(root+'/project0550/data/bidVolumes0550.js'),preview=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
+const savedView=volumes.deriveBidVolumes0550(radio,radioModel,D.SYSTEMS,radioDate);
+const plan=preview.scheduleAllocationPlan0550(radio,savedView).filter(p=>radioOwners.some(l=>l.id===p.line.id));
+const savedRadio=preview.saveScheduleAllocationDrafts0550(radio,plan,radioDate);validate(savedRadio);
+assert.equal(savedRadio.bidVolumes.bindings.filter(b=>b.schedule==='C1'&&b.status==='DRAFT').length,2);
+const appendix=require(root+'/project0550/data/c1Appendix0550.js');
+const savedRadioView=volumes.deriveBidVolumes0550(savedRadio,radioModel,D.SYSTEMS,radioDate);
+const draft=preview.deriveBidVolumeWorkingPreview0550(savedRadio,radioModel,D.SYSTEMS,radioDate,savedRadioView);
+const c1=appendix.deriveC1Appendix0550({...draft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550});
+const apf=c1.rows.find(r=>r.key==='OWNER:'+radioOwners[1].id);
+assert.equal(apf.site,'APF');
+assert(apf.components.some(c=>c.quantity===96&&c.description.includes('XIR-P8668ex')));
+assert(apf.components.every(c=>c.unitPrice===null&&c.amount===null));
+assert(c1.rows.find(r=>r.key==='MR-B1-11-APF-01').note.includes('Proposed supply reference'));
+assert(!c1.rows.find(r=>r.key==='MR-B1-11-ABV01-01').note.includes('Proposed supply reference'));
+assert.equal(c1.bindings.filter(b=>radioOwners.some(l=>l.id===b.lineId)).length,2);
+assert.equal(activate(radio),radio);
+const service=G.mgwServiceAllocation0550(),sum=require(root+'/project0550/data/money0550.js').sumMoney0550;
+assert.equal(service.totalUSD,255500);
+assert.equal(sum(service.rows.map(r=>r.totalUSD)),service.totalUSD);
+assert.deepEqual(service.priced.map((_,i)=>sum(service.rows.map(r=>r.shares[i]))),service.priced.map(r=>r.extended));
+assert(!service.rows.some(r=>['TEL-PAGA','TEL-DMR','TEL-TELT'].includes(r.systemToken)));
+assert.equal(service.open[0].extended,null);
+console.log('PASS current MGW DTRS: two source-bound Working owners, SI trace, saved 11.M C1 drafts, no option or unit-open Working price, preserved PAGA exclusion and exact E14 pools.');

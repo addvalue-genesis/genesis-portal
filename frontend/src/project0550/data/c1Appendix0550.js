@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {mgwCurrentOffer0550,mgwCurrentMr0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -79,9 +79,44 @@ export function c1NativeDetails0550(r){
  return {intro:intro.join(' '),components:components.map(c1Component0550),notes};
 }
 
+const componentName=text=>(text||'').trim().replace(/\s+/g,' ').toLowerCase();
+const componentUnit=unit=>/^(ea\.?|pcs?\.?)$/i.test(unit)?'ea':componentName(unit).replace(/\.$/,'').replace(/^sets$/,'set');
+function c1ComponentPrices(row,detailsByOwner,currency){
+ const owners=row.priceOwners||[],name=text=>componentName((text||'').replace(/^Component: /i,'').replace(row.site+' · ',''));
+ const matches=(component,description,quantity,unit)=>component.quantity>0&&component.quantity===quantity&&
+  componentUnit(component.unit)===componentUnit(unit)&&name(component.description)===name(description);
+ const detailRows=owners.flatMap(owner=>detailsByOwner.get(owner.lineId)||[]);
+ return row.components.map(component=>{
+  const unpriced={...component,unitPrice:null,amount:null};
+  if(row.components.filter(other=>matches(component,other.description,other.quantity,other.unit)).length!==1)return unpriced;
+  const linked=detailRows.filter(detail=>matches(component,detail.line.description,detail.quantity,detail.unit));
+  const direct=owners.filter(owner=>matches(component,owner.line.description,owner.quantity,owner.unit));
+  // Exact Working scope, quantity and unit only. An ambiguous match or a
+  // supplier Lot without a breakdown supplies no component selling rate.
+  if(linked.length+direct.length>1)return unpriced;
+  const detail=linked[0],basis=detail||direct[0];
+  if(!basis)return unpriced;
+  const thbDetail=detail&&currency==='THB';
+  const amount=thbDetail?detail.amountTHB:basis.amount,unitPrice=thbDetail?detail.unitPriceTHB:basis.unitPrice;
+  const hasAmount=Number.isFinite(amount),hasRate=Number.isFinite(unitPrice);
+  if(hasAmount&&hasRate){
+   const check=displayPriceCheck0550(amount,component.quantity);
+   if(!check.matches||check.unitPrice!==unitPrice)return unpriced;
+  }
+  return {...unpriced,amount:hasAmount?amount:null,unitPrice:hasRate?unitPrice:null};
+ });
+}
+
 export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
- const usdBindings=view.scheduleRows('C1').filter(b=>b.line&&!b.nonAdditive);
+ const scheduleRows=view.scheduleRows('C1');
+ const usdBindings=scheduleRows.filter(b=>b.line&&!b.nonAdditive);
+ const detailsByOwner=new Map();
+ if(!legacy)for(const detail of new Set([...scheduleRows,...(view.nativeC1||[])])){
+  if(!detail.nonAdditive||!detail.line)continue;
+  if(!detailsByOwner.has(detail.lineId))detailsByOwner.set(detail.lineId,[]);
+  detailsByOwner.get(detail.lineId).push(detail);
+ }
  // THB uses the same Working selling-price basis and ownership as USD.
  const bindings=currency==='THB'?usdBindings.map(scheduleBindingTHB0550):usdBindings;
  const problems=[],byOwner=new Map(),conflictingOwners=new Set();
@@ -131,16 +166,20 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
    (!legacy?{ 'TEL-DMR':'1.5','TEL-TELT':'1.1','TEL-PAGA':'1.4' }[token]:undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
+  const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
   const itemDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
+  const terms=(supplement||radio)?b.line.offer.quoteEvidence.terms:[];
+  const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
+   terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
    description:itemDescription,quantity:b.quantity,unit:b.unit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
-   components:supplement?b.line.offer.quoteEvidence.terms.filter(t=>t.startsWith('BOM: ')).map(t=>c1Component0550(t.slice(5).replace(/^(\d+) x /,'$1 Ea. '))):[],
+   components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
   extra.push(item);charged.add(b.lineId);
-  if(supplement)for(const mrId of mgwCurrentMr0550(b.line.offer)){
+  if(supplement||radio)for(const mrId of mgwCurrentMr0550(b.line.offer)){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
    candidatePackages.get(mrId).push(item.key);
   }
@@ -165,7 +204,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
  // Equal MR names are not equal purchases: keep the original positions and
  // reveal native installation clauses (e.g. the two C-Band dishes).
  for(const rs of repeated)for(const r of rs)r.note=unique([r.note,...r.notes.filter(n=>/\binstall(?:ed|ation)?\b/i.test(n))].filter(Boolean)).join('; ');
- const all=[...rows,...extra];if(!legacy)all.sort((a,b)=>(mrOrder.get(a.key)??Number.MAX_SAFE_INTEGER)-(mrOrder.get(b.key)??Number.MAX_SAFE_INTEGER));
+ const all=[...rows,...extra];
+ if(!legacy){
+  for(const row of all)row.components=c1ComponentPrices(row,detailsByOwner,currency);
+  all.sort((a,b)=>(mrOrder.get(a.key)??Number.MAX_SAFE_INTEGER)-(mrOrder.get(b.key)??Number.MAX_SAFE_INTEGER));
+ }
  const groups=C1_APPENDICES_0550.map(s=>({id:s.id,title:legacy?s.title:'Scope of Supply for '+mrScopeNames[s.id],rows:all.filter(r=>r.appendix===s.id)}));
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];

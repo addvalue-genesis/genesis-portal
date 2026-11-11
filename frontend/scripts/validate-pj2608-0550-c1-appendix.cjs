@@ -16,6 +16,18 @@ const view=make(data,[binding(lan)]),before=JSON.stringify(data),p=C.deriveC1App
 assert.equal(p.groups.length,8);assert.equal(p.rows.filter(r=>r.kind==='MR').length,179);assert.equal(p.problems.length,0,p.problems.join('\n'));assert.equal(p.amount,1234.56);
 const row=p.rows.find(r=>r.key==='MR-B1-13-APF-09');assert.equal(row.amount,1234.56);assert.equal(row.components.length,8);assert(row.ownerIds.includes(id));assert.equal(row.components.find(c=>c.description.includes('Core Switch')).quantity,2);
 assert(row.notes.some(n=>n.includes('Instrument & Telecom Room')));assert(row.intro.includes('comprised of'));
+const core=row.components.find(c=>c.description.includes('Core Switch'));
+const pricedComponent={lineId:id,line:{description:'Component: '+core.description},quantity:core.quantity,unit:core.unit,
+ nonAdditive:true,unitPrice:25,amount:50,unitPriceTHB:787.5,amountTHB:1575};
+const withComponent={...view,nativeC1:[pricedComponent]};
+const detail=C.deriveC1Appendix0550(withComponent);
+const displayedCore=projection=>projection.rows.find(r=>r.key===row.key).components.find(c=>c.description===core.description);
+assert.deepEqual([displayedCore(detail).unitPrice,displayedCore(detail).amount],[25,50]);
+assert.deepEqual([displayedCore(C.deriveC1Appendix0550(withComponent,'THB')).unitPrice,displayedCore(C.deriveC1Appendix0550(withComponent,'THB')).amount],[787.5,1575]);
+assert.equal(detail.amount,p.amount);
+assert.equal(detail.bindings.length,p.bindings.length);
+assert.equal(displayedCore(C.deriveC1Appendix0550({...withComponent,nativeC1:[pricedComponent,{...pricedComponent}]})).unitPrice,null);
+assert.equal(displayedCore(C.deriveC1Appendix0550({...withComponent,c1LayoutVersion:C.C1_APPENDIX_LAYOUT_LEGACY_0550})).unitPrice,undefined);
 const radio=p.rows.find(r=>r.key==='MR-B1-11-APF-01');assert(radio.components.some(c=>c.description.includes('ABV01, ACP and MOGE')&&c.quantity===98));
 const details=require(root+'/project0550/data/c1MrDetails0550.json');assert.equal(Object.keys(details.rows).length,179);assert(p.rows.filter(r=>r.kind==='MR').every(r=>details.rows[r.key]));
 for(const group of p.groups){const native=p.rows.filter(r=>r.kind==='MR'&&r.appendix===group.id);assert.deepEqual(native.map(r=>r.sn),native.map((_,i)=>group.id+'.'+(i+1)));assert.deepEqual(native.map(r=>r.key),Object.keys(details.rows).filter(id=>id.startsWith('MR-B1-'+group.id.replace('.','')+'-')));}

@@ -1,5 +1,5 @@
 import {pagaRevisionItems0550,pagaRevisionSelected0550,pagaIncludedScope0550,PAGA_REVISION_OPEN_0550} from './supplierRevision0550';
-import {MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550,MGW_CURRENT_SCOPE_0550,MGW_MET_NDB_0550,mgwBulkOffer0550,mgwCurrentOffer0550,mgwCurrentIncluded0550,MGW_SECTION_SUBTOTAL_0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
+import {MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550,MGW_CURRENT_SCOPE_0550,MGW_MET_NDB_0550,mgwBulkOffer0550,mgwRadioDtrsOffer0550,mgwCurrentOffer0550,mgwCurrentIncluded0550,MGW_SECTION_SUBTOTAL_0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 // Read-only live SI dossier. Source facts remain separate from authored interpretation.
 import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord0550,emptyTechnicalProposal0550} from './technicalProposal0550';
 import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
@@ -19,7 +19,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const tables=[];
  const currentMgw=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(systemToken));
  if(currentMgw.length&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
-  const supplement=currentMgw.find(o=>mgwSupplementOffer0550(o)||mgwBulkOffer0550(o));
+  const supplement=currentMgw.find(o=>mgwSupplementOffer0550(o)||mgwBulkOffer0550(o)||mgwRadioDtrsOffer0550(o));
   tables.push({title:supplement?supplement.quoteRef+' · supplier proposal':'MGW LAN/PBX/FO · supplier proposal and drawing',heads:['Technical basis','Open verification'],
    rows:[supplement?[supplement.quoteEvidence.fileName+' / '+supplement.quoteEvidence.sourceUrl,
     mgwSupplementOpen0550(supplement,systemToken)+' Delivery basis and terms remain open.'+
@@ -29,7 +29,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  if(currentMgw.length&&sectionId==='equipment'){
   tables.push({title:'MGW quoted BOM · supplier quantities and equipment data',heads:['Offer / PDF locator','Equipment / model detail','Quoted quantity / treatment'],
    rows:currentMgw.map(o=>[o.id+' / '+o.quoteEvidence.locator,o.brand+' / '+o.description+'\n'+o.quoteEvidence.terms.filter(t=>!t.startsWith('Supplier technical drawing:')&&!t.startsWith(MGW_SECTION_SUBTOTAL_0550)&&!t.startsWith('Quoted grand total USD:')).join('\n'),
-    (o.quoteEvidence.quotedQuantity===null?'Quantity OPEN':o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit)+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
+    (o.quoteEvidence.quotedQuantity===null||mgwRadioDtrsOffer0550(o)&&o.quoteEvidence.classification==='OPTION'?'Quantity OPEN':o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit)+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){

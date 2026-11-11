@@ -1,6 +1,6 @@
 {
   "schema": "pj2608-0550-handoff/2.0",
-  "updatedDate": "2026-11-10",
+  "updatedDate": "2026-11-11",
   "repo": "addvalue-genesis/genesis-portal",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "pr": 53,
@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261110_EXHIBIT_C_OPEN_RECONCILIATION.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261111_MGW_DTRS_AND_C1_COMPONENT_RATES.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261111_MGW_DTRS_AND_C1_COMPONENT_RATES.md",
     "docs/handoff/pj2608-0550/20261110_EXHIBIT_C_OPEN_RECONCILIATION.md",
     "docs/handoff/pj2608-0550/20261110_APF_LAN_WORKING_BASIS.md",
     "docs/handoff/pj2608-0550/20261109_PAGA_REVISION_BID_CHAIN.md",

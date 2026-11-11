@@ -65,7 +65,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
         <tr data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>
         {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
-        {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">—</td><td className="number">—</td><td>{c.note}</td></tr>)}
+        {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}
         {expanded(r.key,true)&&(r.notes||[]).map((note,i)=><tr className="c1-detail-note" key={'note'+i}><td/><td colSpan={6}>{note}</td></tr>)}
        </React.Fragment>)}
       </React.Fragment>)}

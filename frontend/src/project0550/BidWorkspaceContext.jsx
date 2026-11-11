@@ -1,4 +1,4 @@
-import {prepareMgwCurrentWorking0550} from "./data/mgwCurrentWorking0550";
+import {prepareMgwCurrentWorking0550,prepareMgwRadioDtrsRegister0550} from "./data/mgwCurrentWorking0550";
 import {mgwOfferSourcePending0550} from "./data/mgwQuoteSelection0550";
 import {applyDirectSupplierMarkup0550,prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
 import {prepareBidProcess0550} from "./data/bidProcess0550";
@@ -56,7 +56,9 @@ export function BidWorkspaceProvider({children}){
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
    const vendorDraft=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
-   const priced=prepareMgwCurrentWorking0550(prepareMgwDetailPricing0550(vendorDraft,COMMERCIAL_POLICY,reviewDate),COMMERCIAL_POLICY,reviewDate);
+   const detail=prepareMgwDetailPricing0550(vendorDraft,COMMERCIAL_POLICY,reviewDate);
+   const radio=prepareMgwRadioDtrsRegister0550(detail,systemTokens0550,reviewDate);
+   const priced=prepareMgwCurrentWorking0550(radio,COMMERCIAL_POLICY,reviewDate);
    const avlPrepared=prepareSystemAvlDeviations0550(priced,deriveIntegration0550(priced,SYSTEMS,reviewDate));
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);

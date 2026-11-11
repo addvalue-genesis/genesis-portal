@@ -1,4 +1,4 @@
-import {mgwBulkMr0550,mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
+import {mgwBulkMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
 import {ceragonSupersededOffer0550} from "./ceragonSelection0550";
 import catalog from "./mgwQuote0550.json";
 import procurement from "./procurementScope0550.json";
@@ -56,6 +56,8 @@ const descriptionCounts=new Map();catalog.rows.forEach(r=>descriptionCounts.set(
 export const mgwQuoteItem0550=offer=>rows.get(offer?.mgwQuoteLineId)||rows.get(offer?.id?.replace(/^OFFER-/,""));
 export const mgwOffersFor0550=(data,systemToken,wbs="A")=>data.offers.filter(o=>{const r=mgwQuoteItem0550(o);return r&&!supplierOfferExcluded0550(data,o,systemToken)&&r.wbs[0]===wbs[0]&&(wbs==="A"?mgwOfferSystemTokens0550(o).includes(systemToken):r.wbs===wbs);});
 export function mgwOfferProblems0550(offer,line){
+ if(mgwRadioDtrsOffer0550(offer)&&offer.quoteEvidence.quotedUnit==='Not stated'&&!offer.unitBasis?.trim())
+  return ["MGW_UNIT_OPEN: ยืนยันหน่วยพร้อมแหล่งอ้างอิงใน Vendor Offer"];
  const r=mgwQuoteItem0550(offer);if(!r)return [];
  const problems=[];
  if(r.unit===null&&!offer.unitBasis?.trim())problems.push("MGW_UNIT_OPEN: ยืนยันหน่วยพร้อมแหล่งอ้างอิงใน Vendor Offer");

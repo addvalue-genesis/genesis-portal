@@ -1,6 +1,8 @@
 import {MGW_QUOTE_0550 as quote,mgwQuoteItem0550,mgwGroupExcluded0550,mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550,MGW_SCOPE_EXCLUDED_0550,PROCUREMENT_SCOPE_0550,reconcileMgwWorkingScope0550} from "./mgwVendorBasis0550";
 import {policyDefaults0550} from "../bidWorkingBasis0550";
-import {sumMoney0550} from "./money0550";
+import {roundMoney0550,sumMoney0550} from "./money0550";
+import {evaluateServiceEquation} from "../serviceEquationRuntime";
+import {TSI_DESIGN_WORKLOAD_0550} from "./tsiActivityBudget0550";
 
 // 29-Oct-2026 user decision: price the detailed MGW scope despite cover errors.
 // This prices quoted scope; it does not certify MR quantities or adequacy.
@@ -23,6 +25,31 @@ const groups=[
  ...section("SERVICES").map(r=>{const field=r.id.endsWith("006"),freight=r.id.endsWith("004");return make(r.id.replace("MGW-Q26-063-",""),r.description,"COMMON",field?"B4":freight?"B2":"B1",[r],!field,field?"B4":freight?"B2":"B1");}),
  make("PAGA-STUDY","BOSCH PAGA coverage study alternative","TEL-PAGA","B1",section("PAGA").filter(r=>r.wbs!=="A"),false,"B1")
 ];
+// Internal estimate only. Each cover charge stays a single quoted pool.
+export function mgwServiceAllocation0550(){
+ const excluded=new Set(PROCUREMENT_SCOPE_0550.directProcurement.flatMap(scope=>scope.mgwExcludedSystemTokens));
+ const quotedSystems=new Set(quote.rows.filter(r=>r.wbs==='A'&&Number.isFinite(r.extended)).flatMap(r=>r.systemTokens));
+ const drivers=TSI_DESIGN_WORKLOAD_0550.filter(([system])=>quotedSystems.has(system)&&!excluded.has(system));
+ const totalDrivers=drivers.reduce((sum,[,driver])=>sum+driver,0);
+ const services=section('SERVICES'),priced=services.filter(r=>Number.isFinite(r.extended));
+ const totalUSD=sumMoney0550(priced.map(r=>r.extended));
+ const allocated=priced.map(r=>0);
+ let cumulativeDriver=0;
+ const rows=drivers.map(([systemToken,driver])=>{
+  cumulativeDriver+=driver;
+  // Difference of rounded cumulative shares preserves each quoted pool to the cent.
+  const shares=priced.map((row,i)=>{
+   const pool=row.extended;
+   const cumulativeUSD=roundMoney0550(evaluateServiceEquation('E14',{pool,driver:cumulativeDriver,totalDrivers}).value);
+   const amount=roundMoney0550(cumulativeUSD-allocated[i]);
+   allocated[i]=cumulativeUSD;
+   return amount;
+  });
+  return {systemToken,driver,shares,totalUSD:sumMoney0550(shares)};
+ });
+ return {rows,priced,totalDrivers,totalUSD,open:services.filter(r=>!Number.isFinite(r.extended))};
+}
+
 export const MGW_DETAIL_GROUPS_0550=groups.filter(g=>!mgwGroupExcluded0550(g.id));
 // Legacy group identities remain readable for saved workspaces and frozen issues.
 export const mgwDetailGroup0550=id=>groups.find(g=>g.id===id);
