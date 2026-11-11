@@ -8,6 +8,8 @@ import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550'
 import {c2DraftRowsFromExisting0550,c2HasSystem0550,c2ProjectLotOverlaps0550,spareSystemGroups0550,spareEquationDraftRows0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {LanCusSpareCoverage0550} from './LanCusBasis0550';
+import {useBidWorkspace} from './BidWorkspaceContext';
+import {c5EquationDraftRows0550,c5SelectedSystems0550,c5UnmappedSystems0550,C5_TOOLS_DRAFT_NOTE_0550} from './data/c5ToolsScope0550';
 
 const a1DirectRows=[
  [3,'S/N 2 · Inspection and tests'],
@@ -59,9 +61,12 @@ export function LazyNativeExhibitC0550(props){
  return <details open={open} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>{props.label}</summary>{open&&<NativeExhibitC0550 {...props}/>}</details>;
 }
 
+// BID-FLOW: CUS ↔ VND → SI A/B/C → Release → Volume I (A1 A2 C1–C8 D E F M) / II / III
+// C2–C4 drafts come from SI spare equations; the C5 draft comes from TOOLS-SCOPE. Neither enters A1/A2 until bound in 11.M.
 export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,c2Scope,onPrepareSpare,disabled=false}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
+ const ws=useBidWorkspace();
  const references=useMemo(()=>{
   if(!['C2','C3','C4'].includes(id)||!view.workingPreview||!c2Scope)return undefined;
   const equations=spareEquationDraftRows0550(c2Scope.data,c2Scope.model,id);
@@ -74,6 +79,9 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const unresolved=useMemo(()=>id==='C2'&&groups.length?view.scheduleRows('C2').filter(row=>!c2HasSystem0550(row)):[],[view,groups,id]);
  const formView=useMemo(()=>groups.length?{...view,c2SystemToken:selected?.token,
   scheduleRows:schedule=>schedule===id?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)}:view,[view,groups,selected,id]);
+ const hasPricedTools=id==='C5'&&view.scheduleRows('C5').some(row=>row.quantity>0&&Number.isFinite(row.amount));
+ const toolDrafts=useMemo(()=>id!=='C5'||!view.workingPreview||hasPricedTools||!ws?.data||!ws?.model?[]:c5EquationDraftRows0550(ws.data,ws.model),[id,view.workingPreview,hasPricedTools,ws?.data,ws?.model]);
+ const toolSystems=useMemo(()=>toolDrafts.length?c5SelectedSystems0550(ws.data,ws.model):[],[toolDrafts,ws?.data,ws?.model]);
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
  const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency,references),[screenView,id,currency,references]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
@@ -92,6 +100,13 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {id==='C2'&&view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference · {SPARE_DRAFT_NOTE_0550} · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}
+  {toolDrafts.length>0&&<details className="p55-panel" open><summary>SI · Special Tools ตามระบบใน Working (Draft · {toolDrafts.length} ประเภท)</summary>
+   <p>{C5_TOOLS_DRAFT_NOTE_0550}</p>
+   <p>ระบบที่เลือกใน Working A: {toolSystems.join(', ')||'OPEN'}{c5UnmappedSystems0550(toolSystems).length>0&&' · ยังไม่มีรายการเครื่องมือสำหรับ: '+c5UnmappedSystems0550(toolSystems).join(', ')}</p>
+   <div className="p55-table-wrap"><table className="p55-table" aria-label="C5 special tool type drafts"><thead><tr><th>Tool type</th><th>ระบบ</th><th>จำนวน / ยี่ห้อ / ราคา</th><th>หมายเหตุ</th></tr></thead><tbody>
+    {toolDrafts.map(t=><tr key={t.id}><td>{t.description}</td><td>{t.systems.join(', ')}</td><td>OPEN</td><td><small>{t.source}</small></td></tr>)}
+   </tbody></table></div>
+  </details>}
   {groups.filter(g=>!selected||selected.token===g.token).flatMap(g=>g.draftRows).some(r=>r.equationDraft)&&<details className="p55-panel" open><summary>SI · Q_add / ต้นทุน / ราคาขาย Draft</summary>
    <p>{SPARE_DRAFT_NOTE_0550}</p>
    <div className="p55-table-wrap"><table className="p55-table" aria-label={id+' SI equation drafts'}><thead><tr><th>Working / Offer</th><th>Q_required / Q_add</th><th>ต้นทุนต่อหน่วย / รวม</th><th>ราคาขาย Draft USD</th><th>ทำงานต่อ</th></tr></thead><tbody>
