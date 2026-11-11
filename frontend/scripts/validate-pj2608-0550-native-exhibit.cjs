@@ -331,6 +331,59 @@ assert.match(updatedNative.I.find(s=>s.name==='Schedule B').rows[3][1],/Copy of 
 assert.deepEqual(P.freezeBidPackageOutput0550(withCurrent,reviewedModel,'NATIVE-TEST',today,{nativeExhibitVersion:native.nativeExhibitVersion}),native);
 const unread=reviewBindings({...withCurrent,sourceIntake:{...withCurrent.sourceIntake,sources:withCurrent.sourceIntake.sources.map(s=>s===currentCommercial?{...s,readState:'METADATA_ONLY'}:s)}});
 assert.throws(()=>P.freezeBidPackageOutput0550(unread,reviewedModel,'NATIVE-TEST',today),/Native Exhibit C has unresolved response slots/);
+// Customer export uses reviewed allocation and validates the rendered Word and
+// HTML independently of the existing Draft and frozen output.
+const C=require(root+'/project0550/customerExhibit0550.js');
+let customerFixture=withCurrent;
+for(const {id} of V.SCHEDULES_0550){
+ const record=customerFixture.bidVolumes.records.find(r=>r.id==='I.'+id);
+ const optional=!currentView.scheduleRows(id).length&&(/^C[2-8]$/.test(id)||id==='A2');
+ customerFixture=V.saveBidVolumeRecord0550(customerFixture,'records',{
+  ...record,disposition:optional?'NOT_APPLICABLE':record.disposition,
+  reason:optional?'No additional scope in this synthetic tender':record.reason,
+  nativeFields:id==='A'?{agreementNo:'QA-AGREEMENT-123'}:record.nativeFields,
+ },today,true);
+}
+const customerView=V.deriveBidVolumes0550(customerFixture,reviewedModel,D.SYSTEMS,today);
+const customerBefore=JSON.stringify(customerFixture);
+assert.deepEqual(customerView.priceProblems,[]);
+const gate=C.customerReadiness0550(customerView);
+assert(gate.ready,JSON.stringify(gate.items.filter(item=>item.problems.length)));
+const customerHtml=C.customerHtml0550(customerView),customerDocx=C.buildCustomerDocx0550(customerView);
+assert(customerDocx instanceof Uint8Array);
+assert.equal((customerHtml.match(/data-native-schedule=/g)||[]).length,13);
+assert.match(customerHtml,/Initial Contract Price shall be the United States Dollar[^<]*[0-9]+[.][0-9]{2}/);
+assert.match(customerHtml,/Updated MDDR/);
+assert.match(customerHtml,/QA-AGREEMENT-123/);
+assert.doesNotMatch(customerHtml,/\bOPEN\b|NOT FOR SUBMISSION|Source page|Working B5/);
+assert.doesNotMatch(Buffer.from(customerDocx).toString(),/\bOPEN\b|NOT FOR SUBMISSION|Niger to Benin|customXml\/item1.xml/);
+fs.writeFileSync(path.join(dir,'customer.html'),customerHtml);
+fs.writeFileSync(path.join(dir,'customer.docx'),customerDocx);
+const amendedRecord=(id,amend)=>({...customerView,getRecord:key=>key===id?{...customerView.getRecord(key),...amend}:customerView.getRecord(key)});
+for(const blocked of [
+ {...customerView,workingPreview:true},
+ {...customerView,priceProblems:['SCHEDULE_BINDING_REVIEW_OPEN']},
+ {...customerView,optionsAssigned:null,active:[...customerView.active,{wbs:'C3'}]},
+ amendedRecord('I.A',{nativeFields:{}}),
+ amendedRecord('I.C2',{disposition:'REQUIRED'}),
+ amendedRecord('I.C1',{content:'Internal reference 11.M'}),
+ amendedRecord('I.C1',{content:'Client remark: OPEN'}),
+ amendedRecord('I.C1',{content:'รายการเสนอราคา'}),
+]){
+ assert.equal(C.customerReadiness0550(blocked).ready,false);
+ assert.throws(()=>C.customerHtml0550(blocked),/OPEN/);
+ assert.throws(()=>C.buildCustomerDocx0550(blocked),/OPEN/);
+}
+assert.throws(()=>C.customerHtml0550(customerView,true),/บันทึก/);
+assert.throws(()=>C.buildCustomerDocx0550(customerView,true),/บันทึก/);
+const {CustomerVersion0550}=require(root+'/project0550/CustomerVersion0550.jsx');
+const renderCustomer=(view,disabled=false)=>renderToStaticMarkup(React.createElement(CustomerVersion0550,{view,disabled}));
+assert.match(renderCustomer(customerView),/<button type="button">Export Word<\/button>/);
+assert.match(renderCustomer(customerView,true),/<button type="button" disabled="">Export Word<\/button>/);
+assert.match(renderCustomer(amendedRecord('I.A',{nativeFields:{}})),/<button type="button" disabled="">Print \/ Save as PDF<\/button>/);
+assert.equal(JSON.stringify(customerFixture),customerBefore);
+console.log('PASS Customer Exhibit C: reviewed A–C8, reconciled Schedule A, Word/HTML output and OPEN, internal text, review and unsaved changes gates.');
+
 assert.equal(JSON.stringify(fixture),before);console.log('PASS native Exhibit C: all 13 source forms, merged headers/notes, canonical numbers and unchanged inputs, CIF/FOB placement, overflow without dropped rows, per-equipment spares forms, escaped Word/HTML, legacy schema/reviews/history restore, new exact frozen native Word. Synthetic exports: '+dir);
 
 if(!process.env.PJ0550_VOLUME_FIXTURE)fs.rmSync(fixtureFile,{force:true});

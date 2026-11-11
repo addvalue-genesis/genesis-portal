@@ -11,6 +11,8 @@ import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DR
 import {paymentSchedule0550} from './data/bidVolumes0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
+export const NATIVE_SCHEDULE_IDS_0550=Object.keys(template.schedules);
+const customerProjectTitle='Supply of Telecommunication and Security Systems for Onshore Processing Facilities and Associated Onshore Pipelines for Aung Sinkha Development Project';
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
 const escape=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const number=v=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
@@ -74,6 +76,21 @@ function fill(id,values,format,currency,draftPriceRows=[]){
   return escape(v).replace(/\n/g,format==='xml'?'</w:t><w:br/><w:t xml:space="preserve">':'<br>');
  });
 }
+function nativeSpareSystems(view,id,references){
+ const rows=view.scheduleRows(id);
+ if(view.customerVersion&&rows.length){
+  // Group reviewed rows by system first. Equipment tags can recur in other
+  // systems. Include COMMON rows once when they have a reviewed allocation.
+  const groups=new Map();
+  for(const row of rows){
+   const token=row.line.systemToken||'COMMON';
+   if(!groups.has(token))groups.set(token,{rows:[]});
+   groups.get(token).rows.push(row);
+  }
+  return [...groups.values()];
+ }
+ return !view.customerVersion&&(view.c2Systems||references)?spareSystemGroups0550(view,id,references):[{rows}];
+}
 function nativePages(view,id,currency='USD',c2References){
  const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
@@ -133,6 +150,12 @@ function nativePages(view,id,currency='USD',c2References){
    if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
    if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
   }
+  if(view.customerVersion){
+   // Fixed rows with no reconciled allocation do not carry bidder instructions.
+   for(const [row,column] of (base?[[8,5],[8,6],[8,7],[9,5],[9,6],[11,7]]:[[6,1],[7,1]])){
+    if(!groups.has(row))set(v,row,column,'Not applicable');
+   }
+  }
   if(base&&view.workingPreview){
    if(!groups.has(4)){
     set(v,4,6,'OPEN');
@@ -162,7 +185,8 @@ function nativePages(view,id,currency='USD',c2References){
   if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: '+currency+' '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned,currency)+(partial?'\nKnown subtotal: '+currency+' '+number(shownSum(view,eligible))+' / '+partial:''));}
   else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
    const bs=eligible.filter(b=>term(b)===t),total=sum(bs);
-   const pending=eligible.some(b=>!term(b))||view.workingPreview&&!Number.isFinite(view.optionsAssigned);
+   const pending=eligible.some(b=>!term(b))||(view.workingPreview||view.customerVersion)&&!Number.isFinite(view.optionsAssigned);
+   if(view.customerVersion&&!pending&&!bs.length){set(v,r,2,'Not applicable');continue;}
    set(v,r,2,'In figures: '+(pending?'OPEN':bs.length?currency+' '+number(total):'OPEN')+'\nIn Words: '+(view.workingPreview&&pending?'OPEN':words(total,currency)));
   }
   add(v,'',draftPriceRows.length?{draftPriceRows}:undefined);return {pages,issues};
@@ -178,7 +202,8 @@ function nativePages(view,id,currency='USD',c2References){
  if(['C2','C3','C4'].includes(id)){
   // Draft from SI equation — not allocated to Schedule. Does not enter Volume I
   // totals until bound in 11.M. These rows are never appended to view.bindings.
-  const systems=view.c2Systems||c2References?spareSystemGroups0550(view,id,c2References):[{rows}];
+  const systems=nativeSpareSystems(view,id,c2References);
+  const notApplicable=view.customerVersion&&!rows.length&&view.getRecord('I.'+id).disposition==='NOT_APPLICABLE'&&view.getRecord('I.'+id).state==='REVIEWED';
   for(const system of systems){
    if(system.draftRows?.length){
     chunks(system.draftRows,7).forEach((references,pi)=>{
@@ -204,9 +229,9 @@ function nativePages(view,id,currency='USD',c2References){
     continue;
    }
    let firstPage=true;
-   const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
+   const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set(notApplicable?'Not applicable':'OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
-    const v=blankValues(id),draftPriceRows=[];set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
+    const v=blankValues(id),draftPriceRows=[];set(v,0,0,notApplicable?'':value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,notApplicable?'':shared(bs,'vendorEquipmentNo'));set(v,1,1,notApplicable?'':shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
      const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description;
      [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
@@ -235,13 +260,13 @@ function nativePages(view,id,currency='USD',c2References){
      set(v,start+i,2,name);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');
      set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));
     });
-    set(v,subtotal,1,number(shownSum(view,group)));
+    set(v,subtotal,1,view.customerVersion&&!group.length?(bs.length?'—':'Not applicable'):number(shownSum(view,group)));
    }
-   set(v,11,1,unknown.length&&!view.workingPreview?'OPEN':number(shownSum(view,pageRows)));
+   set(v,11,1,unknown.length&&!view.workingPreview?'OPEN':view.customerVersion&&!pageRows.length?'Not applicable':number(shownSum(view,pageRows)));
    const siteDays=field(view,id,'sitePeriodDays'),trainingDays=field(view,id,'trainingPeriodDays');
-   set(v,1,6,view.workingPreview&&!siteDays.trim()?'Site service period to confirm':value(siteDays)+' days');
-   set(v,6,6,view.workingPreview&&!trainingDays.trim()?'Training period to confirm':value(trainingDays)+' days');
-   add(v,p?'Continuation '+(p+1):'',view.workingPreview?{pageNumber:p+1,pageCount:count}:undefined);
+   set(v,1,6,view.customerVersion&&!site.length?'Not applicable':view.workingPreview&&!siteDays.trim()?'Site service period to confirm':value(siteDays)+' days');
+   set(v,6,6,view.customerVersion&&!training.length?'Not applicable':view.workingPreview&&!trainingDays.trim()?'Training period to confirm':value(trainingDays)+' days');
+   add(v,p?'Continuation '+(p+1):'',view.workingPreview||view.customerVersion?{pageNumber:p+1,pageCount:count}:undefined);
   }
  }
  if(id==='C8'){
@@ -250,17 +275,17 @@ function nativePages(view,id,currency='USD',c2References){
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
   for(const [key,r] of Object.entries(rowMap)){
    const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;
-   const assigned=view.workingPreview?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
+   const assigned=view.workingPreview||view.customerVersion?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
    const qty=assigned.length&&assigned.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?assigned.reduce((n,b)=>n+b.quantity,0):null;
    set(v,r,3,key==='AIRPORT'||!assigned.length?'':value(qty));
    set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
    set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
-   set(v,r,6,bs.map(b=>b.line.description+' / '+(b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
+   set(v,r,6,bs.map(b=>b.line.description+' / '+(b.treatment==='CALLOFF'&&(view.workingPreview||view.customerVersion)?'Call-off rate only':b.treatment)).join('; '));
    if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
   }
-  const assigned=view.workingPreview?rows.filter(b=>b.treatment!=='CALLOFF'):rows;
-  const ratesOnly=view.workingPreview&&rows.length&&!assigned.length;
-  set(v,6,1,ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,assigned)));
+  const assigned=view.workingPreview||view.customerVersion?rows.filter(b=>b.treatment!=='CALLOFF'):rows;
+  const ratesOnly=(view.workingPreview||view.customerVersion)&&rows.length&&!assigned.length;
+  set(v,6,1,ratesOnly?'Call-off rates only':view.customerVersion&&!rows.length?'Not applicable':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,assigned)));
   add(v);
  }
  return {pages,issues};
@@ -281,8 +306,8 @@ function paymentTable(rows,format){
 }
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
- if(view.workingPreview&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
- if(view.workingPreview&&page.id==='C7'&&page.pageCount>1){
+ if((view.workingPreview||view.customerVersion)&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
+ if((view.workingPreview||view.customerVersion)&&page.id==='C7'&&page.pageCount>1){
   result=result.replace('TOTAL (Sub-total 1.0+2.0)',`Page ${page.pageNumber} of ${page.pageCount} subtotal`);
  }
  const payment=page.id==='B'&&paymentSchedule0550(view);
@@ -302,16 +327,21 @@ function renderPage(view,page,format,currency='USD'){
    const text=words(amount,currency).replace(/ only$/,'');
    return currency==='THB'?text:text.replace(/^United States Dollars /,'');
   };
-  if(view.workingPreview&&format==='xml'){
+  if((view.workingPreview||view.customerVersion)&&format==='xml'){
    // Word splits two of the native blanks across adjacent runs.
    result=result.replace(/_{5,}(?:<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t\b[^>]*>_{5,})+/g,'_____');
   }
-  const wording=view.workingPreview?draftWords:amount=>words(amount,currency);
-  const vals=['OPEN','OPEN',number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
+  const formatted=view.workingPreview||view.customerVersion;
+  const wording=formatted?draftWords:amount=>words(amount,currency);
+  const initial=view.customerVersion?sumMoney0550([view.baseAssigned,view.optionsAssigned]):null;
+  const vals=[number(initial),wording(initial),number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
   result=result.replace(/_{5,}/g,(match,offset)=>escape(vals[i++]||'OPEN')+
-   (view.workingPreview&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
-  if(view.workingPreview)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
+   (formatted&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
+  if(formatted)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
    .replace(/\b(OPEN)only\b/g,'$1 only');
+ }
+ if(view.customerVersion&&format==='xml'){
+  result=result.replace(/<w:t>only<\/w:t>/g,'<w:t xml:space="preserve"> only</w:t>');
  }
  if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
   const note='[1] Component quantities follow the MGW package basis stored in Working; MR reconciliation remains pending. Included components form part of their parent package amount and are not charged again.';
@@ -390,7 +420,13 @@ export function nativeSchedule0550(view,id,currency='USD',c2References){
  if(id==='C1'&&isC1Appendix0550(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
  const {pages,issues}=nativePages(view,id,currency,c2References),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
  const sourceLabel=id==='B'&&paymentSchedule0550(view)?'Schedule B · Current tender':'Source page '+template.schedules[id].page+' of 18';
- const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${sourceLabel}${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
+ const html=pages.map(page=>{
+  const documentRef=escape(view.proposal.documentNo||'OPEN')+' / '+escape(view.proposal.revision);
+  const status=view.customerVersion?'':`<p class="native-status">${escape(label)} / ${documentRef}${page.detail?' / '+escape(page.detail):''}</p>`;
+  const headerTitle=view.customerVersion?customerProjectTitle:'Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project';
+  const footer=view.customerVersion?documentRef:sourceLabel+(page.detail?' / '+escape(page.detail):'');
+  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>${headerTitle}<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${footer}</span></footer></article>`;
+ }).join('');
  return {html,issues,pages};
 }
 export function nativeExhibitProblems0550(view,only){
@@ -398,7 +434,7 @@ export function nativeExhibitProblems0550(view,only){
  // Only active detail forms need these header/period values. Empty schedules keep
  // their explicit applicability review in the existing package model.
  for(const id of ['C2','C3','C4'].filter(id=>!only||only===id)){
-  const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows:view.scheduleRows(id)}];
+  const systems=view.customerVersion?nativeSpareSystems(view,id):id==='C2'&&view.c2Systems?c2SystemGroups0550(view):[{rows:view.scheduleRows(id)}];
   const rows=systems.flatMap(group=>group.rows);
   if(!rows.length)continue;
   if(!field(view,id,'vendorNameAddress').trim())problems.push(id+' / VENDOR name and address OPEN');
@@ -407,6 +443,10 @@ export function nativeExhibitProblems0550(view,only){
    const equipment=new Set(system.rows.map(b=>b.mainEquipment));
    for(const main of equipment)if(['vendorEquipmentNo','referenceDrawings'].some(key=>new Set(system.rows.filter(b=>b.mainEquipment===main).map(b=>b[key])).size>1))problems.push(id+' / Conflicting equipment header references: '+(system.token?system.token+' / ':'')+main);
   }
+ }
+ if(view.customerVersion){
+  const missingTerms=view.scheduleRows('C1').filter(b=>!term(b));
+  problems.push(...missingTerms.map(b=>'C1 / Customer CIF/FOB term OPEN: '+b.lineId));
  }
  for(const [r,key] of [['FIELD_SERVICE','sitePeriodDays'],['TRAINING','trainingPeriodDays']])if((!only||only==='C7')&&view.scheduleRows('C7').some(b=>role(b)===r)&&!field(view,'C7',key).trim())problems.push('C7 / '+key+' OPEN');
  if((!only||only==='C1')&&isC1Appendix0550(view))problems.push(...deriveC1Appendix0550(view).problems.map(p=>'C1 / '+p));
@@ -456,6 +496,45 @@ export function buildNativeExhibitDocx0550(view,only){
  for(const name of Object.keys(parts).filter(n=>/^word\/footer\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:p(?:\s[^>]*)?>)/,m=>m+`<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')} / </w:t></w:r>`);
  for(const [name,b64] of Object.entries(template.binary))parts[name]=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
  return zipStore(parts);
+}
+// The customer copy contains Schedule A–C8 only. Reuse the native form blocks
+// and final landscape section without the template's agreement/TOC or old headers.
+export function customerExhibitWordParts0550(view){
+ const trailingPageBreak=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/;
+ const pageBreak='<w:p><w:r><w:br w:type="page"/></w:r></w:p>';
+ const schedules=NATIVE_SCHEDULE_IDS_0550.map(id=>id==='C1'&&isC1Appendix0550(view)
+  ?c1AppendixWord0550(view)
+  :nativePages(view,id).pages.map(page=>renderPage(view,page,'xml').replace(trailingPageBreak,'')).join(pageBreak));
+ const document=template.document;
+ const bodyStart=document.indexOf('<w:body>')+8,sectionStart=document.lastIndexOf('<w:sectPr');
+ const section=document.slice(sectionStart)
+  .replace(/<w:pgMar[^>]+\/>/,'<w:pgMar w:top="1050" w:right="680" w:bottom="1020" w:left="680" w:header="350" w:footer="350" w:gutter="0"/>');
+ const title='<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Exhibit C — Commercial Terms</w:t></w:r></w:p>';
+ const parts={...template.parts,'word/document.xml':document.slice(0,bodyStart)+title+schedules.join(pageBreak)+section};
+ const keep=name=>!(/^(customXml|docProps)\//.test(name)||/^word\/(?:_rels\/)?(?:header[1-4]|footer[1-5])\.xml(?:\.rels)?$/.test(name));
+ for(const name of Object.keys(parts))if(!keep(name))delete parts[name];
+ parts['[Content_Types].xml']=parts['[Content_Types].xml'].replace(/<Override PartName="\/([^"]+)"[^>]*\/>/g,(m,name)=>keep(name)?m:'');
+ parts['_rels/.rels']=parts['_rels/.rels'].replace(/<Relationship [^>]*Target="docProps\/[^"]+"[^>]*\/>/g,'');
+ parts['word/_rels/document.xml.rels']=parts['word/_rels/document.xml.rels'].replace(/<Relationship [^>]*Target="([^"]+)"[^>]*\/>/g,(m,target)=>keep(target.startsWith('../')?target.slice(3):'word/'+target)?m:'');
+ const namespace='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+ parts['word/header5.xml']=parts['word/header5.xml']
+  .replace('> Export </w:t>','> </w:t>')
+  .replace('>XXX</w:t>','>Telecommunication and Security Systems</w:t>')
+  .replace(/(>AGREEMENT No\.:)<\/w:t>/,(_,label)=>label+' '+escape(field(view,'A','agreementNo')||'OPEN')+'</w:t>');
+ const ref=escape(view.proposal.documentNo||'OPEN')+' / '+escape(view.proposal.revision);
+ parts['word/footer6.xml']=`<?xml version="1.0" encoding="UTF-8"?><w:ftr ${namespace}><w:p><w:r><w:t>Exhibit C - Commercial Terms · ${ref}</w:t></w:r></w:p></w:ftr>`;
+ // Preserve bold/italic/table layout from the form while standardizing Word font and size.
+ const fonts='<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:eastAsia="Arial" w:cs="Arial"/>';
+ for(const name of ['word/document.xml','word/header5.xml','word/footer6.xml','word/styles.xml','word/numbering.xml']){
+  const size=name.includes('footer')||name.includes('header')?18:20;
+  const sizes=`<w:sz w:val="${size}"/><w:szCs w:val="${size}"/>`;
+  parts[name]=parts[name]
+   .replace(/<w:rFonts\b[^>]*\/>/g,fonts)
+   .replace(/<w:sz(Cs)?\b[^>]*\/>/g,(_,cs)=>`<w:sz${cs||''} w:val="${size}"/>`)
+   .replace(/(<w:r\b[^>]*>)(?=<w:(?:t\b|br\b))/g,`$1<w:rPr>${fonts}${sizes}</w:rPr>`);
+ }
+ for(const [name,b64] of Object.entries(template.binary))parts[name]=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
+ return parts;
 }
 export function downloadNativeExhibit0550(view,format='docx',only){
  const html=format==='html',content=html?nativeExhibitHtml0550(view,only):buildNativeExhibitDocx0550(view,only),url=URL.createObjectURL(new Blob([content],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})),a=document.createElement('a');
