@@ -6,6 +6,7 @@ import {bidPresentationIndex,bidOwnerStyle,lineOwner0550} from "./bidPresentatio
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {CUSTOMER_FORM_0550,officialCustomerRows} from "./data/officialPricing0550";
 import {workingOffers0550} from "./data/workingOffers0550";
+import {mgwCurrentItemKey0550,mgwCurrentRequirementTrace0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {bidCompletionSourceUsages0550} from "./data/bidCompletion0550";
 import {exportOfficialCustomerXlsx} from "./exportOriginalPriceForm";
 import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
@@ -27,7 +28,14 @@ function PriceNotes({note,onSource}){
   {note.owner&&<button type="button" onClick={()=>onSource(note.owner.sourceModuleId)}>เปิดเจ้าของราคารวม · {note.owner.description}</button>}
   {note.checks?.length>0&&<div><strong>ประเด็นที่ต้องตรวจ</strong><ul>{note.checks.map(check=><li key={check}>{check}</li>)}</ul></div>}
   {note.reasons?.length>0&&<><p><strong>OPEN:</strong> {note.reasons[0]}</p><details><summary>เหตุผลที่ยังเป็น OPEN ({note.reasons.length})</summary><ul>{note.reasons.map(reason=><li key={reason}>{reason}</li>)}</ul></details></>}
-  {note.candidates?.length>0&&<details><summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({note.candidates.length})</summary><p>ยังไม่จัดสรรราคา package นี้เข้าแถว MR — ต้องตรวจขอบเขตและเจ้าของราคาก่อน ไม่แบ่งราคาหรือบวกซ้ำอัตโนมัติ</p>{note.candidates.map(c=><p key={c.id}><button type="button" onClick={()=>onSource(c.sourceModuleId)}>ตรวจ package · {c.description}</button><small>ราคา Customer ต้นทาง · PROVISIONAL: {amount(c.provisionalCustomerNative,c.currency)} · {c.offer?.quoteRef||c.sourceRef}</small></p>)}</details>}
+  {note.candidates?.length>0&&<details>
+   <summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({note.candidates.length})</summary>
+   <p>ยังไม่จัดสรรราคา package นี้เข้าแถว MR · ราคาอ้างอิงมาจาก Working owner ของแต่ละ package</p>
+   {note.candidates.map(c=><p key={c.id}>
+    <button type="button" onClick={()=>onSource(c.sourceModuleId)}>ตรวจ package · {mgwRadioDtrsOffer0550(c.offer)&&mgwCurrentItemKey0550(c.offer)+" · "}{c.description}</button>
+    <small>ราคาขายร่างจาก Working · {amount(c.provisionalCustomerNative,c.currency)} · {c.offer?.quoteRef||c.sourceRef}</small>
+   </p>)}
+  </details>}
  </div>;
 }
 // Internal navigation alongside the customer projection. Trace the price basis,
@@ -40,23 +48,30 @@ function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate}){
  const selectedOffers=workingOffers0550(data,basis);
  const usage=basis.systemToken==="TEL-DMR"?sourceUsages.get(basis.id):undefined;
  const offers=selectedOffers.length?selectedOffers:(usage?.offerIds||[]).map(id=>data.offers.find(o=>o.id===id)).filter(Boolean);
- if(!offers.length){
+ const mappedOffers=line.systemToken==="TEL-RADIO-DTRS"&&line.mrRequirementId
+  ?mgwCurrentRequirementTrace0550(data,"REQDEF-"+line.mrRequirementId)
+    .filter(offer=>mgwRadioDtrsOffer0550(offer)&&!offers.some(selected=>selected.id===offer.id))
+  :[];
+ if(!offers.length&&!mappedOffers.length){
   return <small>{basis.offerId?"หา Offer ที่ผูกไว้ไม่พบ · "+basis.offerId:"ไม่มี Offer ผูกโดยตรง · ดูฐานราคาที่ Source"}</small>;
  }
  const link=(offer,withDescription=false)=><button key={offer.id} type="button"
   disabled={!onNavigate} onClick={()=>onNavigate("bid.vendor.offer."+offer.id)}>
+  {mgwRadioDtrsOffer0550(offer)&&mgwCurrentItemKey0550(offer)+" · "}
   {offer.quoteRef||offer.id}{offer.quoteEvidence?.revision&&" · Rev "+offer.quoteEvidence.revision}
   {withDescription&&offer.description&&" · "+offer.description}
  </button>;
  let label=ownerId?"Offer ของเจ้าของราคารวม":"Offer ที่ผูกกับ Working";
- if(!selectedOffers.length){
+ if(usage&&!selectedOffers.length){
   label=usage.current?"Offer อ้างอิงฐานประมาณการ":"Offer อ้างอิงเดิม · ฐานเปลี่ยน รอทบทวน";
  }
- return offers.length===1
-  ? <div><small>{label} · อ้างอิงภายใน</small>{link(offers[0])}</div>
-  : <details><summary>{label} · {offers.length} รายการ</summary>
-    {offers.map(offer=>link(offer,true))}
-   </details>;
+ return <>
+  {offers.length===1&&<div><small>{label} · อ้างอิงภายใน</small>{link(offers[0])}</div>}
+  {offers.length>1&&<details><summary>{label} · {offers.length} รายการ</summary>{offers.map(offer=>link(offer,true))}</details>}
+  {mappedOffers.length>0&&<div><small>หลักฐาน Offer จาก Mapping · ตรวจขอบเขตที่ WP.7</small>
+   {mappedOffers.map(offer=>link(offer))}
+  </div>}
+ </>;
 }
 
 export function OfficialCustomerForm({official,onSource,navigationTarget,open=true,children,onNavigate,onOpenSource}){

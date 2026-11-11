@@ -1,6 +1,7 @@
 import {towerC1Reference0550} from "./towerTenderScope0550";
 import catalog from "./mrWorkingCatalog0550.json";
 import {mgwWorkingLineExcluded0550} from "./mgwVendorBasis0550";
+import {mgwCurrentMr0550,mgwRadioDtrsOffer0550} from "./mgwQuoteSelection0550";
 import form from "./customerForm0550.json";
 import {policyDefaults0550} from "../bidWorkingBasis0550";
 
@@ -44,7 +45,12 @@ export function mrLineScope0550(data,line) {
  const owner=data.lines.find(l=>l.id===line.coveredByLineId);
  const covered=Boolean(line.coveredByLineId&&line.coverageBasis?.trim()&&owner&&owner.id!==line.id&&owner.selected&&!towerC1Reference0550(owner)&&!mgwWorkingLineExcluded0550(data,owner)&&!owner.coveredByLineId&&owner.responsibility!=="COMPANY"&&owner.satelliteScope!=="COMPANY_SUPPLY"&&owner.wbs[0]===line.wbs[0]&&responsibility==="TSI"&&basis);
  if(line.coveredByLineId&&!covered)problems.push("MR_COVERAGE_OWNER_OPEN: เจ้าของราคาไม่มี / ไม่เลือก / วนซ้ำ / อยู่คนละ Part / ขาดหลักฐาน");
- const candidates=data.lines.filter(l=>l.id!==line.id&&!l.mrRequirementId&&l.systemToken===line.systemToken&&l.wbs[0]===line.wbs[0]&&l.selected&&!mgwWorkingLineExcluded0550(data,l));
+ const candidates=data.lines.filter(l=>{
+  if(l.id===line.id||l.mrRequirementId||l.systemToken!==line.systemToken||l.wbs[0]!==line.wbs[0]||!l.selected)return false;
+  const offer=data.offers?.find(o=>o.id===l.offerId);
+  if(mgwWorkingLineExcluded0550(data,l,offer))return false;
+  return !mgwRadioDtrsOffer0550(offer)||mgwCurrentMr0550(offer).includes(requirement.id);
+ });
  if(!covered&&!excluded&&candidates.length&&!line.coverageBasis?.trim())problems.push("MR_PACKAGE_COVERAGE_OPEN: มีราคา package เดิม ต้องระบุว่ารวมอยู่ใน owner หรือเป็นงานเพิ่มที่ไม่ซ้ำ");
  return {applicable:true,requirement,responsibility,excluded,covered,owner,problems,candidates};
 }

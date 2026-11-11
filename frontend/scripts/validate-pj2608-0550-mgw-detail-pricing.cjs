@@ -121,6 +121,29 @@ const mappingRow=mr=>mappingHtml.split('data-mapping-requirement="REQDEF-'+mr+'"
 assert(mappingRow(apfMr).includes('data-supplier-source-text="'+equipmentOffer.id+'"'));
 assert.match(mappingRow(apfMr),/Radio System Cabinet G26642[\s\S]*Repeater SLR5500[\s\S]*Dispatching Server R740/);
 assert(!mappingRow(acpMr).includes(equipmentOffer.id));
+
+const {OfficialCustomerForm}=require(root+'/project0550/OfficialCustomerForm.jsx');
+const {releasePricePresentation0550}=require(root+'/project0550/releasePricePresentation0550.js');
+const provisional=radioModel.provisional;
+const releaseNotes=releasePricePresentation0550(provisional);
+const releaseId=mr=>'bid.budget.release.line.REQ-'+mr;
+const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{
+ official:provisional,onSource:()=>{},onNavigate:()=>{},
+}));
+const releaseRow=mr=>releaseHtml.split('data-component-key="'+releaseId(mr)+'"')[1].split('</tr>')[0];
+assert.match(releaseRow(apfMr),/หลักฐาน Offer จาก Mapping.*RADIO-001.*RADIO-009/s);
+assert.doesNotMatch(releaseRow(acpMr),/RADIO-001|RADIO-009/);
+assert.deepEqual(releaseNotes.get(releaseId(apfMr)).candidates.filter(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)).map(line=>line.offer.id),
+ [equipmentOffer.id,subscriberOffer.id]);
+assert(!releaseNotes.get(releaseId(acpMr)).candidates.some(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)));
+const releaseRows=O.officialCustomerRows(provisional);
+assert.equal(releaseRows.find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
+const equipmentReleaseRows=releaseRows.filter(row=>row.key===radioOwner.id);
+assert.equal(equipmentReleaseRows.length,1);
+assert.equal(equipmentReleaseRows[0].cells[6],143064);
+assert.equal(provisional.lines.find(line=>line.id==='REQ-'+apfMr).offerId,'','The displayed Offer link is read-only');
+assert.equal(O.officialCustomerRows(radioModel.official).find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
+
 for(const line of radioOwners){
  const req=radioRequirements.requirements.find(r=>r.id==='REQDEF-'+radioSelection.mgwCurrentMr0550(line.offer)[0]);
  assert(req.workLineIds.includes(line.id)&&req.offerIds.includes(line.offerId)&&req.state==='OPEN');
