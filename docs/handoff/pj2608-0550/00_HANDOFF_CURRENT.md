@@ -1,5 +1,7 @@
 Latest spare workflow: [SI quantity drafts in 11.C2/C3/C4](20261111_SI_SPARE_DRAFT_WORKFLOW.md). Selected Working A and current 07 offers feed SI quantity, then the existing pricing and FX equations. Drafts are internal; prepare a separate spare owner and bind in 11.M before its price enters Volume I.
 
+Latest C2 update: [11 Nov B5 startup allowance](20261108_A1_SPARE_PRICING.md#11-nov--provisional-b5-startup-allowance). The shared PCT_START scenario defaults to 5% of the in-scope selected Working A procurement basis and remains a provisional budget reference in B5, C2, A1 and Release B5. Existing OEM itemized costs keep their current 11.M allocation and approval path.
+
 Latest MGW DTRS update: [current RADIO / DTRS and C1 component rates](20261111_MGW_DTRS_AND_C1_COMPONENT_RATES.md). The ACP and APF Offer lots feed 10.2 and 11.M Drafts. Quote validity, scope and component price gaps remain OPEN. The E14 source-panel estimate uses the existing design complexity drivers and retains one pool per quoted service.
 
 Latest Exhibit C draft update: [Schedule OPEN reconciliation](20261110_EXHIBIT_C_OPEN_RECONCILIATION.md). C7 distinguishes page subtotals from its A1 Base and A2 Option amounts. The draft review identifies the current C8 cross-reference conflict, retains missing price and allocation inputs, and exports A1 and A2 alongside A and C1–C8.

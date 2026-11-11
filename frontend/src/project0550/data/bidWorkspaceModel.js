@@ -22,9 +22,9 @@ import {validateTechnicalProposal0550} from "./technicalProposal0550";
 import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
 import {validateBidVolumes0550} from "./bidVolumes0550";
 import {validateBidPunchPlans} from "../../common/governance/bidPunch";
-import {COMMISSIONING_PHASES_0550} from './commissioningSparePhases0550';
+import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -45,6 +45,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
  const unsupportedFields=Object.keys(data).filter(k=>!BID_WORKSPACE_FIELDS_0550.includes(k)).sort();
  if(unsupportedFields.length){const error=Error("Unsupported workspace field: "+unsupportedFields.join(", "));error.code="WORKSPACE_UNSUPPORTED_FIELDS";error.unsupportedFields=unsupportedFields;throw error;}
+ if(data.b5StartupPct!==undefined&&!validB5StartupPct0550(data.b5StartupPct))fail("Invalid B5 PCT_START fraction");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
   if(!Array.isArray(data[key])||data[key].length>2000)fail("Invalid "+key);
@@ -222,5 +223,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const requirementGaps=mrWorkingGaps0550(data,lines);
  const baseScopeOpen=requirementGaps.some(g=>!g.code||!g.code.startsWith("C")),optionScopeOpen=requirementGaps.some(g=>!g.code||g.code.startsWith("C"));
  const result={requirementGaps,lines,selected,groups,complete:complete&&!requirementGaps.length,missingSystems,missingWbs,baseTHB:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0&&requirementGaps.length===0,revision:data.revision};
- return {...result,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional:deriveProvisionalPricing(data,result)};
+ const provisional=deriveProvisionalPricing(data,result);
+ return {...result,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional,
+  b5StartupAllowance:deriveB5StartupAllowance0550(data,provisional.selected)};
 }

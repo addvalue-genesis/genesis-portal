@@ -6,6 +6,42 @@ const {retireLegacyTowerPricing0550}=require(src+'/project0550/data/towerLegacyP
 const today='2026-11-04',tokens=D.SYSTEMS.map(s=>s.token),hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const options=d=>({policies:D.COMMERCIAL_POLICY,team:D.CORE_TEAM,pricing:()=>B.deriveBidWorkspace(d,tokens,today)});
 const empty=B.emptyBidWorkspace(D.DATA_LAYER_META.datasetId);assert.equal(C.prepareBidCompletion0550(empty,options(empty),today),empty,'No private evidence means no price/assumption installation');
+{
+ const {releaseBasisKey0550,releaseSnapshot0550}=require(src+'/project0550/data/releaseIssue0550.js');
+ const owner=(id,systemToken,customerRowCode,manualCost)=>({
+  id,systemToken,customerRowCode,wbs:'A',description:id,scopeKey:id,tagRef:'APF',requirementRef:'QA scope',
+  sourceRef:'QA procurement basis',vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',
+  currency:'USD',manualCost,sellMode:'MARKUP',sellRate:null,markupPct:10,marginPct:null,primePct:null,selected:true,
+ });
+ const base={...empty,fx:{source:'QA FX',date:today,thbPerUSD:31.5,thbPerEUR:null},lines:[
+  owner('QA-PHONE','TEL-IPP','A1-04',2000),owner('QA-CCTV','TEL-CCTV','A1-06',1000),
+  owner('QA-PAGA','TEL-PAGA','A1-05',null),owner('QA-VCS','TEL-LAN-VCS','A1-03',5000),
+  owner('QA-TOWER','TEL-TELT','A1-11',9000),
+ ]};
+ const derive=data=>B.deriveBidWorkspace(data,tokens,today);
+ const before=derive(base),budget=before.b5StartupAllowance;
+ assert.equal(budget.pct,0.05);
+ assert.equal(budget.totalUSD,150,'Use procurement cost even when Prime sell inputs are OPEN');
+ assert.equal(budget.totalTHB,4725);
+ assert.deepEqual(budget.drivers.map(r=>r.quantity),[6,3,1]);
+ assert.equal(budget.rows.find(row=>row.code==='A1-05').amountUSD,null);
+ assert.equal(budget.rows.find(row=>row.code==='A1-03').amountUSD,0,'D_ITEM VCS IN=0');
+ assert.equal(budget.rows.find(row=>row.code==='A1-11').amountUSD,null,'Exclude Tower from Microwave basis');
+ const updated={...base,b5StartupPct:0.1};
+ B.validateBidWorkspace(updated,D.DATA_LAYER_META.datasetId,tokens);
+ const after=derive(updated);
+ assert.equal(after.b5StartupAllowance.totalUSD,300);
+ assert.deepEqual(after.b5StartupAllowance.drivers.map(r=>r.quantity),[13,6,3]);
+ assert.equal(derive({...base,b5StartupPct:0}).b5StartupAllowance.totalUSD,0);
+ assert.equal(derive({...base,fx:empty.fx}).b5StartupAllowance.totalUSD,null);
+ assert.equal(derive({...base,lines:base.lines.filter(l=>l.id!=='QA-CCTV')}).b5StartupAllowance.totalUSD,100);
+ for(const invalid of [-0.1,1.01,null,'0.05'])assert.throws(()=>B.validateBidWorkspace({...base,b5StartupPct:invalid},D.DATA_LAYER_META.datasetId,tokens),/PCT_START/);
+ assert.deepEqual(after.official,before.official);
+ assert.deepEqual(after.provisional,before.provisional);
+ assert.equal(releaseBasisKey0550(updated),releaseBasisKey0550(base));
+ assert.deepEqual(releaseSnapshot0550(updated),releaseSnapshot0550(base));
+ console.log('PASS B5 startup E08: editable 5% default, D_ITEM scope, D_QTY rounding, cost-only basis, missing inputs, untouched C2 owners and frozen Release basis.');
+}
 assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
 {
  const {importMrWorkingBasis0550}=require(src+'/project0550/data/mrWorkingBasis0550.js');

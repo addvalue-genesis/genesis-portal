@@ -12,6 +12,7 @@ import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {releasePricePresentation0550} from "./releasePricePresentation0550";
 import {releaseHierarchy0550} from "./releaseHierarchy0550";
+import {B5StartupAmount0550} from "./CommissioningSpares0550";
 import {ReleaseScheduleDrafts0550} from "./ReleaseScheduleDrafts0550.jsx";
 
 const EXPANSION_KEY="GENESIS.PJ2608-0550.release.expanded.v1";
@@ -59,7 +60,7 @@ function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate}){
 }
 
 export function OfficialCustomerForm({official,onSource,navigationTarget,open=true,children,onNavigate,onOpenSource}){
- const {data}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
+ const {data,model}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const rows=useMemo(()=>officialCustomerRows(official),[official]),provisional=official.pricingBasis==="PROVISIONAL_VENDOR",notes=releasePricePresentation0550(official);
  const hierarchy=useMemo(()=>releaseHierarchy0550(official,rows),[official,rows]);
  const partPrices=useMemo(()=>provisional?knownPriceGroups0550(official):[],[official,provisional]);
@@ -131,7 +132,7 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   }
   if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
-  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<PriceNotes note={notes.get(r.moduleId)} onSource={onSource}/>}</td>)}</tr>;
+  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource}/></>}</td>)}</tr>;
  })}</tbody></table></div>
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>

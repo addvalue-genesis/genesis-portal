@@ -1,4 +1,43 @@
+import Decimal from 'decimal.js';
+import customerForm from './customerForm0550.json';
+import {roundMoney0550,sumMoney0550} from './money0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './scheduleRollup0550';
+
+export const B5_STARTUP_DEFAULT_0550=0.05;
+export const B5_STARTUP_STATUS_0550='Provisional – Subject to Company Approval';
+export const validB5StartupPct0550=value=>Number.isFinite(value)&&value>=0&&value<=1;
+const b5StartupTags=customerForm.rows.filter(row=>row.part==='A');
+const b5StartupDrivers=[
+ {code:'A1-04',id:'N_PHONE',installed:129,unit:'เครื่อง',source:'D_QTY!C11'},
+ {code:'A1-06',id:'N_CAM',installed:55,unit:'กล้อง',source:'D_QTY!C5'},
+ {code:'A1-05',id:'N_PAGA_AMP',installed:26,unit:'แอมป์',source:'D_QTY!C12'},
+];
+
+export function priceB5StartupAllowance0550(basis,pct){
+ const rows=basis.rows.map(row=>({...row,amountUSD:!row.included?0:row.basisUSD===null?null:row.basisUSD*pct}));
+ const known=rows.filter(row=>row.included&&Number.isFinite(row.amountUSD));
+ // Grok Rev00 E08 / C_B5B6!E22. LUMP_B5 (D_PARAM!C48) is zero.
+ const totalUSD=known.length?sumMoney0550([0,...known.map(row=>row.amountUSD)]):null;
+ const totalTHB=totalUSD===null?null:roundMoney0550(totalUSD*basis.thbPerUSD);
+ return {...basis,pct,rows,totalUSD,totalTHB,
+  drivers:b5StartupDrivers.map(driver=>({...driver,quantity:new Decimal(driver.installed).times(pct).toDecimalPlaces(0,Decimal.ROUND_HALF_UP).toNumber()}))};
+}
+
+export function deriveB5StartupAllowance0550(data,selected){
+ const fx=data.fx,thbPerUSD=fx.source.trim()&&fx.date&&fx.thbPerUSD>0?fx.thbPerUSD:null;
+ // D_ITEM!J8:J22 is an unfilled historical input. Use selected Working A
+ // procurement cost as the stated proxy and retain the workbook's IN scope.
+ const owners=selected.filter(line=>line.wbs==='A'&&line.systemToken!=='TEL-TELT');
+ const rows=b5StartupTags.map(tag=>{
+  const included=tag.code!=='A1-03';
+  const matching=included?owners.filter(line=>line.customerRowCode===tag.code):[];
+  const priced=matching.filter(line=>Number.isFinite(line.spareProcurementCostTHB));
+  const basisTHB=sumMoney0550(priced.map(line=>line.spareProcurementCostTHB));
+  return {code:tag.code,description:tag.description,included,basisUSD:basisTHB===null||!thbPerUSD?null:basisTHB/thbPerUSD,
+   ownerIds:priced.map(line=>line.id),open:matching.length-priced.length};
+ });
+ return priceB5StartupAllowance0550({rows,thbPerUSD},data.b5StartupPct??B5_STARTUP_DEFAULT_0550);
+}
 
 export const COMMISSIONING_PHASES_0550=[
  {id:'PRE_COMMISSIONING',number:'5.1',title:'Pre-commissioning',driver:'รอบตรวจสาย / Loop check × จำนวนใช้ต่อรอบ',legacyId:'REQ-MR-ACT-B5-D02'},

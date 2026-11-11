@@ -35,7 +35,7 @@ import {BidInheritedBasis} from "./BidInheritedBasis";
 import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550} from "./bidWorkingBasis0550";
 import {OfficialCustomerForm} from "./OfficialCustomerForm";
 import {LicensingCost0550} from "./LicensingCost0550";
-import {CommissioningSpareQuotes0550} from './CommissioningSpares0550';
+import {B5StartupEstimate0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
 import {LanCusLine0550,LanCusStandards0550} from './LanCusBasis0550';
 import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {SATELLITE_SCOPE_OPTIONS,isSatelliteScope0550,satelliteScopeNote0550} from "./data/satelliteScope0550";
@@ -181,7 +181,7 @@ const mrProposalRank0550=row=>{
 const partAProposalRows0550=CUSTOMER_FORM_0550.rows.filter(row=>row.part==="A")
  .sort((a,b)=>mrProposalRank0550(a)-mrProposalRank0550(b));
 
-function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew,onNavigate,onOpenSource,preparationSystem}){
+function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onEdit,onRelease,onNew,onNavigate,onOpenSource,preparationSystem}){
  const r11Price=model.lines.find(line=>line.id===CERAGON_LINK_OWNER_0550&&line.selected&&line.offerId===CERAGON_R11_0550);
  const provisional=Boolean(model.pricingBasis);
  const supplierSources=useMemo(()=>supplierCostProjection0550(data),[data]);
@@ -221,7 +221,7 @@ function WorkingHierarchy({model,integration,working,data,onEdit,onRelease,onNew
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
  {code==='TEL-LAN'&&<LanCusStandards0550 data={data} onNavigate={onNavigate}/>}
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code,...(code==='B5'?{customerRowCode:'B5'}:{})})}>เตรียมรายการใน {code}</button>
- {code==='B5'&&<B5Preparation0550 lines={pricing} initialSystem={preparationSystem} onNew={onNew}/>}
+ {code==='B5'&&<><B5StartupEstimate0550 allowance={b5StartupAllowance} onNavigate={onNavigate}/><B5Preparation0550 lines={pricing} initialSystem={preparationSystem} onNew={onNew}/></>}
  <div className="p55-table-wrap"><table className="p55-table" aria-label={"Working cost lines "+code}><thead><tr><th>รายการ / Owner</th><th>ต้นทาง / Qty</th><th>ต้นทุนที่จัดสรร Working THB</th><th>ADDVALUE THB</th><th>Customer THB</th><th>สถานะ / Trace</th></tr></thead><tbody>{pricing.map(r=>{const raw=data.lines.find(l=>l.id===r.id);const showDmrTags=dmr&&dmrTagCosts.equipment.some(tag=>tag.mrLineId===r.id);
  const r11Owner=dmr&&r===r11Price;
  const showR11Price=r11Owner&&(provisional||r.reviewState==="REVIEWED_WORKING");
@@ -322,7 +322,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <p>ลำดับงานใน 10.2: อ่านข้อกำหนดและ System Particular → วิเคราะห์ใน WP.1–WP.8 → เลือกรายการ A/B/C → เปิดรายละเอียดเพื่อแก้ไขและทบทวนราคา</p>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget} navigationSystem={navigationSystem}/>
- <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
+ <WorkingHierarchy b5StartupAllowance={model.b5StartupAllowance} integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
  <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module>

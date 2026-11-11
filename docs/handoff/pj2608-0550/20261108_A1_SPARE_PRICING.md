@@ -1,5 +1,37 @@
 # A1 commissioning and operating spare pricing
 
+## 11 Nov · Provisional B5 startup allowance
+
+Grok Part B Price Model Rev00 uses `D_PARAM!C47` for `PCT_START`,
+`D_ITEM!D8:D22` for inclusion and `D_ITEM!J8:J22` for historical
+Part A prices. `C_B5B6!E22` feeds `S_FORM!F28`. All 15 historical
+price inputs are zero in the source workbook, as are `PCT_START` and
+`LUMP_B5`. The existing workbook was used as a read-only reference.
+
+Working B5 and 11.C2 now share a saved PCT_START scenario with a 5% default.
+E08 uses LUMP_B5 (USD 0) plus the sum of IN × basis USD × PCT_START.
+The basis is the known procurement cost of selected Working A owners using
+existing FX and A1 mappings. It is a proxy for the blank historical input,
+and the UI identifies it as such. Rev00 scope keeps A1-03 VCS out and
+excludes Telecom Tower from the Microwave basis. Missing price inputs
+remain OPEN. The three Rev00 D_QTY drivers give 6 phones, 3 cameras and
+1 PAGA amplifier at 5% using Excel ROUND (half-up).
+
+The same budget reference is visible in the provisional 10.7 B5 row and
+11.A1 commissioning breakdown, marked Provisional – Subject to Company
+Approval. It has no price owner or Schedule allocation. C2 and A1
+commercial totals continue to use the itemized owners allocated through
+11.M. The GENESIS E08 travel equation and other B/C calculations retain
+their existing implementations. The scenario is saved in the working
+backup and excluded from controlled issue snapshots and fingerprints.
+
+ADR-0550-001 principles 2, 5, 6 and 8–12 apply. The Bid Completion
+regression checks recalculation, deliberate zero, missing input, scope,
+and the unchanged Release fingerprint. Working Schedules checks the
+rendered C2 and A1 estimate plus unchanged schedule bindings and native
+A1 rows. The source workbook still has no independently filled Price_old
+basis. The owner's browser workspace was outside the verification.
+
 ## Volume I takes the available priced Working rows
 
 Existing 11.C2–C6 draft Word, HTML and screen forms show known Working selling rates and amounts in the price cells. Prices span the two term columns until the customer CIF/FOB basis is saved. C7 continues to use the existing hours calculation or an OPEN hour basis. 11.0, A1 and 11.P show C2–C8 plus the D/E/F supporting subtotals and a direct route to 11.M. D uses A1 inspection and E/F partition A1 Others without double counting. C6 and C8 still have no eligible Working allocation in the checked data.

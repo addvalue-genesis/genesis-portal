@@ -233,6 +233,16 @@ try{
  const removed=structuredClone(seeds);removed.lines=removed.lines.filter(l=>l.id!==focus[0].id);const rm=derive(removed),rv=V.deriveBidVolumes0550(removed,rm,D.SYSTEMS,today);
  assert(!P.scheduleCrosswalk0550(removed,rm,rv).rows.some(r=>r.id===focus[0].id),'No deleted line is recreated');
  const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{ScheduleAllocationCrosswalk0550}=require(root+'/project0550/WorkingSchedulePreview0550.jsx');
+ const {CommissioningBreakdown0550}=require(root+'/project0550/CommissioningSpares0550.jsx');
+ const b5=renderToStaticMarkup(React.createElement(CommissioningBreakdown0550,{view:pv,model:pm,systems:D.SYSTEMS,currency:'USD'}));
+ assert(b5.includes('Provisional – Subject to Company Approval'));
+ assert(b5.includes('PCT_START (%)')&&b5.includes('value="5"'));
+ assert(b5.includes('USD 24,107.10')&&b5.includes('N_CAM'));
+ const summary=renderToStaticMarkup(React.createElement(CommissioningBreakdown0550,{view:pv,model:pm,systems:D.SYSTEMS,currency:'USD',summary:true}));
+ assert(summary.includes('USD 24,107.10'));
+ const changedB5=preview({...partial,b5StartupPct:0.1});
+ assert.deepEqual(changedB5.bindings,pv.bindings,'E08 is a non-additive planning amount');
+ assert.deepEqual(N.nativeSchedule0550(changedB5,'A1').pages,a1.pages,'Native A1 pricing stays tied to saved owners');
  const escaped=structuredClone(partial);escaped.lines.find(l=>l.id==='TEST-MGW-CCTV').description='<script>unsafe</script>';
  const xhtml=renderToStaticMarkup(React.createElement(ScheduleAllocationCrosswalk0550,{data:escaped,model:pm,savedView:sv,displayView:pv}));
  assert(xhtml.includes('Official to Schedule reconciliation'));assert(xhtml.includes('Exhibit C allocation'));assert(xhtml.includes('&lt;script&gt;unsafe&lt;/script&gt;'));assert(!xhtml.includes('<script>'));assert.equal(D.MODULE_REGISTRY.length,15);

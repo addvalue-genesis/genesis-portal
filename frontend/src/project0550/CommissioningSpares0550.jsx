@@ -1,9 +1,10 @@
 import React,{useState} from 'react';
-import {COMMISSIONING_PHASES_0550,commissioningBreakdown0550,commissioningPhase0550} from './data/commissioningSparePhases0550';
+import {COMMISSIONING_PHASES_0550,commissioningBreakdown0550,commissioningPhase0550,B5_STARTUP_STATUS_0550,priceB5StartupAllowance0550,validB5StartupPct0550} from './data/commissioningSparePhases0550';
 import {CERAGON_R11_0550,CERAGON_R12_0550} from './data/ceragonSelection0550';
 import {evaluateServiceEquation} from './serviceEquationRuntime';
 import {lanStockBasis0550} from './data/lanStockBasis0550';
 import {LanCusLine0550,LanCusStandards0550} from './LanCusBasis0550';
+import {useBidWorkspace} from './BidWorkspaceContext';
 
 const money=(amount,currency)=>Number.isFinite(amount)?`${currency} ${amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'OPEN';
 const subtotal=(rollup,currency)=>rollup.priced?money(rollup.knownUSD,currency):'OPEN';
@@ -72,6 +73,52 @@ export function CommissioningSpareQuotes0550({data,model,onNavigate,disabled}){
  </section>;
 }
 
+export function B5StartupAmount0550({allowance,currency='USD'}){
+ if(!allowance)return null;
+ const total=currency==='THB'?allowance.totalTHB:allowance.totalUSD;
+ return <p><strong>วงเงิน B5 / C2 จาก E08 · {money(total,currency)}</strong>
+  <small>{B5_STARTUP_STATUS_0550} · ประมาณการจากต้นทุนอุปกรณ์ที่มีฐานราคา</small></p>;
+}
+
+export function B5StartupEstimate0550({allowance,currency='USD',disabled,onNavigate}){
+ const {busy,change}=useBidWorkspace()||{};
+ const [edited,setEdited]=useState(null);
+ if(!allowance)return null;
+ const value=edited??String(Number((allowance.pct*100).toPrecision(14)));
+ const pct=value.trim()?Number(value)/100:null,valid=validB5StartupPct0550(pct);
+ const shown=edited===null?allowance:valid?priceB5StartupAllowance0550(allowance,pct):null;
+ const save=async e=>{
+  e.preventDefault();
+  if(valid&&await change(data=>({...data,b5StartupPct:pct}),'Update B5 provisional PCT_START'))setEdited(null);
+ };
+ return <section className="p55-panel" aria-label="B5 E08 provisional allowance">
+  <h4>B5 / C2 · วงเงินอะไหล่เริ่มเดินระบบ</h4>
+  <form className="p55-review-toolbar" onSubmit={save}>
+   <label>PCT_START (%) <input type="number" min="0" max="100" step="any" required value={value}
+    onChange={e=>setEdited(e.target.value)} disabled={disabled||busy||!change}/></label>
+   <button type="submit" disabled={disabled||busy||!change||!valid||edited===null}>บันทึก PCT_START</button>
+  </form>
+  <div aria-live="polite">{shown?<B5StartupAmount0550 allowance={shown} currency={currency}/>:<p>ระบุ PCT_START ระหว่าง 0 ถึง 100%</p>}</div>
+  <p>Grok Rev00 E08 · LUMP_B5 (USD 0) + Σ (IN × Price_old × PCT_START) · ใช้ต้นทุน Working A แทน Price_old ที่ยังไม่ได้กรอกใน Rev00</p>
+  <p>วงเงินนี้ใช้วางงบก่อนยืนยัน Part No., จำนวน, ราคา และรายการที่ OEM รวมไว้ ยอด 11.C2 / A1 ใช้เจ้าของราคาที่จัดลง 11.M</p>
+  {shown&&<details><summary>ดูฐานต้นทุนและจำนวนอะไหล่ประมาณการ</summary>
+   <div className="p55-table-wrap"><table className="p55-table" aria-label="B5 estimate by A1 item"><thead>
+    <tr><th>รายการ A1</th><th>IN</th><th>Working A USD</th><th>วงเงิน B5 USD</th></tr>
+   </thead><tbody>{shown.rows.map(row=><tr key={row.code}><th scope="row">{row.code} · {row.description}</th><td>{row.included?1:0}</td>
+    <td>{money(row.basisUSD,'USD')}{row.open>0&&<small>{row.open} เจ้าของราคา OPEN</small>}
+     {onNavigate&&row.ownerIds.length>0&&<details><summary>{row.ownerIds.length} เจ้าของต้นทุน Working A</summary>
+      {row.ownerIds.map(id=><Trace key={id} id={workingId(id)} label={id} disabled={disabled} onNavigate={onNavigate}/>)}
+     </details>}</td><td>{money(row.amountUSD,'USD')}</td></tr>)}</tbody></table></div>
+   <p>A1-11 ใช้ต้นทุน Microwave ตามขอบเขต Rev00 แยกจากงาน Telecom Tower</p>
+   <div className="p55-table-wrap"><table className="p55-table" aria-label="Provisional startup spare quantities"><thead>
+    <tr><th>Driver จาก D_QTY</th><th>จำนวนติดตั้ง</th><th>จำนวนอะไหล่ประมาณการ</th></tr>
+   </thead><tbody>{shown.drivers.map(driver=><tr key={driver.id}><th scope="row">{driver.id} · {driver.source}</th>
+    <td>{driver.installed} {driver.unit}</td><td>{driver.quantity} {driver.unit}</td></tr>)}</tbody></table></div>
+   <p>จำนวนประมาณการ = ROUND(จำนวนติดตั้ง × PCT_START, 0) · ใช้สำหรับวางงบและตรวจจำนวนกับ OEM</p>
+  </details>}
+ </section>;
+}
+
 export function CommissioningBreakdown0550({view,systems,currency,summary,onNavigate,onAllocate,disabled,onOpenC3,model}){
  const {groups,bySystem,unclassified,total,operations,operationRows}=commissioningBreakdown0550(view,systems,currency);
  const working=new Map(model.lines.map(line=>[line.id,line]));
@@ -80,6 +127,8 @@ export function CommissioningBreakdown0550({view,systems,currency,summary,onNavi
  const totalText=rollup=>subtotal(rollup,currency);
  return <section className="p55-panel" aria-label={summary?'A1 commissioning spare breakdown':'C2 Working phase breakdown'}>
   <h4>{summary?'5.1–5.3 · รายละเอียด Commissioning Spares สำหรับ A1':'11.C2 · สมการและรายการ Working แยกตามระบบ'}</h4>
+  {summary?<B5StartupAmount0550 allowance={model.b5StartupAllowance} currency={currency}/>:
+   <B5StartupEstimate0550 allowance={model.b5StartupAllowance} currency={currency} disabled={disabled} onNavigate={onNavigate}/>}
   <p>อ้างอิงแบบต้นฉบับ · A1 S/N 4 รับยอด C2 เป็น Base 1 Lot · S/N 5 อ้างอิง C3 อะไหล่เดินเครื่อง 2 ปีใน A2 Option</p>
   {summary?<>
    <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>เลขย่อย Breakdown</th><th>ช่วงงาน</th><th>ราคาขายที่มี</th><th>แถว Working</th></tr></thead><tbody>
