@@ -35,13 +35,15 @@ export const MGW_RADIO_DTRS_0550 = {
  prefix:'OFFER-MGW-Q26-063-RADIO-DTRS-',
  sha256:quote.sourceSha256,
  mrMap:{
-  'RADIO-001':['MR-B1-11-ACP-01'], // ACO is the registered alias of ACP.
+  'RADIO-001':['MR-B1-11-APF-01'], // User confirmed APF on 2026-11-11; ACO is a typo on this row.
   'RADIO-009':['MR-B1-11-APF-01'], // Subscriber equipment only.
   'RADIO-009-OPTION':[],
   'RADIO-016':[], // APM = AMS01; the quote does not identify ABV01.
  },
 };
-export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 expired 8 Nov 2026. ACP and APF lots cover the quoted equipment only. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
+export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
+export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 expired 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
+ ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
 export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId];

@@ -17,17 +17,17 @@ owner basis nor source PDFs, C1 source text, procurement or frozen records.
 
 Upstream baseline `bfc7ec4d`. The original Q26-063 ver1.0 PDF SHA-256
 `6d11565391a0ca5760cdcc76e9f12e191de44004d59dd7865ae8237b1f2b2a31`
-matches the source catalogue. Pages 9–11 and the registered site aliases provide
-the basis for the RADIO / DTRS register.
+matches the source catalogue. The RADIO / DTRS register uses pages 9–11 and
+the user-confirmed site correction for RADIO-001.
 
 | Original quote row | Site | Working and MR trace |
 |---|---|---|
-| RADIO-001 | ACO → ACP | One quoted equipment Lot. Draft reference to `MR-B1-11-ACP-01`. |
+| RADIO-001 | APF (printed as ACO) | One quoted equipment Lot. Draft reference to `MR-B1-11-APF-01`. |
 | RADIO-009 | APF | One subscriber-equipment Lot. Draft reference to `MR-B1-11-APF-01`. |
 | Option following RADIO-009 | APF | Optional charger and speaker/microphone. Quantity and amount TBD. |
 | RADIO-016 | APM → AMS01 | Source price retained. Unit and MR allocation OPEN. |
 
-There is no evidenced RADIO / DTRS offer for ABV01. APF lists 96 handhelds
+Confirm RADIO / DTRS supply for ACP and ABV01. APF lists 96 handhelds
 against MR 98 and 26 mobiles against MR 21. Fixed radios, licences, the
 GTPL relocation and site allocation still require scope reconciliation.
 The quotation validity ended on 8 Nov. Keep the two prices provisional until
@@ -57,7 +57,7 @@ release decisions. The registration is idempotent and a competing saved
 Working price owner takes precedence.
 
 Verification used the real source catalogue with synthetic FX. The DTRS
-regression covers Vendor registration, ACP/APF MR links, Working owners,
+regression covers Vendor registration, APF MR links, Working owners,
 11.M Draft bindings and C1 component quantities and rates. The C1 regression
 covers USD/THB, ambiguous matches, owner totals and exact legacy restore.
 PAGA successor, Working Schedules and Native Exhibit checks passed. Production

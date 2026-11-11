@@ -3,7 +3,7 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_DTRS_0550, MGW_SUPERSEDED_0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_SUPERSEDED_0550,
  mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
@@ -43,7 +43,8 @@ export function prepareMgwRadioDtrsRegister0550(data,systems,today){
   return [makeOffer(false,base),...(option?[makeOffer(true,option)]:[])];
  });
  const pack={schema:VENDOR_REGISTER_SCHEMA_0550,projectId:data.projectId,batchId,preparedOn,
-  coverageNote:'Q26-063 ver1.0 pp9–11. ACO is ACP; APM is AMS01. Reconcile listed quantities and GTPL scope to MR Appendix 1.1.',vendors:[vendor],offers};
+  coverageNote:'Q26-063 ver1.0 pp9–11. '+MGW_RADIO_001_SITE_NOTE_0550+
+   ' APM is AMS01. Reconcile listed quantities and GTPL scope to MR Appendix 1.1.',vendors:[vendor],offers};
  try{return planVendorRegister0550(data,pack,systems).workspace;}
  catch(error){
   const receipt=data.mgwDetailPricingImport,message='DTRS vendor register / '+error.message;
@@ -60,6 +61,15 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  let next=decision===receipt.decision?data:{...data,mgwDetailPricingImport:{...receipt,decision}};
  const retired=next.lines.map(line=>line.selected&&mgwHistoricalLine0550(next,line)?{...line,selected:false}:line);
  if(retired.some((line,i)=>line!==next.lines[i]))next={...next,lines:retired};
+ // Repair the generated owner even if the supplier batch was already applied.
+ const radio001=next.offers.find(o=>o.id===MGW_RADIO_DTRS_0550.prefix+'RADIO-001'&&mgwRadioDtrsOffer0550(o));
+ if(radio001){
+  const [ref]=mgwCurrentMr0550(radio001),site=nativeMr.get(ref).site;
+  const lines=next.lines.map(line=>line.id==='LINE-MGW-CURRENT-RADIO-001'&&line.offerId===radio001.id&&
+   line.systemToken==='TEL-RADIO-DTRS'&&line.wbs==='A'&&line.tagRef==='ACP'&&line.requirementRef==='MR-B1-11-ACP-01'
+   ?{...line,tagRef:site,requirementRef:ref}:line);
+  if(lines.some((line,i)=>line!==next.lines[i]))next={...next,lines};
+ }
  const batches=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
   (next.supplierRevisionImports||[]).some(r=>r.batchId===id));
  if(!batches.length)return next;
