@@ -6,7 +6,7 @@ import {safeSourceUrl} from './sourceIntakeModel';
 import {mgwQuoteItem0550,mgwOfferSystemTokens0550,currentSupplierOffers0550,supplierOfferExcluded0550,mgwProjectWideService0550} from './mgwVendorBasis0550';
 import {workingOffers0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
-import {validateSupplierQuoteRow0550} from './supplierRevision0550';
+import {validateSupplierCommercialTotals0550,validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
 
 // Extend the existing offer registry; this importer never creates Working prices.
@@ -18,7 +18,7 @@ const same=(a,b)=>a===b||a!==undefined&&b!==undefined&&integrationFingerprint055
 const nameKey=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
 export function validateVendorQuoteEvidence0550(e,systems){
  if(e===undefined)return;
- fields(e,['revision','systemTokens','sourceId','sourceSha256','sourceUrl','locator','quotedQuantity','quotedUnit','quotedUnitCost','quotedCurrency','classification','rateBasis','terms','quotedTotal','quotedTotalText','originBatchId','fileName','workingReferenceOfferIds']);
+ fields(e,['revision','systemTokens','sourceId','sourceSha256','sourceUrl','locator','quotedQuantity','quotedUnit','quotedUnitCost','quotedCurrency','classification','rateBasis','terms','quotedTotal','quotedTotalText','originBatchId','fileName','workingReferenceOfferIds','commercialTotals']);
  for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
  if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
  if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
@@ -32,6 +32,11 @@ export function validateVendorQuoteEvidence0550(e,systems){
  if(e.workingReferenceOfferIds!==undefined&&(!Array.isArray(e.workingReferenceOfferIds)||e.workingReferenceOfferIds.length>100||new Set(e.workingReferenceOfferIds).size!==e.workingReferenceOfferIds.length||e.workingReferenceOfferIds.some(id=>typeof id!=='string'||!/^[\w.-]{1,100}$/.test(id))))fail('invalid Working reference offers');
  if(!Array.isArray(e.terms)||e.terms.length>30)fail('invalid quotation terms');
  e.terms.forEach(t=>text(t,6000));
+ if(e.commercialTotals!==undefined){
+  const t=e.commercialTotals;
+  fields(t,['gross','discountable','discount','net','discountPercent']);
+  if(Object.keys(t).length!==5||Object.values(t).some(v=>!Number.isFinite(v)||v<0||v>1e12)||t.discountPercent>100||t.net!==e.quotedTotal)fail('invalid printed commercial totals');
+ }
 }
 export function planVendorRegister0550(data,pack,systems){
  fields(pack,['schema','projectId','batchId','preparedOn','coverageNote','vendors','offers']);
@@ -42,6 +47,13 @@ export function planVendorRegister0550(data,pack,systems){
  const key=integrationFingerprint0550(pack),receipt=(data.supplierRevisionImports||[]).find(r=>r.batchId===pack.batchId);
  if(receipt){if(receipt.packageKey!==key)fail('consumed batch changed');return {workspace:data,changed:false,sourceState:'CURRENT',stats:[]};}
  if(new Set(pack.vendors.map(v=>v.id)).size!==pack.vendors.length||new Set(pack.offers.map(o=>o.id)).size!==pack.offers.length)fail('duplicate IDs');
+ for(const net of pack.offers.filter(o=>o.quoteEvidence?.commercialTotals)){
+  const evidence=net.quoteEvidence,items=pack.offers.filter(o=>o.supplierQuoteRow?.parentOfferId===net.id);
+  if(net.supplierQuoteRow?.classification!=='NET_PACKAGE'||items.some(o=>o.vendorId!==net.vendorId||o.quoteRef!==net.quoteRef||
+   o.quoteEvidence?.sourceSha256!==evidence.sourceSha256||o.quoteEvidence?.sourceId!==evidence.sourceId||
+   o.currency!==evidence.quotedCurrency||o.quoteEvidence.quotedUnitCost!==o.unitCost))fail('commercial totals require one matching original package');
+  validateSupplierCommercialTotals0550(evidence.commercialTotals,items,net);
+ }
  const vendors=[...data.vendors],vendorIds=new Map(),stats=[];
  let addedVendors=0;
  for(const v of pack.vendors){
@@ -163,6 +175,14 @@ export function groupVendorOffers0550(entries,mode,systems,{sourceGroups=false}=
 
 // Supplier totals are a read-only projection, never Working cost adoption.
 export const vendorWorkingRateReference0550=offer=>/Working rate reference/i.test(offer.quoteEvidence?.locator||'');
+export function vendorQuoteNetUnitRate0550(offer,parent){
+ const item=offer.supplierQuoteRow,evidence=offer.quoteEvidence,totals=parent?.quoteEvidence?.commercialTotals;
+ if(!totals||item?.classification!=='BASE_PRICE'||item.parentOfferId!==parent.id||!Number.isFinite(evidence?.quotedUnitCost)||
+  evidence.sourceSha256!==parent.quoteEvidence.sourceSha256||evidence.sourceId!==parent.quoteEvidence.sourceId)return null;
+ const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
+ const rate=item.discountable?totals.discountPercent:0;
+ return new Money(evidence.quotedUnitCost).times(new Money(1).minus(new Money(rate).div(100))).toNumber();
+}
 export function vendorQuoteRowTreatment0550(entry){
  const {offer}=entry,classification=offer.supplierQuoteRow?.classification;
  if(entry.referenceOnly||vendorWorkingRateReference0550(offer)||classification==='INCLUDED_REFERENCE'||mgwCurrentIncluded0550(offer))return 'REFERENCE';

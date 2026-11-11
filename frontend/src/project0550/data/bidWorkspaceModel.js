@@ -2,7 +2,7 @@ import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwReplacementActive0550,MGW_
 import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
-import {validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
+import {pagaRevisionNet0550,validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
 import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroup0550,mgwDetailGroupPrice0550} from "./mgwDetailPricing0550";
@@ -97,7 +97,11 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
- const counts=new Map();data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
+ const eligible=data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered);
+ const counts=new Map();
+ for(const line of eligible)if(line.scopeKey.trim()){const key=line.scopeKey.trim().toLowerCase();counts.set(key,(counts.get(key)||0)+1);}
+ const pagaNetIds=new Set(data.offers.filter(pagaRevisionNet0550).map(o=>o.id));
+ const pagaOwners=eligible.filter(l=>l.systemToken==='TEL-PAGA'&&l.wbs==='A'&&pagaNetIds.has(l.offerId));
  const priceLine=(l,spareCostBasisTHB)=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
@@ -114,6 +118,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     if(mgwCurrentOffer0550(offer)&&selected){
      if(mgwCurrentIncluded0550(offer)||offer.quoteEvidence.classification==='OPTION')problems.push('MGW_QUOTE_NON_ADDITIVE_OR_OPTION');
      if(data.lines.some(other=>other.id!==l.id&&other.selected&&!other.coveredByLineId&&other.offerId===offer.id))problems.push('MGW_SOURCE_COST_OWNER_DUPLICATE / '+offer.id);
+    }
+    if(pagaNetIds.has(offer.id)&&selected){
+     if(l.systemToken!=='TEL-PAGA'||l.wbs!=='A'||l.quantity!==1||l.calculationId)problems.push('PAGA_NET_PACKAGE_BASIS: select one EUR Lot in Working A for TEL-PAGA');
+     if(pagaOwners.length>1)problems.push('PAGA_NET_COST_OWNER_DUPLICATE: select one PAGA NET revision');
     }
     if(offer.vendorId!==l.vendorId)problems.push("Vendor/offer mismatch");
     if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");

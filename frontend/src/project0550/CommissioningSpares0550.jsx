@@ -51,7 +51,7 @@ function LanWorkingStock({basis,link,data,onNavigate}){
 export function CommissioningSpareQuotes0550({data,model,onNavigate,disabled}){
  const active=model.lines.filter(l=>l.selected&&l.offerId&&!l.mrScopeState?.covered);
  const offers=new Map(data.offers.map(o=>[o.id,o]));
- const paga=['OFFER-PAGA-A20261632-002-18020','OFFER-PAGA-A20261632-18020'].map(id=>offers.get(id)).filter(Boolean);
+ const paga=data.offers.filter(o=>o.id.startsWith('OFFER-PAGA-A20261632')&&o.supplierQuoteRow?.itemCode==='18020'&&o.supplierQuoteRow.classification==='BASE_PRICE');
  const dmr=offers.get(CERAGON_R12_0550);
  const dmrBase=active.find(l=>l.wbs==='A'&&l.offerId===CERAGON_R11_0550);
  const lan=lanStockBasis0550(data,model);

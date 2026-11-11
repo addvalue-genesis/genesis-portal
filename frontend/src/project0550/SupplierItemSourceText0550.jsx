@@ -215,7 +215,7 @@ export function SupplierPagaBom0550({
   const matchesOffer=offer=>(!vendorId||offer.vendorId===vendorId)&&isPagaBomOffer(offer);
   if(!data.offers.some(matchesOffer))return null;
   const quotes=(index?.bySystem.get('TEL-PAGA')||[]).filter(quote=>quote.items.some(entry=>matchesOffer(entry.offer)));
-  const quote=quotes.find(candidate=>candidate.key===quoteKey)||quotes.find(candidate=>candidate.title==='A20261632-002')||quotes[0];
+  const quote=quotes.find(candidate=>candidate.key===quoteKey)||quotes.find(candidate=>candidate.owners.some(u=>u.line.wbs==='A'))||quotes[0];
   const mappings=new Map();
   for(const requirement of open?requirements:[]){
     for(const id of requirementSupplierOfferIds0550(requirement)){

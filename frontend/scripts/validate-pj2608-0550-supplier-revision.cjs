@@ -83,6 +83,57 @@ const afterRegistry=R.planSupplierRevision0550(registryFirst,pack,tokens).worksp
 const ctx=require(root+'/project0550/BidWorkspaceContext.jsx');ctx.useBidWorkspace=()=>({data,change:()=>{},busy:false});const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');assert(renderToStaticMarkup(React.createElement(require(root+'/project0550/SiWorkPackage0550.jsx').SiWorkPackage0550)).includes('Import SI work package'));
 ctx.useBidWorkspace=()=>({data:next,put:()=>{},busy:false});assert(renderToStaticMarkup(React.createElement(require(root+'/project0550/VendorWorkspace.jsx').VendorWorkspace)).includes('SYNTHETIC-REV2'));
 console.log('PASS supplier revision: exact ancestor preservation, same-code revision identity, canonical SI/offer/Working writes, no active repricing, edits/deletions/FX/history preservation, non-additive evidence, receipt idempotence/tamper/conflict checks, real import surface SSR.');
+{
+ const V=require(root+'/project0550/data/vendorRegister0550.js');
+ const volumes=require(root+'/project0550/data/bidVolumes0550.js');
+ const previews=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
+ const docs=require(root+'/project0550/releaseScheduleDrafts0550.js');
+ const native=require(root+'/project0550/exhibitCNative0550.js');
+ const currentQuote='A20261632-003',priorQuote='A20261632-002';
+ const netId=quoteRef=>'OFFER-PAGA-'+quoteRef+'-NET';
+ const sourceId='SYNTHETIC-PAGA-003';
+ const commercialTotals={gross:125,discountable:100,discount:25,net:100,discountPercent:25};
+ const offer=(quoteRef,code,price,classification,discountable)=>({
+  ...net,id:code==='NET'?netId(quoteRef):'OFFER-PAGA-'+quoteRef+'-'+code,quoteRef,
+  unit:code==='NET'?'Lot':'U',unitCost:price,brand:'INDUSTRONIC',
+  supplierQuoteRow:{sourceId,itemCode:code,classification,quantity:1,quotedUnit:code==='NET'?'Lot':'U',parentOfferId:netId(quoteRef),discountable},
+  quoteEvidence:{revision:'',systemTokens:['TEL-PAGA'],sourceId,sourceSha256:'a'.repeat(64),sourceUrl:'https://drive.google.com/file/d/SYNTHETIC/view',
+   locator:'PDF p2 / item '+code,quotedQuantity:1,quotedUnit:code==='NET'?'Lot':'U',quotedUnitCost:price,quotedCurrency:'EUR',
+   quotedTotal:price,classification:'RATE',rateBasis:'Synthetic quote',terms:['FCA Wertheim Germany','Advance payment net']}
+ });
+ const previous=offer(priorQuote,'NET',80,'NET_PACKAGE',false);
+ const revised=offer(currentQuote,'NET',100,'NET_PACKAGE',false);
+ revised.quoteEvidence.commercialTotals=commercialTotals;
+ const acoustic=offer(currentQuote,'23050',100,'BASE_PRICE',true),training=offer(currentQuote,'23070',25,'BASE_PRICE',false);
+ const previousOwner={...line,offerId:previous.id,customerRowCode:'A1-05',selected:true,sellMode:'MARKUP',markupPct:0,primePct:0};
+ const input={...data,offers:[previous],lines:[previousOwner],fx:{thbPerEUR:40,thbPerUSD:40,date:'2026-11-11',source:'Synthetic'}};
+ const register={schema:V.VENDOR_REGISTER_SCHEMA_0550,projectId:input.projectId,batchId:'PAGA-RECEIVED-SYNTHETIC',
+  preparedOn:'2026-11-11',coverageNote:'Synthetic only',vendors:[vendor],offers:[revised,acoustic,training]};
+ const registered=V.planVendorRegister0550(input,register,tokens).workspace;
+ assert.equal(registered.lines,input.lines,'Registration preserves saved selections');
+ assert.equal(R.pagaRevisionSelected0550(registered).net,previous);
+ assert.equal(R.pagaRevisionCandidate0550(registered).id,revised.id);
+ const changed=structuredClone(register);changed.offers[1].supplierQuoteRow.discountable=false;
+ assert.throws(()=>V.planVendorRegister0550(input,changed,tokens),/totals\/discount do not reconcile/);
+ const edited={...registered,lines:[{...previousOwner,offerId:revised.id}]},today='2026-11-11';
+ const model=W.deriveBidWorkspace(edited,tokens,today);
+ assert.equal(model.lines[0].provisionalCostNative,100);
+ assert.equal(model.lines[0].provisionalCustomerUSD,100);
+ assert.equal(R.pagaRevisionSelected0550(edited).owner.id,previousOwner.id);
+ assert.deepEqual(R.pagaCommercialChanges0550(edited,revised).map(x=>x.state),['SAME','SAME','SAME']);
+ const saved=volumes.deriveBidVolumes0550(edited,model,D.SYSTEMS,today);
+ const draft=previews.deriveBidVolumeWorkingPreview0550(edited,model,D.SYSTEMS,today,saved);
+ assert.equal(draft.pagaNet.quoteRef,currentQuote);
+ assert.deepEqual(draft.scheduleRows('C1').map(row=>row.amount),[100]);
+ assert(!draft.ready);
+ assert.match(native.nativeSchedule0550(draft,'C7').html,/23070/);
+ assert(docs.releaseScheduleChecks0550(draft).find(row=>row.id==='C7').checks.some(c=>JSON.stringify(c).includes('23070')));
+ assert(previews.scheduleCrosswalk0550(edited,model,saved,draft).rows[0].advisories[0].includes(currentQuote));
+ const conflict={...edited,lines:[...edited.lines,{...previousOwner,id:'PAGA-SECOND-OWNER',scopeKey:'OTHER-KEY'}]};
+ assert.equal(R.pagaRevisionSelected0550(conflict),null);
+ assert(W.deriveBidWorkspace(conflict,tokens,today).lines.every(l=>l.provisionalCustomerUSD===null&&l.problems.some(p=>p.startsWith('PAGA_NET_COST_OWNER_DUPLICATE'))));
+ console.log('PASS PAGA successor: quote totals validated, registration read-only for Working, explicit single NET selection, C1/C7/11.M draft trace and duplicate price suppression.');
+}
 if(process.argv[2]){
  const privatePack=JSON.parse(fs.readFileSync(process.argv[2])),prep=JSON.parse(fs.readFileSync(process.argv[3])),source=JSON.parse(fs.readFileSync(process.argv[4]));
  const B=require(root+'/project0550/data/legacyVendorBasis0550.js'),M=require(root+'/project0550/data/mrWorkingBasis0550.js'),G=require(root+'/project0550/data/mgwVendorBasis0550.js'),P=require(root+'/project0550/data/repositoryBidBasis0550.js');

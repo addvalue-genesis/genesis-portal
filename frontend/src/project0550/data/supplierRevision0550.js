@@ -9,21 +9,26 @@ import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {activeSupplyLine0550} from './supplyProposalDraft0550';
 export const SUPPLIER_REVISION_SCHEMA_0550='genesis.0550.supplier-revision.v1';
 export const PAGA_REVISION='A20261632-002';
+const PAGA_REVISIONS=[PAGA_REVISION,'A20261632-003'];
 const PAGA_NET_ID='OFFER-PAGA-'+PAGA_REVISION+'-NET';
 const PAGA_OWNER='LINE-LEGACY-TEL-PAGA-1';
 const PAGA_PREDECESSORS=['OFFER-LEGACY-TEL-PAGA-1','OFFER-LEGACY-TEL-PAGA-2','OFFER-LEGACY-TEL-PAGA-3'];
 export const PAGA_REVISION_INCLUDED_0550='NET includes OEM documentation/project management (22030), FAT at Wertheim (23010), packing (24010) and one commissioning kit (18020).';
-export const PAGA_REVISION_OPEN_0550='Confirm fourth access panel TAG, XBC circuits, controller/switch architecture and failover. The quoted controller redundancy activations require hardware/TAG and test verification. Separate freight, insurance, duties, ID IE site services/SAT, training and additional spares require their own basis.';
-export const pagaRevisionNet0550=offer=>offer?.id===PAGA_NET_ID&&offer.quoteRef===PAGA_REVISION&&
+export const PAGA_REVISION_OPEN_0550='Confirm fourth access panel TAG, XBC circuits, controller/switch architecture and failover. The quoted controller redundancy activations require hardware/TAG and test verification. Separate freight, insurance, duties, ID IE site services/SAT, additional training and spares require their own basis.';
+export const pagaRevisionNet0550=offer=>PAGA_REVISIONS.includes(offer?.quoteRef)&&offer.id==='OFFER-PAGA-'+offer.quoteRef+'-NET'&&
  offer.supplierQuoteRow?.classification==='NET_PACKAGE'&&offer.supplierQuoteRow.parentOfferId===offer.id&&
  offer.quoteEvidence?.sourceId===offer.supplierQuoteRow.sourceId&&offer.quoteEvidence?.quotedCurrency==='EUR'&&
  offer.currency==='EUR'&&offer.unit==='Lot'&&offer.supplierQuoteRow.quantity===1&&
  Number.isFinite(offer.unitCost)&&offer.unitCost>0&&offer.unitCost===offer.quoteEvidence.quotedTotal;
 export function pagaRevisionSelected0550(data){
- const net=data?.offers.find(pagaRevisionNet0550);
- if(!net)return null;
- const owners=data.lines.map(activeSupplyLine0550).filter(line=>line.selected&&line.wbs==='A'&&line.systemToken==='TEL-PAGA'&&line.offerId===net.id);
- return owners.length===1?{net,owner:owners[0]}:null;
+ const offers=new Map((data?.offers||[]).filter(pagaRevisionNet0550).map(offer=>[offer.id,offer]));
+ const owners=(data?.lines||[]).map(activeSupplyLine0550).filter(line=>line.selected&&line.wbs==='A'&&line.systemToken==='TEL-PAGA'&&
+  !line.coveredByLineId&&line.responsibility!=='COMPANY'&&offers.has(line.offerId));
+ return owners.length===1?{net:offers.get(owners[0].offerId),owner:owners[0]}:null;
+}
+
+export function pagaRevisionCandidate0550(data){
+ return (data?.offers||[]).filter(pagaRevisionNet0550).sort((a,b)=>PAGA_REVISIONS.indexOf(b.quoteRef)-PAGA_REVISIONS.indexOf(a.quoteRef))[0];
 }
 
 export function pagaRevisionItems0550(data,net){
@@ -32,12 +37,35 @@ export function pagaRevisionItems0550(data,net){
   offer.quoteEvidence?.sourceSha256===net.quoteEvidence.sourceSha256);
 }
 
+export function pagaIncludedServices0550(data,net){
+ const base=pagaRevisionItems0550(data,net).filter(o=>o.supplierQuoteRow.classification==='BASE_PRICE');
+ return {acoustic:base.find(o=>o.supplierQuoteRow.itemCode==='23050'),classroom:base.find(o=>o.supplierQuoteRow.itemCode==='23070')};
+}
+
+export function pagaIncludedScope0550(data,net){
+ const {acoustic,classroom}=pagaIncludedServices0550(data,net);
+ return [PAGA_REVISION_INCLUDED_0550,acoustic&&'Acoustic Study (23050) is included in this NET.',
+  classroom&&'Classroom / Virtual Classroom Training (23070) is included in this NET. Verify the tender training requirement separately.'].filter(Boolean).join(' ');
+}
+
+export function pagaCommercialChanges0550(data,net){
+ const previous=data.offers.find(o=>o.id===PAGA_NET_ID&&o.vendorId===net.vendorId&&pagaRevisionNet0550(o));
+ if(!previous||previous.id===net.id)return [];
+ const term=(o,pattern)=>o.quoteEvidence.terms.find(t=>pattern.test(t))||'';
+ const compare=[
+  ['Incoterms',term(previous,/^(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP)\b/i),term(net,/^(EXW|FCA|FAS|FOB|CFR|CIF|CPT|CIP|DAP|DPU|DDP)\b/i)],
+  ['Payment',term(previous,/^(Advance payment|Payment)\b/i),term(net,/^(Advance payment|Payment)\b/i)],
+  ['Validity',previous.validUntil,net.validUntil]
+ ];
+ return compare.map(([label,prior,current])=>({label,prior,current,state:!prior||!current?'OPEN':prior.trim().toLowerCase()===current.trim().toLowerCase()?'SAME':'CHANGED'}));
+}
+
 export function pagaTrainingOption0550(data,net){
  if(!net)return null;
  const item=pagaRevisionItems0550(data,net).find(o=>o.supplierQuoteRow.itemCode==='23060'&&o.supplierQuoteRow.classification==='OPTION');
  const sources=data.sourceIntake?.sources||[],source=sources.find(s=>s.id===item?.quoteEvidence?.sourceId);
- return source&&!sources.some(s=>s.replaces?.includes(source.id))&&
-  /23060[\s\S]{0,340}At actual costs[\s\S]{0,340}Commissioning, training/i.test(source.content||'')?item:null;
+ const original=source&&!sources.some(s=>s.replaces?.includes(source.id))?source.content:!source?item?.quoteEvidence.terms.join('\n'):'';
+ return /23060[\s\S]{0,340}At actual costs[\s\S]{0,420}Commissioning, training/i.test(original||'')?item:null;
 }
 
 export function pagaTwoYearSpareEvidence0550(data,net){
@@ -52,10 +80,10 @@ export function pagaTwoYearSpareEvidence0550(data,net){
 export function preparePagaRevisionPricing0550(data,today){
  const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
  if(today<'2026-11-09'||!receipt||receipt.pagaRevisionHandled)return data;
- const net=data.offers.find(pagaRevisionNet0550);
+ const net=data.offers.find(o=>o.id===PAGA_NET_ID&&pagaRevisionNet0550(o));
  if(!net||!net.date||net.date>today||!net.validUntil||net.validUntil<today)return data;
  const integration=data.integrationWorkspace;
- const review=preparePagaRevisionMapping0550(data,integration?.requirements||[]);
+ const review=preparePagaRevisionMapping0550(data,integration?.requirements||[],net);
  if(!review?.source||review.rows.some(row=>!row.excerpt)||review.source.url!==net.quoteEvidence.sourceUrl||
   data.sourceIntake.sources.some(s=>s.replaces?.includes(review.source.id)))return data;
  const items=pagaRevisionItems0550(data,net);
@@ -110,12 +138,11 @@ const PAGA_MAPPING_ITEMS=[
 
 // Existing WP.7 uses the imported private quote and the native source text.
 // Item numbers alone cannot establish scope across quotation revisions.
-export function preparePagaRevisionMapping0550(data,requirements){
- const net=data.offers.find(o=>o.id===PAGA_NET_ID);
- if(net?.quoteRef!==PAGA_REVISION||net.supplierQuoteRow?.classification!=='NET_PACKAGE'||net.supplierQuoteRow.parentOfferId!==net.id)return null;
+export function preparePagaRevisionMapping0550(data,requirements,net=pagaRevisionCandidate0550(data)||data.offers.find(o=>o.id===PAGA_NET_ID)){
+ if(!net||!PAGA_REVISIONS.includes(net.quoteRef)||net.supplierQuoteRow?.classification!=='NET_PACKAGE'||net.supplierQuoteRow.parentOfferId!==net.id)return null;
  const sourceId=net.supplierQuoteRow.sourceId;
  const sources=data.sourceIntake?.sources||[];
- const source=sources.find(s=>s.id===sourceId&&s.documentNo.includes(PAGA_REVISION)&&s.readState!=='METADATA_ONLY');
+ const source=sources.find(s=>s.id===sourceId&&s.documentNo===net.quoteRef&&s.readState!=='METADATA_ONLY'&&!sources.some(other=>other.replaces?.includes(s.id)));
  const pages=new Map(Array.from((source?.content||'').matchAll(/\[PDF PAGE (\d+)\]([^]*?)(?=\[PDF PAGE |$)/g),
   ([,pageNumber,body])=>[Number(pageNumber),body]));
  const rows=PAGA_MAPPING_ITEMS.map(({mrId,item,label,evidence})=>{
@@ -127,7 +154,7 @@ export function preparePagaRevisionMapping0550(data,requirements){
   const offer=matches.length===1?matches[0]:undefined;
   const locator=offer?.quoteEvidence?.locator||'';
   const pageNumber=Number(locator.match(/^PDF p(\d+) \/ item /)?.[1]);
-  const page=pages.get(pageNumber)||'';
+  const page=pages.get(pageNumber)||(!source?offer?.quoteEvidence.terms?.join('\n'):'')||'';
   const itemRow=page.match(new RegExp('^[ \\t]*'+item+'[ \\t]+.*$', 'm'));
   const afterItem=itemRow?page.slice(itemRow.index):'';
   const nextRow=afterItem.slice(itemRow?.[0].length||0).search(/^[ \t]*\d{4,5}[ \t]+\d+[,.]\d+/m);
@@ -146,9 +173,9 @@ export function pagaRevisionRequirementDraft0550(row,source){
  const append=(prior,value)=>[prior,value].filter(Boolean).join('\n');
  const draft={...r,status:'DRAFT',reviewer:'',reviewedOn:'',basisKey:'',
   offerIds:[...r.offerIds,offer.id],supplierSourceIds:[...new Set([...r.supplierSourceIds,source.id])],
-  supplierLocator:append(r.supplierLocator,PAGA_REVISION+' / '+locator),
+  supplierLocator:append(r.supplierLocator,offer.quoteRef+' / '+locator),
   supplierExcerpt:append(r.supplierExcerpt,excerpt),
-  supplierBasis:append(r.supplierBasis,'A20261632-002 · หลักฐานใน NET เดียว · รอตรวจ TAG / การจัดลงพื้นที่และขอบเขต · ไม่เพิ่มเจ้าของราคา')};
+  supplierBasis:append(r.supplierBasis,offer.quoteRef+' · หลักฐานใน NET เดียว · รอตรวจ TAG / การจัดลงพื้นที่และขอบเขต · ไม่เพิ่มเจ้าของราคา')};
  if(draft.offerIds.length>500||draft.supplierSourceIds.length>500||[draft.supplierLocator,draft.supplierExcerpt,draft.supplierBasis].some(s=>s.length>12000))return null;
  return draft;
 }
@@ -167,6 +194,15 @@ export function validateSupplierQuoteRow0550(o){
  if(!['NET_PACKAGE','BASE_PRICE','OPTION','INCLUDED_REFERENCE'].includes(r.classification)||!Number.isFinite(r.quantity)||r.quantity<=0||typeof r.discountable!=='boolean')fail('invalid quote row');
  if(r.classification==='INCLUDED_REFERENCE'&&o.unitCost!==null)fail('included reference cannot have a separate price');
  if(r.classification==='NET_PACKAGE'&&(o.id!==r.parentOfferId||o.unit!=='Lot'||r.quantity!==1||o.unitCost===null))fail('invalid net owner');
+}
+export function validateSupplierCommercialTotals0550(totals,offers,net){
+ object(totals,['gross','discountable','discount','net','discountPercent']);
+ for(const v of Object.values(totals))if(!Number.isFinite(v)||v<0)fail('invalid commercial totals');
+ if(Object.keys(totals).length!==5||totals.discountPercent>100)fail('invalid discount');
+ const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP}),baseRows=offers.filter(o=>o.supplierQuoteRow?.classification==='BASE_PRICE');
+ if(!baseRows.length||offers.filter(o=>o.supplierQuoteRow?.classification==='NET_PACKAGE').length!==1||baseRows.some(o=>o.unitCost===null))fail('priced base rows required');
+ const sum=rows=>rows.reduce((n,o)=>n.plus(new Money(o.unitCost).times(o.supplierQuoteRow.quantity)),new Money(0)).toDecimalPlaces(2);
+ if(!sum(baseRows).eq(totals.gross)||!sum(baseRows.filter(o=>o.supplierQuoteRow.discountable)).eq(totals.discountable)||!new Money(totals.discountable).times(totals.discountPercent).div(100).toDecimalPlaces(2).eq(totals.discount)||!new Money(totals.gross).minus(totals.discount).eq(totals.net)||!new Money(net.unitCost).eq(totals.net))fail('quote totals/discount do not reconcile');
 }
 export function planSupplierRevision0550(data,pack,systems){
  object(pack,['schema','projectId','batchId','preparedOn','coverageNote','sourceIntake','predecessorSourceKey','vendor','offers','line','requirements','particulars','expectedRequirements','commercialTotals']);
@@ -192,13 +228,7 @@ export function planSupplierRevision0550(data,pack,systems){
  const net=pack.offers.find(o=>o.id===pack.line.offerId);
  if(!net||net.supplierQuoteRow?.classification!=='NET_PACKAGE'||net.vendorId!==vendor.id||pack.line.vendorId!==vendor.id)fail('net owner missing');
  for(const o of pack.offers){validateSupplierQuoteRow0550(o);if(!o.supplierQuoteRow||o.vendorId!==vendor.id||o.quoteRef!==net.quoteRef||o.supplierQuoteRow.parentOfferId!==net.id||!bySource.has(o.supplierQuoteRow.sourceId)||o.currency!=='EUR')fail('offer revision identity missing');}
- const totals=pack.commercialTotals;object(totals,['gross','discountable','discount','net','discountPercent']);
- for(const v of Object.values(totals))if(!Number.isFinite(v)||v<0)fail('invalid commercial totals');
- if(Object.keys(totals).length!==5||totals.discountPercent>100)fail('invalid discount');
- const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP}),baseRows=pack.offers.filter(o=>o.supplierQuoteRow.classification==='BASE_PRICE');
- if(!baseRows.length||pack.offers.filter(o=>o.supplierQuoteRow.classification==='NET_PACKAGE').length!==1||baseRows.some(o=>o.unitCost===null))fail('priced base rows required');
- const sum=rows=>rows.reduce((n,o)=>n.plus(new Money(o.unitCost).times(o.supplierQuoteRow.quantity)),new Money(0)).toDecimalPlaces(2);
- if(!sum(baseRows).eq(totals.gross)||!sum(baseRows.filter(o=>o.supplierQuoteRow.discountable)).eq(totals.discountable)||!new Money(totals.discountable).times(totals.discountPercent).div(100).toDecimalPlaces(2).eq(totals.discount)||!new Money(totals.gross).minus(totals.discount).eq(totals.net)||!new Money(net.unitCost).eq(totals.net))fail('quote totals/discount do not reconcile');
+ validateSupplierCommercialTotals0550(pack.commercialTotals,pack.offers,net);
  for(const e of pack.expectedRequirements){object(e,['id','basisKey']);if(typeof e.id!=='string'||typeof e.basisKey!=='string'||!pack.requirements.some(r=>r.id===e.id))fail('invalid expected requirement');}
  if(new Set(pack.expectedRequirements.map(r=>r.id)).size!==pack.expectedRequirements.length)fail('duplicate expected requirements');
  const source=bySource.get(net.supplierQuoteRow.sourceId);

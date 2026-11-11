@@ -366,7 +366,10 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
   if(page.id==='C2'&&page.systemToken==='TEL-PAGA'&&view.pagaNet){
-   partialNote=[partialNote,'INDUSTRONIC A20261632-002 item 18020: one commissioning kit included in A1-05. Confirm additional spares by equipment and phase.'].filter(Boolean).join(' ');
+   partialNote=[partialNote,'INDUSTRONIC '+view.pagaNet.quoteRef+' item 18020: one commissioning kit included in A1-05. Confirm additional spares by equipment and phase.'].filter(Boolean).join(' ');
+  }
+  if(page.id==='C7'&&page.pageNumber===1&&view.pagaNet&&view.pagaScope){
+   partialNote=[partialNote,'INDUSTRONIC '+view.pagaNet.quoteRef+' · '+view.pagaScope].filter(Boolean).join(' ');
   }
   if(page.id==='C3'&&view.pagaSpares?.recommended.length){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');

@@ -1,4 +1,5 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
+import {pagaRevisionNet0550,pagaIncludedScope0550} from './data/supplierRevision0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,ceragonR11Selected0550,DMR_PART_B_0550} from './data/ceragonSelection0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {APF_LAN_BID_BASIS_0550,mgwCurrentOffer0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./data/mgwQuoteSelection0550";
@@ -90,7 +91,22 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  <Select label="Customer form row" value={form.customerRowCode||""} onChange={v=>field("customerRowCode",v)} options={[["","OPEN · suggested "+(suggestedCustomerCode(form)||"เลือกตามขอบเขต")],...CUSTOMER_FORM_0550.rows.filter(r=>r.part===form.wbs[0]).map(r=>[r.code,r.code+" · "+r.description])]}/><Field label="Customer brand / model" value={form.brand||""} onChange={v=>field("brand",v)}/><Field label="Customer remark" value={form.customerRemark||""} onChange={v=>field("customerRemark",v)}/>
  <Field label="Requirement reference" value={form.requirementRef} onChange={v=>field("requirementRef",v)}/><Field label="TAG / site reference" value={form.tagRef} onChange={v=>field("tagRef",v)}/><Field label="Line source / manual basis" value={form.sourceRef} onChange={v=>field("sourceRef",v)} required/>
  {!mgwGroup&&<><Select label="Line vendor" value={form.vendorId} onChange={v=>setForm(f=>({...f,vendorId:v,offerId:""}))} options={[["","Manual / owner OPEN"],...data.vendors.map(v=>[v.id,v.name])]}/>
- <Select label="Selected offer" value={form.offerId} onChange={v=>{const o=data.offers.find(o=>o.id===v);setForm(f=>({...f,offerId:v,...(o?{unit:o.unit,currency:o.currency,...(mgwQuoteItem0550(o)&&v!==f.offerId?{coverageBasis:""}:{})}: {})}));}} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)).map(o=>[o.id,o.quoteRef+" · "+o.description+" · "+amount(o.unitCost,o.currency)+" / "+o.unit])]}/>
+ <Select label="Selected offer" value={form.offerId} onChange={v=>{
+  const offer=data.offers.find(o=>o.id===v);
+  setForm(line=>{
+   if(!offer)return {...line,offerId:v};
+   const next={...line,offerId:v,unit:offer.unit,currency:offer.currency};
+   if(mgwQuoteItem0550(offer)&&v!==line.offerId)next.coverageBasis="";
+   if(line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&pagaRevisionNet0550(offer)&&v!==line.offerId){
+    const old=data.offers.find(o=>o.id===line.offerId);
+    if(pagaRevisionNet0550(old)&&line.description.includes(old.quoteRef))next.description=line.description.replace(old.quoteRef,offer.quoteRef);
+    next.sourceRef=offer.sourceRef+' / '+pagaIncludedScope0550(data,offer);
+   }
+   return next;
+  });
+ }} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)&&
+  (o.id===form.offerId||!o.id.startsWith('OFFER-PAGA-A20261632')||!o.supplierQuoteRow||pagaRevisionNet0550(o)||
+   o.supplierQuoteRow.classification==='NET_PACKAGE'&&o.quoteRef==='A20261632')).map(o=>[o.id,o.quoteRef+" · "+o.description+" · "+amount(o.unitCost,o.currency)+" / "+o.unit])]}/>
  <Select label="Quantity source" value={form.calculationId} onChange={v=>{const c=data.calculations.find(c=>c.id===v);setForm(f=>({...f,...calculationBinding0550(c,null,chosenOffer)}));}} options={[["","Manual quantity"],...data.calculations.filter(c=>c.systemToken===form.systemToken||c.systemToken==="COMMON").map(c=>[c.id,c.title+" · "+c.equationId])]}/>
  {form.calculationId?<Select label="Equation output" value={form.resultKey} onChange={v=>setForm(f=>({...f,...calculationBinding0550(data.calculations.find(c=>c.id===f.calculationId),v,chosenOffer)}))} options={["value","MD","MH"]}/>:<Field label="Manual quantity" type="number" min="0.000001" step="any" value={form.quantity} onChange={v=>field("quantity",v)}/>}
  {!chosenOffer&&<><Select label="Line unit" value={form.unit} onChange={v=>field("unit",v)} options={BID_UNITS}/><Select label="Line currency" value={form.currency} onChange={v=>field("currency",v)} options={["THB","USD","EUR"]}/><Field label="Manual unit cost" type="number" min="0" step="any" value={form.manualCost} onChange={v=>field("manualCost",v)}/></>}

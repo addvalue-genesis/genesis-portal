@@ -43,13 +43,18 @@ const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)
 const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
 function reconcilePagaTrainingEstimate0550(data,receipt){
  const line=data.lines.find(l=>l.id==='REQ-MR-ACT-B3-D01'),row=receipt.rows.find(r=>r.lineId===line?.id);
- const old='Excludes INDUSTRONIC training already inside selected PAGA package and existing TSI operator/maintenance training.';
- if(row?.kind!=='ESTIMATE'||!row.basis.includes(old)||row.inputKey!==lineKey(data,line))return data;
+ if(row?.kind!=='ESTIMATE'||row.inputKey!==lineKey(data,line))return data;
  const option=pagaTrainingOption0550(data,pagaRevisionSelected0550(data)?.net);
  if(!option)return data;
- const basis='Excludes TSI operator/maintenance training. INDUSTRONIC A20261632-002 item 23060 (p16) is an Onshore Option at actual cost. PAGA OEM training, trainer days and reimbursables require a separate basis.';
+ const basis='Excludes TSI operator/maintenance training. INDUSTRONIC '+option.quoteRef+' item 23060 (p16) is an Onshore Option at actual cost. Additional OEM training, trainer days and reimbursables require a separate basis.';
+ const old=[
+  'Excludes INDUSTRONIC training already inside selected PAGA package and existing TSI operator/maintenance training.',
+  'Excludes TSI operator/maintenance training. INDUSTRONIC A20261632-002 item 23060 (p16) is an Onshore Option at actual cost. PAGA OEM training, trainer days and reimbursables require a separate basis.',
+  'Excludes TSI operator/maintenance training. INDUSTRONIC A20261632-002 item 23060 (p16) is an Onshore Option at actual cost. Additional OEM training, trainer days and reimbursables require a separate basis.'
+ ].find(text=>text!==basis&&row.basis.includes(text));
+ if(!old)return data;
  const updated={...line,sourceRef:line.sourceRef.replace(old,basis),customerRemark:line.customerRemark.replace(old,basis)};
- const offerIds=[...new Set([...row.offerIds,option.id])];
+ const offerIds=[...new Set([...row.offerIds.filter(id=>id!=='OFFER-PAGA-A20261632-002-23060'),option.id])];
  const amended={...row,basis:row.basis.replace(old,basis),inputKey:lineKey(data,updated),offerIds,sourceKey:sourceKey(data,offerIds)};
  return {...data,lines:data.lines.map(l=>l===line?updated:l),repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows:receipt.rows.map(r=>r===row?amended:r)}}};
 }

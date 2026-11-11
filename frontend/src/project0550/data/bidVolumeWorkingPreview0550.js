@@ -1,4 +1,4 @@
-import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,pagaTwoYearSpareEvidence0550} from './supplierRevision0550';
+import {pagaRevisionNet0550,pagaRevisionSelected0550,pagaIncludedScope0550,pagaTwoYearSpareEvidence0550} from './supplierRevision0550';
 import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
@@ -49,7 +49,7 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   const customerMapped=mappingValid(raw),reasons=[];
   // These annotations identify work to inspect; they do not decide applicability.
   const advisories=[];
-  if(pagaRevisionNet0550(line?.offer))advisories.push(line.offer.quoteRef+' · '+PAGA_REVISION_INCLUDED_0550);
+  if(pagaRevisionNet0550(line?.offer))advisories.push(line.offer.quoteRef+' · '+pagaIncludedScope0550(data,line.offer));
   if(mgwCctvEntOffer0550(line?.offer)||mgwBulkOffer0550(line?.offer)){
    const candidates=mgwCurrentMr0550(line.offer);
    if(candidates.length)advisories.push('MR candidate / '+candidates.join(' / '));
@@ -220,8 +220,8 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  }
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:currentSupplierOffers0550(data).filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
  const mgwBulkSupply=bindings.some(b=>b.schedule==='C1'&&Number.isFinite(b.amount)&&mgwBulkOffer0550(b.line?.offer));
- const pagaNet=bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer))?.line.offer;
- return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+ const pagaNet=pagaRevisionSelected0550(data)?.net;
+ return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),

@@ -1,4 +1,4 @@
-import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
+import {pagaRevisionNet0550,PAGA_REVISION_OPEN_0550} from './data/supplierRevision0550';
 import {SCHEDULES_0550,deriveBidVolumes0550} from './data/bidVolumes0550';
 import {deriveBidVolumeWorkingPreview0550} from './data/bidVolumeWorkingPreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
@@ -21,13 +21,13 @@ export function releaseScheduleDraftView0550(data,model,systems,today){
 }
 
 export function releaseScheduleChecks0550(view){
- const paga=view.bindings.find(b=>b.line?.selected&&pagaRevisionNet0550(b.line.offer));
+ const paga=view.pagaNet&&view.bindings.find(b=>b.line?.selected&&b.line.offer?.id===view.pagaNet.id);
  const pagaChecks={
   C2:'PAGA item 18020 is one commissioning kit included in the A1-05 NET. Verify additional OEM spares and recommended quantities.',
   C3:view.pagaSpares?`PAGA SP2 records ${view.pagaSpares.recommended.length} recommended spare lines with supplier prices. Reconcile the kit overlap and Base/Option treatment before replacing the Working allowance.`:
    'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
   C5:'Separate additional PAGA special tools from the kit included in A1-05.',
-  C7:'PAGA OEM FAT at Wertheim is included in A1-05. Confirm field service, SAT and training separately.'
+  C7:'PAGA OEM FAT at Wertheim is included in A1-05. '+(view.pagaScope||'')+' Confirm additional field service, SAT and training against the tender scope.'
  };
  return RELEASE_DRAFT_FORMS_0550.map(({id,title})=>{
   const treatment=id==='A1'?'BASE':id==='A2'?'OPTION':null;
@@ -49,7 +49,7 @@ export function releaseScheduleChecks0550(view){
   for(const b of printed){
    const supplementCheck=mgwSupplementOpen0550(b.line.offer,b.line.systemToken);
    if(supplementCheck)add(supplementCheck,b.lineId);
-   if(pagaRevisionNet0550(b.line.offer))add(PAGA_REVISION_INCLUDED_0550+' '+PAGA_REVISION_OPEN_0550,b.lineId);
+   if(pagaRevisionNet0550(b.line.offer))add(b.line.offer.quoteRef+' · '+(view.pagaScope||'')+' '+PAGA_REVISION_OPEN_0550,b.lineId);
   }
   if(id==='A'){
    if(!record.nativeFields?.agreementNo?.trim())add('Agreement / Contract No. OPEN');

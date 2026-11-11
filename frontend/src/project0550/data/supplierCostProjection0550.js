@@ -23,11 +23,12 @@ export function supplierQuotedSection0550(data,offer){
  if(!offer.id.startsWith('OFFER-PAGA-A20261632')||!row||!evidence)return null;
  const pageNumber=Number(evidence.locator?.match(/^PDF p(\d+) \/ item /)?.[1]);
  const source=data?.sourceIntake?.sources?.find(s=>s.id===row.sourceId&&s.documentNo===offer.quoteRef&&s.readState!=='METADATA_ONLY');
- if(!source?.content||!pageNumber||!/^\d{4,5}$/.test(row.itemCode))return null;
- const declaredHash=source.note?.match(/\bSHA256 ([a-f0-9]{64})/i)?.[1];
+ if(!pageNumber||!/^\d{4,5}$/.test(row.itemCode))return null;
+ const declaredHash=source?.note?.match(/\bSHA256 ([a-f0-9]{64})/i)?.[1];
  if(declaredHash&&declaredHash!==evidence.sourceSha256)return null;
- const pages=[...source.content.matchAll(/\[PDF PAGE (\d+)\]([^]*?)(?=\[PDF PAGE |$)/g)];
- const page=pages.length?pages.find(match=>Number(match[1])===pageNumber)?.[2]:source.content.split('\f')[pageNumber-1];
+ const pages=[...(source?.content||'').matchAll(/\[PDF PAGE (\d+)\]([^]*?)(?=\[PDF PAGE |$)/g)];
+ const excerpt=evidence.terms?.find(t=>t.startsWith('Original PDF item text\n'));
+ const page=source?.content?(pages.length?pages.find(match=>Number(match[1])===pageNumber)?.[2]:source.content.split('\f')[pageNumber-1]):excerpt;
  if(!page)return null;
  const matches=[...page.matchAll(new RegExp('^[ \\t]*'+row.itemCode+'[ \\t]+(\\d+(?:\\.\\d{3})*,\\d{2})[ \\t]+(\\S+)[^\\n]*','gm'))];
  if(matches.length!==1)return null;
@@ -44,7 +45,7 @@ export function supplierQuotedSection0550(data,offer){
   const counted=/^(\d+)x\s+([^]*)$/.exec(detail);
   return [{quantity:counted?Number(counted[1]):null,description:counted?counted[2].trim():detail}];
  }):[];
- return {text,part,components,locator:evidence.locator,sourceId:source.id};
+ return {text,part,components,locator:evidence.locator,sourceId:row.sourceId};
 }
 export const supplierItemLabel0550=offer=>offer.description?.trim().split(/\r?\n/,1)[0]||offer.id;
 

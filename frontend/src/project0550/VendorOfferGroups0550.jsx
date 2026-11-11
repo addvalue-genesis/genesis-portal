@@ -4,7 +4,7 @@ import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwReplacementActive0550} from "./d
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
-import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550,vendorQuoteRowTreatment0550} from './data/vendorRegister0550';
+import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550,vendorQuoteRowTreatment0550,vendorQuoteNetUnitRate0550} from './data/vendorRegister0550';
 import {mgwHistoricalOffer0550,mgwQuoteItem0550,mgwProjectWideService0550} from './data/mgwVendorBasis0550';
 import {SYSTEMS} from './data';
 import {bidOwnerStyle} from './bidPresentation0550';
@@ -75,8 +75,10 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    navigationTarget==='bid.vendor.'+archived?.vendorId||navigationTarget==='bid.vendor.'+mgwVendorId)setMode('company');
  },[entries,archivedKey,archived,mgwVendorId,navigationTarget]);
  const anchors=new Set();
+ const packageQuotes=new Map(data.offers.filter(o=>o.quoteEvidence?.commercialTotals).map(o=>[o.id,o]));
  const renderRow=entry=>{
-  const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o);
+  const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
+  const netRate=vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
   const anchor=!anchors.has(o.id);anchors.add(o.id);
   const currentMr=mgwCurrentMr0550(o);
   const selected=entry.working.filter(activeSupply0550),referenceSelected=entry.referenceWorking.filter(activeSupply0550);
@@ -90,11 +92,13 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
      {e&&<><p>{e.locator} · revision: {e.revision||'ต้นฉบับไม่ระบุ'}</p><p><a href={e.sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></p><small>Source ID: {e.sourceId}<br/>SHA256: {e.sourceSha256}</small></>}
+     {commercial&&<p>Gross {amount(commercial.gross,e.quotedCurrency)} · ฐานส่วนลด {amount(commercial.discountable,e.quotedCurrency)} · ส่วนลด {commercial.discountPercent}% ({amount(commercial.discount,e.quotedCurrency)}) · NET {amount(commercial.net,e.quotedCurrency)}</p>}
      <p>{o.sourceRef}</p>
     </details>
    </td>
    <td>{entry.referenceOnly?<>{entry.working.map(l=>(l.quantity??'OPEN')+' '+l.unit).join(' / ')||'Working basis'}<small>จำนวนที่ใช้ใน Working</small></>:<>{sourceQty===undefined?'ไม่ระบุ':sourceQty} {sourceUnit||'หน่วยรอยืนยัน'}{e&&<small>จำนวนอ้างอิงใน Quote</small>}{r&&<small>{r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป':'จำนวนต้นฉบับ ไม่แทนจำนวน MR'}</small>}</>}</td>
    <td><strong>{amount(e?e.quotedUnitCost:o.unitCost,e?.quotedCurrency||o.currency)}</strong><small>/ {e?.quotedUnit||o.unit}</small>{entry.referenceOnly&&<small>ฐาน Working เดิมรวมหลายใบเสนอราคา · ดูต้นฉบับแยกฉบับ</small>}{e&&<><small>{e.rateBasis}</small>{(o.unitCost!==e.quotedUnitCost||o.currency!==e.quotedCurrency||o.unit!==e.quotedUnit)&&<small>เรตที่บันทึกไว้ {amount(o.unitCost,o.currency)} / {o.unit}</small>}</>}
+    {netRate!==null&&<small>เรตสุทธิอ้างอิง {netRate.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4})} {e.quotedCurrency} / {e.quotedUnit} · {s.discountable?'ใช้ส่วนลด':'ไม่อยู่ในฐานส่วนลด'}</small>}
     {e?.classification==='OPTION'&&<small>{selectedR11&&o.id===CERAGON_R11_0550?'OPTION ในใบต้นฉบับ · เลือกใช้ 1 Lot ใน Working':'OPTION · ยังไม่รวมในฐานโดยอัตโนมัติ'}</small>}
     {s&&<small>{s.classification==='NET_PACKAGE'?'ต้นทุนสุทธิทั้งแพ็กเกจ':s.classification==='INCLUDED_REFERENCE'?'รวมใน Package · ไม่มีราคาแยก':s.classification==='OPTION'?'OPTION · อ้างอิงแยกจากฐาน':'ราคาก่อนส่วนลด · อ้าง Package เดียว'} · Item {s.itemCode}</small>}
     {s?.classification!=='NET_PACKAGE'&&s?.parentOfferId&&<small>{s.parentOfferId}</small>}

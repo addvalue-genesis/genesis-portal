@@ -19,7 +19,7 @@ export function selectedPagaOffer0550(data){
  const offers=ids.map(id=>data.offers.find(o=>o.id===id));
  // The selected package and its additive OEM components share one manufacturer
  // decision. Mixed OEMs or quote bases must be reconciled explicitly.
- if(offers.some(o=>!o||!['A20261632','A20261632-002'].includes(o.quoteRef.trim())||o.quoteRef.trim()!==offers[0]?.quoteRef.trim()||(o.brand.trim()?o.brand.trim().toUpperCase()!=="INDUSTRONIC":!hasIndustronic(data.vendors.find(v=>v.id===o.vendorId)?.name))))return null;
+ if(offers.some(o=>!o||!['A20261632','A20261632-002','A20261632-003'].includes(o.quoteRef.trim())||o.quoteRef.trim()!==offers[0]?.quoteRef.trim()||(o.brand.trim()?o.brand.trim().toUpperCase()!=="INDUSTRONIC":!hasIndustronic(data.vendors.find(v=>v.id===o.vendorId)?.name))))return null;
  return {offer:offers[0],offers,lines};
 }
 

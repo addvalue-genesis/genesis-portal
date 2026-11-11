@@ -30,16 +30,16 @@ export function Multi({label,value,onChange,options}){return <Field label={label
 function Note({children}){return <p className="p55-note">{children}</p>;}
 function PagaRevisionMapping({data,requirements,onEdit,onNavigate,onOpenSource}){
  const view=preparePagaRevisionMapping0550(data,requirements);
- if(!view)return <Note>PAGA A20261632-002 · รอทะเบียน Vendor และใบเสนอราคาต้นทางจาก DATA</Note>;
+ if(!view)return <Note>PAGA · รอทะเบียน Vendor และใบเสนอราคาต้นทางจาก DATA</Note>;
  const {net,source,rows,selected}=view,selectedRevision=pagaRevisionSelected0550(data);
  const deliveryTerm=net.quoteEvidence?.terms?.find(term=>/^FCA\b/i.test(term));
  const quotedPanels=rows[0].offer?.supplierQuoteRow.quantity;
  const requiredPanels=rows.slice(0,2).reduce((total,row)=>total+(row.mr?.quantity||0),0);
  return <details className="p55-panel" open>
-  <summary>PAGA A20261632-002 · ร่าง Mapping ก่อนทบทวน A1-05</summary>
-  <p>NET จากใบเสนอราคา {amount(net.unitCost,net.currency)} / {net.unit} · {selectedRevision?"ใช้หนึ่งเจ้าของราคาใน Working A1-05 แล้ว · ตรวจขอบเขตราย TAG ต่อ":"ตรวจเจ้าของราคาเดิมก่อนใช้ฉบับนี้"}</p>
+  <summary>PAGA {net.quoteRef} · ร่าง Mapping ก่อนทบทวน A1-05</summary>
+  <p>NET จากใบเสนอราคา {amount(net.unitCost,net.currency)} / {net.unit} · {selectedRevision?.net.id===net.id?"ใช้หนึ่งเจ้าของราคาใน Working A1-05 แล้ว · ตรวจขอบเขตราย TAG ต่อ":selectedRevision?"Working A1-05 ใช้ "+selectedRevision.net.quoteRef+" · ตรวจขอบเขตก่อนเปลี่ยนฉบับ":"ตรวจเจ้าของราคาเดิมก่อนใช้ฉบับนี้"}</p>
   {deliveryTerm&&<Note>{deliveryTerm} · ตรวจเงื่อนไขขนส่งก่อนเปลี่ยนฐานราคาขายลูกค้า</Note>}
-  {source?<button type="button" onClick={()=>onOpenSource("bid.documents.source."+source.id)}>เปิดหลักฐาน VND ในทะเบียนเอกสาร</button>:<Note>ยังไม่พบข้อความต้นฉบับใน A · ตรวจ Source Intake จาก DATA</Note>}
+  {source?<button type="button" onClick={()=>onOpenSource("bid.documents.source."+source.id)}>เปิดหลักฐาน VND ในทะเบียนเอกสาร</button>:<Note>เปิด PDF ต้นฉบับจาก 07 VND · หากจะบันทึก Mapping ให้เชื่อม Source Intake ในทะเบียนเอกสารก่อน</Note>}
   <button type="button" onClick={()=>onNavigate("bid.vendor.offer."+net.id)}>เปิด NET ใน B07</button>
   <button type="button" onClick={()=>onNavigate("bid.budget.working.group.TEL-PAGA")}>เปิด Working PAGA</button>
   <button type="button" onClick={()=>onNavigate("bid.quotation.mapping")}>เปิด Schedule allocation 11.M</button>

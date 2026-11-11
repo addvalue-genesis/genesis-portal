@@ -1,5 +1,5 @@
 import React from 'react';
-import {PAGA_REVISION,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550,pagaRevisionSelected0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
+import {PAGA_REVISION_OPEN_0550,pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaCommercialChanges0550,pagaIncludedScope0550,pagaIncludedServices0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 
 const scopeNotes={
  A:'Working A1-05 ใช้ NET 1 Lot อ้างอิง MR Rev.B1 Appendix 1.4 และ WP.7 · Access Panel 4 ตัวตามใบเสนอราคา · ตรวจ TAG ตัวที่สี่กับ MR และวงจร XBC ที่ APF/ACP',
@@ -22,26 +22,35 @@ const scopeNotes={
 
 export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  const selected=pagaRevisionSelected0550(data);
- if(!selected)return null;
- const {net,owner}=selected;
+ const candidate=pagaRevisionCandidate0550(data),net=selected?.net,owner=selected?.owner;
+ if(!net&&!candidate)return null;
+ const received=candidate&&candidate.id!==net?.id&&['vendor','A','commercial'].includes(section)?candidate:null;
+ if(!net&&!received)return null;
+ const services=net?pagaIncludedServices0550(data,net):{};
+ const display=net||received;
  const spares=section==='C3'?pagaTwoYearSpareEvidence0550(data,net):null;
  const training=['C7','mapping'].includes(section)?pagaTrainingOption0550(data,net):null;
  const mr=(data.sourceIntake?.sources||[]).find(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER');
- const terms=net.quoteEvidence.terms.filter(term=>/^(FCA|Advance payment|Validity|Lead time|Warranty)/i.test(term));
+ const terms=display.quoteEvidence.terms.filter(term=>/^(FCA|Advance payment|Validity|Lead time|Warranty|Freight pickup)/i.test(term));
+ const changes=section==='commercial'?pagaCommercialChanges0550(data,received||display):[];
  const links=[
   ...(mr?[['bid.documents.source.'+mr.id,'CUS · MR Rev.B1']]:[]),
-  ['bid.vendor.offer.'+net.id,'07 · VND'],
+  ['bid.vendor.offer.'+display.id,'07 · VND'],
   ['bid.working-preview.step.7','SI · WP.7'],
-  ['bid.budget.working.line.'+owner.id,'Working A1-05'],
-  ['bid.quotation.line.'+owner.id,'11.M'],
+  ...(owner?[['bid.budget.working.line.'+owner.id,'Working A1-05'],['bid.quotation.line.'+owner.id,'11.M']]:[]),
  ];
  return <aside className="p55-panel" aria-label="PAGA current quote scope">
-  <h4>PAGA · INDUSTRONIC {PAGA_REVISION} · Working Draft</h4>
-  <p>{spares?`OEM SP2 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจรายการซ้ำกับ Commissioning Kit และตัดสินใจ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNotes[section]||PAGA_REVISION_INCLUDED_0550}</p>
+  <h4>PAGA · INDUSTRONIC {display.quoteRef} · {net?'Working Draft':'Received'}</h4>
+  {received&&<p>{received.quoteRef} · ได้รับแล้ว · เลือกฉบับในเจ้าของราคา Working A1-05 เมื่อตรวจฐานราคาและขอบเขตแล้ว {onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+received.id)}>07 · เปิดใบเสนอราคา</button>}</p>}
+  {net&&<p>{spares?`OEM SP2 ของ -002 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจความเข้ากันกับฉบับที่เลือก รายการซ้ำกับ Commissioning Kit และ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNotes[section]||pagaIncludedScope0550(data,net)}</p>}
+  {net&&['B','C','C7','D','mapping','release'].includes(section)&&services.acoustic&&<p>Item 23050 · Acoustic Study รวมอยู่ใน NET · ระยะเวลาศึกษาแยกจาก lead time ของอุปกรณ์</p>}
+  {net&&['B','C','C7','mapping','release'].includes(section)&&services.classroom&&<p>Item 23070 · Classroom / Virtual Classroom Training รวมอยู่ใน NET · ตรวจจำนวนผู้เข้าอบรม ระยะเวลา และ On-site Training ตาม Annex ก่อนจัดสรรส่วนเพิ่ม</p>}
   {spares&&onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+(spares.recommended[0]||spares.options[0]).id)}>07 · เปิดหลักฐาน SP2</button>}
-  {training&&<p>A20261632-002 · Item 23060 · Onshore Training คิดตามจริงแยกจาก NET · รอวัน/ชั่วโมงผู้สอนและค่าใช้จ่าย</p>}
-  {section==='commercial'&&<><p>เงื่อนไขจัดซื้อ OEM · {terms.join(' · ')}</p><p>เทียบกับ Schedule B และเงื่อนไขของลูกค้าก่อนบันทึก Commercial Deviation · เอกสารคุณสมบัติและผล AVL ตรวจใน 13 และ 14</p></>}
-  {section==='release'&&<p>{PAGA_REVISION_OPEN_0550}</p>}
+  {training&&<p>{net.quoteRef} · Item 23060 · Onshore Training คิดตามจริงแยกจาก NET · รอวัน/ชั่วโมงผู้สอนและค่าใช้จ่าย</p>}
+  {section==='commercial'&&<><p>เงื่อนไขจัดซื้อ OEM · {terms.join(' · ')}</p>
+   {changes.length>0&&<><p>{(received||display).quoteRef} เทียบกับ -002</p><ul aria-label="PAGA commercial comparison">{changes.map(term=><li key={term.label}>{term.label} · {term.state==='SAME'?'ตรงกัน':term.state==='CHANGED'?'เปลี่ยนจาก '+term.prior+' เป็น '+term.current:'รอยืนยันเงื่อนไข'}</li>)}</ul></>}
+   <p>เทียบกับ Schedule B และเงื่อนไขของลูกค้าก่อนบันทึก Commercial Deviation · เอกสารคุณสมบัติและผล AVL ตรวจใน 13 และ 14</p></>}
+  {net&&section==='release'&&<p>{PAGA_REVISION_OPEN_0550}</p>}
   {onNavigate&&<div className="p55-review-toolbar">{links.map(([id,label])=><button type="button" key={id} disabled={disabled} onClick={()=>onNavigate(id)}>{label}</button>)}</div>}
  </aside>;
 }

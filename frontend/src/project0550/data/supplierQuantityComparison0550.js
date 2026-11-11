@@ -59,7 +59,7 @@ export function supplierQuantityComparison0550(data,model,integration){
   if(!linesByMr.has(line.mrRequirementId))linesByMr.set(line.mrRequirementId,[]);
   linesByMr.get(line.mrRequirementId).push(line);
  }
- const pagaItems=new Map((paga?preparePagaRevisionMapping0550(data,integration.requirements)?.rows||[]:[])
+ const pagaItems=new Map((paga?preparePagaRevisionMapping0550(data,integration.requirements,paga.net)?.rows||[]:[])
   .filter(row=>row.mr&&row.offer&&row.excerpt).map(row=>[row.mr.id,row.offer.id]));
  const offerScope=new Map();
  const rows=MR_WORKING_CATALOG_0550.rows.map(mr=>{

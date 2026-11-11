@@ -1,4 +1,4 @@
-import {pagaRevisionItems0550,pagaRevisionSelected0550,PAGA_REVISION_INCLUDED_0550,PAGA_REVISION_OPEN_0550} from './supplierRevision0550';
+import {pagaRevisionItems0550,pagaRevisionSelected0550,pagaIncludedScope0550,PAGA_REVISION_OPEN_0550} from './supplierRevision0550';
 import {MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550,MGW_CURRENT_SCOPE_0550,MGW_MET_NDB_0550,mgwBulkOffer0550,mgwCurrentOffer0550,mgwCurrentIncluded0550,MGW_SECTION_SUBTOTAL_0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 // Read-only live SI dossier. Source facts remain separate from authored interpretation.
 import {TECHNICAL_SECTIONS_0550,TECHNICAL_AUTHORITY_0550,blankTechnicalRecord0550,emptyTechnicalProposal0550} from './technicalProposal0550';
@@ -34,7 +34,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
   tables.push({title:'PAGA '+paga.net.quoteRef+' · selected INTRON-X package',heads:['Supplier evidence','Scope and verification'],
-   rows:[[paga.net.quoteEvidence.locator+' / '+paga.net.quoteEvidence.sourceUrl,PAGA_REVISION_INCLUDED_0550+' '+PAGA_REVISION_OPEN_0550]]});
+   rows:[[paga.net.quoteEvidence.locator+' / '+paga.net.quoteEvidence.sourceUrl,pagaIncludedScope0550(data,paga.net)+' '+PAGA_REVISION_OPEN_0550]]});
   if(sectionId==='equipment')tables.push({title:'Original PAGA offered BOM',heads:['Item / PDF locator','Quoted description','Quantity / treatment'],
    rows:pagaRevisionItems0550(data,paga.net).map(o=>[o.supplierQuoteRow.itemCode+' / '+o.quoteEvidence.locator,o.description,o.supplierQuoteRow.quantity+' '+o.supplierQuoteRow.quotedUnit+' / '+(o.supplierQuoteRow.classification==='OPTION'?'Option — separate review':'Package reference')])});
  }
