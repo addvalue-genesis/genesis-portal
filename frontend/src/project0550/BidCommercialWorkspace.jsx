@@ -58,6 +58,19 @@ function B5Preparation0550({lines,initialSystem,onNew}){
   })}</div>
  </section>;
 }
+function MrWorkingComponents0550({requirement}){
+ const review=requirement.componentReview;
+ return <div>
+  <strong>ข้อกำหนดลูกค้า (MR)</strong>
+  <ul>{requirement.components.map((component,i)=><li key={i}>{component}</li>)}</ul>
+  {review&&<>
+   <p>{review.appendixReference}</p>
+   <ul aria-label="MR revision differences">{review.notes.map(note=><li key={note}>{note}</li>)}</ul>
+   <ul aria-label="MR source documents">{review.sources.map(source=><li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label}</a></li>)}</ul>
+  </>}
+ </div>;
+}
+
 function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  // Spare SI equations supply Q_add only. Costs, selling E10/E11/E12, Prime
  // and FX continue through the existing Working runtime; no Schedule price is
@@ -72,7 +85,7 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  const [reviewSave,setReviewSave]=useState(false);
  const field=(k,v)=>setForm(f=>({...f,[k]:v}));
  const chosenOffer=data.offers.find(o=>o.id===form.offerId),mgwGroup=mgwDetailGroup0550(form.mgwDetailGroupId);
- const towerScope=towerC1Reference0550(form);
+ const towerScope=towerC1Reference0550(form),mrRequirement=mrRequirement0550(form);
  const mgwExcluded=mgwWorkingLineExcluded0550(data,form,chosenOffer);
  const mgwProjectWideConflict=mgwProjectWideLineConflict0550(form,chosenOffer);
  const spareEstimate=model.provisional.lines.find(l=>l.id===form.id&&l.spareBudget);
@@ -118,9 +131,12 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  {form.sellMode==="DIRECT"?<Field label="ADDVALUE sell rate per unit" type="number" min="0" step="any" value={form.sellRate} onChange={v=>field("sellRate",v)}/>:form.sellMode==="MARKUP"?<Field label="Markup percent" type="number" min="0" step="any" value={form.markupPct} onChange={v=>field("markupPct",v)}/>:<Field label="Margin percent" type="number" min="0" max="99.9999" step="any" value={form.marginPct} onChange={v=>field("marginPct",v)}/>}
  <Field label="Prime markup percent" type="number" min="0" step="any" value={form.primePct} onChange={v=>field("primePct",v)}/></div>
  <SupplyProposalDraftFields0550 data={data} line={form} onNavigate={onNavigate} onChange={draft=>setForm(f=>{const next={...f};if(draft===undefined)delete next.supplyDraft;else next.supplyDraft=draft;return next;})}/>
+ {mrRequirement?.componentReview&&<fieldset><legend>MR component breakdown</legend>
+  <p>{mrRequirement.componentReview.status}</p><MrWorkingComponents0550 requirement={mrRequirement}/>
+ </fieldset>}
  {mgwQuoteItem0550(chosenOffer)&&<fieldset><legend>MGW Q26-063 · ตรวจการใช้เรตกับ MR</legend><p>จำนวนตาม Quote: {mgwQuoteItem0550(chosenOffer).quantity} {mgwQuoteItem0550(chosenOffer).unit||"หน่วยรอยืนยัน"} · จำนวนร่าง MR: {form.quantity??"OPEN"} {form.unit} · {mgwQuoteItem0550(chosenOffer).issues.join(" · ")}</p><Field label="MGW price selection basis" value={form.coverageBasis||""} onChange={v=>field("coverageBasis",v)} placeholder="ยืนยันรุ่น ขอบเขต สถานที่ จำนวน การไม่ซ้ำ และเหตุผลใช้เรตแม้ยอดรวมเอกสารขัดกัน"/><p>ต้องระบุฐานเลือกเรตก่อนคำนวณ ไม่เปลี่ยนจำนวน MR ให้ตรงกับ Quote อัตโนมัติ</p></fieldset>}
  {isSatelliteScope0550(form)&&<fieldset><legend>VSAT / Satellite · ขอบเขตข้อเสนอปัจจุบัน</legend><p>{satelliteScopeNote0550(form.systemToken)||satelliteScopeNote0550("TEL-VSAT")}</p><div className="p55-bid-fields"><Select label="Satellite scope responsibility" value={form.satelliteScope||"OPEN"} onChange={v=>setForm(f=>({...f,satelliteScope:v,...(f.mrRequirementId?{responsibility:v==="COMPANY_SUPPLY"?"COMPANY":["OPEN","CLARIFICATION"].includes(v)?"CLARIFICATION":"TSI"}:{}),...(v==="COMPANY_SUPPLY"?{selected:false}:{})}))} options={SATELLITE_SCOPE_OPTIONS}/><Field label="Satellite scope basis" value={form.scopeBasis||""} onChange={v=>field("scopeBasis",v)} placeholder="Clause / ผู้รับผิดชอบ / ขอบเขตที่แยกจากราคาเหมารวม"/></div><p>COMPANY จัดหา: ไม่รวมยอดและไม่ส่งรายการย่อยออกในแบบลูกค้า · รายการเดิมยังอยู่เพื่อย้อนตรวจ · OPEN/CLARIFICATION ไม่ใช่ราคา 0 · บริการ TSI และ Entertainment ยังมีขอบเขตของตัวเอง</p></fieldset>}
- {form.mrRequirementId&&<fieldset><legend>MR requirement · ผู้รับผิดชอบและเจ้าของราคา</legend><p>{form.mrRequirementId} · {mrRequirement0550(form)?.reference}</p><div className="p55-bid-fields"><Select label="MR responsibility" value={form.responsibility||"TSI"} onChange={v=>setForm(f=>({...f,responsibility:v,...(isSatelliteScope0550(f)?{satelliteScope:v==="COMPANY"?"COMPANY_SUPPLY":v==="CLARIFICATION"?"CLARIFICATION":f.wbs==="A"?"TSI_EQUIPMENT":"TSI_SERVICES"}:{})}))} options={[["TSI","TSI · ขอบเขตของเรา"],["COMPANY","COMPANY / Offshore contractor · ไม่คิดซ้ำ"],["CLARIFICATION","CLARIFICATION · รอยืนยัน"]]}/><Field label="MR scope basis" value={form.scopeBasis||""} onChange={v=>field("scopeBasis",v)}/><Select label="MR included price owner" value={form.coveredByLineId||""} onChange={v=>field("coveredByLineId",v)} options={[["","คิดราคาแยก · ต้องไม่ซ้ำ package เดิม"],...data.lines.filter(l=>l.id!==form.id&&l.selected&&!l.coveredByLineId&&l.wbs[0]===form.wbs[0]).map(l=>[l.id,l.description+" / "+l.id])]}/><Field label="MR price coverage basis" value={form.coverageBasis||""} onChange={v=>field("coverageBasis",v)} placeholder="หลักฐานรวมอยู่ใน package / งานเพิ่มที่ไม่ซ้ำ"/></div><p>เชื่อม owner เมื่อยืนยันขอบเขตรวมแล้วเท่านั้น; การจับคู่เป็นราคาอ้างอิงยังไม่รับรองว่าครบ MR · Qty ที่ไม่ทราบคง OPEN</p></fieldset>}
+ {form.mrRequirementId&&<fieldset><legend>MR requirement · ผู้รับผิดชอบและเจ้าของราคา</legend><p>{form.mrRequirementId} · {mrRequirement?.reference}</p><div className="p55-bid-fields"><Select label="MR responsibility" value={form.responsibility||"TSI"} onChange={v=>setForm(f=>({...f,responsibility:v,...(isSatelliteScope0550(f)?{satelliteScope:v==="COMPANY"?"COMPANY_SUPPLY":v==="CLARIFICATION"?"CLARIFICATION":f.wbs==="A"?"TSI_EQUIPMENT":"TSI_SERVICES"}:{})}))} options={[["TSI","TSI · ขอบเขตของเรา"],["COMPANY","COMPANY / Offshore contractor · ไม่คิดซ้ำ"],["CLARIFICATION","CLARIFICATION · รอยืนยัน"]]}/><Field label="MR scope basis" value={form.scopeBasis||""} onChange={v=>field("scopeBasis",v)}/><Select label="MR included price owner" value={form.coveredByLineId||""} onChange={v=>field("coveredByLineId",v)} options={[["","คิดราคาแยก · ต้องไม่ซ้ำ package เดิม"],...data.lines.filter(l=>l.id!==form.id&&l.selected&&!l.coveredByLineId&&l.wbs[0]===form.wbs[0]).map(l=>[l.id,l.description+" / "+l.id])]}/><Field label="MR price coverage basis" value={form.coverageBasis||""} onChange={v=>field("coverageBasis",v)} placeholder="หลักฐานรวมอยู่ใน package / งานเพิ่มที่ไม่ซ้ำ"/></div><p>เชื่อม owner เมื่อยืนยันขอบเขตรวมแล้วเท่านั้น; การจับคู่เป็นราคาอ้างอิงยังไม่รับรองว่าครบ MR · Qty ที่ไม่ทราบคง OPEN</p></fieldset>}
  <button type="button" onClick={()=>onNavigate(form.calculationId?"bid.engineering.calculation."+form.calculationId:"bid.engineering.equations")}>เปิดสมการ / Inputs ใน 02</button>
  <p>ต้นทุนและเรตขายใช้ {chosenOffer?.currency||form.currency} ต่อ {chosenOffer?.unit||form.unit} เดียวกัน · ช่องว่าง = OPEN; กรอก 0 เฉพาะเมื่อมีเหตุผลว่าเป็นศูนย์จริง · Trip/shared cost ให้ลงหนึ่งแถวด้วย scope key เดียว ไม่บวกซ้ำในทุกระบบ</p>
  <OfficialLineReviewFields value={form.officialReview} onChange={v=>field("officialReview",v)}/>
@@ -227,9 +243,9 @@ function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onE
  const showR11Price=r11Owner&&(provisional||r.reviewState==="REVIEWED_WORKING");
  const apfLanReference=r.bidPriceAllocation?.basisId===APF_LAN_BID_BASIS_0550;
  const amountClass=r11Owner?"p55-dmr-price-amount":undefined;
- const mrComponents=showDmrTags?[]:r.mrScopeState?.requirement?.components??[];
+ const mrRequirement=showDmrTags?null:r.mrScopeState?.requirement;
  const hasMrSupplierDetails=!showDmrTags&&raw?.mrRequirementId&&r.wbs==="A";
- const hasDetails=showDmrTags||mrComponents.length>0||Boolean(hasMrSupplierDetails);
+ const hasDetails=showDmrTags||mrRequirement?.components?.length>0||Boolean(hasMrSupplierDetails);
  const detailsOpen=lineDetailsOpen.get(r.id)??false;
  const detailsId="p55-working-line-details-"+r.id;
  const detailsAction=detailsOpen?"ซ่อนรายการประกอบ":"แสดงรายการประกอบ";
@@ -239,7 +255,8 @@ function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onE
   onClick={()=>setLineDetailsOpen(previous=>new Map(previous).set(r.id,!previous.get(r.id)))}>
   {detailsOpen?"− ":"+ "}{detailsAction}
  </button>}
- <small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small></td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/><LanCusLine0550 data={data} line={r} offer={r.offer} onNavigate={onNavigate} showQuote/></td>{apfLanReference?<><td>รวมในเจ้าของราคา</td><td>—</td><td>—</td></>:<><td><span className={amountClass}>{amount(r.costTHB)}</span>{showR11Price?<small>{amount(r.provisionalCostNative,r.currency)} · R11</small>:model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}{provisional&&r.spareBudget&&<small>วงเงินอะไหล่ · {r.spareBudget.rate*100}% × ต้นทุน Part A ที่มีราคา {amount(r.spareBudget.basisTHB)}</small>}</td><td><span className={amountClass}>{amount(r.workingSellTHB)}</span>{(showR11Price||model.pricingBasis)&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong className={amountClass}>{amount(r.customerTHB)}</strong>{showR11Price?<small>{amount(r.customerUSD,"USD")}{Number.isFinite(r.primePct)&&` · SAMTEL +${r.primePct}%`}</small>:model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}{!r11Owner&&<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small>}</td></>}<td>{apfLanReference?"มีข้อเสนอครอบคลุม · อ้างเจ้าของราคา Working":<>
+ <small>{r.wbs} · {r.systemToken} · {r.customerRowCode||"MAPPING OPEN"}</small><small>{r.scopeKey}</small>
+ {mrRequirement?.componentReview&&<small>{mrRequirement.componentReview.status}</small>}</td><td><WorkingLineSource0550 data={data} line={r} onNavigate={onNavigate}/><small>{r.quantity??"OPEN"} {r.unit}</small><small>{r.requirementRef} / {r.tagRef}</small><WorkingQuoteBasis0550 data={data} line={r} projection={supplierSources} onNavigate={onNavigate}/><LanCusLine0550 data={data} line={r} offer={r.offer} onNavigate={onNavigate} showQuote/></td>{apfLanReference?<><td>รวมในเจ้าของราคา</td><td>—</td><td>—</td></>:<><td><span className={amountClass}>{amount(r.costTHB)}</span>{showR11Price?<small>{amount(r.provisionalCostNative,r.currency)} · R11</small>:model.pricingBasis&&<small>Allocated cost / estimate: {amount(r.provisionalCostNative,r.currency)}</small>}{part==="B"&&Number.isFinite(r.costRate)&&<small>ต้นทุนต่อหน่วย {amount(r.costRate,r.currency)} / {r.unit}</small>}{provisional&&r.spareBudget&&<small>วงเงินอะไหล่ · {r.spareBudget.rate*100}% × ต้นทุน Part A ที่มีราคา {amount(r.spareBudget.basisTHB)}</small>}</td><td><span className={amountClass}>{amount(r.workingSellTHB)}</span>{(showR11Price||model.pricingBasis)&&<small>{amount(r.provisionalSellNative,r.currency)}</small>}{r.sellMode==="MARKUP"&&<small>E11 · ต้นทุน + {r.markupPct}%</small>}</td><td><strong className={amountClass}>{amount(r.customerTHB)}</strong>{showR11Price?<small>{amount(r.customerUSD,"USD")}{Number.isFinite(r.primePct)&&` · SAMTEL +${r.primePct}%`}</small>:model.pricingBasis&&<small>Customer basis: {amount(r.provisionalCustomerNative,r.currency)}</small>}{!r11Owner&&<small>Calculated candidate: {amount(r.calculatedCustomerTHB)}</small>}</td></>}<td>{apfLanReference?"มีข้อเสนอครอบคลุม · อ้างเจ้าของราคา Working":<>
   {r.mrScopeState?.covered?"INCLUDED IN OWNER · ไม่บวกซ้ำ":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY จัดหา · ไม่รวมราคา":r.selected?"SELECTED":"NOT SELECTED"} · {r.reviewState}
  </>}<small>{r.satelliteScopeState?.label}</small><small>{r.scopeBasis}</small>{r.mrScopeState?.covered&&<button type="button" onClick={()=>onEdit(data.lines.find(l=>l.id===r.coveredByLineId))}>เปิดเจ้าของราคา</button>}{!apfLanReference&&r.mrScopeState?.candidates.map(c=><button type="button" key={c.id} onClick={()=>onEdit(c)}>ตรวจราคาเดิม · {c.description}</button>)}<small>{r.reviewProblems.join(" · ")}</small><WorkingRequirementTrace0550 requirements={requirementsByLine.get(r.id)} onNavigate={onNavigate}/><button type="button" onClick={()=>onEdit(raw)}>แก้ไข / ทบทวน</button>{code==='B5'&&r.selected&&r.systemToken!=='COMMON'&&<button type="button" onClick={()=>onNavigate('bid.quotation.line.'+r.id)}>จัดลง C2 ใน 11.M</button>}<button type="button" onClick={()=>onRelease(r.satelliteScopeState?.excluded&&r.customerRowCode?"bid.budget.release.customer."+r.customerRowCode:r.releaseModuleId)}>ไป REL-04</button></td></tr>
  {hasDetails&&<tr className="p55-working-line-child" hidden={!detailsOpen}>
@@ -255,10 +272,7 @@ function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onE
        <tbody><DmrTagCostRows0550 view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/></tbody>
       </table>
      </div>}
-     {mrComponents.length>0&&<div>
-      <strong>ข้อกำหนดลูกค้า (MR)</strong>
-      <ul>{mrComponents.map((component,i)=><li key={i}>{component}</li>)}</ul>
-     </div>}
+     {mrRequirement?.components?.length>0&&<MrWorkingComponents0550 requirement={mrRequirement}/>}
      {showDmrTags&&<DmrWorkingBoq0550 offers={data.offers} view={dmrTagCosts} lineId={r.id} onNavigate={onNavigate}/>}
      {hasMrSupplierDetails&&<WorkingMrSupplierDetails0550 data={data} line={raw} projection={supplierSources} onNavigate={onNavigate}/>}
     </>}

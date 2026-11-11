@@ -1,5 +1,20 @@
 # 11 Nov 2026 · MGW Q26-063 RADIO / DTRS and Schedule C1
 
+## APF MR component breakdown
+
+Working record `REQ-MR-B1-11-APF-01` shows the 11 components of
+MR-0001 Rev.B1 Appendix 1.1, APF item 1, printed p09 (PDF p11).
+The handheld text includes the full list of five locations. The row
+and its editor display the confirmation status. The breakdown links to
+both revisions and retains the original Appendix 2 reference.
+Rev.A1 p07 specified three Omni antennas and 27 mobile radios, whereas
+Rev.B1 specifies two and 21. The total of 98 handhelds stays the same.
+Rev.B1 adds MOGE to its listed scope. Appendix 2 confirmation is pending.
+
+ADR-0550-001 principles 2, 5, 6 and 8–12 apply. The correction is in the
+existing MR catalogue and its Working views. It changes neither the 1 Lot
+owner basis nor source PDFs, C1 source text, procurement or frozen records.
+
 Upstream baseline `bfc7ec4d`. The original Q26-063 ver1.0 PDF SHA-256
 `6d11565391a0ca5760cdcc76e9f12e191de44004d59dd7865ae8237b1f2b2a31`
 matches the source catalogue. Pages 9–11 and the registered site aliases provide

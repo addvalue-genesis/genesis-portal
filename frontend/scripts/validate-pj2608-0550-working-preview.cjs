@@ -152,7 +152,18 @@ for(const group of groups)assert(devHtml.includes(group.vendor));
 const {SubvendorReference0550}=require(root+'/project0550/SubvendorReference0550.jsx');
 assert.equal((renderToStaticMarkup(React.createElement(SubvendorReference0550,{onPrepare:()=>{}})).match(/data-subvendor-row=/g)||[]).length,5);
 const {BidCommercialWorkspace}=require(root+'/project0550/BidCommercialWorkspace.jsx');
-assert(renderToStaticMarkup(React.createElement(BidCommercialWorkspace,props)).includes('ข้อกำหนด / CAL–RPT / Supplier'),'Working price rows retain reverse engineering trace');
+const workingHtml=renderToStaticMarkup(React.createElement(BidCommercialWorkspace,props));
+assert(workingHtml.includes('ข้อกำหนด / CAL–RPT / Supplier'),'Working price rows retain reverse engineering trace');
+const apfDtrs=rawModel.lines.find(line=>line.id==='REQ-MR-B1-11-APF-01');
+const apfMr=apfDtrs.mrScopeState.requirement;
+assert.deepEqual([apfDtrs.quantity,apfDtrs.unit,apfMr.components.length],[1,'Lot',11]);
+assert(apfMr.components.includes('VHF Omni DMR Antenna 2 Ea.'));
+assert(apfMr.components.includes('VHF DMR Mobile Radio 21 Ea.'));
+assert(apfMr.components.includes('VHF DMR Handheld Radio (ATEX or 13:19UL) 98 Ea. (For APF, AMS01, ABV01, ACP and MOGE)'));
+assert.equal(apfMr.componentReview.appendixReference,'Refer to Documents / Drawings in Appendix 2');
+assert(apfMr.componentReview.notes.some(note=>note.includes('3 Ea. in Rev.A1 and 2 Ea. in Rev.B1')));
+assert(apfMr.componentReview.notes.some(note=>note.includes('27 Ea. in Rev.A1 and 21 Ea. in Rev.B1')));
+assert(workingHtml.includes(apfMr.componentReview.status),'The APF MR review status is visible with details collapsed');
 console.log('PASS 0550 Working 1–8: all systems; executable engineering checks; source/particular/CAL/offer staleness; visual and full-page review; AVL/deviation evidence; lifecycle activity gaps; unchanged financial inputs; backup validation; real SSR modules.');
 
 // Confirmed selected-OEM AVL draft: additive, idempotent and never an approval.
