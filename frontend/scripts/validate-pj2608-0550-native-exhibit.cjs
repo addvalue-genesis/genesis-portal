@@ -381,6 +381,21 @@ const renderCustomer=(view,disabled=false)=>renderToStaticMarkup(React.createEle
 assert.match(renderCustomer(customerView),/<button type="button">Export Word<\/button>/);
 assert.match(renderCustomer(customerView,true),/<button type="button" disabled="">Export Word<\/button>/);
 assert.match(renderCustomer(amendedRecord('I.A',{nativeFields:{}})),/<button type="button" disabled="">Print \/ Save as PDF<\/button>/);
+const missingAgreement=amendedRecord('I.A',{nativeFields:{}});
+const incomplete=C.customerReadiness0550(missingAgreement);
+assert.equal(incomplete.ready,false);
+assert.match(incomplete.previewHtml,/Internal preview — Not for submission/);
+assert.match(incomplete.previewHtml,/AGREEMENT No\.: OPEN/);
+assert.equal((incomplete.previewHtml.match(/data-native-schedule=/g)||[]).length,13);
+assert.match(renderCustomer(missingAgreement),/<button type="button" aria-expanded="false">ดูตัวอย่างแบบฟอร์ม<\/button>/);
+assert.match(renderCustomer(missingAgreement),/เปิด 11\.0 Document Control/);
+assert.match(renderCustomer(missingAgreement),/ยังขาด Agreement \/ Contract No\./);
+const missingDelivery={...customerView,scheduleRows:id=>id==='C1'
+ ?customerView.scheduleRows(id).map(row=>({...row,deliveryTerm:''})):customerView.scheduleRows(id)};
+assert.match(renderCustomer(missingDelivery),/ยังไม่ได้ระบุเงื่อนไข CIF\/FOB · 1 รายการ/);
+assert.match(renderCustomer(missingDelivery),/LINE-TEST · เปิด 11\.M/);
+assert.throws(()=>C.customerHtml0550(missingDelivery),/OPEN/);
+assert.doesNotMatch(customerHtml,/Internal preview — Not for submission/);
 assert.equal(JSON.stringify(customerFixture),customerBefore);
 console.log('PASS Customer Exhibit C: reviewed A–C8, reconciled Schedule A, Word/HTML output and OPEN, internal text, review and unsaved changes gates.');
 

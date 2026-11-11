@@ -9,6 +9,7 @@ body{margin:0;color:#000;background:#fff;font:13px/1.3 Arial,Helvetica,"Liberati
 .p55-native-paper h2,.p55-c1-document h2{color:#000;font-size:15px}
 .p55-native-paper table,.p55-c1-document table,.p55-c1-document .c1-component td{font-size:12.5px}
 .p55-native-paper footer,.p55-c1-document footer{color:#000;font-size:11px}
+.customer-preview-status{margin:0;padding:10px 24px;border-bottom:1px solid #765500;background:#fff3cd;color:#392a00;font-weight:bold}
 @media print{
  .p55-native-paper,.p55-c1-document{width:auto;max-width:none;padding:0;margin:0;box-shadow:none;font-size:10.5pt;break-before:page}
  article:first-child{break-before:auto}
@@ -56,6 +57,7 @@ function prepareCustomerExhibit(view){
   if(/^C[2-8]$/.test(id)&&!view.scheduleRows(id).length&&!(record.state==='REVIEWED'&&record.disposition==='NOT_APPLICABLE')){
    problems.push('Schedule ว่าง · ต้องบันทึกและทบทวน applicability');
   }
+  if(id==='A'&&!record.nativeFields?.agreementNo?.trim())problems.push('ยังขาด Agreement / Contract No.');
   if(record.content?.trim()&&record.state!=='REVIEWED')problems.push('BIDDER response รอทบทวน');
   problems.push(...textProblems(htmlText(html)));
   if(!html)problems.push('ไม่มีแบบฟอร์มสำหรับแสดงผล');
@@ -74,8 +76,10 @@ function prepareCustomerExhibit(view){
 }
 
 export function customerReadiness0550(view){
- const {items}=prepareCustomerExhibit(view);
- return {items,ready:items.every(item=>!item.problems.length)};
+ const {items,body}=prepareCustomerExhibit(view);
+ const ready=items.every(item=>!item.problems.length);
+ const warning=ready?'':'<p class="customer-preview-status">Internal preview — Not for submission</p>';
+ return {items,ready,previewHtml:body?customerDocument(warning+body):null};
 }
 
 function readyExhibit(view,disabled){
