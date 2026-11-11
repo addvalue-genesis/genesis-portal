@@ -1,6 +1,10 @@
 // Executable bindings for the existing 0550 E01–E18 register. No rates or FX defaults.
 import { SERVICE_EQUATIONS } from "./serviceEquationModel";
+import Decimal from 'decimal.js';
+const SpareCountDecimal=Decimal.clone({precision:40});
+export const SPARE_EQUATION_SCHEDULES_0550={'C2-SPARE-QTY':'C2','C3-SPARE-QTY':'C3','C4-SPARE-QTY':'C4'};
 const f=(key,label,min=0,max=1e12)=>({key,label,min,max});
+const optional=(key,label,min=0,max=1e12)=>({...f(key,label,min,max),optional:true});
 export const C2_OEM_QUANTITY_ID_0550="B5-C2-OEM-QTY";
 export const C2_OEM_POPULATIONS_0550=[
  ["MAIN_EQUIPMENT","Main equipment items (B)"],
@@ -27,6 +31,13 @@ export function serviceEquationFields0550(id,inputs){
  });
 }
 export const EQUATION_INPUTS = {
+ // SI quantity only: N is the matching installed Working A / CUS-MR population;
+ // vendorQty/oemListQty reference the linked 07 spare offer, never equipment qty.
+ // Rates/minima require a recorded engineering basis; no universal % is assumed.
+ // Q_add is display-only until a distinct spare Working owner is bound in 11.M.
+ 'C2-SPARE-QTY':{fields:[optional('N','Matching installed parts from Working A'),optional('mmcPct','MMC internal benchmark fraction (0.1 = 10%)',0,1),optional('mmcMin','MMC minimum'),optional('planQty','Commissioning plan quantity'),optional('vendorQty','Vendor commissioning spare quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_mmc = max(ceil(N × mmcPct), mmcMin); Q_required = max(Q_mmc, planQty, vendorQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
+ 'C3-SPARE-QTY':{fields:[optional('demand24m','Demand for full 24 months'),optional('safetyStock','Separate safety stock'),optional('vendorQty','Vendor two-year spare quantity'),optional('engReviewQty','Engineering reviewed operating quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_required = max(demand24m + safetyStock, vendorQty, engReviewQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
+ 'C4-SPARE-QTY':{fields:[optional('N','Matching installed parts from Working A'),optional('capitalPct','Source-backed capital fraction',0,1),optional('capitalMin','Capital minimum'),optional('oemListQty','OEM capital spare list quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_pct = max(ceil(N × capitalPct), capitalMin); Q_required = max(Q_pct, oemListQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
  E01:{fields:[f("I","Applicability 0/1",0,1),f("Q","Work objects"),f("UMH","MH per object"),f("F","Factor")],unit:"MH"},
  E02:{fields:[f("Qdoc","Documents"),f("Hinitial","Initial MH/document"),f("Ncycles","Review cycles"),f("Hcycle","MH/review"),f("Hfinal","Final MH/document")],unit:"MH"},
  E03:{fields:[f("months","Months"),f("FTE","FTE"),f("Hmonth","Paid hours/month")],unit:"MH"},
@@ -96,6 +107,27 @@ export function evaluateServiceEquation(id, inputs={}) {
   else if(typeof v!=="number"||!Number.isFinite(v)||v<field.min||v>field.max)errors.push(k+" outside allowed range");
  }};
  check(fields,inputs);
+ if(SPARE_EQUATION_SCHEDULES_0550[id]){
+  const has=k=>inputs[k]!==null&&inputs[k]!==undefined&&inputs[k]!=='';
+  for(const field of fields)if(has(field.key)&&!['mmcPct','capitalPct'].includes(field.key)&&!Number.isSafeInteger(inputs[field.key]))errors.push(field.key+' must be a whole safe count');
+  const candidates=[];let percentQuantity=null;
+  const pct=id==='C2-SPARE-QTY'?'mmcPct':id==='C4-SPARE-QTY'?'capitalPct':null,min=pct==='mmcPct'?'mmcMin':'capitalMin';
+  if(pct&&(has(pct)||has(min))){
+   for(const k of ['N',pct,min])if(!has(k))missing.push(k);
+   if(['N',pct,min].every(has)&&!errors.length)percentQuantity=Math.max(new SpareCountDecimal(inputs.N).times(inputs[pct]).ceil().toNumber(),inputs[min]);
+   if(percentQuantity!==null)candidates.push(percentQuantity);
+  }
+  if(id==='C3-SPARE-QTY'&&(has('demand24m')||has('safetyStock'))){
+   for(const k of ['demand24m','safetyStock'])if(!has(k))missing.push(k);
+   if(has('demand24m')&&has('safetyStock'))candidates.push(inputs.demand24m+inputs.safetyStock);
+  }
+  for(const k of id==='C2-SPARE-QTY'?['planQty','vendorQty']:id==='C3-SPARE-QTY'?['vendorQty','engReviewQty']:['oemListQty'])if(has(k))candidates.push(inputs[k]);
+  if(!candidates.length)missing.push('source-backed spare quantity basis');
+  if(errors.length||missing.length)return {state:errors.length?'INVALID':'OPEN',value:null,unit:'COUNT',errors:[...errors,...[...new Set(missing)].map(k=>'Missing '+k)],engineeringAccepted:false};
+  const requiredQuantity=Math.max(...candidates),value=Math.max(0,requiredQuantity-inputs.includedInKit-inputs.approvedStock);
+  if(!Number.isSafeInteger(requiredQuantity)||!Number.isSafeInteger(inputs.includedInKit+inputs.approvedStock))return {state:'INVALID',value:null,unit:'COUNT',errors:['Spare quantity overflow'],engineeringAccepted:false};
+  return {state:'CALCULATED',value,Q_add:value,requiredQuantity,percentQuantity,unit:'COUNT',errors:[],formula:definition.formula,engineeringAccepted:false};
+ }
  if(definition.rows){
   if(!Array.isArray(inputs.rows)||!inputs.rows.length)missing.push("rows");
   else if(inputs.rows.length>2000)errors.push("Too many work objects");

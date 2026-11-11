@@ -58,6 +58,9 @@ function B5Preparation0550({lines,initialSystem,onNew}){
  </section>;
 }
 function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
+ // Spare SI equations supply Q_add only. Costs, selling E10/E11/E12, Prime
+ // and FX continue through the existing Working runtime; no Schedule price is
+ // created by the equation or by opening a C2/C3/C4 draft.
  // Retain the unsaved editor value when the Official/History context unmounts
  // this form, without propagating every keystroke into the large parent view.
  const [form,setLocalForm]=useState(()=>editorState.current?.initialForm===initialForm?editorState.current.value:initialForm);

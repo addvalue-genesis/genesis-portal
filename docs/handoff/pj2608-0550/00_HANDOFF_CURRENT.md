@@ -1,3 +1,5 @@
+Latest spare workflow: [SI quantity drafts in 11.C2/C3/C4](20261111_SI_SPARE_DRAFT_WORKFLOW.md). Selected Working A and current 07 offers feed SI quantity, then the existing pricing and FX equations. Drafts are internal; prepare a separate spare owner and bind in 11.M before its price enters Volume I.
+
 Latest Exhibit C draft update: [Schedule OPEN reconciliation](20261110_EXHIBIT_C_OPEN_RECONCILIATION.md). C7 distinguishes page subtotals from its A1 Base and A2 Option amounts. The draft review identifies the current C8 cross-reference conflict, retains missing price and allocation inputs, and exports A1 and A2 alongside A and C1–C8.
 
 Latest Working A update: [APF LAN MR 9.0 bid price reference](20261110_APF_LAN_WORKING_BASIS.md). MGW switch and optical-interface evidence links to the selected owners and the original Included Core line. The Ex-phone tie-in remains an SI review.

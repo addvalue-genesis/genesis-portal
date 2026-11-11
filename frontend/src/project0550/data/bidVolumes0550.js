@@ -1,4 +1,5 @@
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
+import {SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 // ADR-0550-001 principles 1–6,8–14. New document views reuse canonical
 // engineering, offers and prices. No allowance, supplier choice or approval is inferred.
 import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequirements0550} from './integrationWorkspace0550';
@@ -183,7 +184,10 @@ export function deriveBidVolumes0550(data,model,systems,today){
  if(bindings.some(b=>b.problems.length))priceProblems.push('SCHEDULE_BINDING_REVIEW_OPEN');
  for(const s of SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)))if(!scheduleRows(s.id).length&&getRecord('I.'+s.id).state!=='REVIEWED')priceProblems.push('SCHEDULE_DISPOSITION_OPEN / '+s.id);
  if(['I.cover','I.A','I.A1','I.A2','I.B','I.C','I.C3','I.C8'].some(id=>getRecord(id).state!=='REVIEWED'))priceProblems.push('VOLUME_I_RESPONSE_OPEN');
- const baseAssigned=unallocated.some(l=>!l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='BASE').map(b=>b.amount)),optionsAssigned=unallocated.some(l=>l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='OPTION').map(b=>b.amount));
+ // SI spare candidates remain visible in 11.M but have no Volume I amount
+ // until bound there. Missing allocation/reconciliation still keeps HOLD.
+ const pendingOwners=unallocated.filter(l=>!SPARE_EQUATION_SCHEDULES_0550[data.calculations.find(c=>c.id===l.calculationId)?.equationId]);
+ const baseAssigned=pendingOwners.some(l=>!l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='BASE').map(b=>b.amount)),optionsAssigned=pendingOwners.some(l=>l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='OPTION').map(b=>b.amount));
  if(baseAssigned!==model.official?.baseUSD||optionsAssigned!==model.official?.optionsUSD)priceProblems.push('SCHEDULE_TOTAL_RECONCILIATION_OPEN');
  const problems=[...priceProblems];
  if(!p.documentNo.trim()||!p.revision.trim())problems.push('BID_DOCUMENT_CONTROL_OPEN');

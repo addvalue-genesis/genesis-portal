@@ -1,7 +1,8 @@
 import React,{useState} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {newId} from "./data/bidWorkspaceModel";
-import {EQUATION_INPUTS,evaluateServiceEquation,serviceEquationFields0550,C2_OEM_QUANTITY_ID_0550,C2_OEM_POPULATIONS_0550,C2_OEM_ROUNDING_0550,C2_OEM_RATIO_FORMULA_0550} from "./serviceEquationRuntime";
+import {EQUATION_INPUTS,evaluateServiceEquation,serviceEquationFields0550,C2_OEM_QUANTITY_ID_0550,C2_OEM_POPULATIONS_0550,C2_OEM_ROUNDING_0550,C2_OEM_RATIO_FORMULA_0550,SPARE_EQUATION_SCHEDULES_0550} from "./serviceEquationRuntime";
+import {vendorOfferEntries0550} from './data/vendorRegister0550';
 import {SERVICE_EQUATIONS,SYSTEMS} from "./data";
 import {Module,Field,Select,Save} from "./BidControls";
 import {BidInheritedBasis} from "./BidInheritedBasis";
@@ -19,6 +20,10 @@ export function EquationWorkbench(){
   return {...f,inputs:{...inputs,[k]:v}};
  });
  const c2Oem=form.equationId===C2_OEM_QUANTITY_ID_0550,ratio=c2Oem&&form.inputs.mode==="RATIO";
+ const spareSchedule=SPARE_EQUATION_SCHEDULES_0550[form.equationId];
+ const spareWorking=data.lines.filter(l=>l.wbs==='A'&&l.selected&&l.systemToken===form.systemToken&&!l.coveredByLineId&&l.responsibility!=='COMPANY');
+ const spareParent=spareWorking.find(l=>l.id===form.inputs.workingLineId);
+ const spareOffers=spareSchedule&&spareParent?vendorOfferEntries0550(data).filter(e=>e.working.some(l=>l.id===spareParent.id)||e.offer.supplierQuoteRow?.parentOfferId===spareParent.offerId):[];
  const legacyRounding=ratio&&form.inputs.roundingMode===undefined&&form.inputs.roundingSourceRef===undefined;
  const setC2Mode=mode=>setForm(f=>{
   const {A,B,included}=f.inputs;
@@ -33,6 +38,13 @@ export function EquationWorkbench(){
  <Select label="Equation" value={form.equationId} onChange={v=>setForm(f=>({...f,equationId:v,inputs:v==="E17"&&data.fx.source&&data.fx.date&&data.fx.thbPerUSD>0?{fx:data.fx.thbPerUSD}:{}}))} options={Object.keys(EQUATION_INPUTS).map(id=>[id,id+" · "+(SERVICE_EQUATIONS.find(e=>e.id===id)?.purpose||EQUATION_INPUTS[id].formula)])}/>
  <Field label="Calculation source / planning basis" value={form.sourceRef} onChange={v=>field("sourceRef",v)} required/></div>
  <p><strong>{ratio?C2_OEM_RATIO_FORMULA_0550(legacyRounding?"CEIL":form.inputs.roundingMode):method?.equation||definition.formula}</strong></p><p>{method?.control}</p>
+ {spareSchedule&&<fieldset><legend>{spareSchedule} · Working A → 07 Vendor → SI quantity</legend>
+  <p>เลือกเจ้าของจำนวนติดตั้งและ Offer เดียวกัน ระบุข้อ MR / OEM / เกณฑ์ MMC ที่เลือกใช้เป็นฐานภายในใน Source ไม่กำหนดเปอร์เซ็นต์ให้ทุกระบบอัตโนมัติ ผลเป็น Q_add สำหรับ Draft; ราคายังผ่าน E10/E11/E12 และ FX เดิม ยังไม่เข้ายอด A1/A2 จนผูกใน 11.M</p>
+  <Select label="Spare installed Working A" value={form.inputs.workingLineId||''} onChange={id=>setForm(f=>{const l=spareWorking.find(l=>l.id===id);return {...f,inputs:{...f.inputs,workingLineId:id,offerId:l?.offerId||'',N:['Pc','U','SET'].includes(l?.unit)?l.quantity:null}};})} options={[["","เลือก Working A"],...spareWorking.map(l=>[l.id,l.description+' / '+l.id])]}/>
+  <Select label="Spare source Offer" value={form.inputs.offerId||''} onChange={id=>input('offerId',id)} options={[["","เลือก Offer ที่ผูกกับ Working"],...spareOffers.map(e=>[e.offer.id,e.offer.quoteRef+' / '+e.offer.description])]}/>
+  <Field label="Spare Part No. / model / rating basis" value={form.inputs.partNo||''} onChange={v=>input('partNo',v)}/>
+  <p>Included in Kit และ Approved Stock เป็นจำนวนของ Part/หน่วย/ช่วงงานเดียวกันเท่านั้น กรอก 0 เมื่อไม่มีจำนวนที่ยืนยันให้หัก; C2 กับ C3 ไม่หักกันอัตโนมัติ</p>
+ </fieldset>}
  {c2Oem&&<>
   <p>Exhibit C2 Notes 1–3 / MR Appendix 10 / STD TEL-001 §7.7.1 · ใช้ต่อ Main Equipment No. และ Part No. ถึง PAC อ้างเอกสาร CUS หรือ OEM ที่ระบุจำนวนหรืออัตราส่วน</p>
   <div className="p55-bid-fields">

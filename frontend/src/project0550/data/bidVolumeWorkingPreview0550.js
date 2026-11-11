@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550,PAGA_REVISION_INCLUDED_0550,pagaTwoYearSpareEvidence0550} from './supplierRevision0550';
-import {evaluateServiceEquation} from '../serviceEquationRuntime';
+import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
 import {blankScheduleBinding0550,deriveBidVolumes0550,emptyBidVolumes0550,saveBidVolumeRecord0550} from './bidVolumes0550';
@@ -96,6 +96,9 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
   if(previouslySaved.has(line.id))return {line,proposal:null,reason:'The previous draft was removed. Select a destination in 11.M to restore it.'};
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
   if(!raw||!base)return {line,proposal:null,reason:'No source category rule; SI must decide the destination'};
+  // SI spare drafts are deliberately absent from suggestions and auto-saves.
+  // Only an explicit saved 11.M binding may enter Volume I A1/A2 totals.
+  if(SPARE_EQUATION_SCHEDULES_0550[data.calculations.find(c=>c.id===raw.calculationId)?.equationId])return {line,proposal:null,reason:'Draft from SI equation — not allocated to Schedule. Bind explicitly in 11.M.'};
   let [schedule,summary,reason]=base;
   if((data.repositoryBasisImport?.tsiActivityBudget?.expenseLineIds||[]).includes(raw.id)){
    schedule='A1';summary='OTHER';reason='Shared SI travel / mobilisation expense → A1 Others; retain one existing owner, not C7 labour hours or C8 purchaser facilities';

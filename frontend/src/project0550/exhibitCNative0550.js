@@ -7,7 +7,7 @@ import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
-import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
@@ -176,23 +176,30 @@ function nativePages(view,id,currency='USD',c2References){
   chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
  }
  if(['C2','C3','C4'].includes(id)){
-  const systems=id==='C2'&&view.c2Systems?c2SystemGroups0550(view,c2References):[{rows}];
+  // Draft from SI equation — not allocated to Schedule. Does not enter Volume I
+  // totals until bound in 11.M. These rows are never appended to view.bindings.
+  const systems=view.c2Systems||c2References?spareSystemGroups0550(view,id,c2References):[{rows}];
   for(const system of systems){
    if(system.draftRows?.length){
     chunks(system.draftRows,7).forEach((references,pi)=>{
      const v=blankValues(id),draftPriceRows=[];
      set(v,0,2,'OPEN');
-     set(v,1,1,'Internal reference · 07 Vendor / 10.2 Working A/B/C · C2 allocation OPEN');
+     const equationDraft=references.some(r=>r.equationDraft);
+     set(v,1,1,equationDraft?SPARE_DRAFT_NOTE_0550:'Internal reference · 07 Vendor / 10.2 Working A/B/C · C2 allocation OPEN');
      references.forEach((reference,i)=>{
       const r=i+4;
-      set(v,r,0,[reference.description,reference.note,reference.source].filter(Boolean).join('\n'));
+      const cost=reference.equationDraft?'Source cost: '+(Number.isFinite(reference.totalCost)?reference.currency+' '+number(reference.totalCost):'OPEN'):'';
+      set(v,r,0,[reference.description,reference.note,reference.source,cost,...(reference.issues||[])].filter(Boolean).join('\n'));
       set(v,r,1,reference.partNo|| (reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN'));
       set(v,r,4,Number.isFinite(reference.quantity)?[reference.quantity,reference.unit].filter(Boolean).join(' '):'OPEN');
-      set(v,r,9,Number.isFinite(reference.unitCost)?reference.currency+' '+number(reference.unitCost):'OPEN');
-      set(v,r,11,Number.isFinite(reference.totalCost)?reference.currency+' '+number(reference.totalCost):'OPEN');
+      const total=reference.equationDraft?(currency==='THB'?reference.customerTHB:reference.amount):reference.totalCost;
+      const rate=reference.equationDraft?(reference.quantity>0&&Number.isFinite(total)?total/reference.quantity:reference.quantity===0&&total===0?0:null):reference.unitCost;
+      const shownCurrency=reference.equationDraft?currency:reference.currency;
+      set(v,r,9,Number.isFinite(rate)?shownCurrency+' '+number(rate):'OPEN');
+      set(v,r,11,Number.isFinite(total)?shownCurrency+' '+number(total):'OPEN');
       draftPriceRows.push([r,9]);
      });
-     add(v,pi?'Reference continuation '+(pi+1):'Source cost reference',{systemToken:system.token,systemName:system.name,systemStatus:system.status,draftPriceRows});
+     add(v,pi?'Reference continuation '+(pi+1):equationDraft?'SI equation Draft':'Source cost reference',{systemToken:system.token,systemName:system.name,systemStatus:equationDraft?'DRAFT_FROM_EQUATION':system.status,draftPriceRows});
     });
     continue;
    }
@@ -365,8 +372,8 @@ function renderPage(view,page,format,currency='USD'){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
  }
- if(page.draftPriceRows?.length&&page.systemStatus!=='DRAFT_FROM_EXISTING')partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
-  (page.id==='C2'&&page.priceRows.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
+ if(page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
+  (page.id==='C2'&&page.priceRows?.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;

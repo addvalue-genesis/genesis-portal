@@ -129,7 +129,8 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     if(!calc.sourceRef.trim())problems.push("Calculation source required");
     const outputUnit=l.resultKey==="MD"?"MD":l.resultKey==="MH"&&calc.equationId==="E05"?"MH":result.unit;
     const spareQuantity=outputUnit==='COUNT';
-    if(spareQuantity&&l.wbs!=='B5')problems.push('B5 spare quantity requires a commissioning spare line');
+    const spareWbs={'C2-SPARE-QTY':'B5','C3-SPARE-QTY':'C3','C4-SPARE-QTY':'C2'}[calc.equationId]||'B5';
+    if(spareQuantity&&l.wbs!==spareWbs)problems.push('Spare quantity requires matching Working WBS '+spareWbs);
     if(spareQuantity?!['U','Pc','SET'].includes(unit):unit!==bidQuantityUnit0550(outputUnit))problems.push("Equation output/rate unit mismatch");
     if(result.state!=="CALCULATED")problems.push(...result.errors);
    }
