@@ -1,10 +1,31 @@
 import {MR_WORKING_CATALOG_0550} from "./data/mrWorkingBasis0550";
+import {mgwCurrentMr0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {MR_SUPPLY_ORDER_0550} from "./bidWorkingBasis0550";
 
 const catalog=MR_WORKING_CATALOG_0550.rows;
 const positions=new Map(catalog.map((row,index)=>[row.id,index]));
 const appendixOf=row=>row?.reference.match(/\bApp\.(\d+\.\d+)\b/)?.[1]||"";
 const rank=line=>positions.get(line?.mrRequirementId)??Infinity;
+
+function mappedRadioPackages(rows,lines){
+ const byMr=new Map();
+ for(const row of rows){
+  const mrId=lines.get(row.key)?.mrRequirementId;
+  if(mrId)byMr.set(mrId,byMr.has(mrId)?null:row);
+ }
+ const byParent=new Map(),nested=new Set();
+ for(const row of rows){
+  const line=lines.get(row.key);
+  if(line.mrRequirementId||!mgwRadioDtrsOffer0550(line.offer))continue;
+  const mrIds=mgwCurrentMr0550(line.offer);
+  const parent=mrIds.length===1?byMr.get(mrIds[0]):undefined;
+  if(!parent)continue;
+  if(!byParent.has(parent.key))byParent.set(parent.key,[]);
+  byParent.get(parent.key).push(row);
+  nested.add(row.key);
+ }
+ return {byParent,nested};
+}
 
 // Screen-only hierarchy. Each canonical customer row occurs once. Split a Lot
 // spanning appendices into display sections, never duplicate its amount/ID.
@@ -27,6 +48,7 @@ export function releaseHierarchy0550(official,customerRows){
   }
   for(const [index,group] of official.schedule.filter(g=>g.part===part).entries()){
    const rows=customerRows.filter(row=>row.kind==="line"&&lines.get(row.key)?.customerRowCode===group.code).sort((a,b)=>rank(lines.get(a.key))-rank(lines.get(b.key)));
+   const packages=part==="A"?mappedRadioPackages(rows,lines):null;
    const references=rows.map(row=>catalog[rank(lines.get(row.key))]).filter(Boolean);
    const groupCatalog=catalog.filter(row=>row.wbs===part&&group.systems.includes(row.systemToken));
    const basis=references.length?references:groupCatalog;
@@ -37,12 +59,14 @@ export function releaseHierarchy0550(official,customerRows){
    if(part==="A")for(const appendix of appendices)segments.set(categoryFor(appendix),{appendix,rows:[]});
    segments.set(anchor,{appendix:firstAppendix,rows:[]});
    for(const row of rows){
+    if(packages?.nested.has(row.key))continue;
     const line=lines.get(row.key),requirement=catalog[rank(line)];
     // Locate a package by its system within the Lot's known appendices. Keep its native reference separate.
     const systemAppendix=part==="A"&&!requirement&&MR_SUPPLY_ORDER_0550.find(grouping=>appendices.includes(grouping.appendix)&&grouping.systems.includes(line?.systemToken))?.appendix;
     const appendix=part==="A"?(appendixOf(requirement)||systemAppendix||firstAppendix):"",key=categoryFor(appendix);
     if(!segments.has(key))segments.set(key,{appendix,rows:[]});
-    segments.get(key).rows.push({...row,mrReference:requirement?.reference||""});
+    const packageRows=packages?.byParent.get(row.key);
+    segments.get(key).rows.push({...row,mrReference:requirement?.reference||"",...(packageRows?{packageRows}:{})});
    }
    for(const [key,segment] of segments)bucket(key,segment.appendix).segments.push({group,index,...segment,anchor:key===anchor,appendices,rank:segment.rows.length?Math.min(...segment.rows.map(row=>rank(lines.get(row.key)))):positions.get(basis[0]?.id)??Infinity});
   }
@@ -76,7 +100,17 @@ export function releaseHierarchy0550(official,customerRows){
      const siteLabel=site+" · "+siteRows.length+" รายการ";
      const siteNode=heading(system.key+"/site/"+site,part==="A"?group.code+" · "+siteLabel:siteLabel,siteParents);
      entries.push({kind:"mr-site",key:siteNode.key,parents:siteNode.parents,toggle:siteNode,lotCode:group.code,siteLabel});
-     entries.push(...siteRows.map(row=>({...row,parents:[...siteNode.parents,siteNode.key]})));
+     const rowParents=[...siteNode.parents,siteNode.key];
+     for(const row of siteRows){
+      const {packageRows,...entry}=row;
+      if(!packageRows){
+       entries.push({...entry,parents:rowParents});
+       continue;
+      }
+      const toggle=heading(entry.moduleId,entry.cells[2],rowParents);
+      entries.push({...entry,parents:rowParents,toggle,nestedOwnerIds:packageRows.map(child=>child.key)});
+      entries.push(...packageRows.map(child=>({...child,parents:[...rowParents,toggle.key],packageChild:true})));
+     }
     }
    }
   }

@@ -130,19 +130,63 @@ const releaseId=mr=>'bid.budget.release.line.REQ-'+mr;
 const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{
  official:provisional,onSource:()=>{},onNavigate:()=>{},
 }));
-const releaseRow=mr=>releaseHtml.split('data-component-key="'+releaseId(mr)+'"')[1].split('</tr>')[0];
+const releaseMarkup=id=>releaseHtml.split('data-component-key="'+id+'"')[1].split('</tr>')[0];
+const releaseRow=mr=>releaseMarkup(releaseId(mr));
 assert.match(releaseRow(apfMr),/หลักฐาน Offer จาก Mapping.*RADIO-001.*RADIO-009/s);
+assert.doesNotMatch(releaseRow(apfMr),/ราคาขายร่างจาก Working|143,064|454,782/);
 assert.doesNotMatch(releaseRow(acpMr),/RADIO-001|RADIO-009/);
 assert.deepEqual(releaseNotes.get(releaseId(apfMr)).candidates.filter(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)).map(line=>line.offer.id),
  [equipmentOffer.id,subscriberOffer.id]);
 assert(!releaseNotes.get(releaseId(acpMr)).candidates.some(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)));
 const releaseRows=O.officialCustomerRows(provisional);
+const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
+const hierarchy=releaseHierarchy0550(provisional,releaseRows);
+const hierarchyIds=hierarchy.entries.filter(row=>row.kind==='line').map(row=>row.moduleId);
+assert.equal(new Set(hierarchyIds).size,hierarchyIds.length);
+const mrEntry=hierarchy.entries.find(row=>row.moduleId===releaseId(apfMr));
+const packageRows=hierarchy.entries.filter(row=>row.packageChild&&row.parents.at(-1)===mrEntry.moduleId);
+assert.deepEqual(packageRows.map(row=>row.key),radioOwners.map(line=>line.id));
+assert(packageRows.every(row=>row.parents.at(-2).endsWith('/site/APF')));
+assert(hierarchy.entries.indexOf(mrEntry)<hierarchy.entries.indexOf(packageRows[0]));
+assert.deepEqual(mrEntry.nestedOwnerIds,radioOwners.map(line=>line.id));
+assert.equal(hierarchy.entries.filter(row=>row.moduleId==='bid.budget.release.customer.A1-07').length,1);
+const storage=globalThis.localStorage;
+try{
+ globalThis.localStorage={getItem:()=>JSON.stringify({[mrEntry.moduleId]:false})};
+ const collapsed=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:provisional,onSource:()=>{}}));
+ for(const owner of radioOwners){
+  const markup=collapsed.split('data-component-key="'+owner.releaseModuleId+'"')[0].split('<tr').at(-1);
+  assert.match(markup,/\bhidden=""/);
+ }
+}finally{
+ if(storage===undefined)delete globalThis.localStorage;
+ else globalThis.localStorage=storage;
+}
+const noParent=releaseHierarchy0550(provisional,releaseRows.filter(row=>row.moduleId!==mrEntry.moduleId));
+for(const owner of radioOwners){
+ assert.equal(hierarchy.entries.filter(row=>row.key===owner.id).length,1);
+ assert.equal(releaseHtml.split('data-component-key="'+owner.releaseModuleId+'"').length,2);
+ assert(noParent.entries.some(row=>row.key===owner.id&&!row.packageChild),'Keep the price visible when its mapped MR is absent');
+}
+const pricedIds=new Set(releaseRows.filter(row=>row.kind==='line'&&Number.isFinite(row.cells[6])).map(row=>row.moduleId));
+const pagaMrEntry=hierarchy.entries.find(row=>releaseNotes.get(row.moduleId)?.candidates
+ ?.some(candidate=>candidate.systemToken==='TEL-PAGA'&&pricedIds.has(candidate.releaseModuleId)));
+assert.match(releaseMarkup(pagaMrEntry.moduleId),/ดูแถวราคาใน Release/);
+assert.doesNotMatch(releaseMarkup(pagaMrEntry.moduleId),/ราคาขายร่างจาก Working/);
+const lotNote=releaseNotes.get('bid.budget.release.customer.A1-07');
+assert.equal(lotNote.known.amount,597846.32);
+assert.equal(lotNote.known.priced,2);
 assert.equal(releaseRows.find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
 const equipmentReleaseRows=releaseRows.filter(row=>row.key===radioOwner.id);
 assert.equal(equipmentReleaseRows.length,1);
 assert.equal(equipmentReleaseRows[0].cells[6],143064);
 assert.equal(provisional.lines.find(line=>line.id==='REQ-'+apfMr).offerId,'','The displayed Offer link is read-only');
 assert.equal(O.officialCustomerRows(radioModel.official).find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
+
+const duplicateRadio={...radio,lines:[...radio.lines,{...radioOwner,id:'QA-DUPLICATE-RADIO',scopeKey:'QA-DUPLICATE-RADIO'}]};
+const duplicateOwners=W.deriveBidWorkspace(duplicateRadio,tokens,radioDate).lines.filter(line=>line.offerId===equipmentOffer.id);
+assert.equal(duplicateOwners.length,2);
+assert(duplicateOwners.every(line=>line.problems.some(problem=>problem.startsWith('MGW_SOURCE_COST_OWNER_DUPLICATE'))&&line.provisionalCustomerUSD===null));
 
 for(const line of radioOwners){
  const req=radioRequirements.requirements.find(r=>r.id==='REQDEF-'+radioSelection.mgwCurrentMr0550(line.offer)[0]);
@@ -168,6 +212,10 @@ assert(apf.components.every(c=>c.unitPrice===null&&c.amount===null));
 assert(c1.rows.find(r=>r.key==='MR-B1-11-APF-01').note.includes('Proposed supply reference'));
 assert(!c1.rows.find(r=>r.key==='MR-B1-11-ABV01-01').note.includes('Proposed supply reference'));
 assert.equal(c1.bindings.filter(b=>radioOwners.some(l=>l.id===b.lineId)).length,2);
+for(const owner of radioOwners){
+ assert.equal(savedRadioView.bindings.filter(binding=>binding.lineId===owner.id).length,1);
+ assert.equal(c1.rows.flatMap(row=>row.priceOwners||[]).filter(binding=>binding.lineId===owner.id).length,1);
+}
 assert.equal(activate(radio),radio);
 const savedOldSite={...radio,lines:radio.lines.map(l=>l===radioOwner?{...l,tagRef:'ACP',requirementRef:acpMr}:l)};
 const repaired=activate(savedOldSite);

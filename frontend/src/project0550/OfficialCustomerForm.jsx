@@ -19,22 +19,28 @@ import {ReleaseScheduleDrafts0550} from "./ReleaseScheduleDrafts0550.jsx";
 const EXPANSION_KEY="GENESIS.PJ2608-0550.release.expanded.v1";
 const loadExpansion=()=>{try{const value=JSON.parse(globalThis.localStorage?.getItem(EXPANSION_KEY)||"{}");return value&&typeof value==="object"&&!Array.isArray(value)?Object.fromEntries(Object.entries(value).slice(0,1000).filter(([key,v])=>key.length<250&&typeof v==="boolean")):{};}catch{return {};}};
 
-function PriceNotes({note,onSource}){
+function PriceNotes({note,onSource,nestedOwnerIds,pricedReleaseRows,onRevealPrice}){
  if(!note)return null;
+ const candidates=note.candidates?.filter(candidate=>!nestedOwnerIds?.includes(candidate.id));
  return <div className="p55-release-price-notes">
   {note.dmrKnown&&<p data-release-dmr-working><strong>DMR · ราคาขายร่างที่คำนวณได้ {amount(note.dmrKnown.amount,"USD")}</strong><small>{note.dmrKnown.priced} เจ้าของราคา DMR · เฉพาะอุปกรณ์และประมาณการที่มีราคา · แยกจาก Telecom Tower และยอด Lot A1-11</small></p>}
-  {note.known&&<p><strong>{note.known.priced?"ราคาย่อยที่คำนวณได้: "+amount(note.known.amount,"USD"):"ยังไม่มีราคาย่อย USD ที่คำนวณได้"}</strong><small>มีราคา {note.known.priced}/{note.known.count} เจ้าของราคา · ยังไม่ใช่ยอด Lot ครบขอบเขต · ไม่บวกเพิ่มจากรายละเอียด</small></p>}
+  {note.known&&<p><strong>{note.known.priced?"ราคาย่อยที่คำนวณได้: "+amount(note.known.amount,"USD"):"ยังไม่มีราคาย่อย USD ที่คำนวณได้"}</strong><small>มีราคา {note.known.priced}/{note.known.count} แถวใน Lot · ยังไม่ใช่ยอด Lot ครบขอบเขต · ไม่บวกเพิ่มจากรายละเอียด</small></p>}
   {note.native&&<p>ราคา Customer ต้นทาง · PROVISIONAL: <strong>{amount(note.native.amount,note.native.currency)}</strong><small>ยังไม่ใช่ราคา USD ที่พร้อมใช้</small></p>}
   {note.owner&&<button type="button" onClick={()=>onSource(note.owner.sourceModuleId)}>เปิดเจ้าของราคารวม · {note.owner.description}</button>}
   {note.checks?.length>0&&<div><strong>ประเด็นที่ต้องตรวจ</strong><ul>{note.checks.map(check=><li key={check}>{check}</li>)}</ul></div>}
   {note.reasons?.length>0&&<><p><strong>OPEN:</strong> {note.reasons[0]}</p><details><summary>เหตุผลที่ยังเป็น OPEN ({note.reasons.length})</summary><ul>{note.reasons.map(reason=><li key={reason}>{reason}</li>)}</ul></details></>}
-  {note.candidates?.length>0&&<details>
-   <summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({note.candidates.length})</summary>
+  {candidates?.length>0&&<details>
+   <summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({candidates.length})</summary>
    <p>ยังไม่จัดสรรราคา package นี้เข้าแถว MR · ราคาอ้างอิงมาจาก Working owner ของแต่ละ package</p>
-   {note.candidates.map(c=><p key={c.id}>
-    <button type="button" onClick={()=>onSource(c.sourceModuleId)}>ตรวจ package · {mgwRadioDtrsOffer0550(c.offer)&&mgwCurrentItemKey0550(c.offer)+" · "}{c.description}</button>
-    <small>ราคาขายร่างจาก Working · {amount(c.provisionalCustomerNative,c.currency)} · {c.offer?.quoteRef||c.sourceRef}</small>
-   </p>)}
+   {candidates.map(c=>{
+    const hasPriceRow=pricedReleaseRows.has(c.releaseModuleId);
+    return <p key={c.id}>
+     <button type="button" onClick={()=>hasPriceRow?onRevealPrice(c.releaseModuleId):onSource(c.sourceModuleId)}>
+      {hasPriceRow?"ดูแถวราคาใน Release":"ตรวจ package"} · {mgwRadioDtrsOffer0550(c.offer)&&mgwCurrentItemKey0550(c.offer)+" · "}{c.description}
+     </button>
+     <small>{!hasPriceRow&&<>ราคาขายร่างจาก Working · {amount(c.provisionalCustomerNative,c.currency)} · </>}{c.offer?.quoteRef||c.sourceRef}</small>
+    </p>;
+   })}
   </details>}
  </div>;
 }
@@ -78,6 +84,8 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
  const {data,model}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const rows=useMemo(()=>officialCustomerRows(official),[official]),provisional=official.pricingBasis==="PROVISIONAL_VENDOR",notes=releasePricePresentation0550(official);
  const hierarchy=useMemo(()=>releaseHierarchy0550(official,rows),[official,rows]);
+ const pricedReleaseRows=useMemo(()=>new Set(hierarchy.entries
+  .filter(row=>row.kind==="line"&&Number.isFinite(row.cells[6])).map(row=>row.moduleId)),[hierarchy]);
  const partPrices=useMemo(()=>provisional?knownPriceGroups0550(official):[],[official,provisional]);
  const linesById=useMemo(()=>new Map(official.lines.map(line=>[line.id,line])),[official.lines]);
  const sourceUsages=useMemo(()=>new Map(bidCompletionSourceUsages0550(data).filter(usage=>usage.kind==="ESTIMATE"&&usage.line.systemToken==="TEL-DMR").map(usage=>[usage.line.id,usage])),[data]);
@@ -99,11 +107,11 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   <button type="button" onClick={()=>togglePartA(false)}>− หุบรายการ A</button>
  </div>;
  const toggleButton=(node,label=node.label)=><button type="button" className="p55-release-toggle" data-release-toggle={node.key} aria-expanded={isOpen(node.key)} aria-label={(isOpen(node.key)?"หุบ ":"ขยาย ")+node.label} onClick={()=>toggle(node)}><span aria-hidden="true">{isOpen(node.key)?"−":"+"}</span>{label&&" "+label}</button>;
- const revealLot=lotId=>{
-  const entry=hierarchy.entries.find(row=>row.moduleId===lotId);
+ const revealReleaseRow=moduleId=>{
+  const entry=hierarchy.entries.find(row=>row.moduleId===moduleId);
   if(!entry)return;
   setExpanded(old=>({...old,...Object.fromEntries(entry.parents.map(key=>[key,true]))}));
-  requestAnimationFrame(()=>document.querySelector('[data-component-key="'+lotId+'"]')?.scrollIntoView({block:"center"}));
+  requestAnimationFrame(()=>document.querySelector('[data-component-key="'+moduleId+'"]')?.scrollIntoView({block:"center"}));
  };
  return <Module id="bid.budget.release" open={open} title={provisional?"REL-04 · ราคาที่เลือก / ประมาณการ — PROVISIONAL / NOT ISSUED":"REL-04 · Official customer form — Review Draft / NOT ISSUED"}>
  {children}
@@ -141,13 +149,13 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
    return <tr key={r.key} hidden={hidden} className="p55-release-mr-system">
     <td/>
     <td>Lot {r.lotCode}</td>
-    <td>{toggleButton(r.toggle)}<small>ขอบเขตต่อเนื่องจาก Lot เดิม <button type="button" onClick={()=>revealLot(r.lotModuleId)}>ดูยอด Lot</button></small></td>
+    <td>{toggleButton(r.toggle)}<small>ขอบเขตต่อเนื่องจาก Lot เดิม <button type="button" onClick={()=>revealReleaseRow(r.lotModuleId)}>ดูยอด Lot</button></small></td>
     <td colSpan={5}/>
    </tr>;
   }
   if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
-  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource}/></>}</td>)}</tr>;
+  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")+(r.packageChild?" p55-release-package-child":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.nestedOwnerIds&&<small>ราคาที่มีอยู่แสดงในรายการแพ็กเกจด้านล่าง</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource} nestedOwnerIds={r.nestedOwnerIds} pricedReleaseRows={pricedReleaseRows} onRevealPrice={revealReleaseRow}/></>}</td>)}</tr>;
  })}</tbody></table></div>
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>
