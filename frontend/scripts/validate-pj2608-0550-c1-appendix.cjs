@@ -26,6 +26,25 @@ assert(marinePrice.problems.includes('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+ma
 assert.deepEqual(C.c1AppendixTable0550(marineView(100)).rows.find(r=>r[0]==='1.1.2').slice(4),[33.33,100,'Marine radio supply']);
 const marineOpen=marineRow(C.deriveC1Appendix0550(marineView(null)));
 assert.deepEqual([C.c1Display0550(marineOpen.unitPrice),C.c1Display0550(marineOpen.amount)],['—','—']);
+const radioScopeData=structuredClone(data);
+const radioScopeOwners=['03','04','06'].map(item=>radioScopeData.lines.find(l=>l.id==='REQ-MR-B1-11-APF-'+item));
+for(const line of radioScopeOwners)Object.assign(line,{selected:true,responsibility:'TSI'});
+const radioScopeView=make(radioScopeData,radioScopeOwners.map(line=>binding(line,100)));
+const radioScopeProjection=C.deriveC1Appendix0550(radioScopeView);
+const radioScopeNote='Quoted equipment only — MR quantities and interfaces remain open';
+const radioScopeRow=(projection,item)=>projection.rows.find(r=>r.key==='MR-B1-11-APF-'+item);
+assert.deepEqual(radioScopeProjection.rows.filter(r=>r.internalNote===radioScopeNote).map(r=>r.sn),['1.1.3','1.1.4','1.1.6']);
+for(const item of ['03','04','06'])assert.equal(radioScopeRow(radioScopeProjection,item).amount,100);
+for(const item of ['05','07']){
+ const reference=radioScopeRow(radioScopeProjection,item);
+ assert.equal(reference.components.length,0);
+ assert.deepEqual(reference.notes,['(Refer to Documents / Drawings in Appendix 2 for reference)']);
+ assert.equal(reference.internalNote,undefined);
+}
+assert.equal(radioScopeRow(C.deriveC1Appendix0550(make(radioScopeData,[])),'03').internalNote,undefined);
+assert.equal(radioScopeRow(C.deriveC1Appendix0550({...radioScopeView,workingPreview:false}),'03').internalNote,undefined);
+assert(!C.c1AppendixHtml0550(radioScopeView).includes(radioScopeNote));
+assert(!C.c1AppendixWord0550(radioScopeView).includes(radioScopeNote));
 assert(row.notes.some(n=>n.includes('Instrument & Telecom Room')));assert(row.intro.includes('comprised of'));
 const core=row.components.find(c=>c.description.includes('Core Switch'));
 const pricedComponent={lineId:id,line:{description:'Component: '+core.description},quantity:core.quantity,unit:core.unit,

@@ -167,7 +167,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const targets=ownerUse.get(b.lineId)||[];
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   if(radio&&view.workingPreview&&!targets.length){
-   // Project the source-mapped equipment owners onto the MR Lot for the draft.
+   // APF DTRS and Marine use the same source-to-MR path for draft prices.
+   // Later radio batches can use it by supplying their exact MR references.
    // Keep the MR Working binding and the technical scope gap open.
    const refs=mgwCurrentMr0550(b.line.offer);
    const target=refs.length===1?rows.find(r=>r.key===refs[0]&&r.appendix==='1.1'):null;
@@ -219,7 +220,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
    r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
    r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
-  }else if(owned.length)r.amount=money(owned.map(b=>b.amount));
+  }else if(owned.length){
+   r.amount=money(owned.map(b=>b.amount));
+   if(!legacy&&view.workingPreview&&/^MR-B1-11-APF-0[346]$/.test(r.key)){
+    r.internalNote='Quoted equipment only — MR quantities and interfaces remain open';
+   }
+  }
   if(Number.isFinite(r.amount)){
    const check=displayPriceCheck0550(r.amount,r.quantity);
    // Keep the Working extension and report any rounding difference separately.
