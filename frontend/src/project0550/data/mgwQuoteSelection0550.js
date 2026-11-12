@@ -1,6 +1,6 @@
 import quote from './mgwQuote0550.json';
 import mrCatalog from './mrWorkingCatalog0550.json';
-import {chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
+import {CHEVALIER_PBX_SUPPLY_0550} from './chevalierPbxQuote0550';
 
 export const MGW_CURRENT_QUOTE_0550 = 'Q26-063 LAN/PBX/FO';
 export const MGW_CURRENT_BATCH_0550 = '0550-MGW-Q26-063-LAN-PBX-FO-20261107';
@@ -302,18 +302,17 @@ export function apfLanBidReference0550(data,prices){
    Number.isFinite(owner.customerUSD)?owner:null;
  };
  const owners=apfLanPricedItems.map(args=>ownerFor(...args));
- const pbxOwners=prices.filter(row=>row.selected&&chevalierApfPbxOwner0550(row,row.offer)&&Number.isFinite(row.customerUSD));
- const pbx=pbxOwners.length===1?pbxOwners[0]:ownerFor('PABX-APF-9-01','A1-04',1);
- owners.push(pbx);
- const field=ownerFor('PABX-APF-7-01','A1-04',3);
- if(owners.some(owner=>!owner)||!field)return null;
+ const sharedPbx=prices.some(row=>row.id===CHEVALIER_PBX_SUPPLY_0550&&row.selected&&row.pbxProducts?.length&&Number.isFinite(row.customerUSD));
+ if(!sharedPbx)owners.push(ownerFor('PABX-APF-9-01','A1-04',1));
+ const field=sharedPbx?null:ownerFor('PABX-APF-7-01','A1-04',3);
+ if(owners.some(owner=>!owner)||(!sharedPbx&&!field))return null;
  const rackOptics=['LAN-APF-9-04','LAN-APF-9-05'].every(key=>currentOffers.get(key).quoteEvidence.terms?.some(term=>/\bSFP-10G-LR\b/.test(term)));
  const fieldConverter=currentOffers.get('PABX-APF-7-01').quoteEvidence.terms?.some(term=>/\bTL-SG2105P\b/.test(term));
- if(!rackOptics||!fieldConverter)return null;
+ if(!rackOptics||(!sharedPbx&&!fieldConverter))return null;
  return {
   basisId:APF_LAN_BID_BASIS_0550,kind:'PRICE_REFERENCE',lineId:parent.id,ownerIds:owners.map(owner=>owner.id),
-  offerIds:[core.id,...owners.map(owner=>owner.offerId)],fieldLineId:field.id,
-  basis:pbxOwners.length===1?'APF MR 9.0 · ราคาอุปกรณ์ LAN และราคา IP PBX อ้างถึงเจ้าของต้นทุนรายรายการ':
+  offerIds:[core.id,...owners.map(owner=>owner.offerId)],fieldLineId:field?.id||'',
+  basis:sharedPbx?'APF MR 9.0 · LAN equipment reference. The PABX supply lot has its own Working owner.':
    'ใช้ชุดเสนอ MGW สำหรับฐานประมูล APF MR 9.0 ตามข้อสรุปผู้จัดทำราคา 10 พ.ย. 2026',
  };
 }

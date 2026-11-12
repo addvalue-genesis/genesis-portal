@@ -1,4 +1,5 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
+import {chevalierPbxSource0550} from './data/chevalierPbxQuote0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
@@ -185,7 +186,9 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
      {e&&<><p>{e.locator} · revision: {e.revision||'ต้นฉบับไม่ระบุ'}</p><p><a href={e.sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></p><small>Source ID: {e.sourceId}<br/>SHA256: {e.sourceSha256}</small></>}
-     {commercial&&<p>Gross {amount(commercial.gross,e.quotedCurrency)} · ฐานส่วนลด {amount(commercial.discountable,e.quotedCurrency)} · ส่วนลด {commercial.discountPercent}% ({amount(commercial.discount,e.quotedCurrency)}) · NET {amount(commercial.net,e.quotedCurrency)}</p>}
+     {commercial&&(chevalierPbxSource0550(o)
+      ?<p>Products {amount(commercial.discountable,e.quotedCurrency)} · ส่วนลดเหมารวม {amount(commercial.discount,e.quotedCurrency)} · Products NET {amount(commercial.discountable-commercial.discount,e.quotedCurrency)} · Products &amp; Services NET {amount(commercial.net,e.quotedCurrency)}</p>
+      :<p>Gross {amount(commercial.gross,e.quotedCurrency)} · ฐานส่วนลด {amount(commercial.discountable,e.quotedCurrency)} · ส่วนลด {commercial.discountPercent}% ({amount(commercial.discount,e.quotedCurrency)}) · NET {amount(commercial.net,e.quotedCurrency)}</p>)}
      <p>{o.sourceRef}</p>
     </details>
    </td>

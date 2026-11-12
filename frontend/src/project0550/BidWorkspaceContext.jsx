@@ -32,7 +32,7 @@ const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
  const revised=preparePagaIdieWorking0550(preparePagaRevisionPricing0550(data,today),COMMERCIAL_POLICY,today);
- const pbx=prepareChevalierPbxWorking0550(revised,today);
+ const pbx=prepareChevalierPbxWorking0550(revised,COMMERCIAL_POLICY,today);
  const avl=preparePagaAvlDeviation0550(pbx);
  const based=pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
  const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
@@ -137,7 +137,7 @@ export function BidWorkspaceProvider({children}){
   setBusy(true);
   try{
    const transformed=repairPagaEngineeringDrafts0550(reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(transform(data))));
-   const sourced=transformed.offers===data.offers?transformed:prepareChevalierPbxWorking0550(transformed,reviewDate);
+   const sourced=transformed.offers===data.offers?transformed:prepareChevalierPbxWorking0550(transformed,COMMERCIAL_POLICY,reviewDate);
    const next=prepareSystemAvlDeviations0550(sourced,deriveIntegration0550(sourced,SYSTEMS,reviewDate));
    setData(await saveProject0550Bid(next,data.revision,action));
    setError("");

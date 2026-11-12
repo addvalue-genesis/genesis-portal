@@ -26,7 +26,7 @@ import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
 import {validateBidVolumes0550} from "./bidVolumes0550";
 import {validateBidPunchPlans} from "../../common/governance/bidPunch";
 import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
-import {chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
+import {chevalierPbxAllocation0550,chevalierPbxOwnerCode0550,chevalierPbxQuote0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
 import {chevalierPbxCostConflict0550} from './chevalierPbxWorking0550';
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct"];
@@ -118,11 +118,14 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  for(const line of eligible)if(line.scopeKey.trim()){const key=line.scopeKey.trim().toLowerCase();counts.set(key,(counts.get(key)||0)+1);}
  const pagaNetIds=new Set(data.offers.filter(pagaRevisionNet0550).map(o=>o.id));
  const pagaOwners=eligible.filter(l=>l.systemToken==='TEL-PAGA'&&l.wbs==='A'&&pagaNetIds.has(l.offerId));
+ const pbxQuote=chevalierPbxQuote0550(data.offers);
+ const hasPbxAllocation=data.lines.some(l=>l.selected&&chevalierPbxOwnerCode0550(l.id));
  const priceLine=(l,spareCostBasisTHB)=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
   const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
   const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
+  const pbxAllocation=chevalierPbxAllocation0550(pbxQuote,l,offer);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}
   if(!l.description.trim()||!l.sourceRef.trim()||!l.scopeKey.trim())problems.push("Description, scope key and source/basis required");
@@ -132,14 +135,16 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
    if(!offer)problems.push("Selected offer missing");
    else {
     currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;
-    if(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE"){
-     if(!chevalierApfPbxOwner0550(l,offer)){
+    if(chevalierPbxOwnerCode0550(l.id)){
+     costRate=pbxAllocation?.cost??null;
+     if(!pbxAllocation)problems.push('CHEVALIER_PBX_BASIS_OPEN: verify quoted Products, discount and service lots');
+     else if(selected&&chevalierPbxCostConflict0550(data,l,pbxQuote)){
       costRate=null;
-      problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the net package owner; options require separate allocation review");
-     }else if(selected&&chevalierPbxCostConflict0550(data,l,offer)){
-      costRate=null;
-      problems.push("SUPPLIER_ROW_COST_OWNER_DUPLICATE: APF PBX server or its parent package already has an owner");
+      problems.push('SUPPLIER_ROW_COST_OWNER_DUPLICATE: reconcile overlapping PABX price owners');
      }
+    }else if((chevalierPbxSource0550(offer)&&hasPbxAllocation)||(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE")){
+     costRate=null;
+     problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the approved quote allocation or net package owner");
     }
     problems.push(...mgwOfferProblems0550(offer,l));
     if(mgwCurrentOffer0550(offer)&&selected){
@@ -236,7 +241,8 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
   const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  const pbxProducts=pbxAllocation?.products?.map(item=>({description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit}));
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(pbxProducts?{pbxProducts}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  };
  const equipment=new Map();
  if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){

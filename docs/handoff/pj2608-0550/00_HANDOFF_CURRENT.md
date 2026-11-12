@@ -2,7 +2,7 @@ Latest PAGA decision: [INDUSTRONIC supply and ID-IE / ADDVALUE service rates](20
 
 Latest MET sourcing decision: [MGW Vaisala for APF and ACP](20261109_MGW_MET_NDB_QUOTATION.md#13-november--mgw-selected-for-met). C1 shows the two site packages and their MR references. The APF MET Cabinet remains open for scope and price.
 
-Latest PABX pricing decision: [CHEVALIER APF IP PBX Server](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--apf-ip-pbx-server). The existing A1-04 owner uses the registered Rev.01 item 1.1.1 unit rate for one MR server bundle in 10.2, 10.7 Draft and 11.C1. Rate and second-server scope remain under review.
+Latest PABX correction: [CHEVALIER full quotation](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--chevalier-full-quotation-correction). The 34-item discounted Products lot feeds A1-04/C1. Initial site service and remote maintenance feed separate Working B4 owners and C7 / A1 Others. The Volume I draft trace covers A1/A2, C1–C8, D/E/F, M and P.
 
 Latest cabinet procurement decision: [RITTAL from VERSED across the bid](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md#13-november--rittal-cabinet-procurement). QT2611035 prices the 13 LAN racks in the existing Working Draft and original C1 cabinet rows. The other systems' cabinet requirements and price gaps are listed in 07.1.
 

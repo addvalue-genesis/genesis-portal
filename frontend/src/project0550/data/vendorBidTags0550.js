@@ -1,5 +1,6 @@
 import mgwQuote from './mgwQuote0550.json';
 import {MGW_RADIO_DTRS_0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550} from './mgwQuoteSelection0550';
+import {chevalierPbxSections0550} from './chevalierPbxQuote0550';
 
 export const VENDOR_VOLUME_TAGS_0550=['A1','A2','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F'];
 export const VENDOR_PHYSICAL_TAG_FIELDS_0550=[
@@ -40,6 +41,8 @@ export function vendorOptionSpareWbs0550(offer){
 }
 
 export function offerSourceSections0550(offer){
+ const pbx=chevalierPbxSections0550(offer);
+ if(pbx)return pbx;
  const optionWbs=vendorOptionSpareWbs0550(offer);
  if(optionWbs)return ['A2',optionWbs==='C2'?'C4':'C3'];
  const atomic=offer?.atomicLines?.[0];

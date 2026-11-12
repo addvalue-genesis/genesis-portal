@@ -29,6 +29,16 @@ The automatic 07.2 load and manual Vendor registration both use this source when
 
 ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply. The private CHEVALIER register test checks the MR and prior MGW paths, source quantity, repeated preparation, A1-04 Release and C1 price parity, competing NET, and protected Working and Schedule records. The Windows workspace must load the prepared CHEVALIER Vendor register through the existing source intake. Its saved state has not been observed.
 
+## 13 November · CHEVALIER full quotation correction
+
+The previous single-R660 draft is superseded. The original CITT-QT-392-2026 Rev.01 PDF reconciles to 34 Products items, two Base service lots, and 15 Options. The successor Vendor register retains the printed rates and quantities and records the fixed discount against Products. Software licences and prepaid OEM support follow the Products lot.
+
+Working A and A1-04 use the discounted Products lot once. C1 displays the shared supply price and all quoted product quantities, including two R660 bundles. The APF server and the five phone requirements retain their native quantities and refer to the shared price. Site assignments, handset mix and Ex-phone accessories still require review. The source NET summary and previous MGW Offers remain available in Vendor.
+
+Working B4 carries the two supplier-procured service lots under the existing Procured Cost policy. C7 carries the initial site and integration lot. A1 Others / 11.E carries the two-year remote maintenance lot. Scope and price notes identify the unallocated Options and the outstanding C2–C6, C8, D, E and F requirements. 11.M and 11.P read the same Working allocations. The 11.P draft trace is present in the screen, XLSX, HTML and complete draft Word export. Reviewed and frozen records follow the existing controls.
+
+Verification uses the original two-page PDF and the private Vendor register. It reconciles the 51 item prices, the fixed discount, the three Working owners and the C1, C7 and E amounts. Regression checks cover prior generated owners, overlapping NET, reviewed and authored work, all draft trace destinations and customer exports. Saved Windows consumption is pending verification.
+
 ## 13 November · PAGA supply and service rates
 
 Working A1-05 selects the current INDUSTRONIC A20261632-005 NET against

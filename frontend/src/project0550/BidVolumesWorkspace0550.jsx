@@ -27,6 +27,7 @@ import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {ScheduleResults0550} from './SchedulePriceDiagnostics0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
 import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
+import {CHEVALIER_PBX_SCHEDULE_NOTES_0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {CommissioningBreakdown0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
 import {NATIVE_SUMMARIES_0550,NATIVE_FIELDS_0550,downloadNativeExhibit0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/changeImpact0550';
@@ -212,6 +213,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  </div>}
  {volume==='I'&&panel==='A1'&&<CommissioningBreakdown0550 view={displayView} systems={SYSTEMS} currency={currency} summary model={model} disabled={dirty} onNavigate={go} onOpenC3={()=>{setShowAllSchedules(true);choose('C3');}}/>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
+ {volume==='I'&&displayView.chevalierPbxSupply&&['A2','D','E','F'].includes(panel)&&
+  <p className="p55-note"><strong>IP Telephony and PABX</strong> · {CHEVALIER_PBX_SCHEDULE_NOTES_0550[panel]}</p>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
  {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping'].includes(panel))||
@@ -240,6 +243,12 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   <CommissioningSpareQuotes0550 data={data} model={model} onNavigate={go} disabled={dirty}/>
  </>}
  {panel==='mapping'&&<><LifecycleCostDrivers0550 data={data} model={model} onNavigate={go}/><h3>One Working owner → one Schedule allocation</h3><p>ไม่มีการคัดลอกราคา · ไม่สร้างต้นทุนใหม่ · รายการที่ยังไม่ผูก = OPEN · A1/A2 และ C ใช้ยอดเดียวกัน ห้ามนำมาบวกซ้ำ</p><Select label="Working line to allocate" value={bindingId} onChange={v=>{if(!dirty)setBindingId(v);}} rows={options(view.available,l=>l.id+' / '+(l.selected?'SELECTED':'NOT SELECTED')+' / '+l.description)}/><div ref={bindingEditor}>{bindingId&&<RecordEditor key={bindingId} collection="bindings" initial={initialAllocation} onDirtyChange={setDirty} onNavigate={go}/>}</div><ScheduleAllocationCrosswalk0550 data={data} model={model} savedView={view} displayView={displayView} disabled={dirty||busy} onNavigate={go} onEdit={id=>{if(!dirty)setBindingId(id);}}/></>}
+ {volume==='I'&&panel==='preview'&&displayView.chevalierPbxSupply&&
+  <Grid label="IP Telephony and PABX schedule trace" heads={['Volume I','Draft status','Scope']}
+   rows={chevalierPbxScheduleTrace0550(displayView).map(([id,status,scope])=>[
+    <button type="button" disabled={dirty||id==='P'} onClick={()=>{if(!quotationSchedules0550().some(s=>s.id===id))setShowAllSchedules(true);choose(id==='M'?'mapping':id);}}>11.{id}</button>,
+    status,scope,
+   ])}/>}
  {panel==='deviations'&&<><h3>Commercial Deviation register</h3><p>ข้อแตกต่างจากเงื่อนไขลูกค้า พร้อมหลักฐานการยอมรับ · ความไม่ตรงของข้อมูลภายในให้แก้ที่ต้นทางก่อน</p><button type="button" disabled={dirty} onClick={()=>setDeviationId(newId('CDEV'))}>เพิ่ม Commercial Deviation</button>{deviationId&&<RecordEditor key={deviationId} collection="commercialDeviations" initial={view.proposal.commercialDeviations.find(r=>r.id===deviationId)||blankCommercialDeviation0550(deviationId)} onDirtyChange={setDirty}/>}<Grid label="Commercial deviations" heads={['Title','Clause / Proposal','Decision / Review','Edit']} rows={view.commercialDeviations.map(d=>[d.title,d.locator+' / '+d.proposal,d.decision+' / '+d.state,<button type="button" disabled={dirty} onClick={()=>setDeviationId(d.id)}>แก้ไข / ทบทวน</button>])}/></>}
  {panel==='preview'&&<><h3>Preview / Export · DRAFT</h3>{volume==='I'&&<button type="button" disabled={dirty} onClick={()=>downloadNativeExhibit0550(displayView,'docx')}>Export Exhibit C Word ต้นฉบับ (.docx)</button>}<p>Word และ HTML ของ Volume I ใช้แบบฟอร์มต้นฉบับเดียวกับหน้าจอ · Excel เป็นตารางข้อมูลประกอบ · เปิด HTML เพื่อ Print to PDF · OPEN ยังคงแสดงในร่าง ไม่ถือว่าอนุมัติหรือส่งลูกค้า</p><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume)}>Export Volume {volume} XLSX</button><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume,'html')}>Export HTML / Print to PDF</button>{volume==='I'?visibleSchedules.map(s=><LazyNativeExhibitC0550 key={s.id} currency={currency} label={'11.'+s.id+' · '+s.title} disabled={dirty} onNavigate={go} view={displayView} id={s.id} c2Scope={['C2','C3','C4'].includes(s.id)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>):<Grid label="Volume III preview" heads={['Item','Requirement','Response','State']} rows={QUALIFICATIONS_0550.map(q=>[q.id,q.title,view.getRecord('III.'+q.id).content||'OPEN',view.getRecord('III.'+q.id).state])}/>}</>}
  </section></div>;

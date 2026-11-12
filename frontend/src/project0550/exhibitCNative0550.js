@@ -1,6 +1,7 @@
 // The HTML and DOCX bodies come from the supplied Word file, including merges,
 // notes and fixed labels. Only bidder response slots are substituted here.
 import template from './data/exhibitCNativeTemplate0550.json';
+import {CHEVALIER_PBX_SCHEDULE_NOTES_0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {sumMoney0550} from './data/money0550';
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
@@ -376,6 +377,10 @@ function renderPage(view,page,format,currency='USD'){
   if(page.id==='C3'&&view.pagaSpares?.recommended.length){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
+  const pbxNote=CHEVALIER_PBX_SCHEDULE_NOTES_0550[page.id];
+  if(view.chevalierPbxSupply&&pbxNote&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
+   partialNote=[partialNote,'IP Telephony and PABX. '+pbxNote].filter(Boolean).join(' ');
+  }
  }
  if(page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
   (page.id==='C2'&&page.priceRows?.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
@@ -417,7 +422,9 @@ export function nativeExhibitProblems0550(view,only){
 export function nativeExhibitHtml0550(view,only,includeCover=false){
  const ids=only?[only]:Object.keys(template.schedules);
  const cover=includeCover?`<article class="p55-native-paper"><h2>Volume I — Quotation</h2><p>${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p><p>${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}</p><h2>Power of Attorney / Undertaking</h2><p>${escape(view.getRecord('I.cover').content||'OPEN')}</p></article>`:'';
- return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}</body></html>`;
+ const pbx=only?[]:chevalierPbxScheduleTrace0550(view);
+ const appendix=pbx.length?`<article class="p55-native-paper"><h2>IP Telephony and PABX · Volume I draft trace</h2><table><thead><tr><th>Volume I</th><th>Draft status</th><th>Scope</th></tr></thead><tbody>${pbx.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')}</tbody></table></article>`:'';
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${appendix}</body></html>`;
 }
 export function buildNativeExhibitDocx0550(view,only){
  if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
@@ -438,6 +445,14 @@ export function buildNativeExhibitDocx0550(view,only){
   const start=xml.indexOf('<w:body>')+8,end=xml.lastIndexOf('<w:sectPr');
   const block=only==='C2'&&view.c2Systems?blocks[only].replace(trailingBreak,''):blocks[only];
   xml=xml.slice(0,start)+block+xml.slice(end);
+ }
+ const pbx=only?[]:chevalierPbxScheduleTrace0550(view);
+ if(pbx.length){
+  const paragraph=text=>`<w:p><w:r><w:t xml:space="preserve">${escape(text)}</w:t></w:r></w:p>`;
+  const appendix=paragraph('IP Telephony and PABX · Volume I draft trace')+
+   pbx.map(([id,status,scope])=>paragraph('11.'+id+' · '+status+' · '+scope)).join('');
+  const section=xml.lastIndexOf('<w:sectPr');
+  xml=xml.slice(0,section)+appendix+xml.slice(section);
  }
  if(view.workingPreview)xml=xml.replace(/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/g,table=>{
   if(!table.includes('Component: '))return table;let index=0;

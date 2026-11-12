@@ -8,8 +8,9 @@ import {workingOffers0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {validateSupplierCommercialTotals0550,validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
-import {validateAtomicPackage0550} from './atomicLines0550';
+import {atomicRoute0550,validateAtomicPackage0550} from './atomicLines0550';
 import {vendorOfferLocation0550} from './vendorOfferLocation0550';
+import {CHEVALIER_PBX_REGISTER_0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
 
 // Extend the existing offer registry; this importer never creates Working prices.
 export const VENDOR_REGISTER_SCHEMA_0550='genesis.0550.vendor-register.v1';
@@ -94,6 +95,24 @@ export function planVendorRegister0550(data,pack,systems){
    }
    if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.quoteEvidence?.revision!==e.revision||old.quoteEvidence?.sourceSha256!==e.sourceSha256||old.quoteEvidence?.locator!==e.locator)fail('Offer ID belongs to another quotation/version / '+o.id);
    existingOffers++;
+   if(pack.batchId===CHEVALIER_PBX_REGISTER_0550&&chevalierPbxSource0550(o)){
+    const {originBatchId,commercialTotals,...source}=e;
+    const {originBatchId:oldOrigin,commercialTotals:oldTotals,...previous}=old.quoteEvidence;
+    const {atomicLines:atoms,quoteEvidence,...row}=o;
+    const {atomicLines:oldAtoms,quoteEvidence:oldEvidence,...previousRow}=old;
+    const code=o.supplierQuoteRow?.itemCode;
+    const targetClass=o.supplierQuoteRow?.classification==='BASE_PRICE'?
+     /^1\.[23]\./.test(code)?'EQUIP':code==='2.2'?'OTHER_COST':null:null;
+    const priorClass=code==='2.2'?'SERVICE_SITE':'OTHER_COST';
+    const expected=oldAtoms?.map(atom=>targetClass&&atom.route.line_class===priorClass?
+     {...atom,route:atomicRoute0550(targetClass)}:atom);
+    if(same(source,previous)&&same(row,previousRow)&&(!oldTotals||same(oldTotals,commercialTotals))&&
+     (!oldAtoms||same(expected,atoms))){
+     const enriched={...old,...(atoms?{atomicLines:atoms}:{}),quoteEvidence:{...old.quoteEvidence,...(commercialTotals?{commercialTotals}:{})}};
+     if(!same(enriched,old)){offers[offers.indexOf(old)]=enriched;updatedOffers++;}
+     continue;
+    }
+   }
    if(o.atomicLines&&!old.atomicLines){
     const {originBatchId,...source}=e;
     const {originBatchId:priorBatch,...priorSource}=old.quoteEvidence;
@@ -211,7 +230,7 @@ export function groupVendorOffers0550(entries,mode,systems,{sourceGroups=false}=
 export const vendorWorkingRateReference0550=offer=>/Working rate reference/i.test(offer.quoteEvidence?.locator||'');
 export function vendorQuoteNetUnitRate0550(offer,parent){
  const item=offer.supplierQuoteRow,evidence=offer.quoteEvidence,totals=parent?.quoteEvidence?.commercialTotals;
- if(!totals||item?.classification!=='BASE_PRICE'||item.parentOfferId!==parent.id||!Number.isFinite(evidence?.quotedUnitCost)||
+ if(!totals||chevalierPbxSource0550(parent)||item?.classification!=='BASE_PRICE'||item.parentOfferId!==parent.id||!Number.isFinite(evidence?.quotedUnitCost)||
   evidence.sourceSha256!==parent.quoteEvidence.sourceSha256||evidence.sourceId!==parent.quoteEvidence.sourceId)return null;
  const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
  const rate=item.discountable?totals.discountPercent:0;

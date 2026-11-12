@@ -190,70 +190,86 @@ if(process.env.GENESIS_ALIE_TEST_PAGA005){
 }
 if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  const {importMrWorkingBasis0550}=require(root+'/project0550/data/mrWorkingBasis0550.js');
- const {APF_PBX_MR_0550,chevalierApfPbxOffer0550}=require(root+'/project0550/data/vendorOfferLocation0550.js');
  const {prepareChevalierPbxWorking0550}=require(root+'/project0550/data/chevalierPbxWorking0550.js');
- const {prepareMgwCurrentWorking0550}=require(root+'/project0550/data/mgwCurrentWorking0550.js');
- const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=
-  require(root+'/project0550/data/mgwQuoteSelection0550.js');
- const {blankScheduleBinding0550,deriveBidVolumes0550,emptyBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
- const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {CHEVALIER_PBX_SUPPLY_0550:supply,CHEVALIER_PBX_FIELD_0550:field,CHEVALIER_PBX_MA_0550:ma,
+  chevalierPbxQuote0550,chevalierPbxScheduleTrace0550}=require(root+'/project0550/data/chevalierPbxQuote0550.js');
+ const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
+ const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixHtml0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {offerSourceSections0550}=require(root+'/project0550/data/vendorBidTags0550.js');
  const {roundMoney0550}=require(root+'/project0550/data/money0550.js');
- const allSystems=SYSTEMS.map(s=>s.token),ownerId='REQ-'+APF_PBX_MR_0550;
- const original=JSON.parse(fs.readFileSync(process.env.GENESIS_ALIE_TEST_CHEVALIER,'utf8'));
- const fx={thbPerUSD:31.5,thbPerEUR:36,source:'QA fixture FX',date};
- const base=importMrWorkingBasis0550({...empty,fx},COMMERCIAL_POLICY,date);
- const ingest=data=>planVendorRegister0550(data,original,allSystems).workspace;
- const actual=ingest(base),offer=actual.offers.find(chevalierApfPbxOffer0550);
- assert.equal(offer.supplierQuoteRow.quantity,2);
- const prepare=data=>prepareChevalierPbxWorking0550(data,date);
- const getOwner=data=>data.lines.find(line=>line.id===ownerId);
- assert.equal(getOwner(prepare(actual)).offerId,offer.id);
-
- const prior={...offer,id:MGW_CURRENT_PREFIX_0550+'PABX-APF-9-01',quoteRef:MGW_CURRENT_QUOTE_0550,
-  vendorId:'QA-MGW',currency:'USD',unitCost:1000,brand:'Avaya',sourceRef:'QA / MGW APF PABX',
-  quoteEvidence:{...offer.quoteEvidence,sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,
-   quotedQuantity:1,quotedUnit:'U',quotedUnitCost:1000,quotedCurrency:'USD',quotedTotal:1000}};
- delete prior.supplierQuoteRow;
- delete prior.atomicLines;
- const mgw=prepareMgwCurrentWorking0550({...base,offers:[prior],
-  vendors:[{id:prior.vendorId,name:'QA MGW',kind:'SUPPLIER',reference:'QA fixture'}],
-  mgwDetailPricingImport:{decision:'',conflicts:[]},supplierRevisionImports:[{batchId:MGW_CURRENT_BATCH_0550}]},
-  COMMERCIAL_POLICY,date);
- const oldOwner=getOwner(mgw);
- assert.equal(oldOwner.offerId,prior.id);
- const binding={...blankScheduleBinding0550(ownerId),basis:'SI DRAFT / QA',locator:oldOwner.requirementRef+' / '+oldOwner.sourceRef};
- const input={...mgw,bidVolumes:{...emptyBidVolumes0550(),bindings:[binding]}};
- const registered=ingest({...input,mgwDetailPricingImport:undefined,supplierRevisionImports:[]});
- const selected=prepare({...input,vendors:registered.vendors,offers:registered.offers});
+ const {a1OthersRows0550}=require(root+'/project0550/A1OthersBreakdown0550.jsx');
+ const {bidVolumeSheets0550,bidVolumeHtml0550}=require(root+'/project0550/exportBidVolumes0550.js');
+ const {buildNativeExhibitDocx0550}=require(root+'/project0550/exhibitCNative0550.js');
+ const all=SYSTEMS.map(s=>s.token),fx={thbPerUSD:31.5,thbPerEUR:36,source:'QA fixture FX',date};
+ const input=importMrWorkingBasis0550({...empty,fx},COMMERCIAL_POLICY,date);
+ const load=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+ const register=load(process.env.GENESIS_ALIE_TEST_CHEVALIER);
+ const oldFile=process.env.GENESIS_ALIE_TEST_CHEVALIER_PREDECESSOR;
+ const prior=oldFile?planVendorRegister0550(input,load(oldFile),all).workspace:input;
+ const current=planVendorRegister0550(prior,register,all).workspace;
+ const quote=chevalierPbxQuote0550(current.offers);
+ assert.equal(quote.products.length,34);
+ assert.equal(quote.products[0].supplierQuoteRow.quantity,2);
+ assert.equal(quote.productsNet+quote.field.unitCost+quote.ma.unitCost,quote.net.unitCost);
+ const originalNet=register.offers.find(o=>o.supplierQuoteRow.classification==='NET_PACKAGE');
+ const printed=originalNet.quoteEvidence.commercialTotals;
+ const originalCost=code=>register.offers.find(o=>o.supplierQuoteRow.classification==='BASE_PRICE'&&o.supplierQuoteRow.itemCode===code).unitCost;
+ const expectedCosts=[roundMoney0550(printed.discountable-printed.discount),originalCost('2.1'),originalCost('2.2')];
+ assert.deepEqual([quote.productsNet,quote.field.unitCost,quote.ma.unitCost],expectedCosts);
+ const software=quote.products.find(o=>o.supplierQuoteRow.itemCode==='1.2.1');
+ assert.deepEqual(offerSourceSections0550(software),['A1','C1']);
+ assert.deepEqual(offerSourceSections0550(quote.ma),['A1','E']);
+ assert.deepEqual(offerSourceSections0550(current.offers.find(o=>o.id.endsWith('-OPT-1.11'))),['A2']);
+ assert.deepEqual(offerSourceSections0550(current.offers.find(o=>o.id.endsWith('-OPT-2.1'))),['A2','C7']);
+ const prepare=data=>prepareChevalierPbxWorking0550(data,COMMERCIAL_POLICY,date);
+ const selected=prepare(current);
  assert.equal(prepare(selected),selected);
- const owner=getOwner(selected);
- assert.deepEqual([owner.offerId,owner.quantity,owner.tagRef,owner.coveredByLineId],[offer.id,1,'APF','']);
- assert(selected.bidVolumes.bindings[0].locator.includes(offer.sourceRef));
- assert(selected.offers.includes(prior));
- const model=deriveBidWorkspace(selected,allSystems,date);
- const expected=roundMoney0550(roundMoney0550(offer.unitCost/0.95*1.2)/31.5);
- assert.equal(model.lines.find(line=>line.id===ownerId).provisionalCostNative,offer.unitCost);
- assert.equal(model.provisional.schedule.find(row=>row.code==='A1-04').children.find(row=>row.id===ownerId).customerUSD,expected);
- assert.equal(model.official.lines.find(line=>line.id===ownerId).customerUSD,null);
+ assert.equal(selected.lines.filter(l=>l.coveredByLineId===supply).length,6);
+ const derived=data=>deriveBidWorkspace(data,all,date);
+ const model=derived(selected),owners=model.lines.filter(l=>[supply,field,ma].includes(l.id));
+ validateBidWorkspace(selected,selected.baselineSnapshotId,all);
+ assert.deepEqual(owners.map(l=>l.provisionalCostNative),expectedCosts);
+ const expectedSell=expectedCosts.map(cost=>roundMoney0550(cost/0.95*1.2));
+ assert.deepEqual(owners.map(l=>l.provisionalCustomerTHB),expectedSell);
+ assert.equal(model.provisional.schedule.find(r=>r.code==='A1-04').children.find(l=>l.id===supply).customerTHB,expectedSell[0]);
+ assert.equal(model.official.lines.find(l=>l.id===supply).customerUSD,null);
  const view=deriveBidVolumeWorkingPreview0550(selected,model,SYSTEMS,date,deriveBidVolumes0550(selected,model,SYSTEMS,date));
- const c1=deriveC1Appendix0550({...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550});
- const charges=c1.rows.filter(row=>row.priceOwners?.some(price=>price.lineId===ownerId));
- assert.deepEqual(charges.map(row=>[row.sn,row.site,row.quantity,row.amount]),[['1.3.P1','APF',1,expected]]);
-
- const edit=line=>({...selected,lines:selected.lines.map(current=>current===owner?line:current)});
- assert.equal(deriveBidWorkspace(edit({...owner,quantity:2}),allSystems,date).lines.find(line=>line.id===ownerId).costRate,null);
- const net=selected.offers.find(candidate=>candidate.id===offer.supplierQuoteRow.parentOfferId);
- const withNet=data=>({...data,lines:[...data.lines,{...owner,id:'QA-PBX-NET',scopeKey:'QA.PBX.NET',
-  offerId:net.id,mrRequirementId:undefined,unit:net.unit}]});
- assert.equal(deriveBidWorkspace(withNet(selected),allSystems,date).lines.find(line=>line.id===ownerId).costRate,null);
- const previous={...selected,lines:input.lines,bidVolumes:input.bidVolumes};
- const reviewed={...previous,bidVolumes:{...previous.bidVolumes,bindings:[{...binding,status:'REVIEWED'}]}};
- assert.equal(prepare(reviewed),reviewed);
- const competing=withNet(previous);
- assert.equal(prepare(competing),competing);
- const authored={...previous,lines:previous.lines.map(line=>line===oldOwner?{...line,manualCost:1}:line)};
+ assert.deepEqual(view.scheduleRows('C7').filter(b=>[field,ma].includes(b.lineId)).map(b=>b.lineId),[field]);
+ assert.equal(a1OthersRows0550(view,'E').filter(b=>b.lineId===ma).length,1);
+ assert.equal(a1OthersRows0550(view,'F').filter(b=>b.lineId===ma).length,0);
+ for(const id of ['C2','C3','C4','C5','C6','C8'])assert(!view.scheduleRows(id).some(b=>[supply,field,ma].includes(b.lineId)));
+ const c1View={...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550},c1=deriveC1Appendix0550(c1View);
+ const row=c1.rows.find(r=>r.priceOwners?.some(b=>b.lineId===supply));
+ assert.deepEqual([row.sn,row.quantity,row.unit,row.components.length,row.components[0].quantity],['1.3.P1',1,'Lot',34,2]);
+ assert.equal(c1.rows.filter(r=>r.priceOwners?.some(b=>[supply,field,ma].includes(b.lineId))).length,1);
+ assert.match(c1AppendixHtml0550(c1View),/R660/);
+ const sections=['A1','A2','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','M','P'];
+ assert.deepEqual(chevalierPbxScheduleTrace0550(view).map(row=>row[0]),sections);
+ assert.deepEqual(view.allocationPlan.filter(row=>[supply,field,ma].includes(row.line.id))
+  .map(row=>[row.line.id,row.proposal.schedule]),[[supply,'C1'],[field,'C7'],[ma,'A1']]);
+ assert.deepEqual(bidVolumeSheets0550(c1View,'I').find(sheet=>sheet.name==='PABX Schedule Trace').rows.map(row=>row[0]),sections);
+ assert.match(bidVolumeHtml0550(c1View,'I'),/Separate witnessed FAT\/iFAT scope and price are OPEN/);
+ assert(Buffer.from(buildNativeExhibitDocx0550(c1View)).includes(Buffer.from('11.F · OPEN · The supplier excludes international freight and insurance.')));
+ const raw=selected.lines.find(l=>l.id===supply),full={...raw,id:'QA-PBX-NET',scopeKey:'QA.PBX.NET'};
+ const duplicate=derived({...selected,lines:[...selected.lines,full]});
+ assert(duplicate.lines.filter(l=>[supply,field,ma,full.id].includes(l.id)).every(l=>l.provisionalCustomerUSD===null));
+ const apf=current.lines.find(l=>l.id==='REQ-MR-B1-13-APF-09-PBX'),server=quote.products[0];
+ const migration={...current,lines:current.lines.map(l=>l!==apf?l:{
+  ...l,vendorId:server.vendorId,offerId:server.id,coveredByLineId:'',brand:'Dell R660',
+  sourceRef:l.sourceRef+'\n'+server.sourceRef,
+  coverageBasis:'Use one bundle for APF MR 9.0 at the printed unit rate before the package-level discount. The supplier quotes two bundles.',
+  customerRemark:'Draft price for one server bundle. Confirm the one-bundle rate and the second server’s role and location.',
+ })};
+ assert.equal(prepare(migration).lines.find(l=>l.id===apf.id).coveredByLineId,supply);
+ const authored={...current,lines:current.lines.map(l=>l===apf?{...l,manualCost:1}:l)};
  assert.equal(prepare(authored),authored);
- console.log('PASS private CHEVALIER register: one APF R660 in Working, draft Release and C1, with NET and reviewed-owner protection.');
+ if(oldFile){
+  assert.equal(prepare(prior).lines.find(l=>l.id===supply).offerId,quote.net.id);
+  assert.equal(software.atomicLines[0].route.line_class,'EQUIP');
+  const deleted={...prior,offers:prior.offers.filter(o=>o.id!==software.id)};
+  assert(!planVendorRegister0550(deleted,register,all).workspace.offers.some(o=>o.id===software.id));
+ }
+ console.log('PASS private CHEVALIER: discounted C1 Products lot, separate B4 lots, C7/E routes, prior migration and duplicate protection.');
 }
 if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
  const D=require(root+'/project0550/data.js');

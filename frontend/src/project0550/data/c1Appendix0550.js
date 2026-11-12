@@ -12,7 +12,7 @@ import {mrLineScope0550} from './mrWorkingBasis0550';
 import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
 import {versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
-import {chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
+import {CHEVALIER_PBX_SUPPLY_0550} from './chevalierPbxQuote0550';
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
 export const C1_APPENDIX_LAYOUT_0550='mr-appendix.v2';
@@ -349,11 +349,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   const lan=!legacy&&view.workingPreview&&mgwLanEquipmentOffer0550(b.line.offer);
   const directRadio=radio&&view.workingPreview;
+  const pbx=b.lineId===CHEVALIER_PBX_SUPPLY_0550&&b.line.pbxProducts?.length;
   const sharedRadio=directRadio&&mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1;
   // A draft Working row without a price or MR link is an internal mapping task,
   // not an additional customer supply package. Keep its canonical owner intact.
   if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
-  if(targets.length===1){const target=targets[0];target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
+  if(targets.length===1&&!pbx){const target=targets[0];target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
   const token=b.line.systemToken,section=directRadio?'1.1':targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
    (!legacy?{ 'TEL-DMR':'1.5','TEL-TELT':'1.1','TEL-PAGA':'1.4' }[token]:undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
@@ -366,12 +367,19 @@ export function deriveC1Appendix0550(view,currency='USD'){
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
   const unitOpen=directRadio&&radioUnitOpen(b.line.offer);
   const site=targets.length?unique(targets.map(t=>t.site)).join(' / '):
-   mgwCurrentOffer0550(b.line.offer)||chevalierApfPbxOwner0550(b.line,b.line.offer)?b.line.tagRef:'PROJECT';
+   mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT';
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site,
    description:itemDescription,quantity:b.quantity,unit:unitOpen?'':b.unit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
+  if(pbx){
+   item.components=b.line.pbxProducts.map(product=>({...product,source:product.description,note:'Included in supply lot'}));
+   if(view.workingPreview){
+    item.internalNote='Shared equipment price. Confirm site and TAG placement, handset model allocation and the excluded interfaces.';
+    problems.push('C1_PBX_MR_SCOPE_OPEN / '+item.key);
+   }
+  }
   if(metOffer){
    item.metOffer=metOffer;
    item.workingNote=['MGW',metOffer.quoteRef,metOffer.brand].filter(Boolean).join(' · ');

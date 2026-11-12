@@ -13,6 +13,7 @@ import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwL
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
+import {CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,CHEVALIER_PBX_SUPPLY_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -106,6 +107,8 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
   let [schedule,summary,reason]=base;
   const offer=data.offers.find(o=>o.id===raw.offerId),tagged=vendorTaggedSchedule0550(offer,raw);
   if(tagged?.summary)({schedule,summary,basis:reason}=tagged);
+  if(raw.id===CHEVALIER_PBX_MA_0550){schedule='A1';summary='OTHER';reason='Two-year remote maintenance → A1 Others / 11.E';}
+  if(raw.id===CHEVALIER_PBX_FIELD_0550){schedule='C7';summary='FIELD_SERVICE';reason='Initial site and integration service → C7 fixed lot; man-hours and programme OPEN';}
   if((data.repositoryBasisImport?.tsiActivityBudget?.expenseLineIds||[]).includes(raw.id)){
    schedule='A1';summary='OTHER';reason='Shared SI travel / mobilisation expense → A1 Others; retain one existing owner, not C7 labour hours or C8 purchaser facilities';
   }
@@ -124,7 +127,8 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
    if(problems.length)return {line,proposal:null,reason:'C2 OPEN · '+problems.join(' / ')};
   }
   const bulkMr=mgwBulkMr0550(offer),radioMr=mgwRadioDtrsOffer0550(offer)?mgwCurrentMr0550(offer):[];
-  const mrIds=[bulkMr,...radioMr].filter(Boolean);
+  const pbxMr=chevalierPbxOwnerCode0550(raw.id)?data.lines.filter(line=>line.coveredByLineId===CHEVALIER_PBX_SUPPLY_0550).map(line=>line.mrRequirementId):[];
+  const mrIds=[bulkMr,...radioMr,...pbxMr].filter(Boolean);
   const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)||mrIds.includes(r.id.replace(/^REQDEF-/,''))&&r.disposition!=='NOT_APPLICABLE').flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
   const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
   const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
@@ -227,8 +231,9 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:currentSupplierOffers0550(data).filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
  const mgwBulkSupply=bindings.some(b=>b.schedule==='C1'&&Number.isFinite(b.amount)&&mgwBulkOffer0550(b.line?.offer));
  const pagaNet=pagaRevisionSelected0550(data)?.net;
+ const chevalierPbxSupply=model.provisional?.selected.some(line=>line.id===CHEVALIER_PBX_SUPPLY_0550&&line.pbxProducts?.length);
  return {...projected,c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
-  pagaItems:pagaNet?pagaRevisionItems0550(data,pagaNet):[]},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+  pagaItems:pagaNet?pagaRevisionItems0550(data,pagaNet):[]},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),
