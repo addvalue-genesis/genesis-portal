@@ -608,3 +608,64 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  assert.deepEqual(tag(prepared.offers.find(o=>o.id.endsWith('LAN-PROJECT-OPT-01'))),['A2']);
  console.log('PASS MGW LAN: 25 A1-01 owners, quote and MR quantities traced, C1 by site, Included/Option excluded, blocked MR recovered and authored costs preserved.',{quotedCostUSD:pricedSourceTotal,workingCostUSD:workingLanCost,sellUSD:net.knownAmount});
 }
+
+if(process.env.PJ0550_MGW_CCTV_ENT_REGISTER){
+ const pack=JSON.parse(fs.readFileSync(process.env.PJ0550_MGW_CCTV_ENT_REGISTER,'utf8'));
+ const registered=register.planVendorRegister0550(radioBase,pack,tokens).workspace;
+ const prepared=current.prepareMgwCurrentWorking0550(registered,D.COMMERCIAL_POLICY,radioLotDate);
+ validate(prepared);
+ const projectCctv=(data,currency='USD')=>{
+  const model=W.deriveBidWorkspace(data,tokens,radioLotDate);
+  const saved=volumes.deriveBidVolumes0550(data,model,D.SYSTEMS,radioLotDate);
+  const view={...preview.deriveBidVolumeWorkingPreview0550(data,model,D.SYSTEMS,radioLotDate,saved),
+   c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550};
+  return {view,c1:appendix.deriveC1Appendix0550(view,currency)};
+ };
+ const {view,c1}=projectCctv(prepared);
+ const cctv=c1.groups.find(g=>g.id==='1.3').systems.find(s=>s.name==='CCTV System');
+ assert.deepEqual(new Set(cctv.sites.map(s=>s.name)),new Set(['PROJECT','APF','ACP','ABV01','AMS01']));
+ const rows=cctv.sites.flatMap(s=>s.rows),findMr=(projection,id)=>projection.rows.find(r=>r.key==='MR-B1-13-'+id);
+ const priced=rows.filter(r=>Number.isFinite(r.amount));
+ const grouped=priced.filter(r=>r.provisionalCctv),packages=priced.filter(r=>r.kind==='PACKAGE');
+ const offerKey=b=>radioSelection.mgwCurrentItemKey0550(b.line.offer);
+ assert.equal(grouped.length,16);
+ assert.deepEqual(packages.map(r=>offerKey(r.priceOwners[0])).sort(),
+  ['CCTV-ABV01-23','CCTV-ACP-17','CCTV-ACP-18','CCTV-AMS01-27','CCTV-APF-02','CCTV-APF-12','CCTV-PROJECT-28']);
+ const owners=priced.flatMap(r=>r.priceOwners),source=pack.offers.filter(o=>o.quoteEvidence.systemTokens.includes('TEL-CCTV'));
+ assert.deepEqual(owners.map(b=>b.line.offerId).sort(),source.map(o=>o.id).sort());
+ assert.equal(sum(priced.map(r=>r.amount)),sum(owners.map(b=>b.amount)));
+ assert.equal(cctv.knownAmount,sum(owners.map(b=>b.amount)));
+ const apfPtz=findMr(c1,'APF-01'),apfGap=findMr(c1,'APF-02'),cabinet=findMr(c1,'APF-11');
+ assert.equal(apfPtz.sn,'1.3.1');
+ assert.equal(offerKey(apfPtz.priceOwners[0]),'CCTV-APF-01');
+ assert.equal(apfGap.amount,null);
+ assert.match(apfGap.note,/MR requires 2 Ex PTZ cameras\. MGW quoted 2 Ex Fixed cameras in item 1\.3\.P/);
+ assert.equal(cabinet.quotedComponents.length,6);
+ assert.equal(cabinet.amount,sum(cabinet.quotedComponents.map(c=>c.amount)));
+ assert.match(cabinet.note,/rack reconciliation/);
+ for(const id of ['APF-12','APF-13']){
+  const monitor=findMr(c1,id);
+  assert.equal(monitor.amount,null);
+  assert(monitor.note.includes(packages.find(r=>offerKey(r.priceOwners[0])==='CCTV-APF-12').sn));
+ }
+ assert(c1.problems.includes('C1_CCTV_MR_SCOPE_OPEN / '+apfPtz.key));
+ assert.equal(c1.amount,null);
+ const savedProjection=appendix.deriveC1Appendix0550({...view,workingPreview:false});
+ assert.equal(findMr(savedProjection,'APF-01').amount,null);
+ assert.equal(savedProjection.rows.filter(r=>r.kind==='PACKAGE'&&r.priceOwners.some(b=>source.some(o=>o.id===b.line.offerId))).length,28);
+ const thb=projectCctv(prepared,'THB').c1;
+ assert.equal(findMr(thb,'APF-11').amount,sum(cabinet.priceOwners.map(b=>b.line.customerTHB)));
+ assert.equal(thb.groups.find(g=>g.id==='1.3').systems.find(s=>s.name==='CCTV System').knownAmount,sum(owners.map(b=>b.line.customerTHB)));
+ const missing={...prepared,lines:prepared.lines.filter(l=>!l.offerId.endsWith('CCTV-APF-09'))};
+ const fallback=projectCctv(missing).c1;
+ assert.equal(findMr(fallback,'APF-11').amount,null);
+ assert(fallback.rows.some(r=>r.kind==='PACKAGE'&&r.priceOwners.some(b=>offerKey(b)==='CCTV-APF-06')));
+ const changedQty={...prepared,lines:prepared.lines.map(l=>l.id==='REQ-MR-B1-13-APF-01'?{...l,quantity:21}:l)};
+ assert.equal(findMr(projectCctv(changedQty).c1,'APF-01').amount,null);
+ const markup=renderToStaticMarkup(React.createElement(C1Appendix0550,{view}));
+ assert(markup.includes('CCTV System'));
+ assert.match(markup,/MR requires 2 Ex PTZ cameras\. MGW quoted 2 Ex Fixed cameras/);
+ assert.match(appendix.c1AppendixHtml0550(view),/MGW quoted both monitor sizes together under the workstation/);
+ assert.equal(R.deriveReleaseControl0550(prepared,W.deriveBidWorkspace(prepared,tokens,radioLotDate),radioLotDate).state,'HOLD');
+ console.log('PASS MGW CCTV: 28 A1-06 owners, 16 priced MR rows, 7 standalone quote rows, USD/THB rollups, quantity/cabinet fallback and Release HOLD.',{cctvUSD:cctv.knownAmount});
+}

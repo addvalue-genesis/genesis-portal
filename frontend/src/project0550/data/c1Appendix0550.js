@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCctvEntOffer0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -44,7 +44,7 @@ function mrDisplayRows(){
 const appendix=r=>r?.id?.match(/^MR-B1-1([1-8])-/)?.[1];
 const unique=xs=>[...new Set(xs)];
 const money=xs=>xs.length&&xs.every(Number.isFinite)?sumMoney0550(xs):null;
-const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||r.provisionalDmr||!r.ownerIds.length||!(r.quantity>0));
+const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||r.provisionalDmr||r.provisionalCctv||!r.ownerIds.length||!(r.quantity>0));
 const sharedRadioLabel='Shared Radio Consoles and Antenna Cables';
 const systemNames={
  'TEL-RADIO-DTRS':'VHF DMR Radio System','TEL-RADIO-MARINE':'VHF-FM Marine Radio System',
@@ -183,6 +183,41 @@ function radioDraftGroups(rows,byOwner,ownerUse){
  return [...groups.values()];
 }
 
+const mgwCctvOffer=offer=>mgwCctvEntOffer0550(offer)&&mgwCurrentItemKey0550(offer).startsWith('CCTV-');
+const apfCctvCabinetMr='MR-B1-13-APF-11';
+const apfCctvCabinetItems=['06','07','08','09','10','11'].map(sn=>'CCTV-APF-'+sn);
+
+function cctvDraftGroups(rows,byOwner,ownerUse){
+ const targets=new Map(rows.filter(row=>row.mr.systemToken==='TEL-CCTV'&&acceptsQuotedDraft(row,byOwner)).map(row=>[row.key,row]));
+ const bindingCountByOffer=new Map(),groups=new Map();
+ for(const {binding} of byOwner.values()){
+  const id=binding.line.offerId;
+  bindingCountByOffer.set(id,(bindingCountByOffer.get(id)||0)+1);
+ }
+ for(const {binding,usdPriced} of byOwner.values()){
+  const {line}=binding,offer=line.offer;
+  if(!usdPriced||!mgwCctvOffer(offer)||offer.quoteEvidence.classification!=='RATE'||
+   bindingCountByOffer.get(line.offerId)!==1||ownerUse.has(binding.lineId)||line.wbs!=='A'||
+   line.systemToken!=='TEL-CCTV'||line.customerRowCode!=='A1-06'||
+   binding.quantity!==offer.quoteEvidence.quotedQuantity||binding.unit!==offer.unit)continue;
+  const refs=mgwCurrentMr0550(offer),target=refs.length===1&&targets.get(refs[0]);
+  const item=mgwCurrentItemKey0550(offer);
+  // APF 02 is a Fixed camera against a PTZ requirement. Equal counts and units
+  // cannot make it a price for the required camera.
+  if(!target||line.tagRef!==target.site||item==='CCTV-APF-02')continue;
+  const cabinet=target.key===apfCctvCabinetMr;
+  if(cabinet?!apfCctvCabinetItems.includes(item)||target.unit!=='Lot':
+   binding.quantity!==target.quantity||componentUnit(binding.unit)!==componentUnit(target.unit))continue;
+  if(!groups.has(target.key))groups.set(target.key,{target,prices:[],included:[]});
+  groups.get(target.key).prices.push(binding);
+ }
+ return [...groups.values()].filter(({target,prices})=>{
+  if(target.key!==apfCctvCabinetMr)return prices.length===1;
+  const enclosure=prices.find(b=>mgwCurrentItemKey0550(b.line.offer)===apfCctvCabinetItems[0]);
+  return prices.length===apfCctvCabinetItems.length&&enclosure?.quantity===target.quantity;
+ });
+}
+
 export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
  const scheduleRows=view.scheduleRows('C1');
@@ -232,6 +267,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  const quotedGroups=!legacy&&view.workingPreview?[
   ...lanCabinetDraftGroups(rows,context.lanOffers||[],byOwner,ownerUse),
   ...radioDraftGroups(rows,byOwner,ownerUse),
+  ...cctvDraftGroups(rows,byOwner,ownerUse),
  ]:[];
  for(const {target,prices,included} of quotedGroups){
   // An unpriced MR binding is only a scope reference once its priced
@@ -240,11 +276,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
   for(const row of ownerUse.get(target.raw.id)||[]){
    if(row!==target)row.ownerIds=row.ownerIds.filter(id=>id!==target.raw.id);
   }
-  const radio=target.appendix==='1.1';
+  const radio=target.appendix==='1.1',cctv=target.mr.systemToken==='TEL-CCTV';
   if(radio){
    target.provisionalRadio=true;
    if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
-  }else target.provisionalLan=true;
+  }else if(cctv)target.provisionalCctv=true;
+  else target.provisionalLan=true;
   target.ownerIds=prices.map(b=>b.lineId);
   target.priceOwners=prices;
   target.quotedComponents=[
@@ -256,7 +293,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
    }),
    ...included.map(offer=>({offer,quantity:offer.quoteEvidence.quotedQuantity,unit:offer.unit,included:true})),
   ].sort((a,b)=>a.offer.id.localeCompare(b.offer.id));
-  if(!radio){
+  if(cctv){
+   const cabinet=target.key===apfCctvCabinetMr;
+   target.note=[target.note,'MGW draft price · scope review pending',cabinet&&'MGW enclosure allowance pending rack reconciliation'].filter(Boolean).join(' · ');
+   target.internalNote=cabinet?'MGW quoted cabinet and equipment. Confirm enclosure cost and the VERSED RITTAL replacement before changing the cost owner.':'MGW quoted CCTV equipment. Confirm final MR scope and interfaces.';
+   problems.push('C1_CCTV_MR_SCOPE_OPEN / '+target.key);
+  }else if(!radio){
    target.note=[target.note,'Quoted LAN equipment · scope review pending'].filter(Boolean).join(' · ');
    target.internalNote='MGW quoted LAN items. MR package scope and interfaces remain open.';
    if(target.quotedComponents.some(c=>apfLan10PatchPanelDraft0550(c.offer)&&c.quotedQuantity!==undefined)){
@@ -387,7 +429,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];
  for(const group of groups){
-  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':offer=>mgwLanEquipmentOffer0550(offer)||mgwMetPackage(offer)}[group.id];
+  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':offer=>mgwLanEquipmentOffer0550(offer)||mgwMetPackage(offer)||mgwCctvOffer(offer)}[group.id];
   const bySystem=!legacy&&view.workingPreview&&systemOffer&&
    group.rows.some(r=>r.priceOwners?.some(b=>systemOffer(b.line.offer)));
   let mrNumber=0,packageNumber=0;const systems=new Map();
@@ -415,13 +457,24 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
  for(const r of displayRows){
   if(r.sharedDmrPriceKey)r.note=[r.note,'Shared R11 equipment price shown at item '+byKey.get(r.sharedDmrPriceKey).sn+'.'].filter(Boolean).join(' ');
-  const candidates=candidatePackages.get(r.key);
-  if(candidates?.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+  const packages=(candidatePackages.get(r.key)||[]).map(key=>byKey.get(key));
+  if(packages.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+packages.map(row=>row.sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+  if(view.workingPreview&&r.mr?.systemToken==='TEL-CCTV'&&!r.excluded){
+   const cctvPackages=packages.filter(row=>row.priceOwners.some(b=>mgwCctvOffer(b.line.offer)));
+   if(cctvPackages.length){
+    const refs=cctvPackages.map(row=>row.sn).join(', ');
+    const note=r.key==='MR-B1-13-APF-02'?'OPEN · MR requires 2 Ex PTZ cameras. MGW quoted 2 Ex Fixed cameras in item '+refs:
+     /^MR-B1-13-APF-1[23]$/.test(r.key)?'MGW quoted both monitor sizes together under the workstation in item '+refs:
+     'MGW quoted scope priced in item '+refs+' · MR reconciliation pending';
+    r.note=[r.note,note].filter(Boolean).join(' · ');
+    r.candidateOfferIds=unique(cctvPackages.flatMap(row=>row.priceOwners.map(b=>b.line.offerId)));
+   }
+  }
   if(r.kind!=='MR'||r.mr.systemToken!=='TEL-MET'||r.excluded||Number.isFinite(r.amount)||r.packageKeys?.length)continue;
-  const packages=(candidates||[]).map(k=>byKey.get(k)).filter(p=>p.metOffer&&p.site===r.site);
-  if(packages.length){
-   r.workingNote='อ้างอิงชุด MGW '+packages.map(p=>p.sn).join(', ')+' · รอตรวจขอบเขต MR';
-   r.candidateOfferIds=packages.map(p=>p.metOffer.id);
+  const metPackages=packages.filter(p=>p.metOffer&&p.site===r.site);
+  if(metPackages.length){
+   r.workingNote='อ้างอิงชุด MGW '+metPackages.map(p=>p.sn).join(', ')+' · รอตรวจขอบเขต MR';
+   r.candidateOfferIds=metPackages.map(p=>p.metOffer.id);
   }else if(r.key==='MR-B1-13-APF-14'&&extra.some(p=>p.metOffer&&p.site===r.site)){
    r.workingNote='ใบเสนอราคาชุด MGW ไม่ระบุ MET Cabinet · รอตรวจขอบเขตและราคา';
   }
