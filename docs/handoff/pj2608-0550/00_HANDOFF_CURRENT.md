@@ -1,3 +1,5 @@
+Latest cabinet procurement decision: [RITTAL from VERSED across the bid](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md#13-november--rittal-cabinet-procurement). QT2611035 prices the 13 LAN racks in the existing Working Draft and original C1 cabinet rows. The other systems' cabinet requirements and price gaps are listed in 07.1.
+
 Latest APF LAN price correction: [C1 item 1.3.10](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md#13-november--apf-mr-100-patch-panel-basis). Working prices 16 CAT6A patch panels from the MR cabinet BOM at the existing quoted unit rate. Vendor retains the original 32 Sets, and C1 shows the Working and quoted quantities on expansion.
 
 Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). Appendix 1.1 shows priced MGW Offer details on the six source-supported MR rows. Standalone prices with an unresolved MR or site carry a review note. The Radio and Shared subtotals retain the same Working owners.

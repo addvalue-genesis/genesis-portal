@@ -7,6 +7,7 @@ import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
 import {MR_WORKING_CATALOG_0550} from './data/mrWorkingBasis0550';
 import {mgwCurrentItemKey0550} from './data/mgwQuoteSelection0550';
+import {versedLanRackOffer0550} from './data/versedRack0550';
 
 // Keep the native MR rows in order. In the interactive screen, put a separate
 // package-price block first so an expanded Appendix still reveals its price.
@@ -103,10 +104,10 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
          <td>{r.note}{!documentMode&&(r.pendingRadioPlacement||r.provisionalRadio)&&<div>{r.pendingRadioPlacement||'ราคาตาม Offer · รอตรวจขอบเขต MR'}</div>}</td>
         </tr>
         {!documentMode&&expanded(r.key,true)&&r.quotedComponents?.map(c=><tr className="c1-component" key={c.offer.id} data-c1-quoted-offer={c.offer.id}>
-         <td>{mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>
+         <td>{versedLanRackOffer0550(c.offer)?c.offer.quoteRef:mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>
          <td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td>
          <td>{c.included?'Included by MGW':c.unit?'Included in parent total':'Included in parent total · supplier unit pending'}
-          {c.quotedQuantity!==undefined&&<div>Working ตาม MR · MGW เสนอ {c.quotedQuantity} {c.unit}</div>}</td>
+          {c.quotedQuantity!==undefined&&<div>Working ตาม MR · ใบเสนอราคา {c.quotedQuantity} {c.unit}</div>}</td>
         </tr>)}
         {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
         {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}

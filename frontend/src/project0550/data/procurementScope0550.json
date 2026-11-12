@@ -6,6 +6,20 @@
   "procurementOwner": "ADDVALUE",
   "directSupplierMarkupPct": 50,
   "pagaAppendix14Pricing": {"customerRowCode": "A1-05", "markupPct": 25, "primePct": 20},
+  "cabinetProcurement": {
+    "brand": "RITTAL",
+    "supplier": "VERSED",
+    "lanQuoteRef": "QT2611035",
+    "pending": [
+      {"system": "VSAT", "scope": "APF and Yangon · reconfirm 4 racks against the older single-set quote."},
+      {"system": "CCTV / MET", "scope": "APF standalone cabinets · split enclosure and equipment prices. ACP shares the LAN cabinet."},
+      {"system": "PAGA", "scope": "APF and ACP · confirm the 9 MR cabinet positions and enclosure compatibility with INDUSTRONIC assemblies."},
+      {"system": "VHF DMR / RoIP / Marine", "scope": "Reconcile MR locations, rack counts and the enclosure cost embedded in the MGW packages."},
+      {"system": "Microwave DMR", "scope": "APF · reconcile the MR cabinet with the CERAGON full-outdoor configuration."},
+      {"system": "Entertainment", "scope": "APF · verify the MGW cabinet reference and split any CCTV or PAGA interface costs."},
+      {"system": "NDB", "scope": "APF · confirm an equivalent marine-grade enclosure and OEM approval for the bundled IP66 cabinet."}
+    ]
+  },
   "systemLabels": {
     "TEL-DMR": "DMR · Digital Microwave Radio + WBB",
     "TEL-RADIO-DTRS": "DTRS · VHF Trunked Radio"

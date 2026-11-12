@@ -31,6 +31,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
   serviceQuotes.set(offer.vendorId,quotes);
  }
  const latestPaga=latestPagaVendorPackage0550(currentOffers);
+ const cabinetProcurement=PROCUREMENT_SCOPE_0550.cabinetProcurement;
  const selectedOfferIds=new Set(data.lines.filter(activeSupply0550).map(line=>line.offerId));
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
  const authoredSections=offer.bidTags?.sections||[];
@@ -48,6 +49,12 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  <p>ฐานราคาเริ่มต้นที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · ตรวจฉบับที่เลือกใช้ใน Working · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>MGW Q26-063: {currentOffers.filter(mgwQuoteItem0550).length} รายการ · {data.mgwQuoteImport?.conflicts.join(" · ")||"นำเข้าเพื่อเลือกตรวจราคา — ไม่แทนผู้ขายเดิมอัตโนมัติ"}</p>
  <p><strong>{PROCUREMENT_SCOPE_0550.procurementOwner} เสนอและรับผิดชอบโดยตรง · อ้างอิงแผนจัดซื้อ</strong> · {PROCUREMENT_SCOPE_0550.directProcurement.map(s=>s.name+' จาก '+s.suppliers.map(v=>v.name+' ('+(latestPaga&&v.vendorIds.includes(latestPaga.vendorId)?latestPaga.quoteRef:v.quoteRef)+(v.quoteScope?' · '+v.quoteScope:'')+')').join(' / ')).join(' · ')}</p>
+ <details>
+  <summary>ตู้และ Rack ทุกระบบ · {cabinetProcurement.brand} จาก {cabinetProcurement.supplier}</summary>
+  <p>LAN · {cabinetProcurement.lanQuoteRef} · ตรวจตู้และอุปกรณ์ประกอบเทียบกับ MR ก่อนยืนยัน</p>
+  <p>รายการที่รอยืนยันราคาและขอบเขตตู้ RITTAL</p>
+  <ul>{cabinetProcurement.pending.map(({system,scope})=><li key={system}><strong>{system}</strong> · {scope}</li>)}</ul>
+ </details>
  <p>{PROCUREMENT_SCOPE_0550.mgw.bidOfferOwner} เสนอระบบอื่น รวม VHF Trunked Radio (DTRS) · ขอบเขตที่ยังไม่มีใบเสนอราคาคงสถานะ OPEN</p>
  <p>MR Appendix 1.4 · INDUSTRONIC PAGA · ADDVALUE +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.markupPct}% → SAMTEL +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.primePct}% · CERAGON / Master Tower ใช้ ADDVALUE +{PROCUREMENT_SCOPE_0550.directSupplierMarkupPct}% ตามฐานจัดซื้อโดยตรง</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>

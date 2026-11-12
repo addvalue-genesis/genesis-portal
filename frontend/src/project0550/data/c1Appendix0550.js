@@ -11,6 +11,7 @@ import {satelliteScope0550} from './satelliteScope0550';
 import {mrLineScope0550} from './mrWorkingBasis0550';
 import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
+import {versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
 export const C1_APPENDIX_LAYOUT_0550='mr-appendix.v2';
@@ -143,6 +144,11 @@ function lanCabinetDraftGroups(rows,offers,byOwner,ownerUse){
   const quoted=group.filter(offer=>!mgwCurrentIncluded0550(offer));
   const prices=quoted.map(offer=>{
    const entries=bindingsByOffer.get(offer.id)||[];
+   if(!entries.length&&offer===cabinet){
+    const replacement=byOwner.get('LINE-MGW-CURRENT-'+mgwCurrentItemKey0550(cabinet));
+    if(replacement?.usdPriced&&!ownerUse.has(replacement.binding.lineId)&&
+     versedLanRackReplaces0550(replacement.binding.line,cabinet))return replacement.binding;
+   }
    if(entries.length!==1)return null;
    const {binding,usdPriced}=entries[0];
    const patchDraft=apfLan10PatchPanelDraft0550(offer);
@@ -251,8 +257,12 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(!radio){
    target.note=[target.note,'Quoted LAN equipment · scope review pending'].filter(Boolean).join(' · ');
    target.internalNote='MGW quoted LAN items. MR package scope and interfaces remain open.';
-   if(target.quotedComponents.some(c=>c.quotedQuantity!==undefined)){
+   if(target.quotedComponents.some(c=>apfLan10PatchPanelDraft0550(c.offer)&&c.quotedQuantity!==undefined)){
     target.note+=' · CAT6A patch panels priced at MR quantity';
+   }
+   if(target.quotedComponents.some(c=>versedLanRackOffer0550(c.offer))){
+    target.note+=' · RITTAL cabinet and accessories';
+    target.internalNote='VERSED rack plus existing LAN equipment prices. Rack fit, protection and accessories are under review.';
    }
    problems.push('C1_LAN_MR_SCOPE_OPEN / '+target.key);
   }

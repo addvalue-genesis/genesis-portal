@@ -2,6 +2,7 @@ import {policyDefaults0550} from '../bidWorkingBasis0550';
 import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
+import {prepareVersedLanRacks0550} from './versedRack0550';
 import {
  MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
  apfLan10PatchPanelDraft0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
@@ -142,7 +143,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   receipt.conflicts.includes(formerLanMappingBlock(mgwCurrentDirectMr0550(offer)))&&
   !next.lines.some(line=>line.offerId===offer.id||line.id==='LINE-MGW-CURRENT-'+mgwCurrentItemKey0550(offer)));
  const blockedLanIds=new Set(blockedLan.map(offer=>offer.id));
- if(!batches.length&&!blockedLan.length)return next;
+ if(!batches.length&&!blockedLan.length)return prepareVersedLanRacks0550(next,today);
 
  const policy=policyDefaults0550(policies,'Goods / Procured Cost');
  if(!policy)return next;
@@ -239,6 +240,6 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   if(lan&&mr)conflicts.delete(formerLanMappingBlock(mr));
  }
  const newlyApplied=batches.filter(id=>!decision.includes(applied(id)));
- return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,
-  decision:newlyApplied.length?[decision,...newlyApplied.map(applied)].join('\n'):decision,conflicts:[...conflicts]}};
+ return prepareVersedLanRacks0550({...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,
+  decision:newlyApplied.length?[decision,...newlyApplied.map(applied)].join('\n'):decision,conflicts:[...conflicts]}},today);
 }
