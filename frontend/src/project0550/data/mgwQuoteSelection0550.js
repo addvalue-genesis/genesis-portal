@@ -182,6 +182,10 @@ export const mgwReplacementActive0550 = data => Boolean(data.mgwDetailPricingImp
 export const mgwLanPbxFoOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_CURRENT_PREFIX_0550) &&
  offer.quoteRef===MGW_CURRENT_QUOTE_0550 && offer.quoteEvidence?.sourceId===MGW_CURRENT_BATCH_0550 &&
  offer.quoteEvidence.sourceSha256===MGW_CURRENT_SOURCE_HASH_0550);
+export const mgwLanEquipmentOffer0550 = offer => mgwLanPbxFoOffer0550(offer) &&
+ /^LAN-(APF|ACP|ABV01|AMS01)-\d+-\d+$/.test(offer.id.slice(MGW_CURRENT_PREFIX_0550.length)) &&
+ offer.quoteEvidence.classification==='RATE' && offer.quoteEvidence.systemTokens?.length===1 &&
+ offer.quoteEvidence.systemTokens[0]==='TEL-LAN';
 export const mgwMetNdbOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_MET_NDB_0550.prefix) &&
  offer.quoteRef===MGW_MET_NDB_0550.quoteRef && offer.quoteEvidence?.sourceId===MGW_MET_NDB_0550.batchId &&
  offer.quoteEvidence.sourceSha256===MGW_MET_NDB_0550.sha256 &&

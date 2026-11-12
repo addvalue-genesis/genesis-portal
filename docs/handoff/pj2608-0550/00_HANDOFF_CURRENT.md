@@ -1,3 +1,5 @@
+Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Existing LAN Offer rows feed Working A1-01 and Appendix 1.3 Network System by site. An AP mapping gap can carry the quoted supply as a standalone Draft owner. Core Switch inclusions and the Wi-Fi Study option are shown in Vendor.
+
 Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). The Q26-063 source extensions feed 10.2 and 11.C1 Appendix 1.1 by system. The shared Console and Cable scope has one charge per source row. WP.7 remains the technical trace.
 
 Latest Working pricing: [Vendor Offers as the Working price source](20261112_VENDOR_DIRECT_WORKING_PRICING.md). Eligible 07.2 ALIE rows open the existing Working editor with their source basis. Working applies the selling equations and Volume I preview reads compatible intake tags. PAGA A1-05 can select the registered -005 NET on its existing owner.

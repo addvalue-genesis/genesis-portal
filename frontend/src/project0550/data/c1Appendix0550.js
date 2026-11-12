@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -166,6 +166,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   const targets=ownerUse.get(b.lineId)||[];
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
+  const lan=!legacy&&view.workingPreview&&mgwLanEquipmentOffer0550(b.line.offer);
   const directRadio=radio&&view.workingPreview;
   const sharedRadio=directRadio&&mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1;
   if(directRadio&&!sharedRadio&&!targets.length){
@@ -191,7 +192,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
   const itemDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
-  const terms=(supplement||radio)?b.line.offer.quoteEvidence.terms:[];
+  const terms=(supplement||radio||lan)?b.line.offer.quoteEvidence.terms:[];
   const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
   const unitOpen=directRadio&&b.line.offer.quoteEvidence.quotedUnit==='Not stated'&&!b.line.offer.unitBasis?.trim();
@@ -205,7 +206,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
    item.internalNote=[item.internalNote||MGW_RADIO_DTRS_QUOTED_SCOPE_0550,unitOpen?'Supplier unit OPEN':''].filter(Boolean).join(' · ');
   }
   extra.push(item);
-  if(supplement||radio)for(const mrId of mgwCurrentMr0550(b.line.offer)){
+  if(supplement||radio||lan)for(const mrId of mgwCurrentMr0550(b.line.offer)){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
    candidatePackages.get(mrId).push(item.key);
   }
@@ -255,22 +256,24 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];
  for(const group of groups){
-  const radioBySystem=!legacy&&view.workingPreview&&group.id==='1.1'&&
-   group.rows.some(r=>r.priceOwners?.some(b=>mgwRadioDtrsOffer0550(b.line.offer)));
+  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':mgwLanEquipmentOffer0550}[group.id];
+  const bySystem=!legacy&&view.workingPreview&&systemOffer&&
+   group.rows.some(r=>r.priceOwners?.some(b=>systemOffer(b.line.offer)));
   let mrNumber=0,packageNumber=0;const systems=new Map();
   group.rows.forEach(r=>{
-   const system=legacy||radioBySystem?r.system:mrScopeNames[group.id]||r.system;
+   const system=bySystem&&group.id==='1.3'&&r.mr?.systemToken==='TEL-LAN'?systemNames['TEL-LAN']:
+    legacy||bySystem?r.system:mrScopeNames[group.id]||r.system;
    if(!systems.has(system))systems.set(system,new Map());
    const sites=systems.get(system);
    if(!sites.has(r.site))sites.set(r.site,[]);
-   const item=radioBySystem?{...r,sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)}:r;
+   const item=bySystem?{...r,sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)}:r;
    sites.get(r.site).push(item);
   });
   group.systems=[...systems].map(([name,sites])=>{
-   const rollup=radioBySystem?scheduleRollup0550([...sites.values()].flatMap(items=>items.flatMap(r=>r.priceOwners||[]))):null;
+   const rollup=bySystem?scheduleRollup0550([...sites.values()].flatMap(items=>items.flatMap(r=>r.priceOwners||[]))):null;
    return {name,knownAmount:rollup?.priced?rollup.knownUSD:null,
     sites:[...sites].map(([name,items])=>({name,rows:items.map(r=>{
-     const item=radioBySystem?r:{...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};
+     const item=bySystem?r:{...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};
      displayRows.push(item);return item;
     })}))};
   });

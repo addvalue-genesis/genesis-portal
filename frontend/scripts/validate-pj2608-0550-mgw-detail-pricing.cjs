@@ -413,3 +413,63 @@ assert.equal(activateLots(upgraded),upgraded);
 console.log('PASS MGW Radio direct draft: 18 single owners, USD 700,501 supplier cost, five C1 system/shared groups, no SI/MR dependency, no duplicate or unpriced option charge, missing supplier units still OPEN for Official.');
 console.log('PASS current MGW DTRS: APF mapping and supplier components, saved Working site repair, two source-bound owners, 11.M/C1 drafts, PAGA exclusion and exact E14 pools.');
 console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, C1 open-scope notes on 1.1.3/1.1.4/1.1.6, and missing Working owners re-applied.');
+
+// Optional check against the existing private 07 register. Keep its prices
+// and BOM outside the repository and run the normal Working/Volume entry points.
+if(process.env.PJ0550_MGW_LAN_REGISTER){
+ const pack=JSON.parse(fs.readFileSync(process.env.PJ0550_MGW_LAN_REGISTER,'utf8'));
+ const ingest=input=>register.planVendorRegister0550(input,pack,tokens).workspace;
+ const prepare=input=>current.prepareMgwCurrentWorking0550(input,D.COMMERCIAL_POLICY,radioLotDate);
+ const input=ingest({...radioBase,lines:radioBase.lines.filter(l=>!l.mrRequirementId)});
+ const source=input.offers.filter(radioSelection.mgwLanEquipmentOffer0550);
+ const priced=source.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal));
+ const pricedIds=new Set(priced.map(o=>o.id));
+ const pricedSourceTotal=sum(priced.map(o=>o.quoteEvidence.quotedTotal));
+ assert.equal(priced.length,25);
+ assert.equal(source.filter(radioSelection.mgwCurrentIncluded0550).length,2);
+ const prepared=prepare(input);validate(prepared);
+ assert.equal(prepare(prepared),prepared);
+ const withMr=prepare(ingest(radioBase));validate(withMr);
+ assert.equal(withMr.lines.filter(l=>l.selected&&pricedIds.has(l.offerId)).length,25);
+ const preparedModel=W.deriveBidWorkspace(prepared,tokens,radioLotDate);
+ const lanOwners=preparedModel.lines.filter(l=>l.selected&&pricedIds.has(l.offerId));
+ assert.equal(lanOwners.length,priced.length);
+ assert.equal(new Set(lanOwners.map(l=>l.offerId)).size,priced.length);
+ assert(lanOwners.every(l=>l.customerRowCode==='A1-01'&&l.systemToken==='TEL-LAN'&&Number.isFinite(l.provisionalCustomerUSD)));
+ assert.equal(sum(lanOwners.map(l=>l.provisionalCostNative)),pricedSourceTotal);
+ assert(!prepared.lines.some(l=>l.selected&&source.some(o=>o.id===l.offerId&&radioSelection.mgwCurrentIncluded0550(o))));
+ assert(!prepared.lines.some(l=>l.selected&&l.offerId.endsWith('LAN-PROJECT-OPT-01')));
+ const activeView=volumes.deriveBidVolumes0550(prepared,preparedModel,D.SYSTEMS,radioLotDate);
+ const lanDraft=preview.deriveBidVolumeWorkingPreview0550(prepared,preparedModel,D.SYSTEMS,radioLotDate,activeView);
+ const lanC1=appendix.deriveC1Appendix0550({...lanDraft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550,c1Context:{lines:prepared.lines}});
+ const net=lanC1.groups.find(g=>g.id==='1.3').systems.find(system=>system.name==='Network System');
+ assert.deepEqual(new Set(net.sites.map(s=>s.name)),new Set(['APF','ACP','ABV01','AMS01']));
+ const lanRows=net.sites.flatMap(s=>s.rows).filter(row=>row.priceOwners.some(b=>pricedIds.has(b.line.offerId)));
+ assert.equal(lanRows.length,25);
+ assert.equal(sum(lanRows.map(row=>row.amount)),sum(lanOwners.map(l=>l.provisionalCustomerUSD)));
+ assert.equal(net.knownAmount,sum(lanRows.map(row=>row.amount)));
+ assert.equal(lanC1.amount,null,'The priced LAN subtotal leaves the full scope under review');
+ const {MgwCurrentQuote0550}=require(root+'/project0550/MgwCurrentQuote0550.jsx');
+ const vendorHtml=renderToStaticMarkup(React.createElement(MgwCurrentQuote0550,{data:prepared}));
+ assert.match(vendorHtml,/LAN · A1-01 \/ C1 Appendix 1.3.*25 รายการมีราคา.*2 รายการ Included/s);
+ const ap=priced.find(o=>o.id.endsWith('LAN-APF-8-01'));
+ const apMr=radioSelection.mgwCurrentDirectMr0550(ap);
+ const mappingBlock='REQ-'+apMr+' / current MGW Offer awaits Working reconciliation';
+ const blocked={...prepared,lines:prepared.lines.filter(l=>l.offerId!==ap.id),mgwDetailPricingImport:{
+  ...prepared.mgwDetailPricingImport,conflicts:[...prepared.mgwDetailPricingImport.conflicts,mappingBlock],
+ }};
+ const recovered=prepare(blocked);validate(recovered);
+ assert.equal(recovered.lines.filter(l=>l.offerId===ap.id).length,1);
+ assert(!recovered.mgwDetailPricingImport.conflicts.includes(mappingBlock));
+ const removed={...recovered,lines:recovered.lines.filter(l=>l.offerId!==ap.id)};
+ assert.equal(prepare(removed),removed,'Preserve a Working owner deleted after preparation');
+ const authored={...radioBase.lines.find(l=>l.mrRequirementId===apMr),manualCost:100,selected:true};
+ const held=prepare({...blocked,lines:[...blocked.lines,authored]});
+ assert.equal(held.lines.find(l=>l.id===authored.id),authored);
+ assert(!held.lines.some(l=>l.offerId===ap.id),'The saved competing cost remains the only owner');
+ assert.equal(prepare(held),held);
+ const tag=require(root+'/project0550/data/vendorBidTags0550.js').offerSourceSections0550;
+ assert.deepEqual(tag(ap),['A1','C1']);
+ assert.deepEqual(tag(prepared.offers.find(o=>o.id.endsWith('LAN-PROJECT-OPT-01'))),['A2']);
+ console.log('PASS MGW LAN: 25 A1-01 owners, quote-only C1 by site, exact cost reconciliation, Included/Option excluded, blocked MR recovered and authored costs preserved.',{costUSD:pricedSourceTotal,sellUSD:net.knownAmount});
+}

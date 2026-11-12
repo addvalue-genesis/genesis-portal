@@ -12,7 +12,7 @@ import {
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
  MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
  MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
- mgwCctvEntOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
+ mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
 const radioSourceRows=MGW_QUOTE_0550.rows.filter(row=>row.section==='RADIO');
@@ -103,6 +103,9 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
  if(!mgwReplacementActive0550(data))return showRadioSource?<MgwRadioSource0550 data={data} sectionFilter={sectionFilter}/>:null;
  const offers=data.offers.filter(mgwLanPbxFoOffer0550);
  const quote=offers[0]?.quoteEvidence;
+ const lan=offers.filter(mgwLanEquipmentOffer0550);
+ const lanPriced=lan.filter(offer=>Number.isFinite(offer.quoteEvidence.quotedTotal));
+ const lanIncluded=lan.filter(mgwCurrentIncluded0550);
  const metNdb=data.offers.filter(mgwMetNdbOffer0550);
  const metNdbQuote=metNdb[0]?.quoteEvidence;
  const cctvEnt=data.offers.filter(mgwCctvEntOffer0550);
@@ -126,6 +129,7 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
  return <section className="p55-panel" aria-label="Current MGW quotation">
   <h3>MGW · ใบเสนอราคาที่ใช้ใน Working</h3>
   <p>{MGW_CURRENT_QUOTE_0550} · {quote?'มีราคา LAN, IP Telephony/PABX และ Fiber Patch Panel ตามรายการในใบเสนอราคา':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'} · ยกเลิกฐานใบราคา MGW เดิม{historical?' '+historical+' Offer IDs':''}</p>
+  {lan.length>0&&<p>LAN · A1-01 / C1 Appendix 1.3 · ต้นทุนตามใบเสนอราคา USD {amount(sumMoney0550(lanPriced.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · {lanPriced.length} รายการมีราคา · {lanIncluded.length} รายการ Included</p>}
   <p>{MGW_MET_NDB_0550.quoteRef} · {metNdbQuote?metNdb.length+' รายการที่อยู่ในทะเบียน · MET APF/ACP และ NDB · Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_CCTV_ENT_0550.quoteRef} · {MGW_CCTV_ENT_0550.revision} · {cctvEntQuote?cctvEnt.length+' รายการในทะเบียน · Equipment Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_BULK_0550.quoteRef} · {bulk.length?`${bulkPriced.length}/${bulk.length} รายการมีราคา · USD ${amount(sumMoney0550(bulkPriced.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · Supply / Draft`:'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
