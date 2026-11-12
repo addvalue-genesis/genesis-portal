@@ -7,6 +7,7 @@ import {selectAutomaticSource} from './sourceAutoLoad';
 import {validateBidWorkspace} from './bidWorkspaceModel';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {activeSupplyLine0550} from './supplyProposalDraft0550';
+import {quoteValidity0550} from './quoteValidity0550';
 export const SUPPLIER_REVISION_SCHEMA_0550='genesis.0550.supplier-revision.v1';
 export const PAGA_REVISION='A20261632-002';
 const PAGA_REVISIONS=[PAGA_REVISION,'A20261632-003'];
@@ -81,7 +82,7 @@ export function preparePagaRevisionPricing0550(data,today){
  const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
  if(today<'2026-11-09'||!receipt||receipt.pagaRevisionHandled)return data;
  const net=data.offers.find(o=>o.id===PAGA_NET_ID&&pagaRevisionNet0550(o));
- if(!net||!net.date||net.date>today||!net.validUntil||net.validUntil<today)return data;
+ if(!quoteValidity0550(net,today).current)return data;
  const integration=data.integrationWorkspace;
  const review=preparePagaRevisionMapping0550(data,integration?.requirements||[],net);
  if(!review?.source||review.rows.some(row=>!row.excerpt)||review.source.url!==net.quoteEvidence.sourceUrl||

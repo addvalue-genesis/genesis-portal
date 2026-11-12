@@ -43,7 +43,7 @@ export const MGW_RADIO_DTRS_0550 = {
 };
 export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
-export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 expired 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
+export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
  ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';

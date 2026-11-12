@@ -49,6 +49,16 @@ try {
  const missingUsd=clone();missingUsd.offers[0].currency="THB";missingUsd.fx.thbPerUSD=null;assert.equal(derive(missingUsd).selectedTHB,3960);assert.equal(derive(missingUsd).selectedUSD,null);
  const tinyFx=clone();tinyFx.offers[0].currency="THB";tinyFx.fx.thbPerUSD=1e-9;assert.equal(derive(tinyFx).selectedUSD,null,"Invalid E17 result must never round null to zero");
  const expired=clone();expired.offers[0].validUntil="2026-10-02";assert.equal(derive(expired).selectedTHB,null);
+ const quoteBefore=JSON.stringify(expired.offers);
+ const deriveOn=(workspace,date)=>deriveBidWorkspace(validate(workspace),ids,date);
+ assert.equal(deriveOn(expired,"2026-11-11").selectedTHB,null,"The extension starts with the project decision");
+ assert.equal(deriveOn(expired,"2026-12-31").selectedTHB,158400,"Original validity plus 90 days, inclusive");
+ assert.equal(deriveOn(expired,"2027-01-01").selectedTHB,null,"Day 91 expires again");
+ assert.equal(JSON.stringify(expired.offers),quoteBefore,"The source dates are retained and cannot accumulate extensions");
+ const undated=clone();undated.offers[0].validUntil="";
+ assert(deriveOn(undated,"2026-11-12").lines[0].problems.includes("Quote date/validity missing"));
+ const futureDated=clone();futureDated.offers[0].date="2026-11-13";
+ assert(deriveOn(futureDated,"2026-11-12").lines[0].problems.includes("Quote dated in future — confirm source date"));
  const wrongUnit=clone();wrongUnit.lines[0].resultKey="MH";assert.equal(derive(wrongUnit).selectedTHB,null);
  const mismatch=clone();mismatch.lines[0].vendorId="OTHER";assert.equal(derive(mismatch).selectedTHB,null);
  const unknown=clone();unknown.offers[0].unitCost=null;assert.equal(derive(unknown).selectedTHB,null);

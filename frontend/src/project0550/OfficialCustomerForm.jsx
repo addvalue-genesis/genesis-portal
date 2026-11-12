@@ -6,6 +6,7 @@ import {bidPresentationIndex,bidOwnerStyle,lineOwner0550} from "./bidPresentatio
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {CUSTOMER_FORM_0550,officialCustomerRows} from "./data/officialPricing0550";
 import {workingOffers0550} from "./data/workingOffers0550";
+import {quoteValidity0550} from "./data/quoteValidity0550";
 import {mrSupplierLinks0550} from "./data/mrSupplierLinks0550";
 import {mgwCurrentItemKey0550,mgwCurrentRequirementTrace0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {bidCompletionSourceUsages0550} from "./data/bidCompletion0550";
@@ -100,12 +101,15 @@ function RadioMrTrace({row,data,linesById,reviewDate,onNavigate,onReveal}){
   {!row.moduleId&&!externalOwners.length&&<small>OPEN · ยังไม่มีแถวราคาที่จัดสรรตรงกับรายการ MR นี้</small>}
   {evidence.length>0&&<div>
    <small>หลักฐาน Offer จาก Mapping · ตรวจขอบเขตที่ WP.7</small>
-   {evidence.map(({id,offer})=><div key={id}>
+   {evidence.map(({id,offer})=>{
+    const validity=quoteValidity0550(offer,reviewDate);
+    return <div key={id}>
     <button type="button" disabled={!onNavigate||!offer} onClick={()=>onNavigate?.("bid.vendor.offer."+id)}>
      {mgwRadioDtrsOffer0550(offer)&&mgwCurrentItemKey0550(offer)+" · "}{offer?.quoteRef||id}
     </button>
-    <small>{offer?.validUntil&&reviewDate&&offer.validUntil<reviewDate?"EXPIRED · "+offer.validUntil:"อ้างอิง · รอทบทวน"}</small>
-   </div>)}
+    <small>{validity.expired?"EXPIRED · "+validity.effectiveUntil:"อ้างอิง · รอทบทวน"}</small>
+   </div>;
+   })}
   </div>}
  </div>;
 }
@@ -200,7 +204,7 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,mrNavig
   if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
   const line=linesById.get(r.key);
-  const expired=r.radioPackage&&line?.offer?.validUntil&&reviewDate&&line.offer.validUntil<reviewDate;
+  const radioValidity=r.radioPackage?quoteValidity0550(line?.offer,reviewDate):null;
   const rowClass=["p55-customer-"+r.kind,partADetail&&r.kind==="line"&&"p55-release-lot-item",r.packageChild&&"p55-release-package-child"].filter(Boolean).join(" ");
   const owner=identity(rowId)?.owner||r.mr?.systemToken||(["A","B","C"].includes(r.key)?r.key:undefined);
   return <tr key={r.key} hidden={hidden} className={rowClass}
@@ -215,7 +219,7 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,mrNavig
      {r.radioScope&&<small>ขอบเขต VHF and MF/HF ตาม MR Appendix 1.1 · ยอดบนหัว Lot ใช้เฉพาะราคาที่จัดสรรเข้า A1-07</small>}
      {r.mrReference&&<small>{r.mrReference}</small>}
      {r.nestedOwnerIds&&<small>ดูฐานราคาในรายการย่อย</small>}
-     {r.radioPackage&&<small>{expired?"EXPIRED · "+line.offer.validUntil:provisional?"PROVISIONAL":"Working / package"}</small>}
+     {radioValidity&&<small>{radioValidity.expired?"EXPIRED · "+radioValidity.effectiveUntil:provisional?"PROVISIONAL":"Working / package"}</small>}
      {r.mr&&!hidden&&<RadioMrTrace row={r} data={data} linesById={linesById} reviewDate={reviewDate} onNavigate={onNavigate} onReveal={revealReleaseRow}/>}
      {r.sourceId&&<div className="p55-source-trace">
       <button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>

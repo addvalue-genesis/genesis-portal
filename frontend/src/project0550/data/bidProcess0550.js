@@ -3,6 +3,7 @@
 import {sumMoney0550} from './money0550';
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
 import {policyDefaults0550} from '../bidWorkingBasis0550';
+import {quoteValidity0550} from './quoteValidity0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,CERAGON_R11_0550,CERAGON_R11_DECISION_DATE_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Source0550} from './ceragonSelection0550';
 const finite=Number.isFinite;
 const unique=a=>[...new Set(a.filter(Boolean))];
@@ -76,7 +77,7 @@ export function prepareBidProcess0550(data,policies,today){
  }
  let ceragonHandled=previous?.ceragonHandled||false;
  const id=CERAGON_LINK_OWNER_0550;
- const offers=data.offers.filter(o=>o.vendorId==='VENDOR-CERAGON-0550'&&o.id===CERAGON_R10_0550&&o.quoteEvidence?.revision==='RevA1'&&o.quoteEvidence?.systemTokens?.length===1&&o.quoteEvidence.systemTokens[0]==='TEL-DMR'&&o.quoteEvidence.quotedQuantity===1&&o.currency==='USD'&&o.unit==='Lot'&&finite(o.unitCost)&&o.unitCost>=0&&o.date&&o.date<=today&&o.validUntil&&o.validUntil>=today);
+ const offers=data.offers.filter(o=>o.vendorId==='VENDOR-CERAGON-0550'&&o.id===CERAGON_R10_0550&&o.quoteEvidence?.revision==='RevA1'&&o.quoteEvidence?.systemTokens?.length===1&&o.quoteEvidence.systemTokens[0]==='TEL-DMR'&&o.quoteEvidence.quotedQuantity===1&&o.currency==='USD'&&o.unit==='Lot'&&finite(o.unitCost)&&o.unitCost>=0&&quoteValidity0550(o,today).current);
  if(today>=CERAGON_R11_DECISION_DATE_0550){
   ceragonHandled=ceragonHandled||lines.some(line=>line.id===id&&line.offerId===CERAGON_R11_0550);
  }else if(!ceragonHandled&&offers.length===1){

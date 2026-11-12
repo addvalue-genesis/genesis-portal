@@ -6,6 +6,7 @@ import {MGW_QUOTE_0550,mgwQuoteItem0550,supplierOfferExcluded0550,MGW_SCOPE_EXCL
 import {bidRequirementOwners0550} from './bidProcess0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {mgwDetailGroupPrice0550} from './mgwDetailPricing0550';
+import {quoteValidity0550} from './quoteValidity0550';
 const unique=xs=>[...new Set(xs.filter(Boolean))];
 const okSource=(data,id)=>{const s=data.sourceIntake?.sources.find(s=>s.id===id);return s&&s.content&&s.readState!=='METADATA_ONLY'&&s.authority==='CURRENT_TENDER'&&!data.sourceIntake.sources.some(n=>n.replaces?.includes(id));};
 export function deriveControlledTagMapping0550(data,model,systems,today){
@@ -32,7 +33,7 @@ export function deriveControlledTagMapping0550(data,model,systems,today){
    const registered={offerId:o.id,sourceId,itemCode,quantity:n?.quantity,unit:n?.unit,rate:n?.rate,currency:n?.currency};
    const expected={...registered,unit:o.unit,rate:o.unitCost,currency:o.currency};
    const result=matchQuotedSourceLineV2({expected,registered});
-   const validityCurrent=Boolean(today&&o.date&&o.validUntil&&o.date<=today&&o.validUntil>=today);
+   const validityCurrent=quoteValidity0550(o,today).current;
    const extended=deriveSourcedExtendedV2({quantity:n?.quantity,sourceUnitRate:n?.rate,currency:n?.currency,round:roundMoney0550,pricingPolicy:PRICING_POLICY_0550});
    return {...result,id:o.id,validityCurrent,originalExtended:extended.amount,sourceTotal:n?.total,originalTotalMatches:Number.isFinite(n?.total)&&extended.amount===n.total};
   });

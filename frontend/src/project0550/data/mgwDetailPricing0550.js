@@ -3,6 +3,7 @@ import {policyDefaults0550} from "../bidWorkingBasis0550";
 import {roundMoney0550,sumMoney0550} from "./money0550";
 import {evaluateServiceEquation} from "../serviceEquationRuntime";
 import {TSI_DESIGN_WORKLOAD_0550} from "./tsiActivityBudget0550";
+import {quoteValidity0550} from "./quoteValidity0550";
 
 // 29-Oct-2026 user decision: price the detailed MGW scope despite cover errors.
 // This prices quoted scope; it does not certify MR quantities or adequacy.
@@ -70,7 +71,7 @@ export function mgwDetailGroupPrice0550(data,id,line,today){
   if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");
   if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
   if(today&&offer.date>today)problems.push("Quote dated in future — confirm source date");
-  if(today&&offer.validUntil&&offer.validUntil<today)problems.push("Quote expired — review replacement source");
+  if(quoteValidity0550(offer,today).expired)problems.push("Quote expired — review replacement source");
   if(line?.selected&&data.lines.some(other=>other.id!==line.id&&other.selected&&!other.coveredByLineId&&(other.offerId===offer.id||mgwDetailGroup0550(other.mgwDetailGroupId)?.rowIds.includes(row.rowId))&&!mgwWorkingLineExcluded0550(data,other)&&!mgwProjectWideLineConflict0550(other,data.offers.find(o=>o.id===other.offerId))))problems.push("MGW_SOURCE_COST_OWNER_DUPLICATE / "+row.rowId);
   amounts.push(offer.unitCost*row.quantity);
  }

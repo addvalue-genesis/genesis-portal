@@ -8,7 +8,7 @@ import {COMMERCIAL_SOURCES} from "./data";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 export function VendorWorkspace({navigationTarget,onNavigate}){
- const {data,put,busy,vendorSync}=useBidWorkspace();
+ const {data,put,busy,vendorSync,reviewDate}=useBidWorkspace();
  const [vendor,setVendor]=useState({id:"",name:"",kind:"SUPPLIER",reference:""});
  const blankOffer={id:"",vendorId:"",description:"",brand:"",quoteRef:"",sourceRef:"",date:"",validUntil:"",currency:"THB",unit:"MD",unitCost:null};
  const [offer,setOffer]=useState(blankOffer);
@@ -38,7 +38,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  {mgwQuoteItem0550(offer)?.unit===null&&<Field label="Offer unit confirmation / source" value={offer.unitBasis||""} onChange={v=>setO("unitBasis",v)} placeholder="หน่วยที่ยืนยันและแหล่งอ้างอิง"/>}
  <Select label="Offer currency" value={offer.currency} onChange={v=>setO("currency",v)} options={["THB","USD","EUR"]}/><Select label="Offer unit" value={offer.unit} onChange={v=>setO("unit",v)} options={BID_UNITS.map(unit=>[unit,unit==="MD"?"MD · Man-day":unit==="MH"?"MH · Man-hour":unit])}/><Field label="Quoted unit cost" type="number" min="0" step="any" value={offer.unitCost} onChange={v=>setO("unitCost",v)} required/></div><Save busy={busy}>บันทึกใบเสนอราคา / เรตต้นทุน</Save></form>
  <p>แก้เรตใน Offer เดิมจะคำนวณแถว Working ที่อ้างอิง Offer นั้นใหม่ หากเป็นใบเสนอราคาคนละฉบับให้สร้าง Offer ใหม่เพื่อเก็บฉบับเก่า</p>
- <VendorOfferGroups0550 data={data} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
+ <VendorOfferGroups0550 data={data} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
  </Module>
  <Module id="bid.vendor.controlled-sources" title="แหล่ง Vendor เดิมของ 0550 — ใช้อ้างอิงก่อนเลือกเรต" open={false}>
  <MgwQuoteSummary/>

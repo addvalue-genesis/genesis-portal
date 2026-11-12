@@ -14,6 +14,7 @@ import {activeSupply0550} from './data/workingOffers0550';
 import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
 import {supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
+import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 const quoteTitle=q=>[q.title,q.fileName,q.revision&&'Rev.'+q.revision,q.hash?.slice(0,8)].filter(Boolean).join(' · ');
@@ -44,7 +45,7 @@ function QuoteTotal({quote,fx,selectedR11,groupOnly=false}){
   {!t.packageUnallocated&&!t.hasBase&&!t.option&&<span>มีเฉพาะรายการอ้างอิงในกลุ่มนี้</span>}
  </span>;
 }
-export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget}){
+export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigationTarget}){
  const [mode,setMode]=useState('company');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
  const quoteGroups=useMemo(()=>groupVendorOffers0550(entries,mode,SYSTEMS,{sourceGroups:true}),[entries,mode]);
@@ -78,6 +79,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
  const packageQuotes=new Map(data.offers.filter(o=>o.quoteEvidence?.commercialTotals).map(o=>[o.id,o]));
  const renderRow=entry=>{
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
+  const validity=quoteValidity0550(o,reviewDate);
   const netRate=vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
   const anchor=!anchors.has(o.id);anchors.add(o.id);
   const currentMr=mgwCurrentMr0550(o);
@@ -106,6 +108,7 @@ export function VendorOfferGroups0550({data,onEdit,onNavigate,navigationTarget})
    </td>
    <td>{entry.referenceOnly?'อ้างอิงยอดต้นฉบับแยกแต่ละฉบับ':e?.quotedTotal!==undefined?(e.quotedTotal===null?e.quotedTotalText||'ต้นฉบับไม่ระบุยอดแยก':amount(e.quotedTotal,e.quotedCurrency)):r?amount(r.extended,'USD'):'OPEN · ยังไม่บันทึกยอดต้นฉบับ'}{e&&<small>{e.locator}</small>}</td>
    <td>{o.date||'วันที่ OPEN'}<small>Valid until: {o.validUntil||'ไม่ระบุวันสิ้นสุด'}</small>
+    {validity.extended&&<small>ใช้ในงบถึง {validity.effectiveUntil} · โครงการขยาย {QUOTE_EXTENSION_DAYS_0550} วัน{validity.expired?' · หมดอายุ':''}</small>}
    </td>
    <td><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.offer.'+o.id}/><button type="button" onClick={()=>onEdit(o)}>เปิด Offer / แก้ไข</button>
     <small>{towerScope?towerScope.text:selected.length?'มี Working ที่เลือกใช้ '+selected.length+' รายการ':allocated.length?'จัดสรรต้นทุนใน Working แล้ว '+allocated.length+' รายการ':referenceSelected.length?'อ้างอิงเจ้าของราคา Working เดิม':stale.length?'ฐานจัดสรรเปลี่ยน · ต้องทบทวน':'ยังไม่เลือกใช้ใน Working'}</small>

@@ -140,6 +140,15 @@ assert.doesNotMatch(releaseRow(apfMr),/RADIO-001|RADIO-009|ราคาขาย
 assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/RADIO-001 · Q26-063 Radio \/ DTRS.*143,064\.00/s);
 assert.match(releaseMarkup(radioOwners[1].releaseModuleId),/RADIO-009 · Q26-063 Radio \/ DTRS.*454,782\.32/s);
 assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/EXPIRED · 2026-11-08/);
+const {quoteValidity0550}=require(root+'/project0550/data/quoteValidity0550');
+assert.deepEqual(quoteValidity0550(equipmentOffer,'2026-11-12'),{
+ effectiveUntil:'2027-02-06',expired:false,extended:true,current:true
+});
+const extendedRadio=W.deriveBidWorkspace(radio,tokens,'2026-11-12');
+assert(extendedRadio.lines.filter(line=>radioOwners.some(owner=>owner.id===line.id)).every(line=>
+ !line.problems.some(problem=>problem.startsWith('Quote expired'))&&line.offer.validUntil==='2026-11-08'));
+assert.equal(extendedRadio.lines.find(line=>line.id==='LINE-MGW-DETAIL-RADIO-MARINE').selected,false,
+ 'Extending offer validity does not reselect historical price owners');
 assert.doesNotMatch(releaseRow(acpMr),/RADIO-001|RADIO-009/);
 assert.deepEqual(releaseNotes.get(releaseId(apfMr)).candidates.filter(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)).map(line=>line.offer.id),
  [equipmentOffer.id,subscriberOffer.id]);

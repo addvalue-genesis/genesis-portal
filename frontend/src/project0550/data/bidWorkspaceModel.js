@@ -6,6 +6,7 @@ import {pagaRevisionNet0550,validateSupplierQuoteRow0550,validateSupplierRevisio
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
 import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroup0550,mgwDetailGroupPrice0550} from "./mgwDetailPricing0550";
+import {quoteValidity0550} from "./quoteValidity0550";
 import {mgwOfferProblems0550,MGW_QUOTE_0550,mgwWorkingLineExcluded0550,mgwHistoricalLine0550,mgwGroupExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./mgwVendorBasis0550";
 import {mrLineScope0550,mrWorkingGaps0550,MR_WORKING_CATALOG_0550} from "./mrWorkingBasis0550";
 import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationRuntime";
@@ -128,7 +129,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");
     if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
     if(offer.date&&offer.date>reviewDate)problems.push("Quote dated in future — confirm source date");
-    if(offer.validUntil&&offer.validUntil<reviewDate)problems.push("Quote expired — review replacement source");
+    if(quoteValidity0550(offer,reviewDate).expired)problems.push("Quote expired — review replacement source");
    }
   }
   if(l.calculationId){
