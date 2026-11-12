@@ -1,5 +1,7 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
+import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
+import {VENDOR_PHYSICAL_TAG_FIELDS_0550,VENDOR_VOLUME_TAGS_0550,offerLinkedSections0550,offerSourceSections0550,vendorTaggedSchedule0550} from './data/vendorBidTags0550';
 import {mgwCctvEntOffer0550,mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
 import {CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
@@ -112,6 +114,45 @@ export function VolumeRadioMrContext0550({mrId,onNavigate,componentKey,children}
  </aside>;
 }
 
+function VolumeOfferTagTrace0550({data,view,panel,onNavigate,disabled}){
+ const allocations=new Map(view.bindings.map(binding=>[binding.lineId,binding]));
+ const lines=new Map([...(view.active||[]),...view.bindings.map(binding=>binding.line).filter(Boolean)].map(line=>[line.id,line]));
+ const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
+ const vendors=new Map(data.vendors.map(vendor=>[vendor.id,vendor.name]));
+ const quotes=new Map();
+ for(const line of lines.values()){
+  const offer=line.offer||offers.get(line.offerId);
+  if(!offer)continue;
+  const binding=allocations.get(line.id),sourceTags=offerSourceSections0550(offer);
+  const tags=offerLinkedSections0550(sourceTags,binding?[binding]:[],true);
+  if(panel==='preview'?!binding:panel!=='mapping'&&!tags.includes(panel))continue;
+  const evidence=offer.quoteEvidence;
+  const key=JSON.stringify([offer.vendorId,offer.quoteRef,evidence?.revision,evidence?.sourceSha256]);
+  if(!quotes.has(key))quotes.set(key,{
+   vendor:vendors.get(offer.vendorId)||offer.vendorId,ref:offer.quoteRef,revision:evidence?.revision,rows:[],
+  });
+  quotes.get(key).rows.push({line,offer,binding,sourceTags});
+ }
+ if(!quotes.size)return null;
+ return <details className="p55-panel" aria-label="Volume I by supplier quotation">
+  <summary>รายการ Working แยกตามใบเสนอราคา · {quotes.size} ใบ</summary>
+  {[...quotes.entries()].map(([key,quote])=><details key={key}>
+   <summary>{quote.vendor} · {quote.ref||'Quote reference OPEN'} {quote.revision||''} · {quote.rows.length} รายการ</summary>
+   <div className="p55-table-wrap"><table className="p55-table">
+    <thead><tr><th>Item / Offer</th><th>TAG จาก 07.2</th><th>ปลายทางใน 11.M</th><th>Working owner</th></tr></thead>
+    <tbody>{quote.rows.map(({line,offer,binding,sourceTags})=><tr key={line.id}>
+     <td>{offer.description}<small>{offer.id}</small><button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+offer.id)}>เปิด 07.2</button></td>
+     <td>{sourceTags.map(tag=>'11.'+tag).join(' · ')||'OPEN'}
+      {VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field,label])=>offer.bidTags?.[field]?.length>0&&<small key={field}>{label} · {offer.bidTags[field].join(' · ')}</small>)}
+      <MgwRadioTagEvidence0550 offer={offer}/></td>
+     <td>{binding?'11.'+binding.schedule+' · '+binding.treatment+' · '+(binding.suggested?'ร่างแนะนำ':binding.state||binding.status):'OPEN'}</td>
+     <td><button type="button" disabled={disabled} onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>{line.id}</button></td>
+    </tr>)}</tbody>
+   </table></div>
+  </details>)}
+ </details>;
+}
+
 export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigationTarget,onNavigate,onDirtyChange}){
  const {data,model,reviewDate,view,change,busy}=useBidVolumes0550(),prefix=volume==='I'?'bid.quotation':'bid.commercial';
  const [showWorking,setShowWorking]=useState(true),[showAllSchedules,setShowAllSchedules]=useState(true);
@@ -139,7 +180,13 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  const allocationLine=bindingId&&view.available.find(line=>line.id===bindingId);
  const allocationCalc=allocationLine?.calculationId&&data.calculations.find(c=>c.id===allocationLine.calculationId);
  const spareSchedule=SPARE_EQUATION_SCHEDULES_0550[allocationCalc?.equationId];
- const initialAllocation=bindingId&&(displayView.proposal.bindings.find(binding=>binding.id===bindingId)||
+ const taggedAllocation=!spareSchedule&&vendorTaggedSchedule0550(allocationLine?.offer||data.offers.find(offer=>offer.id===allocationLine?.offerId),allocationLine);
+ const currentSuggestion=displayView.proposal.bindings.find(binding=>binding.id===bindingId);
+ const savedAllocation=view.proposal.bindings.find(binding=>binding.id===bindingId);
+ const initialAllocation=bindingId&&((savedAllocation&&(currentSuggestion||savedAllocation))||
+  (taggedAllocation&&(!currentSuggestion||currentSuggestion.schedule!==taggedAllocation.schedule)?{
+   ...blankScheduleBinding0550(bindingId),...taggedAllocation,locator:[allocationLine.requirementRef,allocationLine.sourceRef].filter(Boolean).join(' / '),
+  }:currentSuggestion)||
   {...blankScheduleBinding0550(bindingId),
    ...(allocationLine?.wbs==='B5'?{schedule:'C2',summary:'COMMISSIONING_SPARES',locator:[allocationLine.requirementRef,allocationLine.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / Working B5'}:{}),
    ...(spareSchedule?{schedule:spareSchedule,summary:{C2:'COMMISSIONING_SPARES',C3:'OPERATION_SPARES',C4:'CAPITAL_SPARES'}[spareSchedule],partNo:allocationCalc.inputs.partNo||'',basis:'SI '+allocationCalc.equationId+' / '+allocationLine.id}:{}),
@@ -172,6 +219,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   <PagaQuoteScope0550 data={data} section={volume==='III'?'commercial':panel} onNavigate={go} disabled={dirty}/>}
  {volume==='I'&&cctvEntScheduleNotes[panel]&&data.offers.some(mgwCctvEntOffer0550)&&
   <p className="p55-note"><strong>MGW CCTV / Entertainment V1.2 · ตรวจเพิ่มเติม</strong> · {cctvEntScheduleNotes[panel]}</p>}
+  {volume==='I'&&[...VENDOR_VOLUME_TAGS_0550,'mapping','preview'].includes(panel)&&
+   <VolumeOfferTagTrace0550 data={data} view={displayView} panel={panel} onNavigate={go} disabled={dirty}/>}
  {(panel==='overview'||volume==='I'&&['A','A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>
   <button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button>

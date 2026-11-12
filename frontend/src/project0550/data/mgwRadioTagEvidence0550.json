@@ -1,0 +1,560 @@
+{
+  "sources": {
+    "mr": {
+      "label": "MR-0001 Rev.B1 · Appendix 1.1",
+      "url": "https://drive.google.com/file/d/1KFCSSo3D50fAS6LUBz0IYKPG4NjGVcDS/view"
+    },
+    "lisApf": {
+      "label": "APF LIS-0001 Rev.C8",
+      "url": "https://drive.google.com/file/d/1RV7Reqq5qCBSlBQACBW_Y3fftmIcxmQI/view"
+    },
+    "lisAcp": {
+      "label": "ACP LIS-0001 Rev.C1",
+      "url": "https://drive.google.com/file/d/1DfrFGgupaIYrbyTPa_FT_4Z26r8mxm_G/view"
+    },
+    "lisAbv": {
+      "label": "ABV01 LIS-0001 Rev.C2",
+      "url": "https://drive.google.com/file/d/1YRj0DqPF8pSygFrt4bK2woGiKVDvV9qc/view"
+    },
+    "bldApf": {
+      "label": "APF Radio BLD-0007 Rev.C3",
+      "url": "https://drive.google.com/file/d/1aNpuIr6Acuyx27Jo-NjkPFxZMX6s3sEE/view"
+    },
+    "bldAcp": {
+      "label": "ACP BLD-0001 Rev.C3",
+      "url": "https://drive.google.com/file/d/1Vo1VIWWyw9HjgERhpCV3RJNcA-m5T17q/view"
+    },
+    "dtsDmr": {
+      "label": "DMR DTS-0008 Rev.B1",
+      "url": "https://drive.google.com/file/d/12B4W2XhJ549JkTFG1Ir4cURYhWuhs7tJ/view"
+    },
+    "dtsMarine": {
+      "label": "Marine DTS-0006 Rev.B1",
+      "url": "https://drive.google.com/file/d/1gqWPktw0ylDYWPluYFauQgEWUz2d3wlH/view"
+    },
+    "dtsAero": {
+      "label": "Aeronautical DTS-0007 Rev.B1",
+      "url": "https://drive.google.com/file/d/1k0UTBxYCTvMU8g0WlYcn0D-VfNqwwCos/view"
+    },
+    "dtsSsb": {
+      "label": "MF/HF DTS-0009 Rev.B1",
+      "url": "https://drive.google.com/file/d/1SytmGwifEFUOOgEsKTy0ZvHgbxGR0ka3/view"
+    }
+  },
+  "items": {
+    "RADIO-001": "apfDmr",
+    "RADIO-002": "apfMarine",
+    "RADIO-003": "apfSsb",
+    "RADIO-004": "acpConsole",
+    "RADIO-005": "acpCable",
+    "RADIO-006": "apmUnresolved",
+    "RADIO-007": "apmUnresolved",
+    "RADIO-008": "apmUnresolved",
+    "RADIO-009": "dmrSubscribers",
+    "RADIO-009-OPTION": "dmrAccessory",
+    "RADIO-010": "apfMarine",
+    "RADIO-011": "apfSsb",
+    "RADIO-012": "aeroFixed",
+    "RADIO-013": "aeroPortable",
+    "RADIO-014": "apfCable",
+    "RADIO-015": "apfConsole",
+    "RADIO-016": "amsDmr",
+    "RADIO-017": "apmUnresolved",
+    "RADIO-018": "apm150"
+  },
+  "groups": {
+    "apfDmr": {
+      "state": "DRAFT",
+      "note": "อ้างอิงชุด APF DMR จาก MR. ตู้ APF-CAB-0004 มีใน LIS แต่ BLD ยังไม่ระบุการจัดอุปกรณ์ลงตู้รายตัว. APF-VHF-0003 ระบุ VTA ใน DTS และ ITR ใน BLD.",
+      "placements": [
+        {
+          "equipment": "Radio system cabinet",
+          "tags": [
+            "APF-CAB-0004"
+          ],
+          "location": "APF / Control Building / Control Room",
+          "rack": "APF-CAB-0004 (ตู้ที่อ้างอิง)",
+          "refs": [
+            [
+              "lisApf",
+              "printed p8 / 11.50"
+            ]
+          ]
+        },
+        {
+          "equipment": "VHF Base Radio / Repeater",
+          "tags": [
+            "APF-VHF-0001",
+            "APF-VHF-0002",
+            "APF-VHF-0003"
+          ],
+          "location": "APF / ITR และ VTA ตาม DTS",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "dtsDmr",
+              "PDF p10"
+            ],
+            [
+              "lisApf",
+              "printed p8 / 11.51–11.53"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ]
+          ]
+        },
+        {
+          "equipment": "DMR antennas",
+          "tags": [
+            "APF-VHF-ANT-0001",
+            "APF-VHF-ANT-0002",
+            "APF-VHF-ANT-0003",
+            "APF-VHF-ANT-0004"
+          ],
+          "location": "APF / Telecom Tower",
+          "rack": "นอกตู้",
+          "refs": [
+            [
+              "dtsDmr",
+              "PDF p10 / Dipole Tx, Dipole Rx, Omni 2"
+            ],
+            [
+              "lisApf",
+              "printed p10 / 12.114–12.116"
+            ]
+          ]
+        },
+        {
+          "equipment": "Dispatching Server · CUS reference",
+          "tags": [
+            "APF-VHF-SERVER-003"
+          ],
+          "location": "APF / Control Building / Instrument and Telecom Room (ITR)",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "dtsDmr",
+              "PDF p10 / VHF DTRS Dispatcher"
+            ]
+          ]
+        }
+      ]
+    },
+    "apfMarine": {
+      "state": "DRAFT",
+      "note": "RADIO-002 และ 010 อ้างถึงกลุ่ม APF เดียวกัน. TAG ชุดนี้เป็น CUS reference รอแยกราย Lot. MR ระบุ Fixed Radio 4 เครื่อง ส่วน DTS/BLD ระบุ TAG Fixed Radio 2 ตัว.",
+      "placements": [
+        {
+          "equipment": "Fixed Radio และ IP Gateway",
+          "tags": [
+            "RAD-310-351",
+            "RAD-310-352",
+            "RAD-310-353",
+            "RAD-310-354"
+          ],
+          "location": "APF / Control Building / Instrument and Telecom Room (ITR)",
+          "rack": "RAD-309",
+          "refs": [
+            [
+              "dtsMarine",
+              "PDF p3 / rows 49–52"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ],
+            [
+              "lisApf",
+              "printed p8 / 11.46"
+            ]
+          ]
+        },
+        {
+          "equipment": "Marine antennas",
+          "tags": [
+            "ANT-310-201",
+            "ANT-310-202"
+          ],
+          "location": "APF / Telecom Tower",
+          "rack": "นอกตู้",
+          "refs": [
+            [
+              "lisApf",
+              "printed p10 / 12.98–12.99"
+            ],
+            [
+              "dtsMarine",
+              "PDF p3 / rows 47–48"
+            ]
+          ]
+        }
+      ]
+    },
+    "apfSsb": {
+      "state": "DRAFT",
+      "note": "RADIO-003 และ 011 อ้างถึงกลุ่ม APF เดียวกัน. DTS B1 และ BLD C3 ใช้ TAG ของ Fixed Radio ต่างกัน. ใช้ BLD ยืนยันตำแหน่งตู้และรอ reconcile TAG ก่อนจัดให้ราย Lot.",
+      "placements": [
+        {
+          "equipment": "MF/HF Fixed Radio",
+          "tags": [
+            "APF-RAD-309-201 (DTS)",
+            "RAD-309-351 (BLD)"
+          ],
+          "location": "APF / Control Building / Instrument and Telecom Room (ITR)",
+          "rack": "RAD-309",
+          "refs": [
+            [
+              "dtsSsb",
+              "PDF p3 / Equipment Tag No."
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ],
+            [
+              "lisApf",
+              "printed p8 / 11.46"
+            ]
+          ]
+        },
+        {
+          "equipment": "MF/HF antenna",
+          "tags": [
+            "ANT-309-201 (LIS/BLD)",
+            "APF-ANT-309-201 (DTS)"
+          ],
+          "location": "APF / Telecom Tower",
+          "rack": "นอกตู้",
+          "refs": [
+            [
+              "lisApf",
+              "printed p10 / 12.97"
+            ],
+            [
+              "dtsSsb",
+              "PDF p3"
+            ]
+          ]
+        },
+        {
+          "equipment": "MF/HF IP Gateway",
+          "tags": [],
+          "location": "APF / Control Building",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "mr",
+              "printed p9 / APF Item 3"
+            ]
+          ]
+        }
+      ]
+    },
+    "acpConsole": {
+      "state": "CUS",
+      "note": "MR ระบุ Console เดี่ยว 1 Pc. BLD แสดง Console ที่จุดใช้งานและมีสายเชื่อม LAN.",
+      "placements": [
+        {
+          "equipment": "Radio Console",
+          "tags": [
+            "CON-308-001 (LIS)",
+            "ACP-CON-308-001 (DTS)"
+          ],
+          "location": "ACP / Control Room (LIS)",
+          "rack": "จุดใช้งาน Console",
+          "refs": [
+            [
+              "mr",
+              "printed p10 / ACP Item 5"
+            ],
+            [
+              "lisAcp",
+              "printed p2"
+            ],
+            [
+              "bldAcp",
+              "sheet 3/4"
+            ],
+            [
+              "dtsDmr",
+              "PDF p10"
+            ]
+          ]
+        }
+      ]
+    },
+    "acpCable": {
+      "state": "DRAFT",
+      "note": "MR ACP Item 4 ระบุสายรวม 700 m. BLD แสดงหลายเส้นทาง RF coax ไปที่ RAD-308-001; ต้องยืนยัน TAG สายและจำนวนต่อเส้นทาง.",
+      "placements": [
+        {
+          "equipment": "Antenna Feeder / RF Jumper",
+          "tags": [],
+          "location": "ACP / Telecom Tower ↔ Technical Room",
+          "rack": "RAD-308-001 (ปลายทางตาม BLD)",
+          "refs": [
+            [
+              "mr",
+              "printed p10 / ACP Item 4"
+            ],
+            [
+              "lisAcp",
+              "printed p3 / RAD-308-001"
+            ],
+            [
+              "bldAcp",
+              "sheet 3/4 / RF coax routes"
+            ]
+          ]
+        }
+      ]
+    },
+    "apmUnresolved": {
+      "state": "OPEN",
+      "note": "ใบเสนอราคาพิมพ์ APM. ยังไม่มีหลักฐานยืนยันไซต์และการจัดลงตู้ของ Item นี้.",
+      "placements": []
+    },
+    "dmrSubscribers": {
+      "state": "DRAFT",
+      "note": "รายการเสนอ 26 Mobile และ 96 Handheld. MR B1 ระบุ 21 และ 98 ตามลำดับ. DTS ระบุ TAG และไซต์แบบกลุ่ม จึงใช้เป็นหลักฐานอ้างอิงและยังไม่กำหนด TAG รายเครื่อง.",
+      "placements": [
+        {
+          "equipment": "DMR mobile radios",
+          "tags": [],
+          "location": "APF / ยานพาหนะและจุดใช้งาน",
+          "rack": "ติดตั้งตามจุดใช้งาน",
+          "refs": [
+            [
+              "mr",
+              "printed p9 / APF Item 1"
+            ],
+            [
+              "lisApf",
+              "printed p11 / 13.1"
+            ],
+            [
+              "dtsDmr",
+              "PDF p10 / VHF Mobile/Fixed Radio"
+            ]
+          ]
+        },
+        {
+          "equipment": "DMR handheld radios",
+          "tags": [
+            "VPR-308-001~097",
+            "VPR-308-098 (MOGE)"
+          ],
+          "location": "APF / ABV01 / AMS01 / ACP / MOGE",
+          "rack": "พกพา",
+          "refs": [
+            [
+              "dtsDmr",
+              "PDF p10"
+            ],
+            [
+              "lisApf",
+              "printed p11 / 13.2"
+            ]
+          ]
+        }
+      ]
+    },
+    "dmrAccessory": {
+      "state": "OPEN",
+      "note": "Motorola accessories Option ในใบเสนอราคา. อ้างถึงชุดผู้ใช้งาน DMR; จุดติดตั้ง charger และ TAG รายอุปกรณ์ยังรอยืนยัน.",
+      "placements": []
+    },
+    "aeroFixed": {
+      "state": "DRAFT",
+      "note": "จัดแสดง TAG ที่ DTS และ BLD ระบุ. Fixed Radio, Gateway และเสาเป็นคนละอุปกรณ์; ทวนจำนวนและขอบเขตที่ MGW เสนอเทียบ MR Item 4.",
+      "placements": [
+        {
+          "equipment": "Fixed AM VHF Radio",
+          "tags": [
+            "RAD-311-351"
+          ],
+          "location": "APF / Control Building / Instrument and Telecom Room (ITR)",
+          "rack": "RAD-309",
+          "refs": [
+            [
+              "dtsAero",
+              "PDF p3"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ]
+          ]
+        },
+        {
+          "equipment": "Aeronautical IP Gateway · CUS reference",
+          "tags": [
+            "RAD-311-352"
+          ],
+          "location": "APF / Control Building / Instrument and Telecom Room (ITR)",
+          "rack": "RAD-309",
+          "refs": [
+            [
+              "dtsAero",
+              "PDF p3"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ]
+          ]
+        },
+        {
+          "equipment": "Aeronautical antenna",
+          "tags": [
+            "ANT-311-201"
+          ],
+          "location": "APF / Telecom Tower",
+          "rack": "นอกตู้",
+          "refs": [
+            [
+              "dtsAero",
+              "PDF p4"
+            ],
+            [
+              "lisApf",
+              "printed p10 / 12.100"
+            ]
+          ]
+        }
+      ]
+    },
+    "aeroPortable": {
+      "state": "CUS",
+      "note": "LIS ระบุอุปกรณ์พกพา 4 เครื่องสำหรับ APF และเว้น TAG รายเครื่อง.",
+      "placements": [
+        {
+          "equipment": "Portable VHF Airband Radio",
+          "tags": [],
+          "location": "APF / ผู้ใช้งาน",
+          "rack": "พกพา",
+          "refs": [
+            [
+              "mr",
+              "printed p9 / APF Item 4"
+            ],
+            [
+              "lisApf",
+              "printed p11 / 13.4"
+            ]
+          ]
+        }
+      ]
+    },
+    "apfCable": {
+      "state": "OPEN",
+      "note": "MR APF Item 5 และ 7 ระบุสาย 500 m เท่ากัน. ยังระบุ TAG สายและปลายทางของ Lot นี้ไม่ได้.",
+      "placements": [
+        {
+          "equipment": "Antenna Cable",
+          "tags": [],
+          "location": "APF / เส้นทางรอยืนยัน",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "mr",
+              "printed p9 / APF Items 5, 7"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2 / RF coax routes"
+            ]
+          ]
+        }
+      ]
+    },
+    "apfConsole": {
+      "state": "DRAFT",
+      "note": "ใบเสนอราคา 1 เครื่อง. LIS ระบุ Console สองจุดใน APF; ต้องเลือกจุดใช้งานของเครื่องที่เสนอ.",
+      "placements": [
+        {
+          "equipment": "Console · CCR",
+          "tags": [
+            "CON-308-001"
+          ],
+          "location": "APF / Control Building / Control Room",
+          "rack": "จุดใช้งาน Console",
+          "refs": [
+            [
+              "lisApf",
+              "printed p8 / 11.31"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ]
+          ]
+        },
+        {
+          "equipment": "Console · Radio Room",
+          "tags": [
+            "CON-308-002"
+          ],
+          "location": "APF / Control Building / Radio Room",
+          "rack": "จุดใช้งาน Console",
+          "refs": [
+            [
+              "lisApf",
+              "printed p8 / 11.32"
+            ],
+            [
+              "bldApf",
+              "sheet 2/2"
+            ]
+          ]
+        }
+      ]
+    },
+    "amsDmr": {
+      "state": "OPEN",
+      "note": "ใช้ AMS01 ตามบันทึกไซต์เดิม. APF LIS §14 ระบุ LAN Cabinet ของ AMS01 แต่ยังไม่พบหลักฐานให้ผูกวิทยุชุดนี้กับตู้ดังกล่าว.",
+      "placements": [
+        {
+          "equipment": "Radio / Console / Antenna",
+          "tags": [],
+          "location": "AMS01 / จุดติดตั้งรอยืนยัน",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "lisApf",
+              "printed p11 / §14"
+            ],
+            [
+              "dtsDmr",
+              "PDF p10"
+            ]
+          ]
+        }
+      ]
+    },
+    "apm150": {
+      "state": "OPEN",
+      "note": "MR ABV01 Item 2 มีสาย 150 m ตรงกัน แต่ใบเสนอราคาพิมพ์ APM. คง ABV01 เป็นข้อเทียบด้านปริมาณจนยืนยันขอบเขตได้.",
+      "placements": [
+        {
+          "equipment": "Antenna Cable",
+          "tags": [],
+          "location": "OPEN · ABV01 เป็นข้อเทียบ",
+          "rack": "OPEN",
+          "refs": [
+            [
+              "mr",
+              "printed p10 / ABV01 Item 2"
+            ],
+            [
+              "lisAbv",
+              "printed p2 / MPLS-0001 และ RAD-308 สำหรับ Fixed Radio"
+            ]
+          ]
+        }
+      ]
+    }
+  }
+}

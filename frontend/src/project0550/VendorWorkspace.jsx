@@ -7,15 +7,27 @@ import {BID_UNITS,newId} from "./data/bidWorkspaceModel";
 import {COMMERCIAL_SOURCES} from "./data";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {VENDOR_PHYSICAL_TAG_FIELDS_0550,VENDOR_VOLUME_TAGS_0550,offerSourceSections0550} from './data/vendorBidTags0550';
+const tagValues=text=>[...new Set(text.split(/[|\n]/).map(tag=>tag.trim()).filter(Boolean))];
 export function VendorWorkspace({navigationTarget,onNavigate}){
  const {data,put,busy,vendorSync,reviewDate}=useBidWorkspace();
  const [vendor,setVendor]=useState({id:"",name:"",kind:"SUPPLIER",reference:""});
  const blankOffer={id:"",vendorId:"",description:"",brand:"",quoteRef:"",sourceRef:"",date:"",validUntil:"",currency:"THB",unit:"MD",unitCost:null};
  const [offer,setOffer]=useState(blankOffer);
+ const [physicalTagText,setPhysicalTagText]=useState({});
  if(!data)return <p>กำลังเปิดฐานข้อมูล Bidding…</p>;
  const currentOffers=currentSupplierOffers0550(data);
  const quotedVendorIds=new Set(currentOffers.map(o=>o.vendorId));
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
+ const authoredSections=offer.bidTags?.sections||[];
+ const changeSection=(tag,checked)=>setO('bidTags',{sections:checked?[...authoredSections,tag]:authoredSections.filter(section=>section!==tag)});
+ const saveOffer=async event=>{
+  event.preventDefault();
+  const {bidTags,...sourceOffer}=offer;
+  const tags={sections:authoredSections,...Object.fromEntries(VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field])=>[field,tagValues(physicalTagText[field]||'')]))};
+  const saved={...sourceOffer,id:offer.id||newId('OFFER'),...(Object.values(tags).some(values=>values.length)?{bidTags:tags}:{})};
+  if(await put('offers',saved)){setOffer(blankOffer);setPhysicalTagText({});}
+ };
  return <div className="p55-stack p55-vendor-workspace">
  <Module id="bid.vendor.master" title="07.1 Vendor / Service Provider">
  {vendorSync&&<p role="status" aria-label="Vendor register loaded status">{vendorSync.message}</p>}
@@ -31,14 +43,23 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  </Module>
  <Module id="bid.vendor.offers" title="07.2 ใบเสนอราคา / ต้นทุนสินค้า / เรตบุคลากร">
  {currentOffers.filter(o=>o.supplierQuoteRow?.classification==="NET_PACKAGE").map(o=><p key={o.id}>{o.quoteRef} · ราคาฐานสุทธิ {amount(o.unitCost,o.currency)} · {data.lines.some(l=>l.offerId===o.id&&l.selected)?"เลือกใน Working แล้ว — ตรวจ scope/ราคาและ Release gates ต่อ":"บันทึกเป็นฉบับใหม่แล้ว / ยังไม่เลือกแทนราคาที่ใช้อยู่"} · รายการย่อยและ Option ไม่บวกในราคาฐานซ้ำ</p>)}
- <form onSubmit={async e=>{e.preventDefault();if(await put("offers",{...offer,id:offer.id||newId("OFFER")}))setOffer(blankOffer);}}>
+ <form onSubmit={saveOffer}>
  <div className="p55-bid-fields"><Select label="Offer vendor" value={offer.vendorId} onChange={v=>setO("vendorId",v)} options={[["","เลือก Vendor"],...data.vendors.map(v=>[v.id,v.name])]}/>
  {[['description','Product / role / service'],['brand','Brand / model'],['quoteRef','Quotation reference'],['sourceRef','Offer source / file / page']].map(([k,l])=><Field key={k} label={l} value={offer[k]} onChange={v=>setO(k,v)} required={k!=="brand"}/>)}
- <Field label="Quote date" type="date" value={offer.date} onChange={v=>setO("date",v)} required/><Field label="Valid until" type="date" value={offer.validUntil} onChange={v=>setO("validUntil",v)} required={!offer.quoteEvidence}/>
+ <Field label="Quote date" type="date" value={offer.date} onChange={v=>setO("date",v)} required={!offer.id}/><Field label="Valid until" type="date" value={offer.validUntil} onChange={v=>setO("validUntil",v)} required={!offer.id&&!offer.quoteEvidence}/>
  {mgwQuoteItem0550(offer)?.unit===null&&<Field label="Offer unit confirmation / source" value={offer.unitBasis||""} onChange={v=>setO("unitBasis",v)} placeholder="หน่วยที่ยืนยันและแหล่งอ้างอิง"/>}
- <Select label="Offer currency" value={offer.currency} onChange={v=>setO("currency",v)} options={["THB","USD","EUR"]}/><Select label="Offer unit" value={offer.unit} onChange={v=>setO("unit",v)} options={BID_UNITS.map(unit=>[unit,unit==="MD"?"MD · Man-day":unit==="MH"?"MH · Man-hour":unit])}/><Field label="Quoted unit cost" type="number" min="0" step="any" value={offer.unitCost} onChange={v=>setO("unitCost",v)} required/></div><Save busy={busy}>บันทึกใบเสนอราคา / เรตต้นทุน</Save></form>
+ <Select label="Offer currency" value={offer.currency} onChange={v=>setO("currency",v)} options={["THB","USD","EUR"]}/><Select label="Offer unit" value={offer.unit} onChange={v=>setO("unit",v)} options={BID_UNITS.map(unit=>[unit,unit==="MD"?"MD · Man-day":unit==="MH"?"MH · Man-hour":unit])}/><Field label="Quoted unit cost" type="number" min="0" step="any" value={offer.unitCost} onChange={v=>setO("unitCost",v)} required={!offer.id}/></div>
+ <details>
+  <summary>TAG รายการเสนอราคา / Volume I</summary>
+  <div className="p55-bid-fields">{VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field,label])=><Field key={field} label={label} value={physicalTagText[field]||''} onChange={value=>setPhysicalTagText(current=>({...current,[field]:value}))} placeholder="คั่นแต่ละ TAG ด้วย |"/>)}</div>
+  <fieldset><legend>หมวดใน Volume I · เลือกได้หลายหมวด</legend>
+   <div className="p55-review-toolbar">{VENDOR_VOLUME_TAGS_0550.map(tag=><label key={tag}><input type="checkbox" checked={authoredSections.includes(tag)} onChange={event=>changeSection(tag,event.target.checked)}/> 11.{tag}</label>)}</div>
+  </fieldset>
+  <small>หมวดที่ใช้แสดง {offerSourceSections0550(offer).map(tag=>'11.'+tag).join(' · ')||'OPEN'} · 11.M และ 11.P อ่านจาก Working และ Schedule allocation</small>
+ </details>
+ <Save busy={busy}>บันทึกใบเสนอราคา / TAG</Save></form>
  <p>แก้เรตใน Offer เดิมจะคำนวณแถว Working ที่อ้างอิง Offer นั้นใหม่ หากเป็นใบเสนอราคาคนละฉบับให้สร้าง Offer ใหม่เพื่อเก็บฉบับเก่า</p>
- <VendorOfferGroups0550 data={data} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
+ <VendorOfferGroups0550 data={data} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});setPhysicalTagText(Object.fromEntries(VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field])=>[field,(o.bidTags?.[field]||[]).join(' | ')])));document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
  </Module>
  <Module id="bid.vendor.controlled-sources" title="แหล่ง Vendor เดิมของ 0550 — ใช้อ้างอิงก่อนเลือกเรต" open={false}>
  <MgwQuoteSummary/>

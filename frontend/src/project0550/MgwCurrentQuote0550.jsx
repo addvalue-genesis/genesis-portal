@@ -4,6 +4,8 @@ import {sumMoney0550} from './data/money0550';
 import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
 import mrCatalog from './data/mrWorkingCatalog0550.json';
+import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
+import {mgwRadioItemForOffer0550,offerLinkedSections0550,offerSourceSections0550,sourceRadioSections0550} from './data/vendorBidTags0550';
 import {
  MGW_CURRENT_BLD_0550, MGW_CURRENT_OPEN_0550, MGW_CURRENT_QUOTE_0550, MGW_MET_NDB_0550, MGW_MET_NDB_OPEN_0550,
  MGW_CCTV_ENT_0550, MGW_CCTV_ENT_SECTIONS_0550, MGW_SECTION_SUBTOTAL_0550,
@@ -35,9 +37,21 @@ const radioUnpriced={
  },
 };
 
-function MgwRadioSource0550(){
+function MgwRadioSource0550({data,sectionFilter}){
  const currency=MGW_QUOTE_0550.currency;
  const total=sumMoney0550(radioSourceRows.map(row=>row.extended));
+ const offersByItem=new Map();
+ for(const offer of data.offers){
+  const item=mgwRadioItemForOffer0550(offer);
+  if(item&&(!offersByItem.has(item)||mgwRadioDtrsOffer0550(offer)))offersByItem.set(item,offer);
+ }
+ const itemSections=item=>{
+  const offer=offersByItem.get(item);
+  const lines=new Set(offer?data.lines.filter(line=>line.offerId===offer.id).map(line=>line.id):[]);
+  const bindings=(data.bidVolumes?.bindings||[]).filter(binding=>lines.has(binding.lineId));
+  return offerLinkedSections0550(offer?offerSourceSections0550(offer):sourceRadioSections0550(item),bindings,lines.size>0);
+ };
+ const isVisible=tags=>!sectionFilter||tags.includes(sectionFilter);
  return <details className="p55-vnd-quote">
   <summary>Radio System · {MGW_QUOTE_0550.quoteRef} · {radioSourceRows.length} รายการมีราคา · {amount(total,currency)} {currency}</summary>
   <p><a href={MGW_QUOTE_0550.sourceUrl} target="_blank" rel="noreferrer">ใบเสนอราคา MGW หน้า 9–12</a>
@@ -53,17 +67,24 @@ function MgwRadioSource0550(){
     const continuation=MGW_QUOTE_0550.radioDetailContinuations[item];
     const [rawDetail,unpricedDetail]=extra?row.detail.split(extra.separator):[row.detail];
     const detail=continuation?rawDetail.replace(continuation.anchor,continuation.text):rawDetail;
+    const sections=itemSections(item);
+    const optionItem=item==='RADIO-009'?'RADIO-009-OPTION':null;
+    const extraSections=optionItem?itemSections(optionItem):[];
     return <React.Fragment key={row.id}>
-     <tr>
+     {isVisible(sections)&&<tr>
       <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
-       <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details></td>
+       <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
+       <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
+       <MgwRadioTagEvidence0550 item={item}/></td>
       <td>{site}{mr&&<small>{mr.id}</small>}{item==='RADIO-016'&&<small>ตามบันทึกไซต์เดิม</small>}</td>
       <td>{row.site}</td><td>{row.quantity} {row.sourceUnit||'· หน่วยไม่ระบุ'}</td>
       <td>{amount(row.unitCost,currency)}</td><td>{amount(row.extended,currency)}</td>
-     </tr>
-     {unpricedDetail&&<tr>
+     </tr>}
+     {unpricedDetail&&isVisible(extraSections)&&<tr>
       <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
-       <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details></td>
+       {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
+       <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
+       {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
       <td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
@@ -73,8 +94,8 @@ function MgwRadioSource0550(){
  </details>;
 }
 
-export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSource=false}){
- if(!mgwReplacementActive0550(data))return showRadioSource?<MgwRadioSource0550/>:null;
+export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSource=false,sectionFilter=''}){
+ if(!mgwReplacementActive0550(data))return showRadioSource?<MgwRadioSource0550 data={data} sectionFilter={sectionFilter}/>:null;
  const offers=data.offers.filter(mgwLanPbxFoOffer0550);
  const quote=offers[0]?.quoteEvidence;
  const metNdb=data.offers.filter(mgwMetNdbOffer0550);
@@ -104,7 +125,7 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
   <p>{MGW_CCTV_ENT_0550.quoteRef} · {MGW_CCTV_ENT_0550.revision} · {cctvEntQuote?cctvEnt.length+' รายการในทะเบียน · Equipment Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_BULK_0550.quoteRef} · {bulk.length?`${bulkPriced.length}/${bulk.length} รายการมีราคา · USD ${amount(sumMoney0550(bulkPriced.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · Supply / Draft`:'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_RADIO_DTRS_0550.quoteRef} · {radio.length?radio.length+' Offer records · '+radioWorking.length+' Working owners · Supply / Draft':'รอข้อมูลใบเสนอราคา'}</p>
-  {showRadioSource&&<MgwRadioSource0550/>}
+  {showRadioSource&&<MgwRadioSource0550 data={data} sectionFilter={sectionFilter}/>}
   {cctvEntQuote&&sections.map(section=><p key={section.system}><strong>{section.label}</strong> · {section.rows.length}/{section.count} รายการ · {Number.isFinite(section.total)?'รวมรายบรรทัด USD '+amount(section.total,'USD'):'ตรวจความครบของราคา'} · ยอดที่พิมพ์ในใบ USD {amount(section.printed,'USD')}{section.delta?' · ส่วนต่าง USD '+amount(section.delta,'USD'):''}</p>)}
   <p>รอราคาสำหรับ {cctvEntQuote?'':'CCTV, Entertainment, '}{radio.length?'':'DTRS, '}Marine/Aero/SSB Radio, {bulk.length?'วัสดุ Bulk ที่ยังไม่มีราคา':'สายและวัสดุ FO/CAT6A'} และงานบริการที่ต้องจัดหาเพิ่ม</p>
   {option&&<p>Wi-Fi Coverage Study · Option {amount(option.quoteEvidence.quotedTotal,'USD')} USD แยกจาก Base</p>}

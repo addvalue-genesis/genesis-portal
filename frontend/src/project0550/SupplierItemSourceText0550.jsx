@@ -1,4 +1,6 @@
 import React,{useMemo,useRef,useState} from 'react';
+import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
+import {VENDOR_PHYSICAL_TAG_FIELDS_0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {amount} from './BidControls';
 import {nativeSupplierItem0550,supplierBoqRows0550,supplierItemLabel0550,supplierItemSourceText0550,supplierCostProjection0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {isTowerSourceItem0550,towerOfferScope0550} from './data/towerTenderScope0550';
@@ -298,12 +300,16 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true,dat
  const texts=supplierItemSourceText0550(offer);
  const rows=supplierBoqRows0550(offer),native=nativeSupplierItem0550(offer);
  const details=texts.filter(text=>!rows.some(row=>text===row.text));
+ const sections=offerSourceSections0550(offer);
  return <div data-supplier-source-text={offer.id}>
   <button type="button" aria-haspopup="dialog" onClick={()=>dialog.current.showModal()}>ดูรายละเอียด Supplier{rows.length?' · BoQ '+rows.length+' แถว':''}</button>
   <dialog ref={dialog} className="p55-supplier-evidence" aria-label={'รายละเอียด Supplier '+(offer.supplierQuoteRow?.itemCode||offer.quoteRef||offer.id)}>
    <div className="p55-supplier-evidence-head"><strong>{offer.quoteRef||'Supplier'}{offer.supplierQuoteRow?.itemCode?' · Item '+offer.supplierQuoteRow.itemCode:''}</strong>
     <form method="dialog"><button type="submit">ปิดรายละเอียด</button></form></div>
    <h3>{supplierItemLabel0550(offer)}</h3>
+   {sections.length>0&&<p>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</p>}
+   {VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field,label])=>offer.bidTags?.[field]?.length>0&&<p key={field}>{label} · {offer.bidTags[field].join(' · ')}</p>)}
+   <MgwRadioTagEvidence0550 offer={offer}/>
    {requirement&&<>
     <p><strong>CUS · {requirement.site} · {requirement.title}</strong><br/>{requirement.sourceLocator}{requirement.supplierLocator&&<><br/>จุดอ้างอิง Supplier ใน Mapping · {requirement.supplierLocator}</>}</p>
     {(requirement.sourceExcerpt||requirement.criteria)&&<details><summary>ข้อความข้อกำหนดลูกค้า / เกณฑ์ตรวจ SI</summary>
