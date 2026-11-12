@@ -8,6 +8,7 @@ import {workingOffers0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {validateSupplierCommercialTotals0550,validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
+import {validateAtomicPackage0550} from './atomicLines0550';
 import {vendorOfferLocation0550} from './vendorOfferLocation0550';
 
 // Extend the existing offer registry; this importer never creates Working prices.
@@ -23,7 +24,7 @@ export function validateVendorQuoteEvidence0550(e,systems){
  for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
  if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
  if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
- const unquantified=e.quotedQuantity===null&&e.quotedUnitCost===null&&e.quotedTotal===null&&e.classification==='RATE';
+ const unquantified=e.quotedQuantity===null&&e.quotedTotal===null&&e.classification==='RATE';
  if(!unquantified&&(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<0||e.quotedQuantity===0&&e.classification!=='OPTION'||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification)))fail('invalid quotation quantity/classification');
  if(!['THB','USD','EUR'].includes(e.quotedCurrency)||e.quotedUnitCost!==null&&(!Number.isFinite(e.quotedUnitCost)||e.quotedUnitCost<0||e.quotedUnitCost>1e12))fail('invalid native quotation rate/currency');
  if(e.quotedTotal!==undefined&&e.quotedTotal!==null&&(!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||e.quotedTotal>1e12))fail('invalid original line total');
@@ -48,6 +49,7 @@ export function planVendorRegister0550(data,pack,systems){
  const key=integrationFingerprint0550(pack),receipt=(data.supplierRevisionImports||[]).find(r=>r.batchId===pack.batchId);
  if(receipt){if(receipt.packageKey!==key)fail('consumed batch changed');return {workspace:data,changed:false,sourceState:'CURRENT',stats:[]};}
  if(new Set(pack.vendors.map(v=>v.id)).size!==pack.vendors.length||new Set(pack.offers.map(o=>o.id)).size!==pack.offers.length)fail('duplicate IDs');
+ validateAtomicPackage0550(pack.offers);
  for(const net of pack.offers.filter(o=>o.quoteEvidence?.commercialTotals)){
   const evidence=net.quoteEvidence,items=pack.offers.filter(o=>o.supplierQuoteRow?.parentOfferId===net.id);
   if(net.supplierQuoteRow?.classification!=='NET_PACKAGE'||items.some(o=>o.vendorId!==net.vendorId||o.quoteRef!==net.quoteRef||
@@ -92,6 +94,12 @@ export function planVendorRegister0550(data,pack,systems){
    }
    if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.quoteEvidence?.revision!==e.revision||old.quoteEvidence?.sourceSha256!==e.sourceSha256||old.quoteEvidence?.locator!==e.locator)fail('Offer ID belongs to another quotation/version / '+o.id);
    existingOffers++;
+   if(o.atomicLines&&!old.atomicLines){
+    const {originBatchId,...source}=e;
+    const {originBatchId:priorBatch,...priorSource}=old.quoteEvidence;
+    if(!same(priorSource,source)||!same(old.supplierQuoteRow,o.supplierQuoteRow))fail('ALIE source facts differ / '+o.id);
+    offers[offers.indexOf(old)]={...old,atomicLines:o.atomicLines};updatedOffers++;continue;
+   }
    const additions=['quotedTotal','quotedTotalText','fileName'].filter(k=>old.quoteEvidence[k]===undefined&&e[k]!==undefined);
    // Supplement only missing printed amount/filename facts from an otherwise
    // exact original. Never replace an authored value or change any active rate.

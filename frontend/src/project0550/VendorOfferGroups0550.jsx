@@ -3,6 +3,7 @@ import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
+import {atomicScheduleTotals0550} from './data/atomicLines0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
 import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550,vendorQuoteRowTreatment0550,vendorQuoteNetUnitRate0550,latestPagaVendorPackage0550,vendorPagaHistoricalQuote0550} from './data/vendorRegister0550';
@@ -67,6 +68,44 @@ function QuoteTotal({quote,fx,selectedR11,groupOnly=false}){
   {!t.packageUnallocated&&!t.hasBase&&!t.option&&<span>มีเฉพาะรายการอ้างอิงในกลุ่มนี้</span>}
  </span>;
 }
+function QuoteAtomicLines0550({lines}){
+ const [open,setOpen]=useState(false);
+ if(!lines.length)return null;
+ const tags=new Map(lines.map(line=>[line.line_id,line.anchor.tag]));
+ return <details className="p55-panel" data-vnd-atomic-lines onToggle={event=>{
+  if(event.target===event.currentTarget)setOpen(event.currentTarget.open);
+ }}>
+  <summary>ALIE Rev.R2 · {lines.length} บรรทัด</summary>
+  {open&&<>
+   <small>ยอดตามหมวดก่อนส่วนลด · ส่วนลดคิดที่สรุปใบเสนอราคา</small>
+   <ul aria-label="ALIE schedule totals">{atomicScheduleTotals0550(lines).map(total=><li key={[total.schedule,total.currency,total.treatment].join('|')}>
+    {total.schedule} · {total.treatment} · {total.known===null?'OPEN':amount(Number(total.known),total.currency)}
+    {total.open>0&&' · OPEN '+total.open+' รายการ'}
+    {total.schedule==='C1'&&' · แสดงจาก EQUIP / A1'}
+   </li>)}</ul>
+   <div className="p55-table-wrap"><table className="p55-table" aria-label="ALIE atomic lines"><thead><tr>
+    <th>TAG / Location / Cabinet</th><th>Part / Service</th><th>Class → Schedule</th><th>Qty / UOM</th><th>Unit cost ต้นทาง</th>
+   </tr></thead><tbody>{lines.map(({line_id,anchor,route,part,qty,cost,internal,prov,parent_line_id})=><tr key={line_id}>
+    <td><strong>{anchor.tag}</strong><small>{anchor.tag_status}</small>
+     <small>{[anchor.site,anchor.location,anchor.cabinet].filter(Boolean).join(' · ')||'Location OPEN'}</small>
+     {anchor.tag_intended&&<small>TAG รอยืนยัน · {anchor.tag_intended}</small>}
+    </td>
+    <td>{part.vnd_desc}{part.vnd_pn&&<small>P/N / Code · {part.vnd_pn}</small>}
+     {parent_line_id&&<small>Parent · {tags.get(parent_line_id)||parent_line_id}</small>}
+     <small>{line_id}</small><small>{prov.src}</small>
+    </td>
+    <td>{route.line_class} → {route.schedule}<small>{internal.treatment}</small></td>
+    <td>{qty.value??qty.state} {qty.uom}</td>
+    <td>{internal.treatment==='REFERENCE'?'อ้างอิง · ราคาอยู่ที่ระดับใบเสนอราคา':cost.unit??cost.state}
+     {internal.treatment!=='REFERENCE'&&' '+cost.currency}
+     {internal.lump_unsplit&&<small>ราคาเหมารวมตามใบเสนอราคา</small>}
+     <details><summary>หลักฐานและเงื่อนไข</summary><small>{internal.notes}</small></details>
+    </td>
+   </tr>)}</tbody></table></div>
+  </>}
+ </details>;
+}
+
 export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigationTarget}){
  const [mode,setMode]=useState('company');
  const [sectionFilter,setSectionFilter]=useState('');
@@ -117,8 +156,9 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
   const validity=quoteValidity0550(o,reviewDate);
   const sourceSection=supplierQuotedSection0550(data,o);
+  const atom=o.atomicLines?.[0];
   const equipment=o.bidTags?.lineClass?.includes('EQUIP');
-  const netRate=vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
+  const netRate=atom?null:vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
   const anchor=!anchors.has(o.id);anchors.add(o.id);
   const currentMr=mgwCurrentMr0550(o);
   const selected=entry.working.filter(activeSupply0550),referenceSelected=entry.referenceWorking.filter(activeSupply0550);
@@ -135,9 +175,11 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     <small>Volume I · {sectionsByOffer.get(o.id).map(tag=>'11.'+tag).join(' · ')||'OPEN'}</small>
     {VENDOR_OFFER_TAG_FIELDS_0550.map(([field,label])=>{
-     const value=o.bidTags?.[field]?.join(' · ');
+     const alieValue=field==='equipment'?atom?.anchor.tag:field==='rack'?atom?.anchor.cabinet:null;
+     const value=o.bidTags?.[field]?.join(' · ')||alieValue;
      return (value||equipment&&VENDOR_PHYSICAL_TAG_FIELDS_0550.some(([key])=>key===field))&&<small key={field}>{label} · {value||'OPEN'}</small>;
     })}
+    {atom&&<small>ALIE TAG · {atom.anchor.tag} · {atom.anchor.tag_status}</small>}
     {rackLabel&&<small>{rackLabel}</small>}
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
@@ -195,6 +237,7 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
  const renderQuote=q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
   <summary><Toggle/>{isLatestPaga(q)?'ฉบับหลัก · ':q.referenceOnly?'ฐาน Working เดิม · ':''}{quoteTitle(q)} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx} selectedR11={selectedR11} groupOnly/></summary>
   {renderRows(q)}
+  <QuoteAtomicLines0550 lines={q.entries.flatMap(({offer})=>offer.atomicLines||[])}/>
   <SupplierQuoteBoq0550 offers={q.entries.map(entry=>entry.offer)}/>
  </details>;
  const renderFullQuotes=quotes=>quotes.length>0&&<details className="p55-panel" aria-label="Full quotation totals">

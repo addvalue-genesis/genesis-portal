@@ -33,6 +33,12 @@ export function sourceRadioSections0550(item){
 }
 
 export function offerSourceSections0550(offer){
+ const atomic=offer?.atomicLines?.[0];
+ if(atomic)return [
+  ...(atomic.internal.treatment==='OPTION'?['A2']:[]),
+  atomic.route.schedule,
+  ...(atomic.route.line_class==='EQUIP'?['C1']:[]),
+ ];
  const authored=offer?.bidTags?.sections;
  const radio=mgwRadioItemForOffer0550(offer);
  const sections=authored?.length?authored:radio?sourceRadioSections0550(radio):

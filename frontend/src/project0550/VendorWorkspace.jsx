@@ -21,6 +21,13 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  const currentOffers=currentSupplierOffers0550(data);
  const quotedVendorIds=new Set(currentOffers.map(o=>o.vendorId));
  const latestPackages=latestVendorPackageQuotes0550(currentOffers);
+ const serviceQuotes=new Map();
+ for(const offer of currentOffers){
+  if(!offer.atomicLines?.[0]?.route.line_class.startsWith('SERVICE_'))continue;
+  const quotes=serviceQuotes.get(offer.vendorId)||new Map();
+  if(!quotes.has(offer.quoteRef))quotes.set(offer.quoteRef,offer.id);
+  serviceQuotes.set(offer.vendorId,quotes);
+ }
  const latestPaga=latestPagaVendorPackage0550(currentOffers);
  const selectedOfferIds=new Set(data.lines.filter(activeSupply0550).map(line=>line.offerId));
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
@@ -44,14 +51,17 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>
  <form onSubmit={async e=>{e.preventDefault();if(await put("vendors",{...vendor,id:vendor.id||newId("VEN")}))setVendor({id:"",name:"",kind:"SUPPLIER",reference:""});}}>
  <div className="p55-bid-fields"><Field label="Vendor name" value={vendor.name} onChange={v=>setV("name",v)} required/><Select label="Vendor type" value={vendor.kind} onChange={v=>setV("kind",v)} options={["SUPPLIER","OEM","SERVICE_PROVIDER","INTERNAL_TEAM"]}/><Field label="Vendor reference" value={vendor.reference} onChange={v=>setV("reference",v)}/></div><Save busy={busy}>บันทึก Vendor</Save></form>
- <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Vendor</th><th>Type / source</th><th>ใบเสนอราคาแพ็กเกจล่าสุดในทะเบียน</th><th>ID / action</th></tr></thead><tbody>{data.vendors.map(v=>{
+ <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Vendor</th><th>Type / source</th><th>ใบเสนอราคาอ้างอิงล่าสุดในทะเบียน</th><th>ID / action</th></tr></thead><tbody>{data.vendors.map(v=>{
   const latest=latestPackages.get(v.id);
   const evidence=latest?.quoteEvidence;
   return <tr key={v.id} data-component-key={quotedVendorIds.has(v.id)?undefined:"bid.vendor."+v.id}><td>{v.name}</td><td>{v.kind}<small>{v.reference}</small></td><td>{latest&&<>
   <strong>{latest.quoteRef} · {latest.date}</strong>
   <small>NET {amount(evidence.commercialTotals.net,evidence.quotedCurrency)} · {selectedOfferIds.has(latest.id)?'เลือกใน Working':'รอเลือกใน Working'}</small>
   {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+latest.id)}>07.2 · เปิดใบเสนอราคา</button>}
- </>}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.vendor."+v.id}/><button type="button" onClick={()=>setVendor({...v})}>แก้ไข Vendor</button></td></tr>;})}</tbody></table></div>
+ </>}{!latest&&[...(serviceQuotes.get(v.id)||[])].map(([quoteRef,offerId])=><div key={quoteRef}>
+  <strong>{quoteRef}</strong>
+  {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+offerId)}>07.2 · ดูเรตบริการ</button>}
+ </div>)}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.vendor."+v.id}/><button type="button" onClick={()=>setVendor({...v})}>แก้ไข Vendor</button></td></tr>;})}</tbody></table></div>
  </Module>
  <Module id="bid.vendor.offers" title="07.2 ใบเสนอราคา / ต้นทุนสินค้า / เรตบุคลากร">
  {currentOffers.filter(o=>o.supplierQuoteRow?.classification==="NET_PACKAGE"&&!vendorPagaHistoricalQuote0550(o,latestPaga)).map(o=><p key={o.id}>{o.quoteRef} · ราคาฐานสุทธิ {amount(o.unitCost,o.currency)} · {selectedOfferIds.has(o.id)?"เลือกใน Working แล้ว — ตรวจ scope/ราคาและ Release gates ต่อ":"บันทึกเป็นฉบับใหม่แล้ว / ยังไม่เลือกแทนราคาที่ใช้อยู่"} · รายการย่อยและ Option ไม่บวกในราคาฐานซ้ำ</p>)}
