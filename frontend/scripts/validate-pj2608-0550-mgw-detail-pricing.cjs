@@ -469,6 +469,9 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  const priced=source.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal));
  const pricedIds=new Set(priced.map(o=>o.id));
  const pricedSourceTotal=sum(priced.map(o=>o.quoteEvidence.quotedTotal));
+ const panel=priced.find(o=>o.id.endsWith('LAN-APF-10-03'));
+ const panelDraft=radioSelection.apfLan10PatchPanelDraft0550(panel);
+ assert.deepEqual([panelDraft.quantity,panelDraft.cabinetQuantity,panel.quoteEvidence.quotedQuantity],[16,8,32]);
  assert.equal(priced.length,25);
  assert.equal(source.filter(radioSelection.mgwCurrentIncluded0550).length,2);
  const prepared=prepare(input);validate(prepared);
@@ -480,7 +483,21 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  assert.equal(lanOwners.length,priced.length);
  assert.equal(new Set(lanOwners.map(l=>l.offerId)).size,priced.length);
  assert(lanOwners.every(l=>l.customerRowCode==='A1-01'&&l.systemToken==='TEL-LAN'&&Number.isFinite(l.provisionalCustomerUSD)));
- assert.equal(sum(lanOwners.map(l=>l.provisionalCostNative)),pricedSourceTotal);
+ const workingLanCost=pricedSourceTotal-(panel.quoteEvidence.quotedQuantity-panelDraft.quantity)*panel.unitCost;
+ assert.equal(sum(lanOwners.map(l=>l.provisionalCostNative)),workingLanCost);
+ const panelOwner=withMr.lines.find(l=>l.offerId===panel.id);
+ assert.equal(panelOwner.quantity,16);
+ assert.deepEqual(withMr.offers.find(o=>o.id===panel.id),panel);
+ const previousPanel={...panelOwner,quantity:32,coverageBasis:radioSelection.MGW_BASIS_REVIEW_0550,
+  customerRemark:'Quoted item only. Scope, technical verification and commercial terms remain open.'};
+ const replacePanel=line=>({...withMr,lines:withMr.lines.map(l=>l===panelOwner?line:l)});
+ const upgradedPanel=prepare(replacePanel(previousPanel));
+ assert.deepEqual(upgradedPanel.lines.find(l=>l.id===panelOwner.id),panelOwner);
+ assert.equal(prepare(upgradedPanel),upgradedPanel);
+ const authoredPanel=replacePanel({...previousPanel,quantity:24});
+ assert.equal(prepare(authoredPanel),authoredPanel);
+ const reviewedPanel=replacePanel({...previousPanel,officialReview:{state:'TEST REVIEW'}});
+ assert.equal(prepare(reviewedPanel),reviewedPanel);
  assert(!prepared.lines.some(l=>l.selected&&source.some(o=>o.id===l.offerId&&radioSelection.mgwCurrentIncluded0550(o))));
  assert(!prepared.lines.some(l=>l.selected&&l.offerId.endsWith('LAN-PROJECT-OPT-01')));
  const activeView=volumes.deriveBidVolumes0550(prepared,preparedModel,D.SYSTEMS,radioLotDate);
@@ -525,7 +542,10 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  const groupedMarkup=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:grouped.view}));
  const groupedMr=groupedMarkup.split('data-c1-mr-id="MR-B1-13-APF-09"')[1].split('</tr>')[0];
  assert.match(groupedMr,/1\.3\.9.*109,143\.16/s);
- assert.match(appendix.c1AppendixHtml0550(grouped.view),/1\.3\.10.*232,208\.85/s);
+ const apf10=cabinetRows.find(r=>r.sn==='1.3.10');
+ assert.equal(apf10.amount,228449.69);
+ assert.deepEqual(apf10.quotedComponents.filter(c=>c.quotedQuantity!==undefined).map(c=>[c.quantity,c.quotedQuantity]),[[16,32]]);
+ assert.match(appendix.c1AppendixHtml0550(grouped.view),/1\.3\.10.*228,449\.69/s);
  assert(!appendix.c1AppendixHtml0550(grouped.view).includes('LAN-APF-9-01'));
  console.log('PASS LAN cabinet rows with the private register:',groupedLanRows.map(r=>[r.sn,r.site,r.amount]));
  const {MgwCurrentQuote0550}=require(root+'/project0550/MgwCurrentQuote0550.jsx');
@@ -550,5 +570,5 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  const tag=require(root+'/project0550/data/vendorBidTags0550.js').offerSourceSections0550;
  assert.deepEqual(tag(ap),['A1','C1']);
  assert.deepEqual(tag(prepared.offers.find(o=>o.id.endsWith('LAN-PROJECT-OPT-01'))),['A2']);
- console.log('PASS MGW LAN: 25 A1-01 owners, quote-only C1 by site, exact cost reconciliation, Included/Option excluded, blocked MR recovered and authored costs preserved.',{costUSD:pricedSourceTotal,sellUSD:net.knownAmount});
+ console.log('PASS MGW LAN: 25 A1-01 owners, quote and MR quantities traced, C1 by site, Included/Option excluded, blocked MR recovered and authored costs preserved.',{quotedCostUSD:pricedSourceTotal,workingCostUSD:workingLanCost,sellUSD:net.knownAmount});
 }

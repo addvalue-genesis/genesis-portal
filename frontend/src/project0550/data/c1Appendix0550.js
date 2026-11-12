@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -145,9 +145,12 @@ function lanCabinetDraftGroups(rows,offers,byOwner,ownerUse){
    const entries=bindingsByOffer.get(offer.id)||[];
    if(entries.length!==1)return null;
    const {binding,usdPriced}=entries[0];
+   const patchDraft=apfLan10PatchPanelDraft0550(offer);
+   const quantityMatches=binding.quantity===offer.quoteEvidence.quotedQuantity||
+    patchDraft&&target.quantity===patchDraft.cabinetQuantity&&binding.quantity===patchDraft.quantity;
    return usdPriced&&binding.line.wbs==='A'&&binding.line.systemToken==='TEL-LAN'&&
     binding.line.customerRowCode==='A1-01'&&!ownerUse.has(binding.lineId)&&
-    binding.quantity===offer.quoteEvidence.quotedQuantity&&binding.unit===offer.unit?binding:null;
+    quantityMatches&&binding.unit===offer.unit?binding:null;
   });
   if(!prices.length||prices.some(price=>!price))continue;
   groups.push({target,prices,included});
@@ -239,13 +242,18 @@ export function deriveC1Appendix0550(view,currency='USD'){
   target.quotedComponents=[
    ...prices.map(b=>{
     const offer=b.line.offer,unitOpen=radio&&radioUnitOpen(offer);
-    return {offer,quantity:b.quantity,unit:unitOpen?'':b.unit,unitPrice:unitOpen?null:b.unitPrice,amount:b.amount};
+    const quotedQuantity=offer.quoteEvidence.quotedQuantity;
+    return {offer,quantity:b.quantity,unit:unitOpen?'':b.unit,unitPrice:unitOpen?null:b.unitPrice,amount:b.amount,
+     ...(b.quantity!==quotedQuantity?{quotedQuantity}:{})};
    }),
    ...included.map(offer=>({offer,quantity:offer.quoteEvidence.quotedQuantity,unit:offer.unit,included:true})),
   ].sort((a,b)=>a.offer.id.localeCompare(b.offer.id));
   if(!radio){
    target.note=[target.note,'Quoted LAN equipment · scope review pending'].filter(Boolean).join(' · ');
    target.internalNote='MGW quoted LAN items. MR package scope and interfaces remain open.';
+   if(target.quotedComponents.some(c=>c.quotedQuantity!==undefined)){
+    target.note+=' · CAT6A patch panels priced at MR quantity';
+   }
    problems.push('C1_LAN_MR_SCOPE_OPEN / '+target.key);
   }
   prices.forEach(b=>groupedQuoteOwners.add(b.lineId));

@@ -1,3 +1,5 @@
+Latest APF LAN price correction: [C1 item 1.3.10](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md#13-november--apf-mr-100-patch-panel-basis). Working prices 16 CAT6A patch panels from the MR cabinet BOM at the existing quoted unit rate. Vendor retains the original 32 Sets, and C1 shows the Working and quoted quantities on expansion.
+
 Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). Appendix 1.1 shows priced MGW Offer details on the six source-supported MR rows. Standalone prices with an unresolved MR or site carry a review note. The Radio and Shared subtotals retain the same Working owners.
 
 Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Appendix 1.3 shows complete priced LAN quote groups on the original cabinet rows for APF, ACP, ABV01 and AMS01. Expand a cabinet to see its quoted items. Standalone Draft prices remain visible when the MR row or quoted group needs reconciliation.

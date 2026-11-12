@@ -4,7 +4,7 @@ import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
  MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
- mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
+ apfLan10PatchPanelDraft0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
@@ -15,6 +15,12 @@ const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Obje
 const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
 const formerRadioMappingBlock=id=>id+' / MR Working scope is deselected, covered or missing; reconcile quoted scope';
 const formerLanMappingBlock=mr=>'REQ-'+mr+' / current MGW Offer awaits Working reconciliation';
+const quotedItemNote='Quoted item only. Scope, technical verification and commercial terms remain open.';
+const patchPanelDraftInputs=basis=>({
+ quantity:basis.quantity,
+ coverageBasis:MGW_BASIS_REVIEW_0550+' / '+basis.note,
+ customerRemark:'Draft uses '+basis.quantity+' CAT6A patch panels per MR. Supplier quantity and rate confirmation pending.',
+});
 
 // Each batch is consumed independently. The DTRS package keeps its original
 // definition (and package key); later quotation rows are added as new batches.
@@ -87,6 +93,20 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  let next=decision===receipt.decision?data:{...data,mgwDetailPricingImport:{...receipt,decision}};
  const retired=next.lines.map(line=>line.selected&&mgwHistoricalLine0550(next,line)?{...line,selected:false}:line);
  if(retired.some((line,i)=>line!==next.lines[i]))next={...next,lines:retired};
+ const patchPanel=next.offers.find(apfLan10PatchPanelDraft0550),patchDraft=apfLan10PatchPanelDraft0550(patchPanel);
+ if(patchDraft){
+  // Update the original generated quantity once. Preserve manually amended
+  // quantities, other sources, deselections and reviewed price records.
+  const id='LINE-MGW-CURRENT-'+mgwCurrentItemKey0550(patchPanel);
+  const lines=next.lines.map(line=>line.id===id&&line.scopeKey===id&&line.offerId===patchPanel.id&&
+   line.selected&&line.wbs==='A'&&line.systemToken==='TEL-LAN'&&line.customerRowCode==='A1-01'&&
+   line.vendorId===patchPanel.vendorId&&line.currency===patchPanel.currency&&
+   !line.officialReview&&!line.calculationId&&!line.coveredByLineId&&line.manualCost==null&&line.sellRate==null&&
+   line.quantity===patchPanel.quoteEvidence.quotedQuantity&&line.unit===patchPanel.unit&&
+   line.sourceRef===patchPanel.sourceRef&&line.coverageBasis===MGW_BASIS_REVIEW_0550&&line.customerRemark===quotedItemNote
+   ?{...line,...patchPanelDraftInputs(patchDraft)}:line);
+  if(lines.some((line,i)=>line!==next.lines[i]))next={...next,lines};
+ }
  // Repair the generated owner even if the supplier batch was already applied.
  const radio001=next.offers.find(o=>o.id===MGW_RADIO_DTRS_0550.prefix+'RADIO-001'&&mgwRadioDtrsOffer0550(o));
  if(radio001){
@@ -160,7 +180,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   const sourceRef=offer.sourceRef;
   const customerRemark=radio
    ?MGW_RADIO_DTRS_QUOTED_SCOPE_0550
-   :'Quoted item only. Scope, technical verification and commercial terms remain open.';
+   :quotedItemNote;
   const inputs={...policy,vendorId:offer.vendorId,offerId:offer.id,currency:offer.currency,unit:offer.unit,
    manualCost:null,sellRate:null,brand:offer.brand,sourceRef,customerRemark};
   const bulkMr=mgwBulkMr0550(offer);
@@ -213,7 +233,8 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   lines.push({id,systemToken,wbs:'A',description:radio?offer.description+' — quoted equipment':offer.description,scopeKey:id,tagRef:site||'',
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
-   coverageBasis:MGW_BASIS_REVIEW_0550,...inputs});
+   coverageBasis:MGW_BASIS_REVIEW_0550,...inputs,
+   ...(offer.id===patchPanel?.id?patchPanelDraftInputs(patchDraft):{})});
   if(radio)conflicts.delete(formerRadioMappingBlock(id));
   if(lan&&mr)conflicts.delete(formerLanMappingBlock(mr));
  }

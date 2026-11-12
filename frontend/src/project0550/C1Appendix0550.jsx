@@ -105,7 +105,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
         {!documentMode&&expanded(r.key,true)&&r.quotedComponents?.map(c=><tr className="c1-component" key={c.offer.id} data-c1-quoted-offer={c.offer.id}>
          <td>{mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>
          <td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td>
-         <td>{c.included?'Included by MGW':c.unit?'Included in parent total':'Included in parent total · supplier unit pending'}</td>
+         <td>{c.included?'Included by MGW':c.unit?'Included in parent total':'Included in parent total · supplier unit pending'}
+          {c.quotedQuantity!==undefined&&<div>Working ตาม MR · MGW เสนอ {c.quotedQuantity} {c.unit}</div>}</td>
         </tr>)}
         {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
         {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}

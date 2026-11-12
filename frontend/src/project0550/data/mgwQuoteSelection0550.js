@@ -1,4 +1,5 @@
 import quote from './mgwQuote0550.json';
+import mrCatalog from './mrWorkingCatalog0550.json';
 
 export const MGW_CURRENT_QUOTE_0550 = 'Q26-063 LAN/PBX/FO';
 export const MGW_CURRENT_BATCH_0550 = '0550-MGW-Q26-063-LAN-PBX-FO-20261107';
@@ -186,6 +187,19 @@ export const mgwLanEquipmentOffer0550 = offer => mgwLanPbxFoOffer0550(offer) &&
  /^LAN-(APF|ACP|ABV01|AMS01)-\d+-\d+$/.test(offer.id.slice(MGW_CURRENT_PREFIX_0550.length)) &&
  offer.quoteEvidence.classification==='RATE' && offer.quoteEvidence.systemTokens?.length===1 &&
  offer.quoteEvidence.systemTokens[0]==='TEL-LAN';
+const apfLanCabinet10=mrCatalog.rows.find(row=>row.id==='MR-B1-13-APF-10');
+export function apfLan10PatchPanelDraft0550(offer){
+ if(!mgwLanEquipmentOffer0550(offer)||offer.id!==MGW_CURRENT_PREFIX_0550+'LAN-APF-10-03')return null;
+ const e=offer.quoteEvidence,each=Number(apfLanCabinet10?.components.find(item=>/^UTP Patch Panel \d+ Ea\.$/.test(item))?.match(/\d+/)?.[0]);
+ const quantity=each*apfLanCabinet10?.quantity;
+ if(!Number.isSafeInteger(quantity)||quantity<=0||offer.unit!=='SET'||e.quotedUnit?.toLowerCase()!=='set'||
+  offer.currency!=='USD'||e.quotedCurrency!=='USD'||e.quotedQuantity!==32||
+  !Number.isFinite(e.quotedUnitCost)||offer.unitCost!==e.quotedUnitCost||
+  Math.round(e.quotedUnitCost*e.quotedQuantity*100)!==Math.round(e.quotedTotal*100))return null;
+ return {quantity,cabinetQuantity:apfLanCabinet10.quantity,
+  note:apfLanCabinet10.reference+' · '+each+' UTP patch panels × '+apfLanCabinet10.quantity+' cabinets = '+quantity+
+   ' SET. MGW quoted '+e.quotedQuantity+' SET. Draft uses the quoted unit rate at the MR quantity pending supplier confirmation.'};
+}
 export const mgwMetNdbOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_MET_NDB_0550.prefix) &&
  offer.quoteRef===MGW_MET_NDB_0550.quoteRef && offer.quoteEvidence?.sourceId===MGW_MET_NDB_0550.batchId &&
  offer.quoteEvidence.sourceSha256===MGW_MET_NDB_0550.sha256 &&
