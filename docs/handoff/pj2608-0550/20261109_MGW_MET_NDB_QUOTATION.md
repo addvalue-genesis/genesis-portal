@@ -19,3 +19,9 @@ MET cabinet and central processing, the ACP monitor count and sensor tolerances 
 ADR-0550-001 principles 1–6 and 8–14 apply to the bounded evidence, candidate mapping, cost ownership and dependent drafts. No new module, schema or approval. The controlled issue guard stays HOLD. Consumed receipts preserve prior edits and deletions. Frozen issues are untouched.
 
 The seven real private rows and prior LAN/PBX/FO package passed independent model checks for import, receipt replay, source identity, conflicts with authored cost, draft sell, 10.7, C1 USD/THB, 11.M, technical BOM and native form price separation. Existing Vendor Register, MGW Detail Pricing, Bid Completion, Price Summary, Working Schedules, Native Exhibit, Bid Volumes, Technical Proposal and Release Issue validators passed. Production webpack compiled with an asset-size warning. Owner Windows sync and IndexedDB were not observed.
+
+## 13 November · MGW selected for MET
+
+Use the existing Vaisala packages on MGW Q26-063 MET/NDB p1 for APF and ACP. Each site retains its own A1-14 Working owner and one priced package row in the C1 Appendix 1.3 Working Preview. The interactive table identifies the MGW basis and shows the candidate package reference on the related MR rows. The APF MET Cabinet has no separate quote price or listed coverage. Confirm the cabinet, central processing, ACP display count and interfaces before accepting the MR scope.
+
+ADR-0550-001 principles 2, 3, 5, 6, 8 and 10–13 apply. The private register check exercised two original Offer IDs, receipt replay, A1-14 draft Release, C1 USD/THB parity, the unpriced MR references, React rendering, and the protected issue register. Existing C1 Appendix and controlled Release Issue validators passed. Supplier basis notes appear in the interactive draft. Customer HTML/Word, the issue gate and saved Workspace records retain their existing controls. The owner's Windows workspace has not been observed.

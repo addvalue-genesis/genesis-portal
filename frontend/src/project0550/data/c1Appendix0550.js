@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -166,6 +166,7 @@ function lanCabinetDraftGroups(rows,offers,byOwner,ownerUse){
 }
 
 const radioUnitOpen=offer=>offer.quoteEvidence.quotedUnit==='Not stated'&&!offer.unitBasis?.trim();
+const mgwMetPackage=offer=>mgwMetNdbOffer0550(offer)&&mgwCurrentItemKey0550(offer).startsWith('MET-');
 
 function radioDraftGroups(rows,byOwner,ownerUse){
  const targets=new Map(rows.filter(row=>row.appendix==='1.1'&&acceptsQuotedDraft(row,byOwner)).map(row=>[row.key,row]));
@@ -306,6 +307,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const token=b.line.systemToken,section=directRadio?'1.1':targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
    (!legacy?{ 'TEL-DMR':'1.5','TEL-TELT':'1.1','TEL-PAGA':'1.4' }[token]:undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
+  const metOffer=!legacy&&view.workingPreview&&usdPriced&&token==='TEL-MET'&&mgwMetPackage(b.line.offer)?b.line.offer:null;
   const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
   const itemDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
@@ -320,6 +322,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
+  if(metOffer){
+   item.metOffer=metOffer;
+   item.workingNote=['MGW',metOffer.quoteRef,metOffer.brand].filter(Boolean).join(' · ');
+   item.internalNote=mgwSupplementOpen0550(metOffer,token);
+  }
   if(directRadio){
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+item.key);
    item.pendingRadioPlacement=mgwCurrentMr0550(b.line.offer).length?'รอตรวจการจัดราคาที่แถว MR':'รอยืนยันแถว MR / ไซต์';
@@ -380,7 +387,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];
  for(const group of groups){
-  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':mgwLanEquipmentOffer0550}[group.id];
+  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':offer=>mgwLanEquipmentOffer0550(offer)||mgwMetPackage(offer)}[group.id];
   const bySystem=!legacy&&view.workingPreview&&systemOffer&&
    group.rows.some(r=>r.priceOwners?.some(b=>systemOffer(b.line.offer)));
   let mrNumber=0,packageNumber=0;const systems=new Map();
@@ -410,6 +417,14 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(r.sharedDmrPriceKey)r.note=[r.note,'Shared R11 equipment price shown at item '+byKey.get(r.sharedDmrPriceKey).sn+'.'].filter(Boolean).join(' ');
   const candidates=candidatePackages.get(r.key);
   if(candidates?.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+  if(r.kind!=='MR'||r.mr.systemToken!=='TEL-MET'||r.excluded||Number.isFinite(r.amount)||r.packageKeys?.length)continue;
+  const packages=(candidates||[]).map(k=>byKey.get(k)).filter(p=>p.metOffer&&p.site===r.site);
+  if(packages.length){
+   r.workingNote='อ้างอิงชุด MGW '+packages.map(p=>p.sn).join(', ')+' · รอตรวจขอบเขต MR';
+   r.candidateOfferIds=packages.map(p=>p.metOffer.id);
+  }else if(r.key==='MR-B1-13-APF-14'&&extra.some(p=>p.metOffer&&p.site===r.site)){
+   r.workingNote='ใบเสนอราคาชุด MGW ไม่ระบุ MET Cabinet · รอตรวจขอบเขตและราคา';
+  }
  }
  const pricedBindings=legacy?bindings:[...byOwner.values()].map(entry=>entry.binding);
  const amount=money(pricedBindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));

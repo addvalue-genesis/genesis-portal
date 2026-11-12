@@ -1,3 +1,5 @@
+Latest MET sourcing decision: [MGW Vaisala for APF and ACP](20261109_MGW_MET_NDB_QUOTATION.md#13-november--mgw-selected-for-met). C1 shows the two site packages and their MR references. The APF MET Cabinet remains open for scope and price.
+
 Latest PABX pricing decision: [CHEVALIER APF IP PBX Server](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--apf-ip-pbx-server). The existing A1-04 owner uses the registered Rev.01 item 1.1.1 unit rate for one MR server bundle in 10.2, 10.7 Draft and 11.C1. Rate and second-server scope remain under review.
 
 Latest cabinet procurement decision: [RITTAL from VERSED across the bid](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md#13-november--rittal-cabinet-procurement). QT2611035 prices the 13 LAN racks in the existing Working Draft and original C1 cabinet rows. The other systems' cabinet requirements and price gaps are listed in 07.1.

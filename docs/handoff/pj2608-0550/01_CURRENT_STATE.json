@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261109_MGW_MET_NDB_QUOTATION.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261109_MGW_MET_NDB_QUOTATION.md",
     "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
     "docs/handoff/pj2608-0550/20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md",
     "docs/handoff/pj2608-0550/20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md",
@@ -24,7 +25,6 @@
     "docs/handoff/pj2608-0550/20261109_PAGA_REVISION_BID_CHAIN.md",
     "docs/handoff/pj2608-0550/20261109_MGW_CCTV_ENT_QUOTATION.md",
     "docs/handoff/pj2608-0550/20261109_DRAFT_SCHEDULE_A_C1_C8.md",
-    "docs/handoff/pj2608-0550/20261109_MGW_MET_NDB_QUOTATION.md",
     "docs/handoff/pj2608-0550/20261108_A1_SPARE_PRICING.md",
     "docs/handoff/pj2608-0550/20261108_A1_OTHERS_BREAKDOWN.md",
     "docs/handoff/pj2608-0550/20261108_DMR_WORKING_SECTIONS.md",
