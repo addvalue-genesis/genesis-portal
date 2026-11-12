@@ -1,18 +1,80 @@
 import React from 'react';
 import {amount} from './BidControls';
 import {sumMoney0550} from './data/money0550';
-import {mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
+import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
+import mrCatalog from './data/mrWorkingCatalog0550.json';
 import {
  MGW_CURRENT_BLD_0550, MGW_CURRENT_OPEN_0550, MGW_CURRENT_QUOTE_0550, MGW_MET_NDB_0550, MGW_MET_NDB_OPEN_0550,
  MGW_CCTV_ENT_0550, MGW_CCTV_ENT_SECTIONS_0550, MGW_SECTION_SUBTOTAL_0550,
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
- MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550, mgwRadioDtrsOffer0550,
+ MGW_RADIO_AERO_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
+ MGW_RADIO_MARINE_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
  mgwCctvEntOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
-export function MgwCurrentQuote0550({data,onNavigate,disabled=false}){
- if(!mgwReplacementActive0550(data))return null;
+const radioSourceRows=MGW_QUOTE_0550.rows.filter(row=>row.section==='RADIO');
+const radioSourceMr={
+ ...MGW_RADIO_DTRS_0550.mrMap,
+ ...MGW_RADIO_MARINE_0550.mrMap,
+ ...MGW_RADIO_SSB_0550.mrMap,
+ ...MGW_RADIO_AERO_0550.mrMap,
+ 'RADIO-004':['MR-B1-11-ACP-05'],
+ 'RADIO-005':['MR-B1-11-ACP-04'],
+};
+const radioMrById=new Map(mrCatalog.rows.filter(row=>row.id.startsWith('MR-B1-11-')).map(row=>[row.id,row]));
+const radioMrSource=radioMrById.get('MR-B1-11-APF-01')?.componentReview?.sources.find(source=>source.label.includes('Rev.B1'));
+const radioUnpriced={
+ 'RADIO-005':{
+  separator:'\nLocation: APM\nVHF DMR Radio System GTPL\n',
+  title:'VHF DMR Radio System · GTPL relocation', sourceSite:'APM', site:'ติดตั้งที่ APF ตามหมายเหตุผู้เสนอ', price:'—',
+ },
+ 'RADIO-009':{
+  separator:'\nVHF DMR Radio System Accessaries MOTOROLA\n',
+  title:'VHF DMR Radio System Accessories · Motorola Option', sourceSite:'APF', site:'APF', price:'TBD',
+ },
+};
+
+function MgwRadioSource0550(){
+ const currency=MGW_QUOTE_0550.currency;
+ const total=sumMoney0550(radioSourceRows.map(row=>row.extended));
+ return <details className="p55-vnd-quote">
+  <summary>Radio System · {MGW_QUOTE_0550.quoteRef} · {radioSourceRows.length} รายการมีราคา · {amount(total,currency)} {currency}</summary>
+  <p><a href={MGW_QUOTE_0550.sourceUrl} target="_blank" rel="noreferrer">ใบเสนอราคา MGW หน้า 9–12</a>
+   {radioMrSource&&<> · <a href={radioMrSource.url} target="_blank" rel="noreferrer">CUS MR Rev.B1 Appendix 1.1</a></>}</p>
+  <p>RADIO-004 ตรงกับ ACP Radio Console 1 Pc · RADIO-005 ตรงกับ ACP Antenna Cable 700 m ตาม CUS</p>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="Original MGW Radio System quotation breakdown">
+   <thead><tr><th>หน้า / รายการ</th><th>ไซต์อ้างอิง</th><th>Location ในใบเสนอราคา</th><th>จำนวนตามใบ</th><th>USD / หน่วย</th><th>รวม USD</th></tr></thead>
+   <tbody>{radioSourceRows.map(row=>{
+    const item=row.id.replace('MGW-Q26-063-','');
+    const mr=radioMrById.get(radioSourceMr[item]?.[0]);
+    const site=mr?.site||(item==='RADIO-016'?'AMS01':row.site==='APF'?row.site:'รอยืนยัน');
+    const extra=radioUnpriced[item];
+    const continuation=MGW_QUOTE_0550.radioDetailContinuations[item];
+    const [rawDetail,unpricedDetail]=extra?row.detail.split(extra.separator):[row.detail];
+    const detail=continuation?rawDetail.replace(continuation.anchor,continuation.text):rawDetail;
+    return <React.Fragment key={row.id}>
+     <tr>
+      <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
+       <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details></td>
+      <td>{site}{mr&&<small>{mr.id}</small>}{item==='RADIO-016'&&<small>ตามบันทึกไซต์เดิม</small>}</td>
+      <td>{row.site}</td><td>{row.quantity} {row.sourceUnit||'· หน่วยไม่ระบุ'}</td>
+      <td>{amount(row.unitCost,currency)}</td><td>{amount(row.extended,currency)}</td>
+     </tr>
+     {unpricedDetail&&<tr>
+      <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
+       <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details></td>
+      <td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
+     </tr>}
+    </React.Fragment>;
+   })}</tbody>
+   <tfoot><tr><th colSpan={5}>รวมตามใบเสนอราคา Radio</th><td>{amount(total,currency)}</td></tr></tfoot>
+  </table></div>
+ </details>;
+}
+
+export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSource=false}){
+ if(!mgwReplacementActive0550(data))return showRadioSource?<MgwRadioSource0550/>:null;
  const offers=data.offers.filter(mgwLanPbxFoOffer0550);
  const quote=offers[0]?.quoteEvidence;
  const metNdb=data.offers.filter(mgwMetNdbOffer0550);
@@ -42,6 +104,7 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false}){
   <p>{MGW_CCTV_ENT_0550.quoteRef} · {MGW_CCTV_ENT_0550.revision} · {cctvEntQuote?cctvEnt.length+' รายการในทะเบียน · Equipment Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_BULK_0550.quoteRef} · {bulk.length?`${bulkPriced.length}/${bulk.length} รายการมีราคา · USD ${amount(sumMoney0550(bulkPriced.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · Supply / Draft`:'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_RADIO_DTRS_0550.quoteRef} · {radio.length?radio.length+' Offer records · '+radioWorking.length+' Working owners · Supply / Draft':'รอข้อมูลใบเสนอราคา'}</p>
+  {showRadioSource&&<MgwRadioSource0550/>}
   {cctvEntQuote&&sections.map(section=><p key={section.system}><strong>{section.label}</strong> · {section.rows.length}/{section.count} รายการ · {Number.isFinite(section.total)?'รวมรายบรรทัด USD '+amount(section.total,'USD'):'ตรวจความครบของราคา'} · ยอดที่พิมพ์ในใบ USD {amount(section.printed,'USD')}{section.delta?' · ส่วนต่าง USD '+amount(section.delta,'USD'):''}</p>)}
   <p>รอราคาสำหรับ {cctvEntQuote?'':'CCTV, Entertainment, '}{radio.length?'':'DTRS, '}Marine/Aero/SSB Radio, {bulk.length?'วัสดุ Bulk ที่ยังไม่มีราคา':'สายและวัสดุ FO/CAT6A'} และงานบริการที่ต้องจัดหาเพิ่ม</p>
   {option&&<p>Wi-Fi Coverage Study · Option {amount(option.quoteEvidence.quotedTotal,'USD')} USD แยกจาก Base</p>}

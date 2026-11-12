@@ -14,6 +14,23 @@
   "sourceName": "Q26-063 Samtel_ASK Onshore_ver1.0.pdf",
   "sourceSha256": "6d11565391a0ca5760cdcc76e9f12e191de44004d59dd7865ae8237b1f2b2a31",
   "pages": 26,
+  "radioDetailContinuations": {
+    "RADIO-003": {
+      "page": 10,
+      "anchor": "~ 1 x Lightning protect device for Antenna",
+      "text": "~ 1 x 6m 12 POL CAN cable (CU-TU)\n~ 1 x Handset SAILOR 6201\n~ 1 x SAILOR 6368 MF/HF 250W Transceiver Unit DSC Class A\n~ 1 x SAILOR 6384 Antenna Tuning Unit\n~ 1 x 8m MF/HF Antenna with install kit HF8000\n~ 1 x Lightning protect device for Antenna"
+    },
+    "RADIO-010": {
+      "page": 11,
+      "anchor": "SAILOR SP3530\n- Charger",
+      "text": "~ 12 x SAILOR SP3530 Portable VHF ATEX, including:\n- Transceiver\n- Belt Clip\n- Lanyard\n- Li-ion rechargeable battery\n- Charger"
+    },
+    "RADIO-017": {
+      "page": 12,
+      "anchor": "Sailor 6210\n- Mounting bracket",
+      "text": "~ 2 x VHF-FM Marine Radio Fixed, including:\n- Transceiver Unit (SAILOR 6210 VHF)\n- SAILOR 6202 Hand Microphone with spiral cable\n- User and installation manual\n- Installation guide\n- Mounting bracket"
+    }
+  },
   "coverEquipmentTotal": 2220345,
   "coverServiceTotal": 255500,
   "coverOverallTotal": 2475845,

@@ -1,6 +1,6 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
-import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550,mgwReplacementActive0550} from "./data/mgwQuoteSelection0550";
+import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
 import React,{useEffect,useMemo,useState} from 'react';
@@ -67,8 +67,8 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
  const selectedR11=ceragonR11Selected0550(data);
  const archived=selectedR11&&data.offers.find(o=>o.id===CERAGON_R10_0550);
  const archivedKey=archived?'bid.vendor.offer.'+archived.id:null;
- const mgwVendorId=mgwReplacementActive0550(data) && (data.offers.find(mgwCurrentOffer0550)?.vendorId ||
-  data.vendors.find(v=>v.id==='VENDOR-MGW-0550')?.id || data.offers.find(o=>mgwHistoricalOffer0550(data,o))?.vendorId);
+ const mgwVendorId=data.offers.find(mgwCurrentOffer0550)?.vendorId ||
+  data.vendors.find(v=>v.id==='VENDOR-MGW-0550')?.id || data.offers.find(o=>mgwHistoricalOffer0550(data,o))?.vendorId;
  const supplementalVendorIds=[...new Set([archived?.vendorId,mgwVendorId].filter(Boolean))];
  const groups=mode==='company'?[...quoteGroups,...supplementalVendorIds.filter(id=>!quoteGroups.some(g=>g.key===id))
   .map(id=>({key:id,title:data.vendors.find(v=>v.id===id)?.name||id,children:[],offerIds:new Set()}))]
@@ -161,7 +161,7 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   </div>
   <p>แต่ละ Offer อยู่ในกลุ่มเดียวตามขอบเขตต้นฉบับ · งานหลายระบบอยู่ในกลุ่มงานร่วม · แยก Base, Option และรายการอ้างอิง · ระบบที่ใช้ Offer ใน Mapping / Working ดูได้ในแต่ละแถว</p>
   {mode==='system'&&<>
-   <MgwCurrentQuote0550 data={data}/>
+   <MgwCurrentQuote0550 data={data} showRadioSource/>
    <PagaQuoteScope0550 data={data} section="vendor" onNavigate={onNavigate}/>
    {renderFullQuotes(fullQuotes)}
    <SupplierTowerBom0550 data={data} onNavigate={onNavigate}/>
@@ -170,7 +170,7 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
    <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs{mode==='company'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+g.key}/></>}</summary>
    {mode==='company'&&<>
-    {g.key===mgwVendorId&&<MgwCurrentQuote0550 data={data}/>}
+    {g.key===mgwVendorId&&<MgwCurrentQuote0550 data={data} showRadioSource/>}
     {g.key==='LEGACY-VENDOR-INDUSTRONIC'&&<PagaQuoteScope0550 data={data} section="vendor" onNavigate={onNavigate}/>}
     {renderFullQuotes(fullQuotes.filter(q=>q.entries[0].offer.vendorId===g.key))}
     {g.key===archived?.vendorId&&archivedR10}
