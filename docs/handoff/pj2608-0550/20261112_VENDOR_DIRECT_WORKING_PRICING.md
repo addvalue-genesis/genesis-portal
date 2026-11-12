@@ -20,3 +20,11 @@ The change follows ADR-0550-001 principles 2, 5 and 8–11. The ALIE regression 
 - The ALIE regression checks live Offer repricing, E11 and E13, duplicate and included-row protection, OPEN service workload, Base/Option routing and source-tagged Schedule preview. The private -005 register checks the actual NET owner, its included kit, 50% ADDVALUE and 20% SAMTEL in the fixture and duplicate NET suppression. No private source file is tracked in Git.
 - Working Schedules, Bid Volumes, Bid Completion, Supplier Revision and controlled Release Issue validators passed. Development and production webpack compiled. Chromium launch is blocked by the execution environment's socket permissions, so browser interaction and the owner's Windows IndexedDB remain unverified.
 - The parent repository-basis fixture expects 117 registered Offers and finds 116. The MGW detail validator on the parent also stops while checking a RADIO component inside a nested HTML table.
+
+## 13 November · APF IP PBX Server
+
+The existing APF MR 9.0 Working owner for A1-04 takes one Dell R660 server bundle at the registered CHEVALIER CITT-QT-392-2026 Rev.01 item 1.1.1 unit rate. The two-bundle Offer and package-level discount remain in 07.2. Working uses the MR quantity and the existing Goods selling basis. The draft still needs supplier confirmation of the one-bundle rate and SI review of the second server's role and placement.
+
+The automatic 07.2 load and manual Vendor registration both use this source when the generated Working owner is eligible. 10.7 Draft and 11.C1 item 1.3.P1 use the same owner and price. The quoted NET package and the allocated server bundle cannot both charge the same source. The old MGW Offer remains traceable. Authored costs, reviewed allocations, and frozen issues retain their existing records.
+
+ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply. The private CHEVALIER register test checks the MR and prior MGW paths, source quantity, repeated preparation, A1-04 Release and C1 price parity, competing NET, and protected Working and Schedule records. The Windows workspace must load the prepared CHEVALIER Vendor register through the existing source intake. Its saved state has not been observed.

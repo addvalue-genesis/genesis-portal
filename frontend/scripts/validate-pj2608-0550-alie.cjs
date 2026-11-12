@@ -188,6 +188,73 @@ if(process.env.GENESIS_ALIE_TEST_PAGA005){
   line.problems.some(problem=>problem.startsWith('PAGA_NET_COST_OWNER_DUPLICATE'))&&line.provisionalCustomerUSD===null));
  console.log('PASS private INDUSTRONIC -005 register: one discounted NET owner, E11 +25%, E13 +20%, and correct included C2 kit.');
 }
+if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
+ const {importMrWorkingBasis0550}=require(root+'/project0550/data/mrWorkingBasis0550.js');
+ const {APF_PBX_MR_0550,chevalierApfPbxOffer0550}=require(root+'/project0550/data/vendorOfferLocation0550.js');
+ const {prepareChevalierPbxWorking0550}=require(root+'/project0550/data/chevalierPbxWorking0550.js');
+ const {prepareMgwCurrentWorking0550}=require(root+'/project0550/data/mgwCurrentWorking0550.js');
+ const {MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_SOURCE_HASH_0550}=
+  require(root+'/project0550/data/mgwQuoteSelection0550.js');
+ const {blankScheduleBinding0550,deriveBidVolumes0550,emptyBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
+ const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {roundMoney0550}=require(root+'/project0550/data/money0550.js');
+ const allSystems=SYSTEMS.map(s=>s.token),ownerId='REQ-'+APF_PBX_MR_0550;
+ const original=JSON.parse(fs.readFileSync(process.env.GENESIS_ALIE_TEST_CHEVALIER,'utf8'));
+ const fx={thbPerUSD:31.5,thbPerEUR:36,source:'QA fixture FX',date};
+ const base=importMrWorkingBasis0550({...empty,fx},COMMERCIAL_POLICY,date);
+ const ingest=data=>planVendorRegister0550(data,original,allSystems).workspace;
+ const actual=ingest(base),offer=actual.offers.find(chevalierApfPbxOffer0550);
+ assert.equal(offer.supplierQuoteRow.quantity,2);
+ const prepare=data=>prepareChevalierPbxWorking0550(data,date);
+ const getOwner=data=>data.lines.find(line=>line.id===ownerId);
+ assert.equal(getOwner(prepare(actual)).offerId,offer.id);
+
+ const prior={...offer,id:MGW_CURRENT_PREFIX_0550+'PABX-APF-9-01',quoteRef:MGW_CURRENT_QUOTE_0550,
+  vendorId:'QA-MGW',currency:'USD',unitCost:1000,brand:'Avaya',sourceRef:'QA / MGW APF PABX',
+  quoteEvidence:{...offer.quoteEvidence,sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,
+   quotedQuantity:1,quotedUnit:'U',quotedUnitCost:1000,quotedCurrency:'USD',quotedTotal:1000}};
+ delete prior.supplierQuoteRow;
+ delete prior.atomicLines;
+ const mgw=prepareMgwCurrentWorking0550({...base,offers:[prior],
+  vendors:[{id:prior.vendorId,name:'QA MGW',kind:'SUPPLIER',reference:'QA fixture'}],
+  mgwDetailPricingImport:{decision:'',conflicts:[]},supplierRevisionImports:[{batchId:MGW_CURRENT_BATCH_0550}]},
+  COMMERCIAL_POLICY,date);
+ const oldOwner=getOwner(mgw);
+ assert.equal(oldOwner.offerId,prior.id);
+ const binding={...blankScheduleBinding0550(ownerId),basis:'SI DRAFT / QA',locator:oldOwner.requirementRef+' / '+oldOwner.sourceRef};
+ const input={...mgw,bidVolumes:{...emptyBidVolumes0550(),bindings:[binding]}};
+ const registered=ingest({...input,mgwDetailPricingImport:undefined,supplierRevisionImports:[]});
+ const selected=prepare({...input,vendors:registered.vendors,offers:registered.offers});
+ assert.equal(prepare(selected),selected);
+ const owner=getOwner(selected);
+ assert.deepEqual([owner.offerId,owner.quantity,owner.tagRef,owner.coveredByLineId],[offer.id,1,'APF','']);
+ assert(selected.bidVolumes.bindings[0].locator.includes(offer.sourceRef));
+ assert(selected.offers.includes(prior));
+ const model=deriveBidWorkspace(selected,allSystems,date);
+ const expected=roundMoney0550(roundMoney0550(offer.unitCost/0.95*1.2)/31.5);
+ assert.equal(model.lines.find(line=>line.id===ownerId).provisionalCostNative,offer.unitCost);
+ assert.equal(model.provisional.schedule.find(row=>row.code==='A1-04').children.find(row=>row.id===ownerId).customerUSD,expected);
+ assert.equal(model.official.lines.find(line=>line.id===ownerId).customerUSD,null);
+ const view=deriveBidVolumeWorkingPreview0550(selected,model,SYSTEMS,date,deriveBidVolumes0550(selected,model,SYSTEMS,date));
+ const c1=deriveC1Appendix0550({...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550});
+ const charges=c1.rows.filter(row=>row.priceOwners?.some(price=>price.lineId===ownerId));
+ assert.deepEqual(charges.map(row=>[row.sn,row.site,row.quantity,row.amount]),[['1.3.P1','APF',1,expected]]);
+
+ const edit=line=>({...selected,lines:selected.lines.map(current=>current===owner?line:current)});
+ assert.equal(deriveBidWorkspace(edit({...owner,quantity:2}),allSystems,date).lines.find(line=>line.id===ownerId).costRate,null);
+ const net=selected.offers.find(candidate=>candidate.id===offer.supplierQuoteRow.parentOfferId);
+ const withNet=data=>({...data,lines:[...data.lines,{...owner,id:'QA-PBX-NET',scopeKey:'QA.PBX.NET',
+  offerId:net.id,mrRequirementId:undefined,unit:net.unit}]});
+ assert.equal(deriveBidWorkspace(withNet(selected),allSystems,date).lines.find(line=>line.id===ownerId).costRate,null);
+ const previous={...selected,lines:input.lines,bidVolumes:input.bidVolumes};
+ const reviewed={...previous,bidVolumes:{...previous.bidVolumes,bindings:[{...binding,status:'REVIEWED'}]}};
+ assert.equal(prepare(reviewed),reviewed);
+ const competing=withNet(previous);
+ assert.equal(prepare(competing),competing);
+ const authored={...previous,lines:previous.lines.map(line=>line===oldOwner?{...line,manualCost:1}:line)};
+ assert.equal(prepare(authored),authored);
+ console.log('PASS private CHEVALIER register: one APF R660 in Working, draft Release and C1, with NET and reviewed-owner protection.');
+}
 if(process.env.GENESIS_ALIE_TEST_LAYOUT){
  const actual=parseQuotedTable(fs.readFileSync(process.env.GENESIS_ALIE_TEST_LAYOUT,'utf8'));
  assert(actual?.rows.length>0,'Supplied private layout must reconcile');

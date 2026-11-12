@@ -26,6 +26,8 @@ import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
 import {validateBidVolumes0550} from "./bidVolumes0550";
 import {validateBidPunchPlans} from "../../common/governance/bidPunch";
 import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
+import {chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
+import {chevalierPbxCostConflict0550} from './chevalierPbxWorking0550';
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
@@ -124,7 +126,18 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(l.vendorId&&!data.vendors.some(v=>v.id===l.vendorId))problems.push("Vendor missing");
   if(l.offerId){
    if(!offer)problems.push("Selected offer missing");
-   else {currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;if(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE"){costRate=null;problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the net package owner; options require separate allocation review");}problems.push(...mgwOfferProblems0550(offer,l));
+   else {
+    currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;
+    if(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE"){
+     if(!chevalierApfPbxOwner0550(l,offer)){
+      costRate=null;
+      problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the net package owner; options require separate allocation review");
+     }else if(selected&&chevalierPbxCostConflict0550(data,l,offer)){
+      costRate=null;
+      problems.push("SUPPLIER_ROW_COST_OWNER_DUPLICATE: APF PBX server or its parent package already has an owner");
+     }
+    }
+    problems.push(...mgwOfferProblems0550(offer,l));
     if(mgwCurrentOffer0550(offer)&&selected){
      if(mgwCurrentIncluded0550(offer)||offer.quoteEvidence.classification==='OPTION')problems.push('MGW_QUOTE_NON_ADDITIVE_OR_OPTION');
      if(data.lines.some(other=>other.id!==l.id&&other.selected&&!other.coveredByLineId&&other.offerId===offer.id))problems.push('MGW_SOURCE_COST_OWNER_DUPLICATE / '+offer.id);

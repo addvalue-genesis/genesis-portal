@@ -12,6 +12,7 @@ import {mrLineScope0550} from './mrWorkingBasis0550';
 import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
 import {versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
+import {chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
 export const C1_APPENDIX_LAYOUT_0550='mr-appendix.v2';
@@ -294,7 +295,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
   const unitOpen=directRadio&&radioUnitOpen(b.line.offer);
-  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
+  const site=targets.length?unique(targets.map(t=>t.site)).join(' / '):
+   mgwCurrentOffer0550(b.line.offer)||chevalierApfPbxOwner0550(b.line,b.line.offer)?b.line.tagRef:'PROJECT';
+  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site,
    description:itemDescription,quantity:b.quantity,unit:unitOpen?'':b.unit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),

@@ -1,4 +1,5 @@
 import {mgwCurrentRequirementTrace0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {APF_PBX_MR_0550,chevalierApfPbxOwner0550} from './vendorOfferLocation0550';
 import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {validateTagBindings0550,tagBindingProblems0550} from './tagEvidence0550';
 import {validCabinetTag0550} from './cabinetTag0550';
@@ -212,11 +213,14 @@ export function deriveIntegration0550(data,systems,today){
   const findings=(data.sourceIntake?.findings||[]).filter(f=>f.state!=="SOURCE_SUPPORTED"&&f.sourceIds.some(id=>r.sourceIds.includes(id))&&(f.systemTokens.includes(r.systemToken)||f.systemTokens.length===0));
   if(findings.length)problems.push(...findings.map(f=>"SOURCE_FINDING / "+f.id));
   const currentMgw=mgwCurrentRequirementTrace0550(data,r.id);
-  const currentMgwIds=currentMgw.map(o=>o.id);
-  const trace=currentMgw.length?{
-   offerIds:[...new Set([...r.offerIds.filter(id=>!mgwHistoricalOffer0550(data,data.offers.find(o=>o.id===id))),...currentMgwIds])],
-   workLineIds:[...new Set([...r.workLineIds,...data.lines.filter(l=>l.selected&&currentMgwIds.includes(l.offerId)).map(l=>l.id)])],
-   supplierLocator:currentMgw.map(o=>o.quoteEvidence.locator).join(' / '),
+  const selectedPbx=r.id==='REQDEF-'+APF_PBX_MR_0550?data.offers.find(offer=>
+   data.lines.some(line=>line.selected&&line.offerId===offer.id&&chevalierApfPbxOwner0550(line,offer))):null;
+  const current=selectedPbx?[selectedPbx,...currentMgw]:currentMgw;
+  const currentIds=current.map(o=>o.id);
+  const trace=current.length?{
+   offerIds:[...new Set([...r.offerIds.filter(id=>!mgwHistoricalOffer0550(data,data.offers.find(o=>o.id===id))),...currentIds])],
+   workLineIds:[...new Set([...r.workLineIds,...data.lines.filter(l=>l.selected&&currentIds.includes(l.offerId)).map(l=>l.id)])],
+   supplierLocator:selectedPbx?.quoteEvidence.locator||currentMgw.map(o=>o.quoteEvidence.locator).join(' / '),
   }:{};
   return {...r,...trace,...(dmrChecks.length?{dmrChecks}:{}),proofs:relatedProofs,activities:relatedActivities,particulars:relatedParticulars,problems:[...new Set(problems)],state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):r.disposition==="NOT_APPLICABLE"?"NOT_APPLICABLE":"REVIEWED_MAPPING"};
  });

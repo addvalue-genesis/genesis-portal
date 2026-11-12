@@ -8,11 +8,11 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
     "docs/handoff/pj2608-0550/20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md",
     "docs/handoff/pj2608-0550/20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md",
-    "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
     "docs/handoff/pj2608-0550/20261112_ALIE_GENESIS_INTAKE.md",
     "docs/handoff/pj2608-0550/20261112_PAGA_ALIE_R2.md",
     "docs/handoff/pj2608-0550/20261112_INDUSTRONIC_005_VENDOR_REGISTER.md",
