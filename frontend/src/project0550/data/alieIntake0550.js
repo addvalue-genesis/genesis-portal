@@ -1,4 +1,4 @@
-import {ALIE_CLASSES_0550,atomicQuoteItem0550,atomicRoute0550} from './atomicLines0550';
+import {ALIE_CLASSES_0550,atomicQuoteItem0550,atomicQuoteRef0550,atomicRoute0550,atomicTreatment0550} from './atomicLines0550';
 import {VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {safeSourceUrl} from './sourceIntakeModel';
@@ -45,11 +45,9 @@ export function defaultAlieRoute0550(offer){
 function atom0550(offer,{lineClass,system,sourceNote,partNumber,quotedItem,vendorCode,unresolvedBreakdown}){
  const evidence=offer.quoteEvidence;
  if(!ALIE_CLASSES_0550.includes(lineClass)||!evidence.systemTokens.includes(system))throw Error('Select LINE_CLASS and system for '+offer.id);
- const row=offer.supplierQuoteRow;
- const treatment=row?.classification==='INCLUDED_REFERENCE'?'REFERENCE':
-  row?.classification==='OPTION'||evidence.classification==='OPTION'?'OPTION':'BASE';
+ const treatment=atomicTreatment0550(offer);
  const item=atomicQuoteItem0550(offer)||quotedItem||normalized(offer.id);
- const line_id=[vendorCode,offer.quoteRef,item].join('|');
+ const line_id=[vendorCode,atomicQuoteRef0550(offer.quoteRef),item].join('|');
  const rawUnit=evidence.quotedUnit;
  const uom=lineClass.startsWith('SERVICE_')?serviceUnit(rawUnit):rawUnit;
  if(!uom)throw Error('Service unit requires a documented person-day, round-trip or lot basis / '+offer.id);
@@ -189,7 +187,7 @@ export function alieRegisterFromJson0550(data,input,today){
   if(exact&&inSources(exact))return exact;
   const root=byLine.get(atom.parent_line_id)||atom;
   const [,quoteRef,item]=root.line_id.split('|');
-  const matches=data.offers.filter(offer=>offer.quoteRef===quoteRef&&quoteRef===meta.source_offer&&inSources(offer)&&
+  const matches=data.offers.filter(offer=>offer.quoteRef===meta.source_offer&&atomicQuoteRef0550(offer.quoteRef)===quoteRef&&inSources(offer)&&
    (atomicQuoteItem0550(offer)===item||offer.id.endsWith('-'+item))&&root.prov?.src.includes(offer.quoteEvidence.locator));
   return single(matches);
  };

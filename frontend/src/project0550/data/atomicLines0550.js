@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import {mgwCurrentIncluded0550} from './mgwQuoteSelection0550';
 
 const routes={
  EQUIP:'A1',SPARE_PRECOM:'C2',TOOL:'C5',SERVICE_SITE:'C7',SERVICE_TRAIN:'C7',
@@ -13,6 +14,12 @@ export function atomicQuoteItem0550(offer){
  const row=offer.supplierQuoteRow;
  const option=row?.classification==='OPTION'&&offer.id.match(/-OPT-([A-Z0-9.-]+)$/);
  return option?'OPT-'+option[1]:row?.itemCode;
+}
+export const atomicQuoteRef0550=quoteRef=>quoteRef.toUpperCase().replace(/[^A-Z0-9.-]+/g,'-').replace(/^-+|-+$/g,'');
+export function atomicTreatment0550(offer){
+ const classification=offer.supplierQuoteRow?.classification;
+ if(classification==='INCLUDED_REFERENCE'||mgwCurrentIncluded0550(offer))return 'REFERENCE';
+ return classification==='OPTION'||offer.quoteEvidence?.classification==='OPTION'?'OPTION':'BASE';
 }
 const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
 const idPattern=/^[A-Z0-9-]+\|[A-Z0-9.-]+\|[A-Z0-9.-]+$/;
@@ -32,7 +39,7 @@ export function validateOfferAtomicLines0550(offer){
  const ids=new Set();
  for(const line of lines){
   if(!fields(line,['line_id','anchor','route','part','qty','cost','customer','internal','prov','parent_line_id'])||
-   !idPattern.test(line.line_id)||line.line_id.split('|')[1]!==offer.quoteRef||
+   !idPattern.test(line.line_id)||line.line_id.split('|')[1]!==atomicQuoteRef0550(offer.quoteRef)||
    ids.has(line.line_id))fail('invalid or duplicate atom identity');
   ids.add(line.line_id);
   const {anchor,route,part,qty,cost,customer,internal,prov,parent_line_id:parent}=line;
@@ -64,8 +71,7 @@ export function validateOfferAtomicLines0550(offer){
  const root=lines[0];
  const quoteItem=offer.supplierQuoteRow?.itemCode;
  const classification=offer.supplierQuoteRow?.classification;
- const treatment=classification==='INCLUDED_REFERENCE'?'REFERENCE':
-  classification==='OPTION'||evidence.classification==='OPTION'?'OPTION':'BASE';
+ const treatment=atomicTreatment0550(offer);
  const atomItem=root.line_id.split('|')[2];
  const exactItem=!quoteItem||atomItem===quoteItem;
  const optionItem=classification==='OPTION'&&atomItem===atomicQuoteItem0550(offer);
