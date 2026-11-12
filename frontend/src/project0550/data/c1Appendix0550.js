@@ -58,7 +58,12 @@ export function c1SystemLabel0550(r){
  if(appendix(r)==='3'&&/Access Point/i.test(r.description))return 'Wireless LAN';
  return systemNames[r.systemToken]||r.systemToken||'Equipment';
 }
-const customerRemark=(line,legacy)=>!legacy&&line.mgwDetailGroupId&&line.customerRemark===mgwDetailCustomerRemark0550(line.mgwDetailGroupId)?'':line.customerRemark||'';
+const customerRemark=(line,legacy)=>{
+ const remark=(line.customerRemark||'').trim();
+ if(!legacy&&(remark===MGW_RADIO_DTRS_QUOTED_SCOPE_0550||
+  (line.mgwDetailGroupId&&remark===mgwDetailCustomerRemark0550(line.mgwDetailGroupId))))return '';
+ return legacy?line.customerRemark||'':remark;
+};
 export function c1Component0550(text){
  const source=String(text).replace(/^-\s*/,''),m=source.match(/\b(\d+)\s*(Ea\.?|Sets?\.?)(?=\s|$)/i);
  return m?{description:(source.slice(0,m.index)+source.slice(m.index+m[0].length)).trim(),quantity:Number(m[1]),unit:m[2],source}:{description:source,quantity:null,unit:'',source};
@@ -210,14 +215,19 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of rows){
   const owned=r.priceOwners||[];
   if(r.provisionalRadio){
-   const priced=owned.map(b=>b.amount).filter(Number.isFinite);
-   r.amount=money(priced);
-   const remarks=owned.filter(b=>mgwRadioDtrsOffer0550(b.line.offer)).map(b=>customerRemark(b.line,legacy).trim());
-   r.note=unique([r.note,MGW_RADIO_DTRS_QUOTED_SCOPE_0550,...remarks].filter(Boolean)).join(' · ');
+   r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
+   r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
+   r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
-  }else if(owned.length){r.amount=money(owned.map(b=>b.amount));const check=displayPriceCheck0550(r.amount,r.quantity);r.unitPrice=check.matches?check.unitPrice:null;if(Number.isFinite(r.amount)&&!check.matches)problems.push('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+r.key);}
+  }else if(owned.length)r.amount=money(owned.map(b=>b.amount));
+  if(Number.isFinite(r.amount)){
+   const check=displayPriceCheck0550(r.amount,r.quantity);
+   // Keep the Working extension and report any rounding difference separately.
+   r.unitPrice=legacy&&!check.matches?null:check.unitPrice;
+   if(!check.matches)problems.push('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+r.key);
+  }
   if(!legacy&&view.workingPreview&&!r.excluded&&/^MR-B1-18-APF-(19|20)$/.test(r.key)&&r.raw&&!r.raw.offerId&&!Number.isFinite(r.amount)){
-   r.note=[r.note,'Cable supplier quote pending',r.quantity>0?'':'Cable length to be confirmed'].filter(Boolean).join(' · ');
+   r.internalNote=['Cable supplier quote pending',r.quantity>0?'':'Cable length to be confirmed'].filter(Boolean).join(' · ');
   }
   r.priceOwners=owned;
  }
@@ -245,7 +255,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
  for(const r of displayRows){
   const candidates=candidatePackages.get(r.key);
-  if(candidates?.length&&!r.excluded)r.note=[r.note,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+  if(candidates?.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
  }
  const pricedBindings=legacy?bindings:[...byOwner.values()].map(entry=>entry.binding);
  const amount=money(pricedBindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));

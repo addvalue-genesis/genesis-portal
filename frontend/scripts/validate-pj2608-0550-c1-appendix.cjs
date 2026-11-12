@@ -15,6 +15,17 @@ const binding=(line,amount=1234.56)=>({lineId:line.id,line,quantity:line.quantit
 const view=make(data,[binding(lan)]),before=JSON.stringify(data),p=C.deriveC1Appendix0550(view);
 assert.equal(p.groups.length,8);assert.equal(p.rows.filter(r=>r.kind==='MR').length,179);assert.equal(p.problems.length,0,p.problems.join('\n'));assert.equal(p.amount,1234.56);
 const row=p.rows.find(r=>r.key==='MR-B1-13-APF-09');assert.equal(row.amount,1234.56);assert.equal(row.components.length,8);assert(row.ownerIds.includes(id));assert.equal(row.components.find(c=>c.description.includes('Core Switch')).quantity,2);
+const marineData=structuredClone(data);
+const marine=marineData.lines.find(l=>l.id==='REQ-MR-B1-11-APF-02');
+Object.assign(marine,{selected:true,responsibility:'TSI',quantity:3,unit:'Lot',customerRemark:'Marine radio supply'});
+const marineView=amount=>make(marineData,[binding(lan),{...binding(marine,amount),unitPrice:amount===null?null:33.33}]);
+const marinePrice=C.deriveC1Appendix0550(marineView(100));
+const marineRow=projection=>projection.rows.find(r=>r.key===marine.mrRequirementId);
+assert.deepEqual([marineRow(marinePrice).sn,marineRow(marinePrice).unitPrice,marineRow(marinePrice).amount,marineRow(marinePrice).note],['1.1.2',33.33,100,'Marine radio supply']);
+assert(marinePrice.problems.includes('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+marine.mrRequirementId));
+assert.deepEqual(C.c1AppendixTable0550(marineView(100)).rows.find(r=>r[0]==='1.1.2').slice(4),[33.33,100,'Marine radio supply']);
+const marineOpen=marineRow(C.deriveC1Appendix0550(marineView(null)));
+assert.deepEqual([C.c1Display0550(marineOpen.unitPrice),C.c1Display0550(marineOpen.amount)],['—','—']);
 assert(row.notes.some(n=>n.includes('Instrument & Telecom Room')));assert(row.intro.includes('comprised of'));
 const core=row.components.find(c=>c.description.includes('Core Switch'));
 const pricedComponent={lineId:id,line:{description:'Component: '+core.description},quantity:core.quantity,unit:core.unit,
