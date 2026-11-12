@@ -153,6 +153,19 @@ export function latestVendorPackageQuotes0550(offers){
  return latest;
 }
 
+const isPagaPackageQuote0550=offer=>/^A20261632(?:-\d{3})?$/.test(offer.quoteRef);
+
+export function latestPagaVendorPackage0550(offers){
+ const packages=offers.filter(offer=>isPagaPackageQuote0550(offer)&&offer.quoteEvidence?.systemTokens.includes('TEL-PAGA'));
+ return [...latestVendorPackageQuotes0550(packages).values()].sort((a,b)=>b.date.localeCompare(a.date)||
+  b.quoteRef.localeCompare(a.quoteRef,'en',{numeric:true}))[0];
+}
+
+export function vendorPagaHistoricalQuote0550(offer,latest){
+ return Boolean(latest&&offer.vendorId===latest.vendorId&&isPagaPackageQuote0550(offer)&&
+  offer.quoteRef.localeCompare(latest.quoteRef,'en',{numeric:true})<0);
+}
+
 const vendorSourceGroup0550=({sourceSystemTokens=[]})=>
  sourceSystemTokens.length===1?sourceSystemTokens[0]:sourceSystemTokens.length?'SHARED':'UNASSIGNED';
 

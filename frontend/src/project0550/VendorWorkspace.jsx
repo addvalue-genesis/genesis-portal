@@ -8,7 +8,7 @@ import {COMMERCIAL_SOURCES} from "./data";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_VOLUME_TAGS_0550,offerSourceSections0550} from './data/vendorBidTags0550';
-import {latestVendorPackageQuotes0550} from './data/vendorRegister0550';
+import {latestPagaVendorPackage0550,latestVendorPackageQuotes0550,vendorPagaHistoricalQuote0550} from './data/vendorRegister0550';
 import {activeSupply0550} from './data/workingOffers0550';
 const tagValues=(field,text)=>[...new Set(text.split(field==='mr'?/\s+\|\s+|\n/:/[|\n]/).map(tag=>tag.trim()).filter(Boolean))];
 export function VendorWorkspace({navigationTarget,onNavigate}){
@@ -21,6 +21,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  const currentOffers=currentSupplierOffers0550(data);
  const quotedVendorIds=new Set(currentOffers.map(o=>o.vendorId));
  const latestPackages=latestVendorPackageQuotes0550(currentOffers);
+ const latestPaga=latestPagaVendorPackage0550(currentOffers);
  const selectedOfferIds=new Set(data.lines.filter(activeSupply0550).map(line=>line.offerId));
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
  const authoredSections=offer.bidTags?.sections||[];
@@ -37,7 +38,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  {vendorSync&&<p role="status" aria-label="Vendor register loaded status">{vendorSync.message}</p>}
  <p>ฐานราคาเริ่มต้นที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · ตรวจฉบับที่เลือกใช้ใน Working · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>MGW Q26-063: {currentOffers.filter(mgwQuoteItem0550).length} รายการ · {data.mgwQuoteImport?.conflicts.join(" · ")||"นำเข้าเพื่อเลือกตรวจราคา — ไม่แทนผู้ขายเดิมอัตโนมัติ"}</p>
- <p><strong>{PROCUREMENT_SCOPE_0550.procurementOwner} เสนอและรับผิดชอบโดยตรง · อ้างอิงแผนจัดซื้อ</strong> · {PROCUREMENT_SCOPE_0550.directProcurement.map(s=>s.name+' จาก '+s.suppliers.map(v=>v.name+' ('+v.quoteRef+(v.quoteScope?' · '+v.quoteScope:'')+')').join(' / ')).join(' · ')}</p>
+ <p><strong>{PROCUREMENT_SCOPE_0550.procurementOwner} เสนอและรับผิดชอบโดยตรง · อ้างอิงแผนจัดซื้อ</strong> · {PROCUREMENT_SCOPE_0550.directProcurement.map(s=>s.name+' จาก '+s.suppliers.map(v=>v.name+' ('+(latestPaga&&v.vendorIds.includes(latestPaga.vendorId)?latestPaga.quoteRef:v.quoteRef)+(v.quoteScope?' · '+v.quoteScope:'')+')').join(' / ')).join(' · ')}</p>
  <p>{PROCUREMENT_SCOPE_0550.mgw.bidOfferOwner} เสนอระบบอื่น รวม VHF Trunked Radio (DTRS) · ขอบเขตที่ยังไม่มีใบเสนอราคาคงสถานะ OPEN</p>
  <p>ฐานขาย ADDVALUE ใช้ต้นทุน × {(1+PROCUREMENT_SCOPE_0550.directSupplierMarkupPct/100).toFixed(2)} สำหรับต้นทุนจัดซื้อจาก {PROCUREMENT_SCOPE_0550.directProcurement.flatMap(s=>s.suppliers.filter(v=>v.useDirectMarkup).map(v=>v.name)).join(' / ')} · ค่าแรงและต้นทุนแหล่งอื่นใช้ฐานของรายการนั้น</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>
@@ -53,7 +54,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  </>}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.vendor."+v.id}/><button type="button" onClick={()=>setVendor({...v})}>แก้ไข Vendor</button></td></tr>;})}</tbody></table></div>
  </Module>
  <Module id="bid.vendor.offers" title="07.2 ใบเสนอราคา / ต้นทุนสินค้า / เรตบุคลากร">
- {currentOffers.filter(o=>o.supplierQuoteRow?.classification==="NET_PACKAGE").map(o=><p key={o.id}>{o.quoteRef} · ราคาฐานสุทธิ {amount(o.unitCost,o.currency)} · {selectedOfferIds.has(o.id)?"เลือกใน Working แล้ว — ตรวจ scope/ราคาและ Release gates ต่อ":"บันทึกเป็นฉบับใหม่แล้ว / ยังไม่เลือกแทนราคาที่ใช้อยู่"} · รายการย่อยและ Option ไม่บวกในราคาฐานซ้ำ</p>)}
+ {currentOffers.filter(o=>o.supplierQuoteRow?.classification==="NET_PACKAGE"&&!vendorPagaHistoricalQuote0550(o,latestPaga)).map(o=><p key={o.id}>{o.quoteRef} · ราคาฐานสุทธิ {amount(o.unitCost,o.currency)} · {selectedOfferIds.has(o.id)?"เลือกใน Working แล้ว — ตรวจ scope/ราคาและ Release gates ต่อ":"บันทึกเป็นฉบับใหม่แล้ว / ยังไม่เลือกแทนราคาที่ใช้อยู่"} · รายการย่อยและ Option ไม่บวกในราคาฐานซ้ำ</p>)}
  <form onSubmit={saveOffer}>
  <div className="p55-bid-fields"><Select label="Offer vendor" value={offer.vendorId} onChange={v=>setO("vendorId",v)} options={[["","เลือก Vendor"],...data.vendors.map(v=>[v.id,v.name])]}/>
  {[['description','Product / role / service'],['brand','Brand / model'],['quoteRef','Quotation reference'],['sourceRef','Offer source / file / page']].map(([k,l])=><Field key={k} label={l} value={offer[k]} onChange={v=>setO(k,v)} required={k!=="brand"}/>)}

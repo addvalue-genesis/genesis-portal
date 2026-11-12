@@ -31,3 +31,16 @@ Validation covers the original gross, discount base and NET, old/new revision
 coexistence, stable vendor identity, unchanged Working records, quoted options,
 idempotent import, the existing Vendor, supplier-revision, TAG mapping, C1,
 Working trace and bid-volume validators, and production webpack.
+
+## Default Vendor quotation
+
+The follow-up directs 07.1 and 07.2 to use the new INDUSTRONIC PAGA package
+as the primary quotation. Once the new package is registered, both Vendor
+grouping directions display its summary first. Earlier base-package revisions
+are in the expandable quotation history, with original Offer IDs and deep
+links retained. SP2 remains independently visible. The Vendor BOM defaults
+to the current package and still allows revision selection. The generic missing
+total message follows the printed evidence; the item rows carry the specific
+actual-cost or quotation-on-request condition. This presentation uses the
+existing data, Working selection and frozen issue records (ADR principles 2,
+6, 9, 10 and 12).
