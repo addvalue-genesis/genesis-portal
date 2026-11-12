@@ -2,6 +2,8 @@ import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {chevalierPbxSource0550} from './data/chevalierPbxQuote0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
+import {mgwFocSupplyOffer0550} from './data/mgwQuoteSelection0550';
+import {scheduleAllocationPlan0550} from './data/bidVolumeWorkingPreview0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {atomicScheduleTotals0550} from './data/atomicLines0550';
@@ -107,18 +109,22 @@ function QuoteAtomicLines0550({lines}){
  </details>;
 }
 
-export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigationTarget}){
+export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,navigationTarget}){
  const [mode,setMode]=useState('company');
  const [sectionFilter,setSectionFilter]=useState('');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
  const sectionsByOffer=useMemo(()=>{
   const bindingsByLine=new Map((data.bidVolumes?.bindings||[]).map(binding=>[binding.lineId,binding]));
+  const focOwners=new Set((model?.provisional?.selected||[]).filter(line=>mgwFocSupplyOffer0550(line.offer)).map(line=>line.id));
+  const unallocated=(model?.official?.lines||[]).filter(line=>focOwners.has(line.id)&&!bindingsByLine.has(line.id));
+  if(unallocated.length)for(const {proposal} of scheduleAllocationPlan0550(data,{unallocated}))if(proposal)bindingsByLine.set(proposal.lineId,proposal);
   return new Map(entries.map(entry=>{
    const lineIds=new Set([...entry.working,...entry.allocatedWorking.map(use=>use.line)].map(line=>line.id));
-   const bindings=[...lineIds].map(id=>bindingsByLine.get(id)).filter(Boolean);
-   return [entry.offer.id,offerLinkedSections0550(offerSourceSections0550(entry.offer),bindings,lineIds.size>0)];
+   const active=mgwFocSupplyOffer0550(entry.offer)&&model?[...lineIds].filter(id=>focOwners.has(id)):[...lineIds];
+   const bindings=active.map(id=>bindingsByLine.get(id)).filter(Boolean);
+   return [entry.offer.id,offerLinkedSections0550(offerSourceSections0550(entry.offer),bindings,active.length>0)];
   }));
- },[data.bidVolumes?.bindings,entries]);
+ },[data,entries,model]);
  const quoteGroups=useMemo(()=>groupVendorOffers0550(entries,mode,SYSTEMS,{sourceGroups:true}),[entries,mode]);
  const latestPaga=latestPagaVendorPackage0550(data.offers);
  const isHistorical=q=>vendorPagaHistoricalQuote0550(q.entries[0].offer,latestPaga);

@@ -1,7 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {bidOwnerStyle} from './bidPresentation0550';
-import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
+import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
 import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
@@ -69,6 +69,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
    {active&&<><p>{active.mr?.reference||active.description}</p>{active.internalNote&&<p>Working · {active.internalNote}</p>}
     {traceCabinetLabel&&<p>{traceCabinetLabel}</p>}
     {active.mr?.id.startsWith('MR-B1-11-')&&<button type="button" disabled={disabled} onClick={()=>navigate(RADIO_RELEASE_LOT_0550,{mrId:active.mr.id})}>10.7 · กลับ Release A1-07</button>}
+    {active.appendix==='1.8'&&[...new Set((active.priceOwners||[]).map(b=>b.line.customerRowCode).filter(Boolean))].map(code=>
+     <button type="button" key={code} disabled={disabled} onClick={()=>navigate('bid.budget.release.customer.'+code)}>10.7 · Release {code}</button>)}
     {active.mr&&<><button type="button" disabled={disabled} onClick={()=>navigate('bid.documents.controlled-source-inventory.mr.page.'+(Number(active.mr.reference.match(/\/\s*p(\d+)/)?.[1]||0)+2))}>CUS · เปิด MR ต้นทาง</button>{(active.mr.canonicalIds||[active.mr.id]).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+id)}>SI-REQ · เปิดข้อกำหนด {active.mr.canonicalIds?id:''}</button>)}</>}
     <button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.step.7')}>SI-WP-07 · Mapping กับ VND</button>
     {traceIds.map(id=><div key={id}><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+id}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+id)}>SI-COST · เปิดเจ้าของงาน/ราคา</button><button type="button" disabled={disabled} onClick={()=>navigate('bid.quotation.line.'+id)}>ตรวจ Schedule allocation</button></div>)}
@@ -97,7 +99,10 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
       </tr>
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode||view.workingPreview&&g.id==='1.1').map(site=><React.Fragment key={site.name}>
-       <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
+       <tr className="c1-site">
+        <td colSpan={!documentMode&&Number.isFinite(site.knownAmount)?5:7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td>
+        {!documentMode&&Number.isFinite(site.knownAmount)&&<><td className="number">{c1Display0550(site.knownAmount)}</td><td>Priced items subtotal</td></>}
+       </tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
         <tr ref={r.key===location?.key?focusedRow:undefined} tabIndex={r.key===location?.key?-1:undefined}
          data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0||r.quotedComponents?.length>0||!documentMode&&r.pagaReference?.offers.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td>
@@ -121,7 +126,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        </React.Fragment>)}
       </React.Fragment>)}
      </React.Fragment>)}
-     {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td><td className="number">{c1Display0550(g.amount)}</td><td/></tr>}
+     {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td>
+      <td className="number">{c1Display0550(g.amount??g.draftSubtotal)}</td><td>{c1AppendixSubtotalLabel0550(g)}</td></tr>}
     </tbody>;})}
     <tfoot><tr><td colSpan={5}>{screenSubtotal===null?'TOTAL — BASE SCOPE OF SUPPLY':'BASE SCOPE OF SUPPLY'}</td><td className="number">{c1Display0550(projection.amount??screenSubtotal)}</td><td>{screenSubtotal!==null?'Priced items subtotal':''}</td></tr></tfoot>
    </table>

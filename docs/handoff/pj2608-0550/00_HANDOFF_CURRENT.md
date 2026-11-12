@@ -1,3 +1,5 @@
+Latest FOC and Cables update: [MGW Bulk Material and Fiber Patch Panels](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--mgw-foc-and-cables). Appendix 1.8 shows site subtotals and the priced Appendix subtotal. Vendor and Volume I use the same Working owners.
+
 Latest PAGA decision: [INDUSTRONIC supply and ID-IE / ADDVALUE service rates](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--paga-supply-and-service-rates). A1-05 and C1 use the selected package once. B4/C7 show the supplier rates and the existing ADDVALUE daily rates while workload is open.
 
 Latest MET sourcing decision: [MGW Vaisala for APF and ACP](20261109_MGW_MET_NDB_QUOTATION.md#13-november--mgw-selected-for-met). C1 shows the two site packages and their MR references. The APF MET Cabinet remains open for scope and price.

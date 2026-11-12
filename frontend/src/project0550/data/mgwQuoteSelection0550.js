@@ -188,6 +188,9 @@ export const mgwLanEquipmentOffer0550 = offer => mgwLanPbxFoOffer0550(offer) &&
  /^LAN-(APF|ACP|ABV01|AMS01)-\d+-\d+$/.test(offer.id.slice(MGW_CURRENT_PREFIX_0550.length)) &&
  offer.quoteEvidence.classification==='RATE' && offer.quoteEvidence.systemTokens?.length===1 &&
  offer.quoteEvidence.systemTokens[0]==='TEL-LAN';
+export const mgwFiberPanelOffer0550 = offer => mgwLanPbxFoOffer0550(offer) &&
+ /^FO-(APF|ACP|ABV01|AMS01)-\d+(?:-\d+)?$/.test(offer.id.slice(MGW_CURRENT_PREFIX_0550.length)) &&
+ offer.quoteEvidence.classification==='RATE' && offer.quoteEvidence.systemTokens?.includes('TEL-FO');
 const apfLanCabinet10=mrCatalog.rows.find(row=>row.id==='MR-B1-13-APF-10');
 export function apfLan10PatchPanelDraft0550(offer){
  if(!mgwLanEquipmentOffer0550(offer)||offer.id!==MGW_CURRENT_PREFIX_0550+'LAN-APF-10-03')return null;
@@ -219,6 +222,7 @@ export function mgwBulkMr0550(offer){
  return Number(item[2])>0&&Number(item[2])<=count?'MR-B1-18-'+site+'-'+item[2]:null;
 }
 export const mgwBulkOffer0550 = offer => Boolean(mgwBulkMr0550(offer));
+export const mgwFocSupplyOffer0550 = offer => mgwFiberPanelOffer0550(offer)||mgwBulkOffer0550(offer);
 export const mgwRadioDtrsOffer0550 = offer => {
  const batch=radioBatch(offer);
  return Boolean(batch && offer.id?.startsWith(MGW_RADIO_DTRS_0550.prefix) && offer.quoteRef===MGW_RADIO_DTRS_0550.quoteRef &&
@@ -240,7 +244,8 @@ export function mgwRadioPrintedExtension0550(offer,line){
 }
 export const mgwSupplementOpen0550 = (offer,system) => mgwMetNdbOffer0550(offer)?MGW_MET_NDB_OPEN_0550[system]:
  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:
- mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwRadioDtrsOffer0550(offer)?
+ mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwFiberPanelOffer0550(offer)?
+  'Quoted 24-port patch panels. Check FODP and patch-cord scope, rack allocation, and the LAN interfaces.' : mgwRadioDtrsOffer0550(offer)?
   radioOpenNote[radioBatch(offer).batchId]:undefined;
 export const mgwCurrentOffer0550 = offer => mgwLanPbxFoOffer0550(offer)||mgwSupplementOffer0550(offer)||mgwBulkOffer0550(offer)||mgwRadioDtrsOffer0550(offer);
 export function mgwCurrentItemKey0550(offer){

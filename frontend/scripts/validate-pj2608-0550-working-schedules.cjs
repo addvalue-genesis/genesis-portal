@@ -45,6 +45,51 @@ try{
  assert.equal(applyVolume(noEvidence),noEvidence);
  assert.equal(P.scheduleAllocationPlan0550(noEvidence,{unallocated:volumeCandidates.filter(l=>l.id==='TEST-B5')})[0].proposal.schedule,'C2');
  const {releaseScheduleDraftView0550,releaseScheduleChecks0550}=require(root+'/project0550/releaseScheduleDrafts0550.js');
+ const Q=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+ const C1=require(root+'/project0550/data/c1Appendix0550.js');
+ const focMr=require(root+'/project0550/data/mrWorkingBasis0550.js');
+ const Registry=require(root+'/project0550/data/vendorRegister0550.js');
+ const Tags=require(root+'/project0550/data/vendorBidTags0550.js');
+ const focDate='2026-11-13';
+ const focSeed=G.prepareMgwDetailPricing0550(
+  M.importMgwVendorBasis0550(focMr.importMrWorkingBasis0550(W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),D.COMMERCIAL_POLICY,focDate),focDate),
+  D.COMMERCIAL_POLICY,focDate);
+ const mgw=focSeed.vendors.find(v=>v.id==='VENDOR-MGW-0550');
+ const panelSource={prefix:Q.MGW_CURRENT_PREFIX_0550,quoteRef:Q.MGW_CURRENT_QUOTE_0550,batchId:Q.MGW_CURRENT_BATCH_0550,sha256:Q.MGW_CURRENT_SOURCE_HASH_0550};
+ const offer=(source,key,qty,unit,rate)=>({
+  id:source.prefix+key,vendorId:mgw.id,description:'APF · Synthetic cable or panel',brand:'QA',quoteRef:source.quoteRef,
+  sourceRef:'Synthetic source / '+key,date:focDate,validUntil:'',currency:'USD',unit,unitCost:rate,
+  quoteEvidence:{revision:'',systemTokens:['TEL-FO'],sourceId:source.batchId,sourceSha256:source.sha256,
+   sourceUrl:'https://drive.google.com/file/d/SYNTHETIC-ONLY/view',locator:'QA / '+key,quotedQuantity:qty,quotedUnit:unit,
+   quotedUnitCost:rate,quotedCurrency:'USD',quotedTotal:qty*rate,classification:'RATE',rateBasis:'Synthetic',terms:[]},
+ });
+ const bulk=offer(Q.MGW_BULK_0550,'1-01',2610,'m',10);
+ const held=offer(Q.MGW_BULK_0550,'1-18',940,'m',5);
+ const panels=[offer(panelSource,'FO-APF-9-01',2,'SET',20),offer(panelSource,'FO-APF-10-01',8,'SET',20)];
+ const load=(input,source,offers)=>Registry.planVendorRegister0550(input,{
+  schema:Registry.VENDOR_REGISTER_SCHEMA_0550,projectId:input.projectId,batchId:source.batchId,preparedOn:focDate,
+  coverageNote:'Synthetic FOC rates for regression',vendors:[mgw],offers,
+ },tokens).workspace;
+ const focSource=load(load(focSeed,Q.MGW_BULK_0550,[bulk,held]),panelSource,panels);
+ const foc=require(root+'/project0550/data/mgwCurrentWorking0550.js').prepareMgwCurrentWorking0550(
+  {...focSource,fx:{...focSource.fx,thbPerUSD:31.5,source:'Synthetic FX',date:focDate}},D.COMMERCIAL_POLICY,focDate);
+ validate(foc);
+ const focIntegration=I.deriveIntegration0550(foc,D.SYSTEMS,focDate);
+ const focModel={...W.deriveBidWorkspace(foc,tokens,focDate,focIntegration),integration:focIntegration};
+ const focView=releaseScheduleDraftView0550(foc,focModel,D.SYSTEMS,focDate);
+ const focBindings=focView.bindings.filter(b=>Q.mgwFocSupplyOffer0550(b.line?.offer));
+ assert.equal(focBindings.length,3);
+ assert(focBindings.every(b=>b.schedule==='C1'&&b.treatment==='BASE'&&b.line.customerRowCode==='A1-13'));
+ assert.deepEqual(Tags.offerLinkedSections0550(Tags.offerSourceSections0550(panels[0]),[focBindings[1]],true),['A1','C1','M','P']);
+ const focC1=C1.deriveC1Appendix0550(focView),focApp=focC1.groups.find(g=>g.id==='1.8');
+ const fodp=focApp.rows.find(row=>row.key==='MR-B1-18-APF-05');
+ assert.deepEqual([fodp.quantity,fodp.unit,fodp.provisionalFiberPanel,fodp.priceOwners.length],[10,'SET',true,2]);
+ assert.equal(focApp.rows.find(row=>row.key==='MR-B1-18-APF-18').amount,null);
+ assert.equal(focApp.amount,null);
+ assert.equal(focApp.draftSubtotal,C1.c1AppendixOverview0550(focC1).find(g=>g.id==='1.8').amount);
+ assert.equal(focApp.systems[0].sites[0].knownAmount,focApp.draftSubtotal);
+ assert.equal(C1.c1AppendixTable0550(focView).rows.find(row=>row[1]==='APPENDIX 1.8 — SUBTOTAL')[5],focApp.draftSubtotal);
+ assert.equal(focView.ready,false);
  const committed=P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today);
  const c2Draft=releaseScheduleDraftView0550(committed,derive(committed),D.SYSTEMS,today);
  const [c2Row]=c2Draft.scheduleRows('C2');

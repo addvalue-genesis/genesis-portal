@@ -12,7 +12,7 @@ import {
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
  MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
  MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
- mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
+ mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwFiberPanelOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
 const radioSourceRows=MGW_QUOTE_0550.rows.filter(row=>row.section==='RADIO');
@@ -106,6 +106,7 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
  const lan=offers.filter(mgwLanEquipmentOffer0550);
  const lanPriced=lan.filter(offer=>Number.isFinite(offer.quoteEvidence.quotedTotal));
  const lanIncluded=lan.filter(mgwCurrentIncluded0550);
+ const fiberPanels=offers.filter(mgwFiberPanelOffer0550);
  const metNdb=data.offers.filter(mgwMetNdbOffer0550);
  const metNdbQuote=metNdb[0]?.quoteEvidence;
  const cctvEnt=data.offers.filter(mgwCctvEntOffer0550);
@@ -133,6 +134,7 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
   <p>{MGW_MET_NDB_0550.quoteRef} · {metNdbQuote?metNdb.length+' รายการที่อยู่ในทะเบียน · MET APF/ACP และ NDB · Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_CCTV_ENT_0550.quoteRef} · {MGW_CCTV_ENT_0550.revision} · {cctvEntQuote?cctvEnt.length+' รายการในทะเบียน · Equipment Supply / Draft':'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
   <p>{MGW_BULK_0550.quoteRef} · {bulk.length?`${bulkPriced.length}/${bulk.length} รายการมีราคา · USD ${amount(sumMoney0550(bulkPriced.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · Supply / Draft`:'รอโหลดใบเสนอราคาจากข้อมูลโครงการ'}</p>
+  {fiberPanels.length>0&&<p>Fiber Patch Panels · {MGW_CURRENT_QUOTE_0550} · {fiberPanels.length} รายการ · USD {amount(sumMoney0550(fiberPanels.map(o=>o.quoteEvidence.quotedTotal)),'USD')} · A1-13 / C1 Appendix 1.8</p>}
   <p>{MGW_RADIO_DTRS_0550.quoteRef} · {radio.length?radio.length+' Offer records · '+radioWorking.length+' Working owners · Supply / Draft':'รอข้อมูลใบเสนอราคา'}</p>
   {showRadioSource&&<MgwRadioSource0550 data={data} sectionFilter={sectionFilter}/>}
   {cctvEntQuote&&sections.map(section=><p key={section.system}><strong>{section.label}</strong> · {section.rows.length}/{section.count} รายการ · {Number.isFinite(section.total)?'รวมรายบรรทัด USD '+amount(section.total,'USD'):'ตรวจความครบของราคา'} · ยอดที่พิมพ์ในใบ USD {amount(section.printed,'USD')}{section.delta?' · ส่วนต่าง USD '+amount(section.delta,'USD'):''}</p>)}

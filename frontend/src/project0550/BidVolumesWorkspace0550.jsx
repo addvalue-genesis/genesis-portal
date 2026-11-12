@@ -2,7 +2,7 @@ import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
 import {VENDOR_PHYSICAL_TAG_FIELDS_0550,VENDOR_VOLUME_TAGS_0550,offerLinkedSections0550,offerSourceSections0550,vendorTaggedSchedule0550} from './data/vendorBidTags0550';
-import {mgwCctvEntOffer0550,mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
+import {mgwCctvEntOffer0550,mgwFocSupplyOffer0550,mgwMetNdbOffer0550} from './data/mgwQuoteSelection0550';
 import {CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {LifecycleCostDrivers0550} from './LifecycleCostDrivers0550';
 import {QualificationChecklist0550,QualificationResponse0550} from './QualificationChecklist0550';
@@ -60,6 +60,29 @@ const cctvEntScheduleNotes={
  E:'ตรวจใบอนุญาต ค่าใช้จ่ายและความรับผิดชอบในการส่งมอบ',
  F:'ตรวจประกันและจุดโอนความเสี่ยงตาม Incoterm',
  mapping:'เจ้าของราคา Working A1-06 (CCTV) และ A1-12 (Entertainment) ผูก C1 ตามรายการ ผู้รับผิดชอบและขอบเขตที่ค้างแสดงรายแถว',
+};
+const focScheduleNotes={
+ A1:'สายและอุปกรณ์ FO ใช้เจ้าของราคาเดิมใน A1-13 ส่วนสาย CAT6A ใช้ A1-01 ทั้งสองหมวดย้อนดูรายบรรทัดได้ใน Appendix 1.8',
+ A2:'ตรวจ Option งานติดตั้งสายและดึงหรือเป่าสาย FO จาก Working Part C',
+ C1:'สายตามใบ Bulk Material และชุด Fiber Patch Panel แสดงตามไซต์ใน Appendix 1.8 ขอบเขต VTA และเส้นทางที่ยังต้องยืนยันคง OPEN',
+ C2:'ตรวจรายการและจำนวนอะไหล่สำหรับ Pre-commissioning, Commissioning และ Start-up',
+ C3:'ตรวจรายการและจำนวนอะไหล่ใช้งานสองปี',
+ C4:'ตรวจรายการและจำนวน Capital Spares',
+ C5:'ตรวจขอบเขตเครื่องมือพิเศษและเครื่องมือทดสอบ FO กับรายการใน Working',
+ C6:'ตรวจการใช้วัสดุสิ้นเปลืองและขอบเขต First Filling ตามแบบฟอร์ม',
+ C7:'ตรวจขอบเขต Site Service, SAT และ Training พร้อมจำนวนคนและชั่วโมง',
+ C8:'ตรวจ Facilities และ Services ที่ผู้ซื้อต้องจัดหาสำหรับงานติดตั้งและทดสอบ',
+ D:'ตรวจขอบเขต Inspection, FAT และ iFAT กับเจ้าของราคา 11.A1 S/N 2',
+ E:'ตรวจเอกสารนำเข้าและค่าธรรมเนียมกับเจ้าของงานใน Working B8 ตามฐาน CIF Yangon',
+ F:'เทียบมูลค่าสินค้า FO/Bulk ที่ส่งจริงกับทุนประกันและเบี้ยประกันสินค้าใน Working B2-D04',
+ mapping:'ตรวจ Offer ID, MR, Working owner และปลายทาง Schedule จากรายการที่เลือก',
+ preview:'ราคาวัสดุ FO/Bulk มาจาก Working ผ่าน C1 ส่วนงานติดตั้งและบริการอ่านจาก Schedule ที่ผูกกับเจ้าของงาน',
+};
+const focRelatedWork={
+ A2:[['C1-D02','Cable installation'],['C1-D03','FO pulling / blowing']],
+ D:[['B4-D01','FAT / TPI'],['B4-D02','iFAT']],
+ E:[['B8-D03','Import / export support'],['B8-D05','Authority / agent fees']],
+ F:[['B2-D04','Cargo insurance']],
 };
 const options=(rows,label)=>rows.map(r=>[r.id,label(r)]);
 function Input({label,value,onChange,multiline=false,type='text',...props}){return <label>{label}{multiline?<textarea rows={4} maxLength={12000} aria-label={label} value={value??''} onChange={e=>onChange(e.target.value)} {...props}/>:<input aria-label={label} type={type} value={value??''} onChange={e=>onChange(type==='number'?(e.target.value===''?null:Number(e.target.value)):e.target.value)} {...props}/>}</label>;}
@@ -178,6 +201,8 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  const panels=volume==='I'?[['overview','11.0 Overview / Cross-check'],['cover','11.1 Power of Attorney / Undertaking'],...visibleSchedules.map(s=>[s.id,'11.'+s.id+' / '+s.title]),['D','11.D Supporting Breakdown'],...A1_OTHERS_PANELS_0550.map(({id,number,title})=>[id,number+' '+title]),['mapping','11.M Schedule allocation'],['preview','11.P Preview / Export']]:[['overview','13.0 Overview'],...QUALIFICATIONS_0550.map(q=>[q.id,'13.'+q.id+' / '+q.title]),['deviations','13.D Commercial Deviations'],['preview','13.P Preview / Export']];
  const changeScheduleScope=value=>{if(dirty)return;const all=value==='ALL';setShowAllSchedules(all);if(!all&&SCHEDULES_0550.some(s=>s.id===panel)&&!quotationSchedules0550().some(s=>s.id===panel))choose('C1');};
  const key=(volume==='I'?'I.':'III.')+panel,record=view.getRecord(key),schedule=SCHEDULES_0550.find(s=>s.id===panel),table=schedule?scheduleTable0550(view,panel):null;
+ const focServiceSchedule=/^C[2-8]$/.test(panel);
+ const focServiceBindings=focServiceSchedule?displayView.scheduleRows(panel).filter(binding=>binding.line.systemToken==='TEL-FO'):[];
  const allocationLine=bindingId&&view.available.find(line=>line.id===bindingId);
  const allocationCalc=allocationLine?.calculationId&&data.calculations.find(c=>c.id===allocationLine.calculationId);
  const spareSchedule=SPARE_EQUATION_SCHEDULES_0550[allocationCalc?.equationId];
@@ -222,6 +247,21 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   <PagaQuoteScope0550 data={data} section={volume==='III'?'commercial':panel} onNavigate={go} disabled={dirty}/>}
  {volume==='I'&&cctvEntScheduleNotes[panel]&&data.offers.some(mgwCctvEntOffer0550)&&
   <p className="p55-note"><strong>MGW CCTV / Entertainment V1.2 · ตรวจเพิ่มเติม</strong> · {cctvEntScheduleNotes[panel]}</p>}
+ {volume==='I'&&focScheduleNotes[panel]&&data.offers.some(mgwFocSupplyOffer0550)&&
+  <aside className="p55-note" aria-label="FOC and Cables schedule basis">
+   <p><strong>FOC and Cables · MGW Q26-063</strong> · {focScheduleNotes[panel]}</p>
+   {(focServiceSchedule||['D','E','F'].includes(panel))&&<p>ใบเสนอราคาสองฉบับให้ราคาวัสดุและอุปกรณ์ ขอบเขตและราคาส่วนนี้ใช้เจ้าของงานที่เกี่ยวข้องใน Working</p>}
+   {focServiceSchedule&&!focServiceBindings.length&&<p>OPEN · ยังไม่มีรายการ TEL-FO ที่ผูกกับ 11.{panel}</p>}
+   <div className="p55-review-toolbar">
+    {panel!=='C1'&&<button type="button" disabled={dirty} onClick={()=>choose('C1')}>11.C1 · FOC and Cables</button>}
+    {(focRelatedWork[panel]||[]).map(([id,label])=>{
+     const lineId='REQ-MR-ACT-'+id;
+     return data.lines.some(line=>line.id===lineId)&&<button key={id} type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+lineId)}>{label}</button>;
+    })}
+    {focServiceBindings.map(binding=><button key={binding.lineId} type="button" disabled={dirty}
+     onClick={()=>go('bid.budget.working.line.'+binding.lineId)}>{binding.line.description}</button>)}
+   </div>
+  </aside>}
   {volume==='I'&&[...VENDOR_VOLUME_TAGS_0550,'mapping','preview'].includes(panel)&&
    <VolumeOfferTagTrace0550 data={data} view={displayView} panel={panel} onNavigate={go} disabled={dirty}/>}
  {(panel==='overview'||volume==='I'&&['A','A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}

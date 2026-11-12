@@ -1,4 +1,5 @@
-import {mgwCurrentIncluded0550,mgwCurrentMr0550} from "./mgwQuoteSelection0550";
+import {mgwBulkOffer0550,mgwCurrentIncluded0550,mgwCurrentMr0550,mgwFocSupplyOffer0550} from "./mgwQuoteSelection0550";
+import {mrRequirement0550} from './mrWorkingBasis0550';
 import Decimal from 'decimal.js';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {validateBidWorkspace} from './bidWorkspaceModel';
@@ -163,7 +164,14 @@ export function vendorOfferEntries0550(data){
   if(!allocations.has(id))allocations.set(id,[]);
   allocations.get(id).push(usage);
  }
- return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,location:vendorOfferLocation0550(offer),
+ const focLocation=offer=>{
+  if(!mgwFocSupplyOffer0550(offer))return null;
+  const requirements=mgwCurrentMr0550(offer).map(mrRequirementId=>mrRequirement0550({mrRequirementId})).filter(Boolean);
+  if(!requirements.length)return null;
+  return {state:'DRAFT',sites:[...new Set(requirements.map(r=>r.site))],requirements,note:mgwBulkOffer0550(offer)?
+   'Appendix 1.8 · ตรวจปริมาณและเส้นทางสายตาม MR/MTO':'Appendix 1.8 · FODP / Patch Cords · อ้างอิงจุดต่อกับตู้ LAN ตาม Appendix 1.3'};
+ };
+ return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,location:vendorOfferLocation0550(offer)||focLocation(offer),
   allocatedWorking:allocations.get(offer.id)||[],
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));

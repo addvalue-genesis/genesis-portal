@@ -1,5 +1,5 @@
 import mgwQuote from './mgwQuote0550.json';
-import {MGW_RADIO_DTRS_0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550} from './mgwQuoteSelection0550';
+import {MGW_RADIO_DTRS_0550,mgwFocSupplyOffer0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550} from './mgwQuoteSelection0550';
 import {chevalierPbxSections0550} from './chevalierPbxQuote0550';
 
 export const VENDOR_VOLUME_TAGS_0550=['A1','A2','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F'];
@@ -53,7 +53,8 @@ export function offerSourceSections0550(offer){
  ];
  const authored=offer?.bidTags?.sections;
  const radio=mgwRadioItemForOffer0550(offer);
- const sections=authored?.length?authored:radio?sourceRadioSections0550(radio):mgwLanEquipmentOffer0550(offer)?['A1','C1']:
+ const supply=mgwLanEquipmentOffer0550(offer)||mgwFocSupplyOffer0550(offer)&&offer.quoteEvidence.classification==='RATE';
+ const sections=authored?.length?authored:radio?sourceRadioSections0550(radio):supply?['A1','C1']:
   [offer?.supplierQuoteRow?.classification,offer?.quoteEvidence?.classification].includes('OPTION')?['A2']:[];
  return unique([
   ...(sections.some(tag=>baseSchedules.includes(tag))?['A1']:[]),

@@ -70,3 +70,33 @@ DATA. The supplier revision, C1, Working Schedules, Bid Completion, Bid
 Volumes and Release Issue validators passed, and production webpack compiled.
 Chromium could not start in the test environment. The owner's Windows workspace
 still needs a pull and a reload.
+
+## 13 November · MGW FOC and Cables
+
+The supplied Bulk Material and LAN/PBX/FO PDFs match the SHA-256 hashes
+in the existing Vendor intake. A fixture transcribed from the PDFs
+validated all 33 priced bulk lines and the six Fiber Patch Panel lines.
+The draft uses 32 cable and six panel owners in the fixture. The APF RG59
+line remains open for overlap with Entertainment coax. APF, ACP and
+ABV01 cable items follow the native MR sites. The three pipeline runs
+quoted under AMS01 follow the MR FOC-WITH-PIPELINE group. AMS01 site
+cables and the remaining VTA scope still require confirmation.
+
+07.2 shows candidate MR locations and the 11.A1, C1, M and P links for
+the selected supply. 10.7 retains A1-13 for FOC/Bulk and A1-01 for CAT6A.
+Appendix 1.8 displays the six panel lines on four FODP rows using the
+quoted set quantities. The LAN cabinet links remain traceable through
+Appendix 1.3. The interactive view shows site subtotals. The Appendix
+footer carries the priced subtotal on screen and in draft exports.
+A2 and D/E/F link to the existing installation, inspection, import
+and cargo-insurance Working rows. C2–C8 display existing TEL-FO
+allocations or an OPEN status.
+
+ADR-0550-001 principles 2–6 and 8–13 govern source identity, cost
+ownership, draft allocations and preserved issued history. The
+PDF-derived fixture checked both currencies, site rollups, Appendix
+and Working price parity, Vendor/Volume I trace and duplicate-owner
+protection. Working Schedules, C1 Appendix, Vendor Register and
+Native Exhibit validators passed. Chromium was blocked at process
+startup by the execution environment. The user's Windows workspace
+and its saved Vendor register were unavailable for inspection.

@@ -13,7 +13,7 @@ import {activeSupply0550} from './data/workingOffers0550';
 import AlieIntake from './AlieIntake';
 const tagValues=(field,text)=>[...new Set(text.split(field==='mr'?/\s+\|\s+|\n/:/[|\n]/).map(tag=>tag.trim()).filter(Boolean))];
 export function VendorWorkspace({navigationTarget,onNavigate}){
- const {data,put,busy,vendorSync,reviewDate}=useBidWorkspace();
+ const {data,model,put,busy,vendorSync,reviewDate}=useBidWorkspace();
  const [vendor,setVendor]=useState({id:"",name:"",kind:"SUPPLIER",reference:""});
  const blankOffer={id:"",vendorId:"",description:"",brand:"",quoteRef:"",sourceRef:"",date:"",validUntil:"",currency:"THB",unit:"MD",unitCost:null};
  const [offer,setOffer]=useState(blankOffer);
@@ -95,7 +95,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
   <summary>ALIE R2 · Atomic Lines Intake</summary>
   {alieOpened&&<AlieIntake onNavigate={onNavigate}/>}
  </details>
- <VendorOfferGroups0550 data={data} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});setOfferTagText(Object.fromEntries(VENDOR_OFFER_TAG_FIELDS_0550.map(([field])=>[field,(o.bidTags?.[field]||[]).join(' | ')])));document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
+ <VendorOfferGroups0550 data={data} model={model} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});setOfferTagText(Object.fromEntries(VENDOR_OFFER_TAG_FIELDS_0550.map(([field])=>[field,(o.bidTags?.[field]||[]).join(' | ')])));document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
  </Module>
  <Module id="bid.vendor.controlled-sources" title="แหล่ง Vendor เดิมของ 0550 — ใช้อ้างอิงก่อนเลือกเรต" open={false}>
  <MgwQuoteSummary/>

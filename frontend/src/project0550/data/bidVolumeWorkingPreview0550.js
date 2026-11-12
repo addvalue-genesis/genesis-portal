@@ -9,7 +9,7 @@ import {vendorTaggedSchedule0550} from './vendorBidTags0550';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
-import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
+import {mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwFocSupplyOffer0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
@@ -55,10 +55,11 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   // These annotations identify work to inspect; they do not decide applicability.
   const advisories=[];
   if(pagaRevisionNet0550(line?.offer))advisories.push(line.offer.quoteRef+' · '+pagaIncludedScope0550(data,line.offer));
-  if(mgwCctvEntOffer0550(line?.offer)||mgwBulkOffer0550(line?.offer)||mgwRadioDtrsOffer0550(line?.offer)){
+  if(mgwCctvEntOffer0550(line?.offer)||mgwFocSupplyOffer0550(line?.offer)||mgwRadioDtrsOffer0550(line?.offer)){
    const candidates=mgwCurrentMr0550(line.offer);
    if(candidates.length)advisories.push('MR candidate / '+candidates.join(' / '));
-   advisories.push(mgwSupplementOpen0550(line.offer,line.systemToken));
+   const scopeNote=mgwSupplementOpen0550(line.offer,line.systemToken);
+   if(scopeNote)advisories.push(scopeNote);
   }
   if(mr?.note.includes(' / CALL-OFF.'))advisories.push('ทะเบียนเดิมระบุ CALL-OFF · ตรวจขอบเขตและ Base/Option ก่อนทบทวน');
   if(raw.mrRequirementId==='MR-ACT-B8-D05')advisories.push('แยกค่าธรรมเนียมออกจากงานสนับสนุนเอกสาร · ยืนยันผู้รับผิดชอบ');
@@ -126,9 +127,9 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
    const problems=c2WorkingAllocationProblems0550(workingById.get(raw.id));
    if(problems.length)return {line,proposal:null,reason:'C2 OPEN · '+problems.join(' / ')};
   }
-  const bulkMr=mgwBulkMr0550(offer),radioMr=mgwRadioDtrsOffer0550(offer)?mgwCurrentMr0550(offer):[];
+  const mgwMr=mgwFocSupplyOffer0550(offer)||mgwRadioDtrsOffer0550(offer)?mgwCurrentMr0550(offer):[];
   const pbxMr=chevalierPbxOwnerCode0550(raw.id)?data.lines.filter(line=>line.coveredByLineId===CHEVALIER_PBX_SUPPLY_0550).map(line=>line.mrRequirementId):[];
-  const mrIds=[bulkMr,...radioMr,...pbxMr].filter(Boolean);
+  const mrIds=[...mgwMr,...pbxMr];
   const sourceIds=[...new Set([...(pagaRevisionNet0550(offer)?[offer.quoteEvidence.sourceId]:[]),...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)||mrIds.includes(r.id.replace(/^REQDEF-/,''))&&r.disposition!=='NOT_APPLICABLE').flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
   const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
   const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
@@ -181,7 +182,6 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
    const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
    // Draft assignment accepts quoted vendor offers (Ceragon, Master Tower, Industronic, MGW)
    // and standard mapped supply lines.
-   const bulkMr=mgwBulkMr0550(offer);
    const hasKnownVendor=Boolean(offer?.vendorId||owner?.systemToken);
    return owner&&(mappingValid(owner)||hasKnownVendor)&&(Number.isFinite(owner.customerUSD)||Boolean(offer?.unitCost));
   }

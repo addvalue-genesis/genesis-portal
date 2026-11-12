@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCctvEntOffer0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwFiberPanelOffer0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -44,7 +44,7 @@ function mrDisplayRows(){
 const appendix=r=>r?.id?.match(/^MR-B1-1([1-8])-/)?.[1];
 const unique=xs=>[...new Set(xs)];
 const money=xs=>xs.length&&xs.every(Number.isFinite)?sumMoney0550(xs):null;
-const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||r.provisionalDmr||r.provisionalCctv||!r.ownerIds.length||!(r.quantity>0));
+const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||r.provisionalDmr||r.provisionalCctv||r.provisionalFiberPanel||!r.ownerIds.length||!(r.quantity>0));
 const sharedRadioLabel='Shared Radio Consoles and Antenna Cables';
 const systemNames={
  'TEL-RADIO-DTRS':'VHF DMR Radio System','TEL-RADIO-MARINE':'VHF-FM Marine Radio System',
@@ -226,6 +226,23 @@ const paga005C1Items={
  'ACP-01':['2010'],'ACP-02':['14030'],'ACP-03':['14020'],'ACP-04':['15010'],'ACP-05':['11010'],
 };
 
+function fiberPanelDraftGroups(rows,byOwner,ownerUse){
+ const targets=new Map(rows.filter(row=>row.appendix==='1.8'&&row.quantity==null&&row.unit==='Lot'&&
+  acceptsQuotedDraft(row,byOwner)).map(row=>[row.key,row]));
+ const groups=new Map();
+ for(const {binding,usdPriced} of byOwner.values()){
+  const {line,quantity,unit}=binding,offer=line.offer;
+  if(!usdPriced||!mgwFiberPanelOffer0550(offer)||ownerUse.has(binding.lineId)||line.wbs!=='A'||
+   line.systemToken!=='TEL-FO'||line.customerRowCode!=='A1-13'||line.mrRequirementId||line.coveredByLineId||
+   quantity!==offer.quoteEvidence.quotedQuantity||!(quantity>0)||unit!==offer.unit||unit.toLowerCase()!=='set')continue;
+  const mr=mgwCurrentMr0550(offer).find(id=>id.startsWith('MR-B1-18-')),target=targets.get(mr);
+  if(!target||target.site!==line.tagRef)continue;
+  if(!groups.has(mr))groups.set(mr,{target,prices:[],included:[]});
+  groups.get(mr).prices.push(binding);
+ }
+ return [...groups.values()];
+}
+
 export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
  const scheduleRows=view.scheduleRows('C1');
@@ -276,6 +293,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   ...lanCabinetDraftGroups(rows,context.lanOffers||[],byOwner,ownerUse),
   ...radioDraftGroups(rows,byOwner,ownerUse),
   ...cctvDraftGroups(rows,byOwner,ownerUse),
+  ...fiberPanelDraftGroups(rows,byOwner,ownerUse),
  ]:[];
  for(const {target,prices,included} of quotedGroups){
   // An unpriced MR binding is only a scope reference once its priced
@@ -284,11 +302,16 @@ export function deriveC1Appendix0550(view,currency='USD'){
   for(const row of ownerUse.get(target.raw.id)||[]){
    if(row!==target)row.ownerIds=row.ownerIds.filter(id=>id!==target.raw.id);
   }
-  const radio=target.appendix==='1.1',cctv=target.mr.systemToken==='TEL-CCTV';
+  const radio=target.appendix==='1.1',cctv=target.mr.systemToken==='TEL-CCTV',fiberPanel=target.appendix==='1.8';
   if(radio){
    target.provisionalRadio=true;
    if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
   }else if(cctv)target.provisionalCctv=true;
+  else if(fiberPanel){
+   target.provisionalFiberPanel=true;
+   target.quantity=prices.reduce((total,b)=>total+b.quantity,0);
+   target.unit=prices[0].unit;
+  }
   else target.provisionalLan=true;
   target.ownerIds=prices.map(b=>b.lineId);
   target.priceOwners=prices;
@@ -306,6 +329,10 @@ export function deriveC1Appendix0550(view,currency='USD'){
    target.note=[target.note,'MGW draft price · scope review pending',cabinet&&'MGW enclosure allowance pending rack reconciliation'].filter(Boolean).join(' · ');
    target.internalNote=cabinet?'MGW quoted cabinet and equipment. Confirm enclosure cost and the VERSED RITTAL replacement before changing the cost owner.':'MGW quoted CCTV equipment. Confirm final MR scope and interfaces.';
    problems.push('C1_CCTV_MR_SCOPE_OPEN / '+target.key);
+  }else if(fiberPanel){
+   target.note=[target.note,'Quoted 24-port patch panel sets · MR FODP quantity and patch-cord scope to confirm'].filter(Boolean).join(' · ');
+   target.internalNote='MGW LAN/PBX/FO · linked to the LAN cabinet interfaces in Appendix 1.3.';
+   problems.push('C1_FODP_MR_SCOPE_OPEN / '+target.key);
   }else if(!radio){
    target.note=[target.note,'Quoted LAN equipment · scope review pending'].filter(Boolean).join(' · ');
    target.internalNote='MGW quoted LAN items. MR package scope and interfaces remain open.';
@@ -348,6 +375,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   }
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   const lan=!legacy&&view.workingPreview&&mgwLanEquipmentOffer0550(b.line.offer);
+  const fiberPanel=!legacy&&view.workingPreview&&mgwFiberPanelOffer0550(b.line.offer);
   const directRadio=radio&&view.workingPreview;
   const pbx=b.lineId===CHEVALIER_PBX_SUPPLY_0550&&b.line.pbxProducts?.length;
   const sharedRadio=directRadio&&mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1;
@@ -391,7 +419,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
    item.internalNote=[item.internalNote||MGW_RADIO_DTRS_QUOTED_SCOPE_0550,unitOpen?'Supplier unit OPEN':''].filter(Boolean).join(' · ');
   }
   extra.push(item);
-  if(supplement||radio||lan)for(const mrId of mgwCurrentMr0550(b.line.offer)){
+  if(supplement||radio||lan||fiberPanel)for(const mrId of mgwCurrentMr0550(b.line.offer)){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
    candidatePackages.get(mrId).push(item.key);
   }
@@ -432,8 +460,10 @@ export function deriveC1Appendix0550(view,currency='USD'){
    r.unitPrice=legacy&&!check.matches?null:check.unitPrice;
    if(!check.matches)problems.push('C1_DISPLAY_QUANTITY_AMOUNT_MISMATCH / '+r.key);
   }
-  if(!legacy&&view.workingPreview&&!r.excluded&&/^MR-B1-18-APF-(19|20)$/.test(r.key)&&r.raw&&!r.raw.offerId&&!Number.isFinite(r.amount)){
-   r.internalNote=['Cable supplier quote pending',r.quantity>0?'':'Cable length to be confirmed'].filter(Boolean).join(' · ');
+  if(!legacy&&view.workingPreview&&!r.excluded&&r.appendix==='1.8'&&!Number.isFinite(r.amount)){
+   const candidates=r.requirements.flatMap(q=>q.offerIds||[]);
+   r.internalNote=candidates.length?'ตรวจใบเสนอราคา ขอบเขต และ Working owner':
+    r.raw?.unit==='m'?'รอยืนยันราคาสายและปริมาณตาม Cable Schedule':'รอยืนยันขอบเขต ปริมาณ และราคา';
   }
   r.priceOwners=owned;
  }
@@ -452,7 +482,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];
  for(const group of groups){
-  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':offer=>mgwLanEquipmentOffer0550(offer)||mgwMetPackage(offer)||mgwCctvOffer(offer)}[group.id];
+  const systemOffer={'1.1':mgwRadioDtrsOffer0550,'1.3':offer=>mgwLanEquipmentOffer0550(offer)||mgwMetPackage(offer)||mgwCctvOffer(offer),
+   '1.8':offer=>mgwBulkOffer0550(offer)||mgwFiberPanelOffer0550(offer)}[group.id];
   const bySystem=!legacy&&view.workingPreview&&systemOffer&&
    group.rows.some(r=>r.priceOwners?.some(b=>systemOffer(b.line.offer)));
   let mrNumber=0,packageNumber=0;const systems=new Map();
@@ -468,13 +499,20 @@ export function deriveC1Appendix0550(view,currency='USD'){
   group.systems=[...systems].map(([name,sites])=>{
    const rollup=bySystem?scheduleRollup0550([...sites.values()].flatMap(items=>items.flatMap(r=>r.priceOwners||[]))):null;
    return {name,knownAmount:rollup?.priced?rollup.knownUSD:null,
-    sites:[...sites].map(([name,items])=>({name,rows:items.map(r=>{
-     const item=bySystem?r:{...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};
-     displayRows.push(item);return item;
-    })}))};
+    sites:[...sites].map(([name,items])=>{
+     const siteRollup=bySystem&&group.id==='1.8'?scheduleRollup0550(items.flatMap(r=>r.priceOwners||[])):null;
+     return {name,knownAmount:siteRollup?.priced?siteRollup.knownUSD:null,rows:items.map(r=>{
+      const item=bySystem?r:{...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};
+      displayRows.push(item);return item;
+     })};
+    })};
   });
   group.amount=group.rows.some(openMr)?null:
    money(group.rows.filter(r=>r.priceOwners?.length||r.kind==='PACKAGE').map(r=>r.amount));
+  if(bySystem&&group.id==='1.8'&&group.amount===null){
+   const subtotal=scheduleRollup0550(group.rows.flatMap(r=>r.priceOwners||[]));
+   if(subtotal.priced)group.draftSubtotal=subtotal.knownUSD;
+  }
  }
  const byKey=new Map(displayRows.map(r=>[r.key,r]));
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
@@ -535,12 +573,13 @@ export function c1AppendixOverview0550(projection){
 
 const groupTitle=g=>g.id==='OTHER'?g.title:'APPENDIX '+g.id+' · '+g.title;
 const groupSubtotal=g=>g.id==='OTHER'?'OTHER BASE SUPPLY — SUBTOTAL':'APPENDIX '+g.id+' — SUBTOTAL';
+export const c1AppendixSubtotalLabel0550=g=>Number.isFinite(g.draftSubtotal)?'Priced items subtotal':'';
 const escape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export const c1Display0550=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
 export function c1AppendixTable0550(view){
  const p=deriveC1Appendix0550(view),rows=[],group=label=>rows.push(['',label,'','','','','']);
  if(view.c1LayoutVersion!==C1_APPENDIX_LAYOUT_LEGACY_0550)group('Currency: USD');
- for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount,'']);}
+ for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount??g.draftSubtotal??null,c1AppendixSubtotalLabel0550(g)]);}
  rows.push(['','TOTAL — BASE SCOPE OF SUPPLY','','','',p.amount,'']);
  if(p.amount===null&&Number.isFinite(p.pricedItemsSubtotal))rows.push(['','WORKING DRAFT — PRICED ITEMS SUBTOTAL','','','',p.pricedItemsSubtotal,'Open items excluded']);
  return {heads:['SN','Item Description','Unit','Qty.','CIF or FOB (USD or RMB) — Unit Rates','CIF or FOB (USD or RMB) — Total Price','Notes'],rows};
@@ -559,7 +598,7 @@ export function c1AppendixHtml0550(view){
     }
    }
   }
-  html+=`<tr class="c1-subtotal"><td colspan="5">${escape(groupSubtotal(g))}</td>${cell(c1Display0550(g.amount),'number')}${cell('')}</tr>`;
+  html+=`<tr class="c1-subtotal"><td colspan="5">${escape(groupSubtotal(g))}</td>${cell(c1Display0550(g.amount??g.draftSubtotal),'number')}${cell(c1AppendixSubtotalLabel0550(g))}</tr>`;
  }
  const label=/^AUTHORIZED COPY\s*\//.test(view.outputLabel||'')?view.outputLabel:'DRAFT — NOT FOR SUBMISSION';
  const response=view.getRecord('I.C1').content||'';
@@ -582,7 +621,7 @@ export function c1AppendixWord0550(view){
  let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
   for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—',c.note||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
-  xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount),'']);
+  xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount??g.draftSubtotal),c1AppendixSubtotalLabel0550(g)]);
  }
  const priced=draft?scheduleRollup0550(c1.bindings):null;
  const subtotal=priced?.priced?p('Priced items subtotal only: USD '+c1Display0550(priced.knownUSD)+' ('+priced.priced+'/'+priced.count+' owners priced).'):'';
