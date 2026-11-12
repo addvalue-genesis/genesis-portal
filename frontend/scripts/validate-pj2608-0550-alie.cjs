@@ -11,7 +11,9 @@ require.extensions['.js']=require.extensions['.jsx']=(module,file)=>file.startsW
   presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,file):originalJs(module,file);
 
 const intake=require(root+'/project0550/data/alieIntake0550.js');
-const {emptyBidWorkspace}=require(root+'/project0550/data/bidWorkspaceModel.js');
+const {deriveBidWorkspace,emptyBidWorkspace,validateBidWorkspace}=require(root+'/project0550/data/bidWorkspaceModel.js');
+const {COMMERCIAL_POLICY}=require(root+'/project0550/data.js');
+const {scheduleAllocationPlan0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
 const {planVendorRegister0550}=require(root+'/project0550/data/vendorRegister0550.js');
 const {vendorRegisterFixture0550}=require('./fixtures/0550-vendor-register.cjs');
 const systems=['TEL-PAGA'];
@@ -80,6 +82,93 @@ assert.deepEqual(parsedWorkspace.lines,source.lines);
 assert.deepEqual(parsedWorkspace.offers.at(-1).atomicLines[0].cost,{unit:'99.99',currency:'THB',basis:'UNIT',state:'DOCUMENTED'});
 assert.throws(()=>intake.parsedAlieRegister0550(source,pdf,{},source.vendors[0].id,
  'https://drive.google.com/file/d/SYNTHETIC-NEW/view',date),/LINE_CLASS/);
+// One selected direct-procurement Offer prices a canonical Working row without
+// any integration or saved Schedule mapping. Verify both native sell layers.
+const direct=structuredClone(registered);
+direct.vendors[0].id='VENDOR-INDUSTRONIC-0550';
+for(const offer of direct.offers)offer.vendorId=direct.vendors[0].id;
+direct.fx={thbPerUSD:31.5,thbPerEUR:36,source:'Synthetic QA',date};
+const sourceRow=intake.registeredAlieRows0550(direct)[0];
+const draftFor=(data,row)=>intake.alieWorkingDraft0550(data,row,COMMERCIAL_POLICY,date);
+const {draft}=draftFor(direct,sourceRow);
+assert.equal(draft.offerId,quote.id);
+assert.equal(draft.quantity,1);
+assert.equal(draft.customerRowCode,'A1-05');
+assert.deepEqual([draft.sellMode,draft.markupPct,draft.primePct],['MARKUP',50,20]);
+const priceRow={id:'LINE-ALIE-QA',calculationId:'',resultKey:'value',manualCost:null,sellRate:null,marginPct:null,selected:true,...draft};
+const save=(data,row=priceRow)=>intake.saveAlieWorkingDraft0550(data,row,draft,COMMERCIAL_POLICY,date);
+const working=save(direct);
+validateBidWorkspace(working,empty.baselineSnapshotId,systems);
+assert.equal(working.offers,direct.offers);
+assert.equal(working.bidVolumes,undefined);
+assert.throws(()=>save(working,{...priceRow,id:'LINE-DUPLICATE'}),/เจ้าของราคาเปลี่ยน/);
+assert.throws(()=>save(direct,{...priceRow,offerId:'OTHER-OFFER'}),/Offer/);
+assert(draftFor(direct,{...sourceRow,allocated:true}).reason);
+assert(draftFor(direct,{...sourceRow,atom:{...sourceRow.atom,parent_line_id:'SYNTHETIC|Q|1'}}).reason);
+assert(draftFor(direct,{...sourceRow,offer:{...sourceRow.offer,unitCost:101}}).reason);
+const priced=deriveBidWorkspace(working,systems,date);
+const line=priced.lines.find(line=>line.id===priceRow.id);
+assert.deepEqual([line.provisionalCostNative,line.provisionalSellNative,line.provisionalCustomerNative,line.provisionalCustomerUSD],
+ [100,150,180,205.71]);
+assert.equal(priced.official.lines.find(row=>row.id===priceRow.id).customerUSD,null);
+const draftAllocation=scheduleAllocationPlan0550(working,{unallocated:[line]})[0].proposal;
+assert.equal(draftAllocation.schedule,'C1');
+assert.match(draftAllocation.basis,/Vendor TAG/);
+const vendorUpdated={...working,offers:working.offers.map(o=>o.id===quote.id?{...o,unitCost:110}:o)};
+const repriced=deriveBidWorkspace(vendorUpdated,systems,date).lines.find(l=>l.id===priceRow.id);
+assert.equal(repriced.provisionalCustomerNative,198,'Saved Working owner reads the current Vendor rate');
+
+const service=structuredClone(source);
+service.offers[0].unit='MD';
+service.offers[0].quoteEvidence.quotedUnit='MD';
+const servicePackage=intake.preparedAlieRegister0550(service,[{...input[0],lineClass:'SERVICE_SITE'}],date);
+const serviceRegistered=planVendorRegister0550(service,servicePackage,systems).workspace;
+const serviceDraft=draftFor(serviceRegistered,intake.registeredAlieRows0550(serviceRegistered)[0]).draft;
+assert.deepEqual([serviceDraft.wbs,serviceDraft.customerRowCode,serviceDraft.quantity,serviceDraft.sellMode,serviceDraft.primePct],
+ ['B4','B4',null,'DIRECT',5]);
+const shared={...priceRow,...serviceDraft,wbs:'B1',unit:'MD',customerRowCode:'B1'};
+const sharedAllocation=scheduleAllocationPlan0550({...serviceRegistered,lines:[shared]},{unallocated:[shared]})[0].proposal;
+assert.equal(sharedAllocation.schedule,'C7','Intake route takes precedence over generic Working B1 draft routing');
+const spare=structuredClone(source);
+spare.offers.at(-1).bidTags={sections:['A2','C4']};
+const optionPack=intake.preparedAlieRegister0550(spare,[{offerId:spare.offers.at(-1).id,system:'TEL-PAGA',lineClass:'EQUIP'}],date);
+const spareRegistered=planVendorRegister0550(spare,optionPack,systems).workspace;
+const spareDraft=draftFor(spareRegistered,intake.registeredAlieRows0550(spareRegistered)[0]).draft;
+assert.deepEqual([spareDraft.wbs,spareDraft.customerRowCode],['C2','C2']);
+const option={...priceRow,...spareDraft};
+const optionAllocation=scheduleAllocationPlan0550({...spareRegistered,lines:[option]},{unallocated:[option]})[0].proposal;
+assert.equal(optionAllocation.schedule,'C4');
+assert.equal(optionAllocation.treatment,'OPTION');
+
+const actionHtml=renderToStaticMarkup(React.createElement(AlieWorking0550,{data:direct,reviewDate:date,onDraft:()=>{}}));
+assert.match(actionHtml,/เตรียม Working A จาก Offer/);
+console.log('PASS ALIE Working: live Vendor cost, E11 and E13, single cost owner, open service workload, source-tag Schedule preview, and unreviewed Official.');
+
+if(process.env.GENESIS_ALIE_TEST_PAGA005){
+ const {pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaIncludedKit0550,pagaIncludedScope0550}=
+  require(root+'/project0550/data/supplierRevision0550.js');
+ const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550.js');
+ const original=JSON.parse(fs.readFileSync(process.env.GENESIS_ALIE_TEST_PAGA005,'utf8'));
+ const actual=planVendorRegister0550({...empty,fx:direct.fx},original,systems).workspace;
+ const net=pagaRevisionCandidate0550(actual);
+ assert.equal(net?.quoteRef,'A20261632-005');
+ assert.equal(pagaIncludedKit0550(actual,net)?.supplierQuoteRow.itemCode,'25010');
+ assert.match(pagaIncludedScope0550(actual,net),/25010/);
+ assert.doesNotMatch(pagaIncludedScope0550(actual,net),/18020/);
+ assert.equal(pagaRevisionSelected0550(actual),null,'Receipt does not change Working selection');
+ const owner={...priceRow,offerId:net.id,vendorId:net.vendorId,quantity:1,unit:'Lot',sourceRef:net.sourceRef,markupPct:0};
+ const selected=applyDirectSupplierMarkup0550({...actual,lines:[owner]});
+ const actualModel=deriveBidWorkspace(selected,systems,date);
+ const pricedNet=actualModel.lines[0];
+ const round=require(root+'/project0550/data/money0550.js').roundMoney0550;
+ assert.equal(pricedNet.provisionalCostNative,net.unitCost);
+ assert.equal(pricedNet.provisionalSellNative,round(net.unitCost*1.5));
+ assert.equal(pricedNet.provisionalCustomerNative,round(net.unitCost*1.5*1.2));
+ const conflict={...selected,lines:[...selected.lines,{...selected.lines[0],id:'LINE-NET-TWICE',scopeKey:'NET-TWICE'}]};
+ assert(deriveBidWorkspace(conflict,systems,date).lines.every(line=>
+  line.problems.some(problem=>problem.startsWith('PAGA_NET_COST_OWNER_DUPLICATE'))&&line.provisionalCustomerUSD===null));
+ console.log('PASS private INDUSTRONIC -005 register: one discounted NET owner, E11 +50%, E13 +20%, and correct included C2 kit.');
+}
 if(process.env.GENESIS_ALIE_TEST_LAYOUT){
  const actual=parseQuotedTable(fs.readFileSync(process.env.GENESIS_ALIE_TEST_LAYOUT,'utf8'));
  assert(actual?.rows.length>0,'Supplied private layout must reconcile');

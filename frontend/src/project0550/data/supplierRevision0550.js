@@ -10,7 +10,7 @@ import {activeSupplyLine0550} from './supplyProposalDraft0550';
 import {quoteValidity0550} from './quoteValidity0550';
 export const SUPPLIER_REVISION_SCHEMA_0550='genesis.0550.supplier-revision.v1';
 export const PAGA_REVISION='A20261632-002';
-const PAGA_REVISIONS=[PAGA_REVISION,'A20261632-003'];
+const PAGA_REVISIONS=[PAGA_REVISION,'A20261632-003','A20261632-005'];
 const PAGA_NET_ID='OFFER-PAGA-'+PAGA_REVISION+'-NET';
 const PAGA_OWNER='LINE-LEGACY-TEL-PAGA-1';
 const PAGA_PREDECESSORS=['OFFER-LEGACY-TEL-PAGA-1','OFFER-LEGACY-TEL-PAGA-2','OFFER-LEGACY-TEL-PAGA-3'];
@@ -38,6 +38,13 @@ export function pagaRevisionItems0550(data,net){
   offer.quoteEvidence?.sourceSha256===net.quoteEvidence.sourceSha256);
 }
 
+export const isPagaCommissioningKit0550=offer=>offer.supplierQuoteRow?.classification==='BASE_PRICE'&&
+ offer.supplierQuoteRow.itemCode===(offer.quoteRef==='A20261632-005'?'25010':'18020');
+
+export function pagaIncludedKit0550(data,net){
+ return pagaRevisionItems0550(data,net).find(isPagaCommissioningKit0550);
+}
+
 export function pagaIncludedServices0550(data,net){
  const base=pagaRevisionItems0550(data,net).filter(o=>o.supplierQuoteRow.classification==='BASE_PRICE');
  return {acoustic:base.find(o=>o.supplierQuoteRow.itemCode==='23050'),classroom:base.find(o=>o.supplierQuoteRow.itemCode==='23070')};
@@ -45,7 +52,12 @@ export function pagaIncludedServices0550(data,net){
 
 export function pagaIncludedScope0550(data,net){
  const {acoustic,classroom}=pagaIncludedServices0550(data,net);
- return [PAGA_REVISION_INCLUDED_0550,acoustic&&'Acoustic Study (23050) is included in this NET.',
+ const kit=pagaIncludedKit0550(data,net);
+ const included=net.quoteRef==='A20261632-005'?
+  'NET includes OEM documentation/project management (22030), FAT at Wertheim (23010) and packing (24010).'+
+   (kit?' Commissioning spare kit (item '+kit.supplierQuoteRow.itemCode+') is included.':''):
+  PAGA_REVISION_INCLUDED_0550;
+ return [included,acoustic&&'Acoustic Study (23050) is included in this NET.',
   classroom&&'Classroom / Virtual Classroom Training (23070) is included in this NET. Verify the tender training requirement separately.'].filter(Boolean).join(' ');
 }
 

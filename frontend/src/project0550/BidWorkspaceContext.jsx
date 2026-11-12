@@ -28,12 +28,12 @@ import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
 import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
-function prepareQuotation0550(data,today,loadedWorkspace){
+function prepareQuotation0550(data,today){
  const revised=preparePagaRevisionPricing0550(data,today);
  const avl=preparePagaAvlDeviation0550(revised);
  const based=revised===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
  const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
- const working=priced===loadedWorkspace||revised!==data?applyDirectSupplierMarkup0550(priced):priced;
+ const working=applyDirectSupplierMarkup0550(priced);
  return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
 }
 export const useBidWorkspace=()=>useContext(Context);
@@ -63,7 +63,7 @@ export function BidWorkspaceProvider({children}){
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
-   const prepared=prepareQuotation0550(processed,reviewDate,current);
+   const prepared=prepareQuotation0550(processed,reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});

@@ -32,7 +32,16 @@ export function sourceRadioSections0550(item){
  return item==='RADIO-009-OPTION'?['A2']:['A1','C1'];
 }
 
+export function vendorOptionSpareWbs0550(offer){
+ if(offer?.quoteEvidence?.classification!=='OPTION')return null;
+ const sections=(offer.bidTags?.sections||[]).filter(section=>section!=='A2');
+ if(sections.length!==1)return null;
+ return {C3:'C3',C4:'C2'}[sections[0]]||null;
+}
+
 export function offerSourceSections0550(offer){
+ const optionWbs=vendorOptionSpareWbs0550(offer);
+ if(optionWbs)return ['A2',optionWbs==='C2'?'C4':'C3'];
  const atomic=offer?.atomicLines?.[0];
  if(atomic)return [
   ...(atomic.internal.treatment==='OPTION'?['A2']:[]),
@@ -62,6 +71,10 @@ export function vendorTaggedSchedule0550(offer,line){
  const summaries=tags.filter(tag=>tag==='A1'||tag==='A2');
  const schedules=tags.filter(tag=>/^C[1-8]$/.test(tag));
  if(summaries.length>1||schedules.length>1)return null;
+ const breakdown=tags.filter(tag=>tag==='E'||tag==='F');
+ if(breakdown.length===1&&!schedules.length&&!summaries.includes('A2')&&
+  (breakdown[0]==='E'&&line.wbs==='B8'||breakdown[0]==='F'&&line.wbs==='B9'))
+  return {schedule:'A1',summary:'OTHER',treatment:'BASE',basis:'DRAFT / Vendor TAG 11.'+breakdown[0]+' / '+offer.id};
  const schedule=schedules[0]||summaries[0];
  if(!schedule)return null;
  const treatment=line.wbs.startsWith('C')?'OPTION':'BASE';

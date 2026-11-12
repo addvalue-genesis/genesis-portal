@@ -1,3 +1,4 @@
+import {isPagaCommissioningKit0550} from './supplierRevision0550';
 import {COMMISSIONING_PHASES_0550,commissioningPhase0550} from './commissioningSparePhases0550';
 import {CERAGON_R12_0550} from './ceragonSelection0550';
 import {mgwCurrentOffer0550} from './mgwQuoteSelection0550';
@@ -50,7 +51,7 @@ export function spareEquationDraftRows0550(data,model,schedule,systemToken){
    const offer=source.offer,key=raw.systemToken+'|'+raw.id+'|'+offer.id;
    if(seen.has(key))continue;seen.add(key);
    const declared=spareReferenceNote(null,offer,byOffer.get(offer.id)?.referenceOnly?'REFERENCE':'');
-   const isSpare=spareDescription(offer.description)||offer.supplierQuoteRow?.itemCode==='18020';
+   const isSpare=spareDescription(offer.description)||isPagaCommissioningKit0550(offer);
    if(isSpare&&((declared.includes('C4')&&schedule!=='C4')||(declared.includes('C3')&&schedule!=='C3')||(!declared.includes('C3')&&!declared.includes('C4')&&schedule!=='C2')))continue;
    const calculations=(data.calculations||[]).filter(c=>c.equationId===equationId&&c.systemToken===raw.systemToken&&c.inputs?.workingLineId===raw.id&&
     (c.inputs.offerId===offer.id||!c.inputs.offerId&&equipment.length===1&&offer.id===direct?.id));
@@ -177,7 +178,7 @@ export function c2DraftRowsFromExisting0550(data,model){
  const bindings=new Map((data.bidVolumes?.bindings||[]).map(binding=>[binding.lineId,binding]));
  const groups=new Map(),offerEntries=vendorOfferEntries0550(data);
  const entryById=new Map(offerEntries.map(entry=>[entry.offer.id,entry]));
- const selectedKits=new Set(offerEntries.filter(({offer:o})=>o.supplierQuoteRow?.itemCode==='18020'&&
+ const selectedKits=new Set(offerEntries.filter(({offer:o})=>isPagaCommissioningKit0550(o)&&
   o.quoteEvidence?.systemTokens.includes('TEL-PAGA')&&activeOffers.has(o.supplierQuoteRow.parentOfferId)).map(({offer:o})=>o.vendorId));
  const add=(token,key,row)=>{
   if(!token||token==='COMMON')return;
@@ -210,7 +211,7 @@ export function c2DraftRowsFromExisting0550(data,model){
  }
  for(const {offer,sourceSystemTokens} of offerEntries){
   const sourceRow=offer.supplierQuoteRow;
-  const kit=sourceRow?.itemCode==='18020'&&sourceSystemTokens.includes('TEL-PAGA');
+  const kit=isPagaCommissioningKit0550(offer)&&sourceSystemTokens.includes('TEL-PAGA');
   const isSpare=spareDescription(offer.description);
   const isMgwForSystem=isMgwReferenceOffer(offer)&&sourceSystemTokens.length>0;
   if(!kit&&!isSpare&&!isMgwForSystem)continue;

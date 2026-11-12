@@ -1,3 +1,4 @@
+import {isPagaCommissioningKit0550} from './data/supplierRevision0550';
 import React,{useState} from 'react';
 import {COMMISSIONING_PHASES_0550,commissioningBreakdown0550,commissioningPhase0550,B5_STARTUP_STATUS_0550,priceB5StartupAllowance0550,validB5StartupPct0550} from './data/commissioningSparePhases0550';
 import {CERAGON_R11_0550,CERAGON_R12_0550} from './data/ceragonSelection0550';
@@ -52,7 +53,7 @@ function LanWorkingStock({basis,link,data,onNavigate}){
 export function CommissioningSpareQuotes0550({data,model,onNavigate,disabled}){
  const active=model.lines.filter(l=>l.selected&&l.offerId&&!l.mrScopeState?.covered);
  const offers=new Map(data.offers.map(o=>[o.id,o]));
- const paga=data.offers.filter(o=>o.id.startsWith('OFFER-PAGA-A20261632')&&o.supplierQuoteRow?.itemCode==='18020'&&o.supplierQuoteRow.classification==='BASE_PRICE');
+ const paga=data.offers.filter(offer=>offer.id.startsWith('OFFER-PAGA-A20261632')&&isPagaCommissioningKit0550(offer));
  const dmr=offers.get(CERAGON_R12_0550);
  const dmrBase=active.find(l=>l.wbs==='A'&&l.offerId===CERAGON_R11_0550);
  const lan=lanStockBasis0550(data,model);
@@ -63,7 +64,7 @@ export function CommissioningSpareQuotes0550({data,model,onNavigate,disabled}){
  return <section className="p55-panel" aria-label="C2 supplier evidence">
   <h4>ราคาและขอบเขตที่พบใน 07 Vendor</h4>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ระบบ</th><th>หลักฐานราคา</th><th>การใช้ใน C2</th><th>ต้นทาง</th></tr></thead><tbody>
-   {paga.length?paga.map(offer=>{const owner=active.find(l=>l.offerId===offer.supplierQuoteRow?.parentOfferId&&l.wbs==='A');return <tr key={offer.id}><td>PAGA · INDUSTRONIC</td><td>18020 · {offer.description} · PN 244-490-200 · {offer.quoteEvidence?.quotedQuantity} {offer.unit} × {money(offer.unitCost,offer.currency)}</td><td>Special Tools · รวมในราคา Net ของใบนี้ · {owner?'ชุดนี้ 1 − 1 = 0 ชุดที่ต้องซื้อเพิ่ม':'รอตรวจการเลือกแพ็กเกจใน Working'} · รายการ Commissioning Spares อื่นยัง OPEN</td><td>{reference(offer,owner)}</td></tr>;}):<tr><td>PAGA · INDUSTRONIC</td><td>รอรายการ 18020 จากทะเบียนใบเสนอราคา</td><td>OPEN</td><td>{link('bid.vendor.offers','07.2 · Vendor')}</td></tr>}
+   {paga.length?paga.map(offer=>{const owner=active.find(l=>l.offerId===offer.supplierQuoteRow?.parentOfferId&&l.wbs==='A');return <tr key={offer.id}><td>PAGA · INDUSTRONIC</td><td>{offer.supplierQuoteRow.itemCode} · {offer.description} · {offer.quoteEvidence?.quotedQuantity} {offer.unit} × {money(offer.unitCost,offer.currency)}</td><td>Commissioning kit · รวมในราคา Net ของใบนี้ · {owner?'ชุดนี้ 1 − 1 = 0 ชุดที่ต้องซื้อเพิ่ม':'รอตรวจการเลือกแพ็กเกจใน Working'} · รายการ Commissioning Spares อื่นยัง OPEN</td><td>{reference(offer,owner)}</td></tr>;}):<tr><td>PAGA · INDUSTRONIC</td><td>รอข้อมูล Commissioning kit จากทะเบียนใบเสนอราคา</td><td>OPEN</td><td>{link('bid.vendor.offers','07.2 · Vendor')}</td></tr>}
    <tr><td>DMR · CERAGON</td><td>{dmrBase&&<div>R11 Working · ติดตั้ง 2 ODU (APF 1 / ACP 1)</div>}{dmr?<>R12 · 2 × Main ODU · {money(dmr.unitCost,dmr.currency)} / {dmr.unit}</>:'รอใบเสนอราคา CERAGON RevA1 ใน 07.2'}</td><td>R12 อยู่ 11.C4 Capital Spares · จำนวน C2 และความพอใช้ของสต็อกรอฐาน OEM</td><td>{dmr&&reference(dmr,active.find(l=>l.offerId===dmr.id&&l.wbs==='C2'))}{link('bid.budget.working.group.TEL-DMR','Working DMR')}</td></tr>
    <tr><td>LAN</td><td>ตรวจอุปกรณ์และวัสดุ {lan.rows.length} แถวจาก Working ด้านล่าง</td><td>ประเมินรายรุ่นเมื่อมีฐานปริมาณและ MTBF</td><td>{link('bid.budget.working.group.TEL-LAN','Working LAN')}</td></tr>
    {apfDistribution&&<tr><td>LAN · APF Distribution Switch</td><td>Q26-063 LAN/PBX/FO · <code>PWR-C1-715WAC</code> เป็น PSU ในชุด C9300 ที่เสนอ</td><td>จำนวนและราคาอะไหล่ C2 ยัง OPEN · ใบ Q26-063 v1.0 เดิมเคยระบุ spare <code>PWR-C1-715WAC-P</code> กับ C9300L คนละรุ่นกับชุดปัจจุบัน</td><td>{reference(apfDistribution.offer,apfDistribution.line)}</td></tr>}

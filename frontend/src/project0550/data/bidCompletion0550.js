@@ -62,6 +62,16 @@ const directMarkupSystems=new Map(procurement.directProcurement.flatMap(system=>
  system.suppliers.filter(supplier=>supplier.useDirectMarkup).flatMap(supplier=>
   supplier.vendorIds.map(id=>[id,system.quotedSystemToken]))));
 
+export function directSupplierMarkup0550(data,line,offer){
+ const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
+ const matchesSystem=directSystem&&(directSystem===line.systemToken||
+  line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
+ if(matchesSystem&&offer.vendorId===line.vendorId&&finite(offer.unitCost)&&
+  (!offer.supplierQuoteRow||offer.supplierQuoteRow.classification==='NET_PACKAGE')&&
+  !(offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data)))return procurement.directSupplierMarkupPct;
+ return null;
+}
+
 // Apply the approved selling basis to the active cost owner. Original offer
 // prices, quantities and the downstream prime rate remain the existing inputs.
 export function applyDirectSupplierMarkup0550(data){
@@ -74,12 +84,7 @@ export function applyDirectSupplierMarkup0550(data){
   if(!line.selected||line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
   if(line.sellMode==='MARKUP'&&line.markupPct===markupPct&&line.sellRate===null&&line.marginPct===null)return line;
   const offer=offers.get(line.offerId),row=rowsByLine.get(line.id);
-  const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
-  const matchesSystem=directSystem&&(directSystem===line.systemToken||
-   line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
-  const direct=matchesSystem&&offer.vendorId===line.vendorId&&
-   finite(offer.unitCost)&&(!offer.supplierQuoteRow||offer.supplierQuoteRow.classification==='NET_PACKAGE')&&
-   !(offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data));
+  const direct=directSupplierMarkup0550(data,line,offer)!==null;
   // Allocated Master Tower items have one THB cost owner even when the
   // activity is recorded under COMMON. Mixed estimates retain their own basis.
   const allocated=!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&

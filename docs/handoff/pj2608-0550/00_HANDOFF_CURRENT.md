@@ -1,3 +1,5 @@
+Latest Working pricing: [Vendor Offers as the Working price source](20261112_VENDOR_DIRECT_WORKING_PRICING.md). Eligible 07.2 ALIE rows open the existing Working editor with their source basis. Working applies the selling equations and Volume I preview reads compatible intake tags. PAGA A1-05 can select the registered -005 NET on its existing owner.
+
 Latest ALIE intake: [ALIE R2 in GENESIS](20261112_ALIE_GENESIS_INTAKE.md). Existing 07.2 registers source-bound atoms after review. Existing 10.2 shows the trace from each atom to its Offer and any Working line already using the source. The checkpoint records Drive and PDF setup, validation, and remaining quotation coverage.
 
 Latest spare workflow: [SI quantity drafts in 11.C2/C3/C4](20261111_SI_SPARE_DRAFT_WORKFLOW.md). Selected Working A and current 07 offers feed SI quantity, then the existing pricing and FX equations. Drafts are internal; prepare a separate spare owner and bind in 11.M before its price enters Volume I.

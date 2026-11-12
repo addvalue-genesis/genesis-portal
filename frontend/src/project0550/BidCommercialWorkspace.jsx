@@ -6,7 +6,7 @@ import {APF_LAN_BID_BASIS_0550,mgwCurrentOffer0550,mgwReplacementActive0550,MGW_
 import {isTowerSourceItem0550,towerC1Reference0550,towerSourceScope0550,TOWER_C1_0550,TOWER_LIS_0550,TOWER_MR_0550} from "./data/towerTenderScope0550";
 import {ControlledTagMapping0550} from './ControlledTagMapping0550';
 import {WorkingLineSource0550,WorkingRequirementTrace0550,WorkingQuoteBasis0550,workingRequirementIndex0550} from './WorkingLineTrace0550';
-import {bidCompletionBasisChanged0550} from "./data/bidCompletion0550";
+import {bidCompletionBasisChanged0550,directSupplierMarkup0550} from "./data/bidCompletion0550";
 import {deriveBidProcess0550} from "./data/bidProcess0550";
 import {SupplyProposalDraftFields0550} from "./SupplyProposalDraft0550";
 import {BidKnownPrices0550,BidKnownPriceHeadline0550} from "./BidKnownPrices0550";
@@ -14,6 +14,7 @@ import {BidFxBasis0550} from "./BidFxBasis0550";
 import {mgwDetailGroup0550} from "./data/mgwDetailPricing0550";
 import {MgwWorkingQuotes} from "./MgwQuoteViews";
 import {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550} from "./WorkingSupplierTrace0550";
+import {saveAlieWorkingDraft0550} from "./data/alieIntake0550";
 import {AlieWorking0550} from "./AlieIntake";
 import {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,DmrWorkingSections0550,dmrTagCostView0550} from "./DmrTagCost0550";
 import {RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OWNER_0550} from "./data/towerLegacyPricing0550";
@@ -33,7 +34,7 @@ import {OfficialLineReviewFields,OfficialSourceImpact,OfficialCustomerScope,Offi
 import {BidHeading,BidStructureGuide} from "./BidModulePresentation";
 import {BID_GROUPS_0550,bidPresentationIndex,bidOwnerStyle,lineOwner0550,bidModuleProps0550} from "./bidPresentation0550";
 import {BidInheritedBasis} from "./BidInheritedBasis";
-import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550} from "./bidWorkingBasis0550";
+import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550,policyDefaults0550} from "./bidWorkingBasis0550";
 import {OfficialCustomerForm} from "./OfficialCustomerForm";
 import {LicensingCost0550} from "./LicensingCost0550";
 import {B5StartupEstimate0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
@@ -72,7 +73,7 @@ function MrWorkingComponents0550({requirement}){
  </div>;
 }
 
-function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
+function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  // Spare SI equations supply Q_add only. Costs, selling E10/E11/E12, Prime
  // and FX continue through the existing Working runtime; no Schedule price is
  // created by the equation or by opening a C2/C3/C4 draft.
@@ -82,7 +83,7 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  const current=useRef(form),selected=useRef(initialForm);
  const setForm=value=>{const next=typeof value==="function"?value(current.current):value;current.current=next;editorState.current={initialForm,value:next};setLocalForm(next);};
  useEffect(()=>{if(selected.current!==initialForm){selected.current=initialForm;setForm(initialForm);}},[initialForm]);
- const {data,model,put,busy}=useBidWorkspace();
+ const {data,model,change,put,busy,reviewDate}=useBidWorkspace();
  const [reviewSave,setReviewSave]=useState(false);
  const field=(k,v)=>setForm(f=>({...f,[k]:v}));
  const chosenOffer=data.offers.find(o=>o.id===form.offerId),mgwGroup=mgwDetailGroup0550(form.mgwDetailGroupId);
@@ -92,7 +93,21 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  const spareEstimate=model.provisional.lines.find(l=>l.id===form.id&&l.spareBudget);
  const [basisChoice,setBasisChoice]=useState("");
  const [roleChoice,setRoleChoice]=useState("");
- return <form onSubmit={async e=>{e.preventDefault();const row={...form,id:form.id||newId("LINE")};if(reviewSave){row.officialReview={...(row.officialReview||blankOfficialReview())};row.officialReview.basisKey=officialLineBasisKey(data,row,row.officialReview);}if(await put("lines",row))setForm(blankLine());setReviewSave(false);}}>
+ const fromAlie=!initialForm.id&&initialForm.scopeKey.startsWith('ALIE / ');
+ const save=async e=>{
+  e.preventDefault();
+  const row={...form,id:form.id||newId("LINE")};
+  if(reviewSave){
+   row.officialReview={...(row.officialReview||blankOfficialReview())};
+   row.officialReview.basisKey=officialLineBasisKey(data,row,row.officialReview);
+  }
+  const saved=fromAlie?await change(d=>saveAlieWorkingDraft0550(d,row,initialForm,COMMERCIAL_POLICY,reviewDate),
+   'Prepare Working from Vendor Offer / '+row.offerId):await put("lines",row);
+  if(saved)onReset();
+  setReviewSave(false);
+ };
+ return <form onSubmit={save}>
+ {fromAlie&&<p className="p55-callout">ต้นทุนจาก Offer ใน 07.2 · ตรวจขอบเขตซ้ำ ปริมาณใช้งาน และฐานราคาขายก่อนบันทึก</p>}
  <p>รายการปลายทาง: <strong>{form.customerRowCode||"ยังไม่เลือก"}</strong> · รับค่าเริ่มต้นจากฐานโครงการ แล้วตรวจรายละเอียดของรายการก่อนบันทึก</p>
  {spareEstimate&&<p className="p55-callout">วงเงินอะไหล่ Working Preview {amount(spareEstimate.costRate)} ต่อ Lot จาก {spareEstimate.spareBudget.rate*100}% × ต้นทุน Part A ที่มีราคา {amount(spareEstimate.spareBudget.basisTHB)} · ช่อง Manual unit cost ด้านล่างแสดงค่าที่บันทึกเดิม · รอรายการ OEM และตรวจส่วนที่รวมในแพ็กเกจ</p>}
  {form.systemToken==="TEL-DMR"&&/^REQ-MR-B1-15-(APF|ACP)-0[12]$/.test(form.id)&&<DmrTagCost0550 data={data} integration={model.integration} working={model.provisional} lineId={form.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/>}
@@ -116,7 +131,9 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
     if(pagaRevisionNet0550(old)&&line.description.includes(old.quoteRef))next.description=line.description.replace(old.quoteRef,offer.quoteRef);
     next.sourceRef=offer.sourceRef+' / '+pagaIncludedScope0550(data,offer);
    }
-   return next;
+   const markupPct=directSupplierMarkup0550(data,next,offer);
+   return markupPct===null?next:{...next,sellMode:"MARKUP",sellRate:null,marginPct:null,markupPct,
+    primePct:next.primePct??policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost")?.primePct??null};
   });
  }} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)&&
   (o.id===form.offerId||!o.id.startsWith('OFFER-PAGA-A20261632')||!o.supplierQuoteRow||pagaRevisionNet0550(o)||
@@ -142,7 +159,7 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource}){
  <p>ต้นทุนและเรตขายใช้ {chosenOffer?.currency||form.currency} ต่อ {chosenOffer?.unit||form.unit} เดียวกัน · ช่องว่าง = OPEN; กรอก 0 เฉพาะเมื่อมีเหตุผลว่าเป็นศูนย์จริง · Trip/shared cost ให้ลงหนึ่งแถวด้วย scope key เดียว ไม่บวกซ้ำในทุกระบบ</p>
  <OfficialLineReviewFields value={form.officialReview} onChange={v=>field("officialReview",v)}/>
  {towerScope&&<p className="p55-callout">{towerScope.text}</p>}
- <label><input type="checkbox" checked={form.selected} disabled={Boolean(towerScope)||(mgwExcluded||mgwProjectWideConflict)&&!form.selected||isSatelliteScope0550(form)&&form.satelliteScope==="COMPANY_SUPPLY"} onChange={e=>field("selected",e.target.checked)}/> เลือกแถวนี้ในข้อเสนอ Working</label><div><button type="submit" disabled={busy} onClick={()=>setReviewSave(false)}>บันทึกแถว Working</button><button type="submit" disabled={busy} onClick={()=>setReviewSave(true)}>บันทึกผลทบทวน OFF-03</button><button type="button" onClick={()=>setForm(blankLine())}>รายการใหม่</button></div>
+ <label><input type="checkbox" checked={form.selected} disabled={Boolean(towerScope)||(mgwExcluded||mgwProjectWideConflict)&&!form.selected||isSatelliteScope0550(form)&&form.satelliteScope==="COMPANY_SUPPLY"} onChange={e=>field("selected",e.target.checked)}/> เลือกแถวนี้ในข้อเสนอ Working</label><div><button type="submit" disabled={busy} onClick={()=>setReviewSave(false)}>บันทึกแถว Working</button><button type="submit" disabled={busy} onClick={()=>setReviewSave(true)}>บันทึกผลทบทวน OFF-03</button><button type="button" onClick={onReset}>รายการใหม่</button></div>
  </form>;
 }
 function PartBCostTotal0550({rows}){
@@ -341,12 +358,12 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget} navigationSystem={navigationSystem}/>
  <details className="p55-panel" onToggle={e=>{if(e.currentTarget.open)setAlieOpened(true);}}>
   <summary>ALIE R2 · Supplier source trace</summary>
-  {alieOpened&&<AlieWorking0550 data={data} reviewDate={reviewDate} onNavigate={onNavigate} onEdit={editWorking}/>}
+  {alieOpened&&<AlieWorking0550 data={data} reviewDate={reviewDate} onNavigate={onNavigate} onEdit={editWorking} onDraft={patch=>editWorking({...blankLine(),...patch})}/>}
  </details>
  <WorkingHierarchy b5StartupAllowance={model.b5StartupAllowance} integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={editWorking} onRelease={id=>go("released",id)}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
- <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module>
+ <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource} onReset={()=>setForm(blankLine())}/></Module>
  </Module>
  <OfficialCustomerScope/>
  <Module id="bid.budget.scope-gates" title="OFF-03 · Coverage / gaps ก่อนอนุมัติข้อเสนอ" open={false}><p>Customer rows รอตรวจ: {official.schedule.filter(r=>!r.ready).map(r=>r.code).join(", ")||"ไม่มี"}</p><p>รายการยังไม่ระบุ Customer row: {official.unmapped.length} · แถวรอทบทวน: {official.selected.length-official.reviewedCount}</p><p>MR requirements ยังเปิด: {official.requirementGaps?.length||0} · Import conflicts: {data.mrWorkingImport?.conflicts.join(", ")||"ไม่มี"}</p><p>Engineering/TAG completeness, quote validity, ownership และ customer-form mapping ต้องตรวจครบ · C1 ต้องมีการตัดสินใจและหลักฐาน · Part C แยกเป็น Option · ผลทบทวนนี้เป็น Working review; การอนุมัติและบันทึกส่งลูกค้ายังเป็น HOLD</p></Module>

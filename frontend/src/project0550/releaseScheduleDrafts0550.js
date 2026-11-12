@@ -23,7 +23,8 @@ export function releaseScheduleDraftView0550(data,model,systems,today){
 export function releaseScheduleChecks0550(view){
  const paga=view.pagaNet&&view.bindings.find(b=>b.line?.selected&&b.line.offer?.id===view.pagaNet.id);
  const pagaChecks={
-  C2:'PAGA item 18020 is one commissioning kit included in the A1-05 NET. Verify additional OEM spares and recommended quantities.',
+  C2:view.pagaKit?'PAGA item '+view.pagaKit.supplierQuoteRow.itemCode+' is included in the A1-05 NET. Verify additional OEM spares and recommended quantities.':
+   'Check PAGA commissioning kit and additional spares against the selected NET quotation.',
   C3:view.pagaSpares?`PAGA SP2 records ${view.pagaSpares.recommended.length} recommended spare lines with supplier prices. Reconcile the kit overlap and Base/Option treatment before replacing the Working allowance.`:
    'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
   C5:'Separate additional PAGA special tools from the kit included in A1-05.',

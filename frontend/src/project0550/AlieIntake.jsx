@@ -1,10 +1,11 @@
 import React,{useMemo,useState} from 'react';
 import {downloadBidFile,useBidWorkspace} from './BidWorkspaceContext';
-import {SYSTEMS} from './data';
+import {COMMERCIAL_POLICY,SYSTEMS} from './data';
 import {ALIE_CLASSES_0550,atomicSections0550} from './data/atomicLines0550';
 import {planVendorRegister0550} from './data/vendorRegister0550';
+import {offerSourceSections0550} from './data/vendorBidTags0550';
 import {
- alieQuoteGroups0550,alieRegisterFromJson0550,defaultAlieRoute0550,exportAlieRows0550,
+ alieWorkingDraft0550,alieQuoteGroups0550,alieRegisterFromJson0550,defaultAlieRoute0550,exportAlieRows0550,
  parsedAlieRegister0550,parsedAlieSystem0550,preparedAlieRegister0550,registeredAlieRows0550,
 } from './data/alieIntake0550';
 import {
@@ -13,7 +14,7 @@ import {
 } from './data/alieDrive0550';
 
 const systems=[...SYSTEMS.map(system=>system.token),'COMMON'];
-const volumes=['A1','A2','C1','C2','C5','C6','C7','E','F'];
+const volumes=['A1','A2','C1','C2','C3','C4','C5','C6','C7','E','F'];
 
 function DriveQuotes({busy,inspectPdf}){
  const [folder,setFolder]=useState(ALIE_DRIVE_FOLDER_0550);
@@ -226,12 +227,13 @@ export default function AlieIntake({onNavigate}){
  </div>;
 }
 
-export function AlieWorking0550({data,reviewDate,onNavigate,onEdit}){
+export function AlieWorking0550({data,reviewDate,onNavigate,onEdit,onDraft}){
  const rows=useMemo(()=>registeredAlieRows0550(data),[data]);
  const [system,setSystem]=useState('');
  const [volume,setVolume]=useState('');
  const [selected,setSelected]=useState(new Set());
- const filtered=rows.filter(({atom})=>(!system||atom.anchor.system===system)&&(!volume||atomicSections0550(atom).includes(volume)));
+ const sections=({offer,atom})=>atom.parent_line_id?atomicSections0550(atom):offerSourceSections0550(offer);
+ const filtered=rows.filter(row=>(!system||row.atom.anchor.system===system)&&(!volume||sections(row).includes(volume)));
  const selectedRows=rows.filter(({atom})=>selected.has(atom.line_id));
  const toggle=(items,checked)=>setSelected(previous=>{
   const next=new Set(previous);
@@ -257,16 +259,19 @@ export function AlieWorking0550({data,reviewDate,onNavigate,onEdit}){
      <th scope="col">Offer / Part or service</th><th scope="col">System / TAG</th><th scope="col">Native Qty / rate</th><th scope="col">Class / Volume I</th><th scope="col">Working trace</th></tr></thead>
     <tbody>{filtered.map(row=>{
      const {offer,atom,working}=row;
+     const {draft,reason}=working.length?{}:alieWorkingDraft0550(data,row,COMMERCIAL_POLICY,reviewDate);
      return <tr key={atom.line_id}>
       <td><input type="checkbox" aria-label={'Select '+atom.line_id} checked={selected.has(atom.line_id)} onChange={e=>toggle([row],e.target.checked)}/></td>
       <td><button type="button" disabled={!onNavigate} onClick={()=>onNavigate?.('bid.vendor.offer.'+offer.id)}>{offer.quoteRef} · {atom.part.vnd_desc}</button>
        <small>{atom.line_id} · {atom.part.vnd_pn||'PN OPEN'}</small>{atom.parent_line_id&&<small>Included in {atom.parent_line_id}</small>}</td>
       <td>{atom.anchor.system} · {atom.anchor.tag}<small>{[atom.anchor.tag_status,atom.anchor.site,atom.anchor.location,atom.anchor.cabinet].filter(Boolean).join(' · ')}</small></td>
       <td>{atom.qty.value??'OPEN'} {atom.qty.uom} · {atom.cost.unit??'OPEN'} {atom.cost.currency}</td>
-      <td>{atom.route.line_class} · {atom.internal.treatment}<small>{atomicSections0550(atom).map(section=>'11.'+section).join(' / ')}</small></td>
+      <td>{atom.route.line_class} · {atom.internal.treatment}<small>{sections(row).map(section=>'11.'+section).join(' / ')}</small></td>
       <td>{working.length?working.map(({line,owner})=><button key={line.id} type="button" onClick={()=>onEdit(line)}>
        {line.wbs} · {line.description} · {owner?'Selected':'Reference'}
-      </button>):'OPEN · ยังไม่มี Working link'}</td>
+      </button>):draft&&onDraft?<button type="button" onClick={()=>onDraft(draft)}>
+       เตรียม Working {draft.wbs} จาก Offer
+      </button>:reason||'OPEN · ยังไม่มี Working link'}</td>
      </tr>;
     })}</tbody>
    </table></div>}

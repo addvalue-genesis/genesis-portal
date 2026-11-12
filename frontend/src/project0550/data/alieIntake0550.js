@@ -1,9 +1,15 @@
 import {ALIE_CLASSES_0550,atomicQuoteItem0550,atomicQuoteRef0550,atomicRoute0550,atomicTreatment0550} from './atomicLines0550';
-import {VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
+import {VENDOR_REGISTER_SCHEMA_0550,vendorWorkingRateReference0550} from './vendorRegister0550';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {safeSourceUrl} from './sourceIntakeModel';
 import {workingOffers0550,activeSupply0550} from './workingOffers0550';
-import {bidCompletionSourceUsages0550} from './bidCompletion0550';
+import {bidCompletionSourceUsages0550,directSupplierMarkup0550} from './bidCompletion0550';
+import {applyPolicyDraft0550,policyDefaults0550} from '../bidWorkingBasis0550';
+import {suggestedCustomerCode} from './officialPricing0550';
+import {mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550} from './mgwVendorBasis0550';
+import {ceragonSupersededOffer0550} from './ceragonSelection0550';
+import {quoteValidity0550} from './quoteValidity0550';
+import {vendorOptionSpareWbs0550} from './vendorBidTags0550';
 
 const project='PJ2608-0550';
 const normalized=value=>value.toUpperCase().replace(/[^A-Z0-9.-]+/g,'-').replace(/^-+|-+$/g,'');
@@ -131,7 +137,7 @@ export function parsedAlieRegister0550(data,pdf,selections,vendorId,sourceLink,t
 }
 
 export function registeredAlieRows0550(data){
- const offerLinks=new Map();
+ const offerLinks=new Map(),allocated=new Set();
  const add=(id,link)=>{
   if(!offerLinks.has(id))offerLinks.set(id,[]);
   offerLinks.get(id).push(link);
@@ -142,7 +148,10 @@ export function registeredAlieRows0550(data){
   }
  }
  for(const usage of bidCompletionSourceUsages0550(data)){
-  if(usage.current)for(const id of usage.offerIds)add(id,{line:usage.line,owner:activeSupply0550(usage.line)});
+  for(const id of usage.offerIds){
+   if(usage.line.selected)allocated.add(id);
+   if(usage.current)add(id,{line:usage.line,owner:activeSupply0550(usage.line)});
+  }
  }
  return data.offers.flatMap(offer=>(offer.atomicLines||[]).map(atom=>{
   const parentId=offer.supplierQuoteRow?.parentOfferId;
@@ -150,8 +159,65 @@ export function registeredAlieRows0550(data){
   const parents=parentId&&parentId!==offer.id&&atom.internal.treatment!=='OPTION'?(offerLinks.get(parentId)||[]).map(ref=>({...ref,owner:false})):[];
   const direct=(offerLinks.get(offer.id)||[]).map(ref=>({...ref,owner:ref.owner&&!atom.parent_line_id&&atom.internal.treatment!=='REFERENCE'}));
   const working=[...new Map([...legacy,...parents,...direct].map(ref=>[ref.line.id,ref])).values()];
-  return {offer,atom,working};
+  return {offer,atom,working,allocated:allocated.has(offer.id)||(offer.quoteEvidence.workingReferenceOfferIds||[]).some(id=>allocated.has(id))};
  }));
+}
+
+const alieWorkingWbs={
+ EQUIP:'A',SPARE_PRECOM:'B5',TOOL:'B6',SERVICE_SITE:'B4',SERVICE_TRAIN:'B3',
+ OTHER_COST:'B8',INSURANCE:'B9',
+};
+const alieScopeKey=atom=>'ALIE / '+atom.line_id;
+
+export function alieWorkingDraft0550(data,{offer,atom,working,allocated},policies,today){
+ const {route,anchor,qty,cost,internal}=atom;
+ const wbs=internal.treatment==='OPTION'?vendorOptionSpareWbs0550(offer):alieWorkingWbs[route.line_class];
+ if(atom.parent_line_id||internal.treatment==='REFERENCE'||offer.supplierQuoteRow||vendorWorkingRateReference0550(offer))
+  return {reason:'ใช้เจ้าของราคาแพ็กเกจหรือรายการหลัก'};
+ if(allocated||working.length||data.lines.some(line=>line.offerId===offer.id||line.scopeKey===alieScopeKey(atom)))
+  return {reason:'มีแถว Working สำหรับรายการนี้แล้ว'};
+ if(!wbs)
+  return {reason:'OPEN · ต้องยืนยัน Working WBS สำหรับรายการนี้'};
+ if(/^(not stated|open|tbd|-)$/i.test(offer.quoteEvidence.quotedUnit.trim())&&!offer.unitBasis?.trim())
+  return {reason:'OPEN · ตรวจหน่วยตามใบเสนอราคาใน 07.2'};
+ if(cost.basis==='ACTUAL'||quoteValidity0550(offer,today).expired||
+  cost.currency!==offer.currency||(cost.unit===null?offer.unitCost!==null:Number(cost.unit)!==offer.unitCost))
+  return {reason:'OPEN · ตรวจฐานราคาและอายุใบเสนอราคาใน 07.2'};
+ const service=route.line_class.startsWith('SERVICE_');
+ // Day and trip rates describe how the vendor bills. Working needs the planned
+ // number of service days or trips, even if the vendor printed an example Qty.
+ const quantity=service&&qty.uom!=='lot'?null:qty.value;
+ let draft={
+  wbs,systemToken:anchor.system,description:atom.customer.desc,scopeKey:alieScopeKey(atom),
+  tagRef:anchor.tag,requirementRef:anchor.mr_ref||'',sourceRef:atom.prov.src.slice(0,3600),
+  vendorId:offer.vendorId,offerId:offer.id,quantity,unit:offer.unit,currency:offer.currency,
+  brand:atom.part.brand==='OPEN'?'':atom.part.brand,
+ };
+ draft.customerRowCode=({B8:'B1',B9:'B4'})[wbs]||suggestedCustomerCode(draft);
+ if(ceragonSupersededOffer0550(data,offer.id)||mgwWorkingLineExcluded0550(data,draft,offer)||mgwProjectWideLineConflict0550(draft,offer))
+  return {reason:'OPEN · ขอบเขตหรือฉบับใบเสนอราคาที่ใช้งานต้องตรวจใน 07.2'};
+ const markupPct=directSupplierMarkup0550(data,draft,offer);
+ if(markupPct!==null){
+  draft={...draft,sellMode:'MARKUP',markupPct,primePct:policyDefaults0550(policies,'Goods / Procured Cost')?.primePct??null};
+ }else if(['A','B5','B6','C2','C3'].includes(wbs)){
+  draft=applyPolicyDraft0550(draft,policies,'Goods / Procured Cost');
+ }else if(service){
+  draft=applyPolicyDraft0550(draft,policies,'Professional Service');
+ }else{
+  // Miscellaneous costs may include both reimbursable fees and priced work.
+  // Leave the sell basis open until its treatment is entered in Working.
+  draft={...draft,sellMode:'MARKUP'};
+ }
+ return {draft};
+}
+
+export function saveAlieWorkingDraft0550(data,row,initialForm,policies,today){
+ const source=registeredAlieRows0550(data).find(({atom})=>alieScopeKey(atom)===initialForm.scopeKey);
+ const current=source&&alieWorkingDraft0550(data,source,policies,today);
+ if(!current?.draft||current.draft.offerId!==row.offerId||current.draft.systemToken!==row.systemToken||
+  row.scopeKey!==initialForm.scopeKey||data.lines.some(line=>line.id===row.id))
+  throw Error('ALIE · Offer หรือเจ้าของราคาเปลี่ยน กรุณาเปิดร่างจากรายการ 07.2 อีกครั้ง');
+ return {...data,lines:[...data.lines,row]};
 }
 
 export function exportAlieRows0550(selected,registered,today){

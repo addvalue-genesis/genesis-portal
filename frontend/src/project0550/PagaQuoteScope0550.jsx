@@ -1,6 +1,6 @@
 import React from 'react';
 import {latestPagaVendorPackage0550} from './data/vendorRegister0550';
-import {PAGA_REVISION_OPEN_0550,pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaCommercialChanges0550,pagaIncludedScope0550,pagaIncludedServices0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
+import {PAGA_REVISION_OPEN_0550,pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaCommercialChanges0550,pagaIncludedScope0550,pagaIncludedServices0550,pagaIncludedKit0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 
 const scopeNotes={
  A:'Working A1-05 ใช้ NET 1 Lot อ้างอิง MR Rev.B1 Appendix 1.4 และ WP.7 · Access Panel 4 ตัวตามใบเสนอราคา · ตรวจ TAG ตัวที่สี่กับ MR และวงจร XBC ที่ APF/ACP',
@@ -30,6 +30,10 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  const display=latestVendorQuote||net||received;
  if(!display)return null;
  const services=net?pagaIncludedServices0550(data,net):{};
+ const kit=net&&pagaIncludedKit0550(data,net);
+ const scopeNote=net?.quoteRef==='A20261632-005'&&['C','C2','C5'].includes(section)?
+  [kit&&('Item '+kit.supplierQuoteRow.itemCode+' · Commissioning spare kit รวมอยู่ใน NET'), 'ตรวจรายการและปริมาณที่ต้องจัดหาเพิ่มจาก OEM'].filter(Boolean).join(' · '):
+  scopeNotes[section];
  const spares=section==='C3'?pagaTwoYearSpareEvidence0550(data,net):null;
  const training=['C7','mapping'].includes(section)?pagaTrainingOption0550(data,net):null;
  const mr=(data.sourceIntake?.sources||[]).find(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER');
@@ -45,7 +49,7 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
   <h4>PAGA · INDUSTRONIC {display.quoteRef} · {vendorView?'ใบเสนอราคาหลักในทะเบียน':net?'Working Draft':'Received'}</h4>
   {vendorView&&net&&net.id!==display.id&&<p>ฐานที่เลือกใน Working A1-05 · {net.quoteRef}</p>}
   {received&&<p>{received.quoteRef} · ได้รับแล้ว · เลือกฉบับในเจ้าของราคา Working A1-05 เมื่อตรวจฐานราคาและขอบเขตแล้ว {onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+received.id)}>07 · เปิดใบเสนอราคา</button>}</p>}
-  {net&&!vendorView&&<p>{spares?`OEM SP2 ของ -002 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจความเข้ากันกับฉบับที่เลือก รายการซ้ำกับ Commissioning Kit และ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNotes[section]||pagaIncludedScope0550(data,net)}</p>}
+  {net&&!vendorView&&<p>{spares?`OEM SP2 ของ -002 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจความเข้ากันกับฉบับที่เลือก รายการซ้ำกับ Commissioning Kit และ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNote||pagaIncludedScope0550(data,net)}</p>}
   {net&&['B','C','C7','D','mapping','release'].includes(section)&&services.acoustic&&<p>Item 23050 · Acoustic Study รวมอยู่ใน NET · ระยะเวลาศึกษาแยกจาก lead time ของอุปกรณ์</p>}
   {net&&['B','C','C7','mapping','release'].includes(section)&&services.classroom&&<p>Item 23070 · Classroom / Virtual Classroom Training รวมอยู่ใน NET · ตรวจจำนวนผู้เข้าอบรม ระยะเวลา และ On-site Training ตาม Annex ก่อนจัดสรรส่วนเพิ่ม</p>}
   {spares&&onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+(spares.recommended[0]||spares.options[0]).id)}>07 · เปิดหลักฐาน SP2</button>}
