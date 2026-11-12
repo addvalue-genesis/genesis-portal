@@ -3,12 +3,12 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_SUPERSEDED_0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
  mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
-const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12', 'TEL-RADIO-DTRS':'A1-07', 'TEL-RADIO-MARINE':'A1-07'};
+const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12', 'TEL-RADIO-DTRS':'A1-07', 'TEL-RADIO-MARINE':'A1-07', 'TEL-RADIO-SSB':'A1-07', 'TEL-RADIO-AERO':'A1-07'};
 const nativeMr=new Map(MR_WORKING_CATALOG_0550.rows.map(row=>[row.id,row]));
 const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Object.keys(original).length&&
  Object.keys(original).every(key=>original[key]===line[key]);
@@ -24,6 +24,11 @@ const radioRegisterBatches=[
  {batchId:MGW_RADIO_MARINE_0550.batchId,preparedOn:MGW_RADIO_MARINE_0550.preparedOn,mrMap:MGW_RADIO_MARINE_0550.mrMap,
   coverageNote:'Q26-063 ver1.0 p9. '+MGW_RADIO_002_SITE_NOTE_0550+
    ' Reconcile the quoted quantity to MR Appendix 1.1.'},
+ {batchId:MGW_RADIO_SSB_0550.batchId,preparedOn:MGW_RADIO_SSB_0550.preparedOn,mrMap:MGW_RADIO_SSB_0550.mrMap,
+  coverageNote:'Q26-063 ver1.0 pp9–11. '+MGW_RADIO_003_SITE_NOTE_0550+
+   ' RADIO-011 maps with RADIO-003 to MR-B1-11-APF-03. Reconcile quoted scope to MR Appendix 1.1.'},
+ {batchId:MGW_RADIO_AERO_0550.batchId,preparedOn:MGW_RADIO_AERO_0550.preparedOn,mrMap:MGW_RADIO_AERO_0550.mrMap,
+  coverageNote:'Q26-063 ver1.0 p11. RADIO-012 and RADIO-013 map to MR-B1-11-APF-04. Reconcile quoted scope to MR Appendix 1.1.'},
 ];
 
 function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,coverageNote}){

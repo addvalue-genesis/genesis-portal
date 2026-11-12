@@ -300,4 +300,42 @@ assert.equal(sum(service.rows.map(r=>r.totalUSD)),service.totalUSD);
 assert.deepEqual(service.priced.map((_,i)=>sum(service.rows.map(r=>r.shares[i]))),service.priced.map(r=>r.extended));
 assert(!service.rows.some(r=>['TEL-PAGA','TEL-DMR','TEL-TELT'].includes(r.systemToken)));
 assert.equal(service.open[0].extended,null);
+
+// Supplemental SSB/Aero lots keep the consumed DTRS package key unchanged.
+const radioLotDate='2026-11-12';
+const activateLots=input=>current.prepareMgwCurrentWorking0550(current.prepareMgwRadioDtrsRegister0550(input,tokens,radioLotDate),D.COMMERCIAL_POLICY,radioLotDate);
+const radioLots=activateLots(radioBase);validate(radioLots);
+const lotOffers=radioLots.offers.filter(radioSelection.mgwRadioDtrsOffer0550);
+assert.deepEqual(lotOffers.map(o=>[radioSelection.mgwCurrentItemKey0550(o),radioSelection.mgwCurrentMr0550(o)]),
+ [['RADIO-001',['MR-B1-11-APF-01']],['RADIO-009',['MR-B1-11-APF-01']],['RADIO-009-OPTION',[]],['RADIO-016',[]],
+  ['RADIO-002',['MR-B1-11-APF-02']],
+  ['RADIO-003',['MR-B1-11-APF-03']],['RADIO-011',['MR-B1-11-APF-03']],
+  ['RADIO-012',['MR-B1-11-APF-04']],['RADIO-013',['MR-B1-11-APF-04']]]);
+assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-003').quoteEvidence.locator,/\/ ACO \//);
+assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-011').quoteEvidence.locator,/\/ APF \//);
+const lotOwners=W.deriveBidWorkspace(radioLots,tokens,radioLotDate).lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
+assert.deepEqual(lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))
+ .map(l=>[radioSelection.mgwCurrentItemKey0550(l.offer),radioSelection.mgwCurrentMr0550(l.offer)[0],l.customerRowCode]),
+ [['RADIO-003','MR-B1-11-APF-03','A1-07'],['RADIO-011','MR-B1-11-APF-03','A1-07'],
+  ['RADIO-012','MR-B1-11-APF-04','A1-07'],['RADIO-013','MR-B1-11-APF-04','A1-07']]);
+const lotBindings=lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))
+ .map(line=>({lineId:line.id,line,quantity:line.quantity,unit:line.unit,amount:line.provisionalCustomerUSD,unitPrice:line.provisionalCustomerUSD,schedule:'C1',treatment:'BASE'}));
+const lotC1=appendix.deriveC1Appendix0550({
+ proposal:{documentNo:'SYNTHETIC',revision:'TEST'},c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550,workingPreview:true,
+ c1Context:{lines:radioLots.lines,requirements:[]},bindings:lotBindings,scheduleRows:()=>lotBindings,getRecord:()=>({nativeFields:{}})
+});
+const openScopeNote='Quoted equipment only — MR quantities and interfaces remain open';
+assert.deepEqual(['03','04'].map(item=>lotC1.rows.find(r=>r.key==='MR-B1-11-APF-'+item)).map(r=>[r.sn,r.internalNote,r.provisionalRadio]),
+ [['1.1.3',radioNote,true],['1.1.4',radioNote,true]]);
+const savedLotOwners=['03','04','06'].map(item=>{
+ const line=radioLots.lines.find(l=>l.id==='REQ-MR-B1-11-APF-'+item);
+ return {lineId:line.id,line:{...line,selected:true,responsibility:'TSI'},quantity:1,unit:'Lot',amount:100,unitPrice:100,schedule:'C1',treatment:'BASE'};
+});
+const savedLotC1=appendix.deriveC1Appendix0550({
+ proposal:{documentNo:'SYNTHETIC',revision:'TEST'},c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550,workingPreview:false,
+ c1Context:{lines:radioLots.lines.map(l=>savedLotOwners.some(b=>b.lineId===l.id)?{...l,selected:true,responsibility:'TSI'}:l),requirements:[]},
+ bindings:savedLotOwners,scheduleRows:()=>savedLotOwners,getRecord:()=>({nativeFields:{}})
+});
+assert.deepEqual(savedLotC1.rows.filter(r=>r.internalNote===openScopeNote).map(r=>r.sn),['1.1.3','1.1.4','1.1.6']);
 console.log('PASS current MGW DTRS: APF mapping and supplier components, saved Working site repair, two source-bound owners, 11.M/C1 drafts, PAGA exclusion and exact E14 pools.');
+console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, and C1 open-scope notes on 1.1.3/1.1.4/1.1.6.');
