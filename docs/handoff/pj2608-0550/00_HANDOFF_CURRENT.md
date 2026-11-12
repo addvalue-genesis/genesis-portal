@@ -1,3 +1,5 @@
+Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). The Q26-063 source extensions feed 10.2 and 11.C1 Appendix 1.1 by system. The shared Console and Cable scope has one charge per source row. WP.7 remains the technical trace.
+
 Latest Working pricing: [Vendor Offers as the Working price source](20261112_VENDOR_DIRECT_WORKING_PRICING.md). Eligible 07.2 ALIE rows open the existing Working editor with their source basis. Working applies the selling equations and Volume I preview reads compatible intake tags. PAGA A1-05 can select the registered -005 NET on its existing owner.
 
 Latest ALIE intake: [ALIE R2 in GENESIS](20261112_ALIE_GENESIS_INTAKE.md). Existing 07.2 registers source-bound atoms after review. Existing 10.2 shows the trace from each atom to its Offer and any Working line already using the source. The checkpoint records Drive and PDF setup, validation, and remaining quotation coverage.

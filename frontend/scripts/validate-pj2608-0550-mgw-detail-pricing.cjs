@@ -117,7 +117,7 @@ const {WorkingPreview0550}=require(root+'/project0550/WorkingPreview0550.jsx');
 const mappingHtml=renderToStaticMarkup(React.createElement(WorkingPreview0550,{
  navigationTarget:'bid.working-preview.step.7',onNavigate:()=>{},onOpenSource:()=>{},
 }));
-const mappingRow=mr=>mappingHtml.split('data-mapping-requirement="REQDEF-'+mr+'"')[1].split('</tr>')[0];
+const mappingRow=mr=>mappingHtml.split('data-mapping-requirement="REQDEF-'+mr+'"')[1].split('data-mapping-requirement=')[0];
 assert(mappingRow(apfMr).includes('data-supplier-source-text="'+equipmentOffer.id+'"'));
 assert.match(mappingRow(apfMr),/Radio System Cabinet G26642[\s\S]*Repeater SLR5500[\s\S]*Dispatching Server R740/);
 assert(!mappingRow(acpMr).includes(equipmentOffer.id));
@@ -243,7 +243,7 @@ const c1View={...draft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550};
 const c1=appendix.deriveC1Appendix0550(c1View);
 const c1Radio=c1.rows.filter(row=>row.appendix==='1.1');
 assert(c1Radio.every(row=>row.kind==='MR'));
-assert.deepEqual(c1Radio.map(row=>row.sn),Array.from({length:16},(_,i)=>'1.1.'+(i+1)));
+assert.deepEqual(appendixScope.map(mr=>c1Radio.find(row=>row.key===mr.id).sn),Array.from({length:16},(_,i)=>'1.1.'+(i+1)));
 const apf=c1Radio.find(row=>row.key===apfMr);
 const radioNote='Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 assert.equal(apf.sn,'1.1.1');
@@ -276,8 +276,9 @@ const strictC1=appendix.deriveC1Appendix0550({...savedRadioView,c1LayoutVersion:
 assert.equal(strictC1.rows.find(row=>row.key===apfMr).amount,null);
 const c1Missing=appendix.deriveC1Appendix0550({...c1View,c1Context:{...c1View.c1Context,lines:c1View.c1Context.lines.filter(line=>line.mrRequirementId!==apfMr)}});
 assert.equal(c1Missing.rows.find(row=>row.key===apfMr).amount,null);
-assert(radioOwners.every(owner=>c1Missing.pendingOwners.some(binding=>binding.lineId===owner.id)));
-assert(!c1Missing.rows.some(row=>row.kind==='PACKAGE'&&radioOwners.some(owner=>row.ownerIds.includes(owner.id))));
+for(const owner of radioOwners){
+ assert.equal(c1Missing.rows.filter(row=>row.kind==='PACKAGE'&&row.appendix==='1.1'&&row.ownerIds.includes(owner.id)).length,1);
+}
 assert.equal(c1.bindings.filter(b=>radioOwners.some(l=>l.id===b.lineId)).length,2);
 for(const owner of radioOwners){
  assert.equal(savedRadioView.bindings.filter(binding=>binding.lineId===owner.id).length,1);
@@ -306,7 +307,8 @@ const radioLotDate='2026-11-12';
 const activateLots=input=>current.prepareMgwCurrentWorking0550(current.prepareMgwRadioDtrsRegister0550(input,tokens,radioLotDate),D.COMMERCIAL_POLICY,radioLotDate);
 const radioLots=activateLots(radioBase);validate(radioLots);
 const lotOffers=radioLots.offers.filter(radioSelection.mgwRadioDtrsOffer0550);
-assert.deepEqual(lotOffers.map(o=>[radioSelection.mgwCurrentItemKey0550(o),radioSelection.mgwCurrentMr0550(o)]),
+assert.deepEqual(lotOffers.filter(o=>o.quoteEvidence.sourceId!==radioSelection.MGW_RADIO_REMAINING_0550.batchId)
+ .map(o=>[radioSelection.mgwCurrentItemKey0550(o),radioSelection.mgwCurrentMr0550(o)]),
  [['RADIO-001',['MR-B1-11-APF-01']],['RADIO-009',['MR-B1-11-APF-01']],['RADIO-009-OPTION',[]],['RADIO-016',[]],
   ['RADIO-002',['MR-B1-11-APF-02']],
   ['RADIO-003',['MR-B1-11-APF-03']],['RADIO-011',['MR-B1-11-APF-03']],
@@ -316,8 +318,8 @@ assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-
 const lotOwners=W.deriveBidWorkspace(radioLots,tokens,radioLotDate).lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
 assert.deepEqual(lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))
  .map(l=>[radioSelection.mgwCurrentItemKey0550(l.offer),radioSelection.mgwCurrentMr0550(l.offer)[0],l.customerRowCode]),
- [['RADIO-003','MR-B1-11-APF-03','A1-07'],['RADIO-011','MR-B1-11-APF-03','A1-07'],
-  ['RADIO-012','MR-B1-11-APF-04','A1-07'],['RADIO-013','MR-B1-11-APF-04','A1-07']]);
+ [['RADIO-003','MR-B1-11-APF-03','A1-10'],['RADIO-011','MR-B1-11-APF-03','A1-10'],
+  ['RADIO-012','MR-B1-11-APF-04','A1-09'],['RADIO-013','MR-B1-11-APF-04','A1-09']]);
 const lotBindings=lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))
  .map(line=>({lineId:line.id,line,quantity:line.quantity,unit:line.unit,amount:line.provisionalCustomerUSD,unitPrice:line.provisionalCustomerUSD,schedule:'C1',treatment:'BASE'}));
 const lotC1=appendix.deriveC1Appendix0550({
@@ -350,5 +352,64 @@ assert.deepEqual(repairedLots.lines.filter(l=>stripIds.has(l.id))
   ['LINE-MGW-CURRENT-RADIO-013','MR-B1-11-APF-04','RADIO-013']]);
 assert.equal(activateLots(repairedLots),repairedLots,'Do not recreate SSB/Aero owners that already exist');
 assert.equal(repairedLots.lines.filter(l=>l.offerId===equipmentOffer.id).length,1,'Leave DTRS owners untouched while repairing SSB/Aero');
+
+// Use the normal Volume I draft projection with no SI records or MR parent
+// rows. Every printed extension still has exactly one commercial destination.
+const directData={...radioLots,lines:radioLots.lines.filter(l=>!l.mrRequirementId),integrationWorkspace:undefined};
+const directModel=W.deriveBidWorkspace(directData,tokens,radioLotDate);
+const directSaved=volumes.deriveBidVolumes0550(directData,directModel,D.SYSTEMS,radioLotDate);
+const directDraft=preview.deriveBidVolumeWorkingPreview0550(directData,directModel,D.SYSTEMS,radioLotDate,directSaved);
+const directC1=appendix.deriveC1Appendix0550({...directDraft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550,c1Context:{lines:directData.lines}});
+assert.equal(lotOffers.length,19,'18 quoted extensions and one unpriced option');
+assert.equal(lotOwners.length,18);
+assert.equal(new Set(lotOwners.map(line=>line.offerId)).size,18);
+assert.equal(sum(lotOwners.map(line=>line.provisionalCostNative)),700501);
+const directCosts=[
+ ['TEL-RADIO-DTRS','A1-07',476819],['COMMON','A1-07',13902],['TEL-RADIO-MARINE','A1-08',129739],
+ ['TEL-RADIO-AERO','A1-09',28724],['TEL-RADIO-SSB','A1-10',51317],
+];
+for(const [token,code,cost] of directCosts){
+ const owners=lotOwners.filter(line=>line.systemToken===token);
+ assert(owners.every(line=>line.customerRowCode===code));
+ assert.equal(sum(owners.map(line=>line.provisionalCostNative)),cost);
+}
+const directRows=directC1.rows.filter(row=>row.priceOwners.some(b=>radioSelection.mgwRadioDtrsOffer0550(b.line.offer)));
+assert.equal(directRows.length,18);
+assert(directRows.every(row=>row.appendix==='1.1'&&Number.isFinite(row.amount)&&row.ownerIds.length===1));
+assert.equal(sum(directRows.map(row=>row.amount)),sum(lotOwners.map(line=>line.provisionalCustomerUSD)));
+assert.equal(sum(directC1.groups.find(group=>group.id==='1.1').systems.map(system=>system.knownAmount).filter(Number.isFinite)),
+ sum(directRows.map(row=>row.amount)));
+assert.equal(directC1.amount,null);
+assert(lotOwners.filter(line=>line.offer.quoteEvidence.quotedUnit==='Not stated').every(line=>
+ line.problems.some(problem=>problem.startsWith('MGW_UNIT_OPEN:'))&&line.customerUSD===null&&Number.isFinite(line.provisionalCustomerUSD)));
+const rawConsole=radioLots.lines.find(line=>line.id==='LINE-MGW-CURRENT-RADIO-004');
+const duplicateConsole={...radioLots,lines:[...radioLots.lines,{...rawConsole,id:'QA-OTHER-CONSOLE',scopeKey:'QA-OTHER-CONSOLE'}]};
+assert(W.deriveBidWorkspace(duplicateConsole,tokens,radioLotDate).lines.filter(line=>line.offerId===rawConsole.offerId).every(line=>
+ line.provisionalCustomerUSD===null&&line.problems.some(problem=>problem.startsWith('MGW_SOURCE_COST_OWNER_DUPLICATE'))));
+const deletedConsole={...radioLots,lines:radioLots.lines.filter(line=>line.id!==rawConsole.id)};
+assert.equal(activateLots(deletedConsole),deletedConsole);
+const unmappedStart=activateLots({...radioBase,lines:radioBase.lines.filter(line=>!line.mrRequirementId)});
+assert.equal(unmappedStart.lines.filter(line=>line.selected&&lotOwners.some(owner=>owner.id===line.id)).length,18);
+const remainingBatch=radioSelection.MGW_RADIO_REMAINING_0550.batchId;
+const preDirectOfferIds=new Set(lotOffers.filter(o=>o.quoteEvidence.sourceId!==remainingBatch).map(o=>o.id));
+const oldOwner=radioLots.lines.find(l=>l.id==='LINE-MGW-CURRENT-RADIO-002');
+const authoredOwner=radioLots.lines.find(l=>l.id==='LINE-MGW-CURRENT-RADIO-013');
+const mappingBlocked='LINE-MGW-CURRENT-RADIO-001 / MR Working scope is deselected, covered or missing; reconcile quoted scope';
+const restored={...radioLots,
+ offers:radioLots.offers.filter(o=>o.quoteEvidence?.sourceId!==remainingBatch),
+ lines:radioLots.lines.filter(l=>!l.id.startsWith('LINE-MGW-CURRENT-RADIO-')||preDirectOfferIds.has(l.offerId)&&!l.id.endsWith('016')&&l.id!==radioOwner.id).map(l=>
+  l===oldOwner?{...l,customerRowCode:'A1-07'}:l===authoredOwner?{...l,customerRowCode:'A1-07',description:'Authored Aero basis'}:l),
+ supplierRevisionImports:radioLots.supplierRevisionImports.filter(r=>r.batchId!==remainingBatch),
+ mgwDetailPricingImport:{...radioLots.mgwDetailPricingImport,
+  conflicts:[...radioLots.mgwDetailPricingImport.conflicts,mappingBlocked],
+  decision:radioLots.mgwDetailPricingImport.decision.split('\n').filter(line=>!line.endsWith(remainingBatch)).join('\n')},
+};
+const upgraded=activateLots(restored);validate(upgraded);
+assert.deepEqual(upgraded.lines.find(l=>l.id===oldOwner.id),oldOwner);
+assert.equal(upgraded.lines.find(l=>l.id===authoredOwner.id),restored.lines.find(l=>l.id===authoredOwner.id));
+assert.equal(upgraded.lines.filter(l=>l.id===radioOwner.id).length,1);
+assert(!upgraded.mgwDetailPricingImport.conflicts.includes(mappingBlocked));
+assert.equal(activateLots(upgraded),upgraded);
+console.log('PASS MGW Radio direct draft: 18 single owners, USD 700,501 supplier cost, five C1 system/shared groups, no SI/MR dependency, no duplicate or unpriced option charge, missing supplier units still OPEN for Official.');
 console.log('PASS current MGW DTRS: APF mapping and supplier components, saved Working site repair, two source-bound owners, 11.M/C1 drafts, PAGA exclusion and exact E14 pools.');
 console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, C1 open-scope notes on 1.1.3/1.1.4/1.1.6, and missing Working owners re-applied.');

@@ -3,16 +3,17 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
- mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwSupplementOffer0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
+ mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
-const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12', 'TEL-RADIO-DTRS':'A1-07', 'TEL-RADIO-MARINE':'A1-07', 'TEL-RADIO-SSB':'A1-07', 'TEL-RADIO-AERO':'A1-07'};
+const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12'};
 const nativeMr=new Map(MR_WORKING_CATALOG_0550.rows.map(row=>[row.id,row]));
 const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Object.keys(original).length&&
  Object.keys(original).every(key=>original[key]===line[key]);
 const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
+const formerRadioMappingBlock=id=>id+' / MR Working scope is deselected, covered or missing; reconcile quoted scope';
 
 // Each batch is consumed independently. The DTRS package keeps its original
 // definition (and package key); later quotation rows are added as new batches.
@@ -29,6 +30,7 @@ const radioRegisterBatches=[
    ' RADIO-011 maps with RADIO-003 to MR-B1-11-APF-03. Reconcile quoted scope to MR Appendix 1.1.'},
  {batchId:MGW_RADIO_AERO_0550.batchId,preparedOn:MGW_RADIO_AERO_0550.preparedOn,mrMap:MGW_RADIO_AERO_0550.mrMap,
   coverageNote:'Q26-063 ver1.0 p11. RADIO-012 and RADIO-013 map to MR-B1-11-APF-04. Reconcile quoted scope to MR Appendix 1.1.'},
+ {...MGW_RADIO_REMAINING_0550,coverageNote:'Q26-063 ver1.0 pp9–12. Remaining priced Radio supply; shared lines are carried once in A1-07. Confirm MR coverage and APM locations.'},
 ];
 
 function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,coverageNote}){
@@ -40,7 +42,11 @@ function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,c
  const offers=sourceRows.flatMap(row=>{
   // The PDF places this unpriced Option directly below item 1, inside the
   // same extracted catalogue detail. Retain each scope on its own record.
-  const [base,option]=row.detail.split('\nVHF DMR Radio System Accessaries MOTOROLA\n');
+  const sourceDetail=batchId===MGW_RADIO_REMAINING_0550.batchId?
+   row.detail.split('\nLocation: APM\nVHF DMR Radio System GTPL\n')[0]:row.detail;
+  const continuation=quote.radioDetailContinuations[row.id.replace('MGW-Q26-063-','')];
+  const [base,option]=(batchId===MGW_RADIO_REMAINING_0550.batchId&&continuation?
+   sourceDetail.replace(continuation.anchor,continuation.text):sourceDetail).split('\nVHF DMR Radio System Accessaries MOTOROLA\n');
   const makeOffer=(isOption,detail)=>{
    const description=isOption?'VHF DMR Radio System Accessories':row.description;
    const locator='p'+row.page+' / RADIO / '+row.site+' / '+(isOption?'Option after item ':'item ')+row.sn;
@@ -91,6 +97,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  }
  const pending=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
   (next.supplierRevisionImports||[]).some(r=>r.batchId===id));
+ const radioRemaining=pending.includes(MGW_RADIO_REMAINING_0550.batchId);
  // SSB / Aero follow the Marine / DTRS Working-owner pattern. Re-apply those
  // batches when mapped offers exist but no Working line yet points at APF-03/04
  // through requirementRef or mrRequirementId (do not disturb other batches).
@@ -114,16 +121,36 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
 
  const policy=policyDefaults0550(policies,'Goods / Procured Cost');
  if(!policy)return next;
- const lines=[...next.lines],defaults=new Map(importMrWorkingBasis0550({lines:[]},policies,today).lines.map(l=>[l.id,l]));
  const offers=new Map(next.offers.map(o=>[o.id,o]));
+ const lines=next.lines.map(line=>{
+  const offer=offers.get(line.offerId),source=mgwRadioSourceRow0550(offer);
+  const code=source?.systemTokens.length===1&&MGW_RADIO_CUSTOMER_CODES_0550[source.systemTokens[0]];
+  if(!radioRemaining||!code||code==='A1-07'||line.customerRowCode!=='A1-07'||!line.selected||line.officialReview||
+   line.id!=='LINE-MGW-CURRENT-'+mgwCurrentItemKey0550(offer)||line.scopeKey!==line.id||
+   line.wbs!=='A'||line.systemToken!==source.systemTokens[0]||line.description!==offer.description+' — quoted equipment'||
+   line.requirementRef!==mgwCurrentMr0550(offer).join(' / ')||line.coveredByLineId||
+   line.coverageBasis!==MGW_BASIS_REVIEW_0550||line.customerRemark!==MGW_RADIO_DTRS_QUOTED_SCOPE_0550)return line;
+  return {...line,customerRowCode:code};
+ });
+ const defaults=new Map(importMrWorkingBasis0550({lines:[]},policies,today).lines.map(l=>[l.id,l]));
  const otherBulkOwner=lines.some(l=>l.selected&&l.wbs==='A'&&!l.mrRequirementId&&l.systemToken==='TEL-FO'&&
   hasPrice(l)&&!mgwLanPbxFoOffer0550(offers.get(l.offerId)));
- const conflicts=[...receipt.conflicts];
- for(const offer of next.offers.filter(o=>mgwCurrentOffer0550(o)&&batches.includes(o.quoteEvidence.sourceId))){
-  const e=offer.quoteEvidence,[systemToken]=e.systemTokens,customerRowCode=codeBySystem[systemToken];
+ const conflicts=new Set(receipt.conflicts);
+ const pendingOffers=next.offers.filter(offer=>{
+  if(!mgwCurrentOffer0550(offer))return false;
+  if(batches.includes(offer.quoteEvidence.sourceId))return true;
+  if(!radioRemaining||!mgwRadioDtrsOffer0550(offer))return false;
+  const item=mgwCurrentItemKey0550(offer);
+  return item==='RADIO-016'||conflicts.has(formerRadioMappingBlock('LINE-MGW-CURRENT-'+item));
+ });
+ for(const offer of pendingOffers){
+  const e=offer.quoteEvidence,radio=mgwRadioDtrsOffer0550(offer);
+  const systemToken=radio&&e.systemTokens.length>1?'COMMON':e.systemTokens[0];
+  const customerRowCode=radio?MGW_RADIO_CUSTOMER_CODES_0550[systemToken]:codeBySystem[systemToken];
   if(!customerRowCode||e.classification!=='RATE'||!Number.isFinite(offer.unitCost))continue;
-  const radio=mgwRadioDtrsOffer0550(offer),quotedRefs=mgwCurrentMr0550(offer);
-  if(radio&&!quotedRefs.length)continue;
+  const quotedRefs=mgwCurrentMr0550(offer);
+  // RADIO-016 was registered before the direct Radio batch and had no owner.
+  if(radio&&!quotedRefs.length&&!radioRemaining&&e.sourceId===MGW_RADIO_DTRS_0550.batchId)continue;
   const mr=mgwCurrentDirectMr0550(offer);
   const sourceRef=offer.sourceRef;
   const customerRemark=radio
@@ -136,7 +163,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    const id='REQ-'+bulkMr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
    if(line?.offerId===offer.id)continue;
    if(bulkMr==='MR-B1-18-APF-18'){
-    conflicts.push(id+' / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)');
+    conflicts.add(id+' / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)');
     continue;
    }
    const quotedLength=nativeMr.get(bulkMr)?.note.match(/^Source quantity: (\d+);/)?.[1];
@@ -149,34 +176,33 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
     const scopeNote='Cable material supply only; quantity in metres per supplier quote. Confirm route, terminations, MTO and delivery before release.';
     lines[index]={...line,...inputs,quantity:e.quotedQuantity,customerRowCode:line.systemToken==='TEL-LAN'?'A1-01':'A1-13',
      sourceRef:line.sourceRef+'\n'+sourceRef,customerRemark:scopeNote,coverageBasis:MGW_BASIS_REVIEW_0550};
-   }else conflicts.push(id+' / current MGW Offer awaits Working reconciliation (saved owner, quantity basis or overlapping cable scope)');
+   }else conflicts.add(id+' / current MGW Offer awaits Working reconciliation (saved owner, quantity basis or overlapping cable scope)');
    continue;
   }
   if(mr){
    const id='REQ-'+mr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
    if(unchanged(line,original)&&line.selected&&line.quantity===e.quotedQuantity&&line.unit===offer.unit){
     lines[index]={...line,...inputs,sourceRef:line.sourceRef+'\n'+sourceRef,coveredByLineId:'',coverageBasis:MGW_BASIS_REVIEW_0550};
-   }else if(line?.offerId!==offer.id)conflicts.push(id+' / current MGW Offer awaits Working reconciliation');
+   }else if(line?.offerId!==offer.id)conflicts.add(id+' / current MGW Offer awaits Working reconciliation');
    continue;
   }
   const key=mgwCurrentItemKey0550(offer),id='LINE-MGW-CURRENT-'+key;
   if(lines.some(l=>l.id===id||l.offerId===offer.id))continue;
-  if(radio&&!quotedRefs.every(ref=>lines.some(l=>l.mrRequirementId===ref&&l.selected&&!l.coveredByLineId))){
-   conflicts.push(id+' / MR Working scope is deselected, covered or missing; reconcile quoted scope');
-   continue;
-  }
-  const occupied=lines.some(l=>l.selected&&l.wbs==='A'&&l.systemToken===systemToken&&
-   (mgwSupplementOffer0550(offer)||quotedRefs.includes(l.mrRequirementId)||!l.mrRequirementId&&l.customerRowCode===customerRowCode)&&
+  const occupied=lines.some(l=>l.selected&&l.wbs==='A'&&
+   (quotedRefs.includes(l.mrRequirementId)||l.systemToken===systemToken&&
+    (mgwSupplementOffer0550(offer)||!l.mrRequirementId&&(l.customerRowCode===customerRowCode||radio&&l.customerRowCode==='A1-07')))&&
    !next.offers.some(o=>o.id===l.offerId&&mgwCurrentOffer0550(o))&&
-   (l.offerId||l.mgwDetailGroupId||l.calculationId||Number.isFinite(l.manualCost)||Number.isFinite(l.sellRate)));
-  if(occupied){conflicts.push(id+' / existing price owner retained; reconcile quoted scope');continue;}
-  const site=radio?nativeMr.get(quotedRefs[0])?.site:mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0];
+   hasPrice(l));
+  if(occupied){conflicts.add(id+' / existing price owner retained; reconcile quoted scope');continue;}
+  const site=radio?(nativeMr.get(quotedRefs[0])?.site||(key==='RADIO-016'?'AMS01':mgwRadioSourceRow0550(offer)?.site)):
+   mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0];
   lines.push({id,systemToken,wbs:'A',description:radio?offer.description+' — quoted equipment':offer.description,scopeKey:id,tagRef:site||'',
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs});
+  if(radio)conflicts.delete(formerRadioMappingBlock(id));
  }
  const newlyApplied=batches.filter(id=>!decision.includes(applied(id)));
  return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,
-  decision:newlyApplied.length?[decision,...newlyApplied.map(applied)].join('\n'):decision,conflicts}};
+  decision:newlyApplied.length?[decision,...newlyApplied.map(applied)].join('\n'):decision,conflicts:[...conflicts]}};
 }

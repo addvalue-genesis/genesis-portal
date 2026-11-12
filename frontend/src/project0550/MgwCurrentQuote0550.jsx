@@ -10,8 +10,8 @@ import {
  MGW_CURRENT_BLD_0550, MGW_CURRENT_OPEN_0550, MGW_CURRENT_QUOTE_0550, MGW_MET_NDB_0550, MGW_MET_NDB_OPEN_0550,
  MGW_CCTV_ENT_0550, MGW_CCTV_ENT_SECTIONS_0550, MGW_SECTION_SUBTOTAL_0550,
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
- MGW_RADIO_AERO_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
- MGW_RADIO_MARINE_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
+ MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
+ MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
  mgwCctvEntOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
@@ -21,8 +21,7 @@ const radioSourceMr={
  ...MGW_RADIO_MARINE_0550.mrMap,
  ...MGW_RADIO_SSB_0550.mrMap,
  ...MGW_RADIO_AERO_0550.mrMap,
- 'RADIO-004':['MR-B1-11-ACP-05'],
- 'RADIO-005':['MR-B1-11-ACP-04'],
+ ...MGW_RADIO_REMAINING_0550.mrMap,
 };
 const radioMrById=new Map(mrCatalog.rows.filter(row=>row.id.startsWith('MR-B1-11-')).map(row=>[row.id,row]));
 const radioMrSource=radioMrById.get('MR-B1-11-APF-01')?.componentReview?.sources.find(source=>source.label.includes('Rev.B1'));
@@ -58,7 +57,7 @@ function MgwRadioSource0550({data,sectionFilter}){
    {radioMrSource&&<> · <a href={radioMrSource.url} target="_blank" rel="noreferrer">CUS MR Rev.B1 Appendix 1.1</a></>}</p>
   <p>RADIO-004 ตรงกับ ACP Radio Console 1 Pc · RADIO-005 ตรงกับ ACP Antenna Cable 700 m ตาม CUS</p>
   <div className="p55-table-wrap"><table className="p55-table" aria-label="Original MGW Radio System quotation breakdown">
-   <thead><tr><th>หน้า / รายการ</th><th>ไซต์อ้างอิง</th><th>Location ในใบเสนอราคา</th><th>จำนวนตามใบ</th><th>USD / หน่วย</th><th>รวม USD</th></tr></thead>
+   <thead><tr><th>หน้า / รายการ</th><th>หมวดราคา Working</th><th>ไซต์อ้างอิง</th><th>Location ในใบเสนอราคา</th><th>จำนวนตามใบ</th><th>USD / หน่วย</th><th>รวม USD</th></tr></thead>
    <tbody>{radioSourceRows.map(row=>{
     const item=row.id.replace('MGW-Q26-063-','');
     const mr=radioMrById.get(radioSourceMr[item]?.[0]);
@@ -70,12 +69,18 @@ function MgwRadioSource0550({data,sectionFilter}){
     const sections=itemSections(item);
     const optionItem=item==='RADIO-009'?'RADIO-009-OPTION':null;
     const extraSections=optionItem?itemSections(optionItem):[];
+    const shared=row.systemTokens.length>1;
+    const code=MGW_RADIO_CUSTOMER_CODES_0550[shared?'COMMON':row.systemTokens[0]];
+    const current=offersByItem.get(item);
+    const owners=current?data.lines.filter(line=>line.selected&&line.offerId===current.id):[];
     return <React.Fragment key={row.id}>
      {isVisible(sections)&&<tr>
       <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
        <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
        <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
        <MgwRadioTagEvidence0550 item={item}/></td>
+      <td>{owners.length===1?owners[0].customerRowCode:code}{shared&&<small>ใช้ร่วมหลายระบบ</small>}
+       <small>{owners.length===1?'10.2 · '+owners[0].id:owners.length>1?'OPEN · ตรวจเจ้าของราคาซ้ำ':'OPEN · รอเจ้าของราคา Working'}</small></td>
       <td>{site}{mr&&<small>{mr.id}</small>}{item==='RADIO-016'&&<small>ตามบันทึกไซต์เดิม</small>}</td>
       <td>{row.site}</td><td>{row.quantity} {row.sourceUnit||'· หน่วยไม่ระบุ'}</td>
       <td>{amount(row.unitCost,currency)}</td><td>{amount(row.extended,currency)}</td>
@@ -85,11 +90,11 @@ function MgwRadioSource0550({data,sectionFilter}){
        {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
        <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
-      <td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
+      <td>—</td><td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
    })}</tbody>
-   <tfoot><tr><th colSpan={5}>รวมตามใบเสนอราคา Radio</th><td>{amount(total,currency)}</td></tr></tfoot>
+   <tfoot><tr><th colSpan={6}>รวมตามใบเสนอราคา Radio</th><td>{amount(total,currency)}</td></tr></tfoot>
   </table></div>
  </details>;
 }
@@ -127,13 +132,13 @@ export function MgwCurrentQuote0550({data,onNavigate,disabled=false,showRadioSou
   <p>{MGW_RADIO_DTRS_0550.quoteRef} · {radio.length?radio.length+' Offer records · '+radioWorking.length+' Working owners · Supply / Draft':'รอข้อมูลใบเสนอราคา'}</p>
   {showRadioSource&&<MgwRadioSource0550 data={data} sectionFilter={sectionFilter}/>}
   {cctvEntQuote&&sections.map(section=><p key={section.system}><strong>{section.label}</strong> · {section.rows.length}/{section.count} รายการ · {Number.isFinite(section.total)?'รวมรายบรรทัด USD '+amount(section.total,'USD'):'ตรวจความครบของราคา'} · ยอดที่พิมพ์ในใบ USD {amount(section.printed,'USD')}{section.delta?' · ส่วนต่าง USD '+amount(section.delta,'USD'):''}</p>)}
-  <p>รอราคาสำหรับ {cctvEntQuote?'':'CCTV, Entertainment, '}{radio.length?'':'DTRS, '}Marine/Aero/SSB Radio, {bulk.length?'วัสดุ Bulk ที่ยังไม่มีราคา':'สายและวัสดุ FO/CAT6A'} และงานบริการที่ต้องจัดหาเพิ่ม</p>
+  <p>รอราคาสำหรับ {cctvEntQuote?'':'CCTV, Entertainment, '}{radio.length?'':'DTRS/Marine/Aero/SSB Radio, '}{bulk.length?'วัสดุ Bulk ที่ยังไม่มีราคา':'สายและวัสดุ FO/CAT6A'} และงานบริการที่ต้องจัดหาเพิ่ม</p>
   {option&&<p>Wi-Fi Coverage Study · Option {amount(option.quoteEvidence.quotedTotal,'USD')} USD แยกจาก Base</p>}
   <details><summary>ประเด็นตรวจขอบเขตและเงื่อนไข</summary>
    <p>{MGW_CURRENT_OPEN_0550}</p>
    {bulk.length>0&&<p>{MGW_BULK_OPEN_0550}</p>}
    {radio.length>0&&<p>{MGW_RADIO_DTRS_OPEN_0550}</p>}
-   {radio.length>0&&onNavigate&&<details><summary>เปิดรายการเสนอราคา DTRS ใน 07</summary>
+   {radio.length>0&&onNavigate&&<details><summary>เปิดรายการเสนอราคา Radio ใน 07</summary>
     {radio.map(o=><p key={o.id}><button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+o.id)}>{o.description}</button> · {o.quoteEvidence.locator}</p>)}
    </details>}
    {metNdbQuote&&Object.values(MGW_MET_NDB_OPEN_0550).map(note=><p key={note}>{note}</p>)}

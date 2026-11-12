@@ -1,4 +1,4 @@
-import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwRadioPrintedExtension0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
 import {validateOfferAtomicLines0550} from './atomicLines0550';
 import {validateVendorBidTags0550} from './vendorBidTags0550';
 import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
@@ -187,11 +187,16 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(!nonnegative(costRate))problems.push("Cost rate OPEN");
   const factor=fx(currency);if(factor===null)problems.push("FX source/date/rate OPEN");
   const costNative=finite(quantity)&&nonnegative(costRate)?quantity*costRate:null;
+  // The printed Radio extension can be carried in the bid draft while its
+  // missing unit remains an Official Working problem.
+  const radioPrintedExtension=mgwRadioPrintedExtension0550(offer,l);
   const draftBlocker=p=>p!==SPARE_BUDGET_REVIEW_0550&&!isBidScopeWarning0550(p)&&
+   !(radioPrintedExtension&&p.startsWith("MGW_UNIT_OPEN:"))&&
    !(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&
    !["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p);
   // The spare provision consumes procurement cost, before any sell/Prime checks.
   const spareProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
+   !problems.some(p=>p.startsWith("MGW_UNIT_OPEN:"))&&
    Math.abs(costNative)<=Number.MAX_SAFE_INTEGER/100&&!problems.some(draftBlocker)?round(costNative*factor):null;
   let addvalueSell=null;
   if(l.sellMode==="DIRECT")addvalueSell=finite(quantity)&&nonnegative(l.sellRate)?eq("E10",{rows:[{id:l.id,quantity,sellRate:l.sellRate}],other:0}):null;

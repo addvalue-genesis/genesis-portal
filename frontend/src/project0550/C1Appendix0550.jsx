@@ -90,7 +90,10 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
      return <tbody key={g.id}>
      <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
-      <tr className="c1-system"><td colSpan={7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td></tr>
+      <tr className="c1-system">
+       <td colSpan={!documentMode&&Number.isFinite(sys.knownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
+       {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
+      </tr>
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode).map(site=><React.Fragment key={site.name}>
        <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>

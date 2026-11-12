@@ -70,6 +70,28 @@ export const MGW_RADIO_AERO_0550 = {
   'RADIO-013':['MR-B1-11-APF-04'], // APF portable airband radios on the same MR.
  },
 };
+// Remaining priced rows in the same PDF. Only RADIO-004/005 have a confirmed
+// CUS site reference. Shared consoles/cables have one commercial owner.
+export const MGW_RADIO_REMAINING_0550 = {
+ batchId:'0550-MGW-Q26-063-RADIO-REMAINING-20261112',
+ preparedOn:'2026-11-12',
+ mrMap:{
+  'RADIO-004':['MR-B1-11-ACP-05'],
+  'RADIO-005':['MR-B1-11-ACP-04'],
+  'RADIO-006':[],
+  'RADIO-007':[],
+  'RADIO-008':[],
+  'RADIO-010':[],
+  'RADIO-014':[],
+  'RADIO-015':[],
+  'RADIO-017':[],
+  'RADIO-018':[],
+ },
+};
+export const MGW_RADIO_CUSTOMER_CODES_0550 = {
+ 'TEL-RADIO-DTRS':'A1-07',COMMON:'A1-07','TEL-RADIO-MARINE':'A1-08',
+ 'TEL-RADIO-AERO':'A1-09','TEL-RADIO-SSB':'A1-10',
+};
 export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
 // Original register wording is part of the imported batch fingerprint.
 export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF-02) per instruction of 12 Nov 2026. The quotation prints ACO.';
@@ -86,7 +108,7 @@ export const MGW_RADIO_AERO_OPEN_0550 = 'Q26-063 ver1.0 · original quote validi
  ' RADIO-012 and RADIO-013 map to APF (MR-B1-11-APF-04). The lots cover the quoted fixed AM VHF telephone and portable airband radios only. Reconcile MR quantity, antennas, gateways and the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
-export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId,MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId];
+export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId,MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId,MGW_RADIO_REMAINING_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [
  {system:'TEL-CCTV',label:'CCTV',count:28,
@@ -145,6 +167,7 @@ const radioBatches = [
  {batchId:MGW_RADIO_MARINE_0550.batchId,systemToken:MGW_RADIO_MARINE_0550.systemToken,mrMap:MGW_RADIO_MARINE_0550.mrMap},
  {batchId:MGW_RADIO_SSB_0550.batchId,systemToken:MGW_RADIO_SSB_0550.systemToken,mrMap:MGW_RADIO_SSB_0550.mrMap},
  {batchId:MGW_RADIO_AERO_0550.batchId,systemToken:MGW_RADIO_AERO_0550.systemToken,mrMap:MGW_RADIO_AERO_0550.mrMap},
+ MGW_RADIO_REMAINING_0550,
 ];
 const radioBatch = offer => radioBatches.find(batch=>batch.batchId===offer?.quoteEvidence?.sourceId);
 const radioOpenNote = {
@@ -152,6 +175,7 @@ const radioOpenNote = {
  [MGW_RADIO_MARINE_0550.batchId]:MGW_RADIO_MARINE_OPEN_0550,
  [MGW_RADIO_SSB_0550.batchId]:MGW_RADIO_SSB_OPEN_0550,
  [MGW_RADIO_AERO_0550.batchId]:MGW_RADIO_AERO_OPEN_0550,
+ [MGW_RADIO_REMAINING_0550.batchId]:'Q26-063 ver1.0 · Original validity through 8 Nov 2026. Confirm APM locations, package interfaces, and scope against MR Appendix 1.1.',
 };
 
 export const mgwReplacementActive0550 = data => Boolean(data.mgwDetailPricingImport?.decision?.includes(MGW_SUPERSEDED_0550));
@@ -180,9 +204,21 @@ export const mgwRadioDtrsOffer0550 = offer => {
  const batch=radioBatch(offer);
  return Boolean(batch && offer.id?.startsWith(MGW_RADIO_DTRS_0550.prefix) && offer.quoteRef===MGW_RADIO_DTRS_0550.quoteRef &&
   offer.quoteEvidence.sourceSha256===MGW_RADIO_DTRS_0550.sha256 &&
-  offer.quoteEvidence.systemTokens?.length===1 && offer.quoteEvidence.systemTokens[0]===batch.systemToken &&
-  Object.hasOwn(batch.mrMap,offer.id.slice(MGW_RADIO_DTRS_0550.prefix.length)));
+  Object.hasOwn(batch.mrMap,offer.id.slice(MGW_RADIO_DTRS_0550.prefix.length)) &&
+  (batch.systemToken?offer.quoteEvidence.systemTokens?.length===1&&offer.quoteEvidence.systemTokens[0]===batch.systemToken:
+   radioSourceByOfferId.get(offer.id)?.systemTokens.join()===offer.quoteEvidence.systemTokens?.join()));
 };
+const radioSourceByOfferId=new Map(quote.rows.filter(row=>row.section==='RADIO').map(row=>[
+ MGW_RADIO_DTRS_0550.prefix+row.id.slice('MGW-Q26-063-'.length),row,
+]));
+export const mgwRadioSourceRow0550=offer=>mgwRadioDtrsOffer0550(offer)?radioSourceByOfferId.get(offer.id):undefined;
+export function mgwRadioPrintedExtension0550(offer,line){
+ const row=mgwRadioSourceRow0550(offer),e=offer?.quoteEvidence;
+ return Boolean(row&&e.classification==='RATE'&&row.unit===null&&e.quotedUnit==='Not stated'&&
+  line.wbs==='A'&&!line.calculationId&&line.quantity===row.quantity&&e.quotedQuantity===row.quantity&&
+  e.quotedTotal===row.extended&&offer.currency===quote.currency&&offer.unitCost===row.unitCost&&
+  row.quantity*row.unitCost===row.extended);
+}
 export const mgwSupplementOpen0550 = (offer,system) => mgwMetNdbOffer0550(offer)?MGW_MET_NDB_OPEN_0550[system]:
  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:
  mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwRadioDtrsOffer0550(offer)?

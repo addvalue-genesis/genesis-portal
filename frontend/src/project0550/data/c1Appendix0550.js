@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -166,28 +166,26 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   const targets=ownerUse.get(b.lineId)||[];
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
-  if(radio&&view.workingPreview&&!targets.length){
-   // APF DTRS and Marine use the same source-to-MR path for draft prices.
-   // Later radio batches can use it by supplying their exact MR references.
-   // Keep the MR Working binding and the technical scope gap open.
+  const directRadio=radio&&view.workingPreview;
+  const sharedRadio=directRadio&&mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1;
+  if(directRadio&&!sharedRadio&&!targets.length){
+   // Use the exact MR for scope context when available. Otherwise show the
+   // priced quote row under its system as a package with scope still open.
    const refs=mgwCurrentMr0550(b.line.offer);
    const target=refs.length===1?rows.find(r=>r.key===refs[0]&&r.appendix==='1.1'):null;
-   if(!target?.raw?.selected||target.excluded||target.raw.coveredByLineId||
-    target.requirements.some(q=>q.id==='REQDEF-'+target.key&&q.disposition==='NOT_APPLICABLE')){
-    pendingOwners.push(b);
-    problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);
+   if(target?.raw?.selected&&!target.excluded&&!target.raw.coveredByLineId&&
+    !target.requirements.some(q=>q.id==='REQDEF-'+target.key&&q.disposition==='NOT_APPLICABLE')){
+    target.ownerIds.push(b.lineId);
+    target.priceOwners=(target.priceOwners||[]).concat(b);
+    target.provisionalRadio=true;
     continue;
    }
-   target.ownerIds.push(b.lineId);
-   target.priceOwners=(target.priceOwners||[]).concat(b);
-   target.provisionalRadio=true;
-   continue;
   }
   // A draft Working row without a price or MR link is an internal mapping task,
   // not an additional customer supply package. Keep its canonical owner intact.
   if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
   if(targets.length===1){const target=targets[0];target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
-  const token=b.line.systemToken,section=targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
+  const token=b.line.systemToken,section=directRadio?'1.1':targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
    (!legacy?{ 'TEL-DMR':'1.5','TEL-TELT':'1.1','TEL-PAGA':'1.4' }[token]:undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
   const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
@@ -196,11 +194,16 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const terms=(supplement||radio)?b.line.offer.quoteEvidence.terms:[];
   const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
-  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
-   description:itemDescription,quantity:b.quantity,unit:b.unit,
-   amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
+  const unitOpen=directRadio&&b.line.offer.quoteEvidence.quotedUnit==='Not stated'&&!b.line.offer.unitBasis?.trim();
+  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?'Shared Radio Consoles and Antenna Cables':systemNames[token]||'Other Base Supply',site:targets.length?unique(targets.map(t=>t.site)).join(' / '):mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT',
+   description:itemDescription,quantity:b.quantity,unit:unitOpen?'':b.unit,
+   amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
+  if(directRadio){
+   problems.push('C1_RADIO_MR_SCOPE_OPEN / '+item.key);
+   item.internalNote=[item.internalNote||MGW_RADIO_DTRS_QUOTED_SCOPE_0550,unitOpen?'Supplier unit OPEN':''].filter(Boolean).join(' · ');
+  }
   extra.push(item);
   if(supplement||radio)for(const mrId of mgwCurrentMr0550(b.line.offer)){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
@@ -252,8 +255,25 @@ export function deriveC1Appendix0550(view,currency='USD'){
  if(extra.some(r=>r.appendix==='OTHER'))groups.push({id:'OTHER',title:'Other Base Supply',rows:extra.filter(r=>r.appendix==='OTHER')});
  let sn=0;const displayRows=[];
  for(const group of groups){
-  let mrNumber=0,packageNumber=0;const systems=new Map();group.rows.forEach(r=>{const system=legacy?r.system:mrScopeNames[group.id]||r.system;if(!systems.has(system))systems.set(system,new Map());const sites=systems.get(system);if(!sites.has(r.site))sites.set(r.site,[]);sites.get(r.site).push(r);});
-  group.systems=[...systems].map(([name,sites])=>({name,sites:[...sites].map(([name,items])=>({name,rows:items.map(r=>{const item={...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};displayRows.push(item);return item;})}))}));
+  const radioBySystem=!legacy&&view.workingPreview&&group.id==='1.1'&&
+   group.rows.some(r=>r.priceOwners?.some(b=>mgwRadioDtrsOffer0550(b.line.offer)));
+  let mrNumber=0,packageNumber=0;const systems=new Map();
+  group.rows.forEach(r=>{
+   const system=legacy||radioBySystem?r.system:mrScopeNames[group.id]||r.system;
+   if(!systems.has(system))systems.set(system,new Map());
+   const sites=systems.get(system);
+   if(!sites.has(r.site))sites.set(r.site,[]);
+   const item=radioBySystem?{...r,sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)}:r;
+   sites.get(r.site).push(item);
+  });
+  group.systems=[...systems].map(([name,sites])=>{
+   const rollup=radioBySystem?scheduleRollup0550([...sites.values()].flatMap(items=>items.flatMap(r=>r.priceOwners||[]))):null;
+   return {name,knownAmount:rollup?.priced?rollup.knownUSD:null,
+    sites:[...sites].map(([name,items])=>({name,rows:items.map(r=>{
+     const item=radioBySystem?r:{...r,sn:legacy?++sn:r.kind==='MR'?group.id+'.'+(++mrNumber):group.id+'.P'+(++packageNumber)};
+     displayRows.push(item);return item;
+    })}))};
+  });
   group.amount=group.rows.some(openMr)?null:
    money(group.rows.filter(r=>r.priceOwners?.length||r.kind==='PACKAGE').map(r=>r.amount));
  }
