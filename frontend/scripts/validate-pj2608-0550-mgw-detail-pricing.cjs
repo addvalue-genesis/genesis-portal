@@ -449,6 +449,41 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
  assert.equal(sum(lanRows.map(row=>row.amount)),sum(lanOwners.map(l=>l.provisionalCustomerUSD)));
  assert.equal(net.knownAmount,sum(lanRows.map(row=>row.amount)));
  assert.equal(lanC1.amount,null,'The priced LAN subtotal leaves the full scope under review');
+ const projectLan=(data,currency='USD')=>{
+  const model=W.deriveBidWorkspace(data,tokens,radioLotDate);
+  const saved=volumes.deriveBidVolumes0550(data,model,D.SYSTEMS,radioLotDate);
+  const view={...preview.deriveBidVolumeWorkingPreview0550(data,model,D.SYSTEMS,radioLotDate,saved),
+   c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550};
+  return {view,c1:appendix.deriveC1Appendix0550(view,currency)};
+ };
+ const grouped=projectLan(withMr),cabinetRows=grouped.c1.rows.filter(r=>r.provisionalLan);
+ const expectedCabinets=[
+  ['APF-09',6,1],['APF-10',3,0],['ACP-06',4,1],['ACP-07',3,0],['ABV01-05',3,0],['AMS01-04',3,0],
+ ];
+ assert.deepEqual(cabinetRows.map(r=>[r.key.slice('MR-B1-13-'.length),r.priceOwners.length,r.quotedComponents.filter(c=>c.included).length]),expectedCabinets);
+ assert.deepEqual(cabinetRows.slice(0,4).map(r=>r.sn),['1.3.9','1.3.10','1.3.24','1.3.25']);
+ assert(cabinetRows.every(r=>r.amount===sum(r.priceOwners.map(b=>b.amount))));
+ const groupedLanRows=grouped.c1.rows.filter(r=>r.priceOwners.some(b=>pricedIds.has(b.line.offerId)));
+ assert.equal(groupedLanRows.length,9,'Six cabinet scopes and three AP rows use the original MR numbers');
+ assert.equal(sum(groupedLanRows.map(r=>r.amount)),net.knownAmount);
+ assert.equal(new Set(groupedLanRows.flatMap(r=>r.ownerIds)).size,25);
+ assert.equal(grouped.c1.amount,null);
+ const beforeGrouping=appendix.deriveC1Appendix0550({...grouped.view,c1Context:{...grouped.view.c1Context,lanOffers:[]}});
+ assert.equal(grouped.c1.pricedItemsSubtotal,beforeGrouping.pricedItemsSubtotal);
+ assert.equal(appendix.c1AppendixOverview0550(grouped.c1).find(g=>g.id==='1.3').amount,
+  appendix.c1AppendixOverview0550(beforeGrouping).find(g=>g.id==='1.3').amount);
+ const thb=projectLan(withMr,'THB').c1.rows.filter(r=>r.provisionalLan);
+ assert(thb.every(r=>r.amount===sum(r.priceOwners.map(b=>b.line.customerTHB))));
+ const missing={...withMr,lines:withMr.lines.filter(l=>!l.offerId.endsWith('LAN-APF-9-06'))};
+ const fallback=projectLan(missing).c1;
+ assert.equal(fallback.rows.find(r=>r.key==='MR-B1-13-APF-09').amount,null);
+ assert(fallback.rows.some(r=>r.kind==='PACKAGE'&&r.priceOwners.some(b=>b.line.offerId.endsWith('LAN-APF-9-01'))));
+ const groupedMarkup=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:grouped.view}));
+ const groupedMr=groupedMarkup.split('data-c1-mr-id="MR-B1-13-APF-09"')[1].split('</tr>')[0];
+ assert.match(groupedMr,/1\.3\.9.*109,143\.16/s);
+ assert.match(appendix.c1AppendixHtml0550(grouped.view),/1\.3\.10.*232,208\.85/s);
+ assert(!appendix.c1AppendixHtml0550(grouped.view).includes('LAN-APF-9-01'));
+ console.log('PASS LAN cabinet rows with the private register:',groupedLanRows.map(r=>[r.sn,r.site,r.amount]));
  const {MgwCurrentQuote0550}=require(root+'/project0550/MgwCurrentQuote0550.jsx');
  const vendorHtml=renderToStaticMarkup(React.createElement(MgwCurrentQuote0550,{data:prepared}));
  assert.match(vendorHtml,/LAN · A1-01 \/ C1 Appendix 1.3.*25 รายการมีราคา.*2 รายการ Included/s);

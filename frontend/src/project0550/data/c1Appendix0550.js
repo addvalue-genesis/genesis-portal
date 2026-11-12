@@ -1,5 +1,5 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
-import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
+import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
 import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
@@ -42,7 +42,7 @@ function mrDisplayRows(){
 const appendix=r=>r?.id?.match(/^MR-B1-1([1-8])-/)?.[1];
 const unique=xs=>[...new Set(xs)];
 const money=xs=>xs.length&&xs.every(Number.isFinite)?sumMoney0550(xs):null;
-const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||!r.ownerIds.length||!(r.quantity>0));
+const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||!r.ownerIds.length||!(r.quantity>0));
 const systemNames={
  'TEL-RADIO-DTRS':'VHF DMR Radio System','TEL-RADIO-MARINE':'VHF-FM Marine Radio System',
  'TEL-RADIO-SSB':'MF/HF SSB Radio System','TEL-RADIO-AERO':'VHF-AM Aeronautical Radio',
@@ -113,6 +113,44 @@ function c1ComponentPrices(row,detailsByOwner,currency){
  });
 }
 
+function lanCabinetDraftGroups(rows,offers,byOwner,ownerUse){
+ const offersByMr=new Map(),bindingsByOffer=new Map();
+ for(const offer of offers.filter(mgwLanEquipmentOffer0550)){
+  const [mr]=mgwCurrentMr0550(offer);
+  if(!offersByMr.has(mr))offersByMr.set(mr,[]);
+  offersByMr.get(mr).push(offer);
+ }
+ for(const entry of byOwner.values()){
+  const id=entry.binding.line.offerId;
+  if(!bindingsByOffer.has(id))bindingsByOffer.set(id,[]);
+  bindingsByOffer.get(id).push(entry);
+ }
+ const groups=[];
+ for(const target of rows){
+  const raw=target.raw,group=offersByMr.get(target.key);
+  const otherOwner=target.ownerIds.some(id=>id!==raw?.id||byOwner.get(id)?.usdPriced);
+  if(!group?.length||target.description!=='LAN Cabinet'||target.excluded||otherOwner||
+   !raw?.selected||target.unit!=='Lot'||raw.offerId||raw.coveredByLineId||raw.calculationId||raw.mgwDetailGroupId||
+   raw.manualCost!=null||raw.sellRate!=null||
+   target.requirements.some(q=>q.id==='REQDEF-'+target.key&&q.disposition==='NOT_APPLICABLE'))continue;
+  const cabinet=group.find(offer=>mgwCurrentItemKey0550(offer).endsWith('-01')&&offer.unit==='Lot');
+  if(!cabinet||cabinet.quoteEvidence.quotedQuantity!==target.quantity)continue;
+  const included=group.filter(mgwCurrentIncluded0550);
+  const quoted=group.filter(offer=>!mgwCurrentIncluded0550(offer));
+  const prices=quoted.map(offer=>{
+   const entries=bindingsByOffer.get(offer.id)||[];
+   if(entries.length!==1)return null;
+   const {binding,usdPriced}=entries[0];
+   return usdPriced&&binding.line.wbs==='A'&&binding.line.systemToken==='TEL-LAN'&&
+    binding.line.customerRowCode==='A1-01'&&!ownerUse.has(binding.lineId)&&
+    binding.quantity===offer.quoteEvidence.quotedQuantity&&binding.unit===offer.unit?binding:null;
+  });
+  if(!prices.length||prices.some(price=>!price))continue;
+  groups.push({target,prices,included});
+ }
+ return groups;
+}
+
 export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
  const scheduleRows=view.scheduleRows('C1');
@@ -154,16 +192,37 @@ export function deriveC1Appendix0550(view,currency='USD'){
    ...detail,ownerIds:excluded?[]:ids,raw,raws:matches,requirements:reqs,
    amount:null,unitPrice:null,note:excluded?'By COMPANY':unique([response?.[0],...matches.map(l=>customerRemark(l,legacy).trim())].filter(Boolean)).join('; '),excluded,kind:'MR'};
   if(canonicalIds.some(id=>matches.filter(l=>l.mrRequirementId===id).length>1))problems.push('MULTIPLE_MR_WORKING_LINES / '+r.id);
-  if(!excluded&&!ids.length)problems.push('MR_C1_OWNER_UNRESOLVED / '+r.id);
   if(!excluded&&!(item.quantity>0))problems.push('C1_REQUIRED_QUANTITY_OPEN / '+r.id);
   for(const id of item.ownerIds){if(!ownerUse.has(id))ownerUse.set(id,[]);ownerUse.get(id).push(item);}
   return item;
  });
+ const groupedLanOwners=new Set();
+ if(!legacy&&view.workingPreview)for(const {target,prices,included} of lanCabinetDraftGroups(rows,context.lanOffers||[],byOwner,ownerUse)){
+  // An unpriced MR binding is only a scope reference once its priced
+  // quotation items are displayed on that row in the Working Preview.
+  byOwner.delete(target.raw.id);
+  for(const row of ownerUse.get(target.raw.id)||[]){
+   if(row!==target)row.ownerIds=row.ownerIds.filter(id=>id!==target.raw.id);
+  }
+  target.provisionalLan=true;
+  target.ownerIds=prices.map(b=>b.lineId);
+  target.priceOwners=prices;
+  target.quotedComponents=[
+   ...prices.map(b=>({offer:b.line.offer,quantity:b.quantity,unit:b.unit,unitPrice:b.unitPrice,amount:b.amount})),
+   ...included.map(offer=>({offer,quantity:offer.quoteEvidence.quotedQuantity,unit:offer.unit,included:true})),
+  ].sort((a,b)=>a.offer.id.localeCompare(b.offer.id));
+  target.note=[target.note,'Quoted LAN equipment · scope review pending'].filter(Boolean).join(' · ');
+  target.internalNote='MGW quoted LAN items. MR package scope and interfaces remain open.';
+  problems.push('C1_LAN_MR_SCOPE_OPEN / '+target.key);
+  prices.forEach(b=>groupedLanOwners.add(b.lineId));
+ }
+ for(const row of rows)if(!row.excluded&&!row.ownerIds.length)problems.push('MR_C1_OWNER_UNRESOLVED / '+row.key);
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
  const extra=[],pendingOwners=[],candidatePackages=new Map();
  for(const {binding:b,usdPriced} of byOwner.values()){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
+  if(groupedLanOwners.has(b.lineId))continue;
   const targets=ownerUse.get(b.lineId)||[];
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   const lan=!legacy&&view.workingPreview&&mgwLanEquipmentOffer0550(b.line.offer);

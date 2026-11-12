@@ -1,4 +1,4 @@
-Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Existing LAN Offer rows feed Working A1-01 and Appendix 1.3 Network System by site. An AP mapping gap can carry the quoted supply as a standalone Draft owner. Core Switch inclusions and the Wi-Fi Study option are shown in Vendor.
+Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Appendix 1.3 shows complete priced LAN quote groups on the original cabinet rows for APF, ACP, ABV01 and AMS01. Expand a cabinet to see its quoted items. Standalone Draft prices remain visible when the MR row or quoted group needs reconciliation.
 
 Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). The Q26-063 source extensions feed 10.2 and 11.C1 Appendix 1.1 by system. The shared Console and Cable scope has one charge per source row. WP.7 remains the technical trace.
 

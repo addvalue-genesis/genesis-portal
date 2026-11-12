@@ -9,7 +9,7 @@ import {vendorTaggedSchedule0550} from './vendorBidTags0550';
 import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVendorBasis0550';
-import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
+import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
@@ -227,7 +227,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const mgwSections=MGW_QUOTE_0550.sections.map(section=>({...section,offers:currentSupplierOffers0550(data).filter(o=>{const r=mgwQuoteItem0550(o);return r?.section===section.id&&r.wbs==='A';}),workingOwners:data.lines.filter(l=>l.mgwDetailGroupId&&mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.some(id=>MGW_QUOTE_0550.rows.some(r=>r.id===id&&r.section===section.id))).map(l=>({id:l.id,title:l.description,selected:projected.active.some(a=>a.id===l.id)}))})).filter(s=>s.offers.length);
  const mgwBulkSupply=bindings.some(b=>b.schedule==='C1'&&Number.isFinite(b.amount)&&mgwBulkOffer0550(b.line?.offer));
  const pagaNet=pagaRevisionSelected0550(data)?.net;
- return {...projected,bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+ return {...projected,c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550)},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),
