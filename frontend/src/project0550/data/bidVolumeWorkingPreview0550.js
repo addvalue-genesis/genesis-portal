@@ -167,9 +167,12 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
  const unallocated=pricing().provisional.selected.filter(line=>
   !bound.has(line.id)&&!recorded.has(line.id)&&Number.isFinite(line.customerUSD)&&line.quantity>0);
  const plan=scheduleAllocationPlan0550(data,{unallocated}).filter(({line,proposal,previewOnly})=>{
-  if(previewOnly||!proposal?.locator.trim()||!proposal.sourceIds.length||proposal.sourceIds.length>500)return false;
+  const owner=lines.get(line.id),offer=offers.get(owner?.offerId),radio=mgwRadioDtrsOffer0550(offer);
+  // MGW radio Working owners map from quotation lots; allow C1 drafts without a
+  // separate source-register id so APF-03/04 prices can land with DTRS/Marine.
+  if(previewOnly||!proposal?.locator.trim()||proposal.sourceIds.length>500)return false;
+  if(!proposal.sourceIds.length&&!radio)return false;
   if(proposal.schedule==='C1'){
-   const owner=lines.get(line.id),offer=offers.get(owner?.offerId);
    // Draft assignment accepts quoted vendor offers (Ceragon, Master Tower, Industronic, MGW)
    // and standard mapped supply lines.
    const bulkMr=mgwBulkMr0550(offer);

@@ -350,5 +350,25 @@ assert.deepEqual(repairedLots.lines.filter(l=>stripIds.has(l.id))
   ['LINE-MGW-CURRENT-RADIO-013','MR-B1-11-APF-04','RADIO-013']]);
 assert.equal(activateLots(repairedLots),repairedLots,'Do not recreate SSB/Aero owners that already exist');
 assert.equal(repairedLots.lines.filter(l=>l.offerId===equipmentOffer.id).length,1,'Leave DTRS owners untouched while repairing SSB/Aero');
+const radio012=lotOwners.find(l=>radioSelection.mgwCurrentItemKey0550(l.offer)==='RADIO-012');
+const radio013=lotOwners.find(l=>radioSelection.mgwCurrentItemKey0550(l.offer)==='RADIO-013');
+assert.equal(radio012.unit,'Lot');
+assert.equal(radio012.offer.unit,'Lot');
+assert(Number.isFinite(radio012.provisionalCustomerUSD),'Price RADIO-012 after Working Lot basis');
+const apf04Amount=sum([radio012.provisionalCustomerUSD,radio013.provisionalCustomerUSD]);
+const releaseDrafts=require(root+'/project0550/releaseScheduleDrafts0550.js');
+const pricedView=releaseDrafts.releaseScheduleDraftView0550(radioLots,W.deriveBidWorkspace(radioLots,tokens,radioLotDate),D.SYSTEMS,radioLotDate);
+const pricedC1=appendix.deriveC1Appendix0550(pricedView);
+assert.deepEqual(['01','02','03','04'].map(item=>{
+ const row=pricedC1.rows.find(r=>r.key==='MR-B1-11-APF-'+item);
+ return [row.sn,row.amount,row.provisionalRadio];
+}),[['1.1.1',597846.32,true],['1.1.2',34961.68,true],['1.1.3',64821.47,true],['1.1.4',apf04Amount,true]]);
+const deselectedLots={...radioLots,lines:radioLots.lines.map(l=>stripIds.has(l.id)?{...l,selected:false}:l)};
+const reselectedLots=activateLots(deselectedLots);validate(reselectedLots);
+assert(reselectedLots.lines.filter(l=>stripIds.has(l.id)).every(l=>l.selected),'Re-select deselected SSB/Aero Working owners');
+const reselectedC1=appendix.deriveC1Appendix0550(releaseDrafts.releaseScheduleDraftView0550(reselectedLots,W.deriveBidWorkspace(reselectedLots,tokens,radioLotDate),D.SYSTEMS,radioLotDate));
+assert.deepEqual(['1.1.1','1.1.2'].map(sn=>reselectedC1.rows.find(r=>r.sn===sn).amount),[597846.32,34961.68],'Keep APF-01/02 prices while repairing SSB/Aero');
+assert.equal(reselectedC1.rows.find(r=>r.sn==='1.1.3').amount,64821.47);
+assert.equal(reselectedC1.rows.find(r=>r.sn==='1.1.4').amount,apf04Amount);
 console.log('PASS current MGW DTRS: APF mapping and supplier components, saved Working site repair, two source-bound owners, 11.M/C1 drafts, PAGA exclusion and exact E14 pools.');
-console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, C1 open-scope notes on 1.1.3/1.1.4/1.1.6, and missing Working owners re-applied.');
+console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, C1 Appendix 1.1.3/1.1.4 priced, and deselected/missing Working owners restored.');

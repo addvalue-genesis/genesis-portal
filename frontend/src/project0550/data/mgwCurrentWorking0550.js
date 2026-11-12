@@ -91,20 +91,51 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  }
  const pending=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
   (next.supplierRevisionImports||[]).some(r=>r.batchId===id));
- // SSB / Aero follow the Marine / DTRS Working-owner pattern. Re-apply those
- // batches when mapped offers exist but no Working line yet points at APF-03/04
- // through requirementRef or mrRequirementId (do not disturb other batches).
+ // RADIO-012 omits unit on the quotation. Give SSB/Aero offers a Working Lot
+ // basis so C1 can price APF-04 without changing consumed register package keys.
+ const repairedOffers=next.offers.map(offer=>{
+  if(!mgwRadioDtrsOffer0550(offer)||offer.quoteEvidence?.quotedUnit!=='Not stated'||offer.unitBasis?.trim())return offer;
+  if(![MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId].includes(offer.quoteEvidence.sourceId))return offer;
+  if(!mgwCurrentMr0550(offer).length)return offer;
+  return {...offer,unit:'Lot',unitBasis:'Lot for Working; quotation omits unit',
+   quoteEvidence:{...offer.quoteEvidence,quotedUnit:'Lot',
+    rateBasis:'One Working Lot of listed supply'}};
+ });
+ if(repairedOffers.some((offer,i)=>offer!==next.offers[i])){
+  const byId=new Map(repairedOffers.map(offer=>[offer.id,offer]));
+  next={...next,offers:repairedOffers,lines:next.lines.map(line=>{
+   const offer=byId.get(line.offerId);
+   if(!offer?.unitBasis||offer.unitBasis!=='Lot for Working; quotation omits unit'||line.unit===offer.unit)return line;
+   return {...line,unit:offer.unit};
+  })};
+ }
+ // SSB / Aero follow the Marine / DTRS Working-owner pattern. Keep selected
+ // owners for APF-03/04 when mapped offers exist (do not disturb other batches).
  const pointsToMr=(line,mr)=>line.mrRequirementId===mr||line.requirementRef===mr||
   String(line.requirementRef||'').split(' / ').includes(mr);
- const ssbAeroMissing=[MGW_RADIO_SSB_0550,MGW_RADIO_AERO_0550].flatMap(batch=>{
+ const ssbAeroBatches=[MGW_RADIO_SSB_0550,MGW_RADIO_AERO_0550];
+ const ssbAeroOffers=batch=>next.offers.filter(o=>mgwRadioDtrsOffer0550(o)&&o.quoteEvidence?.sourceId===batch.batchId&&
+  o.quoteEvidence.classification==='RATE'&&Number.isFinite(o.unitCost)&&mgwCurrentMr0550(o).length);
+ let ensured=next.lines,reselected=false;
+ for(const batch of ssbAeroBatches){
+  if(!(next.supplierRevisionImports||[]).some(r=>r.batchId===batch.batchId))continue;
+  for(const offer of ssbAeroOffers(batch)){
+   const key=mgwCurrentItemKey0550(offer),id='LINE-MGW-CURRENT-'+key,index=ensured.findIndex(l=>l.id===id||l.offerId===offer.id);
+   if(index<0||ensured[index].selected)continue;
+   const refs=mgwCurrentMr0550(offer);
+   ensured=ensured.map((line,i)=>i===index?{...line,selected:true,unit:offer.unit,requirementRef:refs.join(' / ')}:line);
+   reselected=true;
+  }
+ }
+ if(reselected)next={...next,lines:ensured};
+ const ssbAeroMissing=ssbAeroBatches.flatMap(batch=>{
   if(!(next.supplierRevisionImports||[]).some(r=>r.batchId===batch.batchId))return [];
-  const batchOffers=next.offers.filter(o=>mgwRadioDtrsOffer0550(o)&&o.quoteEvidence?.sourceId===batch.batchId&&
-   o.quoteEvidence.classification==='RATE'&&Number.isFinite(o.unitCost)&&mgwCurrentMr0550(o).length);
+  const batchOffers=ssbAeroOffers(batch);
   if(!batchOffers.length)return [];
   const needs=batchOffers.some(offer=>{
    const key=mgwCurrentItemKey0550(offer),id='LINE-MGW-CURRENT-'+key;
-   if(next.lines.some(l=>l.id===id||l.offerId===offer.id))return false;
-   return mgwCurrentMr0550(offer).some(mr=>!next.lines.some(l=>pointsToMr(l,mr)&&l.offerId&&
+   if(next.lines.some(l=>(l.id===id||l.offerId===offer.id)&&l.selected))return false;
+   return mgwCurrentMr0550(offer).some(mr=>!next.lines.some(l=>l.selected&&pointsToMr(l,mr)&&l.offerId&&
     batchOffers.some(o=>o.id===l.offerId)));
   });
   return needs?[batch.batchId]:[];
