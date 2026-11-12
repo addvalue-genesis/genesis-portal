@@ -6,6 +6,7 @@
   "procurementOwner": "ADDVALUE",
   "directSupplierMarkupPct": 50,
   "pagaAppendix14Pricing": {"customerRowCode": "A1-05", "markupPct": 25, "primePct": 20},
+  "dmrAppendix15Pricing": {"customerRowCode": "A1-11", "primePct": 20},
   "cabinetProcurement": {
     "brand": "RITTAL",
     "supplier": "VERSED",

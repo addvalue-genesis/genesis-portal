@@ -56,6 +56,52 @@ const price=W.deriveBidWorkspace(selected,tokens,today).provisional.lines.find(l
 assert.equal(price.provisionalCostNative,actual.offers.find(o=>o.id===current.offerId).unitCost);
 console.log('PASS CERAGON R11: prior workspace migrates one owner, keeps native option quantity zero, and hides the superseded offer from active views.');
 
+const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550');
+const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550');
+const {deriveBidVolumeWorkingPreview0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550');
+const C1=require(root+'/project0550/data/c1Appendix0550');
+const money=require(root+'/project0550/data/money0550');
+const draftInput={...selected,lines:selected.lines.map(l=>l===current?{...l,primePct:5}:l)};
+const priced=applyDirectSupplierMarkup0550(draftInput);
+const pricedOwner=priced.lines.find(l=>l.id===current.id);
+assert.deepEqual([pricedOwner.sellMode,pricedOwner.markupPct,pricedOwner.primePct],['MARKUP',50,20]);
+assert.strictEqual(applyDirectSupplierMarkup0550(priced),priced);
+const pricedModel=W.deriveBidWorkspace(priced,tokens,today);
+const sell=pricedModel.provisional.lines.find(l=>l.id===current.id);
+assert.equal(sell.provisionalSellNative,money.roundMoney0550(price.provisionalCostNative*1.5));
+assert.equal(sell.customerUSD,money.roundMoney0550(sell.provisionalSellNative*1.2));
+assert.equal(pricedModel.provisional.schedule.find(r=>r.code==='A1-11').children.filter(l=>l.id===current.id).length,1);
+const savedVolume=deriveBidVolumes0550(priced,pricedModel,D.SYSTEMS,today);
+const preview={...deriveBidVolumeWorkingPreview0550(priced,pricedModel,D.SYSTEMS,today,savedVolume),c1LayoutVersion:C1.C1_APPENDIX_LAYOUT_0550};
+for(const [currency,amount] of [['USD',sell.customerUSD],['THB',sell.customerTHB]]){
+ const c1=C1.deriveC1Appendix0550(preview,currency);
+ const dmrRows=c1.groups.find(g=>g.id==='1.5').systems.flatMap(s=>s.sites.flatMap(site=>site.rows));
+ assert.deepEqual(dmrRows.map(r=>[r.sn,r.site,r.description,r.quantity,r.unit]),[
+  ['1.5.1','APF','Microwave System',1,'Lot'],['1.5.2','APF','Vendor Cable',200,'m'],
+  ['1.5.3','ACP','Microwave System',1,'Lot'],['1.5.4','ACP','Vendor Cable',200,'m'],
+ ]);
+ assert.deepEqual(dmrRows.map(r=>r.amount),[amount,null,null,null]);
+ assert(dmrRows[0].note.includes('both APF and ACP')&&dmrRows[0].note.includes('ADDVALUE'));
+ assert(dmrRows[0].components.some(c=>c.description==='Access Switch'));
+ assert(dmrRows[2].note.includes('at item 1.5.1'));
+ assert(dmrRows.filter(r=>r.description==='Vendor Cable').every(r=>r.note.includes('pricing remain open')));
+ assert.equal(dmrRows.flatMap(r=>r.priceOwners).filter(b=>b.lineId===current.id).length,1);
+ assert.equal(C1.c1AppendixOverview0550(c1).find(g=>g.id==='1.5').knownAmount,amount);
+ assert(c1.problems.includes('C1_DMR_MR_SCOPE_OPEN / MR-B1-15-APF-01'));
+}
+const draftWord=C1.c1AppendixWord0550(preview);
+assert(!draftWord.includes('1.5.P1'));
+assert(draftWord.includes('Shared R11 equipment price shown at item 1.5.1.'));
+assert.equal(C1.deriveC1Appendix0550({...preview,workingPreview:false}).rows.find(r=>r.key==='OWNER:'+current.id).kind,'PACKAGE');
+const apfOwner=pricedModel.provisional.lines.find(l=>l.mrRequirementId==='MR-B1-15-APF-01');
+const separateApfPrice={lineId:apfOwner.id,line:apfOwner,unit:'Lot',quantity:1,amount:100,unitPrice:100};
+const competingView={...preview,scheduleRows:id=>id==='C1'?
+ [...preview.scheduleRows(id).filter(b=>b.lineId!==apfOwner.id),separateApfPrice]:preview.scheduleRows(id)};
+const competingC1=C1.deriveC1Appendix0550(competingView);
+assert.equal(competingC1.rows.find(r=>r.mr?.id===apfOwner.mrRequirementId).amount,100);
+assert.equal(competingC1.rows.find(r=>r.key==='OWNER:'+current.id).sn,'1.5.P1');
+console.log('PASS DMR commercial draft: 50% and 20% sell layers, one R11 lot, all four MR rows, USD/THB and Word output.');
+
 const I=require(root+'/project0550/data/integrationWorkspace0550');
 const T=require(root+'/project0550/ControlledTagMapping0550');
 const chosen=structuredClone(selected);

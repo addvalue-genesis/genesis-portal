@@ -12,7 +12,7 @@ import {evaluateServiceEquation} from '../serviceEquationRuntime';
 import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550';
 import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
-import {CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {pagaRevisionSelected0550,pagaTrainingOption0550} from './supplierRevision0550';
 import procurement from './procurementScope0550.json';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
@@ -77,6 +77,10 @@ export function directSupplierSellBasis0550(data,line,offer){
  if(line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&line.customerRowCode===customerRowCode){
   return {...directSellBasis,markupPct,primePct};
  }
+ const dmr=procurement.dmrAppendix15Pricing;
+ if(line.id===CERAGON_LINK_OWNER_0550&&offer.id===CERAGON_R11_0550&&line.wbs==='A'&&line.customerRowCode===dmr.customerRowCode){
+  return {...directSellBasis,primePct:dmr.primePct};
+ }
  return directSellBasis;
 }
 
@@ -129,7 +133,7 @@ const TOWER_SUPPLY_ROWS = [
  ['REQ-MR-B1-11-ACP-06', '2609.95.2'],
 ];
 const MICROWAVE_ALLOWANCE = 'LINE-BID-DMR-ANTENNA-GAP-0550';
-const MICROWAVE_PACKAGE = 'LINE-CERAGON-ASK-REVA1-BASE';
+const MICROWAVE_PACKAGE = CERAGON_LINK_OWNER_0550;
 const MICROWAVE_DRAFTS = {
  'REQDEF-MR-B1-15-APF-01': ['iw1:4066144719:2751717861:6057','iw1:2433556402:3434919004:6182'],
  'REQDEF-MR-B1-15-APF-02': ['iw1:2305603546:1944763840:5997','iw1:3689590334:1881833468:6111'],

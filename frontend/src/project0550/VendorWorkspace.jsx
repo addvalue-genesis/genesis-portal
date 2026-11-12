@@ -56,7 +56,8 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
   <ul>{cabinetProcurement.pending.map(({system,scope})=><li key={system}><strong>{system}</strong> · {scope}</li>)}</ul>
  </details>
  <p>{PROCUREMENT_SCOPE_0550.mgw.bidOfferOwner} เสนอระบบอื่น รวม VHF Trunked Radio (DTRS) · ขอบเขตที่ยังไม่มีใบเสนอราคาคงสถานะ OPEN</p>
- <p>MR Appendix 1.4 · INDUSTRONIC PAGA · ADDVALUE +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.markupPct}% → SAMTEL +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.primePct}% · CERAGON / Master Tower ใช้ ADDVALUE +{PROCUREMENT_SCOPE_0550.directSupplierMarkupPct}% ตามฐานจัดซื้อโดยตรง</p>
+ <p>MR Appendix 1.4 · INDUSTRONIC PAGA · ADDVALUE +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.markupPct}% → SAMTEL +{PROCUREMENT_SCOPE_0550.pagaAppendix14Pricing.primePct}%</p>
+ <p>MR Appendix 1.5 · CERAGON DMR R11 · ADDVALUE +{PROCUREMENT_SCOPE_0550.directSupplierMarkupPct}% → SAMTEL +{PROCUREMENT_SCOPE_0550.dmrAppendix15Pricing.primePct}% · Master Tower ใช้ ADDVALUE +{PROCUREMENT_SCOPE_0550.directSupplierMarkupPct}% ตามฐานจัดซื้อโดยตรง</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>
  <form onSubmit={async e=>{e.preventDefault();if(await put("vendors",{...vendor,id:vendor.id||newId("VEN")}))setVendor({id:"",name:"",kind:"SUPPLIER",reference:""});}}>
  <div className="p55-bid-fields"><Field label="Vendor name" value={vendor.name} onChange={v=>setV("name",v)} required/><Select label="Vendor type" value={vendor.kind} onChange={v=>setV("kind",v)} options={["SUPPLIER","OEM","SERVICE_PROVIDER","INTERNAL_TEAM"]}/><Field label="Vendor reference" value={vendor.reference} onChange={v=>setV("reference",v)}/></div><Save busy={busy}>บันทึก Vendor</Save></form>

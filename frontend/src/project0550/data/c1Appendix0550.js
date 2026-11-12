@@ -1,6 +1,6 @@
 import {pagaRevisionNet0550} from './supplierRevision0550';
 import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwLanEquipmentOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550} from "./mgwQuoteSelection0550";
-import {CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 // Read-only presentation of the existing CUS → SI → VND → Working records.
 // ADR 2–6,8–13: MR identities are stable; display SN is never a mapping key.
 import catalog from './mrWorkingCatalog0550.json';
@@ -44,7 +44,7 @@ function mrDisplayRows(){
 const appendix=r=>r?.id?.match(/^MR-B1-1([1-8])-/)?.[1];
 const unique=xs=>[...new Set(xs)];
 const money=xs=>xs.length&&xs.every(Number.isFinite)?sumMoney0550(xs):null;
-const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||!r.ownerIds.length||!(r.quantity>0));
+const openMr=r=>r.kind==='MR'&&!r.excluded&&(r.provisionalRadio||r.provisionalLan||r.provisionalDmr||!r.ownerIds.length||!(r.quantity>0));
 const sharedRadioLabel='Shared Radio Consoles and Antenna Cables';
 const systemNames={
  'TEL-RADIO-DTRS':'VHF DMR Radio System','TEL-RADIO-MARINE':'VHF-FM Marine Radio System',
@@ -269,7 +269,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
   }
   prices.forEach(b=>groupedQuoteOwners.add(b.lineId));
  }
- for(const row of rows)if(!row.excluded&&!row.ownerIds.length)problems.push('MR_C1_OWNER_UNRESOLVED / '+row.key);
+ const dmrApf=r11&&view.workingPreview?rows.find(r=>r.key==='MR-B1-15-APF-01'):undefined;
+ const dmrAcp=dmrApf&&rows.find(r=>r.key==='MR-B1-15-ACP-01');
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
  const extra=[],pendingOwners=[],candidatePackages=new Map();
@@ -277,6 +278,23 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   if(groupedQuoteOwners.has(b.lineId))continue;
   const targets=ownerUse.get(b.lineId)||[];
+  // The APF MR row carries the full two-site R11 Lot in the draft. Keep ACP
+  // and the cable rows in the MR with no implied allocation or scope acceptance.
+  if(b.lineId===CERAGON_LINK_OWNER_0550&&b.line.offerId===CERAGON_R11_0550&&usdPriced&&b.quantity===1&&b.unit==='Lot'&&
+   dmrApf?.quantity===1&&dmrApf.unit==='Lot'&&dmrAcp?.quantity===1&&dmrAcp.unit==='Lot'&&
+   [dmrApf,dmrAcp].every(row=>!row.excluded&&row.raws.length<=1&&row.ownerIds.every(id=>{
+    const owner=byOwner.get(id);
+    return id===b.lineId||(!owner.usdPriced&&!Number.isFinite(owner.binding.amount));
+   }))&&targets.every(row=>row===dmrApf||row===dmrAcp)){
+   dmrApf.ownerIds=unique([...dmrApf.ownerIds,b.lineId]);
+   dmrApf.priceOwners=[...(dmrApf.priceOwners||[]),b];
+   dmrApf.amount=b.amount;
+   dmrApf.provisionalDmr=true;
+   dmrApf.note=['One CERAGON R11 equipment Lot for both APF and ACP. ADDVALUE performs engineering, system integration and testing.',customerRemark(b.line,legacy),dmrApf.note].filter(Boolean).join(' ');
+   dmrAcp.sharedDmrPriceKey=dmrApf.key;
+   problems.push('C1_DMR_MR_SCOPE_OPEN / '+dmrApf.key);
+   continue;
+  }
   const radio=!legacy&&mgwRadioDtrsOffer0550(b.line.offer);
   const lan=!legacy&&view.workingPreview&&mgwLanEquipmentOffer0550(b.line.offer);
   const directRadio=radio&&view.workingPreview;
@@ -320,13 +338,17 @@ export function deriveC1Appendix0550(view,currency='USD'){
   targets.forEach(t=>{t.packageKeys=(t.packageKeys||[]).concat(item.key);});
  }
  for(const r of rows){
+  if(!r.excluded&&!r.ownerIds.length)problems.push('MR_C1_OWNER_UNRESOLVED / '+r.key);
+  if(dmrApf&&!r.excluded&&!r.ownerIds.some(id=>byOwner.get(id)?.usdPriced)&&/^MR-B1-15-(APF|ACP)-02$/.test(r.key)){
+   r.note=[r.note,'MR cable scope and any additional pricing remain open.'].filter(Boolean).join(' ');
+  }
   const owned=r.priceOwners||[];
   if(r.provisionalRadio){
    r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
    r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
    r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
-  }else if(owned.length){
+  }else if(owned.length&&!r.provisionalDmr){
    r.amount=money(owned.map(b=>b.amount));
    if(!legacy&&/^MR-B1-11-APF-0[346]$/.test(r.key)){
     r.internalNote=[r.internalNote,'Quoted equipment only — MR quantities and interfaces remain open'].filter(Boolean).join(' · ');
@@ -385,6 +407,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  const byKey=new Map(displayRows.map(r=>[r.key,r]));
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
  for(const r of displayRows){
+  if(r.sharedDmrPriceKey)r.note=[r.note,'Shared R11 equipment price shown at item '+byKey.get(r.sharedDmrPriceKey).sn+'.'].filter(Boolean).join(' ');
   const candidates=candidatePackages.get(r.key);
   if(candidates?.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
  }
