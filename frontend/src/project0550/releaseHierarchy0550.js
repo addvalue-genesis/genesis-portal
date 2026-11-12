@@ -107,7 +107,7 @@ export function releaseHierarchy0550(official,customerRows){
        entries.push({...entry,parents:rowParents});
        continue;
       }
-      const toggle=heading(entry.moduleId,entry.cells[2],rowParents);
+      const toggle=heading(entry.moduleId,entry.cells[2]+" · ขอบเขตตาม MR",rowParents);
       entries.push({...entry,parents:rowParents,toggle,nestedOwnerIds:packageRows.map(child=>child.key)});
       entries.push(...packageRows.map(child=>({...child,parents:[...rowParents,toggle.key],packageChild:true})));
      }

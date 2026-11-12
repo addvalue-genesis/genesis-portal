@@ -127,13 +127,18 @@ const {releasePricePresentation0550}=require(root+'/project0550/releasePricePres
 const provisional=radioModel.provisional;
 const releaseNotes=releasePricePresentation0550(provisional);
 const releaseId=mr=>'bid.budget.release.line.REQ-'+mr;
-const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{
- official:provisional,onSource:()=>{},onNavigate:()=>{},
+const renderRelease=official=>renderToStaticMarkup(React.createElement(OfficialCustomerForm,{
+ official,onSource:()=>{},onNavigate:()=>{},
 }));
-const releaseMarkup=id=>releaseHtml.split('data-component-key="'+id+'"')[1].split('</tr>')[0];
+const releaseHtml=renderRelease(provisional);
+const releaseMarkup=(id,html=releaseHtml)=>html.split('data-component-key="'+id+'"')[1].split('</tr>')[0];
 const releaseRow=mr=>releaseMarkup(releaseId(mr));
-assert.match(releaseRow(apfMr),/หลักฐาน Offer จาก Mapping.*RADIO-001.*RADIO-009/s);
-assert.doesNotMatch(releaseRow(apfMr),/ราคาขายร่างจาก Working|143,064|454,782/);
+assert.match(releaseRow(apfMr),/data-release-toggle="bid.budget.release.line.REQ-MR-B1-11-APF-01"/);
+assert.match(releaseRow(apfMr),/APF · VHF DMR Radio System · ขอบเขตตาม MR/);
+assert.match(releaseRow(apfMr),/<td>1<\/td><td>Lot<\/td><td>OPEN<\/td><td>OPEN<\/td>/);
+assert.doesNotMatch(releaseRow(apfMr),/RADIO-001|RADIO-009|ราคาขายร่างจาก Working|143,064|454,782/);
+assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/RADIO-001 · Q26-063 Radio \/ DTRS.*143,064\.00/s);
+assert.match(releaseMarkup(radioOwners[1].releaseModuleId),/RADIO-009 · Q26-063 Radio \/ DTRS.*454,782\.32/s);
 assert.doesNotMatch(releaseRow(acpMr),/RADIO-001|RADIO-009/);
 assert.deepEqual(releaseNotes.get(releaseId(apfMr)).candidates.filter(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)).map(line=>line.offer.id),
  [equipmentOffer.id,subscriberOffer.id]);
@@ -150,6 +155,11 @@ assert(packageRows.every(row=>row.parents.at(-2).endsWith('/site/APF')));
 assert(hierarchy.entries.indexOf(mrEntry)<hierarchy.entries.indexOf(packageRows[0]));
 assert.deepEqual(mrEntry.nestedOwnerIds,radioOwners.map(line=>line.id));
 assert.equal(hierarchy.entries.filter(row=>row.moduleId==='bid.budget.release.customer.A1-07').length,1);
+const oneRadioOwner={...provisional,schedule:provisional.schedule.map(group=>group.code==='A1-07'
+ ?{...group,children:group.children.filter(line=>line.offerId!==subscriberOffer.id)}:group)};
+const oneOwnerMr=releaseMarkup(releaseId(apfMr),renderRelease(oneRadioOwner));
+assert.match(oneOwnerMr,/หลักฐาน Offer จาก Mapping.*RADIO-009/s,'Retain the Offer trace when its owner row is absent');
+assert.doesNotMatch(oneOwnerMr,/RADIO-001/);
 const storage=globalThis.localStorage;
 try{
  globalThis.localStorage={getItem:()=>JSON.stringify({[mrEntry.moduleId]:false})};

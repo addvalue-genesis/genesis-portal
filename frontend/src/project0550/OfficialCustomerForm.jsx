@@ -46,7 +46,7 @@ function PriceNotes({note,onSource,nestedOwnerIds,pricedReleaseRows,onRevealPric
 }
 // Internal navigation alongside the customer projection. Trace the price basis,
 // including a shared owner, using the existing Working-to-Offer resolver.
-function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate}){
+function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate,nestedOwnerIds}){
  if(!line)return null;
  const ownerId=line.mrScopeState?.covered?line.mrScopeState.owner.id:null;
  const basis=ownerId?linesById.get(ownerId):line;
@@ -54,11 +54,13 @@ function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate}){
  const selectedOffers=workingOffers0550(data,basis);
  const usage=basis.systemToken==="TEL-DMR"?sourceUsages.get(basis.id):undefined;
  const offers=selectedOffers.length?selectedOffers:(usage?.offerIds||[]).map(id=>data.offers.find(o=>o.id===id)).filter(Boolean);
+ const nestedOfferIds=(nestedOwnerIds||[]).map(id=>linesById.get(id)?.offerId).filter(Boolean);
  const mappedOffers=line.systemToken==="TEL-RADIO-DTRS"&&line.mrRequirementId
   ?mgwCurrentRequirementTrace0550(data,"REQDEF-"+line.mrRequirementId)
-    .filter(offer=>mgwRadioDtrsOffer0550(offer)&&!offers.some(selected=>selected.id===offer.id))
+    .filter(offer=>mgwRadioDtrsOffer0550(offer)&&!nestedOfferIds.includes(offer.id)&&!offers.some(selected=>selected.id===offer.id))
   :[];
  if(!offers.length&&!mappedOffers.length){
+  if(nestedOfferIds.length)return null;
   return <small>{basis.offerId?"หา Offer ที่ผูกไว้ไม่พบ · "+basis.offerId:"ไม่มี Offer ผูกโดยตรง · ดูฐานราคาที่ Source"}</small>;
  }
  const link=(offer,withDescription=false)=><button key={offer.id} type="button"
@@ -155,7 +157,7 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   }
   if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
-  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")+(r.packageChild?" p55-release-package-child":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.nestedOwnerIds&&<small>ราคาที่มีอยู่แสดงในรายการแพ็กเกจด้านล่าง</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource} nestedOwnerIds={r.nestedOwnerIds} pricedReleaseRows={pricedReleaseRows} onRevealPrice={revealReleaseRow}/></>}</td>)}</tr>;
+  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")+(r.packageChild?" p55-release-package-child":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.nestedOwnerIds&&<small>ราคาที่มีอยู่แสดงในรายการแพ็กเกจด้านล่าง</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate} nestedOwnerIds={r.nestedOwnerIds}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource} nestedOwnerIds={r.nestedOwnerIds} pricedReleaseRows={pricedReleaseRows} onRevealPrice={revealReleaseRow}/></>}</td>)}</tr>;
  })}</tbody></table></div>
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>
