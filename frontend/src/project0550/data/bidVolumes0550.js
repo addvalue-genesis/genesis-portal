@@ -70,6 +70,9 @@ export function tenderScheduleBasis0550(data){
   const complete=valid&&rows.length===headings.length&&sumMoney0550(rows.map(r=>Number.parseFloat(r[2])))===100;
   payment={sourceId:c?.id||'',sourceTitle:c?.title?.split(' / ').at(-1)||'',rows:complete?rows:[]};
  }
+ // Rev.1 sets the initial price to Base and quotes the Option separately.
+ const initialPriceText=c?.content?.match(/^(?:\d+:[ \t]*)?(The Initial Contract Price shall be[^\r\n]+exclusive of[^\r\n]+Optional Scope of Supply[^\r\n]*)/im)?.[1].trim();
+ const initialPrice=initialPriceText?.match(/_{5,}/g)?.length===4?{sourceId:c.id,text:initialPriceText}:null;
  const annex=current.filter(s=>s.readState==='TEXT_READ'&&/Training of Operator Personnel/i.test(s.title||''));
  const course=annex.length===1&&(annex[0].content||'').match(/Telecommunication System and Fiber Optic\s+- Operation and Maintenance Course\s+([1-9]\d*)\s+As per CONTRACT\s+([1-9]\d*)\b/i);
  const training=course?{days:Number(course[2]),trainees:Number(course[1]),sourceId:annex[0].id}:null;
@@ -81,9 +84,13 @@ export function tenderScheduleBasis0550(data){
   ?{sourceId:c.id}:null;
  const packing=current.filter(s=>s.readState==='TEXT_READ'&&/Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(s.title||''));
  const importLicence=packing.length===1&&/IMPORT LICENSE APPLICATION \(PL SUBMISSION\) PROVIDED BY VENDOR/.test(packing[0].content||'')?{sourceId:packing[0].id}:null;
- const agreements=current.filter(s=>s.readState==='TEXT_READ'&&/Purchase Agreement.*\.docx$/i.test(s.title||''));
+ const agreementSources=current.filter(s=>/Purchase Agreement.*\.docx$/i.test(s.title||''));
+ const agreements=agreementSources.filter(s=>s.readState==='TEXT_READ');
+ const agreementSource=agreementSources.length===1?agreements[0]:null;
+ const agreementPlaceholder=agreementSource&&/^(?:\d+:[ \t]*)?<INSERT AGREEMENT NO\.>[ \t]*$/im.test((agreementSource.content||'').slice(0,1800))
+  ?{sourceId:agreementSource.id}:null;
  const cargo=agreements.length===1&&/All-Risk Cargo Insurance[^.]{0,450}one hundred ten percent \(110%\) value of supplies under the AGREEMENT or each Purchase Order/.test(agreements[0].content||'')?{sourceId:agreements[0].id}:null;
- return {payment,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,siteHours,facilitiesConflict,importLicence,cargo};
+ return {payment,initialPrice,agreementPlaceholder,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,siteHours,facilitiesConflict,importLicence,cargo};
 }
 const currentSourceProblems=(data,ids,locator)=>{
  const problems=[];if(!ids.length||!trim(locator))problems.push('SOURCE_LOCATOR_OPEN');

@@ -314,8 +314,9 @@ const historicalV2=P.freezeBidPackageOutput0550(fixture,derive(fixture),'OLD-TES
 const paymentLines=['SCHEDULE B - PAYMENT TERMS AND SCHEDULE','Down Payment','Guarantees','10%','Milestone No.1','Updated engineering evidence','[DELETED] old trigger','5%',
  'Milestone No.2','Updated MDDR','15%','Milestone No.3','Copy of B/L or AWB','30%','Milestone No.4','Site receipt','20%',
  'Milestone No.5','PAC','10%','Milestone No.6','FAC','10%','TOTAL','100.00%'];
+const initialPriceClause='The Initial Contract Price shall be the United States Dollar ______ (Amount in words: United States Dollar ______ only), of Lump Sum Initial Contract for the Base Scope of the Supply of the GOODS, exclusive of United States Dollar ______ (Amount in words: United States Dollar ______only) of the Lump Sum Initial Contract Price for the Optional Scope of Supply of the GOODS.';
 const currentCommercial={...fixture.sourceIntake.sources[0],id:'SYNTHETIC-EXHIBIT-C-REV1',documentNo:'SYNTHETIC-CURRENT-COMMERCIAL',revision:'1',url:'https://example.test/current-commercial',replaces:[],title:'Exhibit C-Commercial Terms rev-1-nan.docx',authority:'CURRENT_TENDER',readState:'TEXT_READ',
- content:paymentLines.map((s,i)=>(100+i)+': '+s).join('\n')};
+ content:[...paymentLines,initialPriceClause].map((s,i)=>(100+i)+': '+s).join('\n')};
 const reviewBindings=data=>data.bidVolumes.bindings.reduce((d,b)=>V.saveBidVolumeRecord0550(d,'bindings',b,today,true),data);
 const withCurrent=reviewBindings({...fixture,sourceIntake:{...fixture.sourceIntake,sources:[...fixture.sourceIntake.sources,currentCommercial]}});
 const reviewedModel=derive(fixture);
@@ -351,7 +352,7 @@ const gate=C.customerReadiness0550(customerView);
 assert(gate.ready,JSON.stringify(gate.items.filter(item=>item.problems.length)));
 const customerHtml=C.customerHtml0550(customerView),customerDocx=C.buildCustomerDocx0550(customerView);
 assert(customerDocx instanceof Uint8Array);
-assert.equal((customerHtml.match(/data-native-schedule=/g)||[]).length,13);
+assert.equal((customerHtml.match(/<article[^>]* data-native-schedule=/g)||[]).length,13);
 assert.match(customerHtml,/Initial Contract Price shall be the United States Dollar[^<]*[0-9]+[.][0-9]{2}/);
 assert.match(customerHtml,/Updated MDDR/);
 assert.match(customerHtml,/QA-AGREEMENT-123/);
@@ -386,7 +387,7 @@ const incomplete=C.customerReadiness0550(missingAgreement);
 assert.equal(incomplete.ready,false);
 assert.match(incomplete.previewHtml,/Internal preview — Not for submission/);
 assert.match(incomplete.previewHtml,/AGREEMENT No\.: OPEN/);
-assert.equal((incomplete.previewHtml.match(/data-native-schedule=/g)||[]).length,13);
+assert.equal((incomplete.previewHtml.match(/<article[^>]* data-native-schedule=/g)||[]).length,13);
 assert.match(renderCustomer(missingAgreement),/<button type="button" aria-expanded="false">ดูตัวอย่างแบบฟอร์ม<\/button>/);
 assert.match(renderCustomer(missingAgreement),/เปิด 11\.0 Document Control/);
 assert.match(renderCustomer(missingAgreement),/ยังขาด Agreement \/ Contract No\./);
@@ -396,6 +397,33 @@ assert.match(renderCustomer(missingDelivery),/ยังไม่ได้ระ�
 assert.match(renderCustomer(missingDelivery),/LINE-TEST · เปิด 11\.M/);
 assert.throws(()=>C.customerHtml0550(missingDelivery),/OPEN/);
 assert.doesNotMatch(customerHtml,/Internal preview — Not for submission/);
+const withOptions={...customerView,customerVersion:true,baseAssigned:100,optionsAssigned:25};
+assert.match(N.nativeSchedule0550(withOptions,'A').html,/Dollar 100\.00 .*exclusive of United States Dollar 25\.00/);
+const wordA=Buffer.from(C.buildCustomerDocx0550({...customerView,baseAssigned:100,optionsAssigned:25})).toString();
+assert.match(wordA,/Dollar 100\.00 .*exclusive of United States Dollar 25\.00/);
+assert.doesNotMatch(wordA,/Dollar 125\.00/);
+const a1=N.nativeSchedule0550(withOptions,'A1').pages[0].values;
+assert.match(a1.A1_2_7,/See Schedule C1 for the itemized scope/);
+const purchaseAgreement={...currentCommercial,id:'TEST-PURCHASE-AGREEMENT',title:'Current Tender Purchase Agreement.docx',
+ content:'8: PURCHASE AGREEMENT\n9: <INSERT AGREEMENT NO.>\n10: SYNTHETIC'};
+const currentAgreementData={...withCurrent,sourceIntake:{...withCurrent.sourceIntake,sources:[...withCurrent.sourceIntake.sources,purchaseAgreement]}};
+const agreementBasis=V.tenderScheduleBasis0550(currentAgreementData);
+assert.equal(agreementBasis.agreementPlaceholder.sourceId,purchaseAgreement.id);
+const tenderPlaceholder={...missingAgreement,tenderScheduleBasis:agreementBasis};
+assert(C.customerReadiness0550(tenderPlaceholder).ready);
+assert.match(C.customerHtml0550(tenderPlaceholder),/AGREEMENT No\.: Not stated in tender form/);
+assert.match(Buffer.from(C.buildCustomerDocx0550(tenderPlaceholder)).toString(),/AGREEMENT No\.: Not stated in tender form/);
+const unreadAgreementData={...currentAgreementData,sourceIntake:{...currentAgreementData.sourceIntake,
+ sources:currentAgreementData.sourceIntake.sources.map(source=>source.id===purchaseAgreement.id?{...source,readState:'METADATA_ONLY'}:source)}};
+assert.equal(V.tenderScheduleBasis0550(unreadAgreementData).agreementPlaceholder,null);
+assert.throws(()=>C.customerHtml0550({...customerView,tenderScheduleBasis:{...customerView.tenderScheduleBasis,initialPrice:null}}),/OPEN/);
+const unallocatedCustomer={...customerView,priceProblems:['SCHEDULE_ALLOCATION_OPEN'],unallocated:[{id:'LINE-AWAITING-ALLOCATION'}]};
+assert.match(renderCustomer(unallocatedCustomer),/LINE-AWAITING-ALLOCATION · เปิด 11\.M/);
+assert.throws(()=>C.customerHtml0550(unallocatedCustomer),/OPEN/);
+const coverOnly={...amendedRecord('I.cover',{state:'OPEN'}),priceProblems:['VOLUME_I_RESPONSE_OPEN']};
+assert(C.customerReadiness0550(coverOnly).ready,'The Volume I cover is outside Exhibit C export');
+const missingResponse={...amendedRecord('I.B',{state:'OPEN'}),priceProblems:['VOLUME_I_RESPONSE_OPEN']};
+assert(!C.customerReadiness0550(missingResponse).ready,'The actual Schedule B response still needs review');
 assert.equal(JSON.stringify(customerFixture),customerBefore);
 console.log('PASS Customer Exhibit C: reviewed A–C8, reconciled Schedule A, Word/HTML output and OPEN, internal text, review and unsaved changes gates.');
 

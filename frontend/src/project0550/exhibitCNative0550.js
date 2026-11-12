@@ -29,6 +29,11 @@ const sparePriceNote=(rows,currency)=>{
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||
  (view.workingPreview&&id==='C7'&&name==='trainingPeriodDays'&&view.tenderScheduleBasis?.training?String(view.tenderScheduleBasis.training.days):'');
+export function customerAgreementNumber0550(view){
+ return field(view,'A','agreementNo').trim()||
+  (view.tenderScheduleBasis?.agreementPlaceholder?'Not stated in tender form':'OPEN');
+}
+const agreementNumber=view=>view.customerVersion?customerAgreementNumber0550(view):field(view,'A','agreementNo')||'OPEN';
 const facilitiesFormCheck='Exhibit C Rev.1 §3 refers to a call-off facilities form as C-7. Its contents list C7 as Field Services and Training and omit C8. Confirm the applicable form with the Purchaser.';
 const term=customerPriceColumn0550;
 const normalize=s=>String(s||'').trim().toUpperCase();
@@ -114,7 +119,14 @@ function nativePages(view,id,currency='USD',c2References){
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
    const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,(view.workingPreview&&subtotalNote(view,bs)?(()=>{const p=scheduleRollup0550(bs);return p.priced+'/'+p.count+' priced; '+p.open+' OPEN. Known subtotal only'+(terms.has('')?' / Delivery term OPEN':'');})():(view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':'')));}
+   if(base){
+    set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));
+    const detail=view.customerVersion&&r===2?'See Schedule C1 for the itemized scope.':
+     view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; ');
+    const rollup=view.workingPreview&&subtotalNote(view,bs)?scheduleRollup0550(bs):null;
+    const note=rollup?rollup.priced+'/'+rollup.count+' priced; '+rollup.open+' OPEN. Known subtotal only':detail;
+    set(v,r,7,note+(terms.has('')?(rollup?' / Delivery term OPEN':' / Customer delivery term OPEN'):''));
+   }
    else{
     if(r===6||r===7)set(v,r,1,bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
@@ -231,7 +243,7 @@ function nativePages(view,id,currency='USD',c2References){
    let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set(notApplicable?'Not applicable':'OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
-    const v=blankValues(id),draftPriceRows=[];set(v,0,0,notApplicable?'':value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,notApplicable?'':shared(bs,'vendorEquipmentNo'));set(v,1,1,notApplicable?'':shared(bs,'referenceDrawings'));
+    const v=blankValues(id),draftPriceRows=[];set(v,0,0,notApplicable?'':value(field(view,id,'vendorNameAddress')));set(v,0,1,agreementNumber(view));set(v,0,2,main);set(v,0,3,notApplicable?'':shared(bs,'vendorEquipmentNo'));set(v,1,1,notApplicable?'':shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
      const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description;
      [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
@@ -322,7 +334,18 @@ function renderPage(view,page,format,currency='USD'){
    page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
   result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
- if(page.id==='A'){
+ if(page.id==='A'&&view.customerVersion){
+  const clause=view.tenderScheduleBasis?.initialPrice?.text;
+  const dollars=amount=>words(amount,currency).replace(/^United States Dollars | only$/g,'');
+  const values=[number(view.baseAssigned),dollars(view.baseAssigned),number(view.optionsAssigned),dollars(view.optionsAssigned)];
+  let index=0;
+  const text=clause?clause.replace(/_{5,}(?=only)/g,'$& ').replace(/_{5,}/g,()=>values[index++]):'Initial Contract Price basis: OPEN';
+  const content=escape(text);
+  result=format==='xml'
+   ?result.replace(/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*?<\/w:p>/g,paragraph=>
+    paragraph.includes(' Contract Price shall be the United States Dollar')?`<w:p><w:r><w:t xml:space="preserve">${content}</w:t></w:r></w:p>`:paragraph)
+   :result.replace(/<p>The Initial Contract Price shall be[^<]*<\/p>/,()=>`<p>${content}</p>`);
+ }else if(page.id==='A'){
   const draftWords=amount=>{
    const text=words(amount,currency).replace(/ only$/,'');
    return currency==='THB'?text:text.replace(/^United States Dollars /,'');
@@ -331,17 +354,13 @@ function renderPage(view,page,format,currency='USD'){
    // Word splits two of the native blanks across adjacent runs.
    result=result.replace(/_{5,}(?:<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t\b[^>]*>_{5,})+/g,'_____');
   }
-  const formatted=view.workingPreview||view.customerVersion;
+  const formatted=view.workingPreview;
   const wording=formatted?draftWords:amount=>words(amount,currency);
-  const initial=view.customerVersion?sumMoney0550([view.baseAssigned,view.optionsAssigned]):null;
-  const vals=[number(initial),wording(initial),number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
+  const vals=['OPEN','OPEN',number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
   result=result.replace(/_{5,}/g,(match,offset)=>escape(vals[i++]||'OPEN')+
    (formatted&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
   if(formatted)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
    .replace(/\b(OPEN)only\b/g,'$1 only');
- }
- if(view.customerVersion&&format==='xml'){
-  result=result.replace(/<w:t>only<\/w:t>/g,'<w:t xml:space="preserve"> only</w:t>');
  }
  if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
   const note='[1] Component quantities follow the MGW package basis stored in Working; MR reconciliation remains pending. Included components form part of their parent package amount and are not charged again.';
@@ -425,7 +444,7 @@ export function nativeSchedule0550(view,id,currency='USD',c2References){
   const status=view.customerVersion?'':`<p class="native-status">${escape(label)} / ${documentRef}${page.detail?' / '+escape(page.detail):''}</p>`;
   const headerTitle=view.customerVersion?customerProjectTitle:'Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project';
   const footer=view.customerVersion?documentRef:sourceLabel+(page.detail?' / '+escape(page.detail):'');
-  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>${headerTitle}<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${footer}</span></footer></article>`;
+  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>${headerTitle}<br>AGREEMENT No.: ${escape(agreementNumber(view))}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${footer}</span></footer></article>`;
  }).join('');
  return {html,issues,pages};
 }
@@ -520,7 +539,7 @@ export function customerExhibitWordParts0550(view){
  parts['word/header5.xml']=parts['word/header5.xml']
   .replace('> Export </w:t>','> </w:t>')
   .replace('>XXX</w:t>','>Telecommunication and Security Systems</w:t>')
-  .replace(/(>AGREEMENT No\.:)<\/w:t>/,(_,label)=>label+' '+escape(field(view,'A','agreementNo')||'OPEN')+'</w:t>');
+  .replace(/(>AGREEMENT No\.:)<\/w:t>/,(_,label)=>label+' '+escape(agreementNumber(view))+'</w:t>');
  const ref=escape(view.proposal.documentNo||'OPEN')+' / '+escape(view.proposal.revision);
  parts['word/footer6.xml']=`<?xml version="1.0" encoding="UTF-8"?><w:ftr ${namespace}><w:p><w:r><w:t>Exhibit C - Commercial Terms · ${ref}</w:t></w:r></w:p></w:ftr>`;
  // Preserve bold/italic/table layout from the form while standardizing Word font and size.

@@ -1,5 +1,5 @@
 import {C1_APPENDIX_LAYOUT_0550,c1AppendixCss0550} from './data/c1Appendix0550';
-import {customerExhibitWordParts0550,nativeExhibitProblems0550,nativeFormCss0550,nativeSchedule0550,NATIVE_SCHEDULE_IDS_0550} from './exhibitCNative0550';
+import {customerAgreementNumber0550,customerExhibitWordParts0550,nativeExhibitProblems0550,nativeFormCss0550,nativeSchedule0550,NATIVE_SCHEDULE_IDS_0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 
 const customerCss0550=`
@@ -8,6 +8,7 @@ body{margin:0;color:#000;background:#fff;font:13px/1.3 Arial,Helvetica,"Liberati
 .p55-native-paper *,.p55-c1-document *{font-family:Arial,Helvetica,"Liberation Sans",sans-serif!important}
 .p55-native-paper h2,.p55-c1-document h2{color:#000;font-size:15px}
 .p55-native-paper table,.p55-c1-document table,.p55-c1-document .c1-component td{font-size:12.5px}
+.p55-native-paper[data-native-schedule="A1"] td{vertical-align:top}
 .p55-native-paper footer,.p55-c1-document footer{color:#000;font-size:11px}
 .customer-preview-status{margin:0;padding:10px 24px;border-bottom:1px solid #765500;background:#fff3cd;color:#392a00;font-weight:bold}
 @media print{
@@ -47,9 +48,20 @@ function prepareCustomerExhibit(view){
  const customerView={...view,customerVersion:true,outputLabel:'CUSTOMER VERSION',c1LayoutVersion:C1_APPENDIX_LAYOUT_0550,
   optionsAssigned:noOptions&&view.optionsAssigned===null?0:view.optionsAssigned};
  const issues=nativeExhibitProblems0550(customerView);
- const docProblems=[...view.priceProblems];
+ const docProblems=view.priceProblems.flatMap(problem=>{
+  if(problem==='SCHEDULE_ALLOCATION_OPEN'&&view.unallocated.length)return view.unallocated.map(line=>problem+' / '+line.id);
+  if(problem==='SCHEDULE_BINDING_REVIEW_OPEN'){
+   const pending=view.bindings.filter(binding=>binding.problems.length);
+   if(pending.length)return pending.flatMap(binding=>binding.problems.map(reason=>reason.split(' / ')[0]+' / '+binding.lineId));
+  }
+  if(problem==='VOLUME_I_RESPONSE_OPEN'){
+   return ['A','A1','A2','B','C','C3','C8'].filter(id=>view.getRecord('I.'+id).state!=='REVIEWED')
+    .map(id=>problem+' / '+id);
+  }
+  return [problem];
+ });
  if(!view.proposal.documentNo?.trim()||!view.proposal.revision?.trim())docProblems.push('BID_DOCUMENT_CONTROL_OPEN');
- const items=[{id:'11.M / Document Control',problems:docProblems}];
+ const items=[{id:'11.M / Document Control',problems:[...new Set(docProblems)]}];
  const body=NATIVE_SCHEDULE_IDS_0550.map(id=>{
   const record=view.getRecord('I.'+id);
   const {html}=nativeSchedule0550(customerView,id);
@@ -57,7 +69,12 @@ function prepareCustomerExhibit(view){
   if(/^C[2-8]$/.test(id)&&!view.scheduleRows(id).length&&!(record.state==='REVIEWED'&&record.disposition==='NOT_APPLICABLE')){
    problems.push('Schedule ว่าง · ต้องบันทึกและทบทวน applicability');
   }
-  if(id==='A'&&!record.nativeFields?.agreementNo?.trim())problems.push('ยังขาด Agreement / Contract No.');
+  if(id==='A'){
+   if(customerAgreementNumber0550(customerView)==='OPEN')problems.push('ยังขาด Agreement / Contract No.');
+   if(!view.tenderScheduleBasis?.initialPrice)problems.push('ยังขาด Schedule A จาก Exhibit C Rev.1 ที่อ่านแล้ว');
+   if(!Number.isFinite(customerView.baseAssigned))problems.push('ยอด Base A1 ยังไม่ครบ');
+   if(!Number.isFinite(customerView.optionsAssigned))problems.push('ยอด Option A2 ยังไม่ครบ');
+  }
   if(record.content?.trim()&&record.state!=='REVIEWED')problems.push('BIDDER response รอทบทวน');
   problems.push(...textProblems(htmlText(html)));
   if(!html)problems.push('ไม่มีแบบฟอร์มสำหรับแสดงผล');
