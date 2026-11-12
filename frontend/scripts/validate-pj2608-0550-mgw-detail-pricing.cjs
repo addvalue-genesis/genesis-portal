@@ -201,19 +201,46 @@ assert.equal(savedRadio.bidVolumes.bindings.filter(b=>b.schedule==='C1'&&b.statu
 const appendix=require(root+'/project0550/data/c1Appendix0550.js');
 const savedRadioView=volumes.deriveBidVolumes0550(savedRadio,radioModel,D.SYSTEMS,radioDate);
 const draft=preview.deriveBidVolumeWorkingPreview0550(savedRadio,radioModel,D.SYSTEMS,radioDate,savedRadioView);
-const c1=appendix.deriveC1Appendix0550({...draft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550});
-const equipment=c1.rows.find(r=>r.key==='OWNER:'+radioOwner.id);
-assert.equal(equipment.site,'APF');
-assert(equipment.components.some(c=>c.description.includes('SLR5500')&&c.quantity===3));
-const apf=c1.rows.find(r=>r.key==='OWNER:'+radioOwners[1].id);
-assert.equal(apf.site,'APF');
-assert(apf.components.some(c=>c.quantity===96&&c.description.includes('XIR-P8668ex')));
+const c1View={...draft,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550};
+const c1=appendix.deriveC1Appendix0550(c1View);
+const c1Radio=c1.rows.filter(row=>row.appendix==='1.1');
+assert(c1Radio.every(row=>row.kind==='MR'));
+assert.deepEqual(c1Radio.map(row=>row.sn),Array.from({length:16},(_,i)=>'1.1.'+(i+1)));
+const apf=c1Radio.find(row=>row.key===apfMr);
+const radioNote='Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
+assert.equal(apf.sn,'1.1.1');
+assert.equal(apf.amount,597846.32);
+assert.equal(apf.unitPrice,null,'The quoted equipment subtotal is not a rate for the full MR Lot');
+assert.equal(apf.note,radioNote);
+assert.deepEqual(apf.components.map(c=>c.source),appendix.c1NativeDetails0550(apf.mr).components.map(c=>c.source));
 assert(apf.components.every(c=>c.unitPrice===null&&c.amount===null));
-assert(c1.rows.find(r=>r.key==='MR-B1-11-APF-01').note.includes('Proposed supply reference'));
-assert(!c1.rows.find(r=>r.key==='MR-B1-11-ABV01-01').note.includes('Proposed supply reference'));
+assert(c1Radio.filter(row=>[acpMr,'MR-B1-11-ABV01-01'].includes(row.key)).every(row=>row.amount===null&&!row.note.includes(radioNote)));
+assert.equal(c1.groups.find(group=>group.id==='1.1').amount,null);
+assert.equal(appendix.c1AppendixOverview0550(c1).find(group=>group.id==='1.1').knownAmount,apf.amount);
+assert.equal(c1.amount,null);
+assert(c1.problems.includes('C1_RADIO_MR_SCOPE_OPEN / '+apfMr));
+const apfTHB=appendix.deriveC1Appendix0550(c1View,'THB').rows.find(row=>row.key===apfMr);
+assert.equal(apfTHB.amount,require(root+'/project0550/data/money0550.js').sumMoney0550(radioOwners.map(line=>line.provisionalCustomerTHB)));
+const table=appendix.c1AppendixTable0550(c1View);
+assert.deepEqual(table.rows.find(row=>row[0]===apf.sn).slice(4),[null,apf.amount,radioNote]);
+const {C1Appendix0550}=require(root+'/project0550/C1Appendix0550.jsx');
+const c1Html=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:c1View}));
+assert.match(c1Html.split('data-c1-mr-id="'+apfMr+'"')[1].split('</tr>')[0],/597,846\.32/);
+assert.doesNotMatch(c1Html,/1\.1\.P[12]\b/);
+for(const exported of [appendix.c1AppendixHtml0550(c1View),appendix.c1AppendixWord0550(c1View)]){
+ assert(exported.includes('597,846.32')&&exported.includes(radioNote));
+ assert.doesNotMatch(exported,/1\.1\.P[12]\b/);
+}
+const strictC1=appendix.deriveC1Appendix0550({...savedRadioView,c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550});
+assert.equal(strictC1.rows.find(row=>row.key===apfMr).amount,null);
+const c1Missing=appendix.deriveC1Appendix0550({...c1View,c1Context:{...c1View.c1Context,lines:c1View.c1Context.lines.filter(line=>line.mrRequirementId!==apfMr)}});
+assert.equal(c1Missing.rows.find(row=>row.key===apfMr).amount,null);
+assert(radioOwners.every(owner=>c1Missing.pendingOwners.some(binding=>binding.lineId===owner.id)));
+assert(!c1Missing.rows.some(row=>row.kind==='PACKAGE'&&radioOwners.some(owner=>row.ownerIds.includes(owner.id))));
 assert.equal(c1.bindings.filter(b=>radioOwners.some(l=>l.id===b.lineId)).length,2);
 for(const owner of radioOwners){
  assert.equal(savedRadioView.bindings.filter(binding=>binding.lineId===owner.id).length,1);
+ assert(apf.ownerIds.includes(owner.id));
  assert.equal(c1.rows.flatMap(row=>row.priceOwners||[]).filter(binding=>binding.lineId===owner.id).length,1);
 }
 assert.equal(activate(radio),radio);

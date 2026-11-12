@@ -3,7 +3,7 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_SUPERSEDED_0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_SUPERSEDED_0550,
  mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
@@ -89,7 +89,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   const mr=mgwCurrentDirectMr0550(offer);
   const sourceRef=offer.sourceRef;
   const customerRemark=radio
-   ?'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.'
+   ?MGW_RADIO_DTRS_QUOTED_SCOPE_0550
    :'Quoted item only. Scope, technical verification and commercial terms remain open.';
   const inputs={...policy,vendorId:offer.vendorId,offerId:offer.id,currency:offer.currency,unit:offer.unit,
    manualCost:null,sellRate:null,brand:offer.brand,sourceRef,customerRemark};
