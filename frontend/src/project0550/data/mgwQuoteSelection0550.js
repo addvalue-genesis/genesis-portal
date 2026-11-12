@@ -41,9 +41,9 @@ export const MGW_RADIO_DTRS_0550 = {
   'RADIO-016':[], // APM = AMS01; the quote does not identify ABV01.
  },
 };
-// Supplemental batch for the marine VHF-FM row. The DTRS batch above was consumed
-// with its original package key and must not change, so RADIO-002 is a separate
-// batch that shares the same quotation, prefix and source hash.
+// Supplemental batches for later Radio rows. The DTRS batch above was consumed
+// with its original package key and must not change, so each later lot is a
+// separate batch that shares the same quotation, prefix and source hash.
 export const MGW_RADIO_MARINE_0550 = {
  batchId:'0550-MGW-Q26-063-RADIO-MARINE-20261112',
  preparedOn:'2026-11-12',
@@ -52,18 +52,41 @@ export const MGW_RADIO_MARINE_0550 = {
   'RADIO-002':['MR-B1-11-APF-02'], // APF item 2 confirmed by the user on 2026-11-12.
  },
 };
+export const MGW_RADIO_SSB_0550 = {
+ batchId:'0550-MGW-Q26-063-RADIO-SSB-20261112',
+ preparedOn:'2026-11-12',
+ systemToken:'TEL-RADIO-SSB',
+ mrMap:{
+  'RADIO-003':['MR-B1-11-APF-03'], // APF item 3; quotation prints ACO on RADIO-003.
+  'RADIO-011':['MR-B1-11-APF-03'], // APF MF/HF lot on the same MR.
+ },
+};
+export const MGW_RADIO_AERO_0550 = {
+ batchId:'0550-MGW-Q26-063-RADIO-AERO-20261112',
+ preparedOn:'2026-11-12',
+ systemToken:'TEL-RADIO-AERO',
+ mrMap:{
+  'RADIO-012':['MR-B1-11-APF-04'], // APF VHF-AM fixed telephone.
+  'RADIO-013':['MR-B1-11-APF-04'], // APF portable airband radios on the same MR.
+ },
+};
 export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
 // Original register wording is part of the imported batch fingerprint.
 export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF-02) per instruction of 12 Nov 2026. The quotation prints ACO.';
+export const MGW_RADIO_003_SITE_NOTE_0550 = 'RADIO-003 maps to APF (MR-B1-11-APF-03) per instruction of 12 Nov 2026. The quotation prints ACO.';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
  ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
 export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
  ' RADIO-002 installation site is APF (MR-B1-11-APF-02), confirmed by the user on 12 Nov 2026. ACO is a typo on the quotation.'+
  ' The lot covers the quoted equipment only: two fixed marine radios, one antenna, one IP gateway and one power supply unit. Reconcile the quoted quantity (2 Lot) with the MR quantity and confirm the refreshed quotation.';
+export const MGW_RADIO_SSB_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_003_SITE_NOTE_0550+
+ ' RADIO-011 is the APF MF/HF lot on the same MR. Both lots cover quoted equipment only. Reconcile MR quantity, antenna/IP gateway scope and the refreshed quotation.';
+export const MGW_RADIO_AERO_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
+ ' RADIO-012 and RADIO-013 map to APF (MR-B1-11-APF-04). The lots cover the quoted fixed AM VHF telephone and portable airband radios only. Reconcile MR quantity, antennas, gateways and the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
-export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId];
+export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId,MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [
  {system:'TEL-CCTV',label:'CCTV',count:28,
@@ -120,8 +143,16 @@ const panelMr = {APF:'05', ACP:'04', ABV01:'04', AMS01:'04'};
 const radioBatches = [
  {batchId:MGW_RADIO_DTRS_0550.batchId,systemToken:'TEL-RADIO-DTRS',mrMap:MGW_RADIO_DTRS_0550.mrMap},
  {batchId:MGW_RADIO_MARINE_0550.batchId,systemToken:MGW_RADIO_MARINE_0550.systemToken,mrMap:MGW_RADIO_MARINE_0550.mrMap},
+ {batchId:MGW_RADIO_SSB_0550.batchId,systemToken:MGW_RADIO_SSB_0550.systemToken,mrMap:MGW_RADIO_SSB_0550.mrMap},
+ {batchId:MGW_RADIO_AERO_0550.batchId,systemToken:MGW_RADIO_AERO_0550.systemToken,mrMap:MGW_RADIO_AERO_0550.mrMap},
 ];
 const radioBatch = offer => radioBatches.find(batch=>batch.batchId===offer?.quoteEvidence?.sourceId);
+const radioOpenNote = {
+ [MGW_RADIO_DTRS_0550.batchId]:MGW_RADIO_DTRS_OPEN_0550,
+ [MGW_RADIO_MARINE_0550.batchId]:MGW_RADIO_MARINE_OPEN_0550,
+ [MGW_RADIO_SSB_0550.batchId]:MGW_RADIO_SSB_OPEN_0550,
+ [MGW_RADIO_AERO_0550.batchId]:MGW_RADIO_AERO_OPEN_0550,
+};
 
 export const mgwReplacementActive0550 = data => Boolean(data.mgwDetailPricingImport?.decision?.includes(MGW_SUPERSEDED_0550));
 export const mgwLanPbxFoOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_CURRENT_PREFIX_0550) &&
@@ -155,7 +186,7 @@ export const mgwRadioDtrsOffer0550 = offer => {
 export const mgwSupplementOpen0550 = (offer,system) => mgwMetNdbOffer0550(offer)?MGW_MET_NDB_OPEN_0550[system]:
  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:
  mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwRadioDtrsOffer0550(offer)?
-  (radioBatch(offer).batchId===MGW_RADIO_MARINE_0550.batchId?MGW_RADIO_MARINE_OPEN_0550:MGW_RADIO_DTRS_OPEN_0550):undefined;
+  radioOpenNote[radioBatch(offer).batchId]:undefined;
 export const mgwCurrentOffer0550 = offer => mgwLanPbxFoOffer0550(offer)||mgwSupplementOffer0550(offer)||mgwBulkOffer0550(offer)||mgwRadioDtrsOffer0550(offer);
 export function mgwCurrentItemKey0550(offer){
  const prefix=mgwMetNdbOffer0550(offer)?MGW_MET_NDB_0550.prefix:
