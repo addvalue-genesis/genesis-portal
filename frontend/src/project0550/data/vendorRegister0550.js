@@ -8,6 +8,7 @@ import {workingOffers0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {validateSupplierCommercialTotals0550,validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
+import {vendorOfferLocation0550} from './vendorOfferLocation0550';
 
 // Extend the existing offer registry; this importer never creates Working prices.
 export const VENDOR_REGISTER_SCHEMA_0550='genesis.0550.vendor-register.v1';
@@ -135,7 +136,7 @@ export function vendorOfferEntries0550(data){
   if(!allocations.has(id))allocations.set(id,[]);
   allocations.get(id).push(usage);
  }
- return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
+ return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,location:vendorOfferLocation0550(offer),
   allocatedWorking:allocations.get(offer.id)||[],
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));

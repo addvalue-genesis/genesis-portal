@@ -19,6 +19,19 @@ import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 const quoteTitle=q=>[q.title,q.fileName,q.revision&&'Rev.'+q.revision,q.hash?.slice(0,8)].filter(Boolean).join(' · ');
 const rowSections=[['BASE','Base · รายการหลัก'],['OPTION','Option · รายการทางเลือก'],['REFERENCE','รายการรวมในแพ็กเกจ / อ้างอิง']];
+function OfferLocation({location,onNavigate}){
+ if(!location)return null;
+ const {state,sites,requirements,note}=location;
+ if(state==='OPEN'||state==='COMMON')return <small>Location · {state} · {note}</small>;
+ const label=state==='REFERENCE'?'ไซต์อ้างอิง · Option ยัง OPEN':'CUS Draft';
+ return <details><summary>Location · {sites.join(' / ')} · {label}</summary>
+  <p>{note}</p>
+  {requirements.map(r=><div key={r.id}>
+   {onNavigate?<button type="button" onClick={()=>onNavigate('bid.working-preview.requirement.REQDEF-'+r.id)}>{r.site} · {r.description}</button>:<span>{r.site} · {r.description}</span>}
+   <small>MR {r.quantity} {r.unit} · {r.reference}</small>
+  </div>)}
+ </details>;
+}
 function QuoteTotal({quote,fx,selectedR11,groupOnly=false}){
  const r11=selectedR11&&quote.entries.find(e=>e.offer.id===CERAGON_R11_0550);
  if(r11){
@@ -91,6 +104,7 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} data={data}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
+    <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
