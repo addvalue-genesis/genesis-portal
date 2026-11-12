@@ -41,13 +41,27 @@ export const MGW_RADIO_DTRS_0550 = {
   'RADIO-016':[], // APM = AMS01; the quote does not identify ABV01.
  },
 };
+// Supplemental batch for the marine VHF-FM row. The DTRS batch above was consumed
+// with its original package key and must not change, so RADIO-002 is a separate
+// batch that shares the same quotation, prefix and source hash.
+export const MGW_RADIO_MARINE_0550 = {
+ batchId:'0550-MGW-Q26-063-RADIO-MARINE-20261112',
+ preparedOn:'2026-11-12',
+ systemToken:'TEL-RADIO-MARINE',
+ mrMap:{
+  'RADIO-002':['MR-B1-11-APF-02'], // Mapped to APF item 2 on 2026-11-12; the quotation prints ACO.
+ },
+};
 export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
+export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF-02) per instruction of 12 Nov 2026. The quotation prints ACO.';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
  ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
+export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_002_SITE_NOTE_0550+
+ ' The lot covers the quoted equipment only: two fixed marine radios, one antenna, one IP gateway and one power supply unit. Reconcile the quoted quantity (2 Lot) with the MR quantity and confirm the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
-export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId];
+export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [
  {system:'TEL-CCTV',label:'CCTV',count:28,
@@ -99,6 +113,13 @@ const directMr = {
  'PABX-AMS01-3-01': 'MR-B1-13-AMS01-03',
 };
 const panelMr = {APF:'05', ACP:'04', ABV01:'04', AMS01:'04'};
+// Each radio batch is an independent consumed package: its own source batch,
+// system token and MR map. Offer IDs share the DTRS prefix.
+const radioBatches = [
+ {batchId:MGW_RADIO_DTRS_0550.batchId,systemToken:'TEL-RADIO-DTRS',mrMap:MGW_RADIO_DTRS_0550.mrMap},
+ {batchId:MGW_RADIO_MARINE_0550.batchId,systemToken:MGW_RADIO_MARINE_0550.systemToken,mrMap:MGW_RADIO_MARINE_0550.mrMap},
+];
+const radioBatch = offer => radioBatches.find(batch=>batch.batchId===offer?.quoteEvidence?.sourceId);
 
 export const mgwReplacementActive0550 = data => Boolean(data.mgwDetailPricingImport?.decision?.includes(MGW_SUPERSEDED_0550));
 export const mgwLanPbxFoOffer0550 = offer => Boolean(offer?.id?.startsWith(MGW_CURRENT_PREFIX_0550) &&
@@ -122,15 +143,17 @@ export function mgwBulkMr0550(offer){
  return Number(item[2])>0&&Number(item[2])<=count?'MR-B1-18-'+site+'-'+item[2]:null;
 }
 export const mgwBulkOffer0550 = offer => Boolean(mgwBulkMr0550(offer));
-export const mgwRadioDtrsOffer0550 = offer => Boolean(
- offer?.id?.startsWith(MGW_RADIO_DTRS_0550.prefix) && offer.quoteRef===MGW_RADIO_DTRS_0550.quoteRef &&
- offer.quoteEvidence?.sourceId===MGW_RADIO_DTRS_0550.batchId && offer.quoteEvidence.sourceSha256===MGW_RADIO_DTRS_0550.sha256 &&
- offer.quoteEvidence.systemTokens?.length===1 && offer.quoteEvidence.systemTokens[0]==='TEL-RADIO-DTRS' &&
- Object.hasOwn(MGW_RADIO_DTRS_0550.mrMap,offer.id.slice(MGW_RADIO_DTRS_0550.prefix.length))
-);
+export const mgwRadioDtrsOffer0550 = offer => {
+ const batch=radioBatch(offer);
+ return Boolean(batch && offer.id?.startsWith(MGW_RADIO_DTRS_0550.prefix) && offer.quoteRef===MGW_RADIO_DTRS_0550.quoteRef &&
+  offer.quoteEvidence.sourceSha256===MGW_RADIO_DTRS_0550.sha256 &&
+  offer.quoteEvidence.systemTokens?.length===1 && offer.quoteEvidence.systemTokens[0]===batch.systemToken &&
+  Object.hasOwn(batch.mrMap,offer.id.slice(MGW_RADIO_DTRS_0550.prefix.length)));
+};
 export const mgwSupplementOpen0550 = (offer,system) => mgwMetNdbOffer0550(offer)?MGW_MET_NDB_OPEN_0550[system]:
  mgwCctvEntOffer0550(offer)?MGW_CCTV_ENT_SECTIONS_0550.find(s=>s.system===system)?.check:
- mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwRadioDtrsOffer0550(offer)?MGW_RADIO_DTRS_OPEN_0550:undefined;
+ mgwBulkOffer0550(offer)?MGW_BULK_OPEN_0550:mgwRadioDtrsOffer0550(offer)?
+  (radioBatch(offer).batchId===MGW_RADIO_MARINE_0550.batchId?MGW_RADIO_MARINE_OPEN_0550:MGW_RADIO_DTRS_OPEN_0550):undefined;
 export const mgwCurrentOffer0550 = offer => mgwLanPbxFoOffer0550(offer)||mgwSupplementOffer0550(offer)||mgwBulkOffer0550(offer)||mgwRadioDtrsOffer0550(offer);
 export function mgwCurrentItemKey0550(offer){
  const prefix=mgwMetNdbOffer0550(offer)?MGW_MET_NDB_0550.prefix:
@@ -149,7 +172,7 @@ export function mgwCurrentMr0550(offer){
  if(bulkMr)return [bulkMr];
  if(mgwMetNdbOffer0550(offer))return metNdbMr[mgwCurrentItemKey0550(offer)];
  if(mgwCctvEntOffer0550(offer))return cctvEntMr[mgwCurrentItemKey0550(offer)].map(id=>'MR-B1-'+id);
- if(mgwRadioDtrsOffer0550(offer))return MGW_RADIO_DTRS_0550.mrMap[mgwCurrentItemKey0550(offer)];
+ if(mgwRadioDtrsOffer0550(offer))return radioBatch(offer).mrMap[mgwCurrentItemKey0550(offer)];
  const direct=mgwCurrentDirectMr0550(offer);
  if(direct)return [direct];
  const [section,site,sn]=offer.id.slice(MGW_CURRENT_PREFIX_0550.length).split('-');

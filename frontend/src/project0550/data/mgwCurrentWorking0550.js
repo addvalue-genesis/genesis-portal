@@ -3,24 +3,35 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_SUPERSEDED_0550,
+ MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_SUPERSEDED_0550,
  mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
-const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12', 'TEL-RADIO-DTRS':'A1-07'};
+const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12', 'TEL-RADIO-DTRS':'A1-07', 'TEL-RADIO-MARINE':'A1-07'};
 const nativeMr=new Map(MR_WORKING_CATALOG_0550.rows.map(row=>[row.id,row]));
 const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Object.keys(original).length&&
  Object.keys(original).every(key=>original[key]===line[key]);
 const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
 
-export function prepareMgwRadioDtrsRegister0550(data,systems,today){
- const {batchId,prefix,quoteRef,sha256}=MGW_RADIO_DTRS_0550,quote=MGW_QUOTE_0550;
- const preparedOn='2026-11-11';
+// Each batch is consumed independently. The DTRS package keeps its original
+// definition (and package key); later quotation rows are added as new batches.
+// coverageNote of the DTRS batch is part of its package key. Do not edit it.
+const radioRegisterBatches=[
+ {batchId:MGW_RADIO_DTRS_0550.batchId,preparedOn:'2026-11-11',mrMap:MGW_RADIO_DTRS_0550.mrMap,
+  coverageNote:'Q26-063 ver1.0 pp9–11. '+MGW_RADIO_001_SITE_NOTE_0550+
+   ' APM is AMS01. Reconcile listed quantities and GTPL scope to MR Appendix 1.1.'},
+ {batchId:MGW_RADIO_MARINE_0550.batchId,preparedOn:MGW_RADIO_MARINE_0550.preparedOn,mrMap:MGW_RADIO_MARINE_0550.mrMap,
+  coverageNote:'Q26-063 ver1.0 p9. '+MGW_RADIO_002_SITE_NOTE_0550+
+   ' Reconcile the quoted quantity to MR Appendix 1.1.'},
+];
+
+function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,coverageNote}){
+ const {prefix,quoteRef,sha256}=MGW_RADIO_DTRS_0550,quote=MGW_QUOTE_0550;
  if(today<preparedOn||data.supplierRevisionImports?.some(r=>r.batchId===batchId))return data;
  const savedVendorId=data.offers.find(o=>o.mgwQuoteLineId==='MGW-Q26-063-RADIO-001')?.vendorId;
  const vendor=data.vendors.find(v=>v.id===savedVendorId)||{id:'VENDOR-MGW-0550',name:quote.vendorName,kind:'SUPPLIER',reference:quote.quoteRef+' / '+quote.sourceUrl};
- const sourceRows=quote.rows.filter(r=>Object.hasOwn(MGW_RADIO_DTRS_0550.mrMap,r.id.replace('MGW-Q26-063-','')));
+ const sourceRows=quote.rows.filter(r=>Object.hasOwn(mrMap,r.id.replace('MGW-Q26-063-','')));
  const offers=sourceRows.flatMap(row=>{
   // The PDF places this unpriced Option directly below item 1, inside the
   // same extracted catalogue detail. Retain each scope on its own record.
@@ -43,14 +54,17 @@ export function prepareMgwRadioDtrsRegister0550(data,systems,today){
   return [makeOffer(false,base),...(option?[makeOffer(true,option)]:[])];
  });
  const pack={schema:VENDOR_REGISTER_SCHEMA_0550,projectId:data.projectId,batchId,preparedOn,
-  coverageNote:'Q26-063 ver1.0 pp9–11. '+MGW_RADIO_001_SITE_NOTE_0550+
-   ' APM is AMS01. Reconcile listed quantities and GTPL scope to MR Appendix 1.1.',vendors:[vendor],offers};
+  coverageNote,vendors:[vendor],offers};
  try{return planVendorRegister0550(data,pack,systems).workspace;}
  catch(error){
-  const receipt=data.mgwDetailPricingImport,message='DTRS vendor register / '+error.message;
+  const receipt=data.mgwDetailPricingImport,message='DTRS vendor register / '+batchId+' / '+error.message;
   if(!receipt||receipt.conflicts.includes(message))return data;
   return {...data,mgwDetailPricingImport:{...receipt,conflicts:[...receipt.conflicts,message]}};
  }
+}
+
+export function prepareMgwRadioDtrsRegister0550(data,systems,today){
+ return radioRegisterBatches.reduce((current,batch)=>prepareRadioRegister0550(current,systems,today,batch),data);
 }
 
 export function prepareMgwCurrentWorking0550(data,policies,today){
