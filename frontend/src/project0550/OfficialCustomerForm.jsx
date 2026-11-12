@@ -6,13 +6,14 @@ import {bidPresentationIndex,bidOwnerStyle,lineOwner0550} from "./bidPresentatio
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {CUSTOMER_FORM_0550,officialCustomerRows} from "./data/officialPricing0550";
 import {workingOffers0550} from "./data/workingOffers0550";
+import {mrSupplierLinks0550} from "./data/mrSupplierLinks0550";
 import {mgwCurrentItemKey0550,mgwCurrentRequirementTrace0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {bidCompletionSourceUsages0550} from "./data/bidCompletion0550";
 import {exportOfficialCustomerXlsx} from "./exportOriginalPriceForm";
 import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {releasePricePresentation0550} from "./releasePricePresentation0550";
-import {releaseHierarchy0550} from "./releaseHierarchy0550";
+import {RADIO_RELEASE_LOT_0550,releaseHierarchy0550} from "./releaseHierarchy0550";
 import {B5StartupAmount0550} from "./CommissioningSpares0550";
 import {ReleaseScheduleDrafts0550} from "./ReleaseScheduleDrafts0550.jsx";
 
@@ -82,10 +83,38 @@ function ReleaseOfferTrace({data,line,linesById,sourceUsages,onNavigate,nestedOw
  </>;
 }
 
-export function OfficialCustomerForm({official,onSource,navigationTarget,open=true,children,onNavigate,onOpenSource}){
- const {data,model}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
+function RadioMrTrace({row,data,linesById,reviewDate,onNavigate,onReveal}){
+ const {mr,workingLine,nestedOwnerIds,externalOwners}=row;
+ const nestedOfferIds=new Set((nestedOwnerIds||[]).map(id=>linesById.get(id)?.offerId).filter(Boolean));
+ const {links}=mrSupplierLinks0550(data,workingLine||{id:"REQ-"+mr.id,mrRequirementId:mr.id,systemToken:mr.systemToken});
+ const evidence=links.filter(link=>!nestedOfferIds.has(link.id));
+ const go=id=>onNavigate?.(id,{mrId:mr.id});
+ return <div className="p55-source-trace">
+  <small>{mr.id} · {mr.site} · Item {row.cells[0]}</small>
+  <div className="p55-review-toolbar" role="group" aria-label={mr.id+" Volume references"}>
+   <button type="button" disabled={!onNavigate} onClick={()=>go("bid.quotation.C1")}>11.C1 · Volume I</button>
+   <button type="button" disabled={!onNavigate} onClick={()=>go("bid.technical.equipment.system."+mr.systemToken)}>12.3 · Volume II</button>
+   <button type="button" disabled={!onNavigate} onClick={()=>go("bid.commercial.deviations")}>13.D · Volume III</button>
+  </div>
+  {externalOwners.map(([id,code])=><button key={id} type="button" onClick={()=>onReveal(id)}>ดูขอบเขตราคา Lot {code}</button>)}
+  {!row.moduleId&&!externalOwners.length&&<small>OPEN · ยังไม่มีแถวราคาที่จัดสรรตรงกับรายการ MR นี้</small>}
+  {evidence.length>0&&<div>
+   <small>หลักฐาน Offer จาก Mapping · ตรวจขอบเขตที่ WP.7</small>
+   {evidence.map(({id,offer})=><div key={id}>
+    <button type="button" disabled={!onNavigate||!offer} onClick={()=>onNavigate?.("bid.vendor.offer."+id)}>
+     {mgwRadioDtrsOffer0550(offer)&&mgwCurrentItemKey0550(offer)+" · "}{offer?.quoteRef||id}
+    </button>
+    <small>{offer?.validUntil&&reviewDate&&offer.validUntil<reviewDate?"EXPIRED · "+offer.validUntil:"อ้างอิง · รอทบทวน"}</small>
+   </div>)}
+  </div>}
+ </div>;
+}
+
+export function OfficialCustomerForm({official,onSource,navigationTarget,mrNavigationTarget,open=true,children,onNavigate,onOpenSource}){
+ const {data,model,reviewDate}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const rows=useMemo(()=>officialCustomerRows(official),[official]),provisional=official.pricingBasis==="PROVISIONAL_VENDOR",notes=releasePricePresentation0550(official);
- const hierarchy=useMemo(()=>releaseHierarchy0550(official,rows),[official,rows]);
+ const requirements=model?.integration?.requirements;
+ const hierarchy=useMemo(()=>releaseHierarchy0550(official,rows,requirements),[official,rows,requirements]);
  const pricedReleaseRows=useMemo(()=>new Set(hierarchy.entries
   .filter(row=>row.kind==="line"&&Number.isFinite(row.cells[6])).map(row=>row.moduleId)),[hierarchy]);
  const partPrices=useMemo(()=>provisional?knownPriceGroups0550(official):[],[official,provisional]);
@@ -94,7 +123,19 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
  const [expanded,setExpanded]=useState(loadExpansion),defaults=new Map(hierarchy.controls.map(node=>[node.key,node.defaultOpen]));
  const isOpen=key=>expanded[key]??defaults.get(key)??true;
  useEffect(()=>{try{globalThis.localStorage?.setItem(EXPANSION_KEY,JSON.stringify(expanded));}catch{}},[expanded]);
- useEffect(()=>{const entry=hierarchy.entries.find(row=>(row.moduleId||row.sectionModuleId)===navigationTarget);if(entry)setExpanded(old=>({...old,...Object.fromEntries([...entry.parents,...(entry.kind==="section"?[entry.toggle.key]:[])].map(key=>[key,true]))}));},[navigationTarget,hierarchy]);
+ useEffect(()=>{
+  const entry=hierarchy.entries.find(row=>mrNavigationTarget?row.mr?.id===mrNavigationTarget:(row.moduleId||row.sectionModuleId)===navigationTarget);
+  if(!entry)return;
+  const openTarget=entry.kind==="section"||entry.moduleId===RADIO_RELEASE_LOT_0550;
+  setExpanded(old=>({...old,...Object.fromEntries([...entry.parents,...(openTarget?[entry.toggle.key]:[])].map(key=>[key,true]))}));
+  if(!mrNavigationTarget)return;
+  const timer=setTimeout(()=>{
+   const el=document.querySelector('[data-release-mr-id="'+mrNavigationTarget+'"]');
+   el?.scrollIntoView({block:"center"});
+   el?.focus({preventScroll:true});
+  },60);
+  return ()=>clearTimeout(timer);
+ },[navigationTarget,mrNavigationTarget,hierarchy]);
  const toggle=node=>setExpanded(old=>({...old,[node.key]:!isOpen(node.key)}));
  const toggleAll=open=>setExpanded(Object.fromEntries(hierarchy.controls.map(node=>[node.key,open])));
  const togglePartA=open=>setExpanded(old=>({
@@ -112,7 +153,8 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
  const revealReleaseRow=moduleId=>{
   const entry=hierarchy.entries.find(row=>row.moduleId===moduleId);
   if(!entry)return;
-  setExpanded(old=>({...old,...Object.fromEntries(entry.parents.map(key=>[key,true]))}));
+  const keys=entry.kind==="group"?[...entry.parents,entry.toggle.key]:entry.parents;
+  setExpanded(old=>({...old,...Object.fromEntries(keys.map(key=>[key,true]))}));
   requestAnimationFrame(()=>document.querySelector('[data-component-key="'+moduleId+'"]')?.scrollIntoView({block:"center"}));
  };
  return <Module id="bid.budget.release" open={open} title={provisional?"REL-04 · ราคาที่เลือก / ประมาณการ — PROVISIONAL / NOT ISSUED":"REL-04 · Official customer form — Review Draft / NOT ISSUED"}>
@@ -157,7 +199,36 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
   }
   if(r.kind==="mr-empty")return <tr key={r.key} hidden={hidden} className="p55-release-mr-empty"><td/><td/><td colSpan={6}>{r.description}</td></tr>;
   if(r.kind.startsWith("mr-"))return <tr key={r.key} hidden={hidden} className={"p55-release-"+r.kind}><td colSpan={8}>{toggleButton(r.toggle)}</td></tr>;
-  return <tr key={r.key} hidden={hidden} className={"p55-customer-"+r.kind+(partADetail&&r.kind==="line"?" p55-release-lot-item":"")+(r.packageChild?" p55-release-package-child":"")} data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={identity(rowId)?.owner||(["A","B","C"].includes(r.key)?r.key:undefined)} style={bidOwnerStyle(identity(rowId)?.owner||r.key)} tabIndex={rowId?-1:undefined}>{cells.map((value,i)=><td key={i}>{i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}{i===2&&r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}{i===2&&r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}{i===2&&r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}{i===2&&r.mrReference&&<small>{r.mrReference}</small>}{i===2&&r.nestedOwnerIds&&<small>ราคาที่มีอยู่แสดงในรายการแพ็กเกจด้านล่าง</small>}{i===2&&r.sourceId&&<div className="p55-source-trace"><button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>{!hidden&&r.kind==="line"&&<ReleaseOfferTrace data={data} line={linesById.get(r.key)} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate} nestedOwnerIds={r.nestedOwnerIds}/>}<BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/></div>}{i===7&&<>{provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}<PriceNotes note={notes.get(r.moduleId)} onSource={onSource} nestedOwnerIds={r.nestedOwnerIds} pricedReleaseRows={pricedReleaseRows} onRevealPrice={revealReleaseRow}/></>}</td>)}</tr>;
+  const line=linesById.get(r.key);
+  const expired=r.radioPackage&&line?.offer?.validUntil&&reviewDate&&line.offer.validUntil<reviewDate;
+  const rowClass=["p55-customer-"+r.kind,partADetail&&r.kind==="line"&&"p55-release-lot-item",r.packageChild&&"p55-release-package-child"].filter(Boolean).join(" ");
+  const owner=identity(rowId)?.owner||r.mr?.systemToken||(["A","B","C"].includes(r.key)?r.key:undefined);
+  return <tr key={r.key} hidden={hidden} className={rowClass}
+   data-component-key={rowId} data-module-number={identity(rowId)?.number} data-bid-owner={owner}
+   data-release-mr-id={r.mr?.id} style={bidOwnerStyle(owner||r.key)} tabIndex={rowId||r.mr?-1:undefined}>
+   {cells.map((value,i)=><td key={i}>
+    {i===2&&r.toggle?toggleButton(r.toggle):typeof value==="number"&&i>=5?amount(value,"USD"):value}
+    {i===2&&<>
+     {r.sectionModuleId&&<span className="p55-release-part-id"><ComponentCopyId projectId="PJ2608-0550" componentKey={r.sectionModuleId}/></span>}
+     {r.sectionModuleId==="bid.budget.release.part.A"&&partAControls}
+     {r.mrReferences&&<small>MR: {r.mrReferences} · Customer Lot {r.key}</small>}
+     {r.radioScope&&<small>ขอบเขต VHF and MF/HF ตาม MR Appendix 1.1 · ยอดบนหัว Lot ใช้เฉพาะราคาที่จัดสรรเข้า A1-07</small>}
+     {r.mrReference&&<small>{r.mrReference}</small>}
+     {r.nestedOwnerIds&&<small>ดูฐานราคาในรายการย่อย</small>}
+     {r.radioPackage&&<small>{expired?"EXPIRED · "+line.offer.validUntil:provisional?"PROVISIONAL":"Working / package"}</small>}
+     {r.mr&&!hidden&&<RadioMrTrace row={r} data={data} linesById={linesById} reviewDate={reviewDate} onNavigate={onNavigate} onReveal={revealReleaseRow}/>}
+     {r.sourceId&&<div className="p55-source-trace">
+      <button type="button" onClick={()=>onSource(r.sourceId)}>กลับ Source · {r.key}</button>
+      {!hidden&&r.kind==="line"&&!r.mr&&<ReleaseOfferTrace data={data} line={line} linesById={linesById} sourceUsages={sourceUsages} onNavigate={onNavigate} nestedOwnerIds={r.nestedOwnerIds}/>}
+      <BidHeading {...identity(r.moduleId)} title="ตำแหน่งอ้างอิง"/>
+     </div>}
+    </>}
+    {i===7&&<>
+     {provisional&&r.kind==="group"&&r.key==="B5"&&<B5StartupAmount0550 allowance={model?.b5StartupAllowance}/>}
+     <PriceNotes note={notes.get(r.moduleId)} onSource={onSource} nestedOwnerIds={r.nestedOwnerIds} pricedReleaseRows={pricedReleaseRows} onRevealPrice={revealReleaseRow}/>
+    </>}
+   </td>)}
+  </tr>;
  })}</tbody></table></div>
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>

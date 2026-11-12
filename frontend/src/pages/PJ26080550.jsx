@@ -2115,6 +2115,7 @@ function Project0550Bidding({ lang = "th" }) {
   const [activeTab, setActiveTab] = useState("budget");
   const [area,setArea]=useState("B");
   const [navigationTarget,setNavigationTarget]=useState(null);
+  const [mrNavigationTarget,setMrNavigationTarget]=useState(null);
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const [technicalDirty,setTechnicalDirty]=useState(false);
   const {data,model}=useBidWorkspace();
@@ -2174,12 +2175,12 @@ function Project0550Bidding({ lang = "th" }) {
   const moduleIndex=directory.entries;
   const componentNumbers=useMemo(()=>({projectId:"PJ2608-0550",numbers:directory.numbers}),[directory]);
   const workingSystemTarget=useRef(null);
-  const jump=useCallback((m,workingSystem)=>{if(technicalDirty)return;workingSystemTarget.current=workingSystem;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
-  const navigate=useCallback((id,options)=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m,options?.workingSystem);},[moduleIndex,jump]);
+  const jump=useCallback((m,options)=>{if(technicalDirty)return;workingSystemTarget.current=options?.workingSystem;setMrNavigationTarget(options?.mrId||null);setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
+  const navigate=useCallback((id,options)=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m,options);},[moduleIndex,jump]);
   const openSource=useCallback(id=>jump({id,tab:"documents",area:"A"}),[jump]);
   const legacyBudget=useMemo(()=><LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>,[]);
   const budgetTarget=useRef({});
-  if(area==="B"&&activeTab==="budget")budgetTarget.current={id:navigationTarget,workingSystem:workingSystemTarget.current};
+  if(area==="B"&&activeTab==="budget")budgetTarget.current={id:navigationTarget,workingSystem:workingSystemTarget.current,mrId:mrNavigationTarget};
   useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
   const [pagaEvidence, setPagaEvidence] = useState(null);
 
@@ -2228,7 +2229,7 @@ function Project0550Bidding({ lang = "th" }) {
         {area==="B"&&<div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>}
         {/* Retain the existing Working editor and visited projections across tabs. */}
         <div hidden={area!=="B"||activeTab!=="budget"} data-retained-workspace="budget">
-          <RetainedCommercial0550 onNavigate={navigate} onOpenSource={openSource} navigationTarget={budgetTarget.current.id} navigationSystem={budgetTarget.current.workingSystem} legacy={legacyBudget}/>
+          <RetainedCommercial0550 onNavigate={navigate} onOpenSource={openSource} navigationTarget={budgetTarget.current.id} navigationSystem={budgetTarget.current.workingSystem} mrNavigationTarget={budgetTarget.current.mrId} legacy={legacyBudget}/>
         </div>
         {area==="B"&&<>
 
@@ -2242,8 +2243,8 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace navigationTarget={navigationTarget} onNavigate={navigate}/></> : null}
           {activeTab === "registry" ? <><BidDataControls/><InputImpact0550 onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></> : null}
-          {activeTab === "quotation" || activeTab === "commercial" ? <BidVolumesWorkspace0550 key={activeTab} volume={activeTab==="quotation"?"I":"III"} navigationTarget={navigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={navigate}/> : null}
-          {activeTab === "technical" ? <TechnicalProposalWorkspace0550 navigationTarget={navigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
+          {activeTab === "quotation" || activeTab === "commercial" ? <BidVolumesWorkspace0550 key={activeTab} volume={activeTab==="quotation"?"I":"III"} navigationTarget={navigationTarget} mrNavigationTarget={mrNavigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={navigate}/> : null}
+          {activeTab === "technical" ? <TechnicalProposalWorkspace0550 navigationTarget={navigationTarget} mrNavigationTarget={mrNavigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={navigate}/> : null}
           {activeTab === "deviations" ? <DeviationWorkspace0550 onDirtyChange={setTechnicalDirty} navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
         </>}
       </main>

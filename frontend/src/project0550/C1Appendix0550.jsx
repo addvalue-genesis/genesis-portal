@@ -1,24 +1,46 @@
-import React,{useMemo,useState} from 'react';
+import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
+import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
 
 // Keep the native MR rows in order. In the interactive screen, put a separate
 // package-price block first so an expanded Appendix still reveals its price.
 const screenSites=(sites,documentMode)=>documentMode?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
-export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
+export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mrNavigationTarget}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
  const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
+ const trace=useRef(null),focusedRow=useRef(null);
+ const location=useMemo(()=>{
+  if(!mrNavigationTarget)return null;
+  for(const group of projection.groups)for(const system of group.systems)for(const site of system.sites){
+   const row=site.rows.find(r=>r.mr?.id===mrNavigationTarget);
+   if(row)return {appendix:group.id,system:system.name,site:site.name,key:row.key};
+  }
+  return null;
+ },[projection,mrNavigationTarget]);
+ useEffect(()=>{
+  if(!location)return;
+  const {appendix,system,site,key}=location;
+  setOpened(old=>({...old,['APP:'+appendix]:true,['SYS:'+appendix+':'+system]:true,['SITE:'+appendix+':'+system+':'+site]:true}));
+  setSelected(key);
+  if(trace.current)trace.current.open=true;
+  const timer=setTimeout(()=>{
+   focusedRow.current?.scrollIntoView({block:'center'});
+   focusedRow.current?.focus({preventScroll:true});
+  },80);
+  return ()=>clearTimeout(timer);
+ },[location]);
  const screenSubtotal=projection.amount!==null?null:view.workingPreview?projection.pricedItemsSubtotal:
   documentMode?null:sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite));
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
  const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
  const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
  const active=projection.rows.find(r=>r.key===selected)||projection.rows[0];
- const navigate=(id)=>{if(!disabled)onNavigate?.(id);};
+ const navigate=(id,options)=>{if(!disabled)onNavigate?.(id,options);};
  const button=(key,label,component=false)=>documentMode?(component?null:<span>{label}</span>):<button type="button" className={component?'p55-c1-item-toggle':'p55-c1-group-toggle'} aria-expanded={expanded(key,component)} aria-label={label} onClick={()=>toggle(key,component)}><span aria-hidden="true">{expanded(key,component)?'−':'+'}</span>{!component&&<span>{label}</span>}</button>;
  const traceIds=active?Array.from(new Set([...(active.ownerIds||[]),...(active.raws||[]).map(l=>l.id)])):[];
  return <section className="p55-c1-workspace" aria-label="C1 Appendix workspace">
@@ -32,10 +54,11 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
   </div>
   <nav className="p55-c1-jumps" aria-label="C1 Appendices">{projection.groups.filter(g=>g.id!=='OTHER').map(g=><button type="button" key={g.id} onClick={()=>{setOpened(s=>({...s,['APP:'+g.id]:true}));document.getElementById('p55-c1-app-'+g.id)?.scrollIntoView({block:'start'});}}>{g.id}</button>)}</nav>
   <p className="p55-c1-screen-note">CUS · MR Rev.B1 → SI → VND → Working · ราคาขายจาก Working ที่เลือกตามมุมมองปัจจุบัน · “—” คือยังไม่แสดงค่า ไม่ใช่ศูนย์ · DRAFT จนกว่าจะผ่านการออก Release</p>
-  <details className="p55-c1-trace" aria-label="C1 internal trace"><summary>CUS ↔ SI ↔ VND / Working · Module ID และผลตรวจภายใน</summary>
+  <details ref={trace} className="p55-c1-trace" aria-label="C1 internal trace"><summary>CUS ↔ SI ↔ VND / Working · Module ID และผลตรวจภายใน</summary>
    <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.quotation.C1"/>
    <label>รายการ C1 ที่ต้องการตรวจ<select aria-label="C1 trace row" value={active?.key||''} onChange={e=>setSelected(e.target.value)}>{projection.rows.map(r=><option key={r.key} value={r.key}>{r.sn} · {r.site} · {r.description}</option>)}</select></label>
    {active&&<><p>{active.mr?.reference||active.description}</p>{active.internalNote&&<p>Working · {active.internalNote}</p>}
+    {active.mr?.id.startsWith('MR-B1-11-')&&<button type="button" disabled={disabled} onClick={()=>navigate(RADIO_RELEASE_LOT_0550,{mrId:active.mr.id})}>10.7 · กลับ Release A1-07</button>}
     {active.mr&&<><button type="button" disabled={disabled} onClick={()=>navigate('bid.documents.controlled-source-inventory.mr.page.'+(Number(active.mr.reference.match(/\/\s*p(\d+)/)?.[1]||0)+2))}>CUS · เปิด MR ต้นทาง</button>{(active.mr.canonicalIds||[active.mr.id]).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+id)}>SI-REQ · เปิดข้อกำหนด {active.mr.canonicalIds?id:''}</button>)}</>}
     <button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.step.7')}>SI-WP-07 · Mapping กับ VND</button>
     {traceIds.map(id=><div key={id}><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+id}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+id)}>SI-COST · เปิดเจ้าของงาน/ราคา</button><button type="button" disabled={disabled} onClick={()=>navigate('bid.quotation.line.'+id)}>ตรวจ Schedule allocation</button></div>)}
@@ -55,7 +78,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
     <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB ({currency==='THB'?'THB':'USD or RMB'})</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
     {projection.groups.map(g=>{
      const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;
-     const heading=g.title.toUpperCase()+(!documentMode&&g.id==='1.1'?' / TELECOM TOWER':'');
+     const heading=g.title.toUpperCase();
      return <tbody key={g.id}>
      <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
@@ -63,7 +86,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false}){
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode).map(site=><React.Fragment key={site.name}>
        <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
-        <tr data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>
+        <tr ref={r.key===location?.key?focusedRow:undefined} tabIndex={r.key===location?.key?-1:undefined}
+         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>
         {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
         {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}
         {expanded(r.key,true)&&(r.notes||[]).map((note,i)=><tr className="c1-detail-note" key={'note'+i}><td/><td colSpan={6}>{note}</td></tr>)}

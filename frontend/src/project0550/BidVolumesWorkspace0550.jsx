@@ -19,6 +19,8 @@ import {SPARE_EQUATION_SCHEDULES_0550} from './serviceEquationRuntime';
 import {c2WorkingAllocationProblems0550} from './data/commissioningSparePhases0550';
 import {WorkingScheduleStatus0550,ScheduleAllocationCrosswalk0550} from './WorkingSchedulePreview0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
+import {mrRequirement0550} from './data/mrWorkingBasis0550';
+import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
 import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {ScheduleResults0550} from './SchedulePriceDiagnostics0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
@@ -99,7 +101,18 @@ export function PackageConsistency0550({onNavigate,compact=false,view:providedVi
  return <section className="p55-panel" aria-label="Bid package consistency"><h3>Volume I ↔ Volume II ↔ Volume III / Deviation</h3><p><strong>{native.length?'HOLD':view.state}</strong> · การตรวจนี้ใช้ references ที่บันทึก ไม่ได้ยืนยันความหมายของข้อความแทน SI</p>{compact?<details><summary>รหัสตรวจชุดข้อเสนอ · {view.problems.length+native.length} รายการ · ดู Stage / Punch List ด้านล่าง</summary><ul>{[...view.problems,...native.map(p=>'Native Exhibit C: '+p)].map(p=><li key={p}>{p}</li>)}</ul></details>:<ul>{[...view.problems,...native.map(p=>'Native Exhibit C: '+p)].map(p=><li key={p}>{p}</li>)}</ul>}<details><summary>รายการที่ต้องทบทวน · {view.consistency.length}</summary><Grid label="Volume consistency findings" heads={['System / ID','Check','Open']} rows={view.consistency.map(r=>[r.system+' / '+r.id,r.reason,<button type="button" onClick={()=>onNavigate?.(r.target)}>เปิดรายการ</button>])}/></details><div className="p55-review-toolbar">{[['bid.quotation','11 Volume I'],['bid.technical.overview','12 Volume II'],['bid.commercial','13 Volume III'],['bid.deviations','14 Deviation']].map(([id,label])=><button type="button" key={id} onClick={()=>onNavigate?.(id)}>{label}</button>)}</div></section>;
 }
 
-export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,onDirtyChange}){
+export function VolumeRadioMrContext0550({mrId,onNavigate,componentKey,children}){
+ const mr=mrRequirement0550({mrRequirementId:mrId});
+ if(!mr)return null;
+ return <aside className="p55-callout" aria-label="MR Appendix 1.1 reference" data-volume-mr-id={mr.id} data-component-key={componentKey}>
+  <strong>{mr.id} · {mr.description}</strong>
+  <p>{mr.reference}</p>
+  {children}
+  <button type="button" onClick={()=>onNavigate?.(RADIO_RELEASE_LOT_0550,{mrId:mr.id})}>10.7 · กลับ Release A1-07</button>
+ </aside>;
+}
+
+export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigationTarget,onNavigate,onDirtyChange}){
  const {data,model,reviewDate,view,change,busy}=useBidVolumes0550(),prefix=volume==='I'?'bid.quotation':'bid.commercial';
  const [showWorking,setShowWorking]=useState(true),[showAllSchedules,setShowAllSchedules]=useState(true);
  const [currency,setCurrency]=useState('USD');
@@ -140,6 +153,9 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <label>Schedule ที่แสดง<select aria-label="Schedules shown" value={showAllSchedules?'ALL':'C1_C2'} disabled={dirty} onChange={e=>changeScheduleScope(e.target.value)}><option value="C1_C2">แสดงเฉพาะ C1 และ C2</option><option value="ALL">แสดง Schedule ทั้งหมด</option></select></label><p>A / A1 / A2 และตาราง C เดิมแสดงครบเป็นค่าเริ่มต้น · A1 รับยอด Base และ A2 รับยอด Option จาก Working / Schedule allocation ชุดเดิม · เลือกดูเฉพาะ C1/C2 ได้ · ปุ่ม Export ทั้งชุดยังรวมทุก Schedule</p><Select label="Schedule price view" value={showWorking?'WORKING':'REVIEWED'} onChange={v=>{if(!dirty)setShowWorking(v==='WORKING');}} rows={[["WORKING","Working Preview · แสดงรายการ/ราคาที่มี พร้อมหมวดแนะนำ"],["REVIEWED","เฉพาะข้อมูลที่บันทึกและราคาทบทวนแล้ว"]]}/>{showWorking&&<WorkingScheduleStatus0550 onNavigate={go} view={preview} disabled={dirty||busy} onSave={saveSuggested} onAllocate={()=>choose('mapping')}/>}</>}
  <nav className="p55-technical-tabs" aria-label={'Volume '+volume+' sections'}>{panels.map(([id,label])=><button key={id} type="button" aria-pressed={panel===id} title={label} onClick={()=>choose(id)}>{volume==='I'&&SCHEDULES_0550.some(s=>s.id===id)?'11.'+id:label}</button>)}</nav><p role="status">{message}</p>
  <section className="p55-panel" data-component-key={prefix+'.'+panel}><ComponentCopyId projectId="PJ2608-0550" componentKey={prefix+'.'+panel}/>
+ {volume==='III'&&panel==='deviations'&&navigationTarget==='bid.commercial.deviations'&&<VolumeRadioMrContext0550 mrId={mrNavigationTarget} onNavigate={go}>
+  <p>อ้างอิงรายการ MR สำหรับตรวจเงื่อนไขและ Commercial Deviation ในทะเบียนด้านล่าง</p>
+ </VolumeRadioMrContext0550>}
  {volume==='I'&&['A1','overview','preview'].includes(panel)&&<ScheduleResults0550 view={displayView} currency={currency} disabled={dirty} onOpen={id=>{setShowAllSchedules(true);choose(id);}}/>}
  {volume==='I'&&panel==='A1'&&<div className="p55-review-toolbar">
   <button type="button" disabled={dirty} onClick={()=>choose('D')}>11.D · Breakdown for S/N 2</button>
@@ -169,7 +185,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,onNavigate,
   <button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.part.B')}>เปิด Part B / ฐานต้นทุนงานบริการ</button>
   <button type="button" disabled={dirty} onClick={()=>go('bid.deviations.release')}>เปิดทะเบียน Technical Deviation</button>
  </div>}<h3>Document control / Preparation</h3><div className="p55-bid-fields"><Input label="Bid package document number" value={meta?.documentNo} onChange={v=>{setMeta(m=>({...m,documentNo:v}));setDirty(true);}}/><Input label="Bid package revision" value={meta?.revision} onChange={v=>{setMeta(m=>({...m,revision:v}));setDirty(true);}}/></div><button type="button" disabled={busy||!dirty} onClick={async()=>{if(await change(d=>({...d,bidVolumes:{...(d.bidVolumes||emptyBidVolumes0550()),...meta}}),'Save bid package document control'))setDirty(false);}}>บันทึก Document Control</button><button type="button" onClick={()=>{setMeta({documentNo:view.proposal.documentNo,revision:view.proposal.revision});setDirty(false);}}>ยกเลิกการแก้ไข</button><p>การบันทึกชุดใหม่นี้เปิดการตรวจความพร้อมสาม Volume ก่อนอนุมัติ Commercial issue ใหม่ โดยไม่แก้ประวัติเดิม</p><PackageConsistency0550 onNavigate={go}/>{volume==='I'&&<p>Exhibit C rev-0: C6 = Consumables, C7 = Field services/training, C8 = Facilities. Two-year spares และ C8 Base/call-off มีข้อความขัดกัน ต้องบันทึกข้อยืนยันจากลูกค้าใน 11.C3 / 11.C8 ก่อนปิดรายการ</p>}</>}
- {(panel==='cover'||schedule||volume==='III'&&QUALIFICATIONS_0550.some(q=>q.id===panel))&&<><h3>{schedule?'Schedule '+schedule.id+' — '+schedule.title:panel==='cover'?'Power of Attorney / Undertaking':QUALIFICATIONS_0550.find(q=>q.id===panel)?.title}</h3>{table&&<NativeExhibitC0550 key={panel==='C2'?'C2':undefined} currency={currency} disabled={dirty} onNavigate={go} view={displayView} id={panel} c2Scope={['C2','C3','C4'].includes(panel)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>}{schedule?<details><summary>ข้อมูลหัวแบบฟอร์ม / หลักฐานและการทบทวน · {record.state}</summary><p>{record.problems.join(' / ')}</p><RecordEditor key={key} collection="records" initial={record} onDirtyChange={setDirty}/></details>:<><QualificationResponse0550 record={record} data={data} onNavigate={go}/><details key={key}><summary>แก้ไขคำตอบ / หลักฐานและการทบทวน</summary><RecordEditor key={key} collection="records" initial={record} onDirtyChange={setDirty}/></details></>}</>}
+ {(panel==='cover'||schedule||volume==='III'&&QUALIFICATIONS_0550.some(q=>q.id===panel))&&<><h3>{schedule?'Schedule '+schedule.id+' — '+schedule.title:panel==='cover'?'Power of Attorney / Undertaking':QUALIFICATIONS_0550.find(q=>q.id===panel)?.title}</h3>{table&&<NativeExhibitC0550 key={panel==='C2'?'C2':undefined} currency={currency} disabled={dirty} onNavigate={go} view={displayView} id={panel} mrNavigationTarget={navigationTarget==='bid.quotation.C1'?mrNavigationTarget:undefined} c2Scope={['C2','C3','C4'].includes(panel)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>}{schedule?<details><summary>ข้อมูลหัวแบบฟอร์ม / หลักฐานและการทบทวน · {record.state}</summary><p>{record.problems.join(' / ')}</p><RecordEditor key={key} collection="records" initial={record} onDirtyChange={setDirty}/></details>:<><QualificationResponse0550 record={record} data={data} onNavigate={go}/><details key={key}><summary>แก้ไขคำตอบ / หลักฐานและการทบทวน</summary><RecordEditor key={key} collection="records" initial={record} onDirtyChange={setDirty}/></details></>}</>}
  {volume==='I'&&panel==='C2'&&<>
   <CommissioningBreakdown0550 view={displayView} systems={SYSTEMS} currency={currency} model={model} disabled={dirty} onNavigate={go} onAllocate={openAllocation}/>
   <CommissioningSpareQuotes0550 data={data} model={model} onNavigate={go} disabled={dirty}/>

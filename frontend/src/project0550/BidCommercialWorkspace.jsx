@@ -308,7 +308,7 @@ function BidProcessResult0550({data,model,onNavigate}){
  <details><summary>งานระดับ process ที่ SI ต้องดำเนินการ · {result.groups.length} กลุ่ม</summary><p>แยกตามสาเหตุและเจ้าของงาน ไม่ใช่จำนวนเรื่องที่ต้องขอผู้บริหารตัดสินใจ</p><div className="p55-table-wrap"><table className="p55-table" aria-label="SI bid process tasks"><thead><tr><th>งาน / ระบบ</th><th>ต้องดำเนินการ</th><th>รายการที่เกี่ยวข้อง</th></tr></thead><tbody>{result.groups.map(g=><tr key={g.id}><td>{g.label}<small>{g.systemToken} / {g.wbs} · ผู้ดำเนินการ {g.role}</small></td><td>{g.action}{g.inputProblems.length>0&&<details><summary>ฐานที่ต้องจัดการ {g.inputProblems.length} ประเภท</summary><ul>{g.inputProblems.map(p=><li key={p}>{p}</li>)}</ul></details>}</td><td>{g.lineIds.length} รายการ <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+g.lineIds[0])}>เปิดงานเดิม</button></td></tr>)}</tbody></table></div></details>
  </section>;
 }
-export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem,onOpenSource,onNavigate}){
+export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem,mrNavigationTarget,onOpenSource,onNavigate}){
  const {data,model,change,busy}=useBidWorkspace();
  const editorState=useRef(null);
  const [mode,setMode]=useState("working"),[priceView,setPriceView]=useState("provisional"),[form,setForm]=useState(blankLine),[context,setContext]=useState("official"),[target,setTarget]=useState(null);
@@ -354,7 +354,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <button type="button" onClick={()=>exportBidReviewXlsx(official,"THB")}>Export THB review XLSX</button>
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Budget THB lines"><thead><tr><th>Customer row / WBS</th><th>Description</th><th>Qty / unit</th><th>ต้นทุน Working THB</th><th>Customer THB</th><th>Trace</th></tr></thead><tbody>{official.selected.map(r=><tr key={r.id} data-component-key={"bid.budget.budget-thb.line."+r.id} data-module-number={identity("bid.budget.budget-thb.line."+r.id)?.number} data-bid-owner={lineOwner0550(r)} style={bidOwnerStyle(lineOwner0550(r))}><td>{r.customerRowCode||"OPEN"} / {r.wbs}</td><td><BidHeading {...identity("bid.budget.budget-thb.line."+r.id)}/></td><td>{r.quantity??"OPEN"} {r.unit}</td><td>{amount(r.costTHB)}</td><td>{amount(r.customerTHB)}</td><td>{r.reviewState}<button type="button" onClick={()=>go("working",r.sourceModuleId)}>กลับ Source</button></td></tr>)}</tbody></table></div>
  </Module>
- <OfficialCustomerForm onNavigate={onNavigate} onOpenSource={onOpenSource} official={official} open={false} navigationTarget={target} onSource={id=>go("working",id)}>
+ <OfficialCustomerForm onNavigate={onNavigate} onOpenSource={onOpenSource} official={official} open={false} navigationTarget={target} mrNavigationTarget={target==="bid.budget.release.customer.A1-07"?mrNavigationTarget:undefined} onSource={id=>go("working",id)}>
  <PagaQuoteScope0550 data={data} section="release" onNavigate={onNavigate}/>
  <section className="p55-panel"><strong>Volume II · Technical Proposal</strong><p>ชุดเทคนิคใช้ Requirements / CAL–RPT / Supplier / Working ร่วมกัน สถานะเอกสารเทคนิคต้องตรวจแยกจากการอนุมัติราคานี้</p><button type="button" onClick={()=>onNavigate?.("bid.technical.overview")}>เปิด Volume II · Technical Proposal</button></section>
  </OfficialCustomerForm>

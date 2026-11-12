@@ -139,6 +139,7 @@ assert.match(releaseRow(apfMr),/<td>1<\/td><td>Lot<\/td><td>OPEN<\/td><td>OPEN<\
 assert.doesNotMatch(releaseRow(apfMr),/RADIO-001|RADIO-009|ราคาขายร่างจาก Working|143,064|454,782/);
 assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/RADIO-001 · Q26-063 Radio \/ DTRS.*143,064\.00/s);
 assert.match(releaseMarkup(radioOwners[1].releaseModuleId),/RADIO-009 · Q26-063 Radio \/ DTRS.*454,782\.32/s);
+assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/EXPIRED · 2026-11-08/);
 assert.doesNotMatch(releaseRow(acpMr),/RADIO-001|RADIO-009/);
 assert.deepEqual(releaseNotes.get(releaseId(apfMr)).candidates.filter(line=>radioSelection.mgwRadioDtrsOffer0550(line.offer)).map(line=>line.offer.id),
  [equipmentOffer.id,subscriberOffer.id]);
@@ -146,8 +147,23 @@ assert(!releaseNotes.get(releaseId(acpMr)).candidates.some(line=>radioSelection.
 const releaseRows=O.officialCustomerRows(provisional);
 const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const hierarchy=releaseHierarchy0550(provisional,releaseRows);
-const hierarchyIds=hierarchy.entries.filter(row=>row.kind==='line').map(row=>row.moduleId);
+const hierarchyIds=hierarchy.entries.filter(row=>row.kind==='line'&&row.moduleId).map(row=>row.moduleId);
 assert.equal(new Set(hierarchyIds).size,hierarchyIds.length);
+assert.deepEqual(new Set(hierarchyIds),new Set(releaseRows.filter(row=>row.kind==='line').map(row=>row.moduleId)));
+const a107='bid.budget.release.customer.A1-07';
+const appendixScope=MR.MR_WORKING_CATALOG_0550.rows.filter(row=>row.id.startsWith('MR-B1-11-'));
+const scopeEntries=h=>h.entries.filter(row=>row.mr);
+assert.deepEqual(scopeEntries(hierarchy).map(row=>row.mr.id),appendixScope.map(row=>row.id));
+assert.deepEqual(scopeEntries(hierarchy).filter(row=>row.mr.site==='APF').map(row=>row.cells[0]),['1','2','3','4','5','6','7','8']);
+for(const entry of scopeEntries(hierarchy)){
+ assert(entry.parents.includes(a107+'/site/'+entry.mr.site));
+ assert.deepEqual(entry.cells.slice(3,5),[entry.mr.quantity,entry.mr.unit]);
+ assert(releaseHtml.includes('aria-label="'+entry.mr.id+' Volume references"'));
+}
+const marine=scopeEntries(hierarchy).find(row=>row.mr.id==='MR-B1-11-APF-02');
+assert.equal(marine.cells[6],'—');
+assert.deepEqual(marine.externalOwners.map(([,code])=>code),['A1-08']);
+assert.deepEqual(scopeEntries(releaseHierarchy0550(radioModel.official,O.officialCustomerRows(radioModel.official))).map(row=>row.mr.id),appendixScope.map(row=>row.id));
 const mrEntry=hierarchy.entries.find(row=>row.moduleId===releaseId(apfMr));
 const packageRows=hierarchy.entries.filter(row=>row.packageChild&&row.parents.at(-1)===mrEntry.moduleId);
 assert.deepEqual(packageRows.map(row=>row.key),radioOwners.map(line=>line.id));
@@ -176,8 +192,11 @@ const noParent=releaseHierarchy0550(provisional,releaseRows.filter(row=>row.modu
 for(const owner of radioOwners){
  assert.equal(hierarchy.entries.filter(row=>row.key===owner.id).length,1);
  assert.equal(releaseHtml.split('data-component-key="'+owner.releaseModuleId+'"').length,2);
- assert(noParent.entries.some(row=>row.key===owner.id&&!row.packageChild),'Keep the price visible when its mapped MR is absent');
+ assert(noParent.entries.some(row=>row.key===owner.id&&row.packageChild),'Keep the price under its catalog MR when the Working projection lacks the parent');
 }
+const catalogParent=scopeEntries(noParent).find(row=>row.mr.id===apfMr);
+assert.equal(catalogParent.moduleId,undefined);
+assert.deepEqual(catalogParent.nestedOwnerIds,radioOwners.map(line=>line.id));
 const pricedIds=new Set(releaseRows.filter(row=>row.kind==='line'&&Number.isFinite(row.cells[6])).map(row=>row.moduleId));
 const pagaMrEntry=hierarchy.entries.find(row=>releaseNotes.get(row.moduleId)?.candidates
  ?.some(candidate=>candidate.systemToken==='TEL-PAGA'&&pricedIds.has(candidate.releaseModuleId)));

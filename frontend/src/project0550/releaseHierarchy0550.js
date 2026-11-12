@@ -1,8 +1,11 @@
 import {MR_WORKING_CATALOG_0550} from "./data/mrWorkingBasis0550";
 import {mgwCurrentMr0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
+import {suggestedCustomerCode} from "./data/officialPricing0550";
 import {MR_SUPPLY_ORDER_0550} from "./bidWorkingBasis0550";
 
+export const RADIO_RELEASE_LOT_0550="bid.budget.release.customer.A1-07";
 const catalog=MR_WORKING_CATALOG_0550.rows;
+const radioScope=catalog.filter(row=>row.wbs==="A"&&/^MR-B1-11-.+-\d{2}$/.test(row.id));
 const positions=new Map(catalog.map((row,index)=>[row.id,index]));
 const appendixOf=row=>row?.reference.match(/\bApp\.(\d+\.\d+)\b/)?.[1]||"";
 const rank=line=>positions.get(line?.mrRequirementId)??Infinity;
@@ -27,9 +30,68 @@ function mappedRadioPackages(rows,lines){
  return {byParent,nested};
 }
 
+function radioScopeRows(rows,lines,customerRows,requirements){
+ const byMr=new Map(radioScope.map(mr=>[mr.id,{direct:[],packages:[]}]));
+ const workingMr=new Map();
+ const linkedByLine=new Map();
+ for(const line of lines.values()){
+  if(!byMr.has(line.mrRequirementId))continue;
+  if(!workingMr.has(line.mrRequirementId))workingMr.set(line.mrRequirementId,[]);
+  workingMr.get(line.mrRequirementId).push(line);
+ }
+ for(const requirement of requirements){
+  const mrId=requirement.id.slice("REQDEF-".length);
+  if(!requirement.id.startsWith("REQDEF-")||!byMr.has(mrId))continue;
+  for(const lineId of requirement.workLineIds||[]){
+   if(!linkedByLine.has(lineId))linkedByLine.set(lineId,new Set());
+   linkedByLine.get(lineId).add(mrId);
+  }
+ }
+ const unmatched=[];
+ for(const row of rows){
+  const line=lines.get(row.key);
+  if(byMr.has(line.mrRequirementId)){
+   byMr.get(line.mrRequirementId).direct.push(row);
+   continue;
+  }
+  const mapped=line.mrRequirementId?[line.mrRequirementId]:[
+   ...new Set([...mgwCurrentMr0550(line.offer),...(linkedByLine.get(line.id)||[])])
+  ];
+  if(mapped.length===1&&byMr.has(mapped[0]))byMr.get(mapped[0]).packages.push(row);
+  else unmatched.push(row);
+ }
+ const releaseRows=new Set(customerRows.filter(row=>row.kind==="line").map(row=>row.moduleId));
+ const result=radioScope.map(mr=>{
+  const {direct,packages}=byMr.get(mr.id);
+  const exact=direct.length===1&&direct[0].cells[3]===mr.quantity&&direct[0].cells[4]===mr.unit?direct[0]:null;
+  const scopeLines=workingMr.get(mr.id)||[];
+  const externalOwners=new Map();
+  for(const line of scopeLines){
+   const owner=lines.get(line.mrScopeState?.covered?line.coveredByLineId:line.id);
+   if(!owner?.customerRowCode||owner.customerRowCode==="A1-07")continue;
+   const target=releaseRows.has(owner.releaseModuleId)?owner.releaseModuleId:"bid.budget.release.customer."+owner.customerRowCode;
+   externalOwners.set(target,owner.customerRowCode);
+  }
+  const suggested=suggestedCustomerCode(mr);
+  if(!externalOwners.size&&suggested&&suggested!=="A1-07"&&!direct.length){
+   externalOwners.set("bid.budget.release.customer."+suggested,suggested);
+  }
+  const item=String(Number(mr.id.slice(-2)));
+  const cells=exact?[...exact.cells]:["","","","","",externalOwners.size?"—":"OPEN",externalOwners.size?"—":"OPEN",""];
+  cells.splice(0,5,item,mr.site,mr.site+" · "+mr.description,mr.quantity??"ตาม MR",mr.unit||"—");
+  return {
+   ...exact,kind:"line",key:exact?.key||mr.id,cells,mr,
+   mrReference:mr.reference,externalOwners:[...externalOwners],
+   workingLine:exact?lines.get(exact.key):scopeLines.length===1?scopeLines[0]:undefined,
+   packageRows:[...direct.filter(row=>row!==exact),...packages].map(row=>({...row,radioPackage:true}))
+  };
+ });
+ return {rows:result,unmatched};
+}
+
 // Screen-only hierarchy. Each canonical customer row occurs once. Split a Lot
 // spanning appendices into display sections, never duplicate its amount/ID.
-export function releaseHierarchy0550(official,customerRows){
+export function releaseHierarchy0550(official,customerRows,requirements=[]){
  const lines=new Map(official.lines.map(line=>[line.id,line])),entries=[],controls=[];
  const heading=(key,label,parents,defaultOpen=true)=>{const node={key,label,parents,defaultOpen};controls.push(node);return node;};
  for(const part of ["A","B","C"]){
@@ -48,6 +110,13 @@ export function releaseHierarchy0550(official,customerRows){
   }
   for(const [index,group] of official.schedule.filter(g=>g.part===part).entries()){
    const rows=customerRows.filter(row=>row.kind==="line"&&lines.get(row.key)?.customerRowCode===group.code).sort((a,b)=>rank(lines.get(a.key))-rank(lines.get(b.key)));
+   if(group.releaseModuleId===RADIO_RELEASE_LOT_0550){
+    bucket(categoryFor("1.1"),"1.1").segments.push({
+     group,index,...radioScopeRows(rows,lines,customerRows,requirements),
+     anchor:true,appendices:["1.1"],rank:positions.get(radioScope[0]?.id)??Infinity
+    });
+    continue;
+   }
    const packages=part==="A"?mappedRadioPackages(rows,lines):null;
    const references=rows.map(row=>catalog[rank(lines.get(row.key))]).filter(Boolean);
    const groupCatalog=catalog.filter(row=>row.wbs===part&&group.systems.includes(row.systemToken));
@@ -84,13 +153,13 @@ export function releaseHierarchy0550(official,customerRows){
    }
    if(!category.segments.length)entries.push({kind:"mr-empty",key:category.key+"/empty",parents,description:"ยังไม่มี Lot ที่เชื่อมกับ Appendix นี้ใน Release"});
    for(const segment of category.segments.sort((a,b)=>a.rank-b.rank||a.index-b.index)){
-    const {group,rows,anchor,appendices}=segment;
+    const {group,rows,anchor,appendices,unmatched}=segment;
     const showEmpty=part==="A"&&Boolean(category.appendix)&&!rows.length;
     const system=heading(anchor?group.releaseModuleId:group.releaseModuleId+"/appendix/"+(category.appendix||"working"),group.code+" · "+group.description,parents,part==="A"&&(rows.length>0||showEmpty));
-    entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / ")}:{kind:"mr-system",key:system.key,parents,toggle:system,lotCode:group.code,lotModuleId:group.releaseModuleId});
+    entries.push(anchor?{...customerRows.find(row=>row.kind==="group"&&row.key===group.code),parents,toggle:system,mrReferences:appendices.map(a=>"App. "+a).join(" / "),radioScope:Boolean(unmatched)}:{kind:"mr-system",key:system.key,parents,toggle:system,lotCode:group.code,lotModuleId:group.releaseModuleId});
     if(showEmpty)entries.push({kind:"mr-empty",key:system.key+"/empty",parents:[...parents,system.key],description:"ยังไม่มีรายการย่อยของ Lot นี้ใน Appendix ในมุมมอง Release"});
     const sites=new Map();
-    for(const row of rows){const requirement=catalog[rank(lines.get(row.key))],site=requirement?.site||(part==="A"?"":"Working / package");if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
+    for(const row of rows){const requirement=row.mr||catalog[rank(lines.get(row.key))],site=requirement?.site||(part==="A"?"":"Working / package");if(!sites.has(site))sites.set(site,[]);sites.get(site).push(row);}
     for(const [site,siteRows] of sites){
      const siteParents=[...parents,system.key];
      if(!site){
@@ -103,14 +172,19 @@ export function releaseHierarchy0550(official,customerRows){
      const rowParents=[...siteNode.parents,siteNode.key];
      for(const row of siteRows){
       const {packageRows,...entry}=row;
-      if(!packageRows){
+      if(!packageRows?.length){
        entries.push({...entry,parents:rowParents});
        continue;
       }
-      const toggle=heading(entry.moduleId,entry.cells[2]+" · ขอบเขตตาม MR",rowParents);
+      const toggle=heading(entry.moduleId||siteNode.key+"/"+entry.key,entry.cells[2]+" · ขอบเขตตาม MR",rowParents);
       entries.push({...entry,parents:rowParents,toggle,nestedOwnerIds:packageRows.map(child=>child.key)});
       entries.push(...packageRows.map(child=>({...child,parents:[...rowParents,toggle.key],packageChild:true})));
      }
+    }
+    if(unmatched?.length){
+     const node=heading(system.key+"/unmatched","Working / package · Mapping OPEN", [...parents,system.key],false);
+     entries.push({kind:"mr-unmatched",key:node.key,parents:node.parents,toggle:node});
+     entries.push(...unmatched.map(row=>({...row,parents:[...node.parents,node.key],packageChild:true,radioPackage:true})));
     }
    }
   }

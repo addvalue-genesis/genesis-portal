@@ -8,9 +8,9 @@ import {TECHNICAL_AUTHORITY_0550,TECHNICAL_SECTIONS_0550,emptyTechnicalProposal0
 import {technicalDossierHtml0550,downloadTechnicalDossier0550} from "./technicalDossierHtml0550";
 import {prepareTechnicalDossierDrafts0550} from "./data/technicalDossier0550";
 
-import {VdrlWorkspace0550,PackageConsistency0550} from "./BidVolumesWorkspace0550";
+import {VdrlWorkspace0550,PackageConsistency0550,VolumeRadioMrContext0550} from "./BidVolumesWorkspace0550";
 export const TECHNICAL_PANELS_0550=[{id:"overview",title:"Overview & Checklist"},...TECHNICAL_SECTIONS_0550,{id:"vdrl",title:"VDRL / With Bid"},{id:"preview",title:"Preview & Export"}];
-export function TechnicalProposalWorkspace0550({navigationTarget,onNavigate,onDirtyChange}){
+export function TechnicalProposalWorkspace0550({navigationTarget,mrNavigationTarget,onNavigate,onDirtyChange}){
  const {data,model,change,busy,reviewDate}=useBidWorkspace();
  const [vdrlDirty,setVdrlDirty]=useState(false);
  const [panel,setPanel]=useState("overview"),[system,setSystem]=useState("COMMON"),[form,setForm]=useState(null),[dirty,setDirty]=useState(false),[message,setMessage]=useState(""),[meta,setMeta]=useState(null),[equipment,setEquipment]=useState(null);
@@ -24,7 +24,7 @@ export function TechnicalProposalWorkspace0550({navigationTarget,onNavigate,onDi
  useEffect(()=>{if(!dirty&&TECHNICAL_SECTIONS_0550.some(s=>s.id===panel))setForm(p.records.find(r=>r.systemToken===system&&r.sectionId===panel)||blankTechnicalRecord0550(panel,system));},[panel,system,p.records,dirty]);
  if(!view)return <p>กำลังโหลด Technical Proposal จาก workspace เดิม…</p>;
  const current=view.records.find(r=>r.systemToken===system&&r.sectionId===panel),section=TECHNICAL_SECTIONS_0550.find(s=>s.id===panel);
- const navigate=id=>{if(dirty||vdrlDirty){setMessage("มีร่างที่ยังไม่บันทึก กรุณาบันทึกหรือยกเลิกก่อนเปลี่ยนหัวข้อ");return;}onNavigate(id);};
+ const navigate=(id,options)=>{if(dirty||vdrlDirty){setMessage("มีร่างที่ยังไม่บันทึก กรุณาบันทึกหรือยกเลิกก่อนเปลี่ยนหัวข้อ");return;}onNavigate(id,options);};
  const choose=(key,value)=>{if(dirty||vdrlDirty){setMessage("มีร่างที่ยังไม่บันทึก กรุณาบันทึกหรือยกเลิกก่อนเปลี่ยนหัวข้อ");return;}setMessage("");if(key==="panel")setPanel(value);else setSystem(value);setEquipment(null);};
  const edit=(key,value)=>{setForm(f=>({...f,[key]:value}));setDirty(true);setMessage("");};
  const save=async review=>{if(!form)return;const ok=await change(d=>saveTechnicalRecord0550(d,form,{review,today:reviewDate}),"Save Volume II draft / "+form.id);if(ok){setDirty(false);setMessage(review?"บันทึกผลทบทวนร่างแล้ว · รายการ OPEN/STALE ยังต้องแก้ ไม่ใช่การอนุมัติส่งลูกค้า":"บันทึกร่างแล้ว");}};
@@ -43,6 +43,10 @@ export function TechnicalProposalWorkspace0550({navigationTarget,onNavigate,onDi
     <p>แสดงครบระบบในทะเบียนและ COMMON; การไม่เลือกแถวราคาไม่ตัดระบบออก หากเป็น COMPANY supply ต้องอธิบายขอบเขตและ interface ตามหลักฐาน</p>
    </>}
    {section&&<><h3>{section.number} · {section.title}</h3><p>{section.hint}</p><label>System<select aria-label="Technical system" value={system} onChange={e=>choose("system",e.target.value)}>{view.systems.map(s=><option key={s.token} value={s.token}>{s.name} · {s.token}</option>)}</select></label>
+    {mrNavigationTarget&&panel==="equipment"&&navigationTarget==="bid.technical.equipment.system."+system&&
+     <VolumeRadioMrContext0550 mrId={mrNavigationTarget} onNavigate={navigate} componentKey={navigationTarget}>
+      <button type="button" onClick={()=>navigate("bid.working-preview.requirement.REQDEF-"+mrNavigationTarget)}>เปิดข้อกำหนด SI · {mrNavigationTarget}</button>
+     </VolumeRadioMrContext0550>}
     <iframe title="Live technical section document" sandbox="" srcDoc={dossier} style={{width:"100%",height:640,border:"1px solid #bfd0db",marginTop:16}}/>
     <TechnicalTrace0550 data={data} model={model} view={view} system={system} section={panel} onNavigate={navigate}/>
     <details key={panel+system} className="p55-technical-author"><summary>แก้ไขคำตอบ SI / เชื่อมหลักฐานและทบทวน · {current?.state}</summary>
