@@ -70,8 +70,8 @@ export const MGW_RADIO_AERO_0550 = {
   'RADIO-013':['MR-B1-11-APF-04'], // APF portable airband radios on the same MR.
  },
 };
-// Remaining priced rows in the same PDF. Only RADIO-004/005 have a confirmed
-// CUS site reference. Shared consoles/cables have one commercial owner.
+// Remaining priced rows in the same PDF. Shared consoles/cables have one
+// commercial owner. A source reference is not acceptance of full MR scope.
 export const MGW_RADIO_REMAINING_0550 = {
  batchId:'0550-MGW-Q26-063-RADIO-REMAINING-20261112',
  preparedOn:'2026-11-12',
@@ -81,7 +81,7 @@ export const MGW_RADIO_REMAINING_0550 = {
   'RADIO-006':[],
   'RADIO-007':[],
   'RADIO-008':[],
-  'RADIO-010':[],
+  'RADIO-010':['MR-B1-11-APF-02'], // The quote and CUS TAG review both place this Marine lot at APF.
   'RADIO-014':[],
   'RADIO-015':[],
   'RADIO-017':[],

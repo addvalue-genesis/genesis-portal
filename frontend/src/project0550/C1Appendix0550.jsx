@@ -10,7 +10,7 @@ import {mgwCurrentItemKey0550} from './data/mgwQuoteSelection0550';
 
 // Keep the native MR rows in order. In the interactive screen, put a separate
 // package-price block first so an expanded Appendix still reveals its price.
-const screenSites=(sites,documentMode)=>documentMode?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
+const screenSites=(sites,nativeOrder)=>nativeOrder?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
 export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mrNavigationTarget}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
@@ -95,15 +95,17 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        <td colSpan={!documentMode&&Number.isFinite(sys.knownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
        {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
       </tr>
-      {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode).map(site=><React.Fragment key={site.name}>
+      {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode||view.workingPreview&&g.id==='1.1').map(site=><React.Fragment key={site.name}>
        <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
         <tr ref={r.key===location?.key?focusedRow:undefined} tabIndex={r.key===location?.key?-1:undefined}
-         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0||r.quotedComponents?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>
+         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0||r.quotedComponents?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td>
+         <td>{r.note}{!documentMode&&(r.pendingRadioPlacement||r.provisionalRadio)&&<div>{r.pendingRadioPlacement||'ราคาตาม Offer · รอตรวจขอบเขต MR'}</div>}</td>
+        </tr>
         {!documentMode&&expanded(r.key,true)&&r.quotedComponents?.map(c=><tr className="c1-component" key={c.offer.id} data-c1-quoted-offer={c.offer.id}>
-         <td>{mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit}</td><td className="number">{c.quantity}</td>
+         <td>{mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>
          <td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td>
-         <td>{c.included?'Included by MGW':'Included in parent total'}</td>
+         <td>{c.included?'Included by MGW':c.unit?'Included in parent total':'Included in parent total · supplier unit pending'}</td>
         </tr>)}
         {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
         {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}

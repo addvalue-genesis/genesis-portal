@@ -1,6 +1,6 @@
-Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Appendix 1.3 shows complete priced LAN quote groups on the original cabinet rows for APF, ACP, ABV01 and AMS01. Expand a cabinet to see its quoted items. Standalone Draft prices remain visible when the MR row or quoted group needs reconciliation.
+Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). Appendix 1.1 shows priced MGW Offer details on the six source-supported MR rows. Standalone prices with an unresolved MR or site carry a review note. The Radio and Shared subtotals retain the same Working owners.
 
-Latest MGW Radio draft: [main category pricing](20261112_MGW_RADIO_MAIN_CATEGORY_PRICING.md). The Q26-063 source extensions feed 10.2 and 11.C1 Appendix 1.1 by system. The shared Console and Cable scope has one charge per source row. WP.7 remains the technical trace.
+Latest MGW LAN draft: [main category pricing](20261112_MGW_LAN_MAIN_CATEGORY_PRICING.md). Appendix 1.3 shows complete priced LAN quote groups on the original cabinet rows for APF, ACP, ABV01 and AMS01. Expand a cabinet to see its quoted items. Standalone Draft prices remain visible when the MR row or quoted group needs reconciliation.
 
 Latest Working pricing: [Vendor Offers as the Working price source](20261112_VENDOR_DIRECT_WORKING_PRICING.md). Eligible 07.2 ALIE rows open the existing Working editor with their source basis. Working applies the selling equations and Volume I preview reads compatible intake tags. PAGA A1-05 can select the registered -005 NET on its existing owner.
 

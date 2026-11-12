@@ -380,6 +380,50 @@ assert.equal(sum(directRows.map(row=>row.amount)),sum(lotOwners.map(line=>line.p
 assert.equal(sum(directC1.groups.find(group=>group.id==='1.1').systems.map(system=>system.knownAmount).filter(Number.isFinite)),
  sum(directRows.map(row=>row.amount)));
 assert.equal(directC1.amount,null);
+const radioWithMr=(data,currency='USD')=>{
+ const model=W.deriveBidWorkspace(data,tokens,radioLotDate);
+ const saved=volumes.deriveBidVolumes0550(data,model,D.SYSTEMS,radioLotDate);
+ const view={...preview.deriveBidVolumeWorkingPreview0550(data,model,D.SYSTEMS,radioLotDate,saved),c1LayoutVersion:appendix.C1_APPENDIX_LAYOUT_0550};
+ return {view,c1:appendix.deriveC1Appendix0550(view,currency)};
+};
+const withRadioMr=radioWithMr(radioLots);
+const radioParents=withRadioMr.c1.rows.filter(r=>r.provisionalRadio);
+const bySn=sn=>radioParents.find(row=>row.sn===sn);
+const expectedRadioParents=[
+ ['1.1.1',['RADIO-001','RADIO-009']],['1.1.2',['RADIO-002','RADIO-010']],['1.1.3',['RADIO-003','RADIO-011']],
+ ['1.1.4',['RADIO-012','RADIO-013']],['1.1.12',['RADIO-005']],['1.1.13',['RADIO-004']],
+];
+assert.equal(radioParents.length,expectedRadioParents.length);
+for(const [sn,items] of expectedRadioParents){
+ const row=bySn(sn);
+ assert.deepEqual(row.quotedComponents.map(c=>radioSelection.mgwCurrentItemKey0550(c.offer)),items);
+ assert.equal(row.amount,sum(row.quotedComponents.map(c=>c.amount)));
+}
+assert.equal(bySn('1.1.2').amount,91952.84);
+assert.equal(bySn('1.1.12').amount,3289.26);
+assert.equal(bySn('1.1.13').amount,2511.16);
+assert.equal(bySn('1.1.12').quantity,700);
+assert.equal(bySn('1.1.12').quotedComponents[0].quantity,1);
+assert.equal(bySn('1.1.4').quotedComponents.find(c=>c.offer.id.endsWith('RADIO-012')).unitPrice,null);
+const standaloneRadio=withRadioMr.c1.rows.filter(r=>r.pendingRadioPlacement);
+assert.deepEqual(standaloneRadio.flatMap(r=>r.priceOwners.map(b=>radioSelection.mgwCurrentItemKey0550(b.line.offer))).sort(),
+ ['RADIO-006','RADIO-007','RADIO-008','RADIO-014','RADIO-015','RADIO-016','RADIO-017','RADIO-018']);
+assert.equal(sum([...radioParents,...standaloneRadio].map(r=>r.amount)),sum(lotOwners.map(l=>l.provisionalCustomerUSD)));
+const radioSystems=projection=>projection.groups.find(g=>g.id==='1.1').systems;
+for(const system of radioSystems(directC1).filter(s=>Number.isFinite(s.knownAmount))){
+ assert.equal(radioSystems(withRadioMr.c1).find(s=>s.name===system.name).knownAmount,system.knownAmount);
+}
+assert.equal(radioWithMr(radioLots,'THB').c1.rows.find(r=>r.sn==='1.1.2').amount,
+ sum(lotOwners.filter(l=>['RADIO-002','RADIO-010'].includes(radioSelection.mgwCurrentItemKey0550(l.offer))).map(l=>l.provisionalCustomerTHB)));
+const radioMrHtml=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:withRadioMr.view}));
+assert.match(radioMrHtml.split('data-c1-mr-id="MR-B1-11-APF-02"')[1].split('</tr>')[0],/91,952\.84/);
+assert(radioMrHtml.includes('ราคาตาม Offer · รอตรวจขอบเขต MR'));
+assert(radioMrHtml.includes('รอยืนยันแถว MR / ไซต์'));
+assert(!appendix.c1AppendixHtml0550(withRadioMr.view).includes('รอยืนยันแถว MR / ไซต์'));
+const authoredRadioMr=radioLots.lines.find(l=>l.mrRequirementId==='MR-B1-11-APF-02');
+const heldRadio=radioWithMr({...radioLots,lines:radioLots.lines.map(l=>l===authoredRadioMr?{...l,manualCost:100,currency:'USD'}:l)}).c1;
+assert(!heldRadio.rows.find(r=>r.key===authoredRadioMr.mrRequirementId).provisionalRadio);
+assert.equal(heldRadio.rows.filter(r=>r.pendingRadioPlacement==='รอตรวจการจัดราคาที่แถว MR'&&r.priceOwners.some(b=>b.line.systemToken==='TEL-RADIO-MARINE')).length,2);
 assert(lotOwners.filter(line=>line.offer.quoteEvidence.quotedUnit==='Not stated').every(line=>
  line.problems.some(problem=>problem.startsWith('MGW_UNIT_OPEN:'))&&line.customerUSD===null&&Number.isFinite(line.provisionalCustomerUSD)));
 const rawConsole=radioLots.lines.find(line=>line.id==='LINE-MGW-CURRENT-RADIO-004');
