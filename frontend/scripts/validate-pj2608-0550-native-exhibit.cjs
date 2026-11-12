@@ -314,8 +314,9 @@ const historicalV2=P.freezeBidPackageOutput0550(fixture,derive(fixture),'OLD-TES
 const paymentLines=['SCHEDULE B - PAYMENT TERMS AND SCHEDULE','Down Payment','Guarantees','10%','Milestone No.1','Updated engineering evidence','[DELETED] old trigger','5%',
  'Milestone No.2','Updated MDDR','15%','Milestone No.3','Copy of B/L or AWB','30%','Milestone No.4','Site receipt','20%',
  'Milestone No.5','PAC','10%','Milestone No.6','FAC','10%','TOTAL','100.00%'];
+const initialPriceClause='The Initial Contract Price shall be the United States Dollar ______ (Amount in words: United States Dollar ______ only), of Lump Sum Initial Contract for the Base Scope of the Supply of the GOODS, exclusive of United States Dollar ______ (Amount in words: United States Dollar ______only) of the Lump Sum Initial Contract Price for the Optional Scope of Supply of the GOODS.';
 const currentCommercial={...fixture.sourceIntake.sources[0],id:'SYNTHETIC-EXHIBIT-C-REV1',documentNo:'SYNTHETIC-CURRENT-COMMERCIAL',revision:'1',url:'https://example.test/current-commercial',replaces:[],title:'Exhibit C-Commercial Terms rev-1-nan.docx',authority:'CURRENT_TENDER',readState:'TEXT_READ',
- content:paymentLines.map((s,i)=>(100+i)+': '+s).join('\n')};
+ content:[...paymentLines,initialPriceClause].map((s,i)=>(100+i)+': '+s).join('\n')};
 const reviewBindings=data=>data.bidVolumes.bindings.reduce((d,b)=>V.saveBidVolumeRecord0550(d,'bindings',b,today,true),data);
 const withCurrent=reviewBindings({...fixture,sourceIntake:{...fixture.sourceIntake,sources:[...fixture.sourceIntake.sources,currentCommercial]}});
 const reviewedModel=derive(fixture);
@@ -331,6 +332,101 @@ assert.match(updatedNative.I.find(s=>s.name==='Schedule B').rows[3][1],/Copy of 
 assert.deepEqual(P.freezeBidPackageOutput0550(withCurrent,reviewedModel,'NATIVE-TEST',today,{nativeExhibitVersion:native.nativeExhibitVersion}),native);
 const unread=reviewBindings({...withCurrent,sourceIntake:{...withCurrent.sourceIntake,sources:withCurrent.sourceIntake.sources.map(s=>s===currentCommercial?{...s,readState:'METADATA_ONLY'}:s)}});
 assert.throws(()=>P.freezeBidPackageOutput0550(unread,reviewedModel,'NATIVE-TEST',today),/Native Exhibit C has unresolved response slots/);
+// Customer export uses reviewed allocation and validates the rendered Word and
+// HTML independently of the existing Draft and frozen output.
+const C=require(root+'/project0550/customerExhibit0550.js');
+let customerFixture=withCurrent;
+for(const {id} of V.SCHEDULES_0550){
+ const record=customerFixture.bidVolumes.records.find(r=>r.id==='I.'+id);
+ const optional=!currentView.scheduleRows(id).length&&(/^C[2-8]$/.test(id)||id==='A2');
+ customerFixture=V.saveBidVolumeRecord0550(customerFixture,'records',{
+  ...record,disposition:optional?'NOT_APPLICABLE':record.disposition,
+  reason:optional?'No additional scope in this synthetic tender':record.reason,
+  nativeFields:id==='A'?{agreementNo:'QA-AGREEMENT-123'}:record.nativeFields,
+ },today,true);
+}
+const customerView=V.deriveBidVolumes0550(customerFixture,reviewedModel,D.SYSTEMS,today);
+const customerBefore=JSON.stringify(customerFixture);
+assert.deepEqual(customerView.priceProblems,[]);
+const gate=C.customerReadiness0550(customerView);
+assert(gate.ready,JSON.stringify(gate.items.filter(item=>item.problems.length)));
+const customerHtml=C.customerHtml0550(customerView),customerDocx=C.buildCustomerDocx0550(customerView);
+assert(customerDocx instanceof Uint8Array);
+assert.equal((customerHtml.match(/<article[^>]* data-native-schedule=/g)||[]).length,13);
+assert.match(customerHtml,/Initial Contract Price shall be the United States Dollar[^<]*[0-9]+[.][0-9]{2}/);
+assert.match(customerHtml,/Updated MDDR/);
+assert.match(customerHtml,/QA-AGREEMENT-123/);
+assert.doesNotMatch(customerHtml,/\bOPEN\b|NOT FOR SUBMISSION|Source page|Working B5/);
+assert.doesNotMatch(Buffer.from(customerDocx).toString(),/\bOPEN\b|NOT FOR SUBMISSION|Niger to Benin|customXml\/item1.xml/);
+fs.writeFileSync(path.join(dir,'customer.html'),customerHtml);
+fs.writeFileSync(path.join(dir,'customer.docx'),customerDocx);
+const amendedRecord=(id,amend)=>({...customerView,getRecord:key=>key===id?{...customerView.getRecord(key),...amend}:customerView.getRecord(key)});
+for(const blocked of [
+ {...customerView,workingPreview:true},
+ {...customerView,priceProblems:['SCHEDULE_BINDING_REVIEW_OPEN']},
+ {...customerView,optionsAssigned:null,active:[...customerView.active,{wbs:'C3'}]},
+ amendedRecord('I.A',{nativeFields:{}}),
+ amendedRecord('I.C2',{disposition:'REQUIRED'}),
+ amendedRecord('I.C1',{content:'Internal reference 11.M'}),
+ amendedRecord('I.C1',{content:'Client remark: OPEN'}),
+ amendedRecord('I.C1',{content:'รายการเสนอราคา'}),
+]){
+ assert.equal(C.customerReadiness0550(blocked).ready,false);
+ assert.throws(()=>C.customerHtml0550(blocked),/OPEN/);
+ assert.throws(()=>C.buildCustomerDocx0550(blocked),/OPEN/);
+}
+assert.throws(()=>C.customerHtml0550(customerView,true),/บันทึก/);
+assert.throws(()=>C.buildCustomerDocx0550(customerView,true),/บันทึก/);
+const {CustomerVersion0550}=require(root+'/project0550/CustomerVersion0550.jsx');
+const renderCustomer=(view,disabled=false)=>renderToStaticMarkup(React.createElement(CustomerVersion0550,{view,disabled}));
+assert.match(renderCustomer(customerView),/<button type="button">Export Word<\/button>/);
+assert.match(renderCustomer(customerView,true),/<button type="button" disabled="">Export Word<\/button>/);
+assert.match(renderCustomer(amendedRecord('I.A',{nativeFields:{}})),/<button type="button" disabled="">Print \/ Save as PDF<\/button>/);
+const missingAgreement=amendedRecord('I.A',{nativeFields:{}});
+const incomplete=C.customerReadiness0550(missingAgreement);
+assert.equal(incomplete.ready,false);
+assert.match(incomplete.previewHtml,/Internal preview — Not for submission/);
+assert.match(incomplete.previewHtml,/AGREEMENT No\.: OPEN/);
+assert.equal((incomplete.previewHtml.match(/<article[^>]* data-native-schedule=/g)||[]).length,13);
+assert.match(renderCustomer(missingAgreement),/<button type="button" aria-expanded="false">ดูตัวอย่างแบบฟอร์ม<\/button>/);
+assert.match(renderCustomer(missingAgreement),/เปิด 11\.0 Document Control/);
+assert.match(renderCustomer(missingAgreement),/ยังขาด Agreement \/ Contract No\./);
+const missingDelivery={...customerView,scheduleRows:id=>id==='C1'
+ ?customerView.scheduleRows(id).map(row=>({...row,deliveryTerm:''})):customerView.scheduleRows(id)};
+assert.match(renderCustomer(missingDelivery),/ยังไม่ได้ระบุเงื่อนไข CIF\/FOB · 1 รายการ/);
+assert.match(renderCustomer(missingDelivery),/LINE-TEST · เปิด 11\.M/);
+assert.throws(()=>C.customerHtml0550(missingDelivery),/OPEN/);
+assert.doesNotMatch(customerHtml,/Internal preview — Not for submission/);
+const withOptions={...customerView,customerVersion:true,baseAssigned:100,optionsAssigned:25};
+assert.match(N.nativeSchedule0550(withOptions,'A').html,/Dollar 100\.00 .*exclusive of United States Dollar 25\.00/);
+const wordA=Buffer.from(C.buildCustomerDocx0550({...customerView,baseAssigned:100,optionsAssigned:25})).toString();
+assert.match(wordA,/Dollar 100\.00 .*exclusive of United States Dollar 25\.00/);
+assert.doesNotMatch(wordA,/Dollar 125\.00/);
+const a1=N.nativeSchedule0550(withOptions,'A1').pages[0].values;
+assert.match(a1.A1_2_7,/See Schedule C1 for the itemized scope/);
+const purchaseAgreement={...currentCommercial,id:'TEST-PURCHASE-AGREEMENT',title:'Current Tender Purchase Agreement.docx',
+ content:'8: PURCHASE AGREEMENT\n9: <INSERT AGREEMENT NO.>\n10: SYNTHETIC'};
+const currentAgreementData={...withCurrent,sourceIntake:{...withCurrent.sourceIntake,sources:[...withCurrent.sourceIntake.sources,purchaseAgreement]}};
+const agreementBasis=V.tenderScheduleBasis0550(currentAgreementData);
+assert.equal(agreementBasis.agreementPlaceholder.sourceId,purchaseAgreement.id);
+const tenderPlaceholder={...missingAgreement,tenderScheduleBasis:agreementBasis};
+assert(C.customerReadiness0550(tenderPlaceholder).ready);
+assert.match(C.customerHtml0550(tenderPlaceholder),/AGREEMENT No\.: Not stated in tender form/);
+assert.match(Buffer.from(C.buildCustomerDocx0550(tenderPlaceholder)).toString(),/AGREEMENT No\.: Not stated in tender form/);
+const unreadAgreementData={...currentAgreementData,sourceIntake:{...currentAgreementData.sourceIntake,
+ sources:currentAgreementData.sourceIntake.sources.map(source=>source.id===purchaseAgreement.id?{...source,readState:'METADATA_ONLY'}:source)}};
+assert.equal(V.tenderScheduleBasis0550(unreadAgreementData).agreementPlaceholder,null);
+assert.throws(()=>C.customerHtml0550({...customerView,tenderScheduleBasis:{...customerView.tenderScheduleBasis,initialPrice:null}}),/OPEN/);
+const unallocatedCustomer={...customerView,priceProblems:['SCHEDULE_ALLOCATION_OPEN'],unallocated:[{id:'LINE-AWAITING-ALLOCATION'}]};
+assert.match(renderCustomer(unallocatedCustomer),/LINE-AWAITING-ALLOCATION · เปิด 11\.M/);
+assert.throws(()=>C.customerHtml0550(unallocatedCustomer),/OPEN/);
+const coverOnly={...amendedRecord('I.cover',{state:'OPEN'}),priceProblems:['VOLUME_I_RESPONSE_OPEN']};
+assert(C.customerReadiness0550(coverOnly).ready,'The Volume I cover is outside Exhibit C export');
+const missingResponse={...amendedRecord('I.B',{state:'OPEN'}),priceProblems:['VOLUME_I_RESPONSE_OPEN']};
+assert(!C.customerReadiness0550(missingResponse).ready,'The actual Schedule B response still needs review');
+assert.equal(JSON.stringify(customerFixture),customerBefore);
+console.log('PASS Customer Exhibit C: reviewed A–C8, reconciled Schedule A, Word/HTML output and OPEN, internal text, review and unsaved changes gates.');
+
 assert.equal(JSON.stringify(fixture),before);console.log('PASS native Exhibit C: all 13 source forms, merged headers/notes, canonical numbers and unchanged inputs, CIF/FOB placement, overflow without dropped rows, per-equipment spares forms, escaped Word/HTML, legacy schema/reviews/history restore, new exact frozen native Word. Synthetic exports: '+dir);
 
 if(!process.env.PJ0550_VOLUME_FIXTURE)fs.rmSync(fixtureFile,{force:true});

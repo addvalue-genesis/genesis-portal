@@ -133,7 +133,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  const ownerUse=new Map(),rows=mrDisplayRows().map(r=>{
   const canonicalIds=r.canonicalIds||[r.id],matches=lines.filter(l=>canonicalIds.includes(l.mrRequirementId));
   const raw=matches.length===1?matches[0]:null,detail=c1NativeDetails0550(r);
-  const response=r11?CERAGON_R11_C1_0550[r.id]:undefined;
+  const response=r11&&!view.customerVersion?CERAGON_R11_C1_0550[r.id]:undefined;
   if(response)detail.components=detail.components.map((c,i)=>({...c,note:response[i+1]}));
   const reqs=requirements.filter(q=>canonicalIds.some(id=>q.id==='REQDEF-'+id)||q.workLineIds?.some(id=>matches.some(l=>l.id===id)));
   // SI workLineIds are many-to-many technical trace, not blanket financial
@@ -222,7 +222,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
  for(const r of displayRows){
   const candidates=candidatePackages.get(r.key);
-  if(candidates?.length&&!r.excluded)r.note=[r.note,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
+  if(candidates?.length&&!r.excluded&&(!view.customerVersion||!r.ownerIds.length))r.note=[r.note,'Proposed supply reference '+candidates.map(k=>byKey.get(k).sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
  }
  const pricedBindings=legacy?bindings:[...byOwner.values()].map(entry=>entry.binding);
  const amount=money(pricedBindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));
@@ -283,7 +283,7 @@ export function c1AppendixHtml0550(view){
  const response=view.getRecord('I.C1').content||'';
  const draftSubtotal=c1.amount===null&&Number.isFinite(c1.pricedItemsSubtotal)
   ?'<tr><td colspan="5">WORKING DRAFT — PRICED ITEMS SUBTOTAL</td>'+cell(c1Display0550(c1.pricedItemsSubtotal),'number')+cell('Open items excluded')+'</tr>':'';
- return `<article class="p55-c1-document" data-native-schedule="C1"><div class="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span>${legacy?'':'<span>Currency: USD</span>'}<span>${escape(label)}</span></div><h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2><table aria-label="Schedule C1 preview"><colgroup><col style="width:${legacy?6:9}%"><col style="width:${legacy?42:39}%"><col style="width:7%"><col style="width:7%"><col style="width:11%"><col style="width:11%"><col style="width:16%"></colgroup>${head}<tbody>${html}</tbody><tfoot><tr><td colspan="5">TOTAL — BASE SCOPE OF SUPPLY</td>${cell(c1Display0550(c1.amount),'number')}${cell('')}</tr>${draftSubtotal}</tfoot></table>${response?'<p>'+escape(response)+'</p>':''}<footer>Schedule C1 · ${escape(view.proposal.documentNo||'')} / ${escape(view.proposal.revision)}</footer></article>`;
+ return `<article class="p55-c1-document" data-native-schedule="C1"><div class="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span>${legacy?'':'<span>Currency: USD</span>'}${view.customerVersion?'':'<span>'+escape(label)+'</span>'}</div><h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2><table aria-label="Schedule C1 preview"><colgroup><col style="width:${legacy?6:9}%"><col style="width:${legacy?42:39}%"><col style="width:7%"><col style="width:7%"><col style="width:11%"><col style="width:11%"><col style="width:16%"></colgroup>${head}<tbody>${html}</tbody><tfoot><tr><td colspan="5">TOTAL — BASE SCOPE OF SUPPLY</td>${cell(c1Display0550(c1.amount),'number')}${cell('')}</tr>${draftSubtotal}</tfoot></table>${response?'<p>'+escape(response)+'</p>':''}<footer>Schedule C1 · ${escape(view.proposal.documentNo||'')} / ${escape(view.proposal.revision)}</footer></article>`;
 }
 
 // The new layout uses the same seven customer columns in Word. Legacy native
