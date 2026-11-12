@@ -49,15 +49,17 @@ export const MGW_RADIO_MARINE_0550 = {
  preparedOn:'2026-11-12',
  systemToken:'TEL-RADIO-MARINE',
  mrMap:{
-  'RADIO-002':['MR-B1-11-APF-02'], // Mapped to APF item 2 on 2026-11-12; the quotation prints ACO.
+  'RADIO-002':['MR-B1-11-APF-02'], // APF item 2 confirmed by the user on 2026-11-12.
  },
 };
 export const MGW_RADIO_001_SITE_NOTE_0550 = 'RADIO-001 maps to APF. The quotation prints ACO in error (user confirmed 11 Nov 2026).';
+// Original register wording is part of the imported batch fingerprint.
 export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF-02) per instruction of 12 Nov 2026. The quotation prints ACO.';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
  ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
-export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_002_SITE_NOTE_0550+
+export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
+ ' RADIO-002 installation site is APF (MR-B1-11-APF-02), confirmed by the user on 12 Nov 2026. ACO is a typo on the quotation.'+
  ' The lot covers the quoted equipment only: two fixed marine radios, one antenna, one IP gateway and one power supply unit. Reconcile the quoted quantity (2 Lot) with the MR quantity and confirm the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
 export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
