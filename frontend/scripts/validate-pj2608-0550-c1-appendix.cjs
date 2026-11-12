@@ -42,9 +42,12 @@ for(const item of ['05','07']){
  assert.equal(reference.internalNote,undefined);
 }
 assert.equal(radioScopeRow(C.deriveC1Appendix0550(make(radioScopeData,[])),'03').internalNote,undefined);
-assert.equal(radioScopeRow(C.deriveC1Appendix0550({...radioScopeView,workingPreview:false}),'03').internalNote,undefined);
-assert(!C.c1AppendixHtml0550(radioScopeView).includes(radioScopeNote));
-assert(!C.c1AppendixWord0550(radioScopeView).includes(radioScopeNote));
+const savedRadioScopeView={...radioScopeView,workingPreview:false};
+assert.deepEqual(C.deriveC1Appendix0550(savedRadioScopeView).rows.filter(r=>r.internalNote===radioScopeNote).map(r=>r.sn),['1.1.3','1.1.4','1.1.6']);
+for(const scopeView of [radioScopeView,savedRadioScopeView]){
+ assert(!C.c1AppendixHtml0550(scopeView).includes(radioScopeNote));
+ assert(!C.c1AppendixWord0550(scopeView).includes(radioScopeNote));
+}
 assert(row.notes.some(n=>n.includes('Instrument & Telecom Room')));assert(row.intro.includes('comprised of'));
 const core=row.components.find(c=>c.description.includes('Core Switch'));
 const pricedComponent={lineId:id,line:{description:'Component: '+core.description},quantity:core.quantity,unit:core.unit,

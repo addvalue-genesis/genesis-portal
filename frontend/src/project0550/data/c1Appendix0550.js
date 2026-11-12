@@ -222,8 +222,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
   }else if(owned.length){
    r.amount=money(owned.map(b=>b.amount));
-   if(!legacy&&view.workingPreview&&/^MR-B1-11-APF-0[346]$/.test(r.key)){
-    r.internalNote='Quoted equipment only — MR quantities and interfaces remain open';
+   if(!legacy&&/^MR-B1-11-APF-0[346]$/.test(r.key)){
+    r.internalNote=[r.internalNote,'Quoted equipment only — MR quantities and interfaces remain open'].filter(Boolean).join(' · ');
    }
   }
   if(Number.isFinite(r.amount)){
