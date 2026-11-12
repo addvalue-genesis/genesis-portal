@@ -8,6 +8,7 @@ import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
 import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
 import {preparePagaRevisionPricing0550} from './data/supplierRevision0550';
+import {preparePagaIdieWorking0550} from './data/alieIntake0550';
 import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
@@ -30,7 +31,7 @@ import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
- const revised=preparePagaRevisionPricing0550(data,today);
+ const revised=preparePagaIdieWorking0550(preparePagaRevisionPricing0550(data,today),COMMERCIAL_POLICY,today);
  const pbx=prepareChevalierPbxWorking0550(revised,today);
  const avl=preparePagaAvlDeviation0550(pbx);
  const based=pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));

@@ -92,7 +92,39 @@ export function pagaTwoYearSpareEvidence0550(data,net){
 
 export function preparePagaRevisionPricing0550(data,today){
  const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
- if(today<'2026-11-09'||!receipt||receipt.pagaRevisionHandled)return data;
+ if(!receipt)return data;
+ const latest=pagaRevisionCandidate0550(data);
+ if(latest?.quoteRef==='A20261632-005'&&quoteValidity0550(latest,today).current){
+  const owners=data.lines.filter(line=>line.selected&&line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&
+   !line.coveredByLineId&&line.responsibility!=='COMPANY'&&
+   (line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate)));
+  const base=owners.find(line=>line.id===PAGA_OWNER);
+  const untouched=line=>{
+   const oldOffer=data.offers.find(offer=>offer.id===line.offerId);
+   const legacy=PAGA_PREDECESSORS.includes(line.offerId)&&line.description===oldOffer?.description&&
+    line.sourceRef===oldOffer.sourceRef+' Package includes OEM engineering, FAT and packing; count those inclusions once. Verify project additions and MR quantities.'&&
+    !line.customerRemark&&!line.requirementRef;
+   const previousNet=line===base&&line.offerId===PAGA_NET_ID&&pagaRevisionNet0550(oldOffer)&&
+    line.description==='INDUSTRONIC INTRON-X · '+PAGA_REVISION+' · NET package'&&
+    line.sourceRef===oldOffer.sourceRef+' / one NET Lot. '+PAGA_REVISION_INCLUDED_0550&&
+    line.requirementRef==='MR Rev.B1 Appendix 1.4 / priced PAGA package; allocation of remaining MR items pending.'&&
+    line.customerRemark==='PAGA package with the OEM services and packing stated in the offer. Final technical scope subject to review.';
+   return (legacy||previousNet)&&line.scopeKey==='VENDOR-BASIS.'+line.id.slice(5)&&
+    line.vendorId===latest.vendorId&&line.quantity===1&&line.currency==='EUR'&&line.unit===oldOffer.unit&&
+    line.customerRowCode==='A1-05'&&!line.tagRef&&!line.calculationId&&!line.supplyDraft&&!line.officialReview&&
+    !data.bidVolumes?.bindings.some(b=>b.lineId===line.id&&b.status==='REVIEWED')&&
+    line.manualCost===null&&line.sellRate===null;
+  };
+  if(!base||!owners.every(untouched))return data;
+  const lines=data.lines.map(line=>line===base?{...line,offerId:latest.id,unit:latest.unit,brand:latest.brand,
+   description:'INDUSTRONIC INTRON-X · '+latest.quoteRef+' · NET package',
+   requirementRef:'MR Rev.B1 Appendix 1.4 / APF and ACP; confirm remaining site quantities and TAGs.',
+   sourceRef:latest.sourceRef+' / one NET Lot. '+pagaIncludedScope0550(data,latest),
+   customerRemark:'INDUSTRONIC PAGA package for APF and ACP. Final technical scope subject to review.'
+  }:owners.includes(line)?{...line,selected:false}:line);
+  return {...data,lines,repositoryBasisImport:{...repo,bidProcess:{...receipt,pagaRevisionHandled:true}}};
+ }
+ if(today<'2026-11-09'||receipt.pagaRevisionHandled)return data;
  const net=data.offers.find(o=>o.id===PAGA_NET_ID&&pagaRevisionNet0550(o));
  if(!quoteValidity0550(net,today).current)return data;
  const integration=data.integrationWorkspace;

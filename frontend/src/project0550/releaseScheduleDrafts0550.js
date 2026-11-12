@@ -28,7 +28,8 @@ export function releaseScheduleChecks0550(view){
   C3:view.pagaSpares?`PAGA SP2 records ${view.pagaSpares.recommended.length} recommended spare lines with supplier prices. Reconcile the kit overlap and Base/Option treatment before replacing the Working allowance.`:
    'PAGA two-year spare allowance requires an OEM parts list, quantities and rates.',
   C5:'Separate additional PAGA special tools from the kit included in A1-05.',
-  C7:'PAGA OEM FAT at Wertheim is included in A1-05. '+(view.pagaScope||'')+' Confirm additional field service, SAT and training against the tender scope.'
+  C7:'PAGA OEM FAT at Wertheim is included in A1-05. '+(view.pagaScope||'')+
+   ' ID-IE Local FAT and site supervision use the Working B4 Offers. Plan the service days and ADDVALUE site execution workload separately.'
  };
  return RELEASE_DRAFT_FORMS_0550.map(({id,title})=>{
   const treatment=id==='A1'?'BASE':id==='A2'?'OPTION':null;

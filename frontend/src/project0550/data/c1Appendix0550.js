@@ -218,6 +218,14 @@ function cctvDraftGroups(rows,byOwner,ownerUse){
  });
 }
 
+// The revision quotes the speaker, beacon and panel quantities at project level.
+// Show candidate source items against native MR rows without apportioning NET.
+const paga005C1Items={
+ 'APF-01':['1010'],'APF-02':['3010','4010','5010'],'APF-03':['3010'],
+ 'APF-05':['11010'],'APF-06':['14030'],'APF-07':['14020'],'APF-08':['15010'],
+ 'ACP-01':['2010'],'ACP-02':['14030'],'ACP-03':['14020'],'ACP-04':['15010'],'ACP-05':['11010'],
+};
+
 export function deriveC1Appendix0550(view,currency='USD'){
  const context=view.c1Context||{},lines=context.lines||[],requirements=context.requirements||[],legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550;
  const scheduleRows=view.scheduleRows('C1');
@@ -379,7 +387,14 @@ export function deriveC1Appendix0550(view,currency='USD'){
    if(!candidatePackages.has(mrId))candidatePackages.set(mrId,[]);
    candidatePackages.get(mrId).push(item.key);
   }
-  if(paga)for(const mrId of ['MR-B1-14-APF-01','MR-B1-14-ACP-01','MR-B1-14-APF-05','MR-B1-14-ACP-05']){
+  if(paga&&b.line.offer.quoteRef==='A20261632-005'){
+   const offerItems=new Map((context.pagaItems||[]).filter(o=>o.supplierQuoteRow.classification==='BASE_PRICE')
+    .map(o=>[o.supplierQuoteRow.itemCode,o]));
+   for(const row of rows.filter(r=>r.appendix==='1.4'&&!r.excluded)){
+    const refs=(paga005C1Items[row.key.replace(/^MR-B1-14-/,'')]||[]).map(code=>offerItems.get(code)).filter(Boolean);
+    row.pagaReference={packageKey:item.key,offers:refs};
+   }
+  }else if(paga)for(const mrId of ['MR-B1-14-APF-01','MR-B1-14-ACP-01','MR-B1-14-APF-05','MR-B1-14-ACP-05']){
    if(requirements.some(r=>r.id==='REQDEF-'+mrId&&r.workLineIds.includes(b.lineId)&&r.offerIds.some(id=>id.startsWith('OFFER-PAGA-'+b.line.offer.quoteRef+'-')))){
     candidatePackages.set(mrId,[...(candidatePackages.get(mrId)||[]),item.key]);
    }
@@ -457,6 +472,10 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const r of displayRows)if(r.packageKeys?.length){const included='Included in item '+r.packageKeys.map(k=>byKey.get(k)?.sn).join(', ');r.note=legacy?included:[included,r.note].filter(Boolean).join('; ');}
  for(const r of displayRows){
   if(r.sharedDmrPriceKey)r.note=[r.note,'Shared R11 equipment price shown at item '+byKey.get(r.sharedDmrPriceKey).sn+'.'].filter(Boolean).join(' ');
+  if(r.pagaReference){
+   const {packageKey,offers}=r.pagaReference;
+   r.pagaReference={offers,packageSn:byKey.get(packageKey).sn};
+  }
   const packages=(candidatePackages.get(r.key)||[]).map(key=>byKey.get(key));
   if(packages.length&&!r.excluded)r.internalNote=[r.internalNote,'Proposed supply reference '+packages.map(row=>row.sn).join(', ')+' / final scope OPEN'].filter(Boolean).join(' · ');
   if(view.workingPreview&&r.mr?.systemToken==='TEL-CCTV'&&!r.excluded){

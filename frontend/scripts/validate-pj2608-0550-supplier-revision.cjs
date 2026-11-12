@@ -53,6 +53,18 @@ const data={...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),vendors:[vendor]
  assert.deepEqual(updated.lines.map(l=>l.selected),[true,false,false]);
  assert.deepEqual(updated.offers,active.offers);
  assert.equal(R.preparePagaRevisionPricing0550(updated,'2026-11-09'),updated);
+ const successorRef='A20261632-005',successorId='OFFER-PAGA-'+successorRef+'-NET';
+ const successor={...actualNet,id:successorId,quoteRef:successorRef,
+  supplierQuoteRow:{...actualNet.supplierQuoteRow,parentOfferId:successorId}};
+ const current={...updated,offers:[...updated.offers,successor]};
+ const successorSelected=R.preparePagaRevisionPricing0550(current,'2026-11-13');
+ assert.equal(successorSelected.lines[0].id,updated.lines[0].id);
+ assert.equal(successorSelected.lines[0].offerId,successorId);
+ assert.deepEqual(successorSelected.lines.map(l=>l.selected),[true,false,false]);
+ const reviewed={...current,bidVolumes:{bindings:[{lineId:updated.lines[0].id,status:'REVIEWED'}]}};
+ assert.equal(R.preparePagaRevisionPricing0550(reviewed,'2026-11-13'),reviewed);
+ const authoredTag={...current,lines:current.lines.map((line,i)=>i===0?{...line,tagRef:'APF'}:line)};
+ assert.equal(R.preparePagaRevisionPricing0550(authoredTag,'2026-11-13'),authoredTag);
  const edited={...active,lines:[legacy[0],{...legacy[1],quantity:2},legacy[2]]};
  assert.equal(R.preparePagaRevisionPricing0550(edited,'2026-11-09'),edited);
  const deselected={...active,lines:[{...legacy[0],selected:false},legacy[1],legacy[2]]};

@@ -1,3 +1,5 @@
+Latest PAGA decision: [INDUSTRONIC supply and ID-IE / ADDVALUE service rates](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--paga-supply-and-service-rates). A1-05 and C1 use the selected package once. B4/C7 show the supplier rates and the existing ADDVALUE daily rates while workload is open.
+
 Latest MET sourcing decision: [MGW Vaisala for APF and ACP](20261109_MGW_MET_NDB_QUOTATION.md#13-november--mgw-selected-for-met). C1 shows the two site packages and their MR references. The APF MET Cabinet remains open for scope and price.
 
 Latest PABX pricing decision: [CHEVALIER APF IP PBX Server](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--apf-ip-pbx-server). The existing A1-04 owner uses the registered Rev.01 item 1.1.1 unit rate for one MR server bundle in 10.2, 10.7 Draft and 11.C1. Rate and second-server scope remain under review.

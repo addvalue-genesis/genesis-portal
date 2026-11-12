@@ -28,3 +28,35 @@ The existing APF MR 9.0 Working owner for A1-04 takes one Dell R660 server bundl
 The automatic 07.2 load and manual Vendor registration both use this source when the generated Working owner is eligible. 10.7 Draft and 11.C1 item 1.3.P1 use the same owner and price. The quoted NET package and the allocated server bundle cannot both charge the same source. The old MGW Offer remains traceable. Authored costs, reviewed allocations, and frozen issues retain their existing records.
 
 ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply. The private CHEVALIER register test checks the MR and prior MGW paths, source quantity, repeated preparation, A1-04 Release and C1 price parity, competing NET, and protected Working and Schedule records. The Windows workspace must load the prepared CHEVALIER Vendor register through the existing source intake. Its saved state has not been observed.
+
+## 13 November · PAGA supply and service rates
+
+Working A1-05 selects the current INDUSTRONIC A20261632-005 NET against
+the existing generated Part A owner. The price uses ADDVALUE +25% and
+SAMTEL +20%. Authored, reviewed and deselected owners retain their
+selection. In the Working C1 Appendix 1.4 view, the APF and ACP MR rows
+reference the package and the relevant quotation items. Per-site
+allocation remains open. The package carries one amount through
+Working, draft Release A1-05 and C1.
+
+Working B4 and draft C7 use two ID-IE Offer-linked rows. QO26169 covers
+Local FAT execution in Bangkok. QO26163R1 covers OEM site supervision
+for the ADDVALUE execution team at APF and ACP, subject to confirmation
+of Myanmar applicability. Quantity and service selling inputs are open.
+The QO26169 crew-day basis and the number of days require confirmation.
+The OEM FAT at Wertheim remains inside the original INDUSTRONIC package.
+
+The PAGA service section displays the existing ADDVALUE protected daily
+rates from 06 Execution for the Senior Telecom Engineer and Chief Telecom
+Technician. PAGA person-days and the allocation against shared Working B4
+activities are pending the execution plan.
+
+ADR-0550-001 principles 2–6 and 8–12 apply. The private register checks
+cover the existing owner, C1 and Release tie-out, the five ACP rows,
+unpriced ID-IE B4/C7 workloads, the system rates and preservation of
+authored selections and deleted service drafts. Vendor registers were
+located in the original project DATA. Supplier rates remain in private
+DATA. The supplier revision, C1, Working Schedules, Bid Completion, Bid
+Volumes and Release Issue validators passed, and production webpack compiled.
+Chromium could not start in the test environment. The owner's Windows workspace
+still needs a pull and a reload.

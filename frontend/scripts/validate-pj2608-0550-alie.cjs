@@ -255,6 +255,66 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  assert.equal(prepare(authored),authored);
  console.log('PASS private CHEVALIER register: one APF R660 in Working, draft Release and C1, with NET and reviewed-owner protection.');
 }
+if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
+ const D=require(root+'/project0550/data.js');
+ const {importLegacyVendorBasis0550}=require(root+'/project0550/data/legacyVendorBasis0550.js');
+ const {prepareRepositoryBidBasis0550,prepareAuthorizedEurThb0550}=require(root+'/project0550/data/repositoryBidBasis0550.js');
+ const {prepareBidProcess0550}=require(root+'/project0550/data/bidProcess0550.js');
+ const {preparePagaRevisionPricing0550,pagaRevisionSelected0550}=require(root+'/project0550/data/supplierRevision0550.js');
+ const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
+ const {deriveC1Appendix0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {PagaQuoteScope0550}=require(root+'/project0550/PagaQuoteScope0550.jsx');
+ const tokens=SYSTEMS.map(s=>s.token),today='2026-11-13',baseline=D.DATA_LAYER_META.datasetId;
+ const seed=importLegacyVendorBasis0550(emptyBidWorkspace(baseline),{
+  meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE,commercialSources:D.COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY,
+ },today);
+ const repo=prepareAuthorizedEurThb0550(prepareRepositoryBidBasis0550(seed,{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE},today),today);
+ const initial=prepareBidProcess0550(repo,COMMERCIAL_POLICY,today);
+ const readPack=file=>JSON.parse(fs.readFileSync(file,'utf8'));
+ const registered=[process.env.GENESIS_ALIE_TEST_PAGA005,process.env.GENESIS_ALIE_TEST_PAGA_SERVICES].filter(Boolean)
+  .reduce((workspace,file)=>planVendorRegister0550(workspace,readPack(file),tokens).workspace,initial);
+ const revised=preparePagaRevisionPricing0550(registered,today);
+ const prepared=intake.preparePagaIdieWorking0550(applyDirectSupplierMarkup0550(revised),COMMERCIAL_POLICY,today);
+ validateBidWorkspace(prepared,baseline,tokens);
+ const {net,owner}=pagaRevisionSelected0550(prepared);
+ assert.equal(net.quoteRef,'A20261632-005');
+ assert.equal(owner.id,'LINE-LEGACY-TEL-PAGA-1');
+ assert.equal(preparePagaRevisionPricing0550(prepared,today),prepared);
+ assert.equal(intake.preparePagaIdieWorking0550(prepared,COMMERCIAL_POLICY,today),prepared);
+ assert.equal(prepared.offers,registered.offers);
+ assert.equal(prepared.fx,registered.fx);
+ const old=registered.lines.find(l=>l.id===owner.id);
+ const edited={...registered,lines:registered.lines.map(l=>l===old?{...l,description:'Authored scope'}:l)};
+ assert.equal(preparePagaRevisionPricing0550(edited,today),edited);
+ const model=deriveBidWorkspace(prepared,tokens,today);
+ const serviceIds=new Set(prepared.repositoryBasisImport.bidProcess.pagaIdieDraftOfferIds);
+ const services=model.lines.filter(l=>serviceIds.has(l.offerId));
+ assert.equal(services.length,2);
+ assert(services.every(l=>l.selected&&l.wbs==='B4'&&l.quantity===null&&l.costRate===l.offer.unitCost&&l.provisionalCustomerUSD===null));
+ const deleted={...prepared,lines:prepared.lines.filter(l=>l.id!==services[0].id)};
+ assert.equal(intake.preparePagaIdieWorking0550(deleted,COMMERCIAL_POLICY,today),deleted);
+ const saved=deriveBidVolumes0550(prepared,model,SYSTEMS,today);
+ const preview=deriveBidVolumeWorkingPreview0550(prepared,model,SYSTEMS,today,saved);
+ assert.equal(preview.scheduleRows('C7').filter(r=>serviceIds.has(r.line.offerId)).length,2);
+ assert(!preview.scheduleRows('C1').some(r=>serviceIds.has(r.line.offerId)));
+ const c1=deriveC1Appendix0550(preview),acp=c1.rows.filter(r=>r.appendix==='1.4'&&r.site==='ACP');
+ assert.deepEqual(acp.map(r=>[r.sn,r.quantity,r.pagaReference.offers.map(o=>o.supplierQuoteRow.itemCode)]),[
+  ['1.4.9',1,['2010']],['1.4.10',9,['14030']],['1.4.11',8,['14020']],['1.4.12',3,['15010']],['1.4.13',1,['11010']],
+ ]);
+ assert(acp.every(r=>r.amount===null&&r.pagaReference.packageSn==='1.4.P1'));
+ const netAmount=model.lines.find(l=>l.id===owner.id).provisionalCustomerUSD;
+ const releaseNet=model.provisional.schedule.find(r=>r.code==='A1-05').children.find(r=>r.id===owner.id);
+ assert.equal(releaseNet.customerUSD,netAmount);
+ assert.equal(c1.rows.find(r=>r.sn==='1.4.P1').amount,netAmount);
+ assert.equal(c1.bindings.filter(r=>r.line.offerId===net.id).length,1);
+ const html=renderToStaticMarkup(React.createElement(PagaQuoteScope0550,{data:prepared,section:'C7'}));
+ for(const role of ['Senior Telecom Engineer','Chief Telecom Technician']){
+  const rate=D.CORE_TEAM.find(r=>r.role===role).protectedUsdDay;
+  assert(html.includes(role)&&html.includes(rate.toFixed(2)));
+ }
+ assert(html.includes('QO26163R1')&&html.includes('QO26169'));
+ console.log('PASS current PAGA supplier basis: existing A1-05 owner, five ACP references, OPEN ID-IE B4/C7 workload and existing ADDVALUE rates. Draft NET customer USD:',netAmount);
+}
 if(process.env.GENESIS_ALIE_TEST_LAYOUT){
  const actual=parseQuotedTable(fs.readFileSync(process.env.GENESIS_ALIE_TEST_LAYOUT,'utf8'));
  assert(actual?.rows.length>0,'Supplied private layout must reconcile');

@@ -169,6 +169,41 @@ const alieWorkingWbs={
 };
 const alieScopeKey=atom=>'ALIE / '+atom.line_id;
 
+export const PAGA_IDIE_WORKING_0550=[
+ {offerId:'OFFER-IDIE-QO26169-LOCAL-FAT-DAY',label:'PAGA Local FAT · Bangkok',site:'Bangkok',
+  basis:'ID-IE local FAT execution. Confirm service days and crew. ADDVALUE handles temporary installation and cabling.'},
+ {offerId:'OFFER-IDIE-QO26163R1-ENG-DAY',label:'PAGA Site Supervisor · APF / ACP',site:'APF / ACP',
+  basis:'ID-IE OEM supervision for the ADDVALUE site execution team. Confirm Myanmar applicability and person-days by site and campaign.'},
+];
+
+export function preparePagaIdieWorking0550(data,policies,today){
+ const repo=data.repositoryBasisImport,receipt=repo?.bidProcess;
+ if(!receipt)return data;
+ const handled=new Set(receipt.pagaIdieDraftOfferIds||[]);
+ const pending=PAGA_IDIE_WORKING_0550.filter(({offerId})=>!handled.has(offerId)&&data.offers.some(o=>o.id===offerId&&o.atomicLines?.length));
+ if(!pending.length)return data;
+ const registered=registeredAlieRows0550(data),lines=[];
+ for(const {offerId,label,site,basis} of pending){
+  const row=registered.find(({offer,atom})=>offer.id===offerId&&offer.vendorId==='VENDOR-IDIE-0550'&&
+   atom.anchor.system==='TEL-PAGA'&&atom.route.line_class==='SERVICE_SITE');
+  if(!row||!quoteValidity0550(row.offer,today).current)continue;
+  const id=offerId.replace(/^OFFER-/,'LINE-');
+  if(data.lines.some(line=>line.id===id||line.offerId===offerId||line.scopeKey===alieScopeKey(row.atom))){
+   handled.add(offerId);
+   continue;
+  }
+  const {draft}=alieWorkingDraft0550(data,row,policies,today);
+  if(!draft)continue;
+  lines.push({id,calculationId:'',resultKey:'value',manualCost:null,sellRate:null,markupPct:null,marginPct:null,primePct:null,
+   selected:true,...draft,description:label,quantity:null,tagRef:[draft.tagRef,site].filter(Boolean).join(' / '),
+   sourceRef:draft.sourceRef+' / '+basis,customerRemark:basis});
+  handled.add(offerId);
+ }
+ if(handled.size===(receipt.pagaIdieDraftOfferIds||[]).length)return data;
+ return {...data,lines:[...data.lines,...lines],repositoryBasisImport:{...repo,
+  bidProcess:{...receipt,pagaIdieDraftOfferIds:[...handled]}}};
+}
+
 export function alieWorkingDraft0550(data,{offer,atom,working,allocated},policies,today){
  const {route,anchor,qty,cost,internal}=atom;
  const wbs=internal.treatment==='OPTION'?vendorOptionSpareWbs0550(offer):alieWorkingWbs[route.line_class];

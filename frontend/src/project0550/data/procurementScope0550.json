@@ -39,8 +39,8 @@
       "name": "PAGA",
       "mgwExcludedSystemTokens": ["TEL-PAGA"],
       "suppliers": [
-        {"name": "INDUSTRONIC", "vendorIds": ["LEGACY-VENDOR-INDUSTRONIC", "VENDOR-INDUSTRONIC-0550"], "quoteRef": "A20261632-002", "useDirectMarkup": true},
-        {"name": "ID IE", "vendorIds": ["VENDOR-IDIE-0550"], "quoteRef": "QO26163", "quoteScope": "PAGA services"}
+        {"name": "INDUSTRONIC", "vendorIds": ["LEGACY-VENDOR-INDUSTRONIC", "VENDOR-INDUSTRONIC-0550"], "quoteRef": "A20261632-005", "useDirectMarkup": true},
+        {"name": "ID IE", "vendorIds": ["VENDOR-IDIE-0550"], "quoteRef": "QO26169 / QO26163R1", "quoteScope": "Bangkok Local FAT / APF and ACP site supervision"}
       ],
       "quotedSystemToken": "TEL-PAGA",
       "quotedScope": "Public Address & General Alarm"
