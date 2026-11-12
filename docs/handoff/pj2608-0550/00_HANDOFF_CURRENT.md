@@ -1,3 +1,5 @@
+Latest ALIE intake: [ALIE R2 in GENESIS](20261112_ALIE_GENESIS_INTAKE.md). Existing 07.2 registers source-bound atoms after review. Existing 10.2 shows the trace from each atom to its Offer and any Working line already using the source. The checkpoint records Drive and PDF setup, validation, and remaining quotation coverage.
+
 Latest spare workflow: [SI quantity drafts in 11.C2/C3/C4](20261111_SI_SPARE_DRAFT_WORKFLOW.md). Selected Working A and current 07 offers feed SI quantity, then the existing pricing and FX equations. Drafts are internal; prepare a separate spare owner and bind in 11.M before its price enters Volume I.
 
 Latest C2 update: [11 Nov B5 startup allowance](20261108_A1_SPARE_PRICING.md#11-nov--provisional-b5-startup-allowance). The shared PCT_START scenario defaults to 5% of the in-scope selected Working A procurement basis and remains a provisional budget reference in B5, C2, A1 and Release B5. Existing OEM itemized costs keep their current 11.M allocation and approval path.

@@ -10,6 +10,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_VOLUME_TAGS_0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {latestPagaVendorPackage0550,latestVendorPackageQuotes0550,vendorPagaHistoricalQuote0550} from './data/vendorRegister0550';
 import {activeSupply0550} from './data/workingOffers0550';
+import AlieIntake from './AlieIntake';
 const tagValues=(field,text)=>[...new Set(text.split(field==='mr'?/\s+\|\s+|\n/:/[|\n]/).map(tag=>tag.trim()).filter(Boolean))];
 export function VendorWorkspace({navigationTarget,onNavigate}){
  const {data,put,busy,vendorSync,reviewDate}=useBidWorkspace();
@@ -17,6 +18,7 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  const blankOffer={id:"",vendorId:"",description:"",brand:"",quoteRef:"",sourceRef:"",date:"",validUntil:"",currency:"THB",unit:"MD",unitCost:null};
  const [offer,setOffer]=useState(blankOffer);
  const [offerTagText,setOfferTagText]=useState({});
+ const [alieOpened,setAlieOpened]=useState(false);
  if(!data)return <p>กำลังเปิดฐานข้อมูล Bidding…</p>;
  const currentOffers=currentSupplierOffers0550(data);
  const quotedVendorIds=new Set(currentOffers.map(o=>o.vendorId));
@@ -81,6 +83,10 @@ export function VendorWorkspace({navigationTarget,onNavigate}){
  </details>
  <Save busy={busy}>บันทึกใบเสนอราคา / TAG</Save></form>
  <p>แก้เรตใน Offer เดิมจะคำนวณแถว Working ที่อ้างอิง Offer นั้นใหม่ หากเป็นใบเสนอราคาคนละฉบับให้สร้าง Offer ใหม่เพื่อเก็บฉบับเก่า</p>
+ <details className="p55-panel" onToggle={e=>{if(e.currentTarget.open)setAlieOpened(true);}}>
+  <summary>ALIE R2 · Atomic Lines Intake</summary>
+  {alieOpened&&<AlieIntake onNavigate={onNavigate}/>}
+ </details>
  <VendorOfferGroups0550 data={data} reviewDate={reviewDate} navigationTarget={navigationTarget} onNavigate={onNavigate} onEdit={o=>{setOffer({...o});setOfferTagText(Object.fromEntries(VENDOR_OFFER_TAG_FIELDS_0550.map(([field])=>[field,(o.bidTags?.[field]||[]).join(' | ')])));document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
  </Module>
  <Module id="bid.vendor.controlled-sources" title="แหล่ง Vendor เดิมของ 0550 — ใช้อ้างอิงก่อนเลือกเรต" open={false}>

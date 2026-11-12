@@ -21,7 +21,9 @@ module.exports = {
     new MiniCssExtractPlugin({filename: "bundle.css", chunkFilename: "[id].css"}),
     new webpack.DefinePlugin({
       __PJ0553_BUILD_REVISION__:buildRevision,
-      __PJ0550_BUILD_REVISION__:buildRevision
+      __PJ0550_BUILD_REVISION__:buildRevision,
+      __PJ0550_ALIE_GOOGLE_CLIENT__:JSON.stringify(process.env.GENESIS_0550_GOOGLE_CLIENT_ID||''),
+      __PJ0550_ALIE_DRIVE_FOLDER__:JSON.stringify(process.env.GENESIS_0550_ALIE_DRIVE_FOLDER||'')
     })
   ],
   output: {
@@ -54,6 +56,7 @@ module.exports = {
   devServer: {
     setupMiddlewares: (middlewares) => {
       middlewares.unshift({name: "local-private-source-0550", middleware: require("./scripts/source-drive-0550.cjs").createMiddleware()});
+      middlewares.unshift({name: "local-alie-pdf-0550", middleware: require("./scripts/alie-pdf-0550.cjs").createAliePdfMiddleware()});
       return middlewares;
     },
     static: {

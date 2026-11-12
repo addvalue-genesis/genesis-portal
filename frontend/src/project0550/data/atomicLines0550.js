@@ -4,6 +4,16 @@ const routes={
  EQUIP:'A1',SPARE_PRECOM:'C2',TOOL:'C5',SERVICE_SITE:'C7',SERVICE_TRAIN:'C7',
  OTHER_COST:'E',FILL_CONSUMABLE:'C6',INSURANCE:'F',
 };
+export const ALIE_CLASSES_0550=Object.keys(routes);
+export const atomicRoute0550=line_class=>({line_class,schedule:routes[line_class],volume:routes[line_class]});
+export const atomicSections0550=({route,internal})=>[
+ ...(internal.treatment==='OPTION'?['A2']:[]),route.schedule,...(route.line_class==='EQUIP'?['C1']:[]),
+];
+export function atomicQuoteItem0550(offer){
+ const row=offer.supplierQuoteRow;
+ const option=row?.classification==='OPTION'&&offer.id.match(/-OPT-([A-Z0-9.-]+)$/);
+ return option?'OPT-'+option[1]:row?.itemCode;
+}
 const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
 const idPattern=/^[A-Z0-9-]+\|[A-Z0-9.-]+\|[A-Z0-9.-]+$/;
 const fields=(row,keys)=>row&&typeof row==='object'&&!Array.isArray(row)&&
@@ -56,7 +66,10 @@ export function validateOfferAtomicLines0550(offer){
  const classification=offer.supplierQuoteRow?.classification;
  const treatment=classification==='INCLUDED_REFERENCE'?'REFERENCE':
   classification==='OPTION'||evidence.classification==='OPTION'?'OPTION':'BASE';
- if(classification==='NET_PACKAGE'||(quoteItem&&root.line_id.split('|')[2]!==quoteItem)||
+ const atomItem=root.line_id.split('|')[2];
+ const exactItem=!quoteItem||atomItem===quoteItem;
+ const optionItem=classification==='OPTION'&&atomItem===atomicQuoteItem0550(offer);
+ if(classification==='NET_PACKAGE'||(!exactItem&&!optionItem)||
   root.internal.treatment!==treatment||(root.cost.unit===null)!==(evidence.quotedUnitCost===null)||
   root.cost.unit!==null&&!new Money(root.cost.unit).eq(evidence.quotedUnitCost)||
   (root.qty.value!==null&&root.qty.value!==evidence.quotedQuantity)||

@@ -14,6 +14,7 @@ import {BidFxBasis0550} from "./BidFxBasis0550";
 import {mgwDetailGroup0550} from "./data/mgwDetailPricing0550";
 import {MgwWorkingQuotes} from "./MgwQuoteViews";
 import {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550} from "./WorkingSupplierTrace0550";
+import {AlieWorking0550} from "./AlieIntake";
 import {DmrTagCost0550,DmrTagCostRows0550,DmrWorkingBoq0550,DmrWorkingSections0550,dmrTagCostView0550} from "./DmrTagCost0550";
 import {RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OWNER_0550} from "./data/towerLegacyPricing0550";
 import {sourceAmountTHB0550,supplierCostProjection0550} from "./data/supplierCostProjection0550";
@@ -309,13 +310,15 @@ function BidProcessResult0550({data,model,onNavigate}){
  </section>;
 }
 export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem,mrNavigationTarget,onOpenSource,onNavigate}){
- const {data,model,change,busy}=useBidWorkspace();
+ const {data,model,change,busy,reviewDate}=useBidWorkspace();
  const editorState=useRef(null);
+ const [alieOpened,setAlieOpened]=useState(false);
  const [mode,setMode]=useState("working"),[priceView,setPriceView]=useState("provisional"),[form,setForm]=useState(blankLine),[context,setContext]=useState("official"),[target,setTarget]=useState(null);
  useEffect(()=>{if(navigationTarget){setContext(navigationTarget.startsWith("bid.budget.history")?"history":"official");setMode(navigationTarget.startsWith("bid.budget.release")?"released":navigationTarget.startsWith("bid.budget.budget-thb")?"budgetary":"working");setTarget(navigationTarget);}else setTarget(null);},[navigationTarget]);
  useEffect(()=>{if(!target)return;const timer=setTimeout(()=>{const element=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===target);if(element){for(let n=element;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;document.querySelectorAll("[data-module-focused]").forEach(n=>n.removeAttribute("data-module-focused"));element.setAttribute("data-module-focused","true");element.setAttribute("tabindex","-1");element.scrollIntoView({block:"center"});element.focus?.({preventScroll:true});}},30);return()=>clearTimeout(timer);},[target,mode,context,data]);
  if(!data||!model)return <p>กำลังโหลด Working…</p>;
  const go=(next,id)=>{setMode(next);setTarget(null);setTimeout(()=>setTarget(id),0);};
+ const editWorking=row=>{setForm({...row});go("working","bid.budget.working.editor");};
  const identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const startLine=(patch)=>{let draft={...blankLine(),...patch};const kind=["A","B5","B6","C2","C3"].includes(draft.wbs)?"Goods / Procured Cost":["B1","B3","B4"].includes(draft.wbs)?"Professional Service":null;if(kind)draft=applyPolicyDraft0550(draft,COMMERCIAL_POLICY,kind);setForm(draft);go("working","bid.budget.working.editor");};
  const official=priceView==="provisional"?model.provisional:model.official,currency=mode==="released"?"USD":"THB";
@@ -336,7 +339,11 @@ export function BidCommercialWorkspace({legacy,navigationTarget,navigationSystem
  <p>ลำดับงานใน 10.2: อ่านข้อกำหนดและ System Particular → วิเคราะห์ใน WP.1–WP.8 → เลือกรายการ A/B/C → เปิดรายละเอียดเพื่อแก้ไขและทบทวนราคา</p>
  <ParticularWorkspace0550 onOpenSource={onOpenSource}/>
  <WorkingPreview0550 onNavigate={onNavigate} onOpenSource={onOpenSource} navigationTarget={navigationTarget} navigationSystem={navigationSystem}/>
- <WorkingHierarchy b5StartupAllowance={model.b5StartupAllowance} integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
+ <details className="p55-panel" onToggle={e=>{if(e.currentTarget.open)setAlieOpened(true);}}>
+  <summary>ALIE R2 · Supplier source trace</summary>
+  {alieOpened&&<AlieWorking0550 data={data} reviewDate={reviewDate} onNavigate={onNavigate} onEdit={editWorking}/>}
+ </details>
+ <WorkingHierarchy b5StartupAllowance={model.b5StartupAllowance} integration={model.integration} onNavigate={onNavigate} onOpenSource={onOpenSource} model={official} working={model.provisional} data={data} preparationSystem={navigationTarget==='bid.budget.working.group.B5'?navigationSystem:undefined} onNew={startLine} onEdit={editWorking} onRelease={id=>go("released",id)}/>
  <p>หมวด B / C · ใช้รายการในแบบลูกค้าเพื่อเตรียมกิจกรรมและรายการราคา · ตรวจความครบของขอบเขตที่ 10.3</p>
  <WorkingProposalPlan rows={CUSTOMER_FORM_0550.rows.filter(row=>row.part!=="A")} lines={data.lines} onNew={startLine}/>
  <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate} onOpenSource={onOpenSource}/></Module>
