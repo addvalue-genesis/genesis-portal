@@ -1,4 +1,5 @@
 import React from 'react';
+import {latestVendorPackageQuotes0550} from './data/vendorRegister0550';
 import {PAGA_REVISION_OPEN_0550,pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaCommercialChanges0550,pagaIncludedScope0550,pagaIncludedServices0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 
 const scopeNotes={
@@ -22,7 +23,10 @@ const scopeNotes={
 
 export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  const selected=pagaRevisionSelected0550(data);
- const candidate=pagaRevisionCandidate0550(data),net=selected?.net,owner=selected?.owner;
+ const latestVendorQuote=section==='vendor'?[...latestVendorPackageQuotes0550(data.offers.filter(
+  offer=>offer.id.startsWith('OFFER-PAGA-A20261632-')
+ )).values()].sort((a,b)=>b.date.localeCompare(a.date)||b.quoteRef.localeCompare(a.quoteRef))[0]:null;
+ const candidate=latestVendorQuote||pagaRevisionCandidate0550(data),net=selected?.net,owner=selected?.owner;
  if(!net&&!candidate)return null;
  const received=candidate&&candidate.id!==net?.id&&['vendor','A','commercial'].includes(section)?candidate:null;
  if(!net&&!received)return null;
@@ -41,7 +45,7 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  ];
  return <aside className="p55-panel" aria-label="PAGA current quote scope">
   <h4>PAGA · INDUSTRONIC {display.quoteRef} · {net?'Working Draft':'Received'}</h4>
-  {received&&<p>{received.quoteRef} · ได้รับแล้ว · เลือกฉบับในเจ้าของราคา Working A1-05 เมื่อตรวจฐานราคาและขอบเขตแล้ว {onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+received.id)}>07 · เปิดใบเสนอราคา</button>}</p>}
+  {received&&<p>{received.quoteRef} · ได้รับแล้ว · {section==='vendor'?'หลักฐานสำหรับทบทวนราคาและขอบเขต Working A1-05':'เลือกฉบับในเจ้าของราคา Working A1-05 เมื่อตรวจฐานราคาและขอบเขตแล้ว'} {onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.vendor.offer.'+received.id)}>07 · เปิดใบเสนอราคา</button>}</p>}
   {net&&<p>{spares?`OEM SP2 ของ -002 มี ${spares.recommended.length} รายการพร้อมจำนวนแนะนำและราคาต้นทาง และ ${spares.options.length} รายการทางเลือก · ตรวจความเข้ากันกับฉบับที่เลือก รายการซ้ำกับ Commissioning Kit และ Base/Option ก่อนใช้แทนวงเงิน Working`:scopeNotes[section]||pagaIncludedScope0550(data,net)}</p>}
   {net&&['B','C','C7','D','mapping','release'].includes(section)&&services.acoustic&&<p>Item 23050 · Acoustic Study รวมอยู่ใน NET · ระยะเวลาศึกษาแยกจาก lead time ของอุปกรณ์</p>}
   {net&&['B','C','C7','mapping','release'].includes(section)&&services.classroom&&<p>Item 23070 · Classroom / Virtual Classroom Training รวมอยู่ใน NET · ตรวจจำนวนผู้เข้าอบรม ระยะเวลา และ On-site Training ตาม Annex ก่อนจัดสรรส่วนเพิ่ม</p>}

@@ -7,7 +7,14 @@ export const VENDOR_PHYSICAL_TAG_FIELDS_0550=[
  ['location','TAG Location'],
  ['rack','Rack / Cabinet TAG'],
 ];
-const allowedFields=['sections',...VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field])=>field)];
+export const VENDOR_OFFER_TAG_FIELDS_0550=[
+ ...VENDOR_PHYSICAL_TAG_FIELDS_0550,
+ ['site','Site'],
+ ['mr','MR / Appendix'],
+ ['subsystem','Subsystem'],
+ ['lineClass','Line class'],
+];
+const allowedFields=['sections',...VENDOR_OFFER_TAG_FIELDS_0550.map(([field])=>field)];
 const unique=values=>[...new Set(values)];
 const baseSchedules=['C1','C2','C5'];
 const optionSchedules=['C3','C4','C6'];

@@ -141,6 +141,18 @@ export function vendorOfferEntries0550(data){
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
 }
+export function latestVendorPackageQuotes0550(offers){
+ const latest=new Map();
+ for(const offer of offers){
+  if(offer.supplierQuoteRow?.classification!=='NET_PACKAGE'||!offer.quoteEvidence?.commercialTotals)continue;
+  const previous=latest.get(offer.vendorId);
+  if(!previous||offer.date>previous.date||offer.date===previous.date&&offer.quoteRef.localeCompare(previous.quoteRef,'en',{numeric:true})>0){
+   latest.set(offer.vendorId,offer);
+  }
+ }
+ return latest;
+}
+
 const vendorSourceGroup0550=({sourceSystemTokens=[]})=>
  sourceSystemTokens.length===1?sourceSystemTokens[0]:sourceSystemTokens.length?'SHARED':'UNASSIGNED';
 

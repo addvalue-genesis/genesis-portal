@@ -1,6 +1,6 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
-import {VENDOR_VOLUME_TAGS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
+import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
 import {towerOfferScope0550} from './data/towerTenderScope0550';
@@ -13,13 +13,19 @@ import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
 import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
-import {supplierItemLabel0550} from './data/supplierCostProjection0550';
+import {supplierItemLabel0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 const quoteTitle=q=>[q.title,q.fileName,q.revision&&'Rev.'+q.revision,q.hash?.slice(0,8)].filter(Boolean).join(' · ');
+const primarySection=offer=>{
+ const sections=offer.bidTags?.sections||[];
+ const details=sections.filter(tag=>tag!=='A1'&&tag!=='A2');
+ if(details.length===1)return details[0];
+ return sections.length===1?sections[0]:'';
+};
 const rowSections=[['BASE','Base · รายการหลัก'],['OPTION','Option · รายการทางเลือก'],['REFERENCE','รายการรวมในแพ็กเกจ / อ้างอิง']];
 function OfferLocation({location,onNavigate}){
  if(!location)return null;
@@ -45,7 +51,8 @@ function QuoteTotal({quote,fx,selectedR11,groupOnly=false}){
  }
  const t=vendorQuoteTotals0550(quote,fx,groupOnly);
  if(t.referenceOnly)return <span className="p55-vnd-total">ฐาน Working อ้างอิง · ดูยอดในใบเสนอราคาต้นฉบับ</span>;
- const baseLabel=groupOnly?(['SHARED','UNASSIGNED'].includes(quote.system)?'ยอด Base ของกลุ่มนี้':'รวมเฉพาะระบบนี้'):t.net?'รวมสุทธิใบเสนอราคา':'รวมใบเสนอราคา';
+ const baseLabel=t.net?'รวมสุทธิใบเสนอราคา':groupOnly?
+  (['SHARED','UNASSIGNED'].includes(quote.system)?'ยอด Base ของกลุ่มนี้':'รวมเฉพาะระบบนี้'):'รวมใบเสนอราคา';
  const show=(s,label)=><span className="p55-vnd-total-part">
   <strong>{label}: {s.totalTHB!==null?amount(s.totalTHB,'THB')+' THB':s.hasConverted?'ยอดที่ทราบ '+amount(s.knownTHB,'THB')+' THB · ยังไม่ครบ':'OPEN'}</strong>
   {s.native.length>0&&<span>ต้นทาง {s.native.map(n=>amount(n.value,n.currency)+' '+n.currency).join(' + ')}{s.missingPrices>0?' · เฉพาะยอดที่ทราบ':''}</span>}
@@ -96,7 +103,9 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
  },[data.integrationWorkspace]);
  useEffect(()=>{
   if(!navigationTarget)return;
-  if(navigationTarget===archivedKey||entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId)||
+  const targetOffer=entries.find(({offer})=>navigationTarget==='bid.vendor.offer.'+offer.id);
+  if(targetOffer)setSectionFilter('');
+  if(targetOffer||navigationTarget===archivedKey||entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId)||
    navigationTarget==='bid.vendor.'+archived?.vendorId||navigationTarget==='bid.vendor.'+mgwVendorId)setMode('company');
  },[entries,archivedKey,archived,mgwVendorId,navigationTarget]);
  const anchors=new Set();
@@ -104,6 +113,8 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
  const renderRow=entry=>{
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
   const validity=quoteValidity0550(o,reviewDate);
+  const sourceSection=supplierQuotedSection0550(data,o);
+  const equipment=o.bidTags?.lineClass?.includes('EQUIP');
   const netRate=vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
   const anchor=!anchors.has(o.id);anchors.add(o.id);
   const currentMr=mgwCurrentMr0550(o);
@@ -116,11 +127,14 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   const draftRack=entry.location?.requirements.map(r=>draftCabinetTag0550(r.id)).find(Boolean);
   const rackLabel=cabinetTagLabel0550(mappedRacks,draftRack);
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} data={data}/><small>{o.brand}</small>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     <small>Volume I · {sectionsByOffer.get(o.id).map(tag=>'11.'+tag).join(' · ')||'OPEN'}</small>
-    {VENDOR_PHYSICAL_TAG_FIELDS_0550.map(([field,label])=>o.bidTags?.[field]?.length>0&&<small key={field}>{label} · {o.bidTags[field].join(' · ')}</small>)}
+    {VENDOR_OFFER_TAG_FIELDS_0550.map(([field,label])=>{
+     const value=o.bidTags?.[field]?.join(' · ');
+     return (value||equipment&&VENDOR_PHYSICAL_TAG_FIELDS_0550.some(([key])=>key===field))&&<small key={field}>{label} · {value||'OPEN'}</small>;
+    })}
     {rackLabel&&<small>{rackLabel}</small>}
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
@@ -134,7 +148,7 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
    <td><strong>{amount(e?e.quotedUnitCost:o.unitCost,e?.quotedCurrency||o.currency)}</strong><small>/ {e?.quotedUnit||o.unit}</small>{entry.referenceOnly&&<small>ฐาน Working เดิมรวมหลายใบเสนอราคา · ดูต้นฉบับแยกฉบับ</small>}{e&&<><small>{e.rateBasis}</small>{(o.unitCost!==e.quotedUnitCost||o.currency!==e.quotedCurrency||o.unit!==e.quotedUnit)&&<small>เรตที่บันทึกไว้ {amount(o.unitCost,o.currency)} / {o.unit}</small>}</>}
     {netRate!==null&&<small>เรตสุทธิอ้างอิง {netRate.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4})} {e.quotedCurrency} / {e.quotedUnit} · {s.discountable?'ใช้ส่วนลด':'ไม่อยู่ในฐานส่วนลด'}</small>}
     {e?.classification==='OPTION'&&<small>{selectedR11&&o.id===CERAGON_R11_0550?'OPTION ในใบต้นฉบับ · เลือกใช้ 1 Lot ใน Working':'OPTION · ยังไม่รวมในฐานโดยอัตโนมัติ'}</small>}
-    {s&&<small>{s.classification==='NET_PACKAGE'?'ต้นทุนสุทธิทั้งแพ็กเกจ':s.classification==='INCLUDED_REFERENCE'?'รวมใน Package · ไม่มีราคาแยก':s.classification==='OPTION'?'OPTION · อ้างอิงแยกจากฐาน':'ราคาก่อนส่วนลด · อ้าง Package เดียว'} · Item {s.itemCode}</small>}
+    {s&&<small>{s.classification==='NET_PACKAGE'?'ต้นทุนสุทธิทั้งแพ็กเกจ':s.classification==='INCLUDED_REFERENCE'?'อ้างอิง · ไม่มีราคาแยก':s.classification==='OPTION'?'OPTION · อ้างอิงแยกจากฐาน':'ราคาก่อนส่วนลด · อ้าง Package เดียว'} · Item {s.itemCode}</small>}
     {s?.classification!=='NET_PACKAGE'&&s?.parentOfferId&&<small>{s.parentOfferId}</small>}
    </td>
    <td>{entry.referenceOnly?'อ้างอิงยอดต้นฉบับแยกแต่ละฉบับ':e?.quotedTotal!==undefined?(e.quotedTotal===null?e.quotedTotalText||'ต้นฉบับไม่ระบุยอดแยก':amount(e.quotedTotal,e.quotedCurrency)):r?amount(r.extended,'USD'):'OPEN · ยังไม่บันทึกยอดต้นฉบับ'}{e&&<small>{e.locator}</small>}</td>
@@ -155,7 +169,24 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
  const renderRows=quote=><div className="p55-table-wrap"><table className="p55-table" aria-label={'Vendor costs '+quote.title}><thead><tr><th>รายการ / ระบบ</th><th>จำนวน / หน่วยต้นฉบับ</th><th>ต้นทุน / หน่วยเรต<br/>Unit Price ต้นฉบับ</th><th>Total Price ต้นฉบับ</th><th>วันที่ / เงื่อนไข</th><th>Offer ID / การใช้ใน Working</th></tr></thead>
   {rowSections.map(([type,label])=>{
    const rows=quote.entries.filter(e=>vendorQuoteRowTreatment0550(e)===type&&(!sectionFilter||sectionsByOffer.get(e.offer.id).includes(sectionFilter)));
-   return rows.length>0&&<tbody key={type} data-vnd-treatment={type}><tr><th colSpan={6} scope="rowgroup">{label} · {rows.length} รายการ</th></tr>{rows.map(renderRow)}</tbody>;
+   if(!rows.length)return null;
+   const tagged=quote.entries.some(({offer})=>offer.bidTags?.lineClass?.length);
+   const groups=new Map();
+   for(const row of rows){
+    const section=tagged?primarySection(row.offer):'';
+    if(!groups.has(section))groups.set(section,[]);
+    groups.get(section).push(row);
+   }
+   return [...groups].sort(([a],[b])=>VENDOR_VOLUME_TAGS_0550.indexOf(a)-VENDOR_VOLUME_TAGS_0550.indexOf(b))
+    .map(([section,items])=>{
+     const gross=type==='BASE'&&section?vendorQuoteTotals0550({entries:items}).base.native:[];
+     return <tbody key={type+section} data-vnd-treatment={type} data-vnd-quote-section={section||undefined}>
+      <tr><th colSpan={6} scope="rowgroup">{label}{section&&' · 11.'+section} · {items.length} รายการ
+       {gross.length>0&&' · ก่อนส่วนลด '+gross.map(n=>amount(n.value,n.currency)).join(' + ')}
+      </th></tr>
+      {items.map(renderRow)}
+     </tbody>;
+    });
   })}
  </table></div>;
  const renderFullQuotes=quotes=>quotes.length>0&&<details className="p55-panel" aria-label="Full quotation totals">

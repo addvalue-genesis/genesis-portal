@@ -1,11 +1,10 @@
-import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550,vendorWorkingRateReference0550} from './vendorRegister0550';
+import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550,vendorWorkingRateReference0550 as rateReference} from './vendorRegister0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550} from './mgwVendorBasis0550';
 import {activeSupply0550} from './workingOffers0550';
 import Decimal from 'decimal.js';
 const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
 
 export const supplierNetRow0550=o=>o.supplierQuoteRow?.classification==='NET_PACKAGE'||(!o.supplierQuoteRow&&/\bitem\s+NET\b/i.test(o.quoteEvidence?.locator||''));
-const rateReference=vendorWorkingRateReference0550;
 const itemCode=o=>o.supplierQuoteRow?.itemCode||o.quoteEvidence?.locator?.match(/\bitem\s+([\w.-]+)/i)?.[1]||mgwQuoteItem0550(o)?.sn||o.id;
 const sourceIdentity=o=>[o.vendorId,o.quoteRef,o.quoteEvidence?.sourceSha256||'',itemCode(o)].join('|');
 const original=o=>Boolean(o.quoteEvidence||mgwQuoteItem0550(o))&&!rateReference(o);
@@ -37,7 +36,7 @@ export function supplierQuotedSection0550(data,offer){
  const afterHeader=page.slice(match.index+match[0].length);
  const next=afterHeader.search(/^[ \t]*\d{4,5}[ \t]+/m);
  const text=(match[0]+(next<0?afterHeader:afterHeader.slice(0,next))).trim();
- const part=match[0].match(/\b\d{3}-\d{3}-\d{3}(?:\/[A-Za-z0-9]+)?\b/)?.[0]||'';
+ const part=match[0].match(/\b(?:\d{3}-\d{3}-\d{3}(?:\/[A-Za-z0-9]+)?|V-\d{3})\b/)?.[0]||'';
  const componentText=text.match(/contains following main components:\s*([^]*?)\(The technical data refers to 1 unit\.\)/)?.[1];
  const components=componentText?componentText.split(/(?=^[ \t]*(?:\d+x[ \t]|Wallmounted cabinet))/m).flatMap(block=>{
   const detail=block.trim();
