@@ -89,8 +89,27 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    ?{...line,tagRef:site,requirementRef:ref}:line);
   if(lines.some((line,i)=>line!==next.lines[i]))next={...next,lines};
  }
- const batches=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
+ const pending=MGW_CURRENT_BATCHES_0550.filter(id=>!decision.includes(applied(id))&&
   (next.supplierRevisionImports||[]).some(r=>r.batchId===id));
+ // SSB / Aero follow the Marine / DTRS Working-owner pattern. Re-apply those
+ // batches when mapped offers exist but no Working line yet points at APF-03/04
+ // through requirementRef or mrRequirementId (do not disturb other batches).
+ const pointsToMr=(line,mr)=>line.mrRequirementId===mr||line.requirementRef===mr||
+  String(line.requirementRef||'').split(' / ').includes(mr);
+ const ssbAeroMissing=[MGW_RADIO_SSB_0550,MGW_RADIO_AERO_0550].flatMap(batch=>{
+  if(!(next.supplierRevisionImports||[]).some(r=>r.batchId===batch.batchId))return [];
+  const batchOffers=next.offers.filter(o=>mgwRadioDtrsOffer0550(o)&&o.quoteEvidence?.sourceId===batch.batchId&&
+   o.quoteEvidence.classification==='RATE'&&Number.isFinite(o.unitCost)&&mgwCurrentMr0550(o).length);
+  if(!batchOffers.length)return [];
+  const needs=batchOffers.some(offer=>{
+   const key=mgwCurrentItemKey0550(offer),id='LINE-MGW-CURRENT-'+key;
+   if(next.lines.some(l=>l.id===id||l.offerId===offer.id))return false;
+   return mgwCurrentMr0550(offer).some(mr=>!next.lines.some(l=>pointsToMr(l,mr)&&l.offerId&&
+    batchOffers.some(o=>o.id===l.offerId)));
+  });
+  return needs?[batch.batchId]:[];
+ });
+ const batches=[...new Set([...pending,...ssbAeroMissing])];
  if(!batches.length)return next;
 
  const policy=policyDefaults0550(policies,'Goods / Procured Cost');
@@ -157,5 +176,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs});
  }
- return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,decision:[decision,...batches.map(applied)].join('\n'),conflicts}};
+ const newlyApplied=batches.filter(id=>!decision.includes(applied(id)));
+ return {...next,lines,mgwDetailPricingImport:{...next.mgwDetailPricingImport,
+  decision:newlyApplied.length?[decision,...newlyApplied.map(applied)].join('\n'):decision,conflicts}};
 }

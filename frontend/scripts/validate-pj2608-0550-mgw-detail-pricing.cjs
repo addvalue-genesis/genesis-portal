@@ -337,5 +337,18 @@ const savedLotC1=appendix.deriveC1Appendix0550({
  bindings:savedLotOwners,scheduleRows:()=>savedLotOwners,getRecord:()=>({nativeFields:{}})
 });
 assert.deepEqual(savedLotC1.rows.filter(r=>r.internalNote===openScopeNote).map(r=>r.sn),['1.1.3','1.1.4','1.1.6']);
+// Re-apply SSB/Aero Working owners when mapped offers exist but APF-03/04 owners were removed.
+const stripIds=new Set(['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].map(k=>'LINE-MGW-CURRENT-'+k));
+const strippedLots={...radioLots,lines:radioLots.lines.filter(l=>!stripIds.has(l.id))};
+assert(!strippedLots.lines.some(l=>stripIds.has(l.id)));
+const repairedLots=activateLots(strippedLots);validate(repairedLots);
+assert.deepEqual(repairedLots.lines.filter(l=>stripIds.has(l.id))
+ .map(l=>[l.id,l.requirementRef,radioSelection.mgwCurrentItemKey0550(repairedLots.offers.find(o=>o.id===l.offerId))]),
+ [['LINE-MGW-CURRENT-RADIO-003','MR-B1-11-APF-03','RADIO-003'],
+  ['LINE-MGW-CURRENT-RADIO-011','MR-B1-11-APF-03','RADIO-011'],
+  ['LINE-MGW-CURRENT-RADIO-012','MR-B1-11-APF-04','RADIO-012'],
+  ['LINE-MGW-CURRENT-RADIO-013','MR-B1-11-APF-04','RADIO-013']]);
+assert.equal(activateLots(repairedLots),repairedLots,'Do not recreate SSB/Aero owners that already exist');
+assert.equal(repairedLots.lines.filter(l=>l.offerId===equipmentOffer.id).length,1,'Leave DTRS owners untouched while repairing SSB/Aero');
 console.log('PASS current MGW DTRS: APF mapping and supplier components, saved Working site repair, two source-bound owners, 11.M/C1 drafts, PAGA exclusion and exact E14 pools.');
-console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, and C1 open-scope notes on 1.1.3/1.1.4/1.1.6.');
+console.log('PASS current MGW SSB/Aero: RADIO-003/011→APF-03, RADIO-012/013→APF-04, C1 open-scope notes on 1.1.3/1.1.4/1.1.6, and missing Working owners re-applied.');
