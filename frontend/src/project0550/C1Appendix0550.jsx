@@ -4,6 +4,8 @@ import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
 import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
+import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
+import {MR_WORKING_CATALOG_0550} from './data/mrWorkingBasis0550';
 
 // Keep the native MR rows in order. In the interactive screen, put a separate
 // package-price block first so an expanded Appendix still reveals its price.
@@ -40,6 +42,11 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
  const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
  const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
  const active=projection.rows.find(r=>r.key===selected)||projection.rows[0];
+ const containedMrIds=active?.mr?MR_WORKING_CATALOG_0550.rows.filter(r=>r.owner===active.mr.id).map(r=>r.id):[];
+ const containedReqs=(view.c1Context?.requirements||[]).filter(r=>containedMrIds.includes(r.id.replace(/^REQDEF-/,'')));
+ const traceCabinetTags=[...new Set([...(active?.requirements||[]),...containedReqs].flatMap(r=>mappedCabinetTags0550(r)))];
+ const draftCabinet=[active?.mr?.id,...containedMrIds].map(draftCabinetTag0550).find(Boolean);
+ const traceCabinetLabel=cabinetTagLabel0550(traceCabinetTags,draftCabinet);
  const navigate=(id,options)=>{if(!disabled)onNavigate?.(id,options);};
  const button=(key,label,component=false)=>documentMode?(component?null:<span>{label}</span>):<button type="button" className={component?'p55-c1-item-toggle':'p55-c1-group-toggle'} aria-expanded={expanded(key,component)} aria-label={label} onClick={()=>toggle(key,component)}><span aria-hidden="true">{expanded(key,component)?'−':'+'}</span>{!component&&<span>{label}</span>}</button>;
  const traceIds=active?Array.from(new Set([...(active.ownerIds||[]),...(active.raws||[]).map(l=>l.id)])):[];
@@ -58,6 +65,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
    <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.quotation.C1"/>
    <label>รายการ C1 ที่ต้องการตรวจ<select aria-label="C1 trace row" value={active?.key||''} onChange={e=>setSelected(e.target.value)}>{projection.rows.map(r=><option key={r.key} value={r.key}>{r.sn} · {r.site} · {r.description}</option>)}</select></label>
    {active&&<><p>{active.mr?.reference||active.description}</p>{active.internalNote&&<p>Working · {active.internalNote}</p>}
+    {traceCabinetLabel&&<p>{traceCabinetLabel}</p>}
     {active.mr?.id.startsWith('MR-B1-11-')&&<button type="button" disabled={disabled} onClick={()=>navigate(RADIO_RELEASE_LOT_0550,{mrId:active.mr.id})}>10.7 · กลับ Release A1-07</button>}
     {active.mr&&<><button type="button" disabled={disabled} onClick={()=>navigate('bid.documents.controlled-source-inventory.mr.page.'+(Number(active.mr.reference.match(/\/\s*p(\d+)/)?.[1]||0)+2))}>CUS · เปิด MR ต้นทาง</button>{(active.mr.canonicalIds||[active.mr.id]).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+id)}>SI-REQ · เปิดข้อกำหนด {active.mr.canonicalIds?id:''}</button>)}</>}
     <button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.step.7')}>SI-WP-07 · Mapping กับ VND</button>

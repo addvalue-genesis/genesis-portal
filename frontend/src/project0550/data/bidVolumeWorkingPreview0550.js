@@ -11,6 +11,7 @@ import {MGW_QUOTE_0550,mgwQuoteItem0550,currentSupplierOffers0550} from './mgwVe
 import {mgwBulkMr0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwRadioDtrsOffer0550,mgwSupplementOpen0550} from './mgwQuoteSelection0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
+import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -43,6 +44,8 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
  const rows=data.lines.map(raw=>{
   const line=working.get(raw.id),reviewed=official.get(raw.id),binding=saved.get(raw.id),shown=display.get(raw.id),mr=catalog.get(raw.mrRequirementId);
   const reqs=[...(byLine.get(raw.id)?.values()||[])];
+  const racks=[...new Set(reqs.flatMap(r=>mappedCabinetTags0550(r,{workLineId:raw.id})))];
+  const cabinetLabel=cabinetTagLabel0550(racks,draftCabinetTag0550(mr?.id));
   const company=Boolean(line?.mrScopeState?.excluded||line?.satelliteScopeState?.excluded),included=Boolean(line?.mrScopeState?.covered);
   const scope=company?'COMPANY':included?'INCLUDED':line?.selected?'SELECTED':'NOT_SELECTED';
   const ownerId=included?line.mrScopeState.owner.id:raw.id,ownerLinkOpen=Boolean(raw.coveredByLineId&&!included&&!company);
@@ -67,7 +70,7 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
    if(!Number.isFinite(reviewed?.customerUSD))reasons.push('ราคา / การทบทวน 10.7 ยัง OPEN');
    reasons.push(...advisories);
   }
-  return {id:raw.id,raw,line,scope,ownerId,ownerLinkOpen,requirements:reqs,mr,customerMapped,binding,shown,advisories,reasons,
+  return {id:raw.id,raw,line,scope,ownerId,ownerLinkOpen,requirements:reqs,mr,customerMapped,binding,shown,advisories,reasons,cabinetLabel,
    workingUSD:scope==='SELECTED'?(Number.isFinite(line.customerUSD)?line.customerUSD:Number.isFinite(line.provisionalCustomerUSD)?line.provisionalCustomerUSD:null):null,
    officialUSD:scope==='SELECTED'&&Number.isFinite(reviewed?.customerUSD)?reviewed.customerUSD:null,
    needsAttention:reasons.length>0};

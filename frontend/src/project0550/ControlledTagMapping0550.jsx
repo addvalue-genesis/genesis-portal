@@ -4,6 +4,7 @@ import {SYSTEMS} from './data';
 import {useBidWorkspace} from './BidWorkspaceContext';
 import {deriveControlledTagMapping0550} from './data/controlledTagMapping0550';
 import {customerTagCatalogue0550,tagCandidatesForRequirement0550} from './data/tagEvidence0550';
+import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
 import {TAG_MAPPING_RULE_VERSION} from '../common/engineering/controlledTagMappingV2';
 import {amount} from './BidControls';
 import {newId} from './data/bidWorkspaceModel';
@@ -80,15 +81,28 @@ export function ControlledTagMapping0550({system='ALL',onNavigate,onOpenSource=o
  </details>;
 }
 
-export function RequirementTagBindings0550({data,requirement,onChange,onOpenSource}){
+function CabinetTagField({label,value,onChange,draftTag}){
+ return <div><label>{label}<input aria-label={label} maxLength={100} value={value||''}
+  onChange={e=>onChange(e.target.value.trim().toUpperCase()||undefined)}/></label>
+  {draftTag&&!value&&<button type="button" onClick={()=>onChange(draftTag)}>ใช้ {draftTag} · CUS Draft</button>}
+ </div>;
+}
+
+export function RequirementCabinetTagNote0550({requirement}){
+ const label=cabinetTagLabel0550(mappedCabinetTags0550(requirement),draftCabinetTag0550(requirement.id));
+ return label?<small>{label}</small>:null;
+}
+
+export function RequirementTagBindings0550({data,requirement,onChange,onCabinetChange,onOpenSource}){
  const catalogue=useMemo(()=>customerTagCatalogue0550(data),[data]),candidates=tagCandidatesForRequirement0550(requirement,catalogue),bindings=requirement.tagBindings||[];
  const offers=currentSupplierOffers0550(data,requirement.systemToken),parents=offers.filter(o=>requirement.offerIds.includes(o.id)),supplierOptions=offers.filter(o=>parents.some(p=>p.id===o.id||o.supplierQuoteRow?.parentOfferId===p.id));
  const set=(id,key,value)=>onChange(bindings.map(b=>b.id===id?{...b,[key]:value}:b));
  const add=t=>onChange([...bindings,{id:newId('TAGMAP'),tag:t.tag,site:t.site,sourceId:t.sourceId,locator:t.locator,excerpt:t.excerpt,quantity:t.quantity,unit:t.unit,offerIds:[],workLineIds:[],vdrlIds:[],basis:'DRAFT / source row reference; verify function, current revision, supplier items and unique ownership.',ruleVersion:TAG_MAPPING_RULE_VERSION}]);
  const multi=(label,value,options,change)=><label>{label}<select aria-label={label} multiple value={value} onChange={e=>change([...e.target.selectedOptions].map(o=>o.value))}>{options.map(o=><option key={o.id} value={o.id}>{o.label||o.description||o.title||o.id}</option>)}</select></label>;
  return <fieldset aria-label="Customer TAG evidence bindings"><legend>รายการลูกค้า ↔ TAG · เก็บใน Mapping เดิม</legend><p>APF/ACP เป็นสถานที่ ไม่ใช่หลักฐานยืนยัน TAG · การอ้างแถวเป็นร่าง ไม่ยืนยันสเปกหรือเปลี่ยนราคา</p>
+  {onCabinetChange&&<CabinetTagField label="Cabinet/Rack TAG · ระดับข้อกำหนด" value={requirement.cabinetTag} onChange={onCabinetChange} draftTag={draftCabinetTag0550(requirement.id)}/>}
   <details><summary>แถว TAG ในเอกสารลูกค้าที่ค้นพบ {candidates.length} รายการ</summary>{candidates.slice(0,150).map(t=><div key={t.id}><strong>{t.site} / {t.tag} · {t.quantity} {t.unit}</strong><p>{t.description}</p><small>{t.revision} · {t.authority} · {t.locator}</small><button type="button" onClick={()=>onOpenSource('bid.documents.source.'+t.sourceId)}>เปิดต้นฉบับ TAG</button><button type="button" disabled={bindings.some(b=>b.sourceId===t.sourceId&&b.tag===t.tag&&b.locator===t.locator)} onClick={()=>add(t)}>อ้างแถวนี้เป็นร่าง TAG</button></div>)}{candidates.length>150&&<p>แสดง150แถวแรก · ระบุ TAG/หลักฐานให้ตรงข้อกำหนด ไม่เลือกจากชื่อคล้ายกันอย่างเดียว</p>}</details>
-  {bindings.map(b=><div className="p55-panel" key={b.id} data-tag-binding={b.id}><strong>{b.site} / {b.tag}</strong><p>{b.quantity} {b.unit} · {b.locator}</p><p style={{whiteSpace:'pre-wrap'}}>{b.excerpt}</p><label>TAG mapping basis<input aria-label="TAG mapping basis" value={b.basis} onChange={e=>set(b.id,'basis',e.target.value)}/></label>{multi('TAG supplier Item IDs',b.offerIds,supplierOptions,v=>set(b.id,'offerIds',v))}{multi('TAG Working references',b.workLineIds,data.lines.filter(l=>requirement.workLineIds.includes(l.id)),v=>set(b.id,'workLineIds',v))}{multi('TAG VDRL document IDs',b.vdrlIds,data.bidVolumes?.vdrl||[],v=>set(b.id,'vdrlIds',v))}<button type="button" onClick={()=>onChange(bindings.filter(x=>x.id!==b.id))}>ลบการเชื่อม TAG นี้</button></div>)}
+  {bindings.map(b=><div className="p55-panel" key={b.id} data-tag-binding={b.id}><strong>{b.site} / {b.tag}</strong><p>{b.quantity} {b.unit} · {b.locator}</p><p style={{whiteSpace:'pre-wrap'}}>{b.excerpt}</p><label>TAG mapping basis<input aria-label="TAG mapping basis" value={b.basis} onChange={e=>set(b.id,'basis',e.target.value)}/></label><CabinetTagField label="Cabinet/Rack TAG ของอุปกรณ์" value={b.cabinetTag} onChange={v=>set(b.id,'cabinetTag',v)}/>{multi('TAG supplier Item IDs',b.offerIds,supplierOptions,v=>set(b.id,'offerIds',v))}{multi('TAG Working references',b.workLineIds,data.lines.filter(l=>requirement.workLineIds.includes(l.id)),v=>set(b.id,'workLineIds',v))}{multi('TAG VDRL document IDs',b.vdrlIds,data.bidVolumes?.vdrl||[],v=>set(b.id,'vdrlIds',v))}<button type="button" onClick={()=>onChange(bindings.filter(x=>x.id!==b.id))}>ลบการเชื่อม TAG นี้</button></div>)}
   {!bindings.length&&<p>ยังไม่มี TAG ที่บันทึกกับรายการนี้ · ใช้ฐานราคาเดิมเตรียมร่างต่อพร้อมตรวจ Mapping ได้</p>}
  </fieldset>;
 }

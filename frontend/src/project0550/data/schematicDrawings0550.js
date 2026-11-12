@@ -1,4 +1,5 @@
 import {supplierItemSourceText0550} from './supplierCostProjection0550';
+import {APF_LAN_CABINET_TAG_0550} from './cabinetTag0550';
 
 const document = (site, family, number, revision, title, place) => ({
  documentNo: `MM-ASK-1A-${site}-TEL-${family}-${number}`, site, revision, title, place,
@@ -35,7 +36,7 @@ const layouts = [
 const control = 'Control Building';
 const controlRoom = 'Instrument & Telecom Room';
 const tags = {
- lan:'APF-LAN-307-351', cctv:'APF-CCTV-317', sat:'APF-SAT-301', dmr:'APF-MR-320',
+ lan:APF_LAN_CABINET_TAG_0550, cctv:'APF-CCTV-317', sat:'APF-SAT-301', dmr:'APF-MR-320',
  radio:'APF-RAD-309', paga:'APF-PAGA-303-351', met:'APF-MET-315', odf:'APF-ODF-300',
 };
 const cabinet = (tag, name, systems, item, contentsDrawing, components) => ({

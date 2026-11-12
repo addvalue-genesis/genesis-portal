@@ -1,4 +1,5 @@
 import {TAG_MAPPING_RULE_VERSION,normalizeTagIdentityV2} from '../../common/engineering/controlledTagMappingV2';
+import {validCabinetTag0550} from './cabinetTag0550';
 const clean=s=>String(s||'').replace(/\s+/g,' ').trim();
 const fields=['id','tag','site','sourceId','locator','excerpt','quantity','unit','offerIds','workLineIds','vdrlIds','basis','ruleVersion'];
 export function validateTagBindings0550(bindings){
@@ -6,7 +7,8 @@ export function validateTagBindings0550(bindings){
  if(!Array.isArray(bindings)||bindings.length>500)throw Error('Invalid customer TAG bindings');
  const ids=new Set();
  for(const b of bindings){
-  if(!b||Object.keys(b).some(k=>!fields.includes(k))||fields.some(k=>b[k]===undefined)||!/^[-\w.]{1,100}$/.test(b.id)||ids.has(b.id)||b.ruleVersion!==TAG_MAPPING_RULE_VERSION)throw Error('Invalid/duplicate/versioned TAG binding');ids.add(b.id);
+  if(!b||Object.keys(b).some(k=>k!=='cabinetTag'&&!fields.includes(k))||fields.some(k=>b[k]===undefined)||!/^[-\w.]{1,100}$/.test(b.id)||ids.has(b.id)||b.ruleVersion!==TAG_MAPPING_RULE_VERSION)throw Error('Invalid/duplicate/versioned TAG binding');ids.add(b.id);
+  if(!validCabinetTag0550(b.cabinetTag))throw Error('Invalid Cabinet/Rack TAG');
   for(const k of ['tag','site','sourceId','locator','excerpt','unit','basis'])if(typeof b[k]!=='string'||b[k].length>12000)throw Error('Invalid TAG evidence text');
   if(!b.tag.trim()||b.tag.length>100||!b.site.trim()||!b.sourceId.trim()||!b.locator.trim()||!b.excerpt.trim()||!b.basis.trim()||!Number.isFinite(b.quantity)||b.quantity<=0||!b.unit.trim())throw Error('Incomplete TAG evidence');
   for(const k of ['offerIds','workLineIds','vdrlIds'])if(!Array.isArray(b[k])||b[k].length>500||b[k].some(id=>typeof id!=='string'||!/^[-\w.]{1,100}$/.test(id))||new Set(b[k]).size!==b[k].length)throw Error('Invalid TAG references');

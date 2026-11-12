@@ -15,6 +15,7 @@ import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,Sup
 import {supplierItemLabel0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0550';
+import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
 const quoteTitle=q=>[q.title,q.fileName,q.revision&&'Rev.'+q.revision,q.hash?.slice(0,8)].filter(Boolean).join(' · ');
@@ -101,10 +102,14 @@ export function VendorOfferGroups0550({data,reviewDate,onEdit,onNavigate,navigat
   const sourceQty=mgwRadioDtrsOffer0550(o)&&e.classification==='OPTION'?'TBD':e?.quotedQuantity??s?.quantity??r?.quantity;
   const sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
+  const mappedRacks=[...new Set((requirementsByOffer.get(o.id)||[]).flatMap(r=>mappedCabinetTags0550(r,{offerId:o.id})))];
+  const draftRack=entry.location?.requirements.map(r=>draftCabinetTag0550(r.id)).find(Boolean);
+  const rackLabel=cabinetTagLabel0550(mappedRacks,draftRack);
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong><SupplierItemSourceText0550 offer={o} data={data}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
+    {rackLabel&&<small>{rackLabel}</small>}
     {usageSystems.length>0&&<small>ระบบที่อ้างใน Mapping / Working: {usageSystems.join(' / ')}</small>}
     <details><summary>รายละเอียด / ต้นฉบับ</summary>
      {r&&<><p>{r.site} · PDF p{r.page} · item {r.sn||r.id}</p>{r.issues.map(x=><p key={x}>{x}</p>)}<p>ยอดรายการในต้นฉบับ {amount(r.extended,'USD')}</p>{o.unitCost!==r.unitCost&&<p>เรตต้นฉบับ {amount(r.unitCost,'USD')} · คงเรตที่บันทึกไว้ในตาราง</p>}</>}
