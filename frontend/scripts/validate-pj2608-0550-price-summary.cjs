@@ -42,7 +42,7 @@ const source=fs.readFileSync(root+'/project0550/BidCommercialWorkspace.jsx','utf
 // The same known amounts must be inspectable in the actual 10.7 table.
 const {releasePricePresentation0550}=require(root+'/project0550/releasePricePresentation0550.js');
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
-const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
+const {RADIO_RELEASE_LOT_0550,releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
 const dmrGroup={code:'A1-11',releaseModuleId:'dmr-lot',customerUSD:null,problems:[],children:[
  {id:'R10',systemToken:'TEL-DMR',customerUSD:120.10},{id:'DISH-ESTIMATE',systemToken:'TEL-DMR',customerUSD:20.20},
@@ -71,11 +71,20 @@ const common=releaseFullBid0550(d,missing,D.SYSTEMS).find(r=>r.token==='COMMON')
 const extra=releaseFullBid0550({...d,lines:[...d.lines,{systemToken:'SYNTHETIC-NEW-SYSTEM'}]},m.provisional,D.SYSTEMS).find(r=>r.token==='SYNTHETIC-NEW-SYSTEM');assert(extra&&extra.bid&&extra.records.length===0,'No fixed 19-system cap hides newly registered scope');
 assert.equal(extra.mrDocuments.length,0,'No MR identity invented for a system without a catalog record');
 const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
-const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,...row})=>row);
+const originals=new Map(rowsBefore.map(row=>[row.key,row]));
+const retained=hierarchy.entries.filter(row=>originals.has(row.key)).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,radioScope,radioPackage,packageChild,nestedOwnerIds,mr,workingLine,externalOwners,...row})=>{
+ const original=originals.get(row.key);
+ if(mr){
+  assert(parents.includes(RADIO_RELEASE_LOT_0550));
+  assert.deepEqual(row.cells.slice(3,5),original.cells.slice(3,5),'An MR row can carry a price directly only when its quantity and unit match');
+  row.cells=[...original.cells.slice(0,3),...row.cells.slice(3)];
+ }
+ return row;
+});
 const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
 assert.deepEqual(canonical(retained),canonical(rowsBefore),'Every projected row, ID, quantity, unit, amount and remark retained exactly once');
 assert.equal(new Set(hierarchy.controls.map(n=>n.key)).size,hierarchy.controls.length,'Unique UI expansion keys');
-assert(!hierarchy.controls.some(node=>node.key==='working:A'||(node.parents[0]==='part:A'&&node.label.includes('Working / package'))),'Part A has no standalone Working/package headings');
+assert(!hierarchy.controls.some(node=>node.key==='working:A'||(node.parents[0]==='part:A'&&node.label.includes('Working / package')&&node.key!==RADIO_RELEASE_LOT_0550+'/unmatched')),'The only Part A package heading is the unresolved A1-07 group');
 assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='mr-category').slice(0,8).map(r=>r.key),['mr:1.1','mr:1.2','mr:1.3','mr:1.4','mr:1.5','mr:1.6','mr:1.7','mr:1.8']);
 assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='group').slice(0,4).map(r=>r.key),['A1-07','A1-08','A1-10','A1-09'],'Actual MR first occurrence puts MF/HF before Aeronautical');
 for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
@@ -85,7 +94,7 @@ for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
 const defaultOpen=new Set(hierarchy.controls.filter(node=>node.defaultOpen).map(node=>node.key));
 const detailRows=hierarchy.entries.filter(row=>row.kind==='line');
 assert(detailRows.some(row=>row.parents[0]==='part:A'));
-assert(detailRows.every(row=>row.parents.every(key=>defaultOpen.has(key))===(row.parents[0]==='part:A')),'Part A shows details by default and Parts B/C retain their defaults');
+assert(detailRows.every(row=>row.parents.every(key=>defaultOpen.has(key))===(row.parents[0]==='part:A'&&!row.parents.includes(RADIO_RELEASE_LOT_0550+'/unmatched'))),'Part A scope is expanded by default, with unmatched A1-07 packages collapsed. Parts B/C retain their defaults.');
 assert.equal(hierarchy.entries.filter(r=>r.moduleId==='bid.budget.release.customer.A1-11').length,1,'Cross-appendix Microwave/Tower has one Lot amount/ID');
 assert(hierarchy.entries.some(r=>r.kind==='mr-system'&&r.lotModuleId==='bid.budget.release.customer.A1-11'&&r.parents.includes('mr:1.5')),'Microwave detail remains under its actual Appendix 1.5');
 const sparseLines=new Set(m.provisional.lines.filter(line=>['A1-05','A1-11'].includes(line.customerRowCode)).map(line=>line.id));
