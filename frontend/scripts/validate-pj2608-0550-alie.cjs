@@ -12,8 +12,10 @@ require.extensions['.js']=require.extensions['.jsx']=(module,file)=>file.startsW
 
 const intake=require(root+'/project0550/data/alieIntake0550.js');
 const {deriveBidWorkspace,emptyBidWorkspace,validateBidWorkspace}=require(root+'/project0550/data/bidWorkspaceModel.js');
-const {COMMERCIAL_POLICY}=require(root+'/project0550/data.js');
-const {scheduleAllocationPlan0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
+const {COMMERCIAL_POLICY,SYSTEMS}=require(root+'/project0550/data.js');
+const {deriveBidVolumeWorkingPreview0550,scheduleAllocationPlan0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
+const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550.js');
+const {officialLineBasisKey}=require(root+'/project0550/data/officialPricing0550.js');
 const {planVendorRegister0550}=require(root+'/project0550/data/vendorRegister0550.js');
 const {vendorRegisterFixture0550}=require('./fixtures/0550-vendor-register.cjs');
 const systems=['TEL-PAGA'];
@@ -94,7 +96,7 @@ const {draft}=draftFor(direct,sourceRow);
 assert.equal(draft.offerId,quote.id);
 assert.equal(draft.quantity,1);
 assert.equal(draft.customerRowCode,'A1-05');
-assert.deepEqual([draft.sellMode,draft.markupPct,draft.primePct],['MARKUP',50,20]);
+assert.deepEqual([draft.sellMode,draft.markupPct,draft.primePct],['MARKUP',25,20]);
 const priceRow={id:'LINE-ALIE-QA',calculationId:'',resultKey:'value',manualCost:null,sellRate:null,marginPct:null,selected:true,...draft};
 const save=(data,row=priceRow)=>intake.saveAlieWorkingDraft0550(data,row,draft,COMMERCIAL_POLICY,date);
 const working=save(direct);
@@ -109,14 +111,26 @@ assert(draftFor(direct,{...sourceRow,offer:{...sourceRow.offer,unitCost:101}}).r
 const priced=deriveBidWorkspace(working,systems,date);
 const line=priced.lines.find(line=>line.id===priceRow.id);
 assert.deepEqual([line.provisionalCostNative,line.provisionalSellNative,line.provisionalCustomerNative,line.provisionalCustomerUSD],
- [100,150,180,205.71]);
+ [100,125,150,171.43]);
 assert.equal(priced.official.lines.find(row=>row.id===priceRow.id).customerUSD,null);
 const draftAllocation=scheduleAllocationPlan0550(working,{unallocated:[line]})[0].proposal;
 assert.equal(draftAllocation.schedule,'C1');
 assert.match(draftAllocation.basis,/Vendor TAG/);
 const vendorUpdated={...working,offers:working.offers.map(o=>o.id===quote.id?{...o,unitCost:110}:o)};
 const repriced=deriveBidWorkspace(vendorUpdated,systems,date).lines.find(l=>l.id===priceRow.id);
-assert.equal(repriced.provisionalCustomerNative,198,'Saved Working owner reads the current Vendor rate');
+assert.equal(repriced.provisionalCustomerNative,165,'Saved Working owner reads the current Vendor rate');
+
+const oldOwner={...priceRow,markupPct:50,primePct:5};
+const serviceOwner={...oldOwner,id:'PAGA-SERVICE',wbs:'B4',customerRowCode:'B4'};
+const spareOwner={...oldOwner,id:'PAGA-SPARE',wbs:'C3',customerRowCode:'C3'};
+const unselectedOwner={...oldOwner,id:'PAGA-UNSELECTED',selected:false};
+const existing={...direct,lines:[oldOwner,serviceOwner,spareOwner,unselectedOwner]};
+const migrated=applyDirectSupplierMarkup0550(existing);
+assert.deepEqual(migrated.lines,[priceRow,serviceOwner,spareOwner,unselectedOwner]);
+assert.equal(migrated.offers,existing.offers);
+assert.equal(migrated.fx,existing.fx);
+assert.equal(applyDirectSupplierMarkup0550(migrated),migrated);
+assert.notEqual(officialLineBasisKey(existing,oldOwner),officialLineBasisKey(migrated,migrated.lines[0]));
 
 const service=structuredClone(source);
 service.offers[0].unit='MD';
@@ -147,7 +161,6 @@ console.log('PASS ALIE Working: live Vendor cost, E11 and E13, single cost owner
 if(process.env.GENESIS_ALIE_TEST_PAGA005){
  const {pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaIncludedKit0550,pagaIncludedScope0550}=
   require(root+'/project0550/data/supplierRevision0550.js');
- const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550.js');
  const original=JSON.parse(fs.readFileSync(process.env.GENESIS_ALIE_TEST_PAGA005,'utf8'));
  const actual=planVendorRegister0550({...empty,fx:direct.fx},original,systems).workspace;
  const net=pagaRevisionCandidate0550(actual);
@@ -156,18 +169,24 @@ if(process.env.GENESIS_ALIE_TEST_PAGA005){
  assert.match(pagaIncludedScope0550(actual,net),/25010/);
  assert.doesNotMatch(pagaIncludedScope0550(actual,net),/18020/);
  assert.equal(pagaRevisionSelected0550(actual),null,'Receipt does not change Working selection');
- const owner={...priceRow,offerId:net.id,vendorId:net.vendorId,quantity:1,unit:'Lot',sourceRef:net.sourceRef,markupPct:0};
+ const owner={...priceRow,offerId:net.id,vendorId:net.vendorId,quantity:1,unit:'Lot',sourceRef:net.sourceRef,markupPct:50,primePct:5};
  const selected=applyDirectSupplierMarkup0550({...actual,lines:[owner]});
  const actualModel=deriveBidWorkspace(selected,systems,date);
  const pricedNet=actualModel.lines[0];
  const round=require(root+'/project0550/data/money0550.js').roundMoney0550;
  assert.equal(pricedNet.provisionalCostNative,net.unitCost);
- assert.equal(pricedNet.provisionalSellNative,round(net.unitCost*1.5));
- assert.equal(pricedNet.provisionalCustomerNative,round(net.unitCost*1.5*1.2));
+ assert.equal(pricedNet.provisionalSellNative,round(net.unitCost*1.25));
+ assert.equal(pricedNet.provisionalCustomerNative,round(net.unitCost*1.25*1.2));
+ const releaseRow=actualModel.provisional.schedule.find(row=>row.code==='A1-05').children.find(row=>row.id===owner.id);
+ assert.equal(releaseRow.customerUSD,pricedNet.provisionalCustomerUSD);
+ const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
+ const saved=deriveBidVolumes0550(selected,actualModel,SYSTEMS,date);
+ const preview=deriveBidVolumeWorkingPreview0550(selected,actualModel,SYSTEMS,date,saved);
+ assert.equal(preview.scheduleRows('C1').find(row=>row.lineId===owner.id).amount,releaseRow.customerUSD);
  const conflict={...selected,lines:[...selected.lines,{...selected.lines[0],id:'LINE-NET-TWICE',scopeKey:'NET-TWICE'}]};
  assert(deriveBidWorkspace(conflict,systems,date).lines.every(line=>
   line.problems.some(problem=>problem.startsWith('PAGA_NET_COST_OWNER_DUPLICATE'))&&line.provisionalCustomerUSD===null));
- console.log('PASS private INDUSTRONIC -005 register: one discounted NET owner, E11 +50%, E13 +20%, and correct included C2 kit.');
+ console.log('PASS private INDUSTRONIC -005 register: one discounted NET owner, E11 +25%, E13 +20%, and correct included C2 kit.');
 }
 if(process.env.GENESIS_ALIE_TEST_LAYOUT){
  const actual=parseQuotedTable(fs.readFileSync(process.env.GENESIS_ALIE_TEST_LAYOUT,'utf8'));

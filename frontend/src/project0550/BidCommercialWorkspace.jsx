@@ -6,7 +6,7 @@ import {APF_LAN_BID_BASIS_0550,mgwCurrentOffer0550,mgwReplacementActive0550,MGW_
 import {isTowerSourceItem0550,towerC1Reference0550,towerSourceScope0550,TOWER_C1_0550,TOWER_LIS_0550,TOWER_MR_0550} from "./data/towerTenderScope0550";
 import {ControlledTagMapping0550} from './ControlledTagMapping0550';
 import {WorkingLineSource0550,WorkingRequirementTrace0550,WorkingQuoteBasis0550,workingRequirementIndex0550} from './WorkingLineTrace0550';
-import {bidCompletionBasisChanged0550,directSupplierMarkup0550} from "./data/bidCompletion0550";
+import {bidCompletionBasisChanged0550,directSupplierSellBasis0550} from "./data/bidCompletion0550";
 import {deriveBidProcess0550} from "./data/bidProcess0550";
 import {SupplyProposalDraftFields0550} from "./SupplyProposalDraft0550";
 import {BidKnownPrices0550,BidKnownPriceHeadline0550} from "./BidKnownPrices0550";
@@ -93,10 +93,14 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  const spareEstimate=model.provisional.lines.find(l=>l.id===form.id&&l.spareBudget);
  const [basisChoice,setBasisChoice]=useState("");
  const [roleChoice,setRoleChoice]=useState("");
+ const sourceSellBasis=form.selected&&!form.coveredByLineId&&form.responsibility!=='COMPANY'?
+  directSupplierSellBasis0550(data,form,chosenOffer):null;
+ const appendix14SellBasis=sourceSellBasis?.primePct!=null?sourceSellBasis:null;
+ const sellInputs=appendix14SellBasis||form;
  const fromAlie=!initialForm.id&&initialForm.scopeKey.startsWith('ALIE / ');
  const save=async e=>{
   e.preventDefault();
-  const row={...form,id:form.id||newId("LINE")};
+  const row={...form,...appendix14SellBasis,id:form.id||newId("LINE")};
   if(reviewSave){
    row.officialReview={...(row.officialReview||blankOfficialReview())};
    row.officialReview.basisKey=officialLineBasisKey(data,row,row.officialReview);
@@ -111,8 +115,8 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  <p>รายการปลายทาง: <strong>{form.customerRowCode||"ยังไม่เลือก"}</strong> · รับค่าเริ่มต้นจากฐานโครงการ แล้วตรวจรายละเอียดของรายการก่อนบันทึก</p>
  {spareEstimate&&<p className="p55-callout">วงเงินอะไหล่ Working Preview {amount(spareEstimate.costRate)} ต่อ Lot จาก {spareEstimate.spareBudget.rate*100}% × ต้นทุน Part A ที่มีราคา {amount(spareEstimate.spareBudget.basisTHB)} · ช่อง Manual unit cost ด้านล่างแสดงค่าที่บันทึกเดิม · รอรายการ OEM และตรวจส่วนที่รวมในแพ็กเกจ</p>}
  {form.systemToken==="TEL-DMR"&&/^REQ-MR-B1-15-(APF|ACP)-0[12]$/.test(form.id)&&<DmrTagCost0550 data={data} integration={model.integration} working={model.provisional} lineId={form.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/>}
- <div className="p55-bid-fields"><Select label="Project pricing basis" value={basisChoice} onChange={setBasisChoice} options={[["","เลือกฐานเดิม"],["Goods / Procured Cost","Goods · นโยบายอุปกรณ์เดิม"],["Professional Service","Professional Service · นโยบายบริการเดิม"]]}/><button type="button" disabled={!basisChoice} onClick={()=>setForm(f=>applyPolicyDraft0550(f,COMMERCIAL_POLICY,basisChoice))}>ใช้ฐานราคากับรายการนี้</button>
- <Select label="Project resource role" value={roleChoice} onChange={setRoleChoice} options={[["","เลือกบทบาทจาก 06"],...CORE_TEAM.map(r=>[r.role,r.role+" · "+r.protectedUsdDay+" USD/MD"]) ]}/><button type="button" disabled={!roleChoice||Boolean(chosenOffer&&(chosenOffer.currency!=="USD"||chosenOffer.unit!=="MD"))||Boolean(!chosenOffer&&form.manualCost!=null&&(form.currency!=="USD"||form.unit!=="MD"))} onClick={()=>setForm(f=>applyRoleDraft0550(f,CORE_TEAM.find(r=>r.role===roleChoice),chosenOffer))}>ใช้เรตขายจาก 06</button></div>
+ <div className="p55-bid-fields"><Select label="Project pricing basis" value={basisChoice} onChange={setBasisChoice} options={[["","เลือกฐานเดิม"],["Goods / Procured Cost","Goods · นโยบายอุปกรณ์เดิม"],["Professional Service","Professional Service · นโยบายบริการเดิม"]]}/><button type="button" disabled={!basisChoice||Boolean(appendix14SellBasis)} onClick={()=>setForm(f=>applyPolicyDraft0550(f,COMMERCIAL_POLICY,basisChoice))}>ใช้ฐานราคากับรายการนี้</button>
+ <Select label="Project resource role" value={roleChoice} onChange={setRoleChoice} options={[["","เลือกบทบาทจาก 06"],...CORE_TEAM.map(r=>[r.role,r.role+" · "+r.protectedUsdDay+" USD/MD"]) ]}/><button type="button" disabled={!roleChoice||Boolean(appendix14SellBasis)||Boolean(chosenOffer&&(chosenOffer.currency!=="USD"||chosenOffer.unit!=="MD"))||Boolean(!chosenOffer&&form.manualCost!=null&&(form.currency!=="USD"||form.unit!=="MD"))} onClick={()=>setForm(f=>applyRoleDraft0550(f,CORE_TEAM.find(r=>r.role===roleChoice),chosenOffer))}>ใช้เรตขายจาก 06</button></div>
  <p>เรตขายบุคลากรใช้ USD/MD; ถ้า Quote หรือต้นทุนที่กรอกไว้เป็นสกุลเงินหรือหน่วยอื่น ให้ตรวจฐานให้ตรงก่อน · ปุ่มใช้ฐานเปลี่ยนเฉพาะร่างรายการนี้ ยังไม่บันทึกหรืออนุมัติ</p>
  <div className="p55-bid-fields"><Select label="Line system" value={form.systemToken} onChange={v=>setForm(f=>({...f,systemToken:v,satelliteScope:"OPEN",scopeBasis:""}))} options={[["COMMON","COMMON / shared scope"],...SYSTEMS.map(s=>[s.token,s.name])]}/><Select label="Cost owner WBS" value={form.wbs} onChange={v=>setForm(f=>{const {commissioningPhase,...line}=f;return v==='B5'?{...f,wbs:v}:{...line,wbs:v};})} options={wbsOptions}/>
  {form.wbs==='B5'&&<Select label="C2 commissioning phase" value={commissioningPhase0550(form)} onChange={v=>setForm(f=>{const {commissioningPhase,...line}=f;return v?{...line,commissioningPhase:v}:line;})} options={[["","OPEN · เลือกช่วงงาน"],...COMMISSIONING_PHASES_0550.map(p=>[p.id,p.title])]}/>}
@@ -131,9 +135,9 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
     if(pagaRevisionNet0550(old)&&line.description.includes(old.quoteRef))next.description=line.description.replace(old.quoteRef,offer.quoteRef);
     next.sourceRef=offer.sourceRef+' / '+pagaIncludedScope0550(data,offer);
    }
-   const markupPct=directSupplierMarkup0550(data,next,offer);
-   return markupPct===null?next:{...next,sellMode:"MARKUP",sellRate:null,marginPct:null,markupPct,
-    primePct:next.primePct??policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost")?.primePct??null};
+   const sellBasis=directSupplierSellBasis0550(data,next,offer);
+   return sellBasis?{...next,primePct:next.primePct??policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost")?.primePct??null,
+    ...sellBasis}:next;
   });
  }} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)&&
   (o.id===form.offerId||!o.id.startsWith('OFFER-PAGA-A20261632')||!o.supplierQuoteRow||pagaRevisionNet0550(o)||
@@ -145,9 +149,11 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  {mgwExcluded&&<p className="p55-callout">{mgwHistoricalLine0550(data,form,chosenOffer)?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550}</p>}
  {mgwProjectWideConflict&&<p className="p55-callout">{MGW_PROJECT_WIDE_SERVICE_0550}</p>}
  {mgwGroup&&<p>ราคาชุด {mgwGroup.id} · 1 Lot / USD จาก Offer ต้นทาง {mgwGroup.rowIds.length} รายการ · แก้เรตที่ Vendor Offer; เปลี่ยนการเลือกและนโยบายขายได้ด้านล่าง · ยังไม่ยืนยันว่าครบ MR</p>}
- <Select label="Selling method" value={form.sellMode} onChange={v=>field("sellMode",v)} options={[["DIRECT","E10 · Direct selling rate"],["MARKUP","E11 · Cost + markup"],["MARGIN","E12 · Target gross margin"]]}/>
- {form.sellMode==="DIRECT"?<Field label="ADDVALUE sell rate per unit" type="number" min="0" step="any" value={form.sellRate} onChange={v=>field("sellRate",v)}/>:form.sellMode==="MARKUP"?<Field label="Markup percent" type="number" min="0" step="any" value={form.markupPct} onChange={v=>field("markupPct",v)}/>:<Field label="Margin percent" type="number" min="0" max="99.9999" step="any" value={form.marginPct} onChange={v=>field("marginPct",v)}/>}
- <Field label="Prime markup percent" type="number" min="0" step="any" value={form.primePct} onChange={v=>field("primePct",v)}/></div>
+ {appendix14SellBasis?<Field label="Selling method" value="E11 · Cost + markup" readOnly/>:
+  <Select label="Selling method" value={form.sellMode} onChange={v=>field("sellMode",v)} options={[["DIRECT","E10 · Direct selling rate"],["MARKUP","E11 · Cost + markup"],["MARGIN","E12 · Target gross margin"]]}/>}
+ {sellInputs.sellMode==="DIRECT"?<Field label="ADDVALUE sell rate per unit" type="number" min="0" step="any" value={form.sellRate} onChange={v=>field("sellRate",v)}/>:sellInputs.sellMode==="MARKUP"?<Field label="Markup percent" type="number" min="0" step="any" readOnly={Boolean(appendix14SellBasis)} value={sellInputs.markupPct} onChange={v=>field("markupPct",v)}/>:<Field label="Margin percent" type="number" min="0" max="99.9999" step="any" value={form.marginPct} onChange={v=>field("marginPct",v)}/>}
+ <Field label="Prime markup percent" type="number" min="0" step="any" readOnly={Boolean(appendix14SellBasis)} value={sellInputs.primePct} onChange={v=>field("primePct",v)}/>
+ {appendix14SellBasis&&<small>MR Appendix 1.4 · ADDVALUE +{appendix14SellBasis.markupPct}% → SAMTEL +{appendix14SellBasis.primePct}%</small>}</div>
  <SupplyProposalDraftFields0550 data={data} line={form} onNavigate={onNavigate} onChange={draft=>setForm(f=>{const next={...f};if(draft===undefined)delete next.supplyDraft;else next.supplyDraft=draft;return next;})}/>
  {mrRequirement?.componentReview&&<fieldset><legend>MR component breakdown</legend>
   <p>{mrRequirement.componentReview.status}</p><MrWorkingComponents0550 requirement={mrRequirement}/>

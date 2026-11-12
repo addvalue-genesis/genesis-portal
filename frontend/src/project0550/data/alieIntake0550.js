@@ -3,7 +3,7 @@ import {VENDOR_REGISTER_SCHEMA_0550,vendorWorkingRateReference0550} from './vend
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {safeSourceUrl} from './sourceIntakeModel';
 import {workingOffers0550,activeSupply0550} from './workingOffers0550';
-import {bidCompletionSourceUsages0550,directSupplierMarkup0550} from './bidCompletion0550';
+import {bidCompletionSourceUsages0550,directSupplierSellBasis0550} from './bidCompletion0550';
 import {applyPolicyDraft0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {suggestedCustomerCode} from './officialPricing0550';
 import {mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550} from './mgwVendorBasis0550';
@@ -196,9 +196,9 @@ export function alieWorkingDraft0550(data,{offer,atom,working,allocated},policie
  draft.customerRowCode=({B8:'B1',B9:'B4'})[wbs]||suggestedCustomerCode(draft);
  if(ceragonSupersededOffer0550(data,offer.id)||mgwWorkingLineExcluded0550(data,draft,offer)||mgwProjectWideLineConflict0550(draft,offer))
   return {reason:'OPEN · ขอบเขตหรือฉบับใบเสนอราคาที่ใช้งานต้องตรวจใน 07.2'};
- const markupPct=directSupplierMarkup0550(data,draft,offer);
- if(markupPct!==null){
-  draft={...draft,sellMode:'MARKUP',markupPct,primePct:policyDefaults0550(policies,'Goods / Procured Cost')?.primePct??null};
+ const sellBasis=directSupplierSellBasis0550(data,draft,offer);
+ if(sellBasis){
+  draft={...draft,primePct:policyDefaults0550(policies,'Goods / Procured Cost')?.primePct??null,...sellBasis};
  }else if(['A','B5','B6','C2','C3'].includes(wbs)){
   draft=applyPolicyDraft0550(draft,policies,'Goods / Procured Cost');
  }else if(service){

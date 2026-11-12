@@ -8,6 +8,12 @@ Working Preview in Volume I uses a compatible Vendor schedule tag for an unalloc
 
 PAGA Working A1-05 can select INDUSTRONIC A20261632-005 as one discounted NET Lot on the existing owner. Choosing the Offer applies the project direct-supplier E11 markup and uses the recorded Prime rate, with the project goods default when no Prime rate is entered. Registering the quotation leaves the existing selected revision in place until the Working owner is edited. Item 25010 is the commissioning kit for -005. The included kit in -002/-003 remains Item 18020. Included quote detail stays non-additive.
 
+## PAGA Appendix 1.4 selling policy
+
+12 November 2026 · Follow-up to `ea134091`. The selected INDUSTRONIC Part A owner under A1-05 uses ADDVALUE 25% markup on its sourced cost (E11) and SAMTEL 20% markup on the ADDVALUE sell price (E13). The customer price is 1.50 times the sourced cost before currency conversion and rounding. The policy applies in the Working editor, on offer selection, at startup and when saving live Working. The existing offer, quantity, FX, Volume I binding and issue snapshots retain their own records. The earlier scope notes and checks below describe the initial Vendor intake implementation.
+
+The change follows ADR-0550-001 principles 2, 5 and 8–11. The ALIE regression verifies migration from the earlier selling basis, idempotence, scope isolation and an updated Official review fingerprint. The private -005 check verifies the single NET owner and the common Working, draft Release and C1 amount. Source costs stay on the existing Offer. Official issue review follows the existing controls.
+
 ## Checks and scope
 
 - ADR-0550-001 principles 2–6 and 8–13 guided the separation of quoted facts from working scope, one financial owner, transparent OPEN items, direct source trace, revision review and preserved issue history.

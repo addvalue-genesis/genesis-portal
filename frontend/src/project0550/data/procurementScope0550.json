@@ -5,6 +5,7 @@
   "contractor": "ADDVALUE",
   "procurementOwner": "ADDVALUE",
   "directSupplierMarkupPct": 50,
+  "pagaAppendix14Pricing": {"customerRowCode": "A1-05", "markupPct": 25, "primePct": 20},
   "systemLabels": {
     "TEL-DMR": "DMR · Digital Microwave Radio + WBB",
     "TEL-RADIO-DTRS": "DTRS · VHF Trunked Radio"

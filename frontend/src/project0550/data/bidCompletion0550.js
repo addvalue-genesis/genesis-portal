@@ -62,36 +62,43 @@ const directMarkupSystems=new Map(procurement.directProcurement.flatMap(system=>
  system.suppliers.filter(supplier=>supplier.useDirectMarkup).flatMap(supplier=>
   supplier.vendorIds.map(id=>[id,system.quotedSystemToken]))));
 
-export function directSupplierMarkup0550(data,line,offer){
+const directSellBasis={
+ sellMode:'MARKUP',markupPct:procurement.directSupplierMarkupPct,marginPct:null,sellRate:null,
+};
+
+export function directSupplierSellBasis0550(data,line,offer){
  const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
  const matchesSystem=directSystem&&(directSystem===line.systemToken||
   line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
- if(matchesSystem&&offer.vendorId===line.vendorId&&finite(offer.unitCost)&&
-  (!offer.supplierQuoteRow||offer.supplierQuoteRow.classification==='NET_PACKAGE')&&
-  !(offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data)))return procurement.directSupplierMarkupPct;
- return null;
+ if(!matchesSystem||offer.vendorId!==line.vendorId||!finite(offer.unitCost)||
+  (offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=='NET_PACKAGE')||
+  (offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data)))return null;
+ const {customerRowCode,markupPct,primePct}=procurement.pagaAppendix14Pricing;
+ if(line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&line.customerRowCode===customerRowCode){
+  return {...directSellBasis,markupPct,primePct};
+ }
+ return directSellBasis;
 }
 
-// Apply the approved selling basis to the active cost owner. Original offer
-// prices, quantities and the downstream prime rate remain the existing inputs.
+// Apply the commercial policy to the live cost owner and retain the input
+// records used to calculate the sourced cost.
 export function applyDirectSupplierMarkup0550(data){
- const markupPct=procurement.directSupplierMarkupPct;
  const receipt=data.repositoryBasisImport?.bidCompletion;
  const rowsByLine=new Map((receipt?.rows||[]).map(row=>[row.lineId,row]));
  const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
  const changed=new Map();
  const lines=data.lines.map(line=>{
   if(!line.selected||line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
-  if(line.sellMode==='MARKUP'&&line.markupPct===markupPct&&line.sellRate===null&&line.marginPct===null)return line;
   const offer=offers.get(line.offerId),row=rowsByLine.get(line.id);
-  const direct=directSupplierMarkup0550(data,line,offer)!==null;
+  const direct=directSupplierSellBasis0550(data,line,offer);
   // Allocated Master Tower items have one THB cost owner even when the
   // activity is recorded under COMMON. Mixed estimates retain their own basis.
   const allocated=!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
    row.offerIds.every(id=>isTowerSourceItem0550(offers.get(id))&&directMarkupSystems.get(offers.get(id).vendorId)==='TEL-TELT')&&
    row.inputKey===lineKey(data,line)&&row.sourceKey===sourceKey(data,row.offerIds);
-  if(!direct&&!allocated)return line;
-  const updated={...line,sellMode:'MARKUP',markupPct,marginPct:null,sellRate:null};
+  const sellBasis=direct||(allocated?directSellBasis:null);
+  if(!sellBasis||Object.entries(sellBasis).every(([field,value])=>line[field]===value))return line;
+  const updated={...line,...sellBasis};
   changed.set(line.id,{previous:line,updated});
   return updated;
  });
