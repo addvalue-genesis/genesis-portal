@@ -67,6 +67,7 @@ export function LazyNativeExhibitC0550(props){
 export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,c2Scope,onPrepareSpare,disabled=false,mrNavigationTarget}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
+ const [c8LoadMessage,setC8LoadMessage]=useState('');
  const ws=useBidWorkspace();
  const references=useMemo(()=>{
   if(!['C2','C3','C4'].includes(id)||!view.workingPreview||!c2Scope)return undefined;
@@ -101,6 +102,16 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled} mrNavigationTarget={mrNavigationTarget}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {c8Estimate?.count>0&&<p>ยอดประมาณการ Call-off ตามประเทศ · {currency} {money(c8Estimate.count===C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length?c8Estimate.totalUSD:null)} · เรียกใช้ตามอนุมัติ แยกจากยอด A1 และ A2</p>}
+  {id==='C8'&&view.workingPreview&&!c8Estimate?.count&&ws?.importC8Calloff&&<div className="p55-panel" aria-label="C8 price data">
+   <p>ยังไม่มีราคา Call-off รายประเทศใน Working หาก Drive ยังไม่ซิงก์ ให้เลือกไฟล์ราคาโครงการจาก DATA เพื่อโหลดเฉพาะ C8</p>
+   <label>โหลดไฟล์ราคา C8 <input type="file" accept=".json,application/json" disabled={disabled||ws.busy} onChange={async e=>{
+    const input=e.currentTarget;
+    const file=input.files?.[0];
+    input.value='';
+    if(file)setC8LoadMessage(await ws.importC8Calloff(file));
+   }}/></label>
+   {c8LoadMessage&&<p role="status">{c8LoadMessage}</p>}
+  </div>}
   {id==='C2'&&view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference · {SPARE_DRAFT_NOTE_0550} · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}
   {toolDrafts.length>0&&<details className="p55-panel" open><summary>SI · Special Tools ตามระบบใน Working (Draft · {toolDrafts.length} ประเภท)</summary>

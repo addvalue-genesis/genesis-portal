@@ -34,7 +34,7 @@ import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
 import {prepareMgwCctvEntBudget0550} from "./data/mgwCctvEntBudget0550";
 import {prepareVersedDmrCabinet0550} from "./data/versedRack0550";
-import {fetchC8Calloff0550} from "./data/c8Calloff0550";
+import {fetchC8Calloff0550,readC8CalloffFile0550} from "./data/c8Calloff0550";
 import {prepareC8Calloff0550} from "./data/bidVolumes0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
@@ -80,7 +80,7 @@ export function BidWorkspaceProvider({children}){
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
    const c8=await c8Request;
    const prepared=prepareQuotation0550(prepareC8Calloff0550(processed,c8?.error?null:c8,reviewDate),reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts / "+prepared.mgwQuoteImport.version);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts"+(prepared.mgwQuoteImport?.version?" / "+prepared.mgwQuoteImport.version:""));
    setData(current);setError(c8?.error?'C8 · '+c8.error:"");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
@@ -165,6 +165,19 @@ export function BidWorkspaceProvider({children}){
   }
  }
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
+ async function importC8Calloff(file){
+  if(!file||!data)return '';
+  if(lock.current)return 'Workspace กำลังโหลดข้อมูล · ลองเลือกไฟล์อีกครั้ง';
+  try{
+   const pack=await readC8CalloffFile0550(file);
+   const next=prepareC8Calloff0550(data,pack,reviewDate);
+   if(next===data)return 'ไม่มีรายการ C8 ที่เพิ่มได้ · ตรวจรายการเดิมใน 11.M';
+   const saved=await change(()=>next,"Import purchaser call-off Working drafts / "+pack.revision);
+   return saved?'โหลดราคา C8 '+pack.revision+' แล้ว':'บันทึกราคา C8 ไม่สำเร็จ · ตรวจข้อความของ Workspace';
+  }catch{
+   return 'ไฟล์ราคา C8 ไม่ถูกต้อง · เลือกไฟล์ PJ2608-0550_C8_CallOff.json';
+  }
+ }
  async function importFile(file){if(!file)return;try{if(file.size>64*1024*1024)throw Error("Workspace exceeds 64 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>{const releaseRegister=mergeReleaseRegister0550(current.releaseRegister,imported.releaseRegister);return {...imported,...(current.bidVolumes&&!imported.bidVolumes?{bidVolumes:current.bidVolumes}:{}),revision:current.revision,audit:current.audit,...(releaseRegister?{releaseRegister}:{})};},"Import reviewed 0550 workspace backup / merge frozen history");}catch(e){setError(e.message);}}
- return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync,vendorSync}}>{children}</Context.Provider>;
+ return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,importC8Calloff,reviewDate,sourceSync,vendorSync}}>{children}</Context.Provider>;
 }
