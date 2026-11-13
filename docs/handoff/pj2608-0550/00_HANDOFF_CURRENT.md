@@ -1,3 +1,5 @@
+Latest CCTV estimate: [Goods Only / EXW budget](20261113_CCTV_EXW_BUDGET.md). The estimate prices OEM SAT travel, APF/ACP recording, VMS entitlements and the Yangon-to-site responsibility scenario. The Excel and Git checkpoint record the draft calculation.
+
 Latest PAGA display: [Appendix 1.4 supplier cost detail](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--appendix-14-supplier-cost-detail). The 11.C1 Working Preview shows original EUR costs directly below the PAGA package and identifies the revision selected in A1-05.
 
 Latest FOC and Cables update: [LAY/PHI pricing and CDL-024](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--focbulk-lay-budget). Appendix 1.8 uses existing MR Working owners, including CAT6A under A1-01. The pipeline physical installation is an A2 draft. Volume I shows shared-scope estimates for reconciliation against the project owners.
