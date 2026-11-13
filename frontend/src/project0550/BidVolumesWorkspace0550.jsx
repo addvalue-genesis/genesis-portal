@@ -261,6 +261,18 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
     <><button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+row.ownerId)}>{row.ownerId}</button>
      <small>{row.source} · {row.funded?'Included in the Working owner':'Working price OPEN'}</small></>,
    ])}/>}
+ {volume==='I'&&cctvEntBudgetVisible(panel,'C7')&&displayView.entertainmentSiteBudget&&
+  <section aria-label="Entertainment APF site labour">
+   <p className="p55-note"><strong>Entertainment APF · ADDVALUE ทำ SAT</strong> · MGW จัดหาอุปกรณ์ EXW จีน
+    แผน 3 MOB ให้ตรวจปริมาณและต้นทุนที่งบร่วมครอบคลุมก่อนลงส่วนเพิ่ม</p>
+   {displayView.entertainmentSiteBudget.legacyEstimateSelected&&
+    <p className="p55-note">ตรวจรายการ MGW OEM SAT ที่ยังถูกเลือกใน Working ก่อนจัดสรรค่าแรง ADDVALUE</p>}
+   <Grid label="Entertainment APF · existing ADDVALUE site budget" heads={['งาน','Working owner','ฐานราคา']}
+    rows={displayView.entertainmentSiteBudget.owners.map(({id,description,priced})=>[
+     description,<button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+id)}>{id}</button>,
+     priced?'มีราคาขายในงบร่วม':'ราคางบร่วม OPEN',
+    ])}/>
+  </section>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
  {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping','preview'].includes(panel))||

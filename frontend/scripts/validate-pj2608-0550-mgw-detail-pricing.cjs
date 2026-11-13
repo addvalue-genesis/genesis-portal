@@ -714,9 +714,42 @@ if(process.env.PJ0550_MGW_CCTV_ENT_REGISTER){
  const own=code=>budgetView.scheduleRows(code).filter(b=>b.lineId.startsWith(prefix));
  assert.equal(own('C2').length,6);
  assert.equal(own('C6').length,2);
- assert.equal(own('C7').length,2);
  assert.deepEqual(own('C7').map(b=>[b.line.systemToken,b.unit,b.quantity,b.amount,b.line.markupPct,b.line.contingencyPct,b.line.primePct]),
-  [['TEL-CCTV','MH',40,5280,10,null,20],['TEL-ES','MH',10,1320,10,null,20]]);
+  [['TEL-CCTV','MH',40,5280,10,null,20]]);
+ const legacyId=prefix+'ENT-C7';
+ assert(!budget.lines.some(l=>l.id===legacyId));
+ const cctvOwner=budget.lines.find(l=>l.id===prefix+'CCTV-C7');
+ const cctvCalculation=budget.calculations.find(c=>c.id===cctvOwner.calculationId);
+ const sourceRef=cctvOwner.sourceRef.replace('(APF, ACP, ABV01, AMS01)','(APF)');
+ const legacy={...cctvOwner,id:legacyId,scopeKey:legacyId,systemToken:'TEL-ES',
+  description:'Entertainment · OEM SAT specialist',calculationId:'CAL-'+legacyId,sourceRef};
+ const calculation={...cctvCalculation,id:legacy.calculationId,systemToken:legacy.systemToken,title:legacy.description,
+  inputs:{...cctvCalculation.inputs,events:1},sourceRef};
+ const binding={...budget.bidVolumes.bindings.find(b=>b.lineId===cctvOwner.id),id:legacyId,lineId:legacyId,locator:sourceRef};
+ const legacyBudget={...budget,lines:[...budget.lines,legacy],calculations:[...budget.calculations,calculation],
+  bidVolumes:{...budget.bidVolumes,bindings:[...budget.bidVolumes.bindings,binding]},
+  repositoryBasisImport:{...budget.repositoryBasisImport,pricedVolumeDraftIds:[...budget.repositoryBasisImport.pricedVolumeDraftIds,legacyId]}};
+ assert.equal(projectCctv(legacyBudget).view.scheduleRows('C7').find(b=>b.lineId===legacyId).amount,1320);
+ const migrated=prepareBudget(legacyBudget);
+ validate(migrated);
+ assert.equal(prepareBudget(migrated),migrated);
+ assert.equal(migrated.lines.find(l=>l.id===legacyId).selected,false);
+ assert.equal(migrated.calculations,legacyBudget.calculations);
+ assert.deepEqual(migrated.lines.filter(l=>l.id!==legacyId),budget.lines);
+ assert.deepEqual(migrated.bidVolumes,budget.bidVolumes);
+ assert(!projectCctv(migrated).view.scheduleRows('C7').some(b=>b.lineId===legacyId));
+ const edited={...legacyBudget,lines:[...budget.lines,{...legacy,manualCost:1100}]};
+ assert.equal(prepareBudget(edited),edited);
+ assert.equal(projectCctv(edited).view.entertainmentSiteBudget.legacyEstimateSelected,true);
+ const editedBinding={...legacyBudget,bidVolumes:{...legacyBudget.bidVolumes,
+  bindings:[...budget.bidVolumes.bindings,{...binding,basis:'Authored allocation'}]}};
+ assert.equal(prepareBudget(editedBinding),editedBinding);
+ const withTsi=require(root+'/project0550/data/tsiActivityBudget0550').prepareTsiActivityBudget0550(
+  migrated,D.COMMERCIAL_POLICY,D.CORE_TEAM,radioLotDate);
+ const entSite=projectCctv(withTsi).view.entertainmentSiteBudget;
+ assert.equal(entSite.legacyEstimateSelected,false);
+ assert.deepEqual(entSite.owners.map(o=>o.id),['B7-D01','B7-D03','B4-D04','B4-D05','B4-D03','B4-D06'].map(id=>'REQ-MR-ACT-'+id));
+ assert(entSite.owners.every(o=>o.priced));
  assert(own('C2').every(b=>b.quantity===1&&b.amount>0&&b.line.markupPct===5&&b.line.contingencyPct===5));
  assert(own('C6').every(b=>b.treatment==='OPTION'&&b.amount>0));
  assert.equal(own('C8').length,3);

@@ -6,8 +6,20 @@ import licensingBudget from './licensingBudgetBasis0550.json';
 import {mgwCctvEntOffer0550,mgwCurrentItemKey0550} from './mgwQuoteSelection0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import {quoteValidity0550} from './quoteValidity0550';
+import {integrationFingerprint0550} from './integrationWorkspace0550';
 
 export const MGW_CCTV_ENT_BUDGET_PREFIX_0550='LINE-MGW-CCTV-ENT-BUDGET-';
+const entertainmentOemSatId=MGW_CCTV_ENT_BUDGET_PREFIX_0550+'ENT-C7';
+const entertainmentOemSatTitle='Entertainment · OEM SAT specialist';
+const entertainmentSatResponsibility='ADDVALUE executes Entertainment SAT. MGW scope is China EXW goods.';
+const entertainmentSiteOwners=[
+ ['B7-D01','Early Buildings survey'],
+ ['B7-D03','Site readiness'],
+ ['B4-D04','Pre-commissioning'],
+ ['B4-D05','Commissioning'],
+ ['B4-D03','SAT'],
+ ['B4-D06','Punch / retest'],
+];
 const systems={
  'TEL-CCTV':{key:'CCTV',label:'CCTV',sites:['APF','ACP','ABV01','AMS01'],spares:{
   'CCTV-APF-01':'DS-2DY7436IXG-CXLWF316L','CCTV-APF-03':'DS-2CD1623G3-LIZ',
@@ -20,7 +32,37 @@ const estimateOwner=line=>line.id.startsWith(MGW_CCTV_ENT_BUDGET_PREFIX_0550);
 const equation=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
 const importFees=licensingBudget.workingAllowance.find(row=>row.label.startsWith('Import Licence'));
 
+// The draft receipt identifies the generated owner. Preserve authored changes
+// to its Working line, calculation or Volume I binding for explicit review.
+function retireEntertainmentOemSat0550(data){
+ const line=data.lines.find(row=>row.id===entertainmentOemSatId);
+ if(!line?.selected||line.officialReview||
+  !data.repositoryBasisImport?.pricedVolumeDraftIds?.includes(line.id))return data;
+ const calculation=data.calculations.find(row=>row.id==='CAL-'+line.id);
+ const hours=calculation?.inputs?.Hday;
+ if(!calculation||!Number.isFinite(hours)||hours<=0||hours>24||
+  !line.sourceRef.startsWith('E05 / one OEM specialist × 1 day/site × '+hours+' hours (APF) / ')||
+  !line.sourceRef.includes('Additional OEM SAT only.'))return data;
+ const matches=(actual,expected)=>integrationFingerprint0550(actual)===integrationFingerprint0550(expected);
+ const expectedLine={id:line.id,scopeKey:line.id,systemToken:'TEL-ES',wbs:'B4',customerRowCode:'B4',
+  description:entertainmentOemSatTitle,tagRef:'PROJECT',requirementRef:line.requirementRef,sourceRef:line.sourceRef,
+  vendorId:'',offerId:'',calculationId:calculation.id,resultKey:'MD',quantity:null,unit:'MD',manualCost:1000,
+  currency:'USD',sellMode:'MARKUP',markupPct:10,contingencyPct:null,marginPct:null,sellRate:null,primePct:20,
+  selected:true,customerRemark:pending};
+ const expectedCalculation={id:calculation.id,title:entertainmentOemSatTitle,systemToken:'TEL-ES',
+  equationId:'E05',inputs:{events:1,days:1,crew:1,Hday:hours},sourceRef:line.sourceRef};
+ if(!matches(line,expectedLine)||!matches(calculation,expectedCalculation))return data;
+ const expectedBinding={...blankScheduleBinding0550(line.id),schedule:'C7',summary:'FIELD_SERVICE',
+  treatment:'BASE',hoursPerDay:hours,locator:line.sourceRef,basis:pending};
+ const volumes=data.bidVolumes;
+ const bindings=volumes?.bindings.filter(binding=>binding.lineId===line.id)||[];
+ if(bindings.some(binding=>!matches(binding,expectedBinding)))return data;
+ return {...data,lines:data.lines.map(row=>row===line?{...row,selected:false,coverageBasis:entertainmentSatResponsibility}:row),
+  ...(bindings.length?{bidVolumes:{...volumes,bindings:volumes.bindings.filter(binding=>binding.lineId!==line.id)}}:{})};
+}
+
 export function prepareMgwCctvEntBudget0550(data,policies,today){
+ data=retireEntertainmentOemSat0550(data);
  const receipt=data.repositoryBasisImport;
  const goods=policyDefaults0550(policies,GOODS_POLICY_TITLE_0550);
  const external=policyDefaults0550(policies,EXTERNAL_ENGINEERING_POLICY_0550);
@@ -73,7 +115,7 @@ export function prepareMgwCctvEntBudget0550(data,policies,today){
   const separatelyBudgeted=scope.some(l=>(l.wbs==='B4'||bindings.some(b=>b.lineId===l.id&&b.schedule==='C7'&&b.summary==='FIELD_SERVICE'))&&
    (l.offerId||l.calculationId||l.manualCost!=null||l.sellRate!=null))||
    selected.some(l=>l.mgwDetailGroupId==='SERVICES-006');
-  if(!separatelyBudgeted){
+  if(systemToken==='TEL-CCTV'&&!separatelyBudgeted){
    const source='E05 / one OEM specialist × 1 day/site × '+hoursPerDay+' hours ('+plan.sites.join(', ')+') / '+
     (siteHours?'Exhibit C site day':'Exhibit C ten-hour planning basis pending loaded source')+
     ' / USD 1,000 per MD external specialist planning rate (Working B1-D07 / B3-D01). Additional OEM SAT only. ADDVALUE acceptance, FAT/iFAT, training and travel have separate owners. / '+offer.sourceRef+' / Budget application of '+EXTERNAL_ENGINEERING_POLICY_0550+' / '+EXTERNAL_ENGINEERING_FORMULA_0550;
@@ -95,6 +137,19 @@ export function prepareMgwCctvEntBudget0550(data,policies,today){
   }
  }
  return next===data?data:{...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded]}};
+}
+
+export function entertainmentSiteBudget0550(data,model){
+ const selected=model.provisional?.selected||[];
+ if(!selected.some(line=>line.systemToken==='TEL-ES'&&line.wbs==='A'&&mgwCctvEntOffer0550(line.offer)))return null;
+ const active=new Map(selected.map(line=>[line.id,line]));
+ return {
+  legacyEstimateSelected:data.lines.some(line=>line.id===entertainmentOemSatId&&line.selected),
+  owners:entertainmentSiteOwners.map(([activity,description])=>{
+   const id='REQ-MR-ACT-'+activity,line=active.get(id);
+   return {id,description,priced:Number.isFinite(line?.customerUSD??line?.provisionalCustomerUSD)};
+  }),
+ };
 }
 
 // Display the two systems' share of existing project owners. The E14 share
