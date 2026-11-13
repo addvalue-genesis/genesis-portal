@@ -16,7 +16,7 @@
       {"system": "CCTV / MET", "scope": "APF standalone cabinets · split enclosure and equipment prices. ACP shares the LAN cabinet."},
       {"system": "PAGA", "scope": "APF and ACP · confirm the 9 MR cabinet positions and enclosure compatibility with INDUSTRONIC assemblies."},
       {"system": "VHF DMR / RoIP / Marine", "scope": "Reconcile MR locations, rack counts and the enclosure cost embedded in the MGW packages."},
-      {"system": "Microwave DMR", "scope": "APF · reconcile the MR cabinet with the CERAGON full-outdoor configuration."},
+      {"system": "Microwave DMR", "scope": "APF MR-320 · one shared Microwave / Wireless Broadband cabinet at Control Building / ITR. Draft budget uses the VERSED QT2611035 unit rate for an additional set. Confirm fit, protection and additional-set pricing."},
       {"system": "Entertainment", "scope": "APF · verify the MGW cabinet reference and split any CCTV or PAGA interface costs."},
       {"system": "NDB", "scope": "APF · confirm an equivalent marine-grade enclosure and OEM approval for the bundled IP66 cabinet."}
     ]

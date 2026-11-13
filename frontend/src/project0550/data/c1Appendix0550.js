@@ -11,7 +11,7 @@ import {satelliteScope0550} from './satelliteScope0550';
 import {mrLineScope0550} from './mrWorkingBasis0550';
 import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
-import {versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
+import {APF_DMR_CABINET_MR_0550,versedDmrCabinetWorking0550,versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
 import {CHEVALIER_PBX_SUPPLY_0550} from './chevalierPbxQuote0550';
 import chevalierLocation from './chevalierLocationBasis0550.json';
 
@@ -102,6 +102,12 @@ function c1ComponentPrices(row,detailsByOwner,currency){
   componentUnit(component.unit)===componentUnit(unit)&&name(component.description)===name(description);
  const detailRows=owners.flatMap(owner=>detailsByOwner.get(owner.lineId)||[]);
  return row.components.map(component=>{
+  const dmrCabinet=row.provisionalDmr&&component.description==='Microwave Cabinet'&&component.quantity===1&&
+   owners.find(owner=>versedDmrCabinetWorking0550(owner.line)&&owner.quantity===1&&owner.unit==='Lot');
+  if(dmrCabinet)return {...component,description:'Microwave Cabinet MR-320 · RITTAL',
+   note:'Shared with Wireless Broadband at APF Control Building / ITR. Included in item total.',
+   unitPrice:dmrCabinet.unitPrice,amount:dmrCabinet.amount,
+   exportPrice:true};
   const unpriced={...component,unitPrice:null,amount:null};
   if(row.components.filter(other=>matches(component,other.description,other.quantity,other.unit)).length!==1)return unpriced;
   const linked=detailRows.filter(detail=>matches(component,detail.line.description,detail.quantity,detail.unit));
@@ -353,7 +359,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   }
   prices.forEach(b=>groupedQuoteOwners.add(b.lineId));
  }
- const dmrApf=r11&&view.workingPreview?rows.find(r=>r.key==='MR-B1-15-APF-01'):undefined;
+ const dmrApf=r11&&view.workingPreview?rows.find(r=>r.key===APF_DMR_CABINET_MR_0550):undefined;
  const dmrAcp=dmrApf&&rows.find(r=>r.key==='MR-B1-15-ACP-01');
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
@@ -368,11 +374,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
    dmrApf?.quantity===1&&dmrApf.unit==='Lot'&&dmrAcp?.quantity===1&&dmrAcp.unit==='Lot'&&
    [dmrApf,dmrAcp].every(row=>!row.excluded&&row.raws.length<=1&&row.ownerIds.every(id=>{
     const owner=byOwner.get(id);
-    return id===b.lineId||(!owner.usdPriced&&!Number.isFinite(owner.binding.amount));
+    return id===b.lineId||(!owner.usdPriced&&!Number.isFinite(owner.binding.amount))||
+     (row===dmrApf&&versedDmrCabinetWorking0550(owner.binding.line));
    }))&&targets.every(row=>row===dmrApf||row===dmrAcp)){
    dmrApf.ownerIds=unique([...dmrApf.ownerIds,b.lineId]);
    dmrApf.priceOwners=[...(dmrApf.priceOwners||[]),b];
-   dmrApf.amount=b.amount;
    dmrApf.provisionalDmr=true;
    dmrApf.note=['One CERAGON R11 equipment Lot for both APF and ACP. ADDVALUE performs engineering, system integration and testing.',customerRemark(b.line,legacy),dmrApf.note].filter(Boolean).join(' ');
    dmrAcp.sharedDmrPriceKey=dmrApf.key;
@@ -468,7 +474,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
    r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
    r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
-  }else if(owned.length&&!r.provisionalDmr){
+  }else if(r.provisionalDmr){
+   r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
+  }else if(owned.length){
    r.amount=money(owned.map(b=>b.amount));
    if(!legacy&&/^MR-B1-11-APF-0[346]$/.test(r.key)){
     r.internalNote=[r.internalNote,'Quoted equipment only — MR quantities and interfaces remain open'].filter(Boolean).join(' · ');
@@ -599,7 +607,7 @@ export const c1Display0550=v=>Number.isFinite(v)?v.toLocaleString('en-US',{minim
 export function c1AppendixTable0550(view){
  const p=deriveC1Appendix0550(view),rows=[],group=label=>rows.push(['',label,'','','','','']);
  if(view.c1LayoutVersion!==C1_APPENDIX_LAYOUT_LEGACY_0550)group('Currency: USD');
- for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',null,null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount??g.draftSubtotal??null,c1AppendixSubtotalLabel0550(g)]);}
+ for(const g of p.groups){group(groupTitle(g));for(const s of g.systems){group(s.name);for(const site of s.sites){group(site.name);for(const r of site.rows){rows.push([r.sn,r.description,r.unit||'—',r.quantity??'—',r.unitPrice,r.amount,r.note]);if(r.intro)group(r.intro);r.components.forEach((c,i)=>rows.push([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c.exportPrice?c.unitPrice:null,c.exportPrice?c.amount:null,c.note||'']));(r.notes||[]).forEach(group);}}}rows.push(['',groupSubtotal(g),'','','',g.amount??g.draftSubtotal??null,c1AppendixSubtotalLabel0550(g)]);}
  rows.push(['','TOTAL — BASE SCOPE OF SUPPLY','','','',p.amount,'']);
  if(p.amount===null&&Number.isFinite(p.pricedItemsSubtotal))rows.push(['','WORKING DRAFT — PRICED ITEMS SUBTOTAL','','','',p.pricedItemsSubtotal,'Open items excluded']);
  return {heads:['SN','Item Description','Unit','Qty.','CIF or FOB (USD or RMB) — Unit Rates','CIF or FOB (USD or RMB) — Total Price','Notes'],rows};
@@ -613,7 +621,7 @@ export function c1AppendixHtml0550(view){
    for(const site of sys.sites){html+=`<tr class="c1-site"><td colspan="7">${escape(site.name)}</td></tr>`;
     for(const r of site.rows){html+='<tr>'+cell(r.sn)+cell(r.description)+cell(r.unit||'—')+cell(r.quantity??'—')+cell(c1Display0550(r.unitPrice),'number')+cell(c1Display0550(r.amount),'number')+cell(r.note)+'</tr>';
      if(r.intro)html+='<tr class="c1-detail-note"><td></td><td colspan="6">'+escape(r.intro)+'</td></tr>';
-     for(const [i,c] of r.components.entries())html+='<tr class="c1-component">'+cell(r.sn+'.'+(i+1))+cell(c.description)+cell(c.unit||'—')+cell(c.quantity??'—')+cell('—')+cell('—')+cell(c.note||'')+'</tr>';
+     for(const [i,c] of r.components.entries())html+='<tr class="c1-component">'+cell(r.sn+'.'+(i+1))+cell(c.description)+cell(c.unit||'—')+cell(c.quantity??'—')+cell(c.exportPrice?c1Display0550(c.unitPrice):'—',c.exportPrice?'number':'')+cell(c.exportPrice?c1Display0550(c.amount):'—',c.exportPrice?'number':'')+cell(c.note||'')+'</tr>';
      for(const note of r.notes||[])html+='<tr class="c1-detail-note"><td></td><td colspan="6">'+escape(note)+'</td></tr>';
     }
    }
@@ -640,7 +648,7 @@ export function c1AppendixWord0550(view){
  const widths=legacy?[600,4200,700,700,1100,1100,1600]:draft?[1130,5480,710,720,1420,1420,2800]:[900,3900,700,700,1100,1100,1600];
  let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
-  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—','—','—',c.note||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
+  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c1Display0550(c.exportPrice?c.unitPrice:null),c1Display0550(c.exportPrice?c.amount:null),c.note||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
   xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount??g.draftSubtotal),c1AppendixSubtotalLabel0550(g)]);
  }
  const priced=draft?scheduleRollup0550(c1.bindings):null;

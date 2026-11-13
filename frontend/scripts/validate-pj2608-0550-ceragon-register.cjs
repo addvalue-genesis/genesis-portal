@@ -102,6 +102,46 @@ assert.equal(competingC1.rows.find(r=>r.mr?.id===apfOwner.mrRequirementId).amoun
 assert.equal(competingC1.rows.find(r=>r.key==='OWNER:'+current.id).sn,'1.5.P1');
 console.log('PASS DMR commercial draft: 50% and 20% sell layers, one R11 lot, all four MR rows, USD/THB and Word output.');
 
+const rackDate='2026-11-13';
+const {prepareVersedDmrCabinet0550}=require(root+'/project0550/data/versedRack0550');
+const rack={id:'OFFER-VERSED-QT2611035-2DDCB231-LAN-RACK',vendorId:'VENDOR-VERSED-0550',quoteRef:'QT2611035',
+ brand:'RITTAL',unit:'SET',currency:'THB',unitCost:100000,date:'2026-11-11',validUntil:'2026-12-11',
+ sourceRef:'VERSED QT2611035 / p1 / Items 1–6',quoteEvidence:{
+  sourceSha256:'2ddcb231a32491923c35e0ac9da2446e72fc69e1898075cac84d6b0c13c0363f',systemTokens:['TEL-LAN'],
+  classification:'RATE',quotedCurrency:'THB',quotedUnit:'SET',quotedQuantity:13,quotedUnitCost:100000,quotedTotal:1300000,
+ }};
+const rackInput={...priced,offers:[...priced.offers,rack],vendors:[...priced.vendors,{id:rack.vendorId,name:'VERSED'}],
+ fx:{thbPerUSD:31.5,thbPerEUR:null,date:rackDate,source:'Fixture FX'}};
+const prepareRack=data=>prepareVersedDmrCabinet0550(data,D.COMMERCIAL_POLICY,rackDate);
+const withRack=prepareRack(rackInput),rackLine=withRack.lines.find(l=>l.id===apfOwner.id);
+assert.deepEqual([rackLine.tagRef,rackLine.manualCost,rackLine.offerId,rackLine.customerRowCode],['MR-320',100000,'','A1-11']);
+assert.equal(withRack.offers,rackInput.offers);
+assert.equal(withRack.lines.length,rackInput.lines.length);
+assert(withRack.lines.every((line,i)=>line===rackLine||line===rackInput.lines[i]));
+assert.equal(prepareRack(withRack),withRack);
+const editedRackInput={...rackInput,lines:rackInput.lines.map(l=>l.id===apfOwner.id?{...l,manualCost:90000}:l)};
+assert.equal(prepareRack(editedRackInput),editedRackInput);
+const rackModel=W.deriveBidWorkspace(withRack,tokens,rackDate);
+const releasedRack=rackModel.provisional.schedule.find(r=>r.code==='A1-11').children.find(l=>l.id===apfOwner.id);
+assert.deepEqual([releasedRack.costTHB,releasedRack.workingSellTHB,releasedRack.customerTHB,releasedRack.customerUSD],
+ [100000,110000,132000,4190.48]);
+const rackPreview={...deriveBidVolumeWorkingPreview0550(withRack,rackModel,D.SYSTEMS,rackDate,
+ deriveBidVolumes0550(withRack,rackModel,D.SYSTEMS,rackDate)),c1LayoutVersion:C1.C1_APPENDIX_LAYOUT_0550};
+for(const [currency,amount] of [['USD',releasedRack.customerUSD],['THB',releasedRack.customerTHB]]){
+ const projection=C1.deriveC1Appendix0550(rackPreview,currency);
+ const row=projection.rows.find(r=>r.key===apfOwner.mrRequirementId);
+ const r11=row.priceOwners.find(b=>b.lineId===current.id);
+ assert.equal(row.sn,'1.5.1');
+ assert.equal(row.amount,money.sumMoney0550([r11.amount,amount]));
+ assert.equal(row.components.find(c=>c.description.includes('MR-320')).amount,amount);
+ assert.equal(projection.rows.flatMap(r=>r.priceOwners).filter(b=>b.lineId===apfOwner.id).length,1);
+ assert(!projection.rows.some(r=>r.appendix==='1.5'&&r.kind==='PACKAGE'&&r.ownerIds.includes(current.id)));
+}
+assert.equal(C1.c1AppendixTable0550(rackPreview).rows.find(r=>r[0]==='1.5.1.1')[5],4190.48);
+assert.match(C1.c1AppendixHtml0550(rackPreview),/Microwave Cabinet MR-320.*4,190\.48/);
+assert.match(C1.c1AppendixWord0550(rackPreview),/Microwave Cabinet MR-320.*4,190\.48/);
+console.log('PASS APF MR-320: VERSED rate, one incremental cost on the existing MR owner, A1-11, C1 and exports.');
+
 const I=require(root+'/project0550/data/integrationWorkspace0550');
 const T=require(root+'/project0550/ControlledTagMapping0550');
 const chosen=structuredClone(selected);

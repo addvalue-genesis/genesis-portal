@@ -3,6 +3,7 @@ import {amount} from './BidControls';
 import {SupplierBoqTable0550} from './SupplierItemSourceText0550';
 import {MR_WORKING_CATALOG_0550} from './data/mrWorkingBasis0550';
 import {supplierBoqRows0550} from './data/supplierCostProjection0550';
+import {APF_DMR_CABINET_MR_0550,versedDmrCabinetWorking0550} from './data/versedRack0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R12_0550,CERAGON_R11_BOQ_REVIEW_0550,DMR_MR_0550,ceragonR11RequirementSite0550,
  CERAGON_R11_WORKING_BASIS_0550,ceragonR11Dts0550,ceragonR11ScopeCheck0550,ceragonR11Source0550,dmrDtsEquipment0550,dmrMrAdditionalScope0550} from './data/ceragonSelection0550';
 
@@ -50,6 +51,7 @@ export function dmrTagCostView0550(data,integration,working,lineId){
  });
  const equipment=allEquipment.filter(r=>!lineId||r.mrLineId===lineId);
  const cabinet=dmrDtsEquipment0550(dts,'MR-320','Microwave System Cabinet');
+ const cabinetOwner=owners.get('REQ-'+APF_DMR_CABINET_MR_0550);
  const locationRef=(site,component)=>{
   const row=allEquipment.find(r=>r.site===site&&r.component===component);
   return row?.source&&row.location&&row.location!=='ตำแหน่งติดตั้ง OPEN'?`${row.tag} · ${row.location}`:'ตำแหน่ง / TAG รอยืนยัน';
@@ -64,8 +66,11 @@ export function dmrTagCostView0550(data,integration,working,lineId){
  const additional=scope.filter(r=>!r.requirementId||!lineId||'REQ-'+r.requirementId.slice(7)===lineId).map(r=>{
   const part=r.bullets?.includes(11)?'C':r.bullets&&!physicalClauses.has(r.bullets[0])?'B':'A';
   const site=ceragonR11RequirementSite0550({id:r.requirementId||''})||'APF–ACP';
-  return {...r,part,site,workLineIds:(r.workLineIds||[]).filter(id=>owners.get(id)?.wbs.startsWith(part)),
-   location:r.requirement?.startsWith('Microwave Cabinet')?cabinet.location||'ตำแหน่งติดตั้ง OPEN':
+  const cabinetBudget=r.itemName==='Microwave Cabinet'&&cabinetOwner?.selected&&versedDmrCabinetWorking0550(cabinetOwner);
+  const workLineIds=cabinetBudget?[cabinetOwner.id]:(r.workLineIds||[]).filter(id=>owners.get(id)?.wbs.startsWith(part));
+  return {...r,part,site,workLineIds,
+   ...(cabinetBudget?{label:'RITTAL / VERSED · งบจัดหา 1 ชุด',action:cabinetOwner.coverageBasis}:{}),
+   location:r.requirement?.startsWith('Microwave Cabinet')?cabinet.location||(cabinetBudget?'APF Control Building / ITR':'ตำแหน่งติดตั้ง OPEN'):
     site==='ACP'?locationRef('ACP','IDU'):r.requirement?.startsWith('Access Switch')?'ตำแหน่งติดตั้ง / TAG OPEN':null,
     source:r.requirement?.startsWith('Microwave Cabinet')?cabinet.source:
      site==='ACP'?allEquipment.find(row=>row.site==='ACP'&&row.component==='IDU')?.source:null};
@@ -127,7 +132,7 @@ export function DmrTagCost0550({data,integration,working,lineId,costView,onNavig
    <thead><tr><th>ไซต์ / หลักฐาน</th><th>ขอบเขตประกอบ</th><th>สิ่งที่ต้องตรวจเพื่อคิดต้นทุน</th></tr></thead>
    <tbody>{additional.map(r=><tr key={r.title}><td>{r.site}<small>{r.reference}</small>{source(r)}</td>
     <td><strong>{r.title}</strong>{r.requirement&&<small>{r.requirement}</small>}{r.location&&<small>{r.location}</small>}</td>
-    <td><strong>OPEN · ตรวจความครอบคลุม</strong><small>{r.action}</small>{refs(r)}
+    <td><strong>{r.label||'OPEN · ตรวจความครอบคลุม'}</strong><small>{r.action}</small>{refs(r)}
      {r.requirementId&&jump('bid.working-preview.requirement.'+r.requirementId,'เปิดข้อกำหนด')}
      {r.offerIds?.filter(id=>view.offerIds.has(id)).map(id=><div key={id}>{jump('bid.vendor.offer.'+id,'CERAGON '+id.split('-').at(-1))}</div>)}</td></tr>)}</tbody>
   </table></div>

@@ -13,6 +13,7 @@ import {mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentMr0550,mgwFocSupplyOffer0
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
+import {versedDmrCabinetWorking0550} from './versedRack0550';
 import {CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,CHEVALIER_PBX_SUPPLY_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
 import {chevalierPbxSharedBudget0550} from './chevalierPbxBudget0550';
 
@@ -184,7 +185,8 @@ export function preparePricedVolumeDrafts0550(data,pricing,today){
    // Draft assignment accepts quoted vendor offers (Ceragon, Master Tower, Industronic, MGW)
    // and standard mapped supply lines.
    const hasKnownVendor=Boolean(offer?.vendorId||owner?.systemToken);
-   return owner&&(mappingValid(owner)||hasKnownVendor)&&(Number.isFinite(owner.customerUSD)||Boolean(offer?.unitCost));
+   return owner&&(mappingValid(owner)||hasKnownVendor)&&
+    (Number.isFinite(owner.customerUSD)||Boolean(offer?.unitCost)||versedDmrCabinetWorking0550(owner));
   }
   if(['C2','C3','C4','C5','C6'].includes(proposal.schedule))return true;
   if(proposal.schedule==='C7')return ['B3','B4','B7'].includes(line.wbs);

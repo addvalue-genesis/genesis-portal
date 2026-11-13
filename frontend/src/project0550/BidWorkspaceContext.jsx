@@ -29,13 +29,15 @@ import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
 import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550";
 import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
+import {prepareVersedDmrCabinet0550} from "./data/versedRack0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
  const revised=preparePagaIdieWorking0550(preparePagaRevisionPricing0550(data,today),COMMERCIAL_POLICY,today);
  const pbx=prepareChevalierPbxWorking0550(revised,COMMERCIAL_POLICY,today);
  const avl=preparePagaAvlDeviation0550(pbx);
- const based=pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
+ const based=prepareVersedDmrCabinet0550(
+  pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today)),COMMERCIAL_POLICY,today);
  const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
  const working=prepareChevalierPbxBudget0550(applyCommercialSellPolicies0550(priced),COMMERCIAL_POLICY,today);
  return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
