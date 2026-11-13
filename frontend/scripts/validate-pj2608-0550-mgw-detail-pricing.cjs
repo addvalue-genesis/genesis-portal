@@ -95,6 +95,21 @@ const [equipmentOffer,subscriberOffer]=radioOffers;
 assert.match(equipmentOffer.quoteEvidence.locator,/\/ ACO \//);
 assert.equal(radioOffers[2].quoteEvidence.classification,'OPTION');
 assert(!radioOffers[1].quoteEvidence.terms[0].includes('PMPN4296'));
+const radio001=radioOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-001');
+assert.equal(radio001.unitCost,113259);assert.equal(radio001.quoteEvidence.quotedTotal,113259);
+assert.equal(radio001.mgwQuoteLineId,'MGW-Q26-063-RADIO-001');
+assert.equal(Q.mgwQuoteItem0550(radio001).id,'MGW-Q26-063-RADIO-001');
+assert.equal(Q.mgwQuoteItem0550({id:radio001.id}).id,'MGW-Q26-063-RADIO-001','Radio batch offer id resolves to the catalogue row');
+assert.equal(Q.mgwQuoteItem0550({id:'OFFER-MGW-Q26-063-RADIO-DTRS-RADIO-009-OPTION'}),undefined);
+const part=code=>radio001.components.find(c=>c.partNo===code);
+for(const [code,quantity,group] of [['G26642',1,''],['LS-5135S-24T4S-EI',1,''],['SLR5500',3,''],['TQJ-150I',3,''],['LX-BLQ-400-N',3,''],['WLHL-150 F3',3,''],['WLFL-150-3',3,''],['WLSGQ-150',4,''],['MSR 3610-XS',1,''],['R740',1,''],['GMVN6044B',1,''],['HKVN4315A',1,''],['RG-2000',1,''],['HKVN4356A',3,'License'],['HKVN4313A',1,'License'],['HKVN4317A',1,'License'],['HKVN4318A',5,'License'],['HKVN4321A',1,'License'],['HKVN4314A',1,'License'],['GMVN6146A',1,'License'],['GMVN6057A',1,'License'],['GMVN6050A',122,'License'],['M8668i',1,''],['U2424H',1,'DELL PC Workstation'],['OptiPlex Tower',1,'DELL PC Workstation']]){
+ const row=part(code);assert(row,code);assert.equal(row.quantity,quantity,code);assert.equal(row.group,group,code);assert.equal(row.included,true,code);
+}
+assert.match(part('GMVN6050A').remarks,/End User Machine Licenses/);
+const server=part('DL20 Gen10');assert.equal(server.included,false);assert.match(server.remarks,/APF/);
+assert.equal(radio001.components.filter(c=>c.partNo==='TQJ-150I').length,2);
+assert(radio001.components.every(c=>c.unitCost===undefined));
+assert.equal(activate(radio),radio,'Radio lot components stay attached without rewriting prices');
 assert(Q.supplierOfferExcluded0550(radio,radioOffers[0],'TEL-PAGA'));
 assert(Q.mgwWorkingLineExcluded0550(radio,{vendorId:radioOffers[0].vendorId,offerId:radioOffers[0].id,systemToken:'TEL-PAGA',customerRowCode:'A1-05'}));
 assert(!radio.lines.find(l=>l.mgwDetailGroupId==='RADIO-DTRS').selected);
@@ -316,6 +331,16 @@ assert.deepEqual(lotOffers.filter(o=>o.quoteEvidence.sourceId!==radioSelection.M
   ['RADIO-003',['MR-B1-11-APF-03']],['RADIO-011',['MR-B1-11-APF-03']],
   ['RADIO-012',['MR-B1-11-APF-04']],['RADIO-013',['MR-B1-11-APF-04']]]);
 assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-003').quoteEvidence.locator,/\/ ACO \//);
+const radio003=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-003');
+assert.equal(radio003.unitCost,20869);assert.equal(radio003.quoteEvidence.quotedTotal,20869);
+assert.equal(radio003.mgwQuoteLineId,'MGW-Q26-063-RADIO-003');
+for(const code of ['CU-TU','SAILOR 6201','SAILOR 6368','SAILOR 6384','HF8000','SAILOR 6301','XDR-960'])assert(radio003.components.some(c=>c.partNo===code&&c.included),'RADIO-003 continuation / '+code);
+assert(radio003.quoteEvidence.terms[0].includes('6m 12 POL CAN cable'),'SSB page-spill lines are on the offer');
+assert(radio003.components.every(c=>c.unitCost===undefined));
+const radio010=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-010');
+assert.equal(radio010.unitCost,45118);
+assert(radio010.components.some(c=>c.quantity===12&&c.partNo==='SAILOR SP3530'),'RADIO-010 continuation keeps the portable quantity');
+assert.equal(lotOffers.filter(o=>Number.isFinite(o.unitCost)).reduce((n,o)=>n+o.unitCost*o.quoteEvidence.quotedQuantity,0),lotOffers.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0));
 assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-011').quoteEvidence.locator,/\/ APF \//);
 const lotOwners=W.deriveBidWorkspace(radioLots,tokens,radioLotDate).lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
 assert.deepEqual(lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))

@@ -3,6 +3,7 @@ import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {prepareVersedLanRacks0550} from './versedRack0550';
+import {parseRadioLotComponents0550,radioLotSourceText0550} from './radioLotComponents0550';
 import {
  MGW_APF_RG59_OVERLAP_0550, MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
  apfLan10PatchPanelDraft0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
@@ -39,20 +40,53 @@ const radioRegisterBatches=[
  {...MGW_RADIO_REMAINING_0550,coverageNote:'Q26-063 ver1.0 pp9–12. Remaining priced Radio supply; shared lines are carried once in A1-07. Confirm MR coverage and APM locations.'},
 ];
 
+function radioLotForOffer0550(offer){
+ if(!mgwRadioDtrsOffer0550(offer))return null;
+ const item=offer.id.slice(MGW_RADIO_DTRS_0550.prefix.length);
+ const option=item.endsWith('-OPTION');
+ const key=option?item.slice(0,-'-OPTION'.length):item;
+ const row=MGW_QUOTE_0550.rows.find(r=>r.id==='MGW-Q26-063-'+key);
+ if(!row)return null;
+ const continuation=MGW_QUOTE_0550.radioDetailContinuations[key];
+ const stripUnpriced=offer.quoteEvidence?.sourceId===MGW_RADIO_REMAINING_0550.batchId;
+ const source={continuation,option,stripUnpriced};
+ const text=radioLotSourceText0550(row.detail,source);
+ const plain=radioLotSourceText0550(row.detail,{option,stripUnpriced});
+ return {text,plain,components:parseRadioLotComponents0550(text,{defaultGroup:option?'Accessories':''}),
+  mgwQuoteLineId:option?undefined:row.id};
+}
+function attachRadioLotBom0550(data){
+ let changed=false;
+ const offers=data.offers.map(offer=>{
+  const lot=radioLotForOffer0550(offer);
+  if(!lot)return offer;
+  const terms=offer.quoteEvidence?.terms;
+  const patchTerms=Array.isArray(terms)&&terms[0]===lot.plain&&lot.text!==lot.plain;
+  const hasLine=lot.mgwQuoteLineId?offer.mgwQuoteLineId===lot.mgwQuoteLineId:offer.mgwQuoteLineId===undefined;
+  if(hasLine&&!patchTerms&&JSON.stringify(offer.components)===JSON.stringify(lot.components))return offer;
+  changed=true;
+  return {...offer,components:lot.components,
+   ...(lot.mgwQuoteLineId?{mgwQuoteLineId:lot.mgwQuoteLineId}:{}),
+   ...(patchTerms?{quoteEvidence:{...offer.quoteEvidence,terms:[lot.text,...terms.slice(1)]}}:{})};
+ });
+ return changed?{...data,offers}:data;
+}
 function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,coverageNote}){
  const {prefix,quoteRef,sha256}=MGW_RADIO_DTRS_0550,quote=MGW_QUOTE_0550;
- if(today<preparedOn||data.supplierRevisionImports?.some(r=>r.batchId===batchId))return data;
+ if(today<preparedOn)return data;
+ if(data.supplierRevisionImports?.some(r=>r.batchId===batchId))return attachRadioLotBom0550(data);
  const savedVendorId=data.offers.find(o=>o.mgwQuoteLineId==='MGW-Q26-063-RADIO-001')?.vendorId;
  const vendor=data.vendors.find(v=>v.id===savedVendorId)||{id:'VENDOR-MGW-0550',name:quote.vendorName,kind:'SUPPLIER',reference:quote.quoteRef+' / '+quote.sourceUrl};
  const sourceRows=quote.rows.filter(r=>Object.hasOwn(mrMap,r.id.replace('MGW-Q26-063-','')));
+ const stripUnpriced=batchId===MGW_RADIO_REMAINING_0550.batchId;
  const offers=sourceRows.flatMap(row=>{
   // The PDF places this unpriced Option directly below item 1, inside the
   // same extracted catalogue detail. Retain each scope on its own record.
-  const sourceDetail=batchId===MGW_RADIO_REMAINING_0550.batchId?
-   row.detail.split('\nLocation: APM\nVHF DMR Radio System GTPL\n')[0]:row.detail;
-  const continuation=quote.radioDetailContinuations[row.id.replace('MGW-Q26-063-','')];
-  const [base,option]=(batchId===MGW_RADIO_REMAINING_0550.batchId&&continuation?
-   sourceDetail.replace(continuation.anchor,continuation.text):sourceDetail).split('\nVHF DMR Radio System Accessaries MOTOROLA\n');
+  // Page-spill continuations apply to every radio batch, including SSB.
+  const itemKey=row.id.replace('MGW-Q26-063-','');
+  const continuation=quote.radioDetailContinuations[itemKey];
+  const base=radioLotSourceText0550(row.detail,{continuation,stripUnpriced});
+  const option=radioLotSourceText0550(row.detail,{continuation,option:true,stripUnpriced});
   const makeOffer=(isOption,detail)=>{
    const description=isOption?'VHF DMR Radio System Accessories':row.description;
    const locator='p'+row.page+' / RADIO / '+row.site+' / '+(isOption?'Option after item ':'item ')+row.sn;
@@ -72,11 +106,11 @@ function prepareRadioRegister0550(data,systems,today,{batchId,preparedOn,mrMap,c
  });
  const pack={schema:VENDOR_REGISTER_SCHEMA_0550,projectId:data.projectId,batchId,preparedOn,
   coverageNote,vendors:[vendor],offers};
- try{return planVendorRegister0550(data,pack,systems).workspace;}
+ try{return attachRadioLotBom0550(planVendorRegister0550(data,pack,systems).workspace);}
  catch(error){
   const receipt=data.mgwDetailPricingImport,message='DTRS vendor register / '+batchId+' / '+error.message;
-  if(!receipt||receipt.conflicts.includes(message))return data;
-  return {...data,mgwDetailPricingImport:{...receipt,conflicts:[...receipt.conflicts,message]}};
+  const failed=!receipt||receipt.conflicts.includes(message)?data:{...data,mgwDetailPricingImport:{...receipt,conflicts:[...receipt.conflicts,message]}};
+  return attachRadioLotBom0550(failed);
  }
 }
 

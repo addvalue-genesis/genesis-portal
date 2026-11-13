@@ -17,6 +17,7 @@ import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
 import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
+import {RadioLotBomTable0550} from './RadioLotBom0550';
 import {supplierItemLabel0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0550';
@@ -176,7 +177,10 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   const mappedRacks=[...new Set((requirementsByOffer.get(o.id)||[]).flatMap(r=>mappedCabinetTags0550(r,{offerId:o.id})))];
   const draftRack=entry.location?.requirements.map(r=>draftCabinetTag0550(r.id)).find(Boolean);
   const rackLabel=cabinetTagLabel0550(mappedRacks,draftRack);
-  return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
+  const lotBom=o.components?.length?<tr className="p55-radio-lot-bom-row" data-radio-lot-bom={o.id}><td colSpan={6}>
+   <RadioLotBomTable0550 components={o.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(o)}/>
+  </td></tr>:null;
+  return <React.Fragment key={o.id}><tr data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/><small>{o.brand}</small>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
@@ -218,7 +222,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
     {onNavigate&&requirementsByOffer.has(o.id)&&<details><summary>SI Mapping · {requirementsByOffer.get(o.id).length} ข้อ</summary>{requirementsByOffer.get(o.id).map(r=><div key={r.id}><button type="button" onClick={()=>onNavigate('bid.working-preview.requirement.'+r.id)}>{r.site? r.site+' · ':''}{r.title||r.id}</button></div>)}</details>}
     {onNavigate&&[...new Map([...selected,...allocated.map(u=>u.line),...referenceSelected].map(line=>[line.id,line])).values()].map(line=><div key={line.id}><button type="button" onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>10.2 · {line.wbs} · {line.description}</button></div>)}
    </td>
-  </tr>;
+  </tr>{lotBom}</React.Fragment>;
  };
  const renderRows=quote=><div className="p55-table-wrap"><table className="p55-table" aria-label={'Vendor costs '+quote.title}><thead><tr><th>รายการ / ระบบ</th><th>จำนวน / หน่วยต้นฉบับ</th><th>ต้นทุน / หน่วยเรต<br/>Unit Price ต้นฉบับ</th><th>Total Price ต้นฉบับ</th><th>วันที่ / เงื่อนไข</th><th>Offer ID / การใช้ใน Working</th></tr></thead>
   {rowSections.map(([type,label])=>{

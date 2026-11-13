@@ -66,7 +66,8 @@ export function validateBidWorkspace(data,snapshotId,systems){
  const system=s=>{if(s!=="COMMON"&&!systems.includes(s))fail("Unknown system");};
  for(const v of data.vendors){fields(v,["id","name","kind","reference"]);["name","kind","reference"].forEach(k=>string(v[k],k));if(!v.name.trim())fail("Vendor name required");}
  const atomicIds=new Set();
- for(const o of data.offers){fields(o,["id","vendorId","description","brand","quoteRef","sourceRef","date","validUntil","currency","unit","unitCost","mgwQuoteLineId","unitBasis","supplierQuoteRow","quoteEvidence","bidTags","atomicLines"]);validateVendorBidTags0550(o.bidTags);validateOfferAtomicLines0550(o);
+ for(const o of data.offers){fields(o,["id","vendorId","description","brand","quoteRef","sourceRef","date","validUntil","currency","unit","unitCost","mgwQuoteLineId","unitBasis","supplierQuoteRow","quoteEvidence","bidTags","atomicLines","components"]);validateVendorBidTags0550(o.bidTags);validateOfferAtomicLines0550(o);
+  if(o.components!==undefined){if(!Array.isArray(o.components)||o.components.length>200)fail("Invalid radio lot components");for(const c of o.components){fields(c,["quantity","unit","description","partNo","group","included","remarks","sourceLine"]);if(c.quantity!==null&&(!finite(c.quantity)||c.quantity<0||c.quantity>1e12))fail("Invalid component quantity");if(typeof c.included!=="boolean")fail("Invalid component inclusion");for(const k of ["unit","description","partNo","group"])string(c[k],"component "+k,1000);string(c.remarks,"component remarks",4000);string(c.sourceLine,"component source",4000);}}
   for(const {line_id} of o.atomicLines||[]){
    if(atomicIds.has(line_id))fail("Duplicate ALIE line ID / "+line_id);
    atomicIds.add(line_id);

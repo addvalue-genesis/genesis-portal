@@ -1,5 +1,7 @@
 import React from 'react';
 import {amount} from './BidControls';
+import {RadioLotBomTable0550} from './RadioLotBom0550';
+import {parseRadioLotComponents0550} from './data/radioLotComponents0550';
 import {sumMoney0550} from './data/money0550';
 import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
@@ -66,6 +68,8 @@ function MgwRadioSource0550({data,sectionFilter}){
     const continuation=MGW_QUOTE_0550.radioDetailContinuations[item];
     const [rawDetail,unpricedDetail]=extra?row.detail.split(extra.separator):[row.detail];
     const detail=continuation?rawDetail.replace(continuation.anchor,continuation.text):rawDetail;
+    const components=parseRadioLotComponents0550(detail);
+    const unpricedComponents=unpricedDetail?parseRadioLotComponents0550(unpricedDetail,{defaultIncluded:item==='RADIO-009',defaultGroup:item==='RADIO-009'?'Accessories':'Remark'}):[];
     const sections=itemSections(item);
     const optionItem=item==='RADIO-009'?'RADIO-009-OPTION':null;
     const extraSections=optionItem?itemSections(optionItem):[];
@@ -77,7 +81,8 @@ function MgwRadioSource0550({data,sectionFilter}){
      {isVisible(sections)&&<tr>
       <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
        <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
-       <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
+       {components.length>0&&<RadioLotBomTable0550 components={components} caption={'BOM ต่อชุด · '+item}/>}
+       <details><summary>ข้อความต้นฉบับ / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
        <MgwRadioTagEvidence0550 item={item}/></td>
       <td>{owners.length===1?owners[0].customerRowCode:code}{shared&&<small>ใช้ร่วมหลายระบบ</small>}
        <small>{owners.length===1?'10.2 · '+owners[0].id:owners.length>1?'OPEN · ตรวจเจ้าของราคาซ้ำ':'OPEN · รอเจ้าของราคา Working'}</small></td>
@@ -88,7 +93,8 @@ function MgwRadioSource0550({data,sectionFilter}){
      {unpricedDetail&&isVisible(extraSections)&&<tr>
       <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
        {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
-       <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
+       {unpricedComponents.length>0&&<RadioLotBomTable0550 components={unpricedComponents} caption={'ขอบเขตที่ไม่มีราคาแยก · '+item}/>}
+       <details><summary>ข้อความต้นฉบับ / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
       <td>—</td><td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
