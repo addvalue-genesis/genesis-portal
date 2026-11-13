@@ -4,7 +4,7 @@ import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
 import {prepareVersedLanRacks0550} from './versedRack0550';
 import {
- MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
+ MGW_APF_RG59_OVERLAP_0550, MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
  apfLan10PatchPanelDraft0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
@@ -187,7 +187,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    const id='REQ-'+bulkMr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
    if(line?.offerId===offer.id)continue;
    if(bulkMr==='MR-B1-18-APF-18'){
-    conflicts.add(id+' / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)');
+    conflicts.add(MGW_APF_RG59_OVERLAP_0550);
     continue;
    }
    const quotedLength=nativeMr.get(bulkMr)?.note.match(/^Source quantity: (\d+);/)?.[1];

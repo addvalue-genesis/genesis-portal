@@ -109,7 +109,8 @@ export const MGW_RADIO_SSB_OPEN_0550 = 'Q26-063 ver1.0 · original quote validit
 export const MGW_RADIO_AERO_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
  ' RADIO-012 and RADIO-013 map to APF (MR-B1-11-APF-04). The lots cover the quoted fixed AM VHF telephone and portable airband radios only. Reconcile MR quantity, antennas, gateways and the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
-export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
+export const MGW_APF_RG59_OVERLAP_0550='REQ-MR-B1-18-APF-18 / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)';
+export const MGW_BULK_OPEN_0550='Cable supply rates only. The APF and ACP 24-core allowances cover separate local runs per PHI Table 7-9. APF RG59 is budgeted on Appendix 1.8 T6 and Entertainment coax on Appendix 1.6. Confirm final take-off and route endpoints, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
 export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId,MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId,MGW_RADIO_REMAINING_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [

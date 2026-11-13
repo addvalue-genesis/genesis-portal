@@ -108,6 +108,8 @@ try{
  assert.equal(revised.offers.find(o=>o.id===apl01.id).quoteEvidence.quotedQuantity,2800);
  assert.equal(lineById(revised,option).manualCost,186050);
  assert.equal(lineById(revised,'REQ-MR-B1-18-APF-18').offerId,held.id);
+ assert(originalFoc.mgwDetailPricingImport.conflicts.includes(Q.MGW_APF_RG59_OVERLAP_0550));
+ assert(!revised.mgwDetailPricingImport.conflicts.includes(Q.MGW_APF_RG59_OVERLAP_0550));
  assert.equal(revised.lines.filter(l=>l.offerId===apl01.id&&l.selected).length,1);
  const revisedModel=W.deriveBidWorkspace(revised,tokens,focDate);
  const revisedView=releaseScheduleDraftView0550(revised,revisedModel,D.SYSTEMS,focDate);

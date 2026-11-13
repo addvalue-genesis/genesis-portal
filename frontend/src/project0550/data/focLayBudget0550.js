@@ -2,7 +2,7 @@ import plan from './focLayBudget0550.json';
 import {EXTERNAL_ENGINEERING_POLICY_0550,GOODS_POLICY_TITLE_0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550';
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
-import {MGW_BASIS_REVIEW_0550,mgwBulkMr0550,mgwFiberPanelOffer0550,mgwReplacementActive0550} from './mgwQuoteSelection0550';
+import {MGW_APF_RG59_OVERLAP_0550,MGW_BASIS_REVIEW_0550,mgwBulkMr0550,mgwFiberPanelOffer0550,mgwReplacementActive0550} from './mgwQuoteSelection0550';
 import {sumMoney0550} from './money0550';
 
 const mr=suffix=>'MR-B1-18-'+suffix;
@@ -97,7 +97,7 @@ export function prepareFocLayBudget0550(data,policies,today,replacePipeline){
   }
   for(const [id,quantity,basis] of [
    [apl01,5600,'APL01 PHI §8.1: two 24C runs × 2,800 m budgeted. MGW quote quantity remains 2,800 m'],
-   [rg59,940,'MGW BULK 1.18 RG59 allowance. Entertainment quotes RF6 / RF400-75. Confirm route before issue'],
+   [rg59,940,'MR Appendix 1.8 APF T6 / MGW BULK 1.18. Entertainment RF6 and RF400-75 stay on Appendix 1.6 per Entertainment SPE-0012 and DTS-0011. Confirm endpoints and MTO'],
   ]){
    const line=lines.get('REQ-'+id),offer=bulk.get(id),e=offer?.quoteEvidence;
    if(!writable(line,'C1',id===apl01)||!includedInScope(line)||offer?.currency!=='USD'||offer.unit!=='m'||!(offer.unitCost>0)||
@@ -132,6 +132,12 @@ export function prepareFocLayBudget0550(data,policies,today,replacePipeline){
    sourceRef:basis,vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'USD',
    manualCost:3800,...goods,selected:true,commissioningPhase:'COMMISSIONING',customerRemark:warning},
    'C2','COMMISSIONING_SPARES','BASE',{mainEquipment:'FOC and Cables'});
+ }
+ const rg59Line=next.lines.find(line=>line.id==='REQ-'+rg59);
+ const mgwReceipt=next.mgwDetailPricingImport;
+ if(rg59Line?.offerId&&isSelected(rg59Line)&&rg59Line.offerId===bulk.get(rg59)?.id&&
+  mgwReceipt?.conflicts.includes(MGW_APF_RG59_OVERLAP_0550)){
+  next={...next,mgwDetailPricingImport:{...mgwReceipt,conflicts:mgwReceipt.conflicts.filter(conflict=>conflict!==MGW_APF_RG59_OVERLAP_0550)}};
  }
  return next===data?data:{...next,repositoryBasisImport:{...next.repositoryBasisImport,pricedVolumeDraftIds:[...recorded]}};
 }

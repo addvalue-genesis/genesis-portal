@@ -10,7 +10,7 @@
   "contextCommand": "npm run context:pj0550",
   "latestCheckpoint": "docs/handoff/pj2608-0550/20261112_VENDOR_DIRECT_WORKING_PRICING.md",
   "latestTowerDecision": "Master Tower goods 30% / 20%, erection 30% / 5%. A1-11 goods and A1 Others / B4 erection retain the existing owners. C7 separately tracks field workloads. See the Master Tower checkpoint.",
-  "latestFocDecision": "Use the LAY/PHI budget for Appendix 1.8 Draft, with CAT6A in A1-01 and pipeline physical installation as a CDL-024 A2 option. Shared C3–C8/D/E/F exposure is displayed for owner reconciliation. Route, quantities and estimate scope remain subject to review.",
+  "latestFocDecision": "Use the LAY/PHI budget for Appendix 1.8 Draft. Retain distinct APF and ACP 24C local allowances and one APF T6 RG59 allowance in A1-13. Entertainment coax stays in Appendix 1.6. CAT6A goes to A1-01 and physical pipeline installation is a CDL-024 A2 option. Shared costs retain their project owners. Final endpoints and MTO remain open.",
   "latestPagaDecision": "Use INDUSTRONIC A20261632-005 for A1-05 and Appendix 1.4. Use ID-IE Local FAT and site supervision Offers in Working B4/C7. Reuse ADDVALUE rates from 06 Execution; service workloads remain OPEN. The 11.C1 Working Preview shows the original EUR cost breakdown below the package and distinguishes the selected revision from the latest received Offer.",
   "requiredReading": [
     "docs/handoff/pj2608-0550/20261109_MGW_MET_NDB_QUOTATION.md",
