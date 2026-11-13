@@ -78,7 +78,7 @@ export function A1OthersBreakdown0550({panel,view,currency,onNavigate,disabled})
     {items.length?items.map(b=><tr key={b.lineId} data-working-line={b.lineId}>
      <td><strong>{b.line.description}</strong><small>{b.line.wbs} · {b.lineId}</small></td>
      <td>{b.quantity??'OPEN'}</td><td>{b.unit||'OPEN'}</td><td>{money(b.unitPrice)}</td><td>{money(b.amount)}</td>
-     <td><small>{b.suggested?'SI draft allocation':b.state}</small>
+     <td><small>{b.line.a1OthersEstimate?'Draft allowance · verify scope and actual rates':b.suggested?'SI draft allocation':b.state}</small>
       <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.line.'+b.lineId)}>Working</button>{' '}
       <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.quotation.line.'+b.lineId)}>11.M</button>
      </td>

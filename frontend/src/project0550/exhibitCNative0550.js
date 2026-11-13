@@ -133,6 +133,7 @@ function nativePages(view,id,currency='USD',c2References){
     set(v,r,9,notes.join(' / '));
    }
    if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
+   if(base&&r===11&&view.workingPreview&&bs.some(b=>b.line.a1OthersEstimate))v.A1_11_7+=' / Includes estimated freight, handling and insurance where applicable.';
    if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
   }
   if(base&&view.workingPreview){

@@ -35,10 +35,30 @@ const mgwDependentEstimateIds=new Set([
  'LINE-BID-OEM-TRAINING-TRAVEL-0550','REQ-MR-ACT-B9-D01','REQ-MR-ACT-C2-D03','REQ-MR-WARRANTY',
  ...[...spareBudgetRates.keys()].map(code=>'REQ-MR-ACT-'+code),
 ]);
+const cargoPremiumRate0550=0.004;
+const cargoInsuredValueFactor0550=1.1;
+const projectLiabilityRate0550=0.005;
 export function mgwDependentEstimateOpen0550(data,line){
  if(!mgwReplacementActive0550(data)||!mgwDependentEstimateIds.has(line.id))return false;
  const receipt=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id);
  return receipt?.kind==='ESTIMATE'&&receipt.inputKey===lineKey(data,line);
+}
+
+export function a1OthersEstimateRate0550(data,line,procurementTHB){
+ const id=line.id;
+ if(line.unit!=='Lot'||line.quantity!==1)return null;
+ if(id==='REQ-MR-ACT-B2-D01')return line.manualCost;
+ if(id==='REQ-MR-ACT-B2-D02'){
+  const receipt=data.repositoryBasisImport?.bidCompletion?.rows.find(row=>row.lineId===id);
+  // Reuse the origin allowance only while the tower delivery quotations match.
+  if(receipt?.offerIds.length!==2||receipt.sourceKey!==sourceKey(data,receipt.offerIds))return null;
+  const assignedElsewhere=data.lines.some(owner=>owner.selected&&owner.id!==id&&receipt.offerIds.includes(owner.offerId));
+  return assignedElsewhere?null:line.manualCost;
+ }
+ if(!(procurementTHB>0))return null;
+ if(id==='REQ-MR-ACT-B2-D04')return roundMoney0550(procurementTHB*cargoInsuredValueFactor0550*cargoPremiumRate0550);
+ if(id==='REQ-MR-ACT-B9-D01')return roundMoney0550(procurementTHB*projectLiabilityRate0550);
+ return null;
 }
 const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return 'bid1:'+(h>>>0).toString(16)+':'+text.length;};
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
@@ -659,7 +679,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  estimate('B2-D02','THB',3*40000+(delivered||0),'Non-MGW origin handling:3 origin groups × THB40000 estimated, plus original tower item14 warehousing/delivery '+(delivered===null?'unavailable':delivered+' THB')+'. Excludes MGW origin package already priced; no second tower delivery charge.');
  const deliveryRow=rows.find(r=>r.lineId==='REQ-MR-ACT-B2-D02');if(deliveryRow)deliveryRow.offerIds=delivery.map(o=>o.id);
  estimate('B2-D03','THB',4*25000,'Forwarder/consolidation administration allowance4 shipments × THB25000; excludes carrier freight, origin handling, customs duties and statutory fees. No forwarder quotation received.');
- estimate('B2-D04','THB',supplyCost*1.1*0.004,'Cargo premium budget only: known selected PartA procurement cost ×110% insured-value assumption ×0.4% premium assumption. Not an insurer offer or confirmation of cover; duties/deductibles excluded. This is the sole cargo-premium owner.');
+ estimate('B2-D04','THB',supplyCost*cargoInsuredValueFactor0550*cargoPremiumRate0550,'Cargo premium budget only: known selected PartA procurement cost ×110% insured-value assumption ×0.4% premium assumption. Not an insurer offer or confirmation of cover; duties/deductibles excluded. This is the sole cargo-premium owner.');
  reference('B2-D05',['REQ-MR-ACT-B2-D01','REQ-MR-ACT-B2-D02','REQ-MR-ACT-B2-D03'],'Route/Incoterm normalization is SI process work, not another freight purchase. Current bid scenarioCIF Yangon; RFQ FCA/FOB differences remain disclosed.');
  estimate('B3-D01','USD',13*1000,'Additional OEM product training budget13 trainer-MD × USD1000/MD: MGW10MD and microwave3MD planning assumptions. Excludes existing TSI operator/maintenance training. Obtain separate evidence for INDUSTRONIC onshore training scope, hours and rates. Supplier course/duration confirmation remains required.');
  if(rows.some(r=>r.lineId==='REQ-MR-ACT-B3-D01')){
@@ -677,7 +697,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
   'Authority/agent provisional cash allowance: '+licenceAllowance.map(r=>r.label+' · '+r.quantity+' × THB '+r.rateTHB).join(' / ')+'. Estimated exposure, not published statutory tariffs or approval. TSI preparation labour is already separate.');
  // Cash pass-through assumptions are explicit; goods margins do not apply.
  for(const key of ['B8-D05','B2-D04']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,markupPct:null,contingencyPct:null,marginPct:null,primePct:0};}
- estimate('B9-D01','THB',supplyCost*0.005,'Project liability/contract-risk premium provision0.5% of selected PartA procurement value. Explicit bid budget, not insurance advice, a quoted premium or confirmed policy wording; cargo and personnel cover are separate.');
+ estimate('B9-D01','THB',supplyCost*projectLiabilityRate0550,'Project liability/contract-risk premium provision0.5% of selected PartA procurement value. Explicit bid budget, not insurance advice, a quoted premium or confirmed policy wording; cargo and personnel cover are separate.');
  estimate('B9-D03','THB',6*15000,'Medevac/medical-related cover provision6 planning personnel × estimated THB15000; not confirmation of policy eligibility/cover. Existing personnel travel/work-risk allowance is separate; deduct overlap when policy is quoted.');
  for(const key of ['B9-D01','B9-D03']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,markupPct:null,contingencyPct:null,marginPct:null,primePct:0};}
  reference('B9-D04',['REQ-MR-ACT-B2-D04'],'Shipment-related cover is the same cargo premium already owned inB2-D04, not an additional policy.');

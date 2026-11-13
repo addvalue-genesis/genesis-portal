@@ -18,7 +18,7 @@ import {addvalueSell0550} from "../bidWorkingBasis0550";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {a1OthersEstimateRate0550,mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -109,6 +109,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  return data;
 }
 const SPARE_BUDGET_REVIEW_0550="SPARE_BUDGET_REVIEW: Draft allowance from known current Part A costs. Verify OEM parts and deduct confirmed package inclusions.";
+const A1_OTHERS_ESTIMATE_REVIEW_0550="A1_OTHERS_ESTIMATE_REVIEW: Draft freight, handling or insurance allowance. Verify delivery scope and actual rates.";
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
  data=reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(data));
  const towerSurveyOpen=towerSurveyReviewPending0550(data);
@@ -124,7 +125,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const pagaOwners=eligible.filter(l=>l.systemToken==='TEL-PAGA'&&l.wbs==='A'&&pagaNetIds.has(l.offerId));
  const pbxQuote=chevalierPbxQuote0550(data.offers);
  const hasPbxAllocation=data.lines.some(l=>l.selected&&chevalierPbxOwnerCode0550(l.id));
- const priceLine=(l,spareCostBasisTHB)=>{
+ const priceLine=(l,procurementBasisTHB)=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
   const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
@@ -183,15 +184,20 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
    costRate=null;
    problems.push(retiredMgw?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550);
   }
-  let spareBudget;
+  let spareBudget,a1OthersEstimate;
   if(mgwDependentEstimateOpen0550(data,l)){
    const rate=spareBudgetRate0550(l.id);
+   const othersRate=selected?a1OthersEstimateRate0550(data,l,procurementBasisTHB):null;
    // The existing receipt check only allows an untouched generated estimate.
    // This calculation uses current cost owners and is a draft price basis only.
-   if(selected&&rate&&spareCostBasisTHB>0){
-    spareBudget={rate,basisTHB:spareCostBasisTHB};
-    costRate=round(spareCostBasisTHB*rate);
+   if(selected&&rate&&procurementBasisTHB>0){
+    spareBudget={rate,basisTHB:procurementBasisTHB};
+    costRate=round(procurementBasisTHB*rate);
     problems.push(SPARE_BUDGET_REVIEW_0550);
+   }else if(nonnegative(othersRate)){
+    a1OthersEstimate=true;
+    costRate=othersRate;
+    problems.push(A1_OTHERS_ESTIMATE_REVIEW_0550);
    }else{
     costRate=null;
     problems.push('MGW_DEPENDENT_ESTIMATE_OPEN: ตรวจฐานประมาณการหลังเปลี่ยนขอบเขตและต้นทุน MGW');
@@ -220,7 +226,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   // The printed Radio extension can be carried in the bid draft while its
   // missing unit remains an Official Working problem.
   const radioPrintedExtension=mgwRadioPrintedExtension0550(offer,l);
-  const draftBlocker=p=>p!==SPARE_BUDGET_REVIEW_0550&&!isBidScopeWarning0550(p)&&
+  const draftBlocker=p=>p!==SPARE_BUDGET_REVIEW_0550&&p!==A1_OTHERS_ESTIMATE_REVIEW_0550&&!isBidScopeWarning0550(p)&&
    !(radioPrintedExtension&&p.startsWith("MGW_UNIT_OPEN:"))&&
    !(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&
    !["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p);
@@ -228,7 +234,9 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const spareProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
    !problems.some(p=>p.startsWith("MGW_UNIT_OPEN:"))&&
    Math.abs(costNative)<=Number.MAX_SAFE_INTEGER/100&&!problems.some(draftBlocker)?round(costNative*factor):null;
-  const addvalueSell=addvalueSell0550(l,costNative,quantity);
+  // Cargo and liability estimates use a pass-through rate equal to the current premium.
+  const sellInputs=a1OthersEstimate&&l.sellMode==='DIRECT'?{...l,sellRate:costRate}:l;
+  const addvalueSell=addvalueSell0550(sellInputs,costNative,quantity);
   if(addvalueSell===null)problems.push("Working sell inputs OPEN/invalid");
   const customerNative=addvalueSell!==null&&nonnegative(l.primePct)?eq("E13",{sell:addvalueSell,primeMarkup:l.primePct/100}):null;
   if(customerNative===null)problems.push("Prime commercial treatment OPEN/invalid");
@@ -249,15 +257,15 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const pbxProducts=pbxAllocation?.products?.map(item=>({
    itemCode:item.supplierQuoteRow.itemCode,description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit,
   }));
-  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(pbxProducts?{pbxProducts}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(a1OthersEstimate?{a1OthersEstimate}:{}),...(pbxProducts?{pbxProducts}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  };
  const equipment=new Map();
  if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){
   for(const line of data.lines)if(line.wbs==='A')equipment.set(line.id,priceLine(line,null));
  }
- const spareCostBasisTHB=sumMoney0550([...equipment.values()]
+ const procurementBasisTHB=sumMoney0550([...equipment.values()]
   .map(line=>line.spareProcurementCostTHB).filter(finite));
- const lines=data.lines.map(line=>equipment.get(line.id)??priceLine(line,spareCostBasisTHB));
+ const lines=data.lines.map(line=>equipment.get(line.id)??priceLine(line,procurementBasisTHB));
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
  const sum=(rows,key)=>sumMoney0550(rows.map(r=>r[key]));
