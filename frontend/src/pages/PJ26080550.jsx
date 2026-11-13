@@ -2,6 +2,7 @@ import "../project0550/deviationRelease0550.css";
 import "../project0550/mrSourceReader0550.css";
 import {RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "../project0550/data/towerLegacyPricing0550";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
+import {mgwRadioSourceModel0550,mgwRadioSourceRow0550} from "../project0550/data/mgwQuoteSelection0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import {workspaceAlias0550} from '../project0550/workspaceLabels0550';
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from "react";
@@ -2159,7 +2160,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(model?.lines||[]).flatMap(r=>[{id:r.sourceModuleId,title:r.description+" / Source",tab:"budget"},{id:r.releaseModuleId,title:r.description+" / Release",tab:"budget"}]),
     ...(data?.calculations||[]).map(c=>({id:"bid.engineering.calculation."+c.id,title:c.title,tab:"engineering"})),
     ...(data?.vendors||[]).map(v=>({id:"bid.vendor."+v.id,title:v.name,tab:"documents"})),
-    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:o.quoteRef+" / "+o.description,tab:"documents"})),
+    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:[o.quoteRef,[o.description,o.brand,mgwRadioSourceModel0550(mgwRadioSourceRow0550(o))].filter(Boolean).join(" · ")].join(" / "),tab:"documents"})),
     ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
     ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
     ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),

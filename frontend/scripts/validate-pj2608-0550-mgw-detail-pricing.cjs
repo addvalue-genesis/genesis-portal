@@ -343,6 +343,15 @@ const radioLotDate='2026-11-12';
 const activateLots=input=>current.prepareMgwCurrentWorking0550(current.prepareMgwRadioDtrsRegister0550(input,tokens,radioLotDate),D.COMMERCIAL_POLICY,radioLotDate);
 const radioLots=activateLots(radioBase);validate(radioLots);
 const lotOffers=radioLots.offers.filter(radioSelection.mgwRadioDtrsOffer0550);
+const radio012=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-012');
+assert.equal(radioSelection.mgwRadioSourceModel0550(radioSelection.mgwRadioSourceRow0550(radio012)),'TR-910');
+assert.equal(radio012.quoteEvidence.quotedUnit,'Not stated');
+assert.equal(radio012.quoteEvidence.quotedTotal,14680);
+const {VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550.jsx');
+const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:radioLots,onEdit:()=>{}}));
+assert.match(radioVendorHtml,/<strong>FIXED AM VHF Radio Telephone · Jotron · TR-910<\/strong><small>RADIO-012 · PDF 11<\/small>/);
+const radio012VendorRow=radioVendorHtml.match(new RegExp('<tr[^>]+data-vnd-offer="'+radio012.id+'"[^>]*>.*?<\\/tr>','s'))?.[0];
+assert.match(radio012VendorRow,/<strong>FIXED AM VHF Radio Telephone<\/strong><small>Jotron · TR-910<\/small>/);
 assert.deepEqual(lotOffers.filter(o=>o.quoteEvidence.sourceId!==radioSelection.MGW_RADIO_REMAINING_0550.batchId)
  .map(o=>[radioSelection.mgwCurrentItemKey0550(o),radioSelection.mgwCurrentMr0550(o)]),
  [['RADIO-001',['MR-B1-11-APF-01']],['RADIO-009',['MR-B1-11-APF-01']],['RADIO-009-OPTION',[]],['RADIO-016',[]],

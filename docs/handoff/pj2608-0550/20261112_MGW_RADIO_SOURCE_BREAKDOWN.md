@@ -28,3 +28,18 @@ continuations, the quoted total and equality of the prior catalogue fields.
 Both changed JSX files compile with Babel. The context command could not
 complete in the connector source snapshot because it lacks the full dependency
 tree. Full webpack build and Windows runtime were not verified.
+
+## 13 November — find the Jotron fixed VHF-AM offer
+
+In Project Module Search, enter `TR-910` or `Jotron` and select FIXED AM VHF
+Radio Telephone. The existing Offer ID opens under 07.2 → MGW → VHF-AM
+Aeronautical Radio → Q26-063 Radio / DTRS. The model also appears on the
+original Radio System quotation row. It comes from the model line in the
+recorded supplier detail on PDF page 11, item 4.
+
+RADIO-012 has quoted quantity 1, no stated unit and a printed extension of
+USD 14,680. It is counted once in the USD 700,501 radio source total and maps
+to Working A1-09. This change only updates display text and search labels.
+The MGW pricing and Vendor Register validators passed. A development webpack
+build and DOM interaction check verified search and expansion on repository
+seed data. Windows browser storage was not verified.

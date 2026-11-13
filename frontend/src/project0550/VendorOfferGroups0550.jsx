@@ -2,7 +2,7 @@ import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {chevalierPbxSource0550} from './data/chevalierPbxQuote0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
-import {mgwFocSupplyOffer0550} from './data/mgwQuoteSelection0550';
+import {mgwFocSupplyOffer0550,mgwRadioSourceModel0550,mgwRadioSourceRow0550} from './data/mgwQuoteSelection0550';
 import {scheduleAllocationPlan0550} from './data/bidVolumeWorkingPreview0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
@@ -181,7 +181,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
    <RadioLotBomTable0550 components={o.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(o)}/>
   </td></tr>:null;
   return <React.Fragment key={o.id}><tr data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/><small>{o.brand}</small>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<small>{[o.brand,mgwRadioSourceModel0550(mgwRadioSourceRow0550(o))].filter(Boolean).join(' · ')}</small><SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     <small>Volume I · {sectionsByOffer.get(o.id).map(tag=>'11.'+tag).join(' · ')||'OPEN'}</small>

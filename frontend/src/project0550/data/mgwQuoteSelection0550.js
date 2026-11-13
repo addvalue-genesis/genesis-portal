@@ -236,6 +236,7 @@ const radioSourceByOfferId=new Map(quote.rows.filter(row=>row.section==='RADIO')
  MGW_RADIO_DTRS_0550.prefix+row.id.slice('MGW-Q26-063-'.length),row,
 ]));
 export const mgwRadioSourceRow0550=offer=>mgwRadioDtrsOffer0550(offer)?radioSourceByOfferId.get(offer.id):undefined;
+export const mgwRadioSourceModel0550=row=>row?.detail?.match(/^Description:\r?\n([^\r\n]+)/i)?.[1].trim();
 export function mgwRadioPrintedExtension0550(offer,line){
  const row=mgwRadioSourceRow0550(offer),e=offer?.quoteEvidence;
  return Boolean(row&&e.classification==='RATE'&&row.unit===null&&e.quotedUnit==='Not stated'&&

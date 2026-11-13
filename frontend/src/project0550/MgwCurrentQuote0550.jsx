@@ -14,7 +14,7 @@ import {
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
  MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
  MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
- mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwFiberPanelOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
+ mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwFiberPanelOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwRadioSourceModel0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
 const radioSourceRows=MGW_QUOTE_0550.rows.filter(row=>row.section==='RADIO');
@@ -79,7 +79,7 @@ function MgwRadioSource0550({data,sectionFilter}){
     const owners=current?data.lines.filter(line=>line.selected&&line.offerId===current.id):[];
     return <React.Fragment key={row.id}>
      {isVisible(sections)&&<tr>
-      <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
+      <td><strong>{[row.description,row.brand,mgwRadioSourceModel0550(row)].filter(Boolean).join(' · ')}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
        <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
        {components.length>0&&<RadioLotBomTable0550 components={components} caption={'BOM ต่อชุด · '+item}/>}
        <details><summary>ข้อความต้นฉบับ / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
