@@ -1,7 +1,7 @@
 import React from 'react';
 import {amount} from './BidControls';
 import {RadioLotBomTable0550} from './RadioLotBom0550';
-import {parseRadioLotComponents0550,RADIO_ACCESSORIES_SEPARATOR_0550,RADIO_GTPL_SEPARATOR_0550} from './data/radioLotComponents0550';
+import {parseRadioLotComponents0550,RADIO_ACCESSORIES_SEPARATOR_0550,RADIO_GTPL_INSTALLATION_SITE_0550,RADIO_GTPL_SEPARATOR_0550} from './data/radioLotComponents0550';
 import {sumMoney0550} from './data/money0550';
 import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
@@ -34,7 +34,7 @@ export const MGW_GTPL_SOURCE_TARGET_0550={
 const radioUnpriced={
  'RADIO-005':{
   separator:RADIO_GTPL_SEPARATOR_0550,target:MGW_GTPL_SOURCE_TARGET_0550.id,
-  title:'VHF DMR Radio System · GTPL relocation', sourceSite:'APM', site:'GRS#2 → APF Control Building / เสาโทรคมนาคมใหม่ 60 ม.', price:'—',
+  title:'VHF DMR Radio System · GTPL relocation', sourceSite:RADIO_GTPL_INSTALLATION_SITE_0550, site:'GRS#2 → '+RADIO_GTPL_INSTALLATION_SITE_0550+' Control Building / เสาโทรคมนาคมใหม่ 60 ม.', price:'—',
  },
  'RADIO-009':{
   separator:RADIO_ACCESSORIES_SEPARATOR_0550,
@@ -99,9 +99,9 @@ function MgwRadioSource0550({data,sectionFilter}){
       <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
        {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
        {unpricedComponents.length>0&&<RadioLotBomTable0550 components={unpricedComponents} caption={'ขอบเขตที่ไม่มีราคาแยก · '+item}/>}
-       <details><summary>ข้อความต้นฉบับ / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
+       <details><summary>{extra.target?'ขอบเขตตามใบ MGW · Location ที่แก้ไข':'ข้อความต้นฉบับ / ขอบเขต'}</summary><p className="p55-supplier-verbatim">{extra.target&&'Location: '+extra.sourceSite+'\n'}{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
-      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>หัวแถวในใบ MGW · รอชี้แจง</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
+      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>แก้ Location ตามที่ยืนยัน</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
    })}</tbody>

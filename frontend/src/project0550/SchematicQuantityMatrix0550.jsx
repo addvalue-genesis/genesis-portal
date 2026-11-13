@@ -2,6 +2,7 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {PHI_BUILDINGS_0550} from './data/apfPhiMatrix0550';
 import {MGW_CURRENT_MATRIX_0550,NO_SITE_0550,SITE_ONLY_0550,schematicQuantityGroups0550,schematicQuantityMatrix0550,schematicSystemDocs0550} from './data/schematicQuantityMatrix0550';
 import {supplierItemSourceText0550} from './data/supplierCostProjection0550';
+import {radioGtplLocationDisplay0550} from './data/radioLotComponents0550';
 import {MGW_CCTV_ENT_SECTIONS_0550} from './data/mgwQuoteSelection0550';
 import {schematicCoverage0550,schematicOfferMrRefs0550} from './data/schematicCoverage0550';
 
@@ -67,7 +68,7 @@ function VendorBom0550({offers,onNavigate}){
      {exactTags.length>0&&<small>TAG ในใบเสนอราคาตรงกับ CUS · {exactTags.join(', ')}</small>}
      <details><summary>{components.length>2?'BOM ทั้ง '+components.length+' รายการ และต้นทาง':'ดูต้นทางและสเปก'}</summary>
       <small>{[offer.quoteRef,offer.quoteEvidence.revision,native.locator].filter(Boolean).join(' · ')}</small>
-      {terms.length>0&&<ul className="p55-bom-native-text">{terms.map(line=><li key={line}>{line}</li>)}</ul>}
+      {terms.length>0&&<ul className="p55-bom-native-text">{terms.map(line=><li key={line}>{radioGtplLocationDisplay0550(line)}</li>)}</ul>}
       {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.vendor.offer.'+offer.id)}>เปิด Offer ใน 07 VND</button>}
      </details>
     </td>

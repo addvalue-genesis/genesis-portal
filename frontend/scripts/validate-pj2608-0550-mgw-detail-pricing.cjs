@@ -366,7 +366,13 @@ const {MGW_GTPL_SOURCE_TARGET_0550}=require(root+'/project0550/MgwCurrentQuote05
 const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:radioLots,onEdit:()=>{},onNavigate:()=>{}}));
 const gtplRow=radioVendorHtml.split('data-component-key="'+MGW_GTPL_SOURCE_TARGET_0550.id+'"');
 assert.equal(gtplRow.length,2,'One navigation target for the original GTPL reference');
-assert.match(gtplRow[1],/GRS#2 → APF Control Building.*APM<small>หัวแถวในใบ MGW · รอชี้แจง/s);
+assert.match(gtplRow[1],/Location: APF\s+According to MM-ASK-1A-APF-TEL-SPE-0009.*GRS#2 → APF Control Building.*<td>APF<small>แก้ Location ตามที่ยืนยัน/s);
+const {radioGtplLocationDisplay0550,RADIO_GTPL_SEPARATOR_0550}=require(root+'/project0550/data/radioLotComponents0550.js');
+const gtplSource=Q.MGW_QUOTE_0550.rows.find(row=>row.id==='MGW-Q26-063-RADIO-005').detail;
+assert(gtplSource.includes(RADIO_GTPL_SEPARATOR_0550),'Keep the original source transcription');
+assert.equal(radioGtplLocationDisplay0550(gtplSource),gtplSource.replace('Location: APM','Location: APF'));
+assert.equal(radioGtplLocationDisplay0550('Location: APM\nRadio Console'),'Location: APM\nRadio Console');
+assert(radioVendorHtml.includes('Location: APF\nVHF DMR Radio System GTPL'),'Supplier detail uses the corrected location');
 assert.match(radioVendorHtml,/MGW · งานย้ายวิทยุ GTPL/);
 assert.match(radioVendorHtml,/<strong>FIXED AM VHF Radio Telephone · Jotron · TR-910<\/strong><small>RADIO-012 · PDF 11<\/small>/);
 const radio012VendorRow=radioVendorHtml.match(new RegExp('<tr[^>]+data-vnd-offer="'+radio012.id+'"[^>]*>.*?<\\/tr>','s'))?.[0];

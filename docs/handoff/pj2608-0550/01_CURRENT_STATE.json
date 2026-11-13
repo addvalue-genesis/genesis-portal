@@ -11,7 +11,7 @@
   "latestCheckpoint": "docs/handoff/pj2608-0550/20261113_A1_INSPECTION_BUDGET.md",
   "latestVendorOfferSearchDecision": "Search TR-910 or Jotron for the existing MGW RADIO-012 Offer. Its BOM Specification row shows Jotron and TR-910 in the Brand / Model / Part No. column. See the MGW radio source breakdown checkpoint for the 07.2 path and verification.",
   "latestRadioWorkingUnitDecision": "RADIO-012 uses one SET in Working Draft, with Not stated retained in the MGW quotation and one Lot on the MR C1 system row. The USD 14,680 source extension keeps its existing owner.",
-  "latestGtplSourceNavigation": "Search GTPL or GRS#2 or use the DTRS shortcut in 07.2 to open the unpriced MGW relocation reference. The quoted heading is APM and the destination is APF from GRS#2.",
+  "latestGtplSourceNavigation": "Search GTPL or GRS#2 or use the DTRS shortcut in 07.2 to open the unpriced MGW relocation reference. GENESIS displays the owner-confirmed APF location for this row, with GRS#2 as the origin.",
   "latestInspectionDecision": "All-system witnessed FAT/iFAT is one A1 S/N 2 Lot with 11.D detail from the existing B4 Working records. Accepted customer amount USD 105,175.82 per Thailand iFAT / Pre-FAT / Integrated FAT lot at THB 31.50/USD. OEM PAGA FAT at Wertheim remains in A1-05.",
   "latestCctvDecision": "The EXW draft prices additional recording and VMS, OEM SAT travel and conditional post-CIF logistics. Shared-scope credits remain subject to Working owner reconciliation.",
   "latestTowerDecision": "Master Tower goods 30% / 20%, erection 30% / 5%. A1-11 goods and A1 Others / B4 erection retain the existing owners. C7 separately tracks field workloads. See the Master Tower checkpoint.",

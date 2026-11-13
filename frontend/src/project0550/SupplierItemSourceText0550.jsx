@@ -4,6 +4,7 @@ import {VENDOR_PHYSICAL_TAG_FIELDS_0550,offerSourceSections0550} from './data/ve
 import {amount} from './BidControls';
 import {nativeSupplierItem0550,supplierBoqRows0550,supplierItemLabel0550,supplierItemSourceText0550,supplierCostProjection0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {RadioLotBomTable0550} from './RadioLotBom0550';
+import {radioGtplLocationDisplay0550} from './data/radioLotComponents0550';
 import {mgwRadioSourceModel0550,mgwRadioSourceRow0550} from './data/mgwQuoteSelection0550';
 import {isTowerSourceItem0550,towerOfferScope0550} from './data/towerTenderScope0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
@@ -340,7 +341,7 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true,dat
     <p>ส่วนประกอบใช้ราคาแพ็กเกจเดิม · จำนวนข้างต้นเป็นจำนวนในใบเสนอราคาฉบับที่เปิดดู</p>
    </>}
    {sourceSection&&<details><summary>ข้อความ Item จากต้นฉบับ · {sourceSection.locator}</summary><p className="p55-supplier-verbatim">{sourceSection.text}</p></details>}
-   {details.length>0&&<details open={!rows.length}><summary>ข้อความ Supplier / เงื่อนไขที่บันทึก</summary>{details.map((text,i)=><p key={i} className="p55-supplier-verbatim">{text}</p>)}</details>}
+   {details.length>0&&<details open={!rows.length}><summary>ข้อความ Supplier / เงื่อนไขที่บันทึก</summary>{details.map((text,i)=><p key={i} className="p55-supplier-verbatim">{radioGtplLocationDisplay0550(text)}</p>)}</details>}
    {!texts.length&&!sourceSection&&<p>ยังไม่มีข้อความรายละเอียดต้นฉบับของ Item นี้ในข้อมูลที่โหลด · ตรวจใบเสนอราคาต้นฉบับ</p>}
    <details data-supplier-source-ref={offer.id}><summary>ข้อความรายการเต็ม / แหล่งอ้างอิงที่บันทึก</summary><p className="p55-supplier-verbatim">{offer.description}</p>{offer.sourceRef&&<p className="p55-supplier-verbatim">{offer.sourceRef}</p>}</details>
   </dialog>

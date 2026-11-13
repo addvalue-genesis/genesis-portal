@@ -100,7 +100,7 @@ export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF
 export const MGW_RADIO_003_SITE_NOTE_0550 = 'RADIO-003 maps to APF (MR-B1-11-APF-03) per instruction of 12 Nov 2026. The quotation prints ACO.';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
- ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
+ ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and the scope of GTPL relocation from GRS#2 to APF. Confirm the RADIO-016 unit at AMS01 and ABV01 supply.';
 export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
  ' RADIO-002 installation site is APF (MR-B1-11-APF-02), confirmed by the user on 12 Nov 2026. ACO is a typo on the quotation.'+
  ' The lot covers the quoted equipment only: two fixed marine radios, one antenna, one IP gateway and one power supply unit. Reconcile the quoted quantity (2 Lot) with the MR quantity and confirm the refreshed quotation.';

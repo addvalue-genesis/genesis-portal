@@ -2,7 +2,12 @@
 // only price. Remark lines stay notes. Page-spill text is merged by the caller
 // before parse, using radioLotSourceText0550.
 export const RADIO_GTPL_SEPARATOR_0550='\nLocation: APM\nVHF DMR Radio System GTPL\n';
+export const RADIO_GTPL_INSTALLATION_SITE_0550='APF';
 export const RADIO_ACCESSORIES_SEPARATOR_0550='\nVHF DMR Radio System Accessaries MOTOROLA\n';
+
+export function radioGtplLocationDisplay0550(text){
+ return text.replace(RADIO_GTPL_SEPARATOR_0550,'\nLocation: '+RADIO_GTPL_INSTALLATION_SITE_0550+'\nVHF DMR Radio System GTPL\n');
+}
 
 const qtyLine=/^~?\s*(\d+(?:\.\d+)?)\s*x\s+(.+)$/i;
 const bulletLine=/^-\s+(.+)$/;
