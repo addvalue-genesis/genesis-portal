@@ -234,3 +234,31 @@ and review. Replayed a reconstructed workspace with both private quotes:
 owner and two supply owners. Verified C1 amounts, A1 Others binding, full
 NET pricing guard, idempotence and preserved authored binding. The owner's
 Windows workspace and bid issuance are separate from these checks.
+
+## 13 November · FOC/BULK LAY budget
+
+Working reuses the original Appendix 1.8 requirement IDs for the LAY/PHI
+allowances. The APL01 Working quantity is 5,600 m at the live BULK offer rate.
+The supplier's 2,800 m quantity and extension stay in 07.2. APF RG59 is a
+priced draft pending route reconciliation with the two different Entertainment
+coax descriptions. The AMS01 cable allowances use the live ABV01 BULK rates.
+CAT6A is allocated to A1-01 and displayed in Appendix 1.8.
+
+CDL-024 physical pipeline installation uses C1-D03 once as an A2 draft,
+replacing the untouched generated estimate where applicable. An independently
+priced commissioning restoration lot is allocated to C2 if no selected FO or
+common price covers it. The shared engineering, documentation, logistics,
+field, training, spares, tools, C8 and other estimates appear in Volume I
+for reconciliation against their existing owners. Those estimates do not
+increase project totals. The training reference follows the current common
+workbook and C8 follows the project call-off owners.
+
+ADR-0550-001 principles 2–6 and 8–11 apply. Draft preparation preserves
+the source offers, reviewed allocations, user-edited Working inputs and
+frozen issues. Route/MTO and supplier scope review remain open.
+
+Verified against the existing Bulk and LAN/PBX/FO register fixtures, including
+Appendix 1.8 price parity, CAT6A allocation, A2 and C2, idempotence, and
+preservation of edited lines and deleted bindings. Working Schedules, C1
+Appendix and Bid Completion validators passed. Production webpack compiled
+with an asset-size warning. The saved Windows workspace was not replayed.

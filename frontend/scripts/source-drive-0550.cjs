@@ -6,6 +6,8 @@ const sourceLimits = require('../src/project0550/data/sourceWorkspaceLimits0550.
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
 const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
 const VENDOR_ENDPOINT = '/api/local/pj2608-0550/vendor-registers';
+const C8_ENDPOINT = '/api/local/pj2608-0550/c8-calloff';
+const C8_FILE = 'PJ2608-0550_C8_CallOff.json';
 const MAX_VENDOR_BYTES = 4 * 1024 * 1024, MAX_VENDOR_RESPONSE_BYTES = 16 * 1024 * 1024;
 const MAX_BYTES = sourceLimits.sourceBytes;
 // Exact predecessor snapshots are retained in the next reading continuation.
@@ -160,18 +162,31 @@ function permitted(req) {
     return true;
   }catch{return false;}
 }
-function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadDriveSourceWorkspace(),vendorLoader=()=>loadDriveVendorRegisters()) {
+async function loadDriveC8Calloff(options){
+ const projects=await discoverProjects(options),bodies=new Set();
+ for(const project of projects){
+  try{
+   const {intake}=await readJson(path.join(project,'90_SYSTEM_WORKING','DATA',C8_FILE),16384);
+   if(intake?.schema!=='genesis.0550.c8-calloff.v1'||intake.projectId!=='PJ2608-0550')throw fail('C8_CALLOFF_DATA_INVALID');
+   bodies.add(canonical(intake));
+  }catch(e){if(e.code!=='ENOENT')throw e;}
+ }
+ if(!bodies.size)throw fail('C8_CALLOFF_NOT_FOUND',404);
+ if(bodies.size>1)throw fail('C8_CALLOFF_DATA_CONFLICT',409);
+ return [...bodies][0];
+}
+function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadDriveSourceWorkspace(),vendorLoader=()=>loadDriveVendorRegisters(),c8Loader=()=>loadDriveC8Calloff()) {
   const pending=new Map();
   return async(req,res,next)=>{
     const endpoint=req.url.split('?')[0];
-    if(![ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT].includes(endpoint))return next();
+    if(![ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,C8_ENDPOINT].includes(endpoint))return next();
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('X-Content-Type-Options','nosniff');
     if(!permitted(req)){res.statusCode=403;return res.end(JSON.stringify({code:'LOCAL_ACCESS_ONLY'}));}
     if(req.method!=='GET'){res.statusCode=405;return res.end(JSON.stringify({code:'METHOD_NOT_ALLOWED'}));}
     try {
-      if(!pending.has(endpoint))pending.set(endpoint,(endpoint===ENDPOINT?loader:endpoint===WORKSPACE_ENDPOINT?workspaceLoader:vendorLoader)().finally(()=>pending.delete(endpoint)));
+      if(!pending.has(endpoint))pending.set(endpoint,(endpoint===ENDPOINT?loader:endpoint===WORKSPACE_ENDPOINT?workspaceLoader:endpoint===VENDOR_ENDPOINT?vendorLoader:c8Loader)().finally(()=>pending.delete(endpoint)));
       res.end(await pending.get(endpoint));
     }catch(e){res.statusCode=e.status||503;res.end(JSON.stringify({code:e.status?e.code:'DRIVE_UNREADABLE'}));}
   };
 }
-module.exports={ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES,MAX_VENDOR_BYTES,MAX_VENDOR_RESPONSE_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveVendorRegisters,createMiddleware,permitted};
+module.exports={ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,C8_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES,MAX_VENDOR_BYTES,MAX_VENDOR_RESPONSE_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveVendorRegisters,loadDriveC8Calloff,createMiddleware,permitted};

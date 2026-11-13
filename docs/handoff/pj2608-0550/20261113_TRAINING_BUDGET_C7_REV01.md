@@ -25,8 +25,19 @@ PAGA, CCTV and MET each allow 15 hands-on seats by role. Cohorts may share parti
 
 The Base training draft equals USD 101,624.40 at THB 31.50/USD. It excludes the THB 105,820 embedded PAGA item 23070. Training uses a Thai local team in the draft. Participant international airfare and hotel responsibility remain open. The Punch List allowance assumes the planned FAT and site mobilizations. Reconcile factory punch support against D and site punch support against C7 Site Service. Record the stage, system, TAG/site, owner, due date, retest evidence and closure sign-off in the Punch List.
 
-Compare the draft to `REQ-MR-ACT-B3-D01` through `REQ-MR-ACT-B3-D05`, `LINE-BID-OEM-TRAINING-TRAVEL-0550`, the shared B4 travel owners and any included supplier services. The existing OEM estimates are THB 653,500 at the same FX basis. Confirm the applicable overlap against the saved Working rows. The USD 252,154.59 displayed subtotal includes field service and training selling prices. The incremental budget and the revised C7 selling subtotal remain OPEN.
+Compare the draft to `REQ-MR-ACT-B3-D01` through `REQ-MR-ACT-B3-D05`, `LINE-BID-OEM-TRAINING-TRAVEL-0550`, the shared B4 travel owners and any included supplier services. The existing OEM estimates are THB 653,500 at the same FX basis. Confirm the applicable overlap against the saved Working rows. The USD 252,154.59 displayed subtotal includes field service and training selling prices. The revised whole-C7 subtotal depends on the selected and priced rows in the active Working workspace.
 
 This documentation-only checkpoint applies ADR-0550-001 principles 2, 5, 6, 8 and 11. The workbook identifies assumptions, separates shared cost owners, traces the proposed activities to existing routes and leaves commercial reconciliation open. Its stage totals and punch allowances were checked against the saved workbook. Working calculations, C7 allocations and issued snapshots require their own saved records and review.
 
 [Exhibit A Annex 7](https://docs.google.com/document/d/1N6fGdHR9bmgnGa1UgkNPSUTGG9nyBfOG/edit) · [Exhibit C Schedule A1 and C7](https://docs.google.com/document/d/1iFaaOV_pYuLPfC28WzthryB1zjf1SOJk/edit) · [INDUSTRONIC A20261632-005](https://drive.google.com/file/d/1HjNspT_tg7bOX8k3j0F5i98P3hX5m_L7/view)
+
+## Working draft application
+
+| Working price owner | Schedule | Quantity | Rev01 cost THB | Draft customer THB | Draft customer USD at 31.50 |
+|---|---|---:|---:|---:|---:|
+| `REQ-MR-ACT-B3-D02` | A1 Others · Thailand classroom training | 1 Lot | 933,847.58 | 980,539.96 | 31,128.25 |
+| `REQ-MR-ACT-B3-D03` | C7 Training · Myanmar OJT | 300 MH over 15 days | 2,267,321.17 | 2,380,687.23 | 75,577.37 |
+
+The draft recovers the approved ROM at ADDVALUE level and applies the Professional Service SAMTEL uplift of 5%. GENESIS uses saved Working FX for the USD display. At 31.50 the two-decimal C7 rate of USD 251.92 extends to USD 75,576.00. The draft subtotal uses the Working sell amount. Reconcile the rate extension before issue.
+
+The application retires the superseded generated B3 allowances and removes six training trips, 12 paid transit days, 14 room nights and 20 per-diem days from the shared B4 estimate. It preserves authored or reviewed Working inputs for reconciliation. PAGA item 23070 stays with its existing A1-05 owner. FAT, SAT and Punch List retain their own scope and price owners.

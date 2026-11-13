@@ -7,6 +7,66 @@ const N=require(root+'/project0550/exhibitCNative0550.js'),V=require(root+'/proj
 const fixtureFile=process.env.PJ0550_VOLUME_FIXTURE||path.join(os.tmpdir(),'0550-native-fixture-'+process.pid+'.json');if(!process.env.PJ0550_VOLUME_FIXTURE)require('node:child_process').execFileSync(process.execPath,[path.join(__dirname,'validate-pj2608-0550-bid-volumes.cjs')],{env:{...process.env,PJ0550_VOLUME_FIXTURE:fixtureFile},stdio:'pipe'});const fixture=JSON.parse(fs.readFileSync(fixtureFile)),today='2026-10-29';
 const derive=d=>{const integration=I.deriveIntegration0550(d,D.SYSTEMS,today);return {...W.deriveBidWorkspace(d,D.SYSTEMS.map(s=>s.token),today,integration),integration};};
 const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fixture),D.SYSTEMS,today);
+{
+ const countryNames=['Thailand','Germany','China','Myanmar'];
+ const pack={schema:'genesis.0550.c8-calloff.v1',projectId:'PJ2608-0550',revision:'Rev03',
+  sourceFilename:'PJ2608-0550_C8_CallOff_Budget_Rev03.xlsx',
+  countries:countryNames.map(name=>({name,people:2,days:3,airportTrips:1,rates:[[5,6],[10,11],[18,19],[3,4],[2,3]]}))};
+ const input={...fixture,repositoryBasisImport:fixture.repositoryBasisImport||{
+  version:'TEST',snapshotId:fixture.baselineSnapshotId,preparedOn:today,fxInherited:false}};
+ const legacyId='LINE-CHEVALIER-PBX-BUDGET-C8-OFFICE',manualId='LINE-CHEVALIER-PBX-BUDGET-C8-TRANSPORT';
+ const legacyLine={...fixture.lines[0],id:legacyId,scopeKey:legacyId,sourceRef:'PABX estimated budget · 2026-11-13 / 8 purchaser man-days',
+  selected:false,unit:'MD',currency:'THB',quantity:8,sellMode:'DIRECT',manualCost:1000,sellRate:1000,primePct:0,
+  vendorId:'',offerId:'',calculationId:'',customerRemark:'Old planning draft'};
+ delete legacyLine.officialReview;
+ const legacyInput={...input,lines:[...input.lines,legacyLine,{...legacyLine,id:manualId,scopeKey:manualId,manualCost:2000,sellRate:2100}],
+  repositoryBasisImport:{...input.repositoryBasisImport,pricedVolumeDraftIds:[...(input.repositoryBasisImport.pricedVolumeDraftIds||[]),legacyId,manualId]}};
+ const legacyBinding=(id,summary)=>({...V.blankScheduleBinding0550(id),schedule:'C8',summary,treatment:'CALLOFF',
+  locator:legacyLine.sourceRef,basis:legacyLine.customerRemark});
+ const old=V.saveBidVolumeRecord0550(V.saveBidVolumeRecord0550(legacyInput,'bindings',legacyBinding(legacyId,'OFFICE'),today),
+  'bindings',legacyBinding(manualId,'TRANSPORT'),today);
+ const upgraded=V.prepareC8Calloff0550(old,pack,today);
+ assert(!upgraded.lines.some(line=>line.id===legacyId));
+ assert.equal(upgraded.lines.find(line=>line.id===manualId).sellRate,2100);
+ const prepared=V.prepareC8Calloff0550(input,pack,today);
+ W.validateBidWorkspace(prepared,fixture.baselineSnapshotId,D.SYSTEMS.map(s=>s.token));
+ assert.equal(V.prepareC8Calloff0550(prepared,pack,today),prepared);
+ const model=derive(prepared),saved=V.deriveBidVolumes0550(prepared,model,D.SYSTEMS,today);
+ const preview=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js')
+  .deriveBidVolumeWorkingPreview0550(prepared,model,D.SYSTEMS,today,saved);
+ assert.equal(saved.baseAssigned,v.baseAssigned);
+ assert.equal(saved.optionsAssigned,v.optionsAssigned);
+ assert.equal(preview.scheduleRows('C8').length,20);
+ assert.equal(saved.active.some(line=>line.id.startsWith('LINE-C8-CALLOFF-')),false);
+ const form=N.nativeSchedule0550(preview,'C8');
+ const page=form.pages.find(page=>page.c8Country==='Myanmar');
+ assert.equal(form.pages.length,4);
+ assert.equal(page.values.C8_1_3,'6 person-day');
+ assert.equal(page.values.C8_3_3,'1 round trip');
+ assert.equal(page.values.C8_4_3,'3 set-day');
+ assert.equal(page.values.C8_6_1,'151.00');
+ assert.match(Buffer.from(N.buildNativeExhibitDocx0550(preview,'C8')).toString(),/Myanmar · Rev03 · Call-off estimate/);
+ const sheet=require(root+'/project0550/exportBidVolumes0550.js').scheduleTable0550(preview,'C8');
+ assert.deepEqual(sheet.rows.find(row=>row[0]==='Myanmar'&&row[2]==='round trip').slice(3,6),[1,19,19]);
+ const first=preview.scheduleRows('C8')[0].lineId;
+ const deleted={...prepared,lines:prepared.lines.filter(line=>line.id!==first),
+  bidVolumes:{...prepared.bidVolumes,bindings:prepared.bidVolumes.bindings.filter(binding=>binding.lineId!==first)}};
+ assert.equal(V.prepareC8Calloff0550(deleted,pack,today),deleted);
+ if(process.env.PJ0550_C8_FIXTURE){
+  const actual=JSON.parse(fs.readFileSync(process.env.PJ0550_C8_FIXTURE,'utf8'));
+  const project=V.prepareC8Calloff0550(input,actual,today),model=derive(project);
+  const saved=V.deriveBidVolumes0550(project,model,D.SYSTEMS,today);
+  const view=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js')
+   .deriveBidVolumeWorkingPreview0550(project,model,D.SYSTEMS,today,saved);
+  const pages=N.nativeSchedule0550(view,'C8').pages;
+  const totals=actual.countries.map(({people,days,airportTrips,rates})=>{
+   const qty=[people*days,people*days,airportTrips,days,people*days];
+   return rates.reduce((sum,[,rate],index)=>sum+rate*qty[index],0)
+    .toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  });
+  assert.deepEqual(pages.map(page=>page.values.C8_6_1),totals);
+ }
+}
 const b={...v.bindings[0],partNo:'TEST-PART',mainEquipment:'TEST-EQ',vendorEquipmentNo:'TEST-VENDOR-EQ',referenceDrawings:'TEST-DWG',interchangeA:'1',interchangeB:'1',specification:'TEST SPEC',origin:'TEST COUNTRY',shippingFrom:'TEST PORT',delivery:'TEST 12 weeks',physical:{estimatedWeightKg:12},deliveryTerm:'CIF Yangon / synthetic'};
 const rows=[];for(const id of ['C1','C2','C3','C4','C5','C6','C7','C8'])rows.push({...b,id:'TEST-'+id,lineId:'TEST-'+id,schedule:id,summary:id==='C7'?'FIELD_SERVICE':id==='C8'?'OFFICE':'GOODS',unit:id==='C7'?'MH':id==='C8'?'MD':b.unit,line:{...b.line,description:'SYNTHETIC '+id+' equipment/service'},treatment:['C3','C4','C6'].includes(id)?'OPTION':id==='C8'?'CALLOFF':'BASE'});
 const view={...v,bindings:rows,scheduleRows:id=>rows.filter(b=>b.schedule===id),unallocated:[],getRecord:id=>({...v.getRecord(id),nativeFields:{agreementNo:'TEST-CONTRACT',vendorNameAddress:'TEST BIDDER ADDRESS',sitePeriodDays:'2',trainingPeriodDays:'1'}})};

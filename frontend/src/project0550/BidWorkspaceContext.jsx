@@ -1,7 +1,8 @@
+import {prepareFocLayBudget0550} from './data/focLayBudget0550';
 import {prepareRadioAppendix11Budget0550} from './data/radioAppendix11Budget0550';
 import {prepareMgwCurrentWorking0550,prepareMgwRadioDtrsRegister0550} from "./data/mgwCurrentWorking0550";
 import {mgwOfferSourcePending0550} from "./data/mgwQuoteSelection0550";
-import {applyCommercialSellPolicies0550,prepareBidCompletion0550,reconcileTowerTenderScope0550,replaceGeneratedDtrsHandheld0550} from "./data/bidCompletion0550";
+import {applyCommercialSellPolicies0550,prepareBidCompletion0550,reconcileTowerTenderScope0550,replaceGeneratedDtrsHandheld0550,retireGeneratedFocInstallation0550} from "./data/bidCompletion0550";
 import {prepareBidProcess0550} from "./data/bidProcess0550";
 import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
 import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
@@ -26,6 +27,7 @@ import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
 import {deriveReleaseControl0550,mergeReleaseRegister0550} from "./data/releaseIssue0550";
 import {prepareRepositoryBidBasis0550,prepareAuthorizedEurThb0550} from "./data/repositoryBidBasis0550";
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550} from "./data/tsiActivityBudget0550";
+import {prepareTrainingBudget0550} from "./data/trainingBudget0550";
 import {CORE_TEAM} from "./data";
 import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
 import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550";
@@ -33,6 +35,8 @@ import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
 import {prepareMgwCctvEntBudget0550} from "./data/mgwCctvEntBudget0550";
 import {prepareVersedDmrCabinet0550} from "./data/versedRack0550";
+import {fetchC8Calloff0550} from "./data/c8Calloff0550";
+import {prepareC8Calloff0550} from "./data/bidVolumes0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
@@ -44,7 +48,8 @@ function prepareQuotation0550(data,today){
  const radioBudget=prepareRadioAppendix11Budget0550(based,COMMERCIAL_POLICY,today,replaceGeneratedDtrsHandheld0550);
  const priced=prepareBidCompletion0550(radioBudget,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(radioBudget,systemTokens0550,today)},today);
  const pbxBudget=prepareChevalierPbxBudget0550(applyCommercialSellPolicies0550(priced),COMMERCIAL_POLICY,today);
- const working=prepareMgwCctvEntBudget0550(pbxBudget,COMMERCIAL_POLICY,today);
+ const focBudget=prepareFocLayBudget0550(prepareMgwCctvEntBudget0550(pbxBudget,COMMERCIAL_POLICY,today),COMMERCIAL_POLICY,today,retireGeneratedFocInstallation0550);
+ const working=prepareTrainingBudget0550(focBudget,COMMERCIAL_POLICY,CORE_TEAM,today);
  return preparePagaMobWorking0550(preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today));
 }
 export const useBidWorkspace=()=>useContext(Context);
@@ -57,6 +62,7 @@ export function BidWorkspaceProvider({children}){
  const reload=async()=>{
   if(lock.current)return;lock.current=true;setBusy(true);
   try{
+   const c8Request=fetchC8Calloff0550().catch(e=>({error:e.message}));
    let current=await loadProject0550Bid();
    const retired=retireLegacyTowerPricing0550(current);
    if(retired!==current)current=await saveProject0550Bid(retired,current.revision,"Cancel the legacy tower Part A pricing basis");
@@ -74,9 +80,10 @@ export function BidWorkspaceProvider({children}){
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
-   const prepared=prepareQuotation0550(processed,reviewDate);
+   const c8=await c8Request;
+   const prepared=prepareQuotation0550(prepareC8Calloff0550(processed,c8?.error?null:c8,reviewDate),reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts / "+prepared.mgwQuoteImport.version);
-   setData(current);setError("");setRecovery(null);
+   setData(current);setError(c8?.error?'C8 · '+c8.error:"");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
    // must not prevent a valid Vendor register from reaching the existing07.1/07.2.

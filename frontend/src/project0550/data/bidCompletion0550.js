@@ -44,6 +44,11 @@ const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);
 const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
+export function isGeneratedBidEstimate0550(data,line){
+ const row=data.repositoryBasisImport?.bidCompletion?.rows.find(row=>row.lineId===line.id);
+ return ['ESTIMATE','COST_ESTIMATE','INCLUDED','ALLOCATION'].includes(row?.kind)&&row.inputKey===lineKey(data,line)&&
+  row.sourceKey===sourceKey(data,row.offerIds);
+}
 function reconcilePagaTrainingEstimate0550(data,receipt){
  const line=data.lines.find(l=>l.id==='REQ-MR-ACT-B3-D01'),row=receipt.rows.find(r=>r.lineId===line?.id);
  if(row?.kind!=='ESTIMATE'||row.inputKey!==lineKey(data,line))return data;
@@ -195,6 +200,15 @@ export function replaceGeneratedDtrsHandheld0550(data,previous,next){
    previous.officialReview||data.bidVolumes?.bindings.some(b=>b.lineId===previous.id))return data;
  return {...data,lines:data.lines.map(line=>line===previous?next:line),
   repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...completion,rows:completion.rows.filter(row=>row!==entry)}}};
+}
+export function retireGeneratedFocInstallation0550(data,line){
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ const entry=receipt?.rows.find(row=>row.lineId===line.id&&row.kind==='ESTIMATE');
+ if(line.id!=='REQ-MR-ACT-C1-D03'||!entry?.basis.startsWith('FO installation OPTION:3 route campaigns')||
+  entry.inputKey!==lineKey(data,line)||line.officialReview||
+  data.bidVolumes?.bindings.some(b=>b.lineId===line.id))return null;
+ return {...data,repositoryBasisImport:{...data.repositoryBasisImport,
+  bidCompletion:{...receipt,rows:receipt.rows.filter(row=>row!==entry)}}};
 }
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
 const lanLegacyAp='C9105AXI-H',lanController='9800-L-C-K9';

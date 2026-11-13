@@ -5,6 +5,7 @@ import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './Schedule
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
 import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
+import {C8_CALLOFF_COUNTRIES_0550,C8_CALLOFF_ITEMS_0550,c8Country0550} from './data/c8Calloff0550';
 import {c2DraftRowsFromExisting0550,c2HasSystem0550,c2ProjectLotOverlaps0550,spareSystemGroups0550,spareEquationDraftRows0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {LanCusSpareCoverage0550} from './LanCusBasis0550';
@@ -85,6 +86,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
  const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency,references),[screenView,id,currency,references]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
+ const c8Estimate=id==='C8'&&view.workingPreview?scheduleRollup0550(screenView.scheduleRows('C8').filter(c8Country0550)):null;
  const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
  const print=()=>{
   const frame=document.createElement('iframe');frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px';
@@ -98,6 +100,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled} mrNavigationTarget={mrNavigationTarget}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
+  {c8Estimate?.count>0&&<p>ยอดประมาณการ Call-off ตามประเทศ · {currency} {money(c8Estimate.count===C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length?c8Estimate.totalUSD:null)} · เรียกใช้ตามอนุมัติ แยกจากยอด A1 และ A2</p>}
   {id==='C2'&&view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference · {SPARE_DRAFT_NOTE_0550} · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}
   {toolDrafts.length>0&&<details className="p55-panel" open><summary>SI · Special Tools ตามระบบใน Working (Draft · {toolDrafts.length} ประเภท)</summary>

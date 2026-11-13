@@ -1,3 +1,4 @@
+import {focLayBudgetBasis0550,focLayBudgetShared0550} from './data/focLayBudget0550';
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
@@ -204,6 +205,9 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  const changeScheduleScope=value=>{if(dirty)return;const all=value==='ALL';setShowAllSchedules(all);if(!all&&SCHEDULES_0550.some(s=>s.id===panel)&&!quotationSchedules0550().some(s=>s.id===panel))choose('C1');};
  const key=(volume==='I'?'I.':'III.')+panel,record=view.getRecord(key),schedule=SCHEDULES_0550.find(s=>s.id===panel),table=schedule?scheduleTable0550(view,panel):null;
  const focServiceSchedule=/^C[2-8]$/.test(panel);
+ const focBudgetShares=volume==='I'&&focScheduleNotes[panel]&&data.offers.some(mgwFocSupplyOffer0550)?
+  focLayBudgetShared0550(data).filter(row=>row.schedule===panel||['mapping','preview'].includes(panel)||
+   panel==='A1'&&['A1','C5','C6','C7','D','E','F'].includes(row.schedule)||panel==='A2'&&['C3','C4'].includes(row.schedule)):[];
  const focServiceBindings=focServiceSchedule?displayView.scheduleRows(panel).filter(binding=>binding.line.systemToken==='TEL-FO'):[];
  const allocationLine=bindingId&&view.available.find(line=>line.id===bindingId);
  const allocationCalc=allocationLine?.calculationId&&data.calculations.find(c=>c.id===allocationLine.calculationId);
@@ -268,7 +272,14 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   <aside className="p55-note" aria-label="FOC and Cables schedule basis">
    <p><strong>FOC and Cables · MGW Q26-063</strong> · {focScheduleNotes[panel]}</p>
    {(focServiceSchedule||['D','E','F'].includes(panel))&&<p>ใบเสนอราคาสองฉบับให้ราคาวัสดุและอุปกรณ์ ขอบเขตและราคาส่วนนี้ใช้เจ้าของงานที่เกี่ยวข้องใน Working</p>}
-   {focServiceSchedule&&!focServiceBindings.length&&<p>OPEN · ยังไม่มีรายการ TEL-FO ที่ผูกกับ 11.{panel}</p>}
+   {focServiceSchedule&&!focServiceBindings.length&&!focBudgetShares.length&&<p>OPEN · ยังไม่มีรายการ TEL-FO ที่ผูกกับ 11.{panel}</p>}
+   {focBudgetShares.length>0&&<>
+    <p><strong>{focLayBudgetBasis0550}</strong> · ประมาณการสำหรับเทียบกับเจ้าของราคาที่ใช้อยู่ · ยอดรวมอ่านจาก Working</p>
+    <Grid label="FOC budget reconciliation" heads={['Schedule','Scope','Planning cost','Working owners / Basis']}
+     rows={focBudgetShares.map(row=>['11.'+row.schedule,row.description,
+      row.cost==null?'Project call-off':row.currency+' '+row.cost.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}),
+      <>{row.ownerIds.map(id=><button key={id} type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+id)}>{id}</button>)}<small>{row.basis}</small></>])}/>
+   </>}
    <div className="p55-review-toolbar">
     {panel!=='C1'&&<button type="button" disabled={dirty} onClick={()=>choose('C1')}>11.C1 · FOC and Cables</button>}
     {(focRelatedWork[panel]||[]).map(([id,label])=>{

@@ -10,6 +10,7 @@ import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
+import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -27,7 +28,7 @@ const sparePriceNote=(rows,currency)=>{
 };
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||
- (view.workingPreview&&id==='C7'&&name==='trainingPeriodDays'&&view.tenderScheduleBasis?.training?String(view.tenderScheduleBasis.training.days):'');
+ (view.workingPreview&&id==='C7'&&name==='trainingPeriodDays'?String(view.trainingSiteDays??view.tenderScheduleBasis?.training?.days??''):'');
 const facilitiesFormCheck='Exhibit C Rev.1 §3 refers to a call-off facilities form as C-7. Its contents list C7 as Field Services and Training and omit C8. Confirm the applicable form with the Purchaser.';
 const term=customerPriceColumn0550;
 const normalize=s=>String(s||'').trim().toUpperCase();
@@ -145,8 +146,10 @@ function nativePages(view,id,currency='USD',c2References){
     set(v,8,5,'Site service period to confirm');
    }
    if(!groups.has(9)){
-    set(v,9,5,'');set(v,9,6,view.tenderScheduleBasis?.facilitiesConflict?'See C8':'OPEN');
-    set(v,9,7,view.tenderScheduleBasis?.facilitiesConflict?'Call-off form and any Base exceptions require confirmation. See C8.':'Confirm facilities scope, days and rates in C8.');
+    const countryRates=view.scheduleRows('C8').some(c8Country0550);
+    set(v,9,5,'');set(v,9,6,countryRates||view.tenderScheduleBasis?.facilitiesConflict?'See C8':'OPEN');
+    set(v,9,7,countryRates?'Call-off estimates by country. See C8.':view.tenderScheduleBasis?.facilitiesConflict?
+     'Call-off form and any Base exceptions require confirmation. See C8.':'Confirm facilities scope, days and rates in C8.');
    }
    if(!groups.has(5)){
     set(v,5,5,'OPEN');set(v,5,6,'OPEN');
@@ -246,23 +249,37 @@ function nativePages(view,id,currency='USD',c2References){
   }
  }
  if(id==='C8'){
-  const v=blankValues(id),rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
+  const rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
   if(view.workingPreview&&view.tenderScheduleBasis?.facilitiesConflict)issues.push(facilitiesFormCheck);
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
-  for(const [key,r] of Object.entries(rowMap)){
-   const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;
-   const assigned=view.workingPreview?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
-   const qty=assigned.length&&assigned.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?assigned.reduce((n,b)=>n+b.quantity,0):null;
-   set(v,r,3,key==='AIRPORT'||!assigned.length?'':value(qty));
-   set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
-   set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
-   set(v,r,6,bs.map(b=>b.line.description+' / '+(b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
-   if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
+  const groups=new Map();
+  for(const b of rows){
+   const country=c8Country0550(b)||'';
+   if(!groups.has(country))groups.set(country,[]);
+   groups.get(country).push(b);
   }
-  const assigned=view.workingPreview?rows.filter(b=>b.treatment!=='CALLOFF'):rows;
-  const ratesOnly=view.workingPreview&&rows.length&&!assigned.length;
-  set(v,6,1,ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,assigned)));
-  add(v);
+  if(!groups.size)groups.set('',[]);
+  for(const [country,group] of groups){
+   const v=blankValues(id);
+   const revisions=[...new Set(group.map(c8Revision0550).filter(Boolean))];
+   for(const [key,r] of Object.entries(rowMap)){
+    const bs=group.filter(b=>role(b)===key);if(!bs.length)continue;
+    const assigned=view.workingPreview&&!country?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
+    const qty=assigned.length&&assigned.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?assigned.reduce((n,b)=>n+b.quantity,0):null;
+    set(v,r,3,country&&bs.length===1?value(bs[0].quantity)+' '+c8Unit0550(bs[0]):key==='AIRPORT'||!assigned.length?'':value(qty));
+    set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
+    set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
+    set(v,r,6,bs.map(b=>b.line.description+' / '+(country?(r===1?b.basis:'Estimated call-off'):b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
+    if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
+   }
+   const assigned=view.workingPreview&&!country?group.filter(b=>b.treatment!=='CALLOFF'):group;
+   const ratesOnly=view.workingPreview&&group.length&&!assigned.length;
+   const amount=country?(new Set(assigned.map(role)).size===Object.keys(rowMap).length&&assigned.length===Object.keys(rowMap).length?
+    scheduleRollup0550(assigned).totalUSD:null):shownSum(view,assigned);
+   set(v,6,1,ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(amount));
+   const detail=country?[country,...revisions,'Call-off estimate'].join(' · '):groups.size>1?'Other saved facilities':'';
+   add(v,detail,{c8Country:country});
+  }
  }
  return {pages,issues};
 }
@@ -282,6 +299,11 @@ function paymentTable(rows,format){
 }
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
+ if(page.c8Country){
+  const label=escape(page.detail);
+  result=format==='xml'?'<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>'+label+'</w:t></w:r></w:p>'+result:
+   '<p><strong>'+label+'</strong></p>'+result;
+ }
  if(view.workingPreview&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
  if(view.workingPreview&&page.id==='C7'&&page.pageCount>1){
   result=result.replace('TOTAL (Sub-total 1.0+2.0)',`Page ${page.pageNumber} of ${page.pageCount} subtotal`);
@@ -346,6 +368,17 @@ function renderPage(view,page,format,currency='USD'){
     return rollup.count?`${treatment==='BASE'?'Base / A1':'Option / A2'}: ${rollup.priced?currency+' '+number(rollup.knownUSD):'OPEN'} (${rollup.priced}/${rollup.count} priced${rollup.open?', '+rollup.open+' OPEN':''}).`:'';
    }).filter(Boolean);
    if(totals.length)partialNote='C7 Working subtotal across all pages (priced items): '+totals.join(' ');
+   const trainingRows=rows.filter(b=>role(b)==='TRAINING');
+   if(view.trainingSiteDays){
+    const trainingTotal=scheduleRollup0550(trainingRows);
+    if(trainingTotal.priced)partialNote+=' Myanmar OJT training: '+currency+' '+number(trainingTotal.knownUSD)+'.';
+    if(trainingRows.some(b=>b.problems.includes('DISPLAY_UNIT_AMOUNT_MISMATCH'))){
+     partialNote+=' The displayed hourly rate is rounded to two decimals. Use the Working amount for the draft subtotal.';
+    }
+   }
+   if(view.trainingBudgetPending){
+    partialNote+=' Training Rev01 is pending. Reconcile existing Working prices, allocations and training days before replacing the prior basis.';
+   }
    const hours=view.tenderScheduleBasis?.siteHours;
    if(hours&&rows.some(b=>role(b)==='FIELD_SERVICE'&&b.hoursPerDay>0&&b.hoursPerDay!==hours)){
     partialNote+=' Reconcile the Working man-hour basis with the tender site day of '+hours+' hours. Confirm calendar days from the site programme.';
@@ -356,7 +389,7 @@ function renderPage(view,page,format,currency='USD'){
    if(view.tenderScheduleBasis?.facilitiesConflict)partialNote=[partialNote,facilitiesFormCheck].filter(Boolean).join(' ');
   }
   const training=view.tenderScheduleBasis?.training;
-  if(page.id==='C7'&&page.pageNumber===1&&training&&!view.getRecord('I.C7').nativeFields?.trainingPeriodDays?.trim()){
+  if(page.id==='C7'&&page.pageNumber===1&&training&&!view.trainingSiteDays&&!view.getRecord('I.C7').nativeFields?.trainingPeriodDays?.trim()){
    partialNote=[partialNote,`Tender planning basis: estimated ${training.days} course days for ${training.trainees} trainees (Exhibit A Annex 7). Confirm trainer hours, duration and rates separately.`].filter(Boolean).join(' ');
   }
   if(page.priceRows&&(page.id!=='C2'||!page.draftPriceRows?.length)){

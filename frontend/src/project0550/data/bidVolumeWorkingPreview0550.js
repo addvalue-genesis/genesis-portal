@@ -1,4 +1,5 @@
 import {pagaRevisionNet0550,pagaRevisionSelected0550,pagaRevisionCandidate0550,pagaRevisionItems0550,pagaIncludedScope0550,pagaIncludedKit0550,pagaTwoYearSpareEvidence0550} from './supplierRevision0550';
+import {TRAINING_OJT_DAYS_0550,TRAINING_OJT_OWNER_0550,TRAINING_THAI_OWNER_0550,trainingBudgetPending0550,trainingRev01Owner0550} from './trainingBudget0550';
 import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
@@ -112,6 +113,9 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
   let [schedule,summary,reason]=base;
   const offer=data.offers.find(o=>o.id===raw.offerId),tagged=vendorTaggedSchedule0550(offer,raw);
   if(tagged?.summary)({schedule,summary,basis:reason}=tagged);
+  if(trainingRev01Owner0550(raw,TRAINING_THAI_OWNER_0550)){
+   schedule='A1';summary='OTHER';reason='Thailand classroom training → Initial Contract Price';
+  }
   if(raw.id===CHEVALIER_PBX_MA_0550){schedule='A1';summary='OTHER';reason='Two-year remote maintenance → A1 Others / 11.E';}
   if(raw.id===CHEVALIER_PBX_FIELD_0550){schedule='C7';summary='FIELD_SERVICE';reason='Initial site and integration service → C7 fixed lot; man-hours and programme OPEN';}
   if(towerErectionAllocation0550(raw)){
@@ -246,7 +250,9 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const chevalierPbxSupply=model.provisional?.selected.some(line=>line.id===CHEVALIER_PBX_SUPPLY_0550&&line.pbxProducts?.length);
  const pbxBudgetShares=chevalierPbxSharedBudget0550(data,model);
  const mgwCctvEntBudgetShares=mgwCctvEntSharedBudget0550(model);
- return {...projected,c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
+ const trainingSiteDays=bindings.some(b=>b.schedule==='C7'&&b.summary==='TRAINING'&&
+  b.quantity===TRAINING_OJT_DAYS_0550*2*10&&trainingRev01Owner0550(b.line,TRAINING_OJT_OWNER_0550))?TRAINING_OJT_DAYS_0550:null;
+ return {...projected,trainingSiteDays,trainingBudgetPending:trainingBudgetPending0550(data,today),c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
   pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,mgwCctvEntBudgetShares,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
