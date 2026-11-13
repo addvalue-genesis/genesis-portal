@@ -1,5 +1,5 @@
 import {MGW_QUOTE_0550 as quote,mgwQuoteItem0550,mgwGroupExcluded0550,mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550,MGW_SCOPE_EXCLUDED_0550,PROCUREMENT_SCOPE_0550,reconcileMgwWorkingScope0550} from "./mgwVendorBasis0550";
-import {policyDefaults0550} from "../bidWorkingBasis0550";
+import {EXTERNAL_ENGINEERING_MGW_GROUPS_0550,EXTERNAL_ENGINEERING_POLICY_0550,policyDefaults0550} from "../bidWorkingBasis0550";
 import {roundMoney0550,sumMoney0550} from "./money0550";
 import {evaluateServiceEquation} from "../serviceEquationRuntime";
 import {TSI_DESIGN_WORKLOAD_0550} from "./tsiActivityBudget0550";
@@ -81,6 +81,7 @@ export function prepareMgwDetailPricing0550(data,policies,today){
  data=reconcileMgwWorkingScope0550(data);
  if(data.mgwDetailPricingImport?.version===MGW_DETAIL_PRICING_VERSION_0550)return data;
  const policy=policyDefaults0550(policies,"Goods / Procured Cost");if(!policy)return data;
+ const servicePolicy=policyDefaults0550(policies,EXTERNAL_ENGINEERING_POLICY_0550);
  const replacedLineIds=[];
  const replaceIds=["LINE-LEGACY-TEL-RADIO-MARINE-1","LINE-LEGACY-TEL-RADIO-AERO-1","LINE-LEGACY-TEL-RADIO-SSB-1"];
  const next={...data,lines:data.lines.map(l=>{if(replaceIds.includes(l.id)&&l.selected){replacedLineIds.push(l.id);return {...l,selected:false};}return l;})},importedLineIds=[],conflicts=[];
@@ -94,7 +95,7 @@ export function prepareMgwDetailPricing0550(data,policies,today){
   if(g.select&&occupied)conflicts.push(g.id+": existing price owner retained; MGW priced as unselected alternative");
   const basis=`${quote.quoteRef} / ${g.rowIds.join(", ")} / ${quote.sourceUrl}. User instruction 29-Oct-2026: use detailed prices where cover conflicts. One Lot represents the listed quoted scope only, not approved MR quantities. MET/NDB/service cover-only packages retain that source limitation. Bought-in costs use existing Procured Cost policy; OEM inclusions and SI service boundaries require reconciliation.`;
   next.lines.push({id,mgwDetailGroupId:g.id,mgwDetailBasis:mgwDetailGroupBasis0550(data,g.id).source,systemToken:g.systemToken,wbs:g.wbs,description:g.title,scopeKey:"MGW-QUOTED-SCOPE."+g.id,tagRef:"Quoted sites — MR reconciliation pending",requirementRef:"",sourceRef:basis,
-   vendorId:data.offers.find(o=>mgwQuoteItem0550(o)?.id===g.rowIds[0])?.vendorId||"",offerId:"",calculationId:"",resultKey:"value",quantity:1,unit:"Lot",currency:"USD",manualCost:null,sellRate:null,markupPct:null,...policy,selected,customerRowCode:g.customerRowCode,customerRemark:mgwDetailCustomerRemark0550(g.id),brand:"",coverageBasis:basis});
+   vendorId:data.offers.find(o=>mgwQuoteItem0550(o)?.id===g.rowIds[0])?.vendorId||"",offerId:"",calculationId:"",resultKey:"value",quantity:1,unit:"Lot",currency:"USD",manualCost:null,sellRate:null,markupPct:null,...(EXTERNAL_ENGINEERING_MGW_GROUPS_0550.has(g.id)&&servicePolicy||policy),selected,customerRowCode:g.customerRowCode,customerRemark:mgwDetailCustomerRemark0550(g.id),brand:"",coverageBasis:basis});
   importedLineIds.push(id);
  }
  return {...next,mgwDetailPricingImport:{version:MGW_DETAIL_PRICING_VERSION_0550,date:today,importedLineIds,conflicts,replacedLineIds,decision:PROCUREMENT_SCOPE_0550.mgw.decision}};

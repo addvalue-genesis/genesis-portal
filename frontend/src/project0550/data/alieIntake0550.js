@@ -4,7 +4,7 @@ import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {safeSourceUrl} from './sourceIntakeModel';
 import {workingOffers0550,activeSupply0550} from './workingOffers0550';
 import {bidCompletionSourceUsages0550,directSupplierSellBasis0550} from './bidCompletion0550';
-import {applyPolicyDraft0550,policyDefaults0550} from '../bidWorkingBasis0550';
+import {applyPolicyDraft0550,EXTERNAL_ENGINEERING_POLICY_0550,isQuotedEngineeringService0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {suggestedCustomerCode} from './officialPricing0550';
 import {mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550} from './mgwVendorBasis0550';
 import {ceragonSupersededOffer0550} from './ceragonSelection0550';
@@ -232,12 +232,12 @@ export function alieWorkingDraft0550(data,{offer,atom,working,allocated},policie
  if(ceragonSupersededOffer0550(data,offer.id)||mgwWorkingLineExcluded0550(data,draft,offer)||mgwProjectWideLineConflict0550(draft,offer))
   return {reason:'OPEN · ขอบเขตหรือฉบับใบเสนอราคาที่ใช้งานต้องตรวจใน 07.2'};
  const sellBasis=directSupplierSellBasis0550(data,draft,offer);
- if(sellBasis){
+ if(isQuotedEngineeringService0550(atom)){
+  draft=applyPolicyDraft0550(draft,policies,EXTERNAL_ENGINEERING_POLICY_0550);
+ }else if(sellBasis){
   draft={...draft,primePct:policyDefaults0550(policies,'Goods / Procured Cost')?.primePct??null,...sellBasis};
  }else if(['A','B5','B6','C2','C3'].includes(wbs)){
   draft=applyPolicyDraft0550(draft,policies,'Goods / Procured Cost');
- }else if(service){
-  draft=applyPolicyDraft0550(draft,policies,'Professional Service');
  }else{
   // Miscellaneous costs may include both reimbursable fees and priced work.
   // Leave the sell basis open until its treatment is entered in Working.

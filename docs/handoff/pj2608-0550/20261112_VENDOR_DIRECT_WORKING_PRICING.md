@@ -83,6 +83,25 @@ and traceability. The private CHEVALIER fixture verifies the three quoted
 owners through Working and Volume I. Full live project totals depend on the
 Windows workspace and its current Vendor data.
 
+### Quoted external engineering service selling basis
+
+For separately quoted external engineering work, use the supplier Lot or
+quoted rate times the planned workload as the Working cost. E11 applies
+ADDVALUE markup 10% and E13 applies SAMTEL markup 20% to that selling price.
+The customer multiplier is 1.32. The source cost owner is counted once.
+
+The policy applies to the CHEVALIER site integration and remote maintenance
+lots, ID-IE FAT and supervision, the identified MGW engineering/documentation/
+integration lots, and the separately allocated Master Tower engineering and
+technical survey. The equipment shortage allowance, direct ADDVALUE personnel
+rates, reimbursements and mixed packing/delivery scopes retain their respective
+bases. Quote-based daily services require an actual Working workload before
+pricing. Explicitly entered selling rates retain their saved treatment.
+
+ADR-0550-001 principles 2, 5, 6 and 8–11 govern the scope, cost ownership and
+review boundary. Working price inputs feed Release and Volume I. Reviewed
+pricing still requires the existing checks after a basis change.
+
 ## 13 November · PAGA supply and service rates
 
 Working A1-05 selects the current INDUSTRONIC A20261632-005 NET against
@@ -96,7 +115,7 @@ Working, draft Release A1-05 and C1.
 Working B4 and draft C7 use two ID-IE Offer-linked rows. QO26169 covers
 Local FAT execution in Bangkok. QO26163R1 covers OEM site supervision
 for the ADDVALUE execution team at APF and ACP, subject to confirmation
-of Myanmar applicability. Quantity and service selling inputs are open.
+of Myanmar applicability. Confirm the quoted unit and planned quantities.
 The QO26169 crew-day basis and the number of days require confirmation.
 The OEM FAT at Wertheim remains inside the original INDUSTRONIC package.
 

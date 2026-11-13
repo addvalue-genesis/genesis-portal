@@ -34,7 +34,7 @@ import {OfficialLineReviewFields,OfficialSourceImpact,OfficialCustomerScope,Offi
 import {BidHeading,BidStructureGuide} from "./BidModulePresentation";
 import {BID_GROUPS_0550,bidPresentationIndex,bidOwnerStyle,lineOwner0550,bidModuleProps0550} from "./bidPresentation0550";
 import {BidInheritedBasis} from "./BidInheritedBasis";
-import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550,policyDefaults0550} from "./bidWorkingBasis0550";
+import {applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,EXTERNAL_ENGINEERING_POLICY_0550,isQuotedEngineeringService0550,MR_SUPPLY_ORDER_0550,mrBasisForCustomer0550,policyDefaults0550} from "./bidWorkingBasis0550";
 import {OfficialCustomerForm} from "./OfficialCustomerForm";
 import {LicensingCost0550} from "./LicensingCost0550";
 import {B5StartupEstimate0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
@@ -119,7 +119,7 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  <p>รายการปลายทาง: <strong>{form.customerRowCode||"ยังไม่เลือก"}</strong> · รับค่าเริ่มต้นจากฐานโครงการ แล้วตรวจรายละเอียดของรายการก่อนบันทึก</p>
  {spareEstimate&&<p className="p55-callout">วงเงินอะไหล่ Working Preview {amount(spareEstimate.costRate)} ต่อ Lot จาก {spareEstimate.spareBudget.rate*100}% × ต้นทุน Part A ที่มีราคา {amount(spareEstimate.spareBudget.basisTHB)} · ช่อง Manual unit cost ด้านล่างแสดงค่าที่บันทึกเดิม · รอรายการ OEM และตรวจส่วนที่รวมในแพ็กเกจ</p>}
  {form.systemToken==="TEL-DMR"&&/^REQ-MR-B1-15-(APF|ACP)-0[12]$/.test(form.id)&&<DmrTagCost0550 data={data} integration={model.integration} working={model.provisional} lineId={form.id} onNavigate={onNavigate} onOpenSource={onOpenSource}/>}
- <div className="p55-bid-fields"><Select label="Project pricing basis" value={basisChoice} onChange={setBasisChoice} options={[["","เลือกฐานเดิม"],["Goods / Procured Cost","Goods · นโยบายอุปกรณ์เดิม"],["Professional Service","Professional Service · นโยบายบริการเดิม"]]}/><button type="button" disabled={!basisChoice||Boolean(fixedSellBasis)} onClick={()=>setForm(f=>applyPolicyDraft0550(f,COMMERCIAL_POLICY,basisChoice))}>ใช้ฐานราคากับรายการนี้</button>
+ <div className="p55-bid-fields"><Select label="Project pricing basis" value={basisChoice} onChange={setBasisChoice} options={[["","เลือกฐานราคา"],["Goods / Procured Cost","Goods · ฐานจัดซื้ออุปกรณ์"],[EXTERNAL_ENGINEERING_POLICY_0550,"External Engineering Service · ค่าแรงวิศวกรตาม Quote"],["Professional Service","Professional Service · เรตทีม ADDVALUE"]]}/><button type="button" disabled={!basisChoice||Boolean(fixedSellBasis)} onClick={()=>setForm(f=>applyPolicyDraft0550(f,COMMERCIAL_POLICY,basisChoice))}>ใช้ฐานราคากับรายการนี้</button>
  <Select label="Project resource role" value={roleChoice} onChange={setRoleChoice} options={[["","เลือกบทบาทจาก 06"],...CORE_TEAM.map(r=>[r.role,r.role+" · "+r.protectedUsdDay+" USD/MD"]) ]}/><button type="button" disabled={!roleChoice||Boolean(fixedSellBasis)||Boolean(chosenOffer&&(chosenOffer.currency!=="USD"||chosenOffer.unit!=="MD"))||Boolean(!chosenOffer&&form.manualCost!=null&&(form.currency!=="USD"||form.unit!=="MD"))} onClick={()=>setForm(f=>applyRoleDraft0550(f,CORE_TEAM.find(r=>r.role===roleChoice),chosenOffer))}>ใช้เรตขายจาก 06</button></div>
  <p>เรตขายบุคลากรใช้ USD/MD; ถ้า Quote หรือต้นทุนที่กรอกไว้เป็นสกุลเงินหรือหน่วยอื่น ให้ตรวจฐานให้ตรงก่อน · ปุ่มใช้ฐานเปลี่ยนเฉพาะร่างรายการนี้ ยังไม่บันทึกหรืออนุมัติ</p>
  <div className="p55-bid-fields"><Select label="Line system" value={form.systemToken} onChange={v=>setForm(f=>({...f,systemToken:v,satelliteScope:"OPEN",scopeBasis:""}))} options={[["COMMON","COMMON / shared scope"],...SYSTEMS.map(s=>[s.token,s.name])]}/><Select label="Cost owner WBS" value={form.wbs} onChange={v=>setForm(f=>{const {commissioningPhase,...line}=f;return v==='B5'?{...f,wbs:v}:{...line,wbs:v};})} options={wbsOptions}/>
@@ -138,6 +138,9 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
     const old=data.offers.find(o=>o.id===line.offerId);
     if(pagaRevisionNet0550(old)&&line.description.includes(old.quoteRef))next.description=line.description.replace(old.quoteRef,offer.quoteRef);
     next.sourceRef=offer.sourceRef+' / '+pagaIncludedScope0550(data,offer);
+   }
+   if(v!==line.offerId&&line.wbs.startsWith("B")&&offer.atomicLines?.some(isQuotedEngineeringService0550)){
+    return applyPolicyDraft0550(next,COMMERCIAL_POLICY,EXTERNAL_ENGINEERING_POLICY_0550);
    }
    const sellBasis=directSupplierSellBasis0550(data,next,offer);
    return sellBasis?{...next,primePct:next.primePct??policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost")?.primePct??null,

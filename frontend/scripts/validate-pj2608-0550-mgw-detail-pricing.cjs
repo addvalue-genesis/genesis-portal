@@ -11,6 +11,8 @@ let model=derive(d),packages=model.lines.filter(l=>l.mgwDetailGroupId),selected=
 for(const [id,cost] of [['CCTV',482142],['LAN',881760],['RADIO-DTRS',476819],['MET',34316],['NDB',90060]])assert.equal(packages.find(l=>l.mgwDetailGroupId===id).costRate,cost);
 assert.equal(packages.find(l=>l.mgwDetailGroupId==='CCTV').provisionalCustomerUSD,636427.44);assert.equal(packages.find(l=>l.mgwDetailGroupId==='LAN').provisionalCustomerUSD,1163923.20);
 assert.equal(model.provisional.knownUSD,3380193.96,"Known USD excludes the retired tower package");
+assert.deepEqual(packages.filter(l=>/^SERVICES-00[1-5]$/.test(l.mgwDetailGroupId))
+ .map(l=>[l.markupPct,l.contingencyPct,l.primePct]),[[10,null,20],[10,null,20],[10,null,20],[5,5,20],[5,5,20]]);
 const originalQty=Q.MGW_QUOTE_0550.rows.find(r=>r.id==='MGW-Q26-063-CCTV-014');originalQty.quantity+=5;
 try{assert.equal(derive(d).lines.find(l=>l.mgwDetailGroupId==='CCTV').costRate,482142,'Saved quote quantities survive later catalogue edits');}finally{originalQty.quantity-=5;}
 const savedQuantities=d.lines.find(l=>l.mgwDetailGroupId==='CCTV').mgwDetailBasis;assert.equal(savedQuantities.sourceSha256,Q.MGW_QUOTE_0550.sourceSha256);assert(savedQuantities.rows.length===28);

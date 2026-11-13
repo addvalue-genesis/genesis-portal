@@ -138,8 +138,24 @@ service.offers[0].quoteEvidence.quotedUnit='MD';
 const servicePackage=intake.preparedAlieRegister0550(service,[{...input[0],lineClass:'SERVICE_SITE'}],date);
 const serviceRegistered=planVendorRegister0550(service,servicePackage,systems).workspace;
 const serviceDraft=draftFor(serviceRegistered,intake.registeredAlieRows0550(serviceRegistered)[0]).draft;
-assert.deepEqual([serviceDraft.wbs,serviceDraft.customerRowCode,serviceDraft.quantity,serviceDraft.sellMode,serviceDraft.primePct],
- ['B4','B4',null,'DIRECT',5]);
+assert.deepEqual([serviceDraft.wbs,serviceDraft.customerRowCode,serviceDraft.quantity,serviceDraft.sellMode,serviceDraft.markupPct,serviceDraft.contingencyPct,serviceDraft.primePct],
+ ['B4','B4',null,'MARKUP',10,null,20]);
+const serviceLine={...priceRow,...serviceDraft,id:'QA-EXTERNAL-ENGINEER'};
+const serviceWorkspace={...serviceRegistered,fx:direct.fx,lines:[serviceLine]};
+const serviceModel=workspace=>deriveBidWorkspace(workspace,systems,date);
+assert.equal(serviceModel(serviceWorkspace).lines[0].provisionalCustomerTHB,null);
+const pricedService={...serviceWorkspace,lines:[{...serviceLine,quantity:3}]};
+const calculatedService=serviceModel(pricedService).lines[0];
+assert.equal(calculatedService.provisionalCostNative,300);
+assert.equal(calculatedService.provisionalSellNative,330);
+assert.equal(calculatedService.provisionalCustomerNative,396);
+const legacyService={...pricedService,lines:[{...pricedService.lines[0],sellMode:'DIRECT',markupPct:null,primePct:5,
+ sourceRef:'Project commercialPolicy / Professional Service: Workload → protected ADDVALUE rate → SAMTEL +5%'}]};
+const migratedService=applyCommercialSellPolicies0550(legacyService);
+assert.equal(serviceModel(migratedService).lines[0].provisionalCustomerNative,396);
+assert.equal(applyCommercialSellPolicies0550(migratedService),migratedService);
+const authoredService={...legacyService,lines:[{...legacyService.lines[0],sellRate:123}]};
+assert.equal(applyCommercialSellPolicies0550(authoredService),authoredService);
 const shared={...priceRow,...serviceDraft,wbs:'B1',unit:'MD',customerRowCode:'B1'};
 const sharedAllocation=scheduleAllocationPlan0550({...serviceRegistered,lines:[shared]},{unallocated:[shared]})[0].proposal;
 assert.equal(sharedAllocation.schedule,'C7','Intake route takes precedence over generic Working B1 draft routing');
@@ -233,7 +249,7 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  const expectedSell=expectedCosts.map(cost=>roundMoney0550(cost*1.10*1.20));
  assert.deepEqual(owners.map(l=>l.provisionalCustomerTHB),expectedSell);
  assert.equal(expectedSell.reduce((total,price)=>total+price,0),23419440);
- assert(owners.every(l=>l.markupPct===5&&l.contingencyPct===5&&l.primePct===20));
+ assert.deepEqual(owners.map(l=>[l.markupPct,l.contingencyPct,l.primePct]),[[5,5,20],[10,null,20],[10,null,20]]);
  const old={...selected,lines:selected.lines.map(line=>{
   if(![supply,field,ma].includes(line.id))return line;
   const {contingencyPct,...rest}=line;
@@ -243,6 +259,8 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  assert.deepEqual(derived(migrated).lines.filter(l=>[supply,field,ma].includes(l.id)).map(l=>l.provisionalCustomerTHB),expectedSell);
  assert.equal(applyCommercialSellPolicies0550(migrated),migrated);
  assert.equal(migrated.offers,old.offers);
+ const previousPbx={...selected,lines:selected.lines.map(l=>[field,ma].includes(l.id)?{...l,markupPct:5,contingencyPct:5}:l)};
+ assert.deepEqual(applyCommercialSellPolicies0550(previousPbx).lines,selected.lines);
  const oldSupply=old.lines.find(l=>l.id===supply),newSupply=migrated.lines.find(l=>l.id===supply);
  assert.notEqual(officialLineBasisKey(old,oldSupply),officialLineBasisKey(migrated,newSupply));
  const authoredMargin={...old,lines:old.lines.map(l=>l.id===supply?{...l,marginPct:7}:l)};

@@ -2,7 +2,9 @@ import {mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0
 // Current bid preparation, not supplier/engineering acceptance. Estimates are
 // explicit planning allowances; original quotations and authored inputs survive.
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
-import {applyGoodsSellBasis0550,GOODS_FORMULA_0550,LEGACY_GOODS_FORMULA_0550,matchesLegacyGoodsBasis0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
+import {applyGoodsSellBasis0550,EXTERNAL_ENGINEERING_FORMULA_0550,EXTERNAL_ENGINEERING_MGW_GROUPS_0550,EXTERNAL_ENGINEERING_POLICY_0550,
+ EXTERNAL_ENGINEERING_SELL_BASIS_0550,GOODS_FORMULA_0550,isQuotedEngineeringService0550,LEGACY_GOODS_FORMULA_0550,
+ LEGACY_SERVICE_FORMULA_0550,matchesLegacyGoodsBasis0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
@@ -15,7 +17,7 @@ import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SU
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {pagaRevisionSelected0550,pagaTrainingOption0550} from './supplierRevision0550';
 import procurement from './procurementScope0550.json';
-import {CHEVALIER_PBX_BUDGET_PREFIX_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
+import {CHEVALIER_PBX_BUDGET_PREFIX_0550,CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,chevalierPbxOwnerCode0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -68,6 +70,7 @@ const directSellBasis={
 };
 
 export function directSupplierSellBasis0550(data,line,offer){
+ if(line.wbs?.startsWith('B')&&offer?.atomicLines?.some(isQuotedEngineeringService0550))return null;
  const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
  const matchesSystem=directSystem&&(directSystem===line.systemToken||
   line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
@@ -99,20 +102,36 @@ export function applyCommercialSellPolicies0550(data){
  const lines=data.lines.map(line=>{
   if(line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
   const offer=offers.get(line.offerId),row=rowsByLine.get(line.id);
+  const vendorService=line.vendorId&&line.vendorId===offer?.vendorId&&line.wbs.startsWith('B')&&
+   offer.atomicLines?.some(isQuotedEngineeringService0550);
+  const pbxService=[CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550].includes(line.id)&&
+   line.wbs==='B4'&&chevalierPbxSource0550(offer);
+  const mgwService=mgwPackages.has(line.id)&&line.id==='LINE-MGW-DETAIL-'+line.mgwDetailGroupId&&
+   line.wbs==='B1'&&EXTERNAL_ENGINEERING_MGW_GROUPS_0550.has(line.mgwDetailGroupId);
+  const priorGoodsBasis=matchesLegacyGoodsBasis0550(line)||line.sellMode==='MARKUP'&&line.markupPct===5&&line.contingencyPct===5&&line.primePct===20&&line.sellRate==null&&line.marginPct==null;
+  const unpricedServiceBasis=vendorService&&line.sellMode==='DIRECT'&&line.sellRate==null&&line.primePct===5&&
+   line.sourceRef.includes(LEGACY_SERVICE_FORMULA_0550);
   const direct=line.selected&&directSupplierSellBasis0550(data,line,offer);
   // Allocated Master Tower items have one THB cost owner even when the
   // activity is recorded under COMMON. Mixed estimates retain their own basis.
   const allocated=line.selected&&!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
    row.offerIds.every(id=>isTowerSourceItem0550(offers.get(id))&&directMarkupSystems.get(offers.get(id).vendorId)==='TEL-TELT')&&
    row.inputKey===lineKey(data,line)&&row.sourceKey===sourceKey(data,row.offerIds);
+  const towerEngineering=allocated&&[TOWER_ENGINEERING_ID_0550,TOWER_SURVEY_ID_0550].includes(line.id);
+  const priorTowerBasis=line.sellMode==='MARKUP'&&line.markupPct===procurement.directSupplierMarkupPct&&
+   line.contingencyPct==null&&line.sellRate==null&&line.marginPct==null&&line.primePct===20;
+  const external=(pbxService||mgwService||vendorService)&&(priorGoodsBasis||unpricedServiceBasis)||
+   towerEngineering&&(priorGoodsBasis||priorTowerBasis);
   const standard=!direct&&!allocated&&matchesLegacyGoodsBasis0550(line)&&(
    chevalierPbxOwnerCode0550(line.id)||line.id.startsWith(CHEVALIER_PBX_BUDGET_PREFIX_0550)||
    line.sourceRef.includes(LEGACY_GOODS_FORMULA_0550)||legacyImports.has(line.id)||mgwPackages.has(line.id)||
    (mrDefaults.has(line.id)||line.id.startsWith('LINE-MGW-CURRENT-'))&&mgwCurrentOffer0550(offer)||
    line.id.startsWith('LINE-MGW-CURRENT-')&&line.sourceRef.includes('Prior MGW cabinet source:')||
    row&&['ESTIMATE','QUOTED'].includes(row.kind)&&row.inputKey===lineKey(data,line));
-  const sellBasis=direct||(allocated?(line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis):null);
-  const updated=sellBasis?{...line,...sellBasis}:standard?
+  const sellBasis=external?EXTERNAL_ENGINEERING_SELL_BASIS_0550:direct||(allocated&&!towerEngineering?(line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis):null);
+  const updated=external?{...line,...sellBasis,sourceRef:line.sourceRef.replace(
+   'Professional Service: '+LEGACY_SERVICE_FORMULA_0550,EXTERNAL_ENGINEERING_POLICY_0550+': '+EXTERNAL_ENGINEERING_FORMULA_0550)}:
+   sellBasis?{...line,...sellBasis}:standard?
    applyGoodsSellBasis0550({...line,sourceRef:line.sourceRef.replaceAll(LEGACY_GOODS_FORMULA_0550,GOODS_FORMULA_0550)}):line;
   if(updated===line||sellBasis&&Object.entries(sellBasis).every(([field,value])=>line[field]===value))return line;
   changed.set(line.id,{previous:line,updated});

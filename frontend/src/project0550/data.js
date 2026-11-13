@@ -5,7 +5,7 @@ import { getProject0550Dataset, getProject0550DataLayerStatus } from "./data/rep
 import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
 import { buildCoverageMatrix } from "./coverageModel";
 import procurement from "./data/procurementScope0550.json";
-import {GOODS_FORMULA_0550,GOODS_POLICY_TITLE_0550} from "./bidWorkingBasis0550";
+import {EXTERNAL_ENGINEERING_FORMULA_0550,EXTERNAL_ENGINEERING_POLICY_0550,GOODS_FORMULA_0550,GOODS_POLICY_TITLE_0550} from "./bidWorkingBasis0550";
 
 const DATASET = getProject0550Dataset();
 
@@ -14,8 +14,10 @@ export const DATA_LAYER_STATUS = getProject0550DataLayerStatus();
 export { loadProject0550Bid, saveProject0550Bid } from "./data/repository";
 
 export const PROJECT_0550 = DATASET.project;
-export const COMMERCIAL_POLICY = DATASET.commercialPolicy.map(policy=>policy.title===GOODS_POLICY_TITLE_0550?
- {...policy,formula:GOODS_FORMULA_0550}:policy);
+export const COMMERCIAL_POLICY = [
+ ...DATASET.commercialPolicy.map(policy=>policy.title===GOODS_POLICY_TITLE_0550?{...policy,formula:GOODS_FORMULA_0550}:policy),
+ {title:EXTERNAL_ENGINEERING_POLICY_0550,formula:EXTERNAL_ENGINEERING_FORMULA_0550,state:"QUOTED ENGINEERING COST"},
+];
 const directProcurement=new Map(procurement.directProcurement.map(scope=>[scope.quotedSystemToken,scope]));
 export const SYSTEM_GROUPS = DATASET.systemGroups.map(group=>({
   ...group,

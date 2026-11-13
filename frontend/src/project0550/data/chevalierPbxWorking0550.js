@@ -1,4 +1,4 @@
-import {policyDefaults0550} from '../bidWorkingBasis0550';
+import {EXTERNAL_ENGINEERING_POLICY_0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {quoteValidity0550} from './quoteValidity0550';
 import {MGW_BASIS_REVIEW_0550,mgwCurrentDirectMr0550} from './mgwQuoteSelection0550';
 import {mgwHistoricalLine0550} from './mgwVendorBasis0550';
@@ -50,7 +50,8 @@ function convertible(line,mr,prior,reviewed){
 export function prepareChevalierPbxWorking0550(data,policies,today){
  if(data.lines.some(l=>chevalierPbxOwnerCode0550(l.id)||l.coveredByLineId===CHEVALIER_PBX_SUPPLY_0550))return data;
  const quote=chevalierPbxQuote0550(data.offers),policy=policyDefaults0550(policies,'Goods / Procured Cost');
- if(!quote||!policy||![quote.net,quote.field,quote.ma].every(offer=>quoteValidity0550(offer,today).current))return data;
+ const servicePolicy=policyDefaults0550(policies,EXTERNAL_ENGINEERING_POLICY_0550);
+ if(!quote||!policy||!servicePolicy||![quote.net,quote.field,quote.ma].every(offer=>quoteValidity0550(offer,today).current))return data;
  const offers=new Map(data.offers.map(o=>[o.id,o]));
  const reviewed=new Set((data.bidVolumes?.bindings||[]).filter(b=>b.status==='REVIEWED').map(b=>b.lineId));
  const existing=requirements.map(mr=>data.lines.find(l=>l.id==='REQ-'+mr.id));
@@ -62,7 +63,7 @@ export function prepareChevalierPbxWorking0550(data,policies,today){
   requirementRef:'MR Rev.B1 Appendix 1.3 / IP Telephony and PABX',
   sourceRef:source,customerRemark:remark,vendorId:offer.vendorId,offerId:offer.id,
   calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:null,sellRate:null,
-  markupPct:null,...policy,selected:true,
+  markupPct:null,...(wbs==='B4'?servicePolicy:policy),selected:true,
  });
  const supply=working(CHEVALIER_PBX_SUPPLY_0550,quote.net,'IP Telephony and PABX · equipment, licences and OEM support','A','A1-04',
   quote.net.sourceRef+' / PDF p1 / Total Amount of Products after Special Discount',

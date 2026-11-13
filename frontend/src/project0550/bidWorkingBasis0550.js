@@ -6,6 +6,20 @@ export const LEGACY_GOODS_FORMULA_0550="Customer = Cost × (1 + 20% SAMTEL) / (1
 export const GOODS_SELL_BASIS_0550=Object.freeze({sellMode:"MARKUP",markupPct:5,contingencyPct:5,marginPct:null,sellRate:null,primePct:20});
 const {markupPct,contingencyPct,primePct}=GOODS_SELL_BASIS_0550;
 export const GOODS_FORMULA_0550=`Customer = Cost × (1 + ${markupPct}% ADDVALUE markup + ${contingencyPct}% shortage contingency) × (1 + ${primePct}% SAMTEL)`;
+export const EXTERNAL_ENGINEERING_POLICY_0550="External Engineering Service";
+export const EXTERNAL_ENGINEERING_SELL_BASIS_0550=Object.freeze({
+ sellMode:"MARKUP",markupPct:10,contingencyPct:null,marginPct:null,sellRate:null,primePct:20,
+});
+export const EXTERNAL_ENGINEERING_FORMULA_0550=
+ `Customer = Quoted engineering service cost × (1 + ${EXTERNAL_ENGINEERING_SELL_BASIS_0550.markupPct}% ADDVALUE) × (1 + ${EXTERNAL_ENGINEERING_SELL_BASIS_0550.primePct}% SAMTEL)`;
+export const LEGACY_SERVICE_FORMULA_0550="Workload → protected ADDVALUE rate → SAMTEL +5%";
+export const EXTERNAL_ENGINEERING_MGW_GROUPS_0550=new Set(["SERVICES-001","SERVICES-002","SERVICES-003"]);
+
+export function isQuotedEngineeringService0550(atom) {
+ return ['SERVICE_SITE','SERVICE_TRAIN'].includes(atom?.route?.line_class)&&
+  atom.internal?.treatment!=='REFERENCE'&&!atom.parent_line_id&&atom.cost?.basis!=='ACTUAL'&&
+  ['lot','person-day'].includes(atom.qty?.uom);
+}
 
 export function matchesLegacyGoodsBasis0550(line) {
  return line.sellMode==="MARGIN"&&line.marginPct===5&&line.primePct===20&&line.markupPct==null&&line.sellRate==null&&line.contingencyPct===undefined;
@@ -37,6 +51,8 @@ export function addvalueSell0550(line,cost,quantity) {
 export function policyDefaults0550(policies, kind) {
  const policy=policies.find(p=>p.title===kind);
  if(!policy)return null;
+ if(kind===EXTERNAL_ENGINEERING_POLICY_0550&&policy.formula===EXTERNAL_ENGINEERING_FORMULA_0550)
+  return {...EXTERNAL_ENGINEERING_SELL_BASIS_0550};
  if(kind===GOODS_POLICY_TITLE_0550) {
   if(policy.formula===GOODS_FORMULA_0550)return {...GOODS_SELL_BASIS_0550};
   const m=policy.formula.match(/^Customer = Cost × \(1 \+ ([\d.]+)% SAMTEL\) \/ \(1 - ([\d.]+)% ADDVALUE final margin\)$/);
