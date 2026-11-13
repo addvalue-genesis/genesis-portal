@@ -25,3 +25,11 @@ The Working Preview uses the same main-row and expandable Offer display as LAN. 
 Eight source rows remain standalone because the MR or site allocation is open. In particular, APM source rows do not establish an ACP or ABV01 match. The APF 500 m cable has two possible MR rows, and the standalone APF console needs reconciliation against the RoIP scope. The interactive view labels these rows for review and places the native MR sites first. A competing price on the target MR keeps the quote price separate for review. The source and Working price records still carry all 18 owners.
 
 The regression validates the six MR rows, the eight standalone quote rows, unchanged USD and system subtotals, THB, missing-unit handling, a competing MR price and the C1 React projection. The LAN private-register check also passes after reusing the quote-detail display. The Official and archived outputs retain their existing review basis.
+
+## 13 November · Appendix 1.1 SI budget
+
+Working A prepares the reviewed MR quantity gaps from `radioAppendix11Budget0550.json`. The draft adds 13 supply estimates at USD 137,136.22 cost and USD 181,019.81 customer sell using the standard Goods policy. It reuses the existing DTRS handheld owner if its saved generation receipt matches. The draft Release uses A1-07 and A1-09, and the same owners appear on their MR rows in C1 with Draft 11.M bindings. The original 18 MGW owners contribute once each.
+
+The draft provisionally places the quoted APM console at APF, the RADIO-017 Marine lot at ACP and the two ambiguous feeder lots at APF and ABV01. The original quotation preserves its site labels. APF LAY-0001 C1 and LAY-0010 C4, ACP LAY-0001 C2 and LAY-0003 C1, and ABV01 LAY-0001 C1 support locations. MR feeder allowances of 500 + 500 / 700 / 150 m apply until an end-to-end cable takeoff is available. The Working and C1 panels show system notes. The model flags a changed reference rate or competing priced owner for review. Official review and archived issues retain their own approval paths.
+
+ADR-0550-001 principles 2–6 and 8–14 govern the MR quantity basis, trace and separate budget treatment. The regression covers the 13 estimates, four provisional site allocations, duplicate prevention, deletion and changed rates. The saved Windows workspace was unavailable for validation.

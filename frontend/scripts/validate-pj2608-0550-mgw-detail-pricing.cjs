@@ -407,6 +407,39 @@ assert.equal(bySn('1.1.13').amount,2624.16);
 assert.equal(bySn('1.1.12').quantity,700);
 assert.equal(bySn('1.1.12').quotedComponents[0].quantity,1);
 assert.equal(bySn('1.1.4').quotedComponents.find(c=>c.offer.id.endsWith('RADIO-012')).unitPrice,null);
+// The Appendix 1.1 gap budget must reach C1 once without repricing the quote.
+{
+ const {prepareRadioAppendix11Budget0550,radioAppendix11Estimate0550}=require(root+'/project0550/data/radioAppendix11Budget0550');
+ const prepare=input=>prepareRadioAppendix11Budget0550(input,D.COMMERCIAL_POLICY,radioLotDate);
+ const budget=prepare(radioLots);
+ validate(budget);
+ assert.strictEqual(prepare(budget),budget);
+ assert.strictEqual(budget.offers,radioLots.offers);
+ const estimates=budget.lines.filter(line=>radioAppendix11Estimate0550.has(line.id));
+ assert.equal(estimates.length,13);
+ assert.equal(sum(estimates.map(line=>line.quantity*line.manualCost)),137136.22);
+ const model=W.deriveBidWorkspace(budget,tokens,radioLotDate);
+ assert.equal(sum(model.provisional.selected.filter(line=>radioAppendix11Estimate0550.has(line.id)).map(line=>line.customerUSD)),181019.81);
+ assert(model.official.lines.filter(line=>radioAppendix11Estimate0550.has(line.id)).every(line=>line.customerUSD===null));
+ const projection=radioWithMr(budget).c1;
+ assert(!projection.problems.includes('C1_OWNER_TOTAL_MISMATCH'));
+ const rows=projection.rows.filter(row=>row.appendix==='1.1');
+ const ownerIds=rows.flatMap(row=>row.priceOwners.map(binding=>binding.lineId));
+ assert.equal(new Set(ownerIds).size,ownerIds.length);
+ assert.equal(ownerIds.filter(id=>id.startsWith('LINE-MGW-CURRENT-RADIO-')).length,18);
+ assert.equal(ownerIds.filter(id=>radioAppendix11Estimate0550.has(id)).length,13);
+ const quotedAt=(sn,item)=>rows.find(row=>row.sn===sn).quotedComponents.some(c=>c.offer.id.endsWith('-'+item));
+ assert(quotedAt('1.1.6','RADIO-007')&&quotedAt('1.1.6','RADIO-015'));
+ assert(quotedAt('1.1.10','RADIO-017'));
+ assert(quotedAt('1.1.5','RADIO-014')&&quotedAt('1.1.7','RADIO-008')&&quotedAt('1.1.16','RADIO-018'));
+ const deleted={...budget,lines:budget.lines.filter(line=>line.id!==estimates[0].id),
+  bidVolumes:{...budget.bidVolumes,bindings:budget.bidVolumes.bindings.filter(binding=>binding.lineId!==estimates[0].id)}};
+ assert.strictEqual(prepare(deleted),deleted);
+ const rateChanged={...budget,offers:budget.offers.map(offer=>offer.id.endsWith('-RADIO-012')?{...offer,unitCost:offer.unitCost+1}:offer)};
+ assert(W.deriveBidWorkspace(rateChanged,tokens,radioLotDate).lines.find(line=>line.id==='LINE-BID-RADIO-APF-AERO-FIXED')
+  .problems.some(problem=>problem.startsWith('RADIO_SI_ESTIMATE_SOURCE_CHANGED:')));
+ console.log('PASS Appendix 1.1 SI budget: 13 owners, source preservation, provisional site allocations, no duplicate C1 price and no Official promotion.');
+}
 const standaloneRadio=withRadioMr.c1.rows.filter(r=>r.pendingRadioPlacement);
 assert.deepEqual(standaloneRadio.flatMap(r=>r.priceOwners.map(b=>radioSelection.mgwCurrentItemKey0550(b.line.offer))).sort(),
  ['RADIO-006','RADIO-007','RADIO-008','RADIO-014','RADIO-015','RADIO-016','RADIO-017','RADIO-018']);

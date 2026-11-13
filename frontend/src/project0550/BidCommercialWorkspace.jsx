@@ -1,3 +1,4 @@
+import {radioAppendix11Notices0550} from './data/radioAppendix11Budget0550';
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {pagaRevisionNet0550,pagaIncludedScope0550} from './data/supplierRevision0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,ceragonR11Selected0550,DMR_PART_B_0550} from './data/ceragonSelection0550';
@@ -267,6 +268,9 @@ function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onE
  const prices=<>
  <p>การจัดสรรต้นทุน / ราคาขาย Working ด้านล่างเป็นอีกชั้นหนึ่ง · ไม่เปลี่ยนยอด Supplier ต้นฉบับ · ประมาณการและงานเพิ่มต้องมีฐานแยก · เจ้าของราคาคิดครั้งเดียว</p>
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
+ {part==='A'&&radioAppendix11Notices0550[code]&&<p className="p55-note">{radioAppendix11Notices0550[code]}</p>}
+ {part==='A'&&code==='TEL-RADIO-DTRS'&&<p className="p55-note"><strong>RoIP · </strong>{radioAppendix11Notices0550['RoIP Dispatch Console']}</p>}
+ {part==='A'&&code==='COMMON'&&<p className="p55-note"><strong>Appendix 1.1 · RF feeder · </strong>{radioAppendix11Notices0550['Antenna Cables']}</p>}
  {code==='TEL-LAN'&&<LanCusStandards0550 data={data} onNavigate={onNavigate}/>}
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code,...(code==='B5'?{customerRowCode:'B5'}:{})})}>เตรียมรายการใน {code}</button>
  {code==='B5'&&<><B5StartupEstimate0550 allowance={b5StartupAllowance} onNavigate={onNavigate}/><B5Preparation0550 lines={pricing} initialSystem={preparationSystem} onNew={onNew}/></>}

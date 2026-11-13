@@ -139,6 +139,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        <td colSpan={!documentMode&&Number.isFinite(sys.knownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
        {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
       </tr>
+      {!documentMode&&sys.notice&&<tr className="c1-detail-note"><td colSpan={7}>{sys.notice}</td></tr>}
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode||view.workingPreview&&g.id==='1.1').map(site=><React.Fragment key={site.name}>
        <tr className="c1-site">
         <td colSpan={!documentMode&&Number.isFinite(site.knownAmount)?5:7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td>

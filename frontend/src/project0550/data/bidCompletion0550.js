@@ -173,6 +173,15 @@ const MICROWAVE_DRAFTS = {
 };
 const MICROWAVE_LINK_REPORT = 'https://drive.google.com/file/d/1hGcBbwgqPR1DhbsfUzSrtc43E-FS8cS8/view';
 const DTRS_ALLOWANCE = 'LINE-BID-DTRS-HANDHELD-GAP-0550';
+export function replaceGeneratedDtrsHandheld0550(data,previous,next){
+ const completion=data.repositoryBasisImport?.bidCompletion;
+ const entry=completion?.rows.find(row=>row.lineId===DTRS_ALLOWANCE&&row.kind==='ESTIMATE');
+ if(previous?.id!==DTRS_ALLOWANCE||next.id!==DTRS_ALLOWANCE||!entry||
+   ![lineKey(data,previous),lineKey(data,{...previous,selected:true})].includes(entry.inputKey)||
+   previous.officialReview||data.bidVolumes?.bindings.some(b=>b.lineId===previous.id))return data;
+ return {...data,lines:data.lines.map(line=>line===previous?next:line),
+  repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...completion,rows:completion.rows.filter(row=>row!==entry)}}};
+}
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
 const lanLegacyAp='C9105AXI-H',lanController='9800-L-C-K9';
 const lanC2PartNumbers=['C9200-48P-A',lanController];

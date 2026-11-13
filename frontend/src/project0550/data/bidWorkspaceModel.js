@@ -1,3 +1,4 @@
+import {radioAppendix11PriceProblems0550} from './radioAppendix11Budget0550';
 import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwRadioPrintedExtension0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
 import {validateOfferAtomicLines0550} from './atomicLines0550';
 import {validateVendorBidTags0550} from './vendorBidTags0550';
@@ -125,7 +126,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
   const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
-  const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
+  const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...radioAppendix11PriceProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   const pbxAllocation=chevalierPbxAllocation0550(pbxQuote,l,offer);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}

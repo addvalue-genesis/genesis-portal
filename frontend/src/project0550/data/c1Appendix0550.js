@@ -1,3 +1,4 @@
+import {radioAppendix11Estimate0550,radioAppendix11Notices0550,radioAppendix11Placement0550} from './radioAppendix11Budget0550';
 import {pagaRevisionNet0550} from './supplierRevision0550';
 import {MGW_RADIO_DTRS_QUOTED_SCOPE_0550,apfLan10PatchPanelDraft0550,mgwBulkOffer0550,mgwCctvEntOffer0550,mgwCurrentIncluded0550,mgwCurrentItemKey0550,mgwCurrentOffer0550,mgwCurrentMr0550,mgwFiberPanelOffer0550,mgwLanEquipmentOffer0550,mgwMetNdbOffer0550,mgwRadioDtrsOffer0550,mgwRadioSourceRow0550,mgwSupplementOffer0550,mgwSupplementOpen0550} from "./mgwQuoteSelection0550";
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R11_C1_0550,ceragonR11Selected0550} from './ceragonSelection0550';
@@ -180,14 +181,15 @@ function lanCabinetDraftGroups(rows,offers,byOwner,ownerUse){
 const radioUnitOpen=offer=>offer.quoteEvidence.quotedUnit==='Not stated'&&!offer.unitBasis?.trim();
 const mgwMetPackage=offer=>mgwMetNdbOffer0550(offer)&&mgwCurrentItemKey0550(offer).startsWith('MET-');
 
-function radioDraftGroups(rows,byOwner,ownerUse){
+function radioDraftGroups(rows,byOwner,ownerUse,showRadioBudget){
  const targets=new Map(rows.filter(row=>row.appendix==='1.1'&&acceptsQuotedDraft(row,byOwner)).map(row=>[row.key,row]));
  const groups=new Map();
  for(const {binding,usdPriced} of byOwner.values()){
   const {line}=binding,offer=line.offer;
   if(!usdPriced||!mgwRadioDtrsOffer0550(offer)||offer.quoteEvidence.classification!=='RATE'||
    ownerUse.has(binding.lineId)||line.wbs!=='A'||binding.quantity!==offer.quoteEvidence.quotedQuantity||binding.unit!==offer.unit)continue;
-  const refs=mgwCurrentMr0550(offer),target=refs.length===1&&targets.get(refs[0]);
+  const placement=showRadioBudget&&radioAppendix11Placement0550[mgwCurrentItemKey0550(offer)];
+  const refs=placement?[placement]:mgwCurrentMr0550(offer),target=refs.length===1&&targets.get(refs[0]);
   if(!target)continue;
   if(!groups.has(target.key))groups.set(target.key,{target,prices:[],included:[]});
   groups.get(target.key).prices.push(binding);
@@ -300,10 +302,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
   for(const id of item.ownerIds){if(!ownerUse.has(id))ownerUse.set(id,[]);ownerUse.get(id).push(item);}
   return item;
  });
+ const showRadioBudget=!legacy&&view.workingPreview&&bindings.some(b=>radioAppendix11Estimate0550.has(b.lineId)&&Number.isFinite(b.amount));
  const groupedQuoteOwners=new Set();
  const quotedGroups=!legacy&&view.workingPreview?[
   ...lanCabinetDraftGroups(rows,context.lanOffers||[],byOwner,ownerUse),
-  ...radioDraftGroups(rows,byOwner,ownerUse),
+  ...radioDraftGroups(rows,byOwner,ownerUse,showRadioBudget),
   ...cctvDraftGroups(rows,byOwner,ownerUse),
   ...fiberPanelDraftGroups(rows,byOwner,ownerUse),
  ]:[];
@@ -317,7 +320,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const radio=target.appendix==='1.1',cctv=target.mr.systemToken==='TEL-CCTV',fiberPanel=target.appendix==='1.8';
   if(radio){
    target.provisionalRadio=true;
-   if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
+   if(showRadioBudget&&target.key==='MR-B1-11-APF-06')target.system='RoIP Dispatch Console';
+   else if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
   }else if(cctv)target.provisionalCctv=true;
   else if(fiberPanel){
    target.provisionalFiberPanel=true;
@@ -367,6 +371,19 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const {binding:b,usdPriced} of byOwner.values()){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   if(groupedQuoteOwners.has(b.lineId))continue;
+  const radioEstimate=showRadioBudget&&radioAppendix11Estimate0550.get(b.lineId);
+  if(radioEstimate&&usdPriced){
+   const target=rows.find(row=>row.key===radioEstimate.mr);
+   if(target&&!target.excluded){
+    target.priceOwners=[...(target.priceOwners||[]).filter(owner=>Number.isFinite(owner.amount)),b];
+    target.ownerIds=target.priceOwners.map(owner=>owner.lineId);
+    target.provisionalRadio=true;
+    if(target.key==='MR-B1-11-APF-06')target.system='RoIP Dispatch Console';
+    target.components.push({description:b.line.description,quantity:b.quantity,unit:b.unit,amount:b.amount,
+     unitPrice:b.unitPrice,note:'SI budget estimate',source:b.line.description});
+    continue;
+   }
+  }
   const targets=ownerUse.get(b.lineId)||[];
   // The APF MR row carries the full two-site R11 Lot in the draft. Keep ACP
   // and the cable rows in the MR with no implied allocation or scope acceptance.
@@ -473,6 +490,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
    r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
    r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
    r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
+   if(showRadioBudget&&owned.some(b=>radioAppendix11Estimate0550.has(b.lineId)))r.pendingRadioPlacement='ราคาตามใบเสนอราคาและ/หรืองบ SI ส่วนที่ขาด · Draft';
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
   }else if(r.provisionalDmr){
    r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
@@ -526,7 +544,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
   });
   group.systems=[...systems].map(([name,sites])=>{
    const rollup=bySystem?scheduleRollup0550([...sites.values()].flatMap(items=>items.flatMap(r=>r.priceOwners||[]))):null;
-   return {name,knownAmount:rollup?.priced?rollup.knownUSD:null,
+   const token=[...sites.values()][0]?.find(r=>r.mr)?.mr.systemToken;
+   const noticeKey=['RoIP Dispatch Console','Antenna Cables',sharedRadioLabel].includes(name)?
+    (name==='RoIP Dispatch Console'?name:'Antenna Cables'):token;
+   return {name,notice:showRadioBudget&&group.id==='1.1'?radioAppendix11Notices0550[noticeKey]:undefined,
+    knownAmount:rollup?.priced?rollup.knownUSD:null,
     sites:[...sites].map(([name,items])=>{
      const siteRollup=bySystem&&group.id==='1.8'?scheduleRollup0550(items.flatMap(r=>r.priceOwners||[])):null;
      return {name,knownAmount:siteRollup?.priced?siteRollup.knownUSD:null,rows:items.map(r=>{
