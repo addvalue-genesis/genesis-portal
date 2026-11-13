@@ -106,7 +106,22 @@ for(const [code,quantity,group] of [['G26642',1,''],['LS-5135S-24T4S-EI',1,''],[
  const row=part(code);assert(row,code);assert.equal(row.quantity,quantity,code);assert.equal(row.group,group,code);assert.equal(row.included,true,code);
 }
 assert.match(part('GMVN6050A').remarks,/End User Machine Licenses/);
+const afterLicense=radio001.components.slice(radio001.components.findIndex(c=>c.partNo==='GMVN6050A')+1,radio001.components.findIndex(c=>c.partNo==='DL20 Gen10'));
+assert.deepEqual(afterLicense.map(c=>[c.quantity,c.partNo,c.group]),[[1,'M8668i',''],[1,'TQJ-150I',''],[1,'LX-BLQ-400-N','']]);
+assert(radio001.components.filter(c=>c.group==='License').every(c=>/licen[cs]e/i.test(c.description)));
 const server=part('DL20 Gen10');assert.equal(server.included,false);assert.match(server.remarks,/APF/);
+const {RadioLotBomTable0550}=require(root+'/project0550/RadioLotBom0550.jsx');
+const bomHtml=require('react-dom/server').renderToStaticMarkup(require('react').createElement(RadioLotBomTable0550,{components:radio001.components}));
+const licenseBody=bomHtml.split('<tbody').find(body=>body.includes('>License<'));
+assert(licenseBody&&licenseBody.includes('GMVN6050A')&&!licenseBody.includes('M8668i'),'License section ends at the licence remark');
+const mobileBody=bomHtml.split('<tbody').find(body=>body.includes('M8668i'));
+assert(mobileBody.includes('>Equipment<')&&!mobileBody.includes('>License<')&&mobileBody.includes('TQJ-150I')&&mobileBody.includes('LX-BLQ-400-N'));
+const lotParser=require(root+'/project0550/data/radioLotComponents0550.js'),lotQuote=require(root+'/project0550/data/mgwQuote0550.json');
+for(const row of lotQuote.rows.filter(r=>r.section==='RADIO')){
+ const key=row.id.replace('MGW-Q26-063-','');
+ const text=lotParser.radioLotSourceText0550(row.detail,{continuation:lotQuote.radioDetailContinuations[key]});
+ for(const component of lotParser.parseRadioLotComponents0550(text))if(component.group==='License')assert(/licen[cs]e/i.test(component.description),key+' mislabelled as License / '+component.partNo+' / '+component.description);
+}
 assert.equal(radio001.components.filter(c=>c.partNo==='TQJ-150I').length,2);
 assert(radio001.components.every(c=>c.unitCost===undefined));
 assert.equal(activate(radio),radio,'Radio lot components stay attached without rewriting prices');

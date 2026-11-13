@@ -1983,6 +1983,7 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-radio-lot-bom{margin:.35rem 0}
 .p55-radio-lot-bom caption{caption-side:top;text-align:left;font-weight:700;padding:.35rem .2rem}
 .p55-radio-lot-bom .p55-bom-group th{background:var(--bid-tint,#edf3f7);text-align:left}
+.p55-radio-lot-bom tbody+tbody .p55-bom-group th{border-top:2px solid #c5d4e0}
 .p55-radio-lot-bom .p55-bom-quantity{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 tr.p55-radio-lot-bom-row>td{background:#f7fbfd;padding-top:.2rem}
 
