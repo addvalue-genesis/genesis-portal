@@ -100,7 +100,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {groups.length>0&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.group.'+({C2:'B5',C3:'C3',C4:'C2'}[id]),{workingSystem:selected?.token})}>เตรียมรายการ Working {({C2:'B5',C3:'C3',C4:'C2'}[id])}</button>}
   <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled} mrNavigationTarget={mrNavigationTarget}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
-  {/^C[2-8]$/.test(id)&&!hasC8Calloff&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
+  {/^C[2-7]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {id==='C8'&&view.workingPreview&&!hasC8Calloff&&ws?.importC8Calloff&&<div className="p55-panel" aria-label="C8 price data">
    <p>ยังไม่มีราคา Call-off รายประเทศใน Working หาก Drive ยังไม่ซิงก์ ให้เลือกไฟล์ราคาโครงการจาก DATA เพื่อโหลดเฉพาะ C8</p>
    <label>โหลดไฟล์ราคา C8 <input type="file" accept=".json,application/json" disabled={disabled||ws.busy} onChange={async e=>{
@@ -145,7 +145,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
    </li>)}</ul>
   </div>}
   <details className="p55-c1-internal-diagnostics" open={id!=='C1'&&id!=='C8'}><summary>SI · ตรวจราคา / การจัดหมวดภายใน</summary>
-  {hasC8Calloff&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
+  {id==='C8'&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {unresolved.length>0&&<section className="p55-native-issues" aria-label="C2 rows awaiting system assignment">
    <h4>รายการ C2 รอระบุระบบ · {unresolved.length} แถว</h4>
    <p>เก็บรายการ Working เดิมไว้ตรวจทานใน SI ยอดทั้งโครงการยังอ้างอิงรายการเดิม เมื่อยืนยันระบบและ Main Equipment No. แล้วให้จัดลงฟอร์มของระบบนั้น</p>

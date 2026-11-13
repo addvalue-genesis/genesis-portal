@@ -6,7 +6,7 @@ import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequire
 import {deriveTechnicalProposal0550,TECHNICAL_SECTIONS_0550,technicalRecordBasis0550} from './technicalProposal0550';
 import {mgwDetailGroup0550} from './mgwDetailPricing0550';
 import {sumMoney0550,displayPriceCheck0550} from './money0550';
-import {C8_TOTAL_NATIVE_0550,c8CalloffDraftRows0550,c8Country0550,legacyGeneratedC8Calloff0550} from './c8Calloff0550';
+import {C8_TOTAL_NATIVE_0550,c8CalloffDraftRows0550,c8Country0550,c8SingleForm0550,legacyGeneratedC8Calloff0550} from './c8Calloff0550';
 
 export const SCHEDULES_0550=[
  {id:'A',title:'Initial Contract Price'},
@@ -47,7 +47,7 @@ const sources=(data,ids)=>(ids||[]).map(id=>data.sourceIntake?.sources.find(s=>s
 export const CURRENT_PAYMENT_NATIVE_0550='exhibit-c-schedule-b-rev1.v4';
 export const paymentSchedule0550=view=>view.nativeExhibitVersion===CURRENT_PAYMENT_NATIVE_0550
  ?view.tenderScheduleBasis?.payment||{rows:[]}
- :!view.nativeExhibitVersion||view.nativeExhibitVersion===C8_TOTAL_NATIVE_0550?view.tenderScheduleBasis?.payment:null;
+ :c8SingleForm0550(view)||view.nativeExhibitVersion===C8_TOTAL_NATIVE_0550?view.tenderScheduleBasis?.payment:null;
 export function tenderScheduleBasis0550(data){
  const all=data.sourceIntake?.sources||[],replaced=new Set(all.flatMap(s=>s.replaces||[]));
  const current=all.filter(s=>s.authority==='CURRENT_TENDER'&&!replaced.has(s.id));

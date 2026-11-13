@@ -10,7 +10,7 @@ import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
-import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -254,12 +254,14 @@ function nativePages(view,id,currency='USD',c2References){
   if(view.workingPreview&&view.tenderScheduleBasis?.facilitiesConflict)issues.push(facilitiesFormCheck);
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
   const total=c8CalloffTotal0550(view,rows);
-  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
-  if(total){
-   add({},'',{c8CalloffTotal:total});
-   if(total.amount===null)issues.push('Estimated Call-off Total OPEN: reconcile quantities, prices and the C8 source revision in Working.');
-   if(!facilities.length)return {pages,issues};
+  if(total?.amount===null)issues.push('Estimated Call-off Total OPEN: reconcile quantities, prices and the C8 source revision in Working.');
+  const singleForm=c8SingleForm0550(view);
+  if(singleForm||total){
+   add({},'',{c8CalloffTotal:total||{amount:null,revision:''}});
+   if(singleForm)return {pages,issues};
   }
+  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
+  if(total&&!facilities.length)return {pages,issues};
   const groups=new Map();
   for(const b of facilities){
    const country=c8Country0550(b)||'';
@@ -392,7 +394,7 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
   if(page.id==='C8'){
-   partialNote=subtotalNote(view,view.scheduleRows('C8').filter(b=>b.treatment!=='CALLOFF'))||partialNote;
+   if(!c8SingleForm0550(view))partialNote=subtotalNote(view,view.scheduleRows('C8').filter(b=>b.treatment!=='CALLOFF'))||partialNote;
    if(view.tenderScheduleBasis?.facilitiesConflict)partialNote=[partialNote,facilitiesFormCheck].filter(Boolean).join(' ');
   }
   const training=view.tenderScheduleBasis?.training;

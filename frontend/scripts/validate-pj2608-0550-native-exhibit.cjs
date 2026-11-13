@@ -40,7 +40,7 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
  assert.equal(saved.active.some(line=>line.id.startsWith('LINE-C8-CALLOFF-')),false);
  const {scheduleTable0550}=require(root+'/project0550/exportBidVolumes0550.js');
  const {scheduleViewTHB0550}=require(root+'/project0550/data/scheduleRollup0550.js');
- const {C8_TOTAL_NATIVE_0550}=require(root+'/project0550/data/c8Calloff0550.js');
+ const {C8_SINGLE_FORM_NATIVE_0550,C8_TOTAL_NATIVE_0550}=require(root+'/project0550/data/c8Calloff0550.js');
  const form=N.nativeSchedule0550(preview,'C8');
  assert.equal(form.pages.length,1);
  assert.deepEqual(form.pages[0].c8CalloffTotal,{amount:604,revision:'Rev03'});
@@ -59,12 +59,26 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
  const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
  const {NativeExhibitC0550}=require(root+'/project0550/NativeExhibitC0550.jsx');
  assert.match(renderToStaticMarkup(React.createElement(NativeExhibitC0550,{view:preview,id:'C8'})),/USD 604\.00/);
- assert.equal(P.nativeExhibitVersionForWorkspace0550(prepared),C8_TOTAL_NATIVE_0550);
+ assert.equal(P.nativeExhibitVersionForWorkspace0550(prepared),C8_SINGLE_FORM_NATIVE_0550);
  assert.equal(N.nativeSchedule0550(saved,'C8').pages[0].c8CalloffTotal.amount,null);
  const reviewedRows=preview.scheduleRows('C8').map(b=>({...b,state:'REVIEWED'}));
- const reviewed={...saved,nativeExhibitVersion:C8_TOTAL_NATIVE_0550,scheduleRows:id=>id==='C8'?reviewedRows:saved.scheduleRows(id)};
+ const reviewed={...saved,nativeExhibitVersion:C8_SINGLE_FORM_NATIVE_0550,scheduleRows:id=>id==='C8'?reviewedRows:saved.scheduleRows(id)};
  assert.match(N.nativeSchedule0550(reviewed,'C8').html,/USD 604\.00/);
  assert.equal(scheduleTable0550(reviewed,'C8').rows[0][2],604);
+ const otherRows=[
+  {...reviewedRows[0],lineId:'TEST-C8-BASE',treatment:'BASE',amount:700,unitPrice:700,line:{description:'TEST FACILITIES BASE'}},
+  {...reviewedRows[0],lineId:'TEST-C8-LEGACY',amount:800,unitPrice:800,line:{description:'TEST FACILITIES LEGACY'}},
+ ];
+ const withOther={...reviewed,scheduleRows:id=>id==='C8'?[...reviewedRows,...otherRows]:reviewed.scheduleRows(id)};
+ const single=N.nativeSchedule0550(withOther,'C8');
+ assert.equal(single.pages.length,1);
+ assert.match(single.html,/USD 604\.00/);
+ assert.doesNotMatch(single.html,/TEST FACILITIES|700\.00|800\.00/);
+ assert.deepEqual(scheduleTable0550(withOther,'C8'),sheet);
+ assert.equal(N.nativeSchedule0550({...withOther,nativeExhibitVersion:C8_TOTAL_NATIVE_0550},'C8').pages.length,2);
+ const withoutBasis={...preview,scheduleRows:id=>id==='C8'?otherRows:preview.scheduleRows(id)};
+ assert.equal(N.nativeSchedule0550(withoutBasis,'C8').pages.length,1);
+ assert.equal(scheduleTable0550(withoutBasis,'C8').rows[0][2],'OPEN');
  const history={...reviewed,nativeExhibitVersion:'exhibit-c-schedule-b-rev1.v4'};
  const oldForm=N.nativeSchedule0550(history,'C8');
  const page=oldForm.pages.find(page=>page.c8Country==='Myanmar');
@@ -89,7 +103,7 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
   reviewedPrices.has(line.id)?{...line,customerUSD:reviewedPrices.get(line.id)}:line)}};
  const frozen=P.freezeBidPackageOutput0550(reviewedData,reviewedModel,'C8-TEST',today);
  P.validateFrozenBidPackage0550(frozen);
- assert.equal(frozen.nativeExhibitVersion,C8_TOTAL_NATIVE_0550);
+ assert.equal(frozen.nativeExhibitVersion,C8_SINGLE_FORM_NATIVE_0550);
  assert.match(frozen.htmlI,/USD 604\.00/);
  assert.match(Buffer.from(frozen.docxI,'base64').toString(),/USD 604\.00/);
  assert.equal(frozen.I.find(s=>s.name==='Schedule C8').rows[0][2],604);
@@ -107,7 +121,9 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
   });
   assert.deepEqual(pages.map(page=>page.values.C8_6_1),totals);
   const total=totals.reduce((sum,amount)=>sum+Number(amount.replaceAll(',','')),0);
-  assert.equal(N.nativeSchedule0550(view,'C8').pages[0].c8CalloffTotal.amount,total);
+  const form=N.nativeSchedule0550(view,'C8');
+  assert.equal(form.pages.length,1);
+  assert.equal(form.pages[0].c8CalloffTotal.amount,total);
   assert.equal(scheduleTable0550(view,'C8').rows[0][2],total);
  }
 }
@@ -266,8 +282,9 @@ assert.match(c7Native.html,/tender site day of 10 hours/);
 assert.equal(N.nativeSchedule0550(draftServices,'A1').pages[0].values.A1_8_6,'400.00');
 const c8Native=N.nativeSchedule0550(draftServices,'C8');
 assert.match(c8Native.html,/omit C8/);
-assert.equal(c8Native.pages[0].values.C8_1_5,'');
-assert.equal(c8Native.pages[0].values.C8_6_1,'Call-off rates only');
+assert.equal(c8Native.pages.length,1);
+assert.equal(c8Native.pages[0].c8CalloffTotal.amount,null);
+assert.doesNotMatch(c8Native.html,/Call-off rates only|Unit Price/);
 assert.match(Buffer.from(N.buildNativeExhibitDocx0550(draftServices,'C7')).toString(),/Page 2 of 2 subtotal/);
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};

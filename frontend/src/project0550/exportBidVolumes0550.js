@@ -6,7 +6,7 @@ import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
-import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function scheduleTable0550(view,id){
  if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
@@ -35,8 +35,8 @@ export function scheduleTable0550(view,id){
  if(id==='C8'){
   const total=c8CalloffTotal0550(view,rows);
   const facilities=total?rows.filter(c8OtherFacilities0550):rows;
-  if(total&&!facilities.length)return {heads:['Description / Scope of Supply','Unit','Total Price (USD)','Notes'],
-   rows:[[C8_TOTAL_DESCRIPTION_0550,'Lot',total.amount??'OPEN',C8_TOTAL_NOTE_0550]]};
+  if(c8SingleForm0550(view)||(total&&!facilities.length))return {heads:['Description / Scope of Supply','Unit','Total Price (USD)','Notes'],
+   rows:[[C8_TOTAL_DESCRIPTION_0550,'Lot',total?.amount??'OPEN',C8_TOTAL_NOTE_0550]]};
   return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],
    rows:[...(total?[['',C8_TOTAL_DESCRIPTION_0550,'Lot','','',total.amount??'OPEN',C8_TOTAL_NOTE_0550]]:[]),...facilities.map(b=>{
     const country=c8Country0550(b);

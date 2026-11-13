@@ -3,10 +3,10 @@ import {bidVolumeSheets0550,bidVolumeHtml0550,buildBidVolumeXlsx0550} from '../e
 import {technicalDraftHtml0550} from '../exportTechnicalProposal0550';
 import {buildNativeExhibitDocx0550,nativeExhibitProblems0550} from '../exhibitCNative0550';
 import {c1LayoutForNative0550} from './c1Appendix0550';
-import {C8_TOTAL_NATIVE_0550,c8Country0550} from './c8Calloff0550';
+import {C8_SINGLE_FORM_NATIVE_0550,C8_TOTAL_NATIVE_0550} from './c8Calloff0550';
 const base64=bytes=>{let s='';for(let i=0;i<bytes.length;i+=8192)s+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(s);};
 export function nativeExhibitVersionForWorkspace0550(data){
- if(data.bidVolumes?.bindings.some(b=>b.schedule==='C8'&&c8Country0550(b)))return C8_TOTAL_NATIVE_0550;
+ if(data.bidVolumes?.bindings.some(b=>b.schedule==='C8'))return C8_SINGLE_FORM_NATIVE_0550;
  return tenderScheduleBasis0550(data).payment?CURRENT_PAYMENT_NATIVE_0550:'exhibit-c-rev0.v3';
 }
 export function freezeBidPackageOutput0550(data,model,number,today,{legacy=false,nativeExhibitVersion=nativeExhibitVersionForWorkspace0550(data)}={}){
@@ -30,7 +30,7 @@ export function downloadFrozenBidPackage0550(issue,volume,format='xlsx'){
 export function validateFrozenBidPackage0550(p){
  const keys=['documentNo','revision','outputLabel','I','III','VDRL','htmlI','htmlII','htmlIII','htmlVDRL',...(p?.nativeExhibitVersion?['nativeExhibitVersion','docxI']:[])];
  if(!p||Object.keys(p).length!==keys.length||keys.some(k=>p[k]===undefined))throw Error('Release: invalid frozen package');
- if(p.nativeExhibitVersion&&(!['exhibit-c-rev0.v1','exhibit-c-rev0.v2','exhibit-c-rev0.v3',CURRENT_PAYMENT_NATIVE_0550,C8_TOTAL_NATIVE_0550].includes(p.nativeExhibitVersion)||typeof p.docxI!=='string'||!/^UEs[A-Za-z0-9+/]*={0,2}$/.test(p.docxI)))throw Error('Release: invalid frozen native Word output');
+ if(p.nativeExhibitVersion&&(!['exhibit-c-rev0.v1','exhibit-c-rev0.v2','exhibit-c-rev0.v3',CURRENT_PAYMENT_NATIVE_0550,C8_TOTAL_NATIVE_0550,C8_SINGLE_FORM_NATIVE_0550].includes(p.nativeExhibitVersion)||typeof p.docxI!=='string'||!/^UEs[A-Za-z0-9+/]*={0,2}$/.test(p.docxI)))throw Error('Release: invalid frozen native Word output');
  for(const k of keys.filter(k=>!['I','III','VDRL'].includes(k)))if(typeof p[k]!=='string'||p[k].length>16*1024*1024)throw Error('Release: invalid frozen package text');
  for(const k of ['I','III','VDRL'])if(!Array.isArray(p[k])||p[k].length>20||p[k].some(s=>!s||typeof s.name!=='string'||!Array.isArray(s.heads)||!Array.isArray(s.rows)||s.rows.length>20000||s.heads.some(h=>typeof h!=='string')||s.rows.some(row=>!Array.isArray(row)||row.some(v=>v!==null&&typeof v!=='string'&&!(typeof v==='number'&&Number.isFinite(v))))))throw Error('Release: invalid frozen package tables');
 }
