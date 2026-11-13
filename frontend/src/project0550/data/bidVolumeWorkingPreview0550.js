@@ -17,6 +17,7 @@ import {versedDmrCabinetWorking0550} from './versedRack0550';
 import {CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,CHEVALIER_PBX_SUPPLY_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
 import {chevalierPbxSharedBudget0550} from './chevalierPbxBudget0550';
 import {mgwCctvEntSharedBudget0550} from './mgwCctvEntBudget0550';
+import {towerErectionAllocation0550,TOWER_ERECTION_SCHEDULE_BASIS_0550} from './towerTenderScope0550';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -113,6 +114,9 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
   if(tagged?.summary)({schedule,summary,basis:reason}=tagged);
   if(raw.id===CHEVALIER_PBX_MA_0550){schedule='A1';summary='OTHER';reason='Two-year remote maintenance → A1 Others / 11.E';}
   if(raw.id===CHEVALIER_PBX_FIELD_0550){schedule='C7';summary='FIELD_SERVICE';reason='Initial site and integration service → C7 fixed lot; man-hours and programme OPEN';}
+  if(towerErectionAllocation0550(raw)){
+   schedule='A1';summary='OTHER';reason=TOWER_ERECTION_SCHEDULE_BASIS_0550;
+  }
   if((data.repositoryBasisImport?.tsiActivityBudget?.expenseLineIds||[]).includes(raw.id)){
    schedule='A1';summary='OTHER';reason='Shared SI travel / mobilisation expense → A1 Others; retain one existing owner, not C7 labour hours or C8 purchaser facilities';
   }

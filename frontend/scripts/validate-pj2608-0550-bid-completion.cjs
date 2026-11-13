@@ -56,10 +56,26 @@ assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
  assert.equal(ready.lines.find(l=>l.id==='REQ-MR-B1-11-ACP-06').manualCost,null,'Missing ACP evidence cannot inherit APF price');
  assert.equal(C.prepareBidCompletion0550(ready,options(ready),date),ready,'Repeated preparation preserves the applied decision');
  const marked=C.applyCommercialSellPolicies0550(ready),markedTower=marked.lines.find(l=>l.id===id);
- assert.deepEqual(markedTower,{...line,sellMode:'MARKUP',markupPct:50,contingencyPct:null,marginPct:null,sellRate:null});
+ assert.deepEqual(markedTower,{...line,sellMode:'MARKUP',markupPct:30,contingencyPct:null,marginPct:null,sellRate:null,primePct:20});
  assert.equal(marked.offers,ready.offers);
  assert.equal(C.bidCompletionSourceUsages0550(marked).find(r=>r.line.id===id).current,true);
  assert.equal(C.applyCommercialSellPolicies0550(marked),marked);
+ const erection={...line,id:'REQ-MR-ACT-C1-D04',wbs:'B4',customerRowCode:'B4',manualCost:396900};
+ const withErection={...marked,lines:[...marked.lines.filter(l=>l.id!==erection.id),erection]};
+ const actual=C.applyCommercialSellPolicies0550(withErection).lines.find(l=>l.id===erection.id);
+ assert.deepEqual(actual,{...erection,sellMode:'MARKUP',markupPct:30,contingencyPct:null,marginPct:null,sellRate:null,primePct:5});
+ assert.equal(C.towerWorkingSellBasis0550({...erection,wbs:'C1'}),null);
+ assert.equal(C.towerWorkingSellBasis0550({...erection,responsibility:'COMPANY'}),null);
+ const {TOWER_ERECTION_BASE_BASIS_0550,reconcileTowerErectionSchedule0550}=require(src+'/project0550/data/towerTenderScope0550.js');
+ const sourceLine={...erection,scopeBasis:TOWER_ERECTION_BASE_BASIS_0550};
+ const oldDraft={schedule:'C7',summary:'FIELD_SERVICE',treatment:'BASE',status:'DRAFT',
+  basis:'SI DRAFT / Field assistance → C7 Site Service; scope / hour basis still requires review / Working WBS B4 / B4'};
+ assert.equal(reconcileTowerErectionSchedule0550(oldDraft,sourceLine).schedule,'A1');
+ const reviewed={...oldDraft,status:'REVIEWED'};
+ assert.equal(reconcileTowerErectionSchedule0550(reviewed,sourceLine),reviewed);
+ const authored={...oldDraft,basis:'Authored field service allocation'};
+ assert.equal(reconcileTowerErectionSchedule0550(authored,sourceLine),authored);
+
 
  assert(C.bidCompletionBasisChanged0550(ready),'Dependent estimates must be reconciled after added supply');
  const changed={...ready,offers:ready.offers.slice(1)};

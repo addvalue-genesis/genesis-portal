@@ -5,6 +5,16 @@ export const TOWER_SURVEY_ID_0550='REQ-MR-ACT-B7-D04';
 export const TOWER_ENGINEERING_ID_0550='LINE-TOWER-QUOTED-ENGINEERING-0550';
 export const TOWER_ERECTION_ID_0550='REQ-MR-ACT-C1-D04';
 export const TOWER_ERECTION_BASE_BASIS_0550='MR Rev.B1 §1.3(i) · TSI Base erection of APF 60 m and ACP 30 m · Master Tower Item 10 for each tower';
+export const TOWER_ERECTION_SCHEDULE_BASIS_0550='Master Tower erection is a Base lump sum → A1 Others / B4. C7 separately lists field supervision, SAT and training by workload';
+export const towerErectionAllocation0550=line=>line?.id===TOWER_ERECTION_ID_0550&&line.wbs==='B4'&&line.scopeBasis===TOWER_ERECTION_BASE_BASIS_0550;
+export function reconcileTowerErectionSchedule0550(binding,line){
+ // Migrate only the generated C7 draft. Preserve authored and reviewed bindings.
+ const old='SI DRAFT / Field assistance → C7 Site Service; scope / hour basis still requires review / Working WBS B4 / B4';
+ if(!towerErectionAllocation0550(line)||binding.status!=='DRAFT'||binding.reviewer||binding.reviewedOn||binding.basisKey||
+  binding.schedule!=='C7'||binding.summary!=='FIELD_SERVICE'||binding.treatment!=='BASE'||binding.basis!==old||
+  binding.hoursPerDay!=null)return binding;
+ return {...binding,schedule:'A1',summary:'OTHER',basis:'SI DRAFT / '+TOWER_ERECTION_SCHEDULE_BASIS_0550+' / Working WBS B4 / B4'};
+}
 export const towerErectionBaseApproved0550=data=>data.sourceIntake?.findings?.some(f=>f.id==='A-SI-R33-TOWER-ERECTION-BASE'&&f.state==='SOURCE_SUPPORTED');
 export const TOWER_SURVEY_BASIS_0550='Tower technical site survey / TSSR, Item 6 only. Item 7 geotechnical investigation is pending review of the EPC soil report for each tower location. General TSI survey remains in its existing labour owners.';
 export const TOWER_ENGINEERING_BASIS_0550='Tower OEM management, foundation design and as-built documentation (Items 1, 8, 15). MR Rev.B1 §1.3(i) requires the structural calculation report, foundation design and anchor bolt specification before bid close. LIS-0004 Rev.B1 Item 14 assigns installation supervision to Telecom. Item 1 quotes general supervision; verify dedicated installation supervision days, crew and site costs before adding any amount.';
@@ -22,6 +32,8 @@ export const towerSourceScope0550={
  '12':'OPEN · ยืนยันเจ้าของงานรั้วเฉพาะรอบเสา',
  '13':'OPEN · ยืนยันเจ้าของงานปรับพื้นที่และเก็บงาน'
 };
+export const isTowerFullQuote0550=offer=>Boolean(offer?.supplierQuoteRow?.classification==='NET_PACKAGE'&&
+ /^OFFER-MASTER-TOWER-2609\.95\.[12]-NET$/.test(offer.id));
 export const isTowerSourceItem0550=offer=>Boolean(offer?.id.startsWith('OFFER-MASTER-TOWER-2609.95.')&&offer.supplierQuoteRow?.classification==='BASE_PRICE');
 export function towerOfferScope0550(offer){
  if(!isTowerSourceItem0550(offer))return null;

@@ -3,7 +3,7 @@ import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwRadioPrintedExtension0550,
 import {validateOfferAtomicLines0550} from './atomicLines0550';
 import {validateVendorBidTags0550} from './vendorBidTags0550';
 import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
-import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
+import {isTowerFullQuote0550,TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
 import {pagaRevisionNet0550,validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
@@ -202,6 +202,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(l.id===RETIRED_TOWER_OWNER_0550||l.offerId===RETIRED_TOWER_OFFER_0550){
    costRate=null;
    problems.push(RETIRED_TOWER_BASIS_0550);
+  }
+  if(isTowerFullQuote0550(offer)){
+   costRate=null;
+   problems.push("TOWER_FULL_QUOTE_REFERENCE: use the allocated supply and erection owners");
   }
   if(towerSurveyOpen&&l.id===TOWER_SURVEY_ID_0550){
    costRate=null;

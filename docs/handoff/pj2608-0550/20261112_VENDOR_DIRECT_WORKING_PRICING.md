@@ -190,3 +190,29 @@ selected basis, and customer HTML, Word and XLSX exclude the internal figures
 and links. C1 Appendix, supplier revision, Working Schedules, continuity
 checks and the production portal build passed. The owner's Windows view has
 yet to be verified after applying this change.
+
+
+## 13 November — Master Tower goods and erection
+
+The two original Master Tower NET packages stay as quotation references. APF
+and ACP retain their existing A1-11 goods owners from Items 2–5, shown on
+C1 Appendix 1.1 at 1.1.8 and 1.1.14. The Base erection owner uses Item 10
+once across both sites. E11/E13 apply 30%/20% to goods and 30%/5% to
+installation cost. Existing source-bound engineering and survey retain their
+commercial policy. Erection is a fixed lot under A1 Others / B4. An untouched
+generated C7 binding moves to A1; authored and reviewed bindings are preserved.
+C7 supervision, SAT and training require distinct scope and hours.
+
+The WBS workbook traces the bid to MR Rev.B1 §1.3(i), Appendices 1.1, 3 and 4,
+LIS-0004 Item 14 and Annex 4 INT-001 R00. Structural calculations, foundation
+design and anchor-bolt specifications are due with bid. Foundation construction
+is an EPC interface. Installation actuals, supplier validity, OEM spare and
+tool lists, detailed inspection/field workloads and the C8 form remain open.
+The workbook is an internal WBS; it does not write new working estimates.
+
+ADR-0550-001 principles 2–3, 5–6 and 8–11 govern cost ownership, source trace
+and review. Replayed a reconstructed workspace with both private quotes:
+32 registered records, 20 distinct allocated source items, one erection
+owner and two supply owners. Verified C1 amounts, A1 Others binding, full
+NET pricing guard, idempotence and preserved authored binding. The owner's
+Windows workspace and bid issuance are separate from these checks.

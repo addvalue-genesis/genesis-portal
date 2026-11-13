@@ -13,7 +13,7 @@ import {lanStockBasis0550} from './lanStockBasis0550';
 import {evaluateServiceEquation} from '../serviceEquationRuntime';
 import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550';
 import {blankDeviation0550,blankProof0550,integrationFingerprint0550} from './integrationWorkspace0550';
-import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550} from './towerTenderScope0550';
+import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550,TOWER_ERECTION_ID_0550,TOWER_ERECTION_BASE_BASIS_0550,towerErectionBaseApproved0550,reconcileTowerErectionSchedule0550} from './towerTenderScope0550';
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {pagaRevisionSelected0550,pagaTrainingOption0550} from './supplierRevision0550';
 import procurement from './procurementScope0550.json';
@@ -69,11 +69,23 @@ const directSellBasis={
  sellMode:'MARKUP',markupPct:procurement.directSupplierMarkupPct,marginPct:null,sellRate:null,
 };
 
+const towerSellBasis = kind => ({
+ ...directSellBasis,...procurement.towerPricing[kind],contingencyPct:null,
+});
+const towerGoodsOwner = line => line.wbs==='A'&&TOWER_SUPPLY_ROWS.some(([id])=>id===line.id);
+
+export function towerWorkingSellBasis0550(line){
+ if(!line.selected||line.coveredByLineId||line.responsibility==='COMPANY')return null;
+ if(line.id===TOWER_ERECTION_ID_0550&&line.wbs==='B4')return towerSellBasis('installation');
+ return towerGoodsOwner(line)?towerSellBasis('goods'):null;
+}
+
 export function directSupplierSellBasis0550(data,line,offer){
  if(line.wbs?.startsWith('B')&&offer?.atomicLines?.some(isQuotedEngineeringService0550))return null;
  const directSystem=directMarkupSystems.get(offer?.vendorId),quotedSystems=offer?.quoteEvidence?.systemTokens;
  const matchesSystem=directSystem&&(directSystem===line.systemToken||
   line.systemToken==='COMMON'&&quotedSystems?.length===1&&quotedSystems[0]===directSystem);
+ if(directSystem==='TEL-TELT')return null; // The full Master Tower NET contains goods and services.
  if(!matchesSystem||offer.vendorId!==line.vendorId||!finite(offer.unitCost)||
   (offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=='NET_PACKAGE')||
   (offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data)))return null;
@@ -117,6 +129,7 @@ export function applyCommercialSellPolicies0550(data){
   const allocated=line.selected&&!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
    row.offerIds.every(id=>isTowerSourceItem0550(offers.get(id))&&directMarkupSystems.get(offers.get(id).vendorId)==='TEL-TELT')&&
    row.inputKey===lineKey(data,line)&&row.sourceKey===sourceKey(data,row.offerIds);
+  const tower=towerWorkingSellBasis0550(line);
   const towerEngineering=allocated&&[TOWER_ENGINEERING_ID_0550,TOWER_SURVEY_ID_0550].includes(line.id);
   const priorTowerBasis=line.sellMode==='MARKUP'&&line.markupPct===procurement.directSupplierMarkupPct&&
    line.contingencyPct==null&&line.sellRate==null&&line.marginPct==null&&line.primePct===20;
@@ -128,7 +141,8 @@ export function applyCommercialSellPolicies0550(data){
    (mrDefaults.has(line.id)||line.id.startsWith('LINE-MGW-CURRENT-'))&&mgwCurrentOffer0550(offer)||
    line.id.startsWith('LINE-MGW-CURRENT-')&&line.sourceRef.includes('Prior MGW cabinet source:')||
    row&&['ESTIMATE','QUOTED'].includes(row.kind)&&row.inputKey===lineKey(data,line));
-  const sellBasis=external?EXTERNAL_ENGINEERING_SELL_BASIS_0550:direct||(allocated&&!towerEngineering?(line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis):null);
+  const sellBasis=tower||(external?EXTERNAL_ENGINEERING_SELL_BASIS_0550:direct||
+   (allocated&&!towerEngineering?(line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis):null));
   const updated=external?{...line,...sellBasis,sourceRef:line.sourceRef.replace(
    'Professional Service: '+LEGACY_SERVICE_FORMULA_0550,EXTERNAL_ENGINEERING_POLICY_0550+': '+EXTERNAL_ENGINEERING_FORMULA_0550)}:
    sellBasis?{...line,...sellBasis}:standard?
@@ -514,8 +528,13 @@ export function reconcileTowerTenderScope0550(data){
   erectionReceiptChanged=true;
  }
  const receiptChanged=receipt&&(rows.length!==receipt.rows.length||updates.size>0||erectionReceiptChanged);
- if(!receiptChanged&&lines.every((line,i)=>line===data.lines[i]))return data;
- return {...data,lines,...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{})};
+ const bindings=data.bidVolumes?.bindings;
+ const migratedBindings=bindings?.map(binding=>binding.lineId===TOWER_ERECTION_ID_0550?reconcileTowerErectionSchedule0550(binding,erectionLine):binding);
+ const bindingChanged=migratedBindings?.some((binding,i)=>binding!==bindings[i]);
+ if(!receiptChanged&&!bindingChanged&&lines.every((line,i)=>line===data.lines[i]))return data;
+ return {...data,lines,
+  ...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{}),
+  ...(bindingChanged?{bidVolumes:{...data.bidVolumes,bindings:migratedBindings}}:{})};
 }
 function retireCommissioningSpareEstimates0550(data,receipt){
  const retired=new Set();

@@ -4,10 +4,10 @@ import {pagaRevisionNet0550,pagaIncludedScope0550} from './data/supplierRevision
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,ceragonR11Selected0550,DMR_PART_B_0550} from './data/ceragonSelection0550';
 import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {APF_LAN_BID_BASIS_0550,mgwCurrentOffer0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./data/mgwQuoteSelection0550";
-import {isTowerSourceItem0550,towerC1Reference0550,towerSourceScope0550,TOWER_C1_0550,TOWER_LIS_0550,TOWER_MR_0550} from "./data/towerTenderScope0550";
+import {isTowerFullQuote0550,isTowerSourceItem0550,towerC1Reference0550,towerSourceScope0550,TOWER_C1_0550,TOWER_LIS_0550,TOWER_MR_0550} from "./data/towerTenderScope0550";
 import {ControlledTagMapping0550} from './ControlledTagMapping0550';
 import {WorkingLineSource0550,WorkingRequirementTrace0550,WorkingQuoteBasis0550,workingRequirementIndex0550} from './WorkingLineTrace0550';
-import {bidCompletionBasisChanged0550,directSupplierSellBasis0550} from "./data/bidCompletion0550";
+import {bidCompletionBasisChanged0550,directSupplierSellBasis0550,towerWorkingSellBasis0550} from "./data/bidCompletion0550";
 import {deriveBidProcess0550} from "./data/bidProcess0550";
 import {SupplyProposalDraftFields0550} from "./SupplyProposalDraft0550";
 import {BidKnownPrices0550,BidKnownPriceHeadline0550} from "./BidKnownPrices0550";
@@ -100,7 +100,8 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  const [roleChoice,setRoleChoice]=useState("");
  const sourceSellBasis=form.selected&&!form.coveredByLineId&&form.responsibility!=='COMPANY'?
   directSupplierSellBasis0550(data,form,chosenOffer):null;
- const fixedSellBasis=sourceSellBasis?.primePct!=null?sourceSellBasis:null;
+ const towerSellBasis=towerWorkingSellBasis0550(form);
+ const fixedSellBasis=towerSellBasis||(sourceSellBasis?.primePct!=null?sourceSellBasis:null);
  const sellInputs=fixedSellBasis||form;
  const fromAlie=!initialForm.id&&initialForm.scopeKey.startsWith('ALIE / ');
  const save=async e=>{
@@ -148,6 +149,7 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
     ...sellBasis}:next;
   });
  }} options={[["","Manual cost with stated basis"],...currentSupplierOffers0550(data,form.systemToken).filter(o=>o.vendorId===form.vendorId&&!mgwProjectWideLineConflict0550(form,o)&&
+  (o.id===form.offerId||!isTowerFullQuote0550(o))&&
   (o.id===form.offerId||!o.id.startsWith('OFFER-PAGA-A20261632')||!o.supplierQuoteRow||pagaRevisionNet0550(o)||
    o.supplierQuoteRow.classification==='NET_PACKAGE'&&o.quoteRef==='A20261632')).map(o=>[o.id,o.quoteRef+" · "+o.description+" · "+amount(o.unitCost,o.currency)+" / "+o.unit])]}/>
  <Select label="Quantity source" value={form.calculationId} onChange={v=>{const c=data.calculations.find(c=>c.id===v);setForm(f=>({...f,...calculationBinding0550(c,null,chosenOffer)}));}} options={[["","Manual quantity"],...data.calculations.filter(c=>c.systemToken===form.systemToken||c.systemToken==="COMMON").map(c=>[c.id,c.title+" · "+c.equationId])]}/>
@@ -160,9 +162,9 @@ function LineEditor({initialForm,editorState,onNavigate,onOpenSource,onReset}){
  {fixedSellBasis?<Field label="Selling method" value="E11 · Cost + markup" readOnly/>:
   <Select label="Selling method" value={form.sellMode} onChange={v=>field("sellMode",v)} options={[["DIRECT","E10 · Direct selling rate"],["MARKUP","E11 · Cost + markup"],["MARGIN","E12 · Target gross margin"]]}/>}
  {sellInputs.sellMode==="DIRECT"?<Field label="ADDVALUE sell rate per unit" type="number" min="0" step="any" value={form.sellRate} onChange={v=>field("sellRate",v)}/>:sellInputs.sellMode==="MARKUP"?<Field label="Markup percent" type="number" min="0" step="any" readOnly={Boolean(fixedSellBasis)} value={sellInputs.markupPct} onChange={v=>field("markupPct",v)}/>:<Field label="Margin percent" type="number" min="0" max="99.9999" step="any" value={form.marginPct} onChange={v=>field("marginPct",v)}/>}
- {sellInputs.sellMode==="MARKUP"&&!sourceSellBasis&&<Field label="Shortage contingency (% of cost)" type="number" min="0" max="100" step="any" value={form.contingencyPct} onChange={v=>field("contingencyPct",v)}/>}
+ {sellInputs.sellMode==="MARKUP"&&!sourceSellBasis&&!towerSellBasis&&<Field label="Shortage contingency (% of cost)" type="number" min="0" max="100" step="any" value={form.contingencyPct} onChange={v=>field("contingencyPct",v)}/>}
  <Field label="Prime markup percent" type="number" min="0" step="any" readOnly={Boolean(fixedSellBasis)} value={sellInputs.primePct} onChange={v=>field("primePct",v)}/>
- {fixedSellBasis&&<small>MR Appendix {form.systemToken==='TEL-DMR'?'1.5':'1.4'} · ADDVALUE +{fixedSellBasis.markupPct}% → SAMTEL +{fixedSellBasis.primePct}%</small>}</div>
+ {fixedSellBasis&&<small>{towerSellBasis?(form.wbs==='B4'?'Master Tower · งานติดตั้ง':'Master Tower · สินค้า MR Appendix 1.1'):'MR Appendix '+(form.systemToken==='TEL-DMR'?'1.5':'1.4')} · ADDVALUE +{fixedSellBasis.markupPct}% → SAMTEL +{fixedSellBasis.primePct}%</small>}</div>
  <SupplyProposalDraftFields0550 data={data} line={form} onNavigate={onNavigate} onChange={draft=>setForm(f=>{const next={...f};if(draft===undefined)delete next.supplyDraft;else next.supplyDraft=draft;return next;})}/>
  {mrRequirement?.componentReview&&<fieldset><legend>MR component breakdown</legend>
   <p>{mrRequirement.componentReview.status}</p><MrWorkingComponents0550 requirement={mrRequirement}/>

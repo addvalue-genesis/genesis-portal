@@ -60,7 +60,7 @@ export function BidWorkspaceProvider({children}){
    const retired=retireLegacyTowerPricing0550(current);
    if(retired!==current)current=await saveProject0550Bid(retired,current.revision,"Cancel the legacy tower Part A pricing basis");
    const towerScope=reconcileTowerTenderScope0550(current);
-   if(towerScope!==current)current=await saveProject0550Bid(towerScope,current.revision,"Apply TEL-TELT tender boundary: separate CNEEC works, foundation design and geotechnical review");
+   if(towerScope!==current)current=await saveProject0550Bid(towerScope,current.revision,"Reconcile TEL-TELT tender scope and erection schedule allocation");
    const scopeRepaired=repairPagaEngineeringDrafts0550(current);
    if(scopeRepaired!==current)current=await saveProject0550Bid(scopeRepaired,current.revision,"Correct PAGA-only documentation references in three prepared SI drafts");
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);

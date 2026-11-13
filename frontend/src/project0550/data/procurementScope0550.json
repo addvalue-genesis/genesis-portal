@@ -6,6 +6,10 @@
   "procurementOwner": "ADDVALUE",
   "directSupplierMarkupPct": 50,
   "pagaAppendix14Pricing": {"customerRowCode": "A1-05", "markupPct": 25, "primePct": 20},
+  "towerPricing": {
+    "goods": {"markupPct": 30, "primePct": 20},
+    "installation": {"markupPct": 30, "primePct": 5}
+  },
   "dmrAppendix15Pricing": {"customerRowCode": "A1-11", "primePct": 20},
   "cabinetProcurement": {
     "brand": "RITTAL",
