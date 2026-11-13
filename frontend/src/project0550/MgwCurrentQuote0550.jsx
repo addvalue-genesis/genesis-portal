@@ -68,6 +68,7 @@ function MgwRadioSource0550({data,sectionFilter}){
     const continuation=MGW_QUOTE_0550.radioDetailContinuations[item];
     const [rawDetail,unpricedDetail]=extra?row.detail.split(extra.separator):[row.detail];
     const detail=continuation?rawDetail.replace(continuation.anchor,continuation.text):rawDetail;
+    const model=mgwRadioSourceModel0550(row);
     const components=parseRadioLotComponents0550(detail);
     const unpricedComponents=unpricedDetail?parseRadioLotComponents0550(unpricedDetail,{defaultIncluded:item==='RADIO-009',defaultGroup:item==='RADIO-009'?'Accessories':'Remark'}):[];
     const sections=itemSections(item);
@@ -79,9 +80,9 @@ function MgwRadioSource0550({data,sectionFilter}){
     const owners=current?data.lines.filter(line=>line.selected&&line.offerId===current.id):[];
     return <React.Fragment key={row.id}>
      {isVisible(sections)&&<tr>
-      <td><strong>{[row.description,row.brand,mgwRadioSourceModel0550(row)].filter(Boolean).join(' · ')}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
+      <td><strong>{[row.description,row.brand,model].filter(Boolean).join(' · ')}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
        <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
-       {components.length>0&&<RadioLotBomTable0550 components={components} caption={'BOM ต่อชุด · '+item}/>}
+       {components.length>0&&<RadioLotBomTable0550 components={components} caption={'BOM ต่อชุด · '+item} sourceBrand={row.brand} sourceModel={model}/>}
        <details><summary>ข้อความต้นฉบับ / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
        <MgwRadioTagEvidence0550 item={item}/></td>
       <td>{owners.length===1?owners[0].customerRowCode:code}{shared&&<small>ใช้ร่วมหลายระบบ</small>}

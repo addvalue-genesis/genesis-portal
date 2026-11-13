@@ -164,6 +164,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
   const validity=quoteValidity0550(o,reviewDate);
   const sourceSection=supplierQuotedSection0550(data,o);
+  const radioSource=mgwRadioSourceRow0550(o),radioModel=mgwRadioSourceModel0550(radioSource);
   const atom=o.atomicLines?.[0];
   const equipment=o.bidTags?.lineClass?.includes('EQUIP');
   const netRate=atom?null:vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
@@ -178,10 +179,10 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   const draftRack=entry.location?.requirements.map(r=>draftCabinetTag0550(r.id)).find(Boolean);
   const rackLabel=cabinetTagLabel0550(mappedRacks,draftRack);
   const lotBom=o.components?.length?<tr className="p55-radio-lot-bom-row" data-radio-lot-bom={o.id}><td colSpan={6}>
-   <RadioLotBomTable0550 components={o.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(o)}/>
+   <RadioLotBomTable0550 components={o.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(o)} sourceBrand={radioSource?.brand} sourceModel={radioModel}/>
   </td></tr>:null;
   return <React.Fragment key={o.id}><tr data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<small>{[o.brand,mgwRadioSourceModel0550(mgwRadioSourceRow0550(o))].filter(Boolean).join(' · ')}</small><SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<small>{[o.brand,radioModel].filter(Boolean).join(' · ')}</small><SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     <small>Volume I · {sectionsByOffer.get(o.id).map(tag=>'11.'+tag).join(' · ')||'OPEN'}</small>

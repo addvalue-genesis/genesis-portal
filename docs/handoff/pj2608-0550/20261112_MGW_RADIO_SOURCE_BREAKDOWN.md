@@ -43,3 +43,12 @@ to Working A1-09. This change only updates display text and search labels.
 The MGW pricing and Vendor Register validators passed. A development webpack
 build and DOM interaction check verified search and expansion on repository
 seed data. Windows browser storage was not verified.
+
+## 14 November — brand and model on the BOM Specification row
+
+RADIO-012 now shows `Jotron · TR-910` in the `Brand / Model / Part No.`
+column of its Specification row in 07.2, the Radio System source breakdown
+and the Supplier details dialog. The brand and model come from the parent
+quoted item. The included components retain their own part numbers when
+stated. The MGW pricing and Vendor Register validators check the display and
+the existing quote and Working price basis.

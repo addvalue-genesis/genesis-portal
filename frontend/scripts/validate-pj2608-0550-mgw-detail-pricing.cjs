@@ -345,6 +345,10 @@ const radioLots=activateLots(radioBase);validate(radioLots);
 const lotOffers=radioLots.offers.filter(radioSelection.mgwRadioDtrsOffer0550);
 const radio012=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-012');
 assert.equal(radioSelection.mgwRadioSourceModel0550(radioSelection.mgwRadioSourceRow0550(radio012)),'TR-910');
+for(const [key,model] of [['RADIO-003','Sailor 6320'],['RADIO-013','TRON TR30 AIR']]){
+ const offer=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)===key);
+ assert.equal(radioSelection.mgwRadioSourceModel0550(radioSelection.mgwRadioSourceRow0550(offer)),model);
+}
 assert.equal(radio012.quoteEvidence.quotedUnit,'Not stated');
 assert.equal(radio012.quoteEvidence.quotedTotal,14680);
 const {VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550.jsx');
@@ -352,6 +356,9 @@ const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups
 assert.match(radioVendorHtml,/<strong>FIXED AM VHF Radio Telephone · Jotron · TR-910<\/strong><small>RADIO-012 · PDF 11<\/small>/);
 const radio012VendorRow=radioVendorHtml.match(new RegExp('<tr[^>]+data-vnd-offer="'+radio012.id+'"[^>]*>.*?<\\/tr>','s'))?.[0];
 assert.match(radio012VendorRow,/<strong>FIXED AM VHF Radio Telephone<\/strong><small>Jotron · TR-910<\/small>/);
+assert.equal([...radioVendorHtml.matchAll(/<td>Specification<\/td><td>Jotron · TR-910<\/td>/g)].length,3,
+ 'Jotron and TR-910 appear in the source, inline offer and Supplier dialog BOM specification cells');
+assert.match(radioVendorHtml,/<td>Whip Antenna<\/td><td>—<\/td>/,'The parent model does not label individual components');
 assert.deepEqual(lotOffers.filter(o=>o.quoteEvidence.sourceId!==radioSelection.MGW_RADIO_REMAINING_0550.batchId)
  .map(o=>[radioSelection.mgwCurrentItemKey0550(o),radioSelection.mgwCurrentMr0550(o)]),
  [['RADIO-001',['MR-B1-11-APF-01']],['RADIO-009',['MR-B1-11-APF-01']],['RADIO-009-OPTION',[]],['RADIO-016',[]],
