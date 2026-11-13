@@ -357,7 +357,21 @@ assert.equal(radio010.unitCost,45118);
 assert(radio010.components.some(c=>c.quantity===12&&c.partNo==='SAILOR SP3530'),'RADIO-010 continuation keeps the portable quantity');
 assert.equal(lotOffers.filter(o=>Number.isFinite(o.unitCost)).reduce((n,o)=>n+o.unitCost*o.quoteEvidence.quotedQuantity,0),lotOffers.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0));
 assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-011').quoteEvidence.locator,/\/ APF \//);
-const lotOwners=W.deriveBidWorkspace(radioLots,tokens,radioLotDate).lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
+const lotModel=W.deriveBidWorkspace(radioLots,tokens,radioLotDate);
+const lotOwners=lotModel.lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
+const pricedRadio=lotOwners.filter(l=>l.offer.quoteEvidence.classification==='RATE'&&Number.isFinite(l.offer.unitCost));
+for(const line of pricedRadio){
+ assert.equal(line.quantity,line.offer.quoteEvidence.quotedQuantity,line.id);
+ assert.equal(line.costRate,line.offer.unitCost,line.id);
+ assert.equal(Math.round(line.quantity*line.costRate*100),Math.round(line.offer.quoteEvidence.quotedTotal*100),line.id);
+ assert.equal(line.sellMode,'MARKUP');assert.equal(line.markupPct,5);assert.equal(line.contingencyPct,5);assert.equal(line.primePct,20);
+ assert((line.offer.components||[]).every(c=>c.unitPrice==null&&c.amount==null&&c.unitCost==null));
+}
+assert.equal(lotOffers.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0),700501,'Baseline radio supplier cost');
+const officialBasis=require(root+'/project0550/data/officialPricing0550.js');
+const basisLine=radioLots.lines.find(l=>l.offerId===pricedRadio[0].offer.id);
+const withoutComponents={...radioLots,offers:radioLots.offers.map(o=>{if(!o.components)return o;const {components,...price}=o;return price;})};
+assert.equal(officialBasis.officialLineBasisKey(withoutComponents,withoutComponents.lines.find(l=>l.id===basisLine.id)),officialBasis.officialLineBasisKey(radioLots,basisLine),'Radio components do not stale an Official review');
 assert.deepEqual(lotOwners.filter(l=>['RADIO-003','RADIO-011','RADIO-012','RADIO-013'].includes(radioSelection.mgwCurrentItemKey0550(l.offer)))
  .map(l=>[radioSelection.mgwCurrentItemKey0550(l.offer),radioSelection.mgwCurrentMr0550(l.offer)[0],l.customerRowCode]),
  [['RADIO-003','MR-B1-11-APF-03','A1-10'],['RADIO-011','MR-B1-11-APF-03','A1-10'],
@@ -371,6 +385,12 @@ const lotC1=appendix.deriveC1Appendix0550({
 const openScopeNote='Quoted equipment only — MR quantities and interfaces remain open';
 assert.deepEqual(['03','04'].map(item=>lotC1.rows.find(r=>r.key==='MR-B1-11-APF-'+item)).map(r=>[r.sn,r.internalNote,r.provisionalRadio]),
  [['1.1.3',radioNote,true],['1.1.4',radioNote,true]]);
+const componentMoney=rows=>rows.flatMap(r=>r.components||[]).reduce((n,c)=>n+(Number.isFinite(c.amount)?c.amount:0),0);
+assert.equal(componentMoney(lotC1.rows),0,'C1 component rows contribute 0');
+for(const row of lotC1.rows.filter(r=>r.priceOwners?.length)){
+ const ownerSum=row.priceOwners.reduce((n,b)=>n+(Number.isFinite(b.amount)?b.amount:0),0);
+ if(Number.isFinite(row.amount))assert.equal(row.amount,ownerSum,row.key);
+}
 const savedLotOwners=['03','04','06'].map(item=>{
  const line=radioLots.lines.find(l=>l.id==='REQ-MR-B1-11-APF-'+item);
  return {lineId:line.id,line:{...line,selected:true,responsibility:'TSI'},quantity:1,unit:'Lot',amount:100,unitPrice:100,schedule:'C1',treatment:'BASE'};

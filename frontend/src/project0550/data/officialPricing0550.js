@@ -10,6 +10,7 @@ import {deriveIntegration0550,integrationLineProblems0550,integrationLineBasis05
 
 import {isSatelliteScope0550,SATELLITE_SCOPE_VERSION} from "./satelliteScope0550";
 import {roundMoney0550 as round,sumMoney0550,displayPriceCheck0550,PRICING_POLICY_0550} from "./money0550";
+import {offerWithoutRadioComponents0550} from "./radioLotComponents0550";
 
 export const CUSTOMER_FORM_0550 = form;
 export const BID_CONTEXT_TAGS = Object.freeze({history:"HIS-01",source:"RFQ-02",working:"OFF-03",release:"REL-04"});
@@ -60,8 +61,8 @@ export function officialLineBasisKey(data,line,review=line.officialReview){
   chevalierPbxAllocation0550(chevalierPbxQuote0550(data.offers),pbxLine,pbxOffer):undefined;
  const pbxDependencies=pbxAllocation&&{cost:pbxAllocation.cost,offers:pbxAllocation.offers.map(o=>
   [o.id,o.description,o.unit,o.currency,o.unitCost,o.supplierQuoteRow.quantity,o.quoteEvidence.quotedTotal,o.quoteEvidence.sourceSha256])};
- const spareDependencies=SPARE_EQUATION_SCHEDULES_0550[quantityCalculation?.equationId]?{spareDependencies:{installed:installed?installedInputs:null,installedCalculation:data.calculations.find(c=>c.id===installed?.calculationId)||null,offer:data.offers.find(o=>o.id===quantityCalculation.inputs.offerId)||null}}:{};
- return fingerprint({method:"0550-official-review-v1",pricingPolicy:PRICING_POLICY_0550,...spareDependencies,...(pbxDependencies!==undefined?{pbxDependencies}:{}),...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.mgwDetailGroupId?{mgwDetail:mgwDetailGroupBasis0550(data,line.mgwDetailGroupId,line)}:{}),...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
+ const spareDependencies=SPARE_EQUATION_SCHEDULES_0550[quantityCalculation?.equationId]?{spareDependencies:{installed:installed?installedInputs:null,installedCalculation:data.calculations.find(c=>c.id===installed?.calculationId)||null,offer:offerWithoutRadioComponents0550(data.offers.find(o=>o.id===quantityCalculation.inputs.offerId))}}:{};
+ return fingerprint({method:"0550-official-review-v1",pricingPolicy:PRICING_POLICY_0550,...spareDependencies,...(pbxDependencies!==undefined?{pbxDependencies}:{}),...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.mgwDetailGroupId?{mgwDetail:mgwDetailGroupBasis0550(data,line.mgwDetailGroupId,line)}:{}),...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:offerWithoutRadioComponents0550(data.offers.find(o=>o.id===owner?.offerId)),ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:offerWithoutRadioComponents0550(data.offers.find(o=>o.id===line.offerId)),calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
 }
 export function customerScopeBasisKey(data,code,review){
  const {basisKey,...decision}=review;

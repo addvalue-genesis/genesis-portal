@@ -178,3 +178,31 @@ export function parseRadioLotComponents0550(detail,{defaultGroup='',defaultInclu
  flushSpec();
  return components;
 }
+
+// Display rows for a priced radio lot. Quantity may scale by the lot count.
+// Amounts stay null so a schedule cannot add them to the lot price.
+export function offerWithoutRadioComponents0550(offer){
+ if(!offer||!Object.hasOwn(offer,'components'))return offer||null;
+ const {components,...price}=offer;
+ return price;
+}
+export function radioLotIncludedLines0550(offer,lotQuantity){
+ if(!offer?.components?.length)return [];
+ const sets=Number.isFinite(lotQuantity)&&lotQuantity>0?lotQuantity:1;
+ return offer.components.map(component=>{
+  const remark=component.included===false;
+  const perSet=Number.isFinite(component.quantity)?component.quantity:null;
+  return {
+   description:[component.description,component.partNo].filter(Boolean).join(' · '),
+   partNo:component.partNo||'',
+   quantity:!remark&&perSet!=null?perSet*sets:perSet,
+   unit:component.unit||'',
+   unitPrice:null,
+   amount:null,
+   exportPrice:false,
+   nonAdditive:true,
+   included:component.included!==false,
+   note:[remark?'Remark':'Included in lot',component.group,component.remarks].filter(Boolean).join(' · '),
+  };
+ });
+}
