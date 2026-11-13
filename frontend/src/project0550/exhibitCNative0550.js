@@ -10,7 +10,7 @@ import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
-import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -148,7 +148,7 @@ function nativePages(view,id,currency='USD',c2References){
    if(!groups.has(9)){
     const countryRates=view.scheduleRows('C8').some(c8Country0550);
     set(v,9,5,'');set(v,9,6,countryRates||view.tenderScheduleBasis?.facilitiesConflict?'See C8':'OPEN');
-    set(v,9,7,countryRates?'Call-off estimates by country. See C8.':view.tenderScheduleBasis?.facilitiesConflict?
+    set(v,9,7,countryRates?'Estimated Call-off Total. See C8.':view.tenderScheduleBasis?.facilitiesConflict?
      'Call-off form and any Base exceptions require confirmation. See C8.':'Confirm facilities scope, days and rates in C8.');
    }
    if(!groups.has(5)){
@@ -252,8 +252,15 @@ function nativePages(view,id,currency='USD',c2References){
   const rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
   if(view.workingPreview&&view.tenderScheduleBasis?.facilitiesConflict)issues.push(facilitiesFormCheck);
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
+  const total=c8CalloffTotal0550(view,rows);
+  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
+  if(total){
+   add({},'',{c8CalloffTotal:total});
+   if(total.amount===null)issues.push('Estimated Call-off Total OPEN: reconcile quantities, prices and the C8 source revision in Working.');
+   if(!facilities.length)return {pages,issues};
+  }
   const groups=new Map();
-  for(const b of rows){
+  for(const b of facilities){
    const country=c8Country0550(b)||'';
    if(!groups.has(country))groups.set(country,[]);
    groups.get(country).push(b);
@@ -283,9 +290,9 @@ function nativePages(view,id,currency='USD',c2References){
  }
  return {pages,issues};
 }
-function paymentTable(rows,format){
+function scheduleTableMarkup(rows,format,widths=[1900,10700,1900]){
  if(format==='xml'){
-  const grid=[1900,10700,1900].map(width=>'<w:gridCol w:w="'+width+'"/>').join('');
+  const grid=widths.map(width=>'<w:gridCol w:w="'+width+'"/>').join('');
   const borders=['top','left','bottom','right','insideH','insideV'].map(edge=>'<w:'+edge+' w:val="single"/>').join('');
   const body=rows.map(row=>'<w:tr>'+row.map(cell=>{
    const paragraphs=cell.split('\n').map(line=>'<w:p><w:r><w:t xml:space="preserve">'+escape(line)+'</w:t></w:r></w:p>').join('');
@@ -297,8 +304,18 @@ function paymentTable(rows,format){
  const row=cells=>'<tr>'+cells.map(cell=>'<td>'+escape(cell).replace(/\n/g,'<br>')+'</td>').join('')+'</tr>';
  return '<table><thead>'+row(rows[0])+'</thead><tbody>'+rows.slice(1).map(row).join('')+'</tbody></table>';
 }
+function replaceScheduleTable(source,format,rows,widths){
+ return source.replace(format==='xml'?/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/:/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/,
+  ()=>scheduleTableMarkup(rows,format,widths));
+}
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
+ if(page.c8CalloffTotal){
+  const {amount}=page.c8CalloffTotal;
+  const price=amount===null?'OPEN':currency+' '+number(amount);
+  result=replaceScheduleTable(result,format,[['Description / Scope of Supply','Unit','Total Price'],
+   [C8_TOTAL_DESCRIPTION_0550,'Lot',price]],[10300,1700,2500]);
+ }
  if(page.c8Country){
   const label=escape(page.detail);
   result=format==='xml'?'<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>'+label+'</w:t></w:r></w:p>'+result:
@@ -312,7 +329,7 @@ function renderPage(view,page,format,currency='USD'){
  if(payment){
   const rows=payment.rows.length?[['No.','Payment Terms','Percentage of Initial Contract Price for Base Scope of Supply'],...payment.rows,['Total','','100.00%']]:
    [['OPEN','Confirm the current tender payment schedule before issue.','']];
-  result=result.replace(format==='xml'?/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/:/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/,()=>paymentTable(rows,format));
+  result=replaceScheduleTable(result,format,rows);
  }
  if(page.systemToken){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
@@ -400,13 +417,14 @@ function renderPage(view,page,format,currency='USD'){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
   const pbxNote=view.chevalierPbxSupply&&chevalierPbxScheduleNote0550(view,page.id);
-  if(view.chevalierPbxSupply&&pbxNote&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
+  if(view.chevalierPbxSupply&&pbxNote&&!page.c8CalloffTotal&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
    partialNote=[partialNote,'IP Telephony and PABX. '+pbxNote].filter(Boolean).join(' ');
   }
  }
  if(page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
   (page.id==='C2'&&page.priceRows?.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
+ if(page.c8CalloffTotal)partialNote=[C8_TOTAL_NOTE_0550,partialNote].filter(Boolean).join(' ');
  if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');

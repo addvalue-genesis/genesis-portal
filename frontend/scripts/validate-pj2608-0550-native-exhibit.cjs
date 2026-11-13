@@ -38,33 +38,77 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
  assert.equal(saved.optionsAssigned,v.optionsAssigned);
  assert.equal(preview.scheduleRows('C8').length,20);
  assert.equal(saved.active.some(line=>line.id.startsWith('LINE-C8-CALLOFF-')),false);
+ const {scheduleTable0550}=require(root+'/project0550/exportBidVolumes0550.js');
+ const {scheduleViewTHB0550}=require(root+'/project0550/data/scheduleRollup0550.js');
+ const {C8_TOTAL_NATIVE_0550}=require(root+'/project0550/data/c8Calloff0550.js');
  const form=N.nativeSchedule0550(preview,'C8');
- const page=form.pages.find(page=>page.c8Country==='Myanmar');
- assert.equal(form.pages.length,4);
+ assert.equal(form.pages.length,1);
+ assert.deepEqual(form.pages[0].c8CalloffTotal,{amount:604,revision:'Rev03'});
+ assert.match(form.html,/Estimated Call-off Total/);
+ assert.match(form.html,/USD 604\.00/);
+ assert.match(form.html,/Excluded from Schedule A1 and Schedule A2 totals/);
+ assert.doesNotMatch(form.html,/Myanmar|Unit Price|Estimated Man-Days/);
+ assert.match(N.nativeSchedule0550(scheduleViewTHB0550(preview),'C8','THB').html,/THB [\d,]+\.\d{2}/);
+ assert.match(N.nativeExhibitHtml0550(preview,'C8'),/USD 604\.00/);
+ const docx=Buffer.from(N.buildNativeExhibitDocx0550(preview,'C8')).toString();
+ assert.match(docx,/USD 604\.00/);
+ assert.doesNotMatch(docx,/Myanmar|Unit Price|Estimated Man-Days/);
+ const sheet=scheduleTable0550(preview,'C8');
+ assert.equal(sheet.rows.length,1);
+ assert.equal(sheet.rows[0][2],604);
+ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+ const {NativeExhibitC0550}=require(root+'/project0550/NativeExhibitC0550.jsx');
+ assert.match(renderToStaticMarkup(React.createElement(NativeExhibitC0550,{view:preview,id:'C8'})),/USD 604\.00/);
+ assert.equal(P.nativeExhibitVersionForWorkspace0550(prepared),C8_TOTAL_NATIVE_0550);
+ assert.equal(N.nativeSchedule0550(saved,'C8').pages[0].c8CalloffTotal.amount,null);
+ const reviewedRows=preview.scheduleRows('C8').map(b=>({...b,state:'REVIEWED'}));
+ const reviewed={...saved,nativeExhibitVersion:C8_TOTAL_NATIVE_0550,scheduleRows:id=>id==='C8'?reviewedRows:saved.scheduleRows(id)};
+ assert.match(N.nativeSchedule0550(reviewed,'C8').html,/USD 604\.00/);
+ assert.equal(scheduleTable0550(reviewed,'C8').rows[0][2],604);
+ const history={...reviewed,nativeExhibitVersion:'exhibit-c-schedule-b-rev1.v4'};
+ const oldForm=N.nativeSchedule0550(history,'C8');
+ const page=oldForm.pages.find(page=>page.c8Country==='Myanmar');
+ assert.equal(oldForm.pages.length,4);
  assert.equal(page.values.C8_1_3,'6 person-day');
  assert.equal(page.values.C8_3_3,'1 round trip');
  assert.equal(page.values.C8_4_3,'3 set-day');
  assert.equal(page.values.C8_6_1,'151.00');
- assert.match(Buffer.from(N.buildNativeExhibitDocx0550(preview,'C8')).toString(),/Myanmar · Rev03 · Call-off estimate/);
- const sheet=require(root+'/project0550/exportBidVolumes0550.js').scheduleTable0550(preview,'C8');
- assert.deepEqual(sheet.rows.find(row=>row[0]==='Myanmar'&&row[2]==='round trip').slice(3,6),[1,19,19]);
+ assert.deepEqual(scheduleTable0550(history,'C8').rows.find(row=>row[0]==='Myanmar'&&row[2]==='round trip').slice(3,6),[1,19,19]);
  const first=preview.scheduleRows('C8')[0].lineId;
  const deleted={...prepared,lines:prepared.lines.filter(line=>line.id!==first),
   bidVolumes:{...prepared.bidVolumes,bindings:prepared.bidVolumes.bindings.filter(binding=>binding.lineId!==first)}};
  assert.equal(V.prepareC8Calloff0550(deleted,pack,today),deleted);
+ const incomplete={...preview,scheduleRows:id=>preview.scheduleRows(id).filter(b=>b.lineId!==first)};
+ assert.equal(N.nativeSchedule0550(incomplete,'C8').pages[0].c8CalloffTotal.amount,null);
+ assert.equal(scheduleTable0550(incomplete,'C8').rows[0][2],'OPEN');
+ const reviewedData=prepared.bidVolumes.bindings.filter(b=>b.schedule==='C8').reduce((data,b)=>
+  V.saveBidVolumeRecord0550(data,'bindings',{...b,sourceIds:[fixture.sourceIntake.sources[0].id],reviewer:'TEST'},today,true),prepared);
+ // Supply reviewed prices to the freeze renderer without asserting approval of the budget import.
+ const reviewedPrices=new Map(reviewedRows.map(b=>[b.lineId,b.amount]));
+ const reviewedModel={...model,official:{...model.official,lines:model.official.lines.map(line=>
+  reviewedPrices.has(line.id)?{...line,customerUSD:reviewedPrices.get(line.id)}:line)}};
+ const frozen=P.freezeBidPackageOutput0550(reviewedData,reviewedModel,'C8-TEST',today);
+ P.validateFrozenBidPackage0550(frozen);
+ assert.equal(frozen.nativeExhibitVersion,C8_TOTAL_NATIVE_0550);
+ assert.match(frozen.htmlI,/USD 604\.00/);
+ assert.match(Buffer.from(frozen.docxI,'base64').toString(),/USD 604\.00/);
+ assert.equal(frozen.I.find(s=>s.name==='Schedule C8').rows[0][2],604);
  if(process.env.PJ0550_C8_FIXTURE){
   const actual=JSON.parse(fs.readFileSync(process.env.PJ0550_C8_FIXTURE,'utf8'));
   const project=V.prepareC8Calloff0550(input,actual,today),model=derive(project);
   const saved=V.deriveBidVolumes0550(project,model,D.SYSTEMS,today);
   const view=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js')
    .deriveBidVolumeWorkingPreview0550(project,model,D.SYSTEMS,today,saved);
-  const pages=N.nativeSchedule0550(view,'C8').pages;
+  const pages=N.nativeSchedule0550({...view,nativeExhibitVersion:'exhibit-c-schedule-b-rev1.v4'},'C8').pages;
   const totals=actual.countries.map(({people,days,airportTrips,rates})=>{
    const qty=[people*days,people*days,airportTrips,days,people*days];
    return rates.reduce((sum,[,rate],index)=>sum+rate*qty[index],0)
     .toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   });
   assert.deepEqual(pages.map(page=>page.values.C8_6_1),totals);
+  const total=totals.reduce((sum,amount)=>sum+Number(amount.replaceAll(',','')),0);
+  assert.equal(N.nativeSchedule0550(view,'C8').pages[0].c8CalloffTotal.amount,total);
+  assert.equal(scheduleTable0550(view,'C8').rows[0][2],total);
  }
 }
 const b={...v.bindings[0],partNo:'TEST-PART',mainEquipment:'TEST-EQ',vendorEquipmentNo:'TEST-VENDOR-EQ',referenceDrawings:'TEST-DWG',interchangeA:'1',interchangeB:'1',specification:'TEST SPEC',origin:'TEST COUNTRY',shippingFrom:'TEST PORT',delivery:'TEST 12 weeks',physical:{estimatedWeightKg:12},deliveryTerm:'CIF Yangon / synthetic'};

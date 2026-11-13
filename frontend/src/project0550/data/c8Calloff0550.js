@@ -1,3 +1,5 @@
+import {sumMoney0550} from './money0550';
+
 // The rates are read from project DATA at runtime. The public bundle carries
 // only the form structure and the rules for preparing Working allocations.
 export const C8_CALLOFF_SCHEMA_0550='genesis.0550.c8-calloff.v1';
@@ -17,6 +19,24 @@ const prefix='LINE-C8-CALLOFF-';
 export const c8Country0550=binding=>binding.treatment==='CALLOFF'&&
  C8_CALLOFF_COUNTRIES_0550.find(country=>binding.lineId===prefix+country.toUpperCase()+'-'+binding.summary);
 export const c8Revision0550=binding=>binding.line?.sourceRef?.match(/^C8 (Rev\d{2})\b/)?.[1]||'';
+
+export const C8_TOTAL_NATIVE_0550='exhibit-c-c8-calloff-total.v5';
+export const C8_TOTAL_DESCRIPTION_0550='Estimated Call-off Total';
+export const C8_TOTAL_NOTE_0550='Subject to Purchaser call-off approval. Excluded from Schedule A1 and Schedule A2 totals.';
+
+export function c8CalloffTotal0550(view,rows){
+ if(view.nativeExhibitVersion&&view.nativeExhibitVersion!==C8_TOTAL_NATIVE_0550)return null;
+ const items=rows.filter(c8Country0550);
+ if(!items.length)return null;
+ const revisions=new Set(items.map(c8Revision0550));
+ const revision=revisions.size===1?[...revisions][0]:'';
+ const expected=C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length;
+ const complete=items.length===expected&&new Set(items.map(b=>b.lineId)).size===expected&&revision&&
+  items.every(b=>c8Unit0550(b)&&!b.nonAdditive&&(view.workingPreview||b.state==='REVIEWED'));
+ return {amount:complete?sumMoney0550(items.map(b=>b.amount)):null,revision};
+}
+
+export const c8OtherFacilities0550=b=>!c8Country0550(b)&&(b.treatment!=='CALLOFF'||b.state==='REVIEWED');
 
 export function validateC8Calloff0550(pack){
  const positive=n=>Number.isFinite(n)&&n>0&&n<=1e7;
