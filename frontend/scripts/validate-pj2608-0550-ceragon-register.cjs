@@ -56,16 +56,16 @@ const price=W.deriveBidWorkspace(selected,tokens,today).provisional.lines.find(l
 assert.equal(price.provisionalCostNative,actual.offers.find(o=>o.id===current.offerId).unitCost);
 console.log('PASS CERAGON R11: prior workspace migrates one owner, keeps native option quantity zero, and hides the superseded offer from active views.');
 
-const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550');
+const {applyCommercialSellPolicies0550}=require(root+'/project0550/data/bidCompletion0550');
 const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550');
 const {deriveBidVolumeWorkingPreview0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550');
 const C1=require(root+'/project0550/data/c1Appendix0550');
 const money=require(root+'/project0550/data/money0550');
 const draftInput={...selected,lines:selected.lines.map(l=>l===current?{...l,primePct:5}:l)};
-const priced=applyDirectSupplierMarkup0550(draftInput);
+const priced=applyCommercialSellPolicies0550(draftInput);
 const pricedOwner=priced.lines.find(l=>l.id===current.id);
 assert.deepEqual([pricedOwner.sellMode,pricedOwner.markupPct,pricedOwner.primePct],['MARKUP',50,20]);
-assert.strictEqual(applyDirectSupplierMarkup0550(priced),priced);
+assert.strictEqual(applyCommercialSellPolicies0550(priced),priced);
 const pricedModel=W.deriveBidWorkspace(priced,tokens,today);
 const sell=pricedModel.provisional.lines.find(l=>l.id===current.id);
 assert.equal(sell.provisionalSellNative,money.roundMoney0550(price.provisionalCostNative*1.5));

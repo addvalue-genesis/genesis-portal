@@ -1,4 +1,4 @@
-import {applyDirectSupplierMarkup0550,reconcileTowerTenderScope0550} from "./bidCompletion0550";
+import {applyCommercialSellPolicies0550,reconcileTowerTenderScope0550} from "./bidCompletion0550";
 import { controlledSnapshotAdapter } from "./adapters/controlledSnapshotAdapter";
 import { bidIndexedDbAdapter } from "./adapters/bidIndexedDbAdapter";
 import { emptyBidWorkspace, validateBidWorkspace } from "./bidWorkspaceModel";
@@ -30,6 +30,6 @@ export async function loadProject0550Bid(){
 }
 export async function saveProject0550Bid(data,revision,action){
  const reconciled=reconcileMgwWorkingScope0550(reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(validateBid(data))));
- const priced=applyDirectSupplierMarkup0550(reconciled);
- return bidIndexedDbAdapter.save(priced,revision,priced===reconciled?action:action+" / ADDVALUE direct supplier markup");
+ const priced=applyCommercialSellPolicies0550(reconciled);
+ return bidIndexedDbAdapter.save(priced,revision,priced===reconciled?action:action+" / ADDVALUE commercial selling basis");
 }

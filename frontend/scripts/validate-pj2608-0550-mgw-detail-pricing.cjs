@@ -9,8 +9,8 @@ const before=clone(d);d=G.prepareMgwDetailPricing0550(d,D.COMMERCIAL_POLICY,toda
 const groupIds=G.MGW_DETAIL_GROUPS_0550.flatMap(g=>g.rowIds);assert.equal(groupIds.length,108);assert.equal(new Set(groupIds).size,108,'Every in-scope source row assigned once');
 let model=derive(d),packages=model.lines.filter(l=>l.mgwDetailGroupId),selected=packages.filter(l=>l.selected);assert.equal(packages.length,18);assert.equal(selected.length,17);assert.equal(selected.reduce((n,l)=>n+l.costRate,0),2560753);
 for(const [id,cost] of [['CCTV',482142],['LAN',881760],['RADIO-DTRS',476819],['MET',34316],['NDB',90060]])assert.equal(packages.find(l=>l.mgwDetailGroupId===id).costRate,cost);
-assert.equal(packages.find(l=>l.mgwDetailGroupId==='CCTV').provisionalCustomerUSD,609021.47);assert.equal(packages.find(l=>l.mgwDetailGroupId==='LAN').provisionalCustomerUSD,1113802.11);
-assert.equal(model.provisional.knownUSD,3234635.36,"Known USD excludes the retired tower package");
+assert.equal(packages.find(l=>l.mgwDetailGroupId==='CCTV').provisionalCustomerUSD,636427.44);assert.equal(packages.find(l=>l.mgwDetailGroupId==='LAN').provisionalCustomerUSD,1163923.20);
+assert.equal(model.provisional.knownUSD,3380193.96,"Known USD excludes the retired tower package");
 const originalQty=Q.MGW_QUOTE_0550.rows.find(r=>r.id==='MGW-Q26-063-CCTV-014');originalQty.quantity+=5;
 try{assert.equal(derive(d).lines.find(l=>l.mgwDetailGroupId==='CCTV').costRate,482142,'Saved quote quantities survive later catalogue edits');}finally{originalQty.quantity-=5;}
 const savedQuantities=d.lines.find(l=>l.mgwDetailGroupId==='CCTV').mgwDetailBasis;assert.equal(savedQuantities.sourceSha256,Q.MGW_QUOTE_0550.sourceSha256);assert(savedQuantities.rows.length===28);
@@ -136,9 +136,9 @@ const releaseRow=mr=>releaseMarkup(releaseId(mr));
 assert.match(releaseRow(apfMr),/data-release-toggle="bid.budget.release.line.REQ-MR-B1-11-APF-01"/);
 assert.match(releaseRow(apfMr),/APF · VHF DMR Radio System · ขอบเขตตาม MR/);
 assert.match(releaseRow(apfMr),/<td>1<\/td><td>Lot<\/td><td>OPEN<\/td><td>OPEN<\/td>/);
-assert.doesNotMatch(releaseRow(apfMr),/RADIO-001|RADIO-009|ราคาขายร่างจาก Working|143,064|454,782/);
-assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/RADIO-001 · Q26-063 Radio \/ DTRS.*143,064\.00/s);
-assert.match(releaseMarkup(radioOwners[1].releaseModuleId),/RADIO-009 · Q26-063 Radio \/ DTRS.*454,782\.32/s);
+assert.doesNotMatch(releaseRow(apfMr),/RADIO-001|RADIO-009|ราคาขายร่างจาก Working|149,501|475,247/);
+assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/RADIO-001 · Q26-063 Radio \/ DTRS.*149,501\.88/s);
+assert.match(releaseMarkup(radioOwners[1].releaseModuleId),/RADIO-009 · Q26-063 Radio \/ DTRS.*475,247\.52/s);
 assert.match(releaseMarkup(radioOwners[0].releaseModuleId),/EXPIRED · 2026-11-08/);
 const {quoteValidity0550}=require(root+'/project0550/data/quoteValidity0550');
 assert.deepEqual(quoteValidity0550(equipmentOffer,'2026-11-12'),{
@@ -212,12 +212,12 @@ const pagaMrEntry=hierarchy.entries.find(row=>releaseNotes.get(row.moduleId)?.ca
 assert.match(releaseMarkup(pagaMrEntry.moduleId),/ดูแถวราคาใน Release/);
 assert.doesNotMatch(releaseMarkup(pagaMrEntry.moduleId),/ราคาขายร่างจาก Working/);
 const lotNote=releaseNotes.get('bid.budget.release.customer.A1-07');
-assert.equal(lotNote.known.amount,597846.32);
+assert.equal(lotNote.known.amount,624749.40);
 assert.equal(lotNote.known.priced,2);
 assert.equal(releaseRows.find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
 const equipmentReleaseRows=releaseRows.filter(row=>row.key===radioOwner.id);
 assert.equal(equipmentReleaseRows.length,1);
-assert.equal(equipmentReleaseRows[0].cells[6],143064);
+assert.equal(equipmentReleaseRows[0].cells[6],149501.88);
 assert.equal(provisional.lines.find(line=>line.id==='REQ-'+apfMr).offerId,'','The displayed Offer link is read-only');
 assert.equal(O.officialCustomerRows(radioModel.official).find(row=>row.moduleId===releaseId(apfMr)).cells[6],'OPEN');
 
@@ -247,7 +247,7 @@ assert.deepEqual(appendixScope.map(mr=>c1Radio.find(row=>row.key===mr.id).sn),Ar
 const apf=c1Radio.find(row=>row.key===apfMr);
 const radioNote='Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 assert.equal(apf.sn,'1.1.1');
-assert.equal(apf.amount,597846.32);
+assert.equal(apf.amount,624749.40);
 assert.equal(apf.unitPrice,apf.amount,'Show the rate based on the priced Working scope for one Lot');
 assert.equal(apf.note,'');
 assert.equal(apf.internalNote,radioNote);
@@ -265,10 +265,10 @@ const table=appendix.c1AppendixTable0550(c1View);
 assert.deepEqual(table.rows.find(row=>row[0]===apf.sn).slice(4),[apf.unitPrice,apf.amount,'']);
 const {C1Appendix0550}=require(root+'/project0550/C1Appendix0550.jsx');
 const c1Html=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:c1View}));
-assert.match(c1Html.split('data-c1-mr-id="'+apfMr+'"')[1].split('</tr>')[0],/597,846\.32/);
+assert.match(c1Html.split('data-c1-mr-id="'+apfMr+'"')[1].split('</tr>')[0],/624,749\.40/);
 assert.doesNotMatch(c1Html,/1\.1\.P[12]\b/);
 for(const exported of [appendix.c1AppendixHtml0550(c1View),appendix.c1AppendixWord0550(c1View)]){
- assert(exported.includes('597,846.32'));
+ assert(exported.includes('624,749.40'));
  assert(!exported.includes(radioNote));
  assert.doesNotMatch(exported,/1\.1\.P[12]\b/);
 }
@@ -399,9 +399,9 @@ for(const [sn,items] of expectedRadioParents){
  assert.deepEqual(row.quotedComponents.map(c=>radioSelection.mgwCurrentItemKey0550(c.offer)),items);
  assert.equal(row.amount,sum(row.quotedComponents.map(c=>c.amount)));
 }
-assert.equal(bySn('1.1.2').amount,91952.84);
-assert.equal(bySn('1.1.12').amount,3289.26);
-assert.equal(bySn('1.1.13').amount,2511.16);
+assert.equal(bySn('1.1.2').amount,96090.72);
+assert.equal(bySn('1.1.12').amount,3437.28);
+assert.equal(bySn('1.1.13').amount,2624.16);
 assert.equal(bySn('1.1.12').quantity,700);
 assert.equal(bySn('1.1.12').quotedComponents[0].quantity,1);
 assert.equal(bySn('1.1.4').quotedComponents.find(c=>c.offer.id.endsWith('RADIO-012')).unitPrice,null);
@@ -416,7 +416,7 @@ for(const system of radioSystems(directC1).filter(s=>Number.isFinite(s.knownAmou
 assert.equal(radioWithMr(radioLots,'THB').c1.rows.find(r=>r.sn==='1.1.2').amount,
  sum(lotOwners.filter(l=>['RADIO-002','RADIO-010'].includes(radioSelection.mgwCurrentItemKey0550(l.offer))).map(l=>l.provisionalCustomerTHB)));
 const radioMrHtml=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:withRadioMr.view}));
-assert.match(radioMrHtml.split('data-c1-mr-id="MR-B1-11-APF-02"')[1].split('</tr>')[0],/91,952\.84/);
+assert.match(radioMrHtml.split('data-c1-mr-id="MR-B1-11-APF-02"')[1].split('</tr>')[0],/96,090\.72/);
 assert(radioMrHtml.includes('ราคาตาม Offer · รอตรวจขอบเขต MR'));
 assert(radioMrHtml.includes('รอยืนยันแถว MR / ไซต์'));
 assert(!appendix.c1AppendixHtml0550(withRadioMr.view).includes('รอยืนยันแถว MR / ไซต์'));
@@ -573,7 +573,7 @@ if(process.env.PJ0550_MGW_LAN_REGISTER){
   const newApf10=pricedRacks.find(r=>r.sn==='1.3.10');
   const rack10=newApf10.priceOwners.find(b=>b.line.offerId===rack.id);
   const other10=apf10.priceOwners.filter(b=>b.lineId!==rack10.lineId);
-  const replacementAmount=Math.round(rack.unitCost*8/(1-rack10.line.marginPct/100)*(1+rack10.line.primePct/100)/31.5*100)/100;
+  const replacementAmount=Math.round(rack.unitCost*8*1.10*1.20/31.5*100)/100;
   assert.equal(rack10.amount,replacementAmount);
   assert.equal(newApf10.amount,sum([replacementAmount,...other10.map(b=>b.amount)]));
   assert(appendix.c1AppendixHtml0550(projectLan(updated).view).includes(newApf10.amount.toLocaleString('en-US',{minimumFractionDigits:2})));

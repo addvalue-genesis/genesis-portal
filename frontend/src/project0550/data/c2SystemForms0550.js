@@ -7,6 +7,7 @@ import {vendorOfferEntries0550,vendorQuoteRowTreatment0550} from './vendorRegist
 import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 import {mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {sourceAmountTHB0550} from './supplierCostProjection0550';
+import {addvalueSell0550} from '../bidWorkingBasis0550';
 
 export const SPARE_DRAFT_NOTE_0550='Draft from SI equation — not allocated to Schedule. Does not enter Volume I totals until bound in 11.M.';
 const countUnits=new Set(['Pc','U','SET']);
@@ -17,10 +18,7 @@ function draftPrice(data,line,quantity,unitCost,currency,unit){
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const rawCost=knownNumber(quantity)&&knownNumber(unitCost)?quantity*unitCost:null;
  const totalCost=roundMoney0550(rawCost);
- let sell=null;
- if(line.sellMode==='DIRECT'&&currency===line.currency&&unit===line.unit&&knownNumber(line.sellRate))sell=eq('E10',{rows:[{id:line.id,quantity,sellRate:line.sellRate}],other:0});
- if(rawCost!==null&&line.sellMode==='MARKUP'&&knownNumber(line.markupPct))sell=eq('E11',{cost:rawCost,markup:line.markupPct/100});
- if(rawCost!==null&&line.sellMode==='MARGIN'&&knownNumber(line.marginPct))sell=eq('E12',{cost:rawCost,margin:line.marginPct/100});
+ const sell=line.sellMode==='DIRECT'&&(currency!==line.currency||unit!==line.unit)?null:addvalueSell0550(line,rawCost,quantity);
  const customerNative=sell!==null&&knownNumber(line.primePct)?eq('E13',{sell,primeMarkup:line.primePct/100}):null;
  const customerTHB=roundMoney0550(sourceAmountTHB0550(customerNative,currency,data.fx));
  const usd=customerTHB!==null&&data.fx?.source?.trim()&&data.fx?.date&&data.fx.thbPerUSD>0?eq('E17',{THB:customerTHB,fx:data.fx.thbPerUSD}):currency==='USD'?customerNative:null;
@@ -111,6 +109,7 @@ export function prepareEquationSpareWorking0550(data,draft,id){
   tagRef:parent.tagRef||'',requirementRef:parent.requirementRef||parent.mrRequirementId||'',sourceRef:[draft.sourceRef,SPARE_DRAFT_NOTE_0550,...draft.issues].join(' / '),
   vendorId:offer.vendorId,offerId:'',calculationId,resultKey:'value',quantity:null,unit:draft.unit,currency:draft.currency,manualCost:draft.unitCost,
   sellMode:parent.sellMode,sellRate:parent.currency===draft.currency&&parent.unit===draft.unit?parent.sellRate:null,markupPct:parent.markupPct,marginPct:parent.marginPct,primePct:parent.primePct,selected:true,customerRowCode:wbs,
+  ...(parent.contingencyPct!=null?{contingencyPct:parent.contingencyPct}:{}),
   ...(wbs==='B5'?{commissioningPhase:'COMMISSIONING'}:{})};
  // Explicit preparation snapshots the live Working population used by this
  // draft, including when an older saved SI calculation supplied the policy.

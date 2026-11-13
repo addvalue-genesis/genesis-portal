@@ -1,8 +1,8 @@
-import {mgwReplacementActive0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwReplacementActive0550} from "./mgwQuoteSelection0550";
 // Current bid preparation, not supplier/engineering acceptance. Estimates are
 // explicit planning allowances; original quotations and authored inputs survive.
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
-import {policyDefaults0550} from '../bidWorkingBasis0550';
+import {applyGoodsSellBasis0550,GOODS_FORMULA_0550,LEGACY_GOODS_FORMULA_0550,matchesLegacyGoodsBasis0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
@@ -15,6 +15,7 @@ import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SU
 import {CERAGON_LINK_OWNER_0550,CERAGON_R11_0550,CERAGON_R10_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {pagaRevisionSelected0550,pagaTrainingOption0550} from './supplierRevision0550';
 import procurement from './procurementScope0550.json';
+import {CHEVALIER_PBX_BUDGET_PREFIX_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -73,36 +74,47 @@ export function directSupplierSellBasis0550(data,line,offer){
  if(!matchesSystem||offer.vendorId!==line.vendorId||!finite(offer.unitCost)||
   (offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=='NET_PACKAGE')||
   (offer.id===CERAGON_R10_0550&&ceragonR11Selected0550(data)))return null;
+ const basis=line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis;
  const {customerRowCode,markupPct,primePct}=procurement.pagaAppendix14Pricing;
  if(line.systemToken==='TEL-PAGA'&&line.wbs==='A'&&line.customerRowCode===customerRowCode){
-  return {...directSellBasis,markupPct,primePct};
+  return {...basis,markupPct,primePct};
  }
  const dmr=procurement.dmrAppendix15Pricing;
  if(line.id===CERAGON_LINK_OWNER_0550&&offer.id===CERAGON_R11_0550&&line.wbs==='A'&&line.customerRowCode===dmr.customerRowCode){
-  return {...directSellBasis,primePct:dmr.primePct};
+  return {...basis,primePct:dmr.primePct};
  }
- return directSellBasis;
+ return basis;
 }
 
-// Apply the commercial policy to the live cost owner and retain the input
-// records used to calculate the sourced cost.
-export function applyDirectSupplierMarkup0550(data){
+// Migrate recognized project defaults and enforce the named direct-supplier
+// policies on live cost owners, retaining the original cost evidence.
+export function applyCommercialSellPolicies0550(data){
  const receipt=data.repositoryBasisImport?.bidCompletion;
  const rowsByLine=new Map((receipt?.rows||[]).map(row=>[row.lineId,row]));
  const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
+ const mrDefaults=new Set(data.mrWorkingImport?.importedLineIds||[]);
+ const legacyImports=new Set(data.vendorBasisImport?.importedLineIds||[]);
+ const mgwPackages=new Set(data.mgwDetailPricingImport?.importedLineIds||[]);
  const changed=new Map();
  const lines=data.lines.map(line=>{
-  if(!line.selected||line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
+  if(line.coveredByLineId||line.responsibility==='COMPANY'||towerC1Reference0550(line))return line;
   const offer=offers.get(line.offerId),row=rowsByLine.get(line.id);
-  const direct=directSupplierSellBasis0550(data,line,offer);
+  const direct=line.selected&&directSupplierSellBasis0550(data,line,offer);
   // Allocated Master Tower items have one THB cost owner even when the
   // activity is recorded under COMMON. Mixed estimates retain their own basis.
-  const allocated=!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
+  const allocated=line.selected&&!line.offerId&&row?.kind==='QUOTED'&&row.offerIds.length>0&&
    row.offerIds.every(id=>isTowerSourceItem0550(offers.get(id))&&directMarkupSystems.get(offers.get(id).vendorId)==='TEL-TELT')&&
    row.inputKey===lineKey(data,line)&&row.sourceKey===sourceKey(data,row.offerIds);
-  const sellBasis=direct||(allocated?directSellBasis:null);
-  if(!sellBasis||Object.entries(sellBasis).every(([field,value])=>line[field]===value))return line;
-  const updated={...line,...sellBasis};
+  const standard=!direct&&!allocated&&matchesLegacyGoodsBasis0550(line)&&(
+   chevalierPbxOwnerCode0550(line.id)||line.id.startsWith(CHEVALIER_PBX_BUDGET_PREFIX_0550)||
+   line.sourceRef.includes(LEGACY_GOODS_FORMULA_0550)||legacyImports.has(line.id)||mgwPackages.has(line.id)||
+   (mrDefaults.has(line.id)||line.id.startsWith('LINE-MGW-CURRENT-'))&&mgwCurrentOffer0550(offer)||
+   line.id.startsWith('LINE-MGW-CURRENT-')&&line.sourceRef.includes('Prior MGW cabinet source:')||
+   row&&['ESTIMATE','QUOTED'].includes(row.kind)&&row.inputKey===lineKey(data,line));
+  const sellBasis=direct||(allocated?(line.contingencyPct!=null?{...directSellBasis,contingencyPct:null}:directSellBasis):null);
+  const updated=sellBasis?{...line,...sellBasis}:standard?
+   applyGoodsSellBasis0550({...line,sourceRef:line.sourceRef.replaceAll(LEGACY_GOODS_FORMULA_0550,GOODS_FORMULA_0550)}):line;
+  if(updated===line||sellBasis&&Object.entries(sellBasis).every(([field,value])=>line[field]===value))return line;
   changed.set(line.id,{previous:line,updated});
   return updated;
  });
@@ -515,7 +527,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  const lines=[...data.lines],rows=[],conflicts=[],goods=policyDefaults0550(policies,'Goods / Procured Cost');
  if(!goods)return data;
  const at=id=>lines.findIndex(l=>l.id===id),defaultFor=id=>defaults.find(l=>l.id===id);
- const safe=id=>{const n=at(id),expected=defaultFor(id);return n>=0&&expected&&same(lines[n],expected);};
+ const safe=id=>matchesWorkingDefault0550(lines[at(id)],defaultFor(id));
  const set=(id,fields,kind,basis,offerIds=[])=>{
   if(!safe(id)){conflicts.push(id);return;}
   const n=at(id),old=lines[n];
@@ -608,10 +620,10 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  estimate('B8-D05','THB',sumMoney0550(licenceAllowance.map(r=>r.quantity*r.rateTHB)),
   'Authority/agent provisional cash allowance: '+licenceAllowance.map(r=>r.label+' · '+r.quantity+' × THB '+r.rateTHB).join(' / ')+'. Estimated exposure, not published statutory tariffs or approval. TSI preparation labour is already separate.');
  // Cash pass-through assumptions are explicit; goods margins do not apply.
- for(const key of ['B8-D05','B2-D04']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,marginPct:null,primePct:0};}
+ for(const key of ['B8-D05','B2-D04']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,markupPct:null,contingencyPct:null,marginPct:null,primePct:0};}
  estimate('B9-D01','THB',supplyCost*0.005,'Project liability/contract-risk premium provision0.5% of selected PartA procurement value. Explicit bid budget, not insurance advice, a quoted premium or confirmed policy wording; cargo and personnel cover are separate.');
  estimate('B9-D03','THB',6*15000,'Medevac/medical-related cover provision6 planning personnel × estimated THB15000; not confirmation of policy eligibility/cover. Existing personnel travel/work-risk allowance is separate; deduct overlap when policy is quoted.');
- for(const key of ['B9-D01','B9-D03']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,marginPct:null,primePct:0};}
+ for(const key of ['B9-D01','B9-D03']){const n=at('REQ-MR-ACT-'+key);if(rows.some(r=>r.lineId===lines[n]?.id&&r.kind==='ESTIMATE'))lines[n]={...lines[n],sellMode:'DIRECT',sellRate:lines[n].manualCost,markupPct:null,contingencyPct:null,marginPct:null,primePct:0};}
  reference('B9-D04',['REQ-MR-ACT-B2-D04'],'Shipment-related cover is the same cargo premium already owned inB2-D04, not an additional policy.');
  estimate('C1-D01','THB',4*20*4*4000,'Installation OPTION:4 site campaigns ×20 days ×4 technicians × budget THB4000/MD. Physical equipment mounting only; excludes cable installation, FO, tower/civil, SAT/commissioning and COMPANY terminal installation below. Not a verified installation MTO or subcontract quote.');
  estimate('C1-D02','THB',4*10*4*4000,'Installation OPTION:4 sites ×10 days ×4-person crew × budget THB4000/MD, for physical cable/tray work only. Material supply and testing/commissioning remain elsewhere. Workload is a planning assumption pending cable takeoff.');
@@ -624,7 +636,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  reference('C3-D01',['REQ-MR-ACT-C3-D02','REQ-MR-ACT-C3-D03'],'Two-year spare-list/summary is non-additive; the consumable and routine-replacement provisions below are distinct from capital spares. Final OEM list remains a deliverable.');
  estimate('C3-D02','THB',supplyCost*spareBudgetRates.get('C3-D02'),'Two-year normal-operation consumable OPTION provision2% of selected PartA procurement cost. Consumables only; no capital replacement assemblies or commissioning consumption are included again. Estimate pending OEM list.');
  estimate('C3-D03','THB',supplyCost*spareBudgetRates.get('C3-D03'),'Two-year routine-replacement OPTION provision1% of selected PartA procurement cost. Excludes consumables above and ten-year capital assemblies. Estimate pending itemized OEM recommendations.');
- set('REQ-MR-WARRANTY',{quantity:1,unit:'Lot',currency:'THB',manualCost:roundMoney0550(supplyCost*0.0075),sellMode:'DIRECT',sellRate:roundMoney0550(supplyCost*0.0075),marginPct:null,primePct:0},'ESTIMATE','Residual warranty cash reserve0.75% of selected PartA procurement cost, excluding existing90-day support labour and pass-through OEM warranty. Explicit budget reserve, not a duplicated support campaign or confirmation of warranty compliance.');
+ set('REQ-MR-WARRANTY',{quantity:1,unit:'Lot',currency:'THB',manualCost:roundMoney0550(supplyCost*0.0075),sellMode:'DIRECT',sellRate:roundMoney0550(supplyCost*0.0075),markupPct:null,contingencyPct:null,marginPct:null,primePct:0},'ESTIMATE','Residual warranty cash reserve0.75% of selected PartA procurement cost, excluding existing90-day support labour and pass-through OEM warranty. Explicit budget reserve, not a duplicated support campaign or confirmation of warranty compliance.');
  // Estimate internal labour separately from protected selling rates. This does
  // not infer a cost by reversing the selling margin or claim a payroll quote.
  if(team&&data.repositoryBasisImport.tsiActivityBudget){

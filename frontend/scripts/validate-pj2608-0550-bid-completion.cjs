@@ -55,11 +55,11 @@ assert.throws(()=>C.validateBidCompletion0550({version:'unknown'}));
  assert.equal(line.quantity,1);
  assert.equal(ready.lines.find(l=>l.id==='REQ-MR-B1-11-ACP-06').manualCost,null,'Missing ACP evidence cannot inherit APF price');
  assert.equal(C.prepareBidCompletion0550(ready,options(ready),date),ready,'Repeated preparation preserves the applied decision');
- const marked=C.applyDirectSupplierMarkup0550(ready),markedTower=marked.lines.find(l=>l.id===id);
- assert.deepEqual(markedTower,{...line,sellMode:'MARKUP',markupPct:50,marginPct:null,sellRate:null});
+ const marked=C.applyCommercialSellPolicies0550(ready),markedTower=marked.lines.find(l=>l.id===id);
+ assert.deepEqual(markedTower,{...line,sellMode:'MARKUP',markupPct:50,contingencyPct:null,marginPct:null,sellRate:null});
  assert.equal(marked.offers,ready.offers);
  assert.equal(C.bidCompletionSourceUsages0550(marked).find(r=>r.line.id===id).current,true);
- assert.equal(C.applyDirectSupplierMarkup0550(marked),marked);
+ assert.equal(C.applyCommercialSellPolicies0550(marked),marked);
 
  assert(C.bidCompletionBasisChanged0550(ready),'Dependent estimates must be reconciled after added supply');
  const changed={...ready,offers:ready.offers.slice(1)};

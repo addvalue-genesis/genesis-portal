@@ -5,7 +5,7 @@ export function BidInheritedBasis({onNavigate}) {
  const {data}=useBidWorkspace();
  return <div className="p55-inherited-basis">
  <h3>ค่าเริ่มต้นและวิธีคิดจาก 01–08</h3>
- <p>ใช้ฐานเดิมกับรายการใหม่ผ่านตัวเลือกใน Working editor · ค่าที่บันทึกไว้แล้วคงเดิม · ค่าเฉพาะ Quote ใช้สกุลเงินและหน่วยของ Quote · ฐานอ้างอิง {DATA_LAYER_META.snapshotDate}</p>
+ <p>เลือกนโยบายใน Working editor · ฐาน Procured Cost คิด markup และงบเผื่อจากต้นทุนเดียวกัน · ใช้สกุลเงินและหน่วยตาม Quote · ฐานข้อมูลอ้างอิง {DATA_LAYER_META.snapshotDate}</p>
  {data?.repositoryBasisImport&&<p>เตรียมฐานจาก Repository JSON แล้ว · {data.repositoryBasisImport.snapshotId} · {data.repositoryBasisImport.fxInherited?"นำ FX เดิมเข้าสู่ฐานร่างเมื่อทุกช่อง FX ว่าง โดยคงวันที่ต้นทางเดิม":"คง FX ที่มีอยู่แล้ว"} · ไม่มีการสร้าง EUR FX หรืออนุมัติราคาอัตโนมัติ</p>}
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Inherited project basis"><thead><tr><th>ฐาน</th><th>ค่าหรือวิธีคิดที่มีอยู่</th><th>นำไปใช้</th></tr></thead><tbody>
  <tr><td>Currency</td><td>Working / Budget: THB · Customer form: USD · Vendor: ตามใบเสนอราคา</td><td>FX รอบนี้: {data?.fx?.thbPerUSD??"OPEN"} THB/USD · {data?.fx?.date||"วันที่ OPEN"} · {data?.fx?.source||"แหล่งอ้างอิง OPEN"}</td></tr>

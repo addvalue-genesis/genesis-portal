@@ -21,7 +21,7 @@ try {
  const {DATA_LAYER_META,SYSTEMS,MODULE_REGISTRY}=require(path.join(root,"project0550/data.js")),ids=SYSTEMS.map(s=>s.token),snapshot=DATA_LAYER_META.datasetId;
  const {policyDefaults0550,applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550}=require(path.join(root,"project0550/bidWorkingBasis0550.js"));
  const {COMMERCIAL_POLICY,CORE_TEAM}=require(path.join(root,"project0550/data.js"));
- assert.deepEqual(policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost"),{sellMode:"MARGIN",marginPct:5,primePct:20});
+ assert.deepEqual(policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost"),{sellMode:"MARKUP",markupPct:5,contingencyPct:5,marginPct:null,sellRate:null,primePct:20});
  assert.equal(policyDefaults0550([{title:"Goods / Procured Cost",formula:"changed unknown policy"}],"Goods / Procured Cost"),null);
  const prior={currency:"EUR",unit:"Lot",manualCost:321,primePct:11,sourceRef:"kept source"},priorBytes=JSON.stringify(prior);
  const policyDraft=applyPolicyDraft0550(prior,COMMERCIAL_POLICY,"Professional Service");assert.equal(policyDraft.primePct,5);assert.equal(policyDraft.manualCost,321);assert.equal(JSON.stringify(prior),priorBytes);
@@ -42,6 +42,13 @@ try {
  const changed=clone();changed.calculations[0].inputs.crew=5;assert.equal(derive(changed).selectedUSD,4950,"Driver edit must flow into USD");
  const changedOffer=clone();changedOffer.offers[0].unitCost=120;assert.equal(derive(changedOffer).lines[0].costTHB,115200);assert.equal(derive(changedOffer).selectedUSD,3960,"Direct sell is independent of cost");
  const costplus=clone();costplus.lines[0].sellMode="MARKUP";costplus.lines[0].markupPct=20;assert.equal(derive(costplus).selectedTHB,126720);
+ const standard=clone();
+ Object.assign(standard.lines[0],policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost"));
+ assert.equal(derive(standard).lines[0].costTHB,96000);
+ assert.equal(derive(standard).lines[0].workingSellTHB,105600);
+ assert.equal(derive(standard).selectedTHB,126720);
+ const invalidReserve=clone();invalidReserve.lines[0].contingencyPct=5;
+ assert.throws(()=>validate(invalidReserve),/Invalid shortage contingency/);
  const margin=clone();margin.lines[0].sellMode="MARGIN";margin.lines[0].marginPct=20;assert.equal(derive(margin).selectedTHB,132000);
  const duplicate=clone();duplicate.lines.push({...line,id:"LINE-DUP"});assert.equal(derive(duplicate).selectedTHB,null);assert(derive(duplicate).lines.every(r=>r.problems.includes("DUPLICATE_SCOPE_OWNER")));
  duplicate.lines[1].selected=false;assert.equal(derive(duplicate).selectedTHB,158400,"Unselected alternatives must not post");

@@ -1,10 +1,44 @@
 // Read existing project bases without promoting historical amounts to current bid inputs.
 // These helpers only prepare editor drafts. Saved lines and review fingerprints are unchanged.
-import {EQUATION_INPUTS,bidQuantityUnit0550} from "./serviceEquationRuntime";
+import {EQUATION_INPUTS,bidQuantityUnit0550,evaluateServiceEquation} from "./serviceEquationRuntime";
+export const GOODS_POLICY_TITLE_0550="Goods / Procured Cost";
+export const LEGACY_GOODS_FORMULA_0550="Customer = Cost × (1 + 20% SAMTEL) / (1 - 5% ADDVALUE final margin)";
+export const GOODS_SELL_BASIS_0550=Object.freeze({sellMode:"MARKUP",markupPct:5,contingencyPct:5,marginPct:null,sellRate:null,primePct:20});
+const {markupPct,contingencyPct,primePct}=GOODS_SELL_BASIS_0550;
+export const GOODS_FORMULA_0550=`Customer = Cost × (1 + ${markupPct}% ADDVALUE markup + ${contingencyPct}% shortage contingency) × (1 + ${primePct}% SAMTEL)`;
+
+export function matchesLegacyGoodsBasis0550(line) {
+ return line.sellMode==="MARGIN"&&line.marginPct===5&&line.primePct===20&&line.markupPct==null&&line.sellRate==null&&line.contingencyPct===undefined;
+}
+
+export function applyGoodsSellBasis0550(line) {
+ return {...line,...GOODS_SELL_BASIS_0550};
+}
+
+export function matchesWorkingDefault0550(line,original) {
+ if(!line||!original)return false;
+ const candidate=original.contingencyPct!=null&&matchesLegacyGoodsBasis0550(line)?applyGoodsSellBasis0550(line):line;
+ return Object.keys(candidate).length===Object.keys(original).length&&Object.keys(original).every(key=>original[key]===candidate[key]);
+}
+
+export function addvalueSell0550(line,cost,quantity) {
+ const nonnegative=n=>Number.isFinite(n)&&n>=0;
+ if(line.sellMode==="DIRECT")return Number.isFinite(quantity)&&nonnegative(line.sellRate)?
+  evaluateServiceEquation("E10",{rows:[{id:line.id,quantity,sellRate:line.sellRate}],other:0}).value:null;
+ if(cost===null)return null;
+ if(line.sellMode==="MARKUP"){
+  const contingency=line.contingencyPct??0;
+  return nonnegative(line.markupPct)&&nonnegative(contingency)?
+   evaluateServiceEquation("E11",{cost,markup:(line.markupPct+contingency)/100}).value:null;
+ }
+ return nonnegative(line.marginPct)?evaluateServiceEquation("E12",{cost,margin:line.marginPct/100}).value:null;
+}
+
 export function policyDefaults0550(policies, kind) {
  const policy=policies.find(p=>p.title===kind);
  if(!policy)return null;
- if(kind==="Goods / Procured Cost") {
+ if(kind===GOODS_POLICY_TITLE_0550) {
+  if(policy.formula===GOODS_FORMULA_0550)return {...GOODS_SELL_BASIS_0550};
   const m=policy.formula.match(/^Customer = Cost × \(1 \+ ([\d.]+)% SAMTEL\) \/ \(1 - ([\d.]+)% ADDVALUE final margin\)$/);
   if(m&&Number(m[2])<100)return {sellMode:"MARGIN",marginPct:Number(m[2]),primePct:Number(m[1])};
  }
@@ -17,12 +51,15 @@ export function policyDefaults0550(policies, kind) {
 export function applyPolicyDraft0550(line, policies, kind) {
  const defaults=policyDefaults0550(policies,kind);
  if(!defaults)return line;
- return {...line,...defaults,sourceRef:[line.sourceRef,`Project commercialPolicy / ${kind}: ${policies.find(p=>p.title===kind).formula}`].filter(Boolean).join("\n")};
+ const next={...line,...defaults,sourceRef:[line.sourceRef,`Project commercialPolicy / ${kind}: ${policies.find(p=>p.title===kind).formula}`].filter(Boolean).join("\n")};
+ if(defaults.contingencyPct===undefined)delete next.contingencyPct;
+ return next;
 }
 export function applyRoleDraft0550(line, role, offer) {
  if(!role||!Number.isFinite(role.protectedUsdDay)|| (offer&&(offer.currency!=="USD"||offer.unit!=="MD")))return line;
  if(!offer&&line.manualCost!=null&&(line.currency!=="USD"||line.unit!=="MD"))return line;
- return {...line,currency:"USD",unit:"MD",sellMode:"DIRECT",sellRate:role.protectedUsdDay,
+ const {contingencyPct,...inputs}=line;
+ return {...inputs,currency:"USD",unit:"MD",sellMode:"DIRECT",sellRate:role.protectedUsdDay,
   sourceRef:[line.sourceRef,`06 Execution / CORE_TEAM / ${role.role}: ADDVALUE ${role.protectedUsdDay} USD/MD (selling basis; internal cost separate)`].filter(Boolean).join("\n")};
 }
 export function calculationBinding0550(calculation, resultKey, offer) {

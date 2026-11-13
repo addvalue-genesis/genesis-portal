@@ -75,6 +75,7 @@ assert.equal(C.c2EquationDraftRows0550(priceChange,derive(priceChange)).get('TEL
 assert.throws(()=>C.prepareEquationSpareWorking0550({...data,revision:data.revision+1},C.c2EquationDraftRows0550(data,model).get('TEL-LAN')[0],'STALE'),/changed/);
 for(const sellMode of ['DIRECT','MARKUP','MARGIN']){
  const d=structuredClone(data),l=d.lines.find(l=>l.id===parent.id);Object.assign(l,{sellMode,sellRate:14.015,marginPct:20});
+ if(sellMode==='MARKUP')l.contingencyPct=5;
  d.offers.find(o=>o.id===parent.offerId).unitCost=10.075;
  const row=C.c2EquationDraftRows0550(d,derive(d)).get('TEL-LAN')[0],p=C.prepareEquationSpareWorking0550(d,row,'ROUND-'+sellMode),priced=derive(p.workspace).lines.find(l=>l.id===p.lineId);
  assert.equal(row.amount,priced.provisionalCustomerUSD,sellMode+' draft and Working monetary boundaries must match');

@@ -60,7 +60,7 @@ export function prepareChevalierPbxBudget0550(data,policies,today){
  for(const [summary,description,rate] of facilities){
   if(bindings.some(binding=>binding.schedule==='C8'&&binding.summary===summary))continue;
   rows.push([make('C8-'+summary,description,'B8','B1',8,'MD',rate,'8 purchaser man-days (4 sites × 2 MD), call-off planning rate.',
-   {selected:false,sellMode:'DIRECT',sellRate:rate,primePct:0,marginPct:null}),
+   {selected:false,sellMode:'DIRECT',sellRate:rate,primePct:0,markupPct:null,contingencyPct:null,marginPct:null}),
    {schedule:'C8',summary,treatment:'CALLOFF'}]);
  }
  let next=data;

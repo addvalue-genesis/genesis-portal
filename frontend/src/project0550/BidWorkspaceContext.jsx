@@ -1,6 +1,6 @@
 import {prepareMgwCurrentWorking0550,prepareMgwRadioDtrsRegister0550} from "./data/mgwCurrentWorking0550";
 import {mgwOfferSourcePending0550} from "./data/mgwQuoteSelection0550";
-import {applyDirectSupplierMarkup0550,prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
+import {applyCommercialSellPolicies0550,prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
 import {prepareBidProcess0550} from "./data/bidProcess0550";
 import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
 import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
@@ -37,7 +37,7 @@ function prepareQuotation0550(data,today){
  const avl=preparePagaAvlDeviation0550(pbx);
  const based=pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
  const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
- const working=prepareChevalierPbxBudget0550(applyDirectSupplierMarkup0550(priced),COMMERCIAL_POLICY,today);
+ const working=prepareChevalierPbxBudget0550(applyCommercialSellPolicies0550(priced),COMMERCIAL_POLICY,today);
  return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
 }
 export const useBidWorkspace=()=>useContext(Context);

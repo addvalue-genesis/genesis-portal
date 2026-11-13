@@ -1,4 +1,4 @@
-import {policyDefaults0550} from '../bidWorkingBasis0550';
+import {matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {MGW_QUOTE_0550,mgwHistoricalLine0550} from './mgwVendorBasis0550';
 import {planVendorRegister0550,VENDOR_REGISTER_SCHEMA_0550} from './vendorRegister0550';
@@ -11,8 +11,6 @@ import {
 const applied = batchId=>'Current Working prepared / '+batchId;
 const codeBySystem = {'TEL-LAN':'A1-01', 'TEL-IPP':'A1-04', 'TEL-PABX':'A1-04', 'TEL-FO':'A1-13', 'TEL-MET':'A1-14', 'TEL-NDB':'A1-15', 'TEL-CCTV':'A1-06', 'TEL-ES':'A1-12'};
 const nativeMr=new Map(MR_WORKING_CATALOG_0550.rows.map(row=>[row.id,row]));
-const unchanged=(line,original)=>line&&original&&Object.keys(line).length===Object.keys(original).length&&
- Object.keys(original).every(key=>original[key]===line[key]);
 const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
 const formerRadioMappingBlock=id=>id+' / MR Working scope is deselected, covered or missing; reconcile quoted scope';
 const formerLanMappingBlock=mr=>'REQ-'+mr+' / current MGW Offer awaits Working reconciliation';
@@ -198,7 +196,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
     Math.round(e.quotedQuantity*offer.unitCost*100)===Math.round(e.quotedTotal*100);
    const competingOwner=otherBulkOwner||lines.some(l=>l.id!==id&&l.selected&&
     (l.offerId===offer.id||l.mrRequirementId===bulkMr||l.scopeKey===original?.scopeKey));
-   if(unchanged(line,original)&&line.selected&&!line.coveredByLineId&&sameBasis&&!competingOwner){
+   if(matchesWorkingDefault0550(line,original)&&line.selected&&!line.coveredByLineId&&sameBasis&&!competingOwner){
     const scopeNote='Cable material supply only; quantity in metres per supplier quote. Confirm route, terminations, MTO and delivery before release.';
     lines[index]={...line,...inputs,quantity:e.quotedQuantity,customerRowCode:line.systemToken==='TEL-LAN'?'A1-01':'A1-13',
      sourceRef:line.sourceRef+'\n'+sourceRef,customerRemark:scopeNote,coverageBasis:MGW_BASIS_REVIEW_0550};
@@ -213,7 +211,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    !mgwCurrentOffer0550(offers.get(l.offerId))&&hasPrice(l));
   if(mr){
    const id='REQ-'+mr,index=lines.findIndex(l=>l.id===id),line=lines[index],original=defaults.get(id);
-   if((!lan||!occupied)&&unchanged(line,original)&&line.selected&&line.quantity===e.quotedQuantity&&line.unit===offer.unit){
+   if((!lan||!occupied)&&matchesWorkingDefault0550(line,original)&&line.selected&&line.quantity===e.quotedQuantity&&line.unit===offer.unit){
     lines[index]={...line,...inputs,sourceRef:line.sourceRef+'\n'+sourceRef,coveredByLineId:'',coverageBasis:MGW_BASIS_REVIEW_0550};
     if(lan)conflicts.delete(formerLanMappingBlock(mr));
     continue;

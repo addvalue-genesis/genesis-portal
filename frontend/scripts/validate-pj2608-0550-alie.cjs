@@ -14,7 +14,7 @@ const intake=require(root+'/project0550/data/alieIntake0550.js');
 const {deriveBidWorkspace,emptyBidWorkspace,validateBidWorkspace}=require(root+'/project0550/data/bidWorkspaceModel.js');
 const {COMMERCIAL_POLICY,SYSTEMS}=require(root+'/project0550/data.js');
 const {deriveBidVolumeWorkingPreview0550,scheduleAllocationPlan0550}=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js');
-const {applyDirectSupplierMarkup0550}=require(root+'/project0550/data/bidCompletion0550.js');
+const {applyCommercialSellPolicies0550}=require(root+'/project0550/data/bidCompletion0550.js');
 const {officialLineBasisKey}=require(root+'/project0550/data/officialPricing0550.js');
 const {planVendorRegister0550}=require(root+'/project0550/data/vendorRegister0550.js');
 const {vendorRegisterFixture0550}=require('./fixtures/0550-vendor-register.cjs');
@@ -125,11 +125,11 @@ const serviceOwner={...oldOwner,id:'PAGA-SERVICE',wbs:'B4',customerRowCode:'B4'}
 const spareOwner={...oldOwner,id:'PAGA-SPARE',wbs:'C3',customerRowCode:'C3'};
 const unselectedOwner={...oldOwner,id:'PAGA-UNSELECTED',selected:false};
 const existing={...direct,lines:[oldOwner,serviceOwner,spareOwner,unselectedOwner]};
-const migrated=applyDirectSupplierMarkup0550(existing);
+const migrated=applyCommercialSellPolicies0550(existing);
 assert.deepEqual(migrated.lines,[priceRow,serviceOwner,spareOwner,unselectedOwner]);
 assert.equal(migrated.offers,existing.offers);
 assert.equal(migrated.fx,existing.fx);
-assert.equal(applyDirectSupplierMarkup0550(migrated),migrated);
+assert.equal(applyCommercialSellPolicies0550(migrated),migrated);
 assert.notEqual(officialLineBasisKey(existing,oldOwner),officialLineBasisKey(migrated,migrated.lines[0]));
 
 const service=structuredClone(source);
@@ -170,7 +170,7 @@ if(process.env.GENESIS_ALIE_TEST_PAGA005){
  assert.doesNotMatch(pagaIncludedScope0550(actual,net),/18020/);
  assert.equal(pagaRevisionSelected0550(actual),null,'Receipt does not change Working selection');
  const owner={...priceRow,offerId:net.id,vendorId:net.vendorId,quantity:1,unit:'Lot',sourceRef:net.sourceRef,markupPct:50,primePct:5};
- const selected=applyDirectSupplierMarkup0550({...actual,lines:[owner]});
+ const selected=applyCommercialSellPolicies0550({...actual,lines:[owner]});
  const actualModel=deriveBidWorkspace(selected,systems,date);
  const pricedNet=actualModel.lines[0];
  const round=require(root+'/project0550/data/money0550.js').roundMoney0550;
@@ -230,13 +230,30 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  const model=derived(selected),owners=model.lines.filter(l=>[supply,field,ma].includes(l.id));
  validateBidWorkspace(selected,selected.baselineSnapshotId,all);
  assert.deepEqual(owners.map(l=>l.provisionalCostNative),expectedCosts);
- const expectedSell=expectedCosts.map(cost=>roundMoney0550(cost/0.95*1.2));
+ const expectedSell=expectedCosts.map(cost=>roundMoney0550(cost*1.10*1.20));
  assert.deepEqual(owners.map(l=>l.provisionalCustomerTHB),expectedSell);
+ assert.equal(expectedSell.reduce((total,price)=>total+price,0),23419440);
+ assert(owners.every(l=>l.markupPct===5&&l.contingencyPct===5&&l.primePct===20));
+ const old={...selected,lines:selected.lines.map(line=>{
+  if(![supply,field,ma].includes(line.id))return line;
+  const {contingencyPct,...rest}=line;
+  return {...rest,sellMode:'MARGIN',marginPct:5,markupPct:null,primePct:20};
+ })};
+ const migrated=applyCommercialSellPolicies0550(old);
+ assert.deepEqual(derived(migrated).lines.filter(l=>[supply,field,ma].includes(l.id)).map(l=>l.provisionalCustomerTHB),expectedSell);
+ assert.equal(applyCommercialSellPolicies0550(migrated),migrated);
+ assert.equal(migrated.offers,old.offers);
+ const oldSupply=old.lines.find(l=>l.id===supply),newSupply=migrated.lines.find(l=>l.id===supply);
+ assert.notEqual(officialLineBasisKey(old,oldSupply),officialLineBasisKey(migrated,newSupply));
+ const authoredMargin={...old,lines:old.lines.map(l=>l.id===supply?{...l,marginPct:7}:l)};
+ assert.equal(applyCommercialSellPolicies0550(authoredMargin).lines.find(l=>l.id===supply),authoredMargin.lines.find(l=>l.id===supply));
  assert.equal(model.provisional.schedule.find(r=>r.code==='A1-04').children.find(l=>l.id===supply).customerTHB,expectedSell[0]);
  assert.equal(model.official.lines.find(l=>l.id===supply).customerUSD,null);
  const view=deriveBidVolumeWorkingPreview0550(selected,model,SYSTEMS,date,deriveBidVolumes0550(selected,model,SYSTEMS,date));
  assert.deepEqual(view.scheduleRows('C7').filter(b=>[field,ma].includes(b.lineId)).map(b=>b.lineId),[field]);
+ assert.equal(view.scheduleRows('C7').find(b=>b.lineId===field).line.customerTHB,expectedSell[1]);
  assert.equal(a1OthersRows0550(view,'E').filter(b=>b.lineId===ma).length,1);
+ assert.equal(a1OthersRows0550(view,'E').find(b=>b.lineId===ma).line.customerTHB,expectedSell[2]);
  assert.equal(a1OthersRows0550(view,'F').filter(b=>b.lineId===ma).length,0);
  for(const id of ['C2','C3','C4','C5','C6','C8'])assert(!view.scheduleRows(id).some(b=>[supply,field,ma].includes(b.lineId)));
  const c1View={...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550},c1=deriveC1Appendix0550(c1View);
@@ -344,7 +361,7 @@ if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
  const registered=[process.env.GENESIS_ALIE_TEST_PAGA005,process.env.GENESIS_ALIE_TEST_PAGA_SERVICES].filter(Boolean)
   .reduce((workspace,file)=>planVendorRegister0550(workspace,readPack(file),tokens).workspace,initial);
  const revised=preparePagaRevisionPricing0550(registered,today);
- const prepared=intake.preparePagaIdieWorking0550(applyDirectSupplierMarkup0550(revised),COMMERCIAL_POLICY,today);
+ const prepared=intake.preparePagaIdieWorking0550(applyCommercialSellPolicies0550(revised),COMMERCIAL_POLICY,today);
  validateBidWorkspace(prepared,baseline,tokens);
  const {net,owner}=pagaRevisionSelected0550(prepared);
  assert.equal(net.quoteRef,'A20261632-005');

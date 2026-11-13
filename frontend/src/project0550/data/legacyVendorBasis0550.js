@@ -47,7 +47,7 @@ export function importLegacyVendorBasis0550(data,dataset,today) {
   if(!offer){if(next.offers.some(o=>o.id===offerId)){skippedSystems.add(item.systemToken);continue;}offer={id:offerId,vendorId:vendor.id,description:item.description,brand:item.brand,quoteRef:item.quoteRef,sourceRef:item.sourceRef,date:item.date,validUntil:item.validUntil,currency:item.currency,unit:item.unit,unitCost:item.unitCost};next.offers.push(offer);}
   if(occupied.has(item.systemToken)||data.lines.some(l=>l.offerId===offer.id)||next.lines.some(l=>l.id===lineId)){skippedSystems.add(item.systemToken);continue;}
   const line={id:lineId,systemToken:item.systemToken,wbs:"A",description:item.description,scopeKey:"VENDOR-BASIS."+item.id,tagRef:"",requirementRef:"",sourceRef:item.sourceRef+" "+item.scopeNote,
-   vendorId:vendor.id,offerId:offer.id,calculationId:"",resultKey:"value",quantity:item.quantity,unit:offer.unit,currency:offer.currency,manualCost:null,sellMode:policy.sellMode,sellRate:null,markupPct:null,marginPct:policy.marginPct,primePct:policy.primePct,
+   vendorId:vendor.id,offerId:offer.id,calculationId:"",resultKey:"value",quantity:item.quantity,unit:offer.unit,currency:offer.currency,manualCost:null,sellRate:null,markupPct:null,marginPct:null,primePct:null,...policy,
    selected:!item.alternative,brand:item.brand,customerRemark:""};
   line.customerRowCode=suggestedCustomerCode(line);next.lines.push(line);importedLineIds.push(lineId);
  }

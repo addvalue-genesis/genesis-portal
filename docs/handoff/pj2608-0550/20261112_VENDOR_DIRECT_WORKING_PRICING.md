@@ -63,6 +63,26 @@ from Base/Option, unchanged shared owners, edit/deletion preservation,
 and draft XLSX and Word output. Windows startup requires the current
 CHEVALIER register.
 
+### ADDVALUE standard procured-cost selling basis
+
+Working records markup and shortage contingency separately, each at 5% of
+the same cost. SAMTEL adds 20% to the resulting ADDVALUE sell price. The
+standard customer multiplier is 1.32. The allowance stays on the same price
+owner as a selling layer. Quote cost and approved procurement quantities
+retain their original basis. Working, Release and Volume I use the same
+calculated prices. The C2–C4 spare draft uses the same equation as its
+prepared Working owner.
+
+Startup and save update recognized legacy 5% margin / 20% Prime defaults.
+Explicitly different pricing, protected labour, pass-through and the special
+PAGA, CERAGON and Master Tower markups keep their respective treatments.
+Changed price inputs require the existing Official review again. Historical
+policy snapshots and issued records retain their saved inputs and outputs.
+ADR-0550-001 principles 2, 5 and 8–11 govern cost evidence, single ownership
+and traceability. The private CHEVALIER fixture verifies the three quoted
+owners through Working and Volume I. Full live project totals depend on the
+Windows workspace and its current Vendor data.
+
 ## 13 November · PAGA supply and service rates
 
 Working A1-05 selects the current INDUSTRONIC A20261632-005 NET against
