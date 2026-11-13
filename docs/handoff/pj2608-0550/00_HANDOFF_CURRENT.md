@@ -1,3 +1,5 @@
+Latest training plan: [FAT and training in Thailand, OJT in Myanmar, and Punch List](20261113_TRAINING_BUDGET_C7_REV01.md). Rev01 covers one customer training cohort in Thailand and six Myanmar OJT blocks. Use the existing Working cost owners to reconcile the draft before updating D or C7.
+
 Latest PAGA display: [Appendix 1.4 supplier cost detail](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--appendix-14-supplier-cost-detail). The 11.C1 Working Preview shows original EUR costs directly below the PAGA package and identifies the revision selected in A1-05.
 
 Latest FOC and Cables update: [MGW Bulk Material and Fiber Patch Panels](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--mgw-foc-and-cables). Appendix 1.8 shows site subtotals and the priced Appendix subtotal. Vendor and Volume I use the same Working owners.
