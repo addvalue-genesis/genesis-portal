@@ -362,7 +362,12 @@ assert.equal(activateLots(radioLots),radioLots,'Draft unit migration is idempote
 const confirmedAero={...previousAero,offers:previousAero.offers.map(o=>o.id===radio012.id?{...o,unit:'Lot',unitBasis:'QA confirmed unit'}:o)};
 assert.equal(activateLots(confirmedAero),confirmedAero,'Keep an explicitly confirmed unit');
 const {VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550.jsx');
-const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:radioLots,onEdit:()=>{}}));
+const {MGW_GTPL_SOURCE_TARGET_0550}=require(root+'/project0550/MgwCurrentQuote0550.jsx');
+const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:radioLots,onEdit:()=>{},onNavigate:()=>{}}));
+const gtplRow=radioVendorHtml.split('data-component-key="'+MGW_GTPL_SOURCE_TARGET_0550.id+'"');
+assert.equal(gtplRow.length,2,'One navigation target for the original GTPL reference');
+assert.match(gtplRow[1],/GRS#2 → APF Control Building.*APM<small>หัวแถวในใบ MGW · รอชี้แจง/s);
+assert.match(radioVendorHtml,/MGW · งานย้ายวิทยุ GTPL/);
 assert.match(radioVendorHtml,/<strong>FIXED AM VHF Radio Telephone · Jotron · TR-910<\/strong><small>RADIO-012 · PDF 11<\/small>/);
 const radio012VendorRow=radioVendorHtml.match(new RegExp('<tr[^>]+data-vnd-offer="'+radio012.id+'"[^>]*>.*?<\\/tr>','s'))?.[0];
 assert.match(radio012VendorRow,/<strong>FIXED AM VHF Radio Telephone<\/strong><small>Jotron · TR-910<\/small>/);

@@ -67,3 +67,19 @@ their original values, and the supplier-unit review remains open. MGW
 pricing and Vendor Register validators passed. The legacy C1 HTML hash
 check fails identically on the parent commit and this change. The MGW
 validator verifies the C1 system unit and the draft totals directly.
+
+## 14 November — find the GTPL relocation reference
+
+Search `GTPL` or `GRS#2` in Project Module Search, or use the GTPL shortcut
+in 07.2 or under DTRS in the system grouping. The shortcut opens the existing
+MGW Q26-063 PDF page 10 reference and clears the Volume I tag filter.
+The supplier heading is APM. The quoted note describes moving the existing
+equipment from GRS#2 to the APF Control Building and the new 60 m tower, with
+the GTPL contractor responsible per MGW. PHI-0002 Rev.B1 §1.2 defines GTPL as
+Gas To Power Pipeline Development Project. The listed supply boundary remains
+open for clarification. This is an unpriced quotation reference with no
+Offer or Working owner. The MGW radio source total is USD 700,501.
+
+The MGW pricing and Vendor Register validators and development webpack build
+passed. A DOM interaction check verified both search terms and the DTRS
+shortcut under an active Volume I filter.

@@ -1,6 +1,6 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {chevalierPbxSource0550} from './data/chevalierPbxQuote0550';
-import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
+import {MGW_GTPL_SOURCE_TARGET_0550,MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550,mgwAeroFixedDraftUnit0550,mgwFocSupplyOffer0550,mgwRadioSourceModel0550,mgwRadioSourceRow0550} from './data/mgwQuoteSelection0550';
 import {scheduleAllocationPlan0550} from './data/bidVolumeWorkingPreview0550';
@@ -154,7 +154,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
  useEffect(()=>{
   if(!navigationTarget)return;
   const targetOffer=entries.find(({offer})=>navigationTarget==='bid.vendor.offer.'+offer.id);
-  if(targetOffer)setSectionFilter('');
+  if(targetOffer||navigationTarget===MGW_GTPL_SOURCE_TARGET_0550.id)setSectionFilter('');
   if(targetOffer||navigationTarget===archivedKey||entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId)||
    navigationTarget==='bid.vendor.'+archived?.vendorId||navigationTarget==='bid.vendor.'+mgwVendorId)setMode('company');
  },[entries,archivedKey,archived,mgwVendorId,navigationTarget]);
@@ -276,6 +276,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
     {[...VENDOR_VOLUME_TAGS_0550,'M','P'].map(tag=><option key={tag} value={tag}>11.{tag}</option>)}
    </select></label>
    <span>{entries.length} Offer IDs · ต้นทุนตามสกุล/หน่วยต้นฉบับ</span>
+   {onNavigate&&<button type="button" onClick={()=>onNavigate(MGW_GTPL_SOURCE_TARGET_0550.id)}>MGW · งานย้ายวิทยุ GTPL</button>}
   </div>
   {sectionFilter&&<p>แสดง Item ที่มี TAG 11.{sectionFilter} · ยอดใบเสนอราคาแสดงเต็มฉบับ</p>}
   <p>แต่ละ Offer อยู่ในกลุ่มเดียวตามขอบเขตต้นฉบับ · งานหลายระบบอยู่ในกลุ่มงานร่วม · แยก Base, Option และรายการอ้างอิง · ระบบที่ใช้ Offer ใน Mapping / Working ดูได้ในแต่ละแถว</p>
@@ -288,6 +289,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   </>}
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
    <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs{mode==='company'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+g.key}/></>}</summary>
+   {mode==='system'&&g.key==='TEL-RADIO-DTRS'&&onNavigate&&<button type="button" onClick={()=>onNavigate(MGW_GTPL_SOURCE_TARGET_0550.id)}>เปิดขอบเขตงานย้าย GTPL ตามใบ MGW</button>}
    {mode==='company'&&<>
     {g.key===mgwVendorId&&<MgwCurrentQuote0550 data={data} showRadioSource sectionFilter={sectionFilter}/>}
     {g.key==='LEGACY-VENDOR-INDUSTRONIC'&&<PagaQuoteScope0550 data={data} section="vendor" onNavigate={onNavigate}/>}

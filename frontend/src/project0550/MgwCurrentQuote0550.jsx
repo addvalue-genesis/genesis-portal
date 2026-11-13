@@ -1,7 +1,7 @@
 import React from 'react';
 import {amount} from './BidControls';
 import {RadioLotBomTable0550} from './RadioLotBom0550';
-import {parseRadioLotComponents0550} from './data/radioLotComponents0550';
+import {parseRadioLotComponents0550,RADIO_ACCESSORIES_SEPARATOR_0550,RADIO_GTPL_SEPARATOR_0550} from './data/radioLotComponents0550';
 import {sumMoney0550} from './data/money0550';
 import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
@@ -27,13 +27,17 @@ const radioSourceMr={
 };
 const radioMrById=new Map(mrCatalog.rows.filter(row=>row.id.startsWith('MR-B1-11-')).map(row=>[row.id,row]));
 const radioMrSource=radioMrById.get('MR-B1-11-APF-01')?.componentReview?.sources.find(source=>source.label.includes('Rev.B1'));
+export const MGW_GTPL_SOURCE_TARGET_0550={
+ id:'bid.vendor.offers.mgw.radio.gtpl',number:'07.2',tab:'documents',
+ title:'MGW Q26-063 · VHF DMR Radio System · GTPL · GRS#2 → APF',
+};
 const radioUnpriced={
  'RADIO-005':{
-  separator:'\nLocation: APM\nVHF DMR Radio System GTPL\n',
-  title:'VHF DMR Radio System · GTPL relocation', sourceSite:'APM', site:'ติดตั้งที่ APF ตามหมายเหตุผู้เสนอ', price:'—',
+  separator:RADIO_GTPL_SEPARATOR_0550,target:MGW_GTPL_SOURCE_TARGET_0550.id,
+  title:'VHF DMR Radio System · GTPL relocation', sourceSite:'APM', site:'GRS#2 → APF Control Building / เสาโทรคมนาคมใหม่ 60 ม.', price:'—',
  },
  'RADIO-009':{
-  separator:'\nVHF DMR Radio System Accessaries MOTOROLA\n',
+  separator:RADIO_ACCESSORIES_SEPARATOR_0550,
   title:'VHF DMR Radio System Accessories · Motorola Option', sourceSite:'APF', site:'APF', price:'TBD',
  },
 };
@@ -91,13 +95,13 @@ function MgwRadioSource0550({data,sectionFilter}){
       <td>{row.site}</td><td>{row.quantity} {row.sourceUnit||'· หน่วยไม่ระบุ'}</td>
       <td>{amount(row.unitCost,currency)}</td><td>{amount(row.extended,currency)}</td>
      </tr>}
-     {unpricedDetail&&isVisible(extraSections)&&<tr>
+     {unpricedDetail&&isVisible(extraSections)&&<tr data-component-key={extra.target}>
       <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
        {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
        {unpricedComponents.length>0&&<RadioLotBomTable0550 components={unpricedComponents} caption={'ขอบเขตที่ไม่มีราคาแยก · '+item}/>}
        <details><summary>ข้อความต้นฉบับ / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
-      <td>—</td><td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
+      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>หัวแถวในใบ MGW · รอชี้แจง</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
    })}</tbody>
