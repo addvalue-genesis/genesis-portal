@@ -194,6 +194,15 @@ for(const [term,expected] of [['CIF',['50.00','','100.00','']],['FOB',['','50.00
 assert.match(N.nativeExhibitHtml0550(spareView,'C3'),/USD 75\.00.*CIF\/FOB allocation OPEN/);
 assert.match(N.nativeSchedule0550(spareView,'C3').html,/class="native-c2-draft-price"><p[^>]*>USD 75\.00/);
 assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
+const officialSpare=N.nativeSchedule0550({...spareView,customerIssue:true},'A1');
+assert.equal(officialSpare.pages[0].values.A1_5_6,'100.00','Complete official row price is unchanged');
+assert.equal(officialSpare.pages[0].values.A1_6_6,'','Two-year spares stay off the base price columns');
+assert.match(officialSpare.pages[0].values.A1_12_1,/In figures: USD 100\.00/);
+assert.doesNotMatch(officialSpare.html,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Site service period to confirm/);
+assert.match(officialSpare.html,/whiteness/);
+const officialDoc=Buffer.from(N.buildNativeExhibitDocx0550({...spareView,customerIssue:true},'A1')).toString();
+assert.doesNotMatch(officialDoc,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Working owner|priced items/);
+assert.match(officialDoc,/whiteness/);
 const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
 assert.deepEqual(priceCells(N.nativeSchedule0550(thbView,'C2','THB').pages[0]),['THB 1,600.00','','THB 3,200.00','']);
 assert.match(N.nativeSchedule0550(thbView,'A1','THB').pages[0].values.A1_6_7,/THB 2,400\.00/);

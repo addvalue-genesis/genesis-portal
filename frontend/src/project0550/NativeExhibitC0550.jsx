@@ -1,5 +1,5 @@
 import React,{useMemo,useState} from 'react';
-import {a1SummarySlot0550,nativeSchedule0550,nativeExhibitProblems0550,nativeFormCss0550,nativeExhibitHtml0550,downloadNativeExhibit0550} from './exhibitCNative0550';
+import {a1SummarySlot0550,nativeSchedule0550,nativeExhibitProblems0550,nativeFormCss0550,nativeExhibitHtml0550,downloadNativeExhibit0550,officialExhibitGaps0550} from './exhibitCNative0550';
 import {MgwScheduleSource0550} from './WorkingSchedulePreview0550';
 import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './SchedulePriceDiagnostics0550';
 import {C1Appendix0550} from './C1Appendix0550';
@@ -68,6 +68,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
  const [c8LoadMessage,setC8LoadMessage]=useState('');
+ const [issueNote,setIssueNote]=useState('');
  const ws=useBidWorkspace();
  const references=useMemo(()=>{
   if(!['C2','C3','C4'].includes(id)||!view.workingPreview||!c2Scope)return undefined;
@@ -89,16 +90,22 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
  const hasC8Calloff=id==='C8'&&view.scheduleRows('C8').some(c8Country0550);
  const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
+ const issueMessage=only=>{
+  const gaps=officialExhibitGaps0550(only?formView:view,only);
+  setIssueNote(gaps.length?`Official export keeps the customer Exhibit C form. TBA is used where a complete official price is not available (${gaps.length}): ${gaps.slice(0,8).join(' · ')}${gaps.length>8?' · …':''}`:'Official export uses complete prices on the customer Exhibit C form.');
+ };
  const print=()=>{
+  issueMessage(id);
   const frame=document.createElement('iframe');frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px';
   frame.onload=()=>{frame.contentWindow.focus();frame.contentWindow.print();setTimeout(()=>frame.remove(),60000);};
-  frame.srcdoc=nativeExhibitHtml0550(formView,id);document.body.appendChild(frame);
+  frame.srcdoc=nativeExhibitHtml0550({...formView,customerIssue:true},id);document.body.appendChild(frame);
  };
  return <section aria-label={'Native Exhibit C Schedule '+id}>
   <style>{nativeFormCss0550}</style>
   {groups.length>0&&<label>ระบบใน Schedule {id} <select aria-label={id+' system form'} value={selected?.token||''} onChange={e=>setSystemChoice(e.target.value)} disabled={disabled}><option value="">แสดงทุกระบบ</option>{groups.map(group=><option key={group.token} value={group.token}>{group.token}{group.name===group.token?'':' · '+group.name} · {group.rows.length||(group.draftRows.length?'Draft reference':'OPEN')}</option>)}</select></label>}
   {groups.length>0&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.group.'+({C2:'B5',C3:'C3',C4:'C2'}[id]),{workingSystem:selected?.token})}>เตรียมรายการ Working {({C2:'B5',C3:'C3',C4:'C2'}[id])}</button>}
-  <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
+  <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>{issueMessage(id);downloadNativeExhibit0550(formView,'docx',id);}}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>{issueMessage();downloadNativeExhibit0550(view,'docx');}}>Export Exhibit C Word ทั้งชุด</button></div>
+  {issueNote&&<p role="status">{issueNote}</p>}
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled} mrNavigationTarget={mrNavigationTarget}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-7]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {id==='C8'&&view.workingPreview&&!hasC8Calloff&&ws?.importC8Calloff&&<div className="p55-panel" aria-label="C8 price data">
