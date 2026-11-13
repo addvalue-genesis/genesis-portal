@@ -351,11 +351,22 @@ for(const [key,model] of [['RADIO-003','Sailor 6320'],['RADIO-013','TRON TR30 AI
 }
 assert.equal(radio012.quoteEvidence.quotedUnit,'Not stated');
 assert.equal(radio012.quoteEvidence.quotedTotal,14680);
+assert.equal(radio012.unit,'SET');
+assert.equal(radio012.unitBasis,undefined,'An inferred Working unit is not supplier confirmation');
+const aeroFixed=radioLots.lines.find(l=>l.offerId===radio012.id);
+assert.deepEqual([aeroFixed.quantity,aeroFixed.unit],[1,'SET']);
+const previousAero={...radioLots,offers:radioLots.offers.map(o=>o===radio012?{...o,unit:'U'}:o),
+ lines:radioLots.lines.map(l=>l===aeroFixed?{...l,unit:'U'}:l)};
+assert.deepEqual(activateLots(previousAero),radioLots,'Already prepared workspaces receive the same draft unit');
+assert.equal(activateLots(radioLots),radioLots,'Draft unit migration is idempotent');
+const confirmedAero={...previousAero,offers:previousAero.offers.map(o=>o.id===radio012.id?{...o,unit:'Lot',unitBasis:'QA confirmed unit'}:o)};
+assert.equal(activateLots(confirmedAero),confirmedAero,'Keep an explicitly confirmed unit');
 const {VendorOfferGroups0550}=require(root+'/project0550/VendorOfferGroups0550.jsx');
 const radioVendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:radioLots,onEdit:()=>{}}));
 assert.match(radioVendorHtml,/<strong>FIXED AM VHF Radio Telephone · Jotron · TR-910<\/strong><small>RADIO-012 · PDF 11<\/small>/);
 const radio012VendorRow=radioVendorHtml.match(new RegExp('<tr[^>]+data-vnd-offer="'+radio012.id+'"[^>]*>.*?<\\/tr>','s'))?.[0];
 assert.match(radio012VendorRow,/<strong>FIXED AM VHF Radio Telephone<\/strong><small>Jotron · TR-910<\/small>/);
+assert(radioVendorHtml.includes(radioSelection.MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550));
 assert.equal([...radioVendorHtml.matchAll(/<td>Specification<\/td><td>Jotron · TR-910<\/td>/g)].length,3,
  'Jotron and TR-910 appear in the source, inline offer and Supplier dialog BOM specification cells');
 assert.match(radioVendorHtml,/<td>Whip Antenna<\/td><td>—<\/td>/,'The parent model does not label individual components');
@@ -378,6 +389,10 @@ assert(radio010.components.some(c=>c.quantity===12&&c.partNo==='SAILOR SP3530'),
 assert.equal(lotOffers.filter(o=>Number.isFinite(o.unitCost)).reduce((n,o)=>n+o.unitCost*o.quoteEvidence.quotedQuantity,0),lotOffers.filter(o=>Number.isFinite(o.quoteEvidence.quotedTotal)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0));
 assert.match(lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADIO-011').quoteEvidence.locator,/\/ APF \//);
 const lotModel=W.deriveBidWorkspace(radioLots,tokens,radioLotDate);
+const previousAeroModel=W.deriveBidWorkspace(previousAero,tokens,radioLotDate);
+assert.deepEqual(lotModel.lines.map(l=>[l.id,l.provisionalCostNative,l.provisionalCustomerUSD,l.customerUSD]),
+ previousAeroModel.lines.map(l=>[l.id,l.provisionalCostNative,l.provisionalCustomerUSD,l.customerUSD]),'Only the draft unit changes');
+assert.equal(lotModel.lines.find(l=>l.id===aeroFixed.id).unit,'SET');
 const lotOwners=lotModel.lines.filter(l=>l.selected&&radioSelection.mgwRadioDtrsOffer0550(l.offer));
 const pricedRadio=lotOwners.filter(l=>l.offer.quoteEvidence.classification==='RATE'&&Number.isFinite(l.offer.unitCost));
 for(const line of pricedRadio){
@@ -504,6 +519,7 @@ assert.equal(bySn('1.1.13').amount,2624.16);
 assert.equal(bySn('1.1.12').quantity,700);
 assert.equal(bySn('1.1.12').quotedComponents[0].quantity,1);
 assert.equal(bySn('1.1.4').quotedComponents.find(c=>c.offer.id.endsWith('RADIO-012')).unitPrice,null);
+assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
 // The Appendix 1.1 gap budget must reach C1 once without repricing the quote.
 {
  const {prepareRadioAppendix11Budget0550,radioAppendix11Estimate0550}=require(root+'/project0550/data/radioAppendix11Budget0550');

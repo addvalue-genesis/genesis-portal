@@ -52,3 +52,18 @@ and the Supplier details dialog. The brand and model come from the parent
 quoted item. The included components retain their own part numbers when
 stated. The MGW pricing and Vendor Register validators check the display and
 the existing quote and Working price basis.
+
+## 14 November — Working Draft unit for RADIO-012
+
+Working A1-09 uses one `SET` for the fixed Jotron TR-910 with the six
+components under Comprising. MGW Q26-063 PDF page 11 item 4 keeps its
+original quantity 1 and its blank quoted unit (`Not stated` in GENESIS).
+The owner and Offer ID retain the USD 14,680 extension. MR Appendix 1.1
+APF item 4 and the C1 system row use one `Lot` for the complete system.
+
+The draft unit migration applies to the existing generated owner and newly
+prepared workspaces. The source register receipt and quoted evidence keep
+their original values, and the supplier-unit review remains open. MGW
+pricing and Vendor Register validators passed. The legacy C1 HTML hash
+check fails identically on the parent commit and this change. The MGW
+validator verifies the C1 system unit and the draft totals directly.

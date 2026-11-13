@@ -1,6 +1,7 @@
 import React,{useState} from 'react';
 import {mgwDetailGroupBasis0550} from './data/mgwDetailPricing0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550} from './data/mgwVendorBasis0550';
+import {MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550,mgwAeroFixedDraftUnit0550} from './data/mgwQuoteSelection0550';
 import {amount} from './BidControls';
 
 export function WorkingLineSource0550({data,line,onNavigate}){
@@ -46,11 +47,13 @@ export function WorkingRequirementTrace0550({requirements=[],onNavigate}){
 export function WorkingQuoteBasis0550({data,line,projection,onNavigate}){
  const sources=[...projection.quotes.values()];
  const offer=data.offers.find(o=>o.id===line.offerId);
+ const draftUnit=mgwAeroFixedDraftUnit0550(offer);
  const used=sources.filter(q=>q.owners.some(u=>u.line.id===line.id)||offer&&q.allEntries.some(e=>e.offer.id===offer.id||e.offer.quoteEvidence?.workingReferenceOfferIds?.includes(offer.id)));
  const others=offer?sources.filter(q=>!used.includes(q)&&q.systems.includes(line.systemToken)&&q.allEntries.some(e=>e.offer.vendorId===offer.vendorId)):[];
  if(!offer&&!used.length)return null;
  return <div className="p55-working-quote-basis" data-working-quote-basis={line.id}>
   {offer&&<small>Offer ที่ผูก: {offer.quoteRef||'เลขที่ OPEN'} · Revision {offer.quoteEvidence?.revision||'ไม่ระบุ'}<button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+offer.id)}>ตรวจ Offer ที่ผูก</button></small>}
+  {draftUnit===line.unit&&<small>{MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550}</small>}
   {used.map(q=><small key={q.key}>ต้นฉบับที่เชื่อม: {q.title}{q.revision?' · Revision '+q.revision:''} · {q.fileName||'ดูทะเบียนต้นฉบับ'}</small>)}
   {others.length>0&&<details><summary>ใบอื่นของผู้ขายในระบบเดียวกัน · {others.length} ใบ · ยังไม่ใช้ในแถวนี้</summary><p>ต้องเทียบขอบเขตและฉบับก่อนเปลี่ยนราคา ใบอื่นอาจเป็นทางเลือกหรือขอบเขตต่างกัน</p>{others.map(q=>{
    const target=q.allEntries.find(e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE')||q.allEntries[0];

@@ -6,7 +6,7 @@ import {prepareVersedLanRacks0550} from './versedRack0550';
 import {parseRadioLotComponents0550,radioLotSourceText0550} from './radioLotComponents0550';
 import {
  MGW_APF_RG59_OVERLAP_0550, MGW_BASIS_REVIEW_0550, MGW_CURRENT_BATCHES_0550, MGW_RADIO_001_SITE_NOTE_0550, MGW_RADIO_002_SITE_NOTE_0550, MGW_RADIO_003_SITE_NOTE_0550, MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_QUOTED_SCOPE_0550, MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, MGW_SUPERSEDED_0550,
- apfLan10PatchPanelDraft0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
+ apfLan10PatchPanelDraft0550, mgwAeroFixedDraftUnit0550, mgwBulkMr0550, mgwCurrentDirectMr0550, mgwCurrentIncluded0550, mgwCurrentItemKey0550, mgwCurrentMr0550, mgwCurrentOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwRadioDtrsOffer0550, mgwRadioSourceRow0550, mgwSupplementOffer0550,
 } from './mgwQuoteSelection0550';
 
 const applied = batchId=>'Current Working prepared / '+batchId;
@@ -118,12 +118,25 @@ export function prepareMgwRadioDtrsRegister0550(data,systems,today){
  return radioRegisterBatches.reduce((current,batch)=>prepareRadioRegister0550(current,systems,today,batch),data);
 }
 
+function prepareAeroFixedDraftUnit0550(data){
+ const offer=data.offers.find(o=>o.id===MGW_RADIO_DTRS_0550.prefix+'RADIO-012');
+ const unit=mgwAeroFixedDraftUnit0550(offer);
+ if(!unit||!['U',unit].includes(offer.unit))return data;
+ if(offer.unit==='U'&&data.lines.some(line=>line.offerId===offer.id&&line.officialReview))return data;
+ const offers=offer.unit===unit?data.offers:data.offers.map(o=>o===offer?{...o,unit}:o);
+ const id='LINE-MGW-CURRENT-RADIO-012';
+ const lines=data.lines.map(line=>line.id===id&&line.scopeKey===id&&line.offerId===offer.id&&line.wbs==='A'&&
+  line.unit==='U'&&line.quantity===1&&!line.officialReview?{...line,unit}:line);
+ return offers!==data.offers||lines.some((line,i)=>line!==data.lines[i])?{...data,offers,lines}:data;
+}
+
 export function prepareMgwCurrentWorking0550(data,policies,today){
  const receipt=data.mgwDetailPricingImport;
  if(!receipt||today<'2026-11-07')return data;
  const decision=receipt.decision?.includes(MGW_SUPERSEDED_0550)?receipt.decision:
   [receipt.decision,MGW_SUPERSEDED_0550].filter(Boolean).join('\n');
  let next=decision===receipt.decision?data:{...data,mgwDetailPricingImport:{...receipt,decision}};
+ next=prepareAeroFixedDraftUnit0550(next);
  const retired=next.lines.map(line=>line.selected&&mgwHistoricalLine0550(next,line)?{...line,selected:false}:line);
  if(retired.some((line,i)=>line!==next.lines[i]))next={...next,lines:retired};
  const patchPanel=next.offers.find(apfLan10PatchPanelDraft0550),patchDraft=apfLan10PatchPanelDraft0550(patchPanel);

@@ -237,6 +237,13 @@ const radioSourceByOfferId=new Map(quote.rows.filter(row=>row.section==='RADIO')
 ]));
 export const mgwRadioSourceRow0550=offer=>mgwRadioDtrsOffer0550(offer)?radioSourceByOfferId.get(offer.id):undefined;
 export const mgwRadioSourceModel0550=row=>row?.detail?.match(/^Description:[ \t]*(?:\r?\n[ \t]*)?([^\r\n]+)/i)?.[1].trim();
+export function mgwAeroFixedDraftUnit0550(offer){
+ const row=mgwRadioSourceRow0550(offer);
+ if(row?.id==='MGW-Q26-063-RADIO-012'&&row.unit===null&&offer.quoteEvidence.quotedUnit==='Not stated'&&
+  offer.quoteEvidence.quotedQuantity===1&&!offer.unitBasis?.trim())return 'SET';
+ return null;
+}
+export const MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550='Working Draft · 1 SET = Jotron TR-910 พร้อมอุปกรณ์ตาม Comprising · ใบ MGW ไม่ระบุหน่วย';
 export function mgwRadioPrintedExtension0550(offer,line){
  const row=mgwRadioSourceRow0550(offer),e=offer?.quoteEvidence;
  return Boolean(row&&e.classification==='RATE'&&row.unit===null&&e.quotedUnit==='Not stated'&&
