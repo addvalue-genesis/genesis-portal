@@ -1,3 +1,5 @@
+Latest inspection estimate. [A1 S/N 2 and 11.D](20261113_A1_INSPECTION_BUDGET.md) use the same B4 Working owners for FAT/iFAT across 19 systems.
+
 Latest C8 form: [purchaser call-off total](20261113_C8_SINGLE_FORM.md). The customer draft shows one form and one total from the complete Working basis. SI diagnostics retain the supporting rows.
 
 Latest CCTV estimate: [Goods Only / EXW budget](20261113_CCTV_EXW_BUDGET.md). The estimate prices OEM SAT travel, APF/ACP recording, VMS entitlements and the Yangon-to-site responsibility scenario. The Excel and Git checkpoint record the draft calculation.

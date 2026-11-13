@@ -33,6 +33,7 @@ import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550"
 import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
 import {prepareMgwCctvEntBudget0550} from "./data/mgwCctvEntBudget0550";
+import {prepareInspectionBudget0550} from "./data/inspectionBudget0550";
 import {prepareVersedDmrCabinet0550} from "./data/versedRack0550";
 import {fetchC8Calloff0550,readC8CalloffFile0550} from "./data/c8Calloff0550";
 import {prepareC8Calloff0550} from "./data/bidVolumes0550";
@@ -47,7 +48,8 @@ function prepareQuotation0550(data,today){
  const radioBudget=prepareRadioAppendix11Budget0550(based,COMMERCIAL_POLICY,today,replaceGeneratedDtrsHandheld0550);
  const priced=prepareBidCompletion0550(radioBudget,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(radioBudget,systemTokens0550,today)},today);
  const pbxBudget=prepareChevalierPbxBudget0550(applyCommercialSellPolicies0550(priced),COMMERCIAL_POLICY,today);
- const working=prepareFocLayBudget0550(prepareMgwCctvEntBudget0550(pbxBudget,COMMERCIAL_POLICY,today),COMMERCIAL_POLICY,today,retireGeneratedFocInstallation0550);
+ const focBudget=prepareFocLayBudget0550(prepareMgwCctvEntBudget0550(pbxBudget,COMMERCIAL_POLICY,today),COMMERCIAL_POLICY,today,retireGeneratedFocInstallation0550);
+ const working=prepareInspectionBudget0550(focBudget,COMMERCIAL_POLICY,CORE_TEAM,today);
  return preparePagaMobWorking0550(preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today));
 }
 export const useBidWorkspace=()=>useContext(Context);

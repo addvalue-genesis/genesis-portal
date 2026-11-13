@@ -4,6 +4,7 @@ import {importMrWorkingBasis0550} from "./mrWorkingBasis0550";
 // existing protected team rates. These are planning quantities, not a schedule,
 // OEM quotation, verified takeoff, accepted engineering or internal labour cost.
 export const TSI_ACTIVITY_BUDGET_VERSION_0550="0550-tsi-activity-budget-20261101-1";
+export const TSI_INTERNAL_COST_THB_PER_HOUR_0550={PM:875,CHIEF:750,SENIOR:600,TECH:500,SUPPORT:562.5,DOC:400,ADMIN:250};
 export const TSI_DESIGN_WORKLOAD_0550=[
  ["TEL-LAN",120],["TEL-LAN-VCS",16],["TEL-VSAT",32],["TEL-VSAT-KU",16],
  ["TEL-PABX",40],["TEL-IPP",24],["TEL-PAGA",80],["TEL-CCTV",80],

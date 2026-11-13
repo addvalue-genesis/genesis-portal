@@ -7,7 +7,7 @@ import {applyGoodsSellBasis0550,EXTERNAL_ENGINEERING_FORMULA_0550,EXTERNAL_ENGIN
  LEGACY_SERVICE_FORMULA_0550,matchesLegacyGoodsBasis0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
-import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
+import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550,TSI_INTERNAL_COST_THB_PER_HOUR_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
 import {lanStockBasis0550} from './lanStockBasis0550';
 import {evaluateServiceEquation} from '../serviceEquationRuntime';
@@ -718,12 +718,11 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(team&&data.repositoryBasisImport.tsiActivityBudget){
   const labourExpected=prepareTsiActivityBudget0550({projectId:data.projectId,repositoryBasisImport:{},lines:clone(defaults),calculations:[]},policies,team,data.repositoryBasisImport.tsiActivityBudget.preparedOn);
   const expected=prepareTsiExpenseBudget0550(labourExpected,policies,team,data.repositoryBasisImport.tsiActivityBudget.preparedOn);
-  const costMH={PM:875,CHIEF:750,SENIOR:600,TECH:500,SUPPORT:562.5,DOC:400,ADMIN:250};
   for(const plan of [...TSI_ACTIVITY_PLAN_0550,{lineId:"REQ-MR-ACT-B4-D07",role:"TECH"}]){
    const id=plan.lineId||'REQ-MR-ACT-'+plan.key,n=at(id),base=expected.lines.find(l=>l.id===id);
    const calculation=data.calculations.find(c=>c.id===base?.calculationId),expectedCalc=expected.calculations.find(c=>c.id===base?.calculationId);
    if(n<0||!base||!same(lines[n],base)||!same(calculation,expectedCalc))continue;
-   const thbRate=costMH[plan.role]*(base.unit==='MD'?8:1),rate=thbRate/data.fx.thbPerUSD;
+   const thbRate=TSI_INTERNAL_COST_THB_PER_HOUR_0550[plan.role]*(base.unit==='MD'?8:1),rate=thbRate/data.fx.thbPerUSD;
    lines[n]={...lines[n],manualCost:rate,sourceRef:base.sourceRef+'\nINTERNAL COST ESTIMATE / '+today+': planning '+thbRate+' THB/'+base.unit+' ÷ saved THB/USD '+data.fx.thbPerUSD+'; '+plan.role+' workload cost assumption, not a payroll/subcontract quote. Protected selling rate unchanged.'};
    rows.push({lineId:id,kind:'COST_ESTIMATE',basis:'Explicit internal labour planning cost '+thbRate+' THB/'+base.unit+' at saved FX; selling inputs unchanged. Cost grade '+plan.role+'.',offerIds:[],ownerIds:[]});
   }
