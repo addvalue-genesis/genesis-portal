@@ -1,4 +1,5 @@
-import {mgwCurrentOffer0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {mgwCurrentOffer0550,mgwRadioDtrsOffer0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {radioLotIncludedLines0550} from "./radioLotComponents0550";
 import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {workingOffers0550} from './workingOffers0550';
@@ -77,7 +78,8 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
   if(!Number.isFinite(q.quantity)||q.quantity<=0)problems.push("QUANTITY_OPEN");
   if(!detail||!(detail.estimatedWeightKg>0)||!detail.dimensions.trim()||!detail.basis.trim()||!detail.sourceIds.length)problems.push("WEIGHT_DIMENSIONS_EVIDENCE_OPEN");
   if(detail?.sourceIds.some(id=>!sources.some(s=>s.id===id&&s.readState!=="METADATA_ONLY"&&!["HISTORICAL","REPLACED_COPY","UNCONFIRMED"].includes(s.authority))||sources.some(s=>s.replaces?.includes(id))))problems.push("EQUIPMENT_SOURCE_UNREAD_OR_MISSING");
-  return {id:l.id,systemToken:l.systemToken,description:l.description,brand:l.brand||q.offer?.brand||"",quantity:q.quantity,unit:q.unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,problems};
+  const lotContents=mgwRadioDtrsOffer0550(q.offer)?radioLotIncludedLines0550(q.offer,q.quantity):[];
+  return {id:l.id,systemToken:l.systemToken,description:l.description,brand:l.brand||q.offer?.brand||"",quantity:q.quantity,unit:q.unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,lotContents,problems};
  });
  const records=systemRows.flatMap(s=>TECHNICAL_SECTIONS_0550.map(section=>{
   const r=p.records.find(r=>r.systemToken===s.token&&r.sectionId===section.id)||blankTechnicalRecord0550(section.id,s.token),problems=[];

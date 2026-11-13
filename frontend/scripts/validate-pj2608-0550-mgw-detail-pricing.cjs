@@ -403,6 +403,10 @@ const radio002=lotOffers.find(o=>radioSelection.mgwCurrentItemKey0550(o)==='RADI
 const radio002Lines=require(root+'/project0550/data/radioLotComponents0550.js').radioLotIncludedLines0550(radio002,radio002.quoteEvidence.quotedQuantity);
 const radio002Fixed=radio002Lines.find(l=>l.description.includes('VHF-FM Marine Radio Fixed'));
 assert.equal(radio002.quoteEvidence.quotedQuantity,2);assert.equal(radio002Fixed.quantity,4);assert.equal(radio002Fixed.amount,null);
+const dossier=require(root+'/project0550/data/technicalDossier0550.js').technicalDossier0550(radioLots,{integration:{requirements:[],proofs:[],activities:[],deviations:[]}},{records:[],equipment:[]},'TEL-RADIO-DTRS','equipment');
+const radioNarrative=dossier.tables.find(t=>t.title.startsWith('Radio lot contents'));
+assert(radioNarrative.rows.some(r=>r[2].includes('G26642')&&r[3].includes('Included in lot')));
+assert(radioNarrative.rows.every(r=>!/USD|THB|\$/.test(r.join(' '))));
 assert(radio002Lines.filter(l=>!l.included).every(l=>l.note.startsWith('Remark')&&l.amount==null));
 for(const row of lotC1.rows.filter(r=>r.priceOwners?.length)){
  const ownerSum=row.priceOwners.reduce((n,b)=>n+(Number.isFinite(b.amount)?b.amount:0),0);
