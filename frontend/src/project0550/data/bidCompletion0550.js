@@ -196,6 +196,15 @@ export function replaceGeneratedDtrsHandheld0550(data,previous,next){
  return {...data,lines:data.lines.map(line=>line===previous?next:line),
   repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...completion,rows:completion.rows.filter(row=>row!==entry)}}};
 }
+export function retireGeneratedFocInstallation0550(data,line){
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ const entry=receipt?.rows.find(row=>row.lineId===line.id&&row.kind==='ESTIMATE');
+ if(line.id!=='REQ-MR-ACT-C1-D03'||!entry?.basis.startsWith('FO installation OPTION:3 route campaigns')||
+  entry.inputKey!==lineKey(data,line)||line.officialReview||
+  data.bidVolumes?.bindings.some(b=>b.lineId===line.id))return null;
+ return {...data,repositoryBasisImport:{...data.repositoryBasisImport,
+  bidCompletion:{...receipt,rows:receipt.rows.filter(row=>row!==entry)}}};
+}
 const cusPriceIds = new Set([...TOWER_SUPPLY_ROWS.map(([id])=>id), MICROWAVE_ALLOWANCE, DTRS_ALLOWANCE]);
 const lanLegacyAp='C9105AXI-H',lanController='9800-L-C-K9';
 const lanC2PartNumbers=['C9200-48P-A',lanController];

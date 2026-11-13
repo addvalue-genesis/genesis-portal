@@ -90,6 +90,56 @@ try{
  assert.equal(focApp.systems[0].sites[0].knownAmount,focApp.draftSubtotal);
  assert.equal(C1.c1AppendixTable0550(focView).rows.find(row=>row[1]==='APPENDIX 1.8 — SUBTOTAL')[5],focApp.draftSubtotal);
  assert.equal(focView.ready,false);
+ const lay=require(root+'/project0550/data/focLayBudget0550.js');
+ const repository=require(root+'/project0550/data/repositoryBidBasis0550.js');
+ const apl01=offer(Q.MGW_BULK_0550,'4-01',2800,'m',6);
+ const revisedSource=load(load(focSeed,Q.MGW_BULK_0550,[bulk,held,apl01]),panelSource,panels);
+ const revisedSeed=repository.prepareRepositoryBidBasis0550({
+  ...revisedSource,sourceIntake:{...base.sourceIntake,sources:[{...base.sourceIntake.sources[0],
+   documentNo:'MM-ASK-1A-APF-TEL-MR-0001',revision:'B1',authority:'CURRENT_TENDER'}]},
+  fx:{...revisedSource.fx,thbPerUSD:31.5,source:'Synthetic FX',date:focDate},
+ },{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE},focDate);
+ const originalFoc=require(root+'/project0550/data/mgwCurrentWorking0550.js').prepareMgwCurrentWorking0550(revisedSeed,D.COMMERCIAL_POLICY,focDate);
+ const revised=lay.prepareFocLayBudget0550(originalFoc,D.COMMERCIAL_POLICY,focDate);
+ validate(revised);
+ const id='REQ-MR-B1-18-FOC-WITH-PIPELINE-01',option='REQ-MR-ACT-C1-D03';
+ const lineById=(data,id)=>data.lines.find(row=>row.id===id);
+ assert.equal(lineById(revised,id).quantity,5600);
+ assert.equal(revised.offers.find(o=>o.id===apl01.id).quoteEvidence.quotedQuantity,2800);
+ assert.equal(lineById(revised,option).manualCost,186050);
+ assert.equal(lineById(revised,'REQ-MR-B1-18-APF-18').offerId,held.id);
+ assert.equal(revised.lines.filter(l=>l.offerId===apl01.id&&l.selected).length,1);
+ const revisedModel=W.deriveBidWorkspace(revised,tokens,focDate);
+ const revisedView=releaseScheduleDraftView0550(revised,revisedModel,D.SYSTEMS,focDate);
+ assert.equal(revisedView.scheduleRows('A2').find(b=>b.lineId===option).amount,245586);
+ assert.equal(revisedView.scheduleRows('C2').find(b=>b.line.systemToken==='TEL-FO').amount,5016);
+ const revisedC1=revisedView.scheduleRows('C1').find(b=>b.lineId===id);
+ assert.equal(revisedC1.amount,44352,JSON.stringify(revisedModel.lines.find(l=>l.id===id).problems));
+ assert.equal(C1.deriveC1Appendix0550(revisedView).groups.find(g=>g.id==='1.8').rows.find(r=>r.key===id.slice(4)).amount,44352);
+ assert.equal(revisedView.ready,false);
+ assert.deepEqual(revised.offers,originalFoc.offers);
+ assert.equal(lay.prepareFocLayBudget0550(revised,D.COMMERCIAL_POLICY,focDate),revised);
+ const previousBinding=V.saveBidVolumeRecord0550(originalFoc,'bindings',{
+  ...V.blankScheduleBinding0550(id),basis:'SI DRAFT / Equipment → Exhibit C C1',sourceIds:['CUSTOMER'],
+ },focDate);
+ const registered={...previousBinding,repositoryBasisImport:{...previousBinding.repositoryBasisImport,pricedVolumeDraftIds:[id]}};
+ const rebased=lay.prepareFocLayBudget0550(registered,D.COMMERCIAL_POLICY,focDate);
+ assert.equal(lineById(rebased,id).quantity,5600);
+ assert.deepEqual(rebased.bidVolumes.bindings.find(b=>b.lineId===id),previousBinding.bidVolumes.bindings[0]);
+ const removedBinding={...registered,bidVolumes:{...registered.bidVolumes,bindings:[]}};
+ assert.equal(lineById(lay.prepareFocLayBudget0550(removedBinding,D.COMMERCIAL_POLICY,focDate),id).quantity,2800);
+ const authored=structuredClone(originalFoc);
+ lineById(authored,id).quantity=2900;
+ lineById(authored,option).manualCost=12345;
+ const preserved=lay.prepareFocLayBudget0550(authored,D.COMMERCIAL_POLICY,focDate);
+ assert.equal(lineById(preserved,id).quantity,2900);
+ assert.equal(lineById(preserved,option).manualCost,12345);
+ const deleted={...revised,lines:revised.lines.filter(l=>l.id!==id)};
+ assert.equal(lineById(lay.prepareFocLayBudget0550(deleted,D.COMMERCIAL_POLICY,focDate),id),undefined);
+ const c8Reference=lay.focLayBudgetShared0550(revised).find(r=>r.schedule==='C8');
+ assert.equal(c8Reference.cost,null);
+ assert.equal(revisedView.scheduleRows('C8').length,0);
+ console.log('PASS FOC/BULK LAY budget: unique MR owners, preserved source quantities and edits, Draft A2/C2/C1 and shared C8.');
  const committed=P.saveScheduleAllocationDrafts0550(categories,cv.allocationPlan,today);
  const c2Draft=releaseScheduleDraftView0550(committed,derive(committed),D.SYSTEMS,today);
  const [c2Row]=c2Draft.scheduleRows('C2');

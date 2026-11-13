@@ -1,0 +1,51 @@
+{
+  "basis": "FOC/BULK WBS Rev.01 / Bid Budget and LAY Takeoff",
+  "materials": [
+    ["APF-03", 1200, "m", 2.5, "APF building LAY; 12 work areas × 100 m of indoor OS2"],
+    ["APF-04", 1100, "m", 3.1, "APF LAY-0010 C4; local HDPE outside the pipeline corridor"],
+    ["APF-08", 6, "SET", 850, "APF LAY-0010 C4; provisional local pit material"],
+    ["APF-10", 850, "m", 5, "MGW BULK 1.10 quantity; SI rate pending vendor inclusion"],
+    ["APF-21", 1, "Lot", 3800, "Project-wide additional patching and cable management. Excludes quoted 24-port panel kit components"],
+    ["ACP-02", 300, "m", 2.5, "ACP LAY-0001–0004; 3 building work areas × 100 m"],
+    ["ACP-03", 300, "m", 3.1, "ACP LAY-0003 C1; local HDPE"],
+    ["ACP-07", 3, "SET", 850, "ACP LAY-0003 C1; provisional local pit material"],
+    ["ACP-09", 60, "m", 5, "MGW BULK 2.9 quantity; SI rate pending vendor inclusion"],
+    ["ABV01-02", 100, "m", 2.5, "ABV01 LAY-0001 C1 sheet 4; E&I indoor allowance"],
+    ["ABV01-03", 100, "m", 3.1, "ABV01 LAY-0001 C1; local HDPE"],
+    ["ABV01-07", 1, "SET", 850, "ABV01 LAY-0001 C1 sheet 3; local FO manhole material"],
+    ["AMS01-01", 110, "m", "ABV01-01", "MR App.1.8 p28; MGW ABV01 3.1 comparable rate"],
+    ["AMS01-02", 100, "m", 2.5, "AMS01 E&I indoor allowance based on PHI; TQ-028 drawings pending"],
+    ["AMS01-03", 100, "m", 3.1, "AMS01 local HDPE allowance based on PHI"],
+    ["AMS01-05", 12, "SET", 400, "Shared allowance for local closures and remote FODP tie-ins, including MOGE. Excludes the MGW panel kits"],
+    ["AMS01-07", 1, "SET", 850, "AMS01 local pit allowance based on PHI"],
+    ["AMS01-08", 130, "m", "ABV01-08", "MR App.1.8 p28; MGW ABV01 3.8 comparable rate"],
+    ["AMS01-09", 30, "m", "ABV01-09", "MR App.1.8 p28; MGW ABV01 3.9 comparable rate"],
+    ["AMS01-10", 60, "m", "ABV01-10", "MR App.1.8 p28; MGW ABV01 3.10 comparable rate, LAN owner"],
+    ["AMS01-11", 20, "m", "ABV01-11", "MR App.1.8 p28; MGW ABV01 3.11 comparable rate, LAN owner"],
+    ["FOC-WITH-PIPELINE-04", 45990, "m", 2.9, "APL01–03 PHI; 43,800 duct m × 1.05; shared APL02 trunk counted once"],
+    ["FOC-WITH-PIPELINE-06", 24, "SET", 420, "Provisional drum segmentation, branch and interface closure kits"],
+    ["FOC-WITH-PIPELINE-07", 1, "Lot", 9800, "Shared cable entry, earthing, route markers and glands; excludes MGW panel-kit contents"],
+    ["FOC-WITH-PIPELINE-08", 17, "SET", 1250, "Provisional material only; 2 APL01 + 12 APL02 + 3 APL03"]
+  ],
+  "pipelineInstallation": [
+    [22000, 4.5, "Duct laying and civil handling per route metre, in available trench"],
+    [44000, 1.35, "Cable blowing per cable metre"],
+    [17, 950, "Chamber excavation / installation per chamber"],
+    [1, 11500, "Physical-work mobilisation and setup"]
+  ],
+  "shared": [
+    ["A1", "FO detail engineering and SDRL", "USD", 11123.81, ["B1-D02", "B1-D03", "B1-D04"], "Rev.01: route, loss, splice plan and 80 h of documentation. Check current project SDRL allocation before posting any gap."],
+    ["A1", "Preservation, packing and CIF Yangon freight", "USD", 31500, ["B2-D01", "B2-D02", "B2-D03"], "FO-specific planning split. Check project freight and origin charges for inclusion."],
+    ["A2", "Local building cable pulling", "USD", 28500, ["C1-D02"], "Rev.01 allowance; reconcile the existing shared site installation option."],
+    ["C3", "Two-year FOC operating stock", "USD", 8750, ["C3-D02", "C3-D03"], "Reconcile against the existing operating-spares pools and approved stock."],
+    ["C4", "24C capital restoration drum", "USD", 12000, ["C2-D03"], "Rev.01 uses one 2,000 m drum; reconcile the non-microwave capital-spare owner."],
+    ["C5", "Hand-over FO and copper tools", "USD", 14500, ["B6-D01", "B6-D03"], "Check the existing project tool register and distinguish temporary test gear."],
+    ["C6", "Cleaning and test consumables", "USD", 1900, ["B4-D04", "B4-D05"], "Base site-service provision; reconcile in C7. Passive FOC has no first-fill lubricant allowance."],
+    ["C7", "FO specialist field work", "USD", 228715, ["B7-D01", "B4-D03", "B4-D04", "B4-D05", "B4-D07", "B4-D08"], "7 MOB, 216 paid MD and 1,640 site MH including Early Buildings. Check shared trips and specialist effort."],
+    ["C7", "TEL-FO training allocation", "THB", 336039.54, ["B3-D01", "B3-D02", "B3-D03"], "Current project Training Budget C7 TEL-FO row, Library version 1. Reconcile OEM iFAT, FAT training and OJT before allocation."],
+    ["C8", "Purchaser witness facilities and transport", "", null, [], "Project C8 Rev.03 call-off rates and attendance. Use the existing C8 owners once."],
+    ["D", "FAT / iFAT, TPI and witness coordination", "USD", 12600, ["B4-D01", "B4-D02"], "Check TPI, supplier FAT and shared witness scope against the approved ITP."],
+    ["E", "Export/import documentation and agent fees", "USD", 4200, ["B8-D03", "B8-D05"], "Reconcile project logistics owner, duties and importer of record."],
+    ["F", "FO cargo premium provision", "USD", 4027.07, ["B2-D04"], "Rev.01 uses 0.5% of 110% of material and freight. Project policy owner governs the bid total."]
+  ]
+}
