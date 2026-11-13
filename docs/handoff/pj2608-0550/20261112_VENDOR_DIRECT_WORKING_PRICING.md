@@ -100,3 +100,30 @@ protection. Working Schedules, C1 Appendix, Vendor Register and
 Native Exhibit validators passed. Chromium was blocked at process
 startup by the execution environment. The user's Windows workspace
 and its saved Vendor register were unavailable for inspection.
+
+
+## 13 November · Appendix 1.4 supplier cost detail
+
+The Working Preview in 11.C1 displays a supplier-cost disclosure directly below
+the PAGA package. It reads the original Offer items, quantity, unit rate, line
+amount, discount treatment, source page and printed package totals from 07.2.
+Original costs are shown in EUR alongside the USD/THB selling-price view.
+When Working still uses an older revision, the disclosure identifies its selling
+basis and shows the latest registered revision separately. It links to the
+existing A1-05 Working line for changing the selected Offer. When the latest
+revision is already selected, its details appear once. Expanded MR rows for -005
+also show original quote-item costs and quantities where there is a candidate
+match. The quantities retain their quotation basis.
+
+ADR-0550-001 principles 2, 3, 5, 6 and 8–12 apply. All cost details are internal
+screen projections. The selected package contributes a single selling amount.
+The screen's document mode, printing and the native customer exports omit
+supplier costs and source links. No private supplier prices were added to Git.
+
+Verified with the original -002 and -005 Vendor registers and ALIE R2: the -005
+disclosure renders all 43 original quote items, including the two unpriced
+options. The -002 selection still displays the -005 quote alongside the
+selected basis, and customer HTML, Word and XLSX exclude the internal figures
+and links. C1 Appendix, supplier revision, Working Schedules, continuity
+checks and the production portal build passed. The owner's Windows view has
+yet to be verified after applying this change.

@@ -385,15 +385,22 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const directRadio=radio&&view.workingPreview;
   const pbx=b.lineId===CHEVALIER_PBX_SUPPLY_0550&&b.line.pbxProducts?.length;
   const sharedRadio=directRadio&&mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1;
+  const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
+  const pagaCost=paga?{lineId:b.lineId,selected:{offer:b.line.offer,items:context.pagaItems||[]},
+   candidate:context.pagaCandidateQuote}:null;
   // A draft Working row without a price or MR link is an internal mapping task,
   // not an additional customer supply package. Keep its canonical owner intact.
   if(!legacy&&!targets.length&&!usdPriced){pendingOwners.push(b);problems.push('C1_UNMAPPED_WORKING_OWNER / '+b.lineId);continue;}
-  if(targets.length===1&&!pbx){const target=targets[0];target.priceOwners=(target.priceOwners||[]).concat(b);continue;}
+  if(targets.length===1&&!pbx){
+   const target=targets[0];
+   target.priceOwners=(target.priceOwners||[]).concat(b);
+   if(pagaCost)target.pagaCost=pagaCost;
+   continue;
+  }
   const token=b.line.systemToken,section=directRadio?'1.1':targets[0]?.appendix||C1_APPENDICES_0550.find(s=>s.systems.includes(token))?.id||
    (!legacy?{ 'TEL-DMR':'1.5','TEL-TELT':'1.1','TEL-PAGA':'1.4' }[token]:undefined);
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
   const metOffer=!legacy&&view.workingPreview&&usdPriced&&token==='TEL-MET'&&mgwMetPackage(b.line.offer)?b.line.offer:null;
-  const paga=!legacy&&view.workingPreview&&pagaRevisionNet0550(b.line.offer);
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
   const itemDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
   const terms=(supplement||radio||lan)?b.line.offer.quoteEvidence.terms:[];
@@ -407,6 +414,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
+  if(pagaCost)item.pagaCost=pagaCost;
   if(pbx){
    const apfExPhone=!legacy&&targets.find(target=>target.key===apfExPhoneMr);
    for(const product of b.line.pbxProducts){

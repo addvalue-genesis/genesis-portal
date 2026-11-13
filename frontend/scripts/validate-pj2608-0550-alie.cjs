@@ -293,7 +293,8 @@ if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
  const {prepareBidProcess0550}=require(root+'/project0550/data/bidProcess0550.js');
  const {preparePagaRevisionPricing0550,pagaRevisionSelected0550}=require(root+'/project0550/data/supplierRevision0550.js');
  const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
- const {deriveC1Appendix0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550,c1AppendixHtml0550,c1AppendixWord0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {C1Appendix0550}=require(root+'/project0550/C1Appendix0550.jsx');
  const {PagaQuoteScope0550}=require(root+'/project0550/PagaQuoteScope0550.jsx');
  const tokens=SYSTEMS.map(s=>s.token),today='2026-11-13',baseline=D.DATA_LAYER_META.datasetId;
  const seed=importLegacyVendorBasis0550(emptyBidWorkspace(baseline),{
@@ -338,6 +339,39 @@ if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
  assert.equal(releaseNet.customerUSD,netAmount);
  assert.equal(c1.rows.find(r=>r.sn==='1.4.P1').amount,netAmount);
  assert.equal(c1.bindings.filter(r=>r.line.offerId===net.id).length,1);
+ const appendixView={...preview,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550};
+ const cost=c1.rows.find(r=>r.sn==='1.4.P1').pagaCost;
+ assert.equal(cost.selected.offer,net);
+ assert.equal(cost.candidate,null);
+ assert.equal(cost.selected.items.length,43);
+ assert.equal(cost.selected.items.filter(o=>o.supplierQuoteRow.classification==='BASE_PRICE').length,26);
+ const c1Screen=view=>renderToStaticMarkup(React.createElement(C1Appendix0550,{view,currency:'THB',onNavigate:()=>{}}));
+ const nativeNet=net.quoteEvidence.quotedTotal.toLocaleString('en-US',{minimumFractionDigits:2});
+ const screen=c1Screen(appendixView);
+ assert(screen.includes('ดูต้นทุนตามใบเสนอราคา INDUSTRONIC')&&screen.includes('EUR '+nativeNet));
+ assert.equal((screen.match(/data-paga-quote-item=/g)||[]).length,43);
+ assert(screen.includes(net.quoteEvidence.sourceUrl));
+ assert(screen.includes('data-paga-quote-item="23060"')&&screen.includes('At actual costs'));
+ for(const output of [c1AppendixHtml0550(appendixView),c1AppendixWord0550(appendixView),JSON.stringify(c1AppendixTable0550(appendixView))]){
+  assert(!output.includes(nativeNet)&&!output.includes('data-paga-quote-item')&&!output.includes(net.quoteEvidence.sourceUrl));
+ }
+ if(process.env.GENESIS_ALIE_TEST_PAGA002){
+  const prior=planVendorRegister0550(prepared,readPack(process.env.GENESIS_ALIE_TEST_PAGA002),tokens).workspace;
+  const priorNet=prior.offers.find(o=>o.quoteRef==='A20261632-002'&&o.supplierQuoteRow?.classification==='NET_PACKAGE');
+  const retained={...prior,lines:prior.lines.map(l=>l.id===owner.id?{...l,offerId:priorNet.id,description:'Saved '+priorNet.quoteRef}:l)};
+  assert.equal(preparePagaRevisionPricing0550(retained,today),retained);
+  const priorModel=deriveBidWorkspace(retained,tokens,today);
+  const priorSaved=deriveBidVolumes0550(retained,priorModel,SYSTEMS,today);
+  const priorPreview=deriveBidVolumeWorkingPreview0550(retained,priorModel,SYSTEMS,today,priorSaved);
+  const priorView={...priorPreview,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550};
+  const row=deriveC1Appendix0550(priorView).rows.find(r=>r.sn==='1.4.P1');
+  assert.equal(row.pagaCost.selected.offer,priorNet);
+  assert.equal(row.pagaCost.candidate.offer,net);
+  assert.equal(row.amount,priorModel.lines.find(l=>l.id===owner.id).provisionalCustomerUSD);
+  const priorScreen=c1Screen(priorView);
+  assert(priorScreen.includes('ราคาขายแถวด้านบนใช้ A20261632-002')&&priorScreen.includes('EUR '+nativeNet));
+  assert(!c1AppendixHtml0550(priorView).includes('A20261632-005'));
+ }
  const html=renderToStaticMarkup(React.createElement(PagaQuoteScope0550,{data:prepared,section:'C7'}));
  for(const role of ['Senior Telecom Engineer','Chief Telecom Technician']){
   const rate=D.CORE_TEAM.find(r=>r.role===role).protectedUsdDay;

@@ -13,6 +13,47 @@ import {versedLanRackOffer0550} from './data/versedRack0550';
 // package-price block first so an expanded Appendix still reveals its price.
 const screenSites=(sites,nativeOrder)=>nativeOrder?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
+function PagaQuoteCosts0550({quote}){
+ const {offer,items}=quote,evidence=offer.quoteEvidence,totals=evidence.commercialTotals;
+ const {quotedCurrency:currency,sourceUrl}=evidence;
+ const cost=value=>Number.isFinite(value)?currency+' '+c1Display0550(value):'—';
+ const itemStatus=item=>{
+  const row=item.supplierQuoteRow,source=item.quoteEvidence;
+  if(row.classification==='OPTION')return 'Option · '+(source.quotedTotalText||'แยกจากยอด NET');
+  if(row.classification==='INCLUDED_REFERENCE')return source.quotedTotalText||'รวมในแพ็กเกจ';
+  return row.discountable?'อยู่ในฐานส่วนลด':'ไม่มีส่วนลด';
+ };
+ return <div>
+  <p><strong>{offer.quoteRef}</strong>{sourceUrl&&<> · <a href={sourceUrl} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคา PDF</a></>}</p>
+  {items.length>0&&<table aria-label={'ต้นทุนตามใบเสนอราคา '+offer.quoteRef}>
+   <thead><tr><th>Item</th><th>รายการตามใบเสนอราคา</th><th>หน่วย</th><th>จำนวน</th><th>ต้นทุนต่อหน่วย</th><th>ยอดตามใบเสนอราคา</th><th>เงื่อนไข / หน้า PDF</th></tr></thead>
+   <tbody>{items.map(item=>{
+    const source=item.quoteEvidence;
+    return <tr key={item.id} data-paga-quote-item={item.supplierQuoteRow.itemCode}>
+     <td>{item.supplierQuoteRow.itemCode}</td><td>{item.description}</td><td>{source.quotedUnit}</td><td className="number">{source.quotedQuantity??'—'}</td>
+     <td className="number">{cost(source.quotedUnitCost)}</td><td className="number">{cost(source.quotedTotal)}</td><td>{itemStatus(item)} · {source.locator}</td>
+    </tr>;
+   })}</tbody>
+  </table>}
+  {!items.length&&<p>ยังไม่พบรายการย่อยของฉบับนี้ใน 07.2 Vendor Offers</p>}
+  {totals&&<p>ก่อนส่วนลด {cost(totals.gross)} · ฐานส่วนลด {cost(totals.discountable)} · ส่วนลด {totals.discountPercent}% ({cost(totals.discount)})</p>}
+  <p><strong>ต้นทุนสุทธิ NET {cost(evidence.quotedTotal)}</strong></p>
+ </div>;
+}
+
+function PagaPackageCosts0550({cost,onNavigate,disabled}){
+ const {selected,candidate,lineId}=cost;
+ return <tr className="c1-paga-cost"><td colSpan={7}><details>
+  <summary>ดูต้นทุนตามใบเสนอราคา INDUSTRONIC{candidate?' · '+candidate.offer.quoteRef:''}</summary>
+  <p>ราคาขายแถวด้านบนใช้ {selected.offer.quoteRef} ใน Working A1-05 คิดราคาแพ็กเกจ 1 Lot ครั้งเดียว</p>
+  {candidate&&<><p>{candidate.offer.quoteRef} อยู่ในทะเบียน Vendor และรอเลือกใช้ใน Working A1-05</p><PagaQuoteCosts0550 quote={candidate}/></>}
+  {candidate?<details><summary>ดูต้นทุนฉบับที่ใช้ใน Working · {selected.offer.quoteRef}</summary><PagaQuoteCosts0550 quote={selected}/></details>:<PagaQuoteCosts0550 quote={selected}/>}
+  {selected.offer.quoteRef!=='A20261632-005'&&candidate?.offer.quoteRef!=='A20261632-005'&&
+   <p>ถ้าต้องการใช้ A20261632-005 ให้ตรวจว่าใบเสนอราคาฉบับนี้โหลดเข้า 07.2 แล้ว</p>}
+  {onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.budget.working.line.'+lineId)}>เปิด Working A1-05</button>}
+ </details></td></tr>;
+}
+
 export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mrNavigationTarget}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
@@ -53,7 +94,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
  const button=(key,label,component=false)=>documentMode?(component?null:<span>{label}</span>):<button type="button" className={component?'p55-c1-item-toggle':'p55-c1-group-toggle'} aria-expanded={expanded(key,component)} aria-label={label} onClick={()=>toggle(key,component)}><span aria-hidden="true">{expanded(key,component)?'−':'+'}</span>{!component&&<span>{label}</span>}</button>;
  const traceIds=active?Array.from(new Set([...(active.ownerIds||[]),...(active.raws||[]).map(l=>l.id)])):[];
  return <section className="p55-c1-workspace" aria-label="C1 Appendix workspace">
-  <style>{c1AppendixCss0550}</style>
+  <style>{c1AppendixCss0550+'\n.c1-paga-cost{background:#f4f7f9}.c1-paga-cost summary{cursor:pointer;font-weight:600}@media print{.c1-paga-cost{display:none}}'}</style>
   <div className="p55-c1-screen-head"><span>PJ2608-0550 / 11 · Quotation / C1</span><span>SI-OUT / Schedule C1</span></div>
   <h3>C1 · ภาพรวมทั้ง 8 Appendix</h3>
   <div className="p55-c1-controls">
@@ -110,9 +151,12 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
           {!documentMode&&r.pagaReference&&<div>INDUSTRONIC {r.pagaReference.packageSn} · {r.pagaReference.offers.length?'Offer items '+r.pagaReference.offers.map(o=>o.supplierQuoteRow.itemCode).join(', ')+' · ตรวจจำนวนและ TAG รายไซต์':'รอตรวจรายการเทียบกับใบเสนอราคา'}</div>}
          </td>
         </tr>
-        {!documentMode&&expanded(r.key,true)&&r.pagaReference?.offers.map(o=><tr className="c1-component" key={o.id} data-c1-quoted-offer={o.id}>
+        {!documentMode&&r.pagaCost&&<PagaPackageCosts0550 cost={r.pagaCost} onNavigate={onNavigate} disabled={disabled}/>}
+        {!documentMode&&expanded(r.key,true)&&r.pagaReference?.offers.map(o=><tr className="c1-component c1-paga-cost" key={o.id} data-c1-quoted-offer={o.id}>
          <td>{o.supplierQuoteRow.itemCode}</td><td>{o.description}</td><td>{o.quoteEvidence.quotedUnit}</td><td className="number">{o.quoteEvidence.quotedQuantity??'—'}</td>
-         <td/><td/><td>จำนวนตามใบเสนอราคา · ราคาอยู่ที่ {r.pagaReference.packageSn}</td>
+         <td className="number">{o.quoteEvidence.quotedCurrency} {c1Display0550(o.quoteEvidence.quotedUnitCost)}</td>
+         <td className="number">{o.quoteEvidence.quotedCurrency} {c1Display0550(o.quoteEvidence.quotedTotal)}</td>
+         <td>ต้นทุนและจำนวนตามใบเสนอราคา · ยอดขายอยู่ที่ {r.pagaReference.packageSn}</td>
         </tr>)}
         {!documentMode&&expanded(r.key,true)&&r.quotedComponents?.map(c=><tr className="c1-component" key={c.offer.id} data-c1-quoted-offer={c.offer.id}>
          <td>{versedLanRackOffer0550(c.offer)?c.offer.quoteRef:mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>

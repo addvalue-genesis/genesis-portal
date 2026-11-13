@@ -1,3 +1,5 @@
+Latest PAGA display: [Appendix 1.4 supplier cost detail](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--appendix-14-supplier-cost-detail). The 11.C1 Working Preview shows original EUR costs directly below the PAGA package and identifies the revision selected in A1-05.
+
 Latest FOC and Cables update: [MGW Bulk Material and Fiber Patch Panels](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--mgw-foc-and-cables). Appendix 1.8 shows site subtotals and the priced Appendix subtotal. Vendor and Volume I use the same Working owners.
 
 Latest PAGA decision: [INDUSTRONIC supply and ID-IE / ADDVALUE service rates](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--paga-supply-and-service-rates). A1-05 and C1 use the selected package once. B4/C7 show the supplier rates and the existing ADDVALUE daily rates while workload is open.
