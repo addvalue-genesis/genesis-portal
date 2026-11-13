@@ -10,6 +10,7 @@ import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
 import {preparePagaRevisionPricing0550} from './data/supplierRevision0550';
 import {preparePagaIdieWorking0550} from './data/alieIntake0550';
+import {preparePagaMobWorking0550} from './data/pagaMobWorking0550';
 import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
@@ -44,7 +45,7 @@ function prepareQuotation0550(data,today){
  const priced=prepareBidCompletion0550(radioBudget,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(radioBudget,systemTokens0550,today)},today);
  const pbxBudget=prepareChevalierPbxBudget0550(applyCommercialSellPolicies0550(priced),COMMERCIAL_POLICY,today);
  const working=prepareMgwCctvEntBudget0550(pbxBudget,COMMERCIAL_POLICY,today);
- return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
+ return preparePagaMobWorking0550(preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today));
 }
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -147,7 +148,7 @@ export function BidWorkspaceProvider({children}){
    const sourced=transformed.offers===data.offers?transformed:prepareChevalierPbxBudget0550(
     prepareChevalierPbxWorking0550(transformed,COMMERCIAL_POLICY,reviewDate),COMMERCIAL_POLICY,reviewDate);
    const next=prepareSystemAvlDeviations0550(sourced,deriveIntegration0550(sourced,SYSTEMS,reviewDate));
-   setData(await saveProject0550Bid(next,data.revision,action));
+   setData(await saveProject0550Bid(preparePagaMobWorking0550(next),data.revision,action));
    setError("");
    return true;
   }catch(e){

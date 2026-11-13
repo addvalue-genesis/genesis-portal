@@ -1,7 +1,8 @@
 import React from 'react';
 import {latestPagaVendorPackage0550} from './data/vendorRegister0550';
-import {CORE_TEAM} from './data';
+import {COMMERCIAL_POLICY,CORE_TEAM} from './data';
 import {PAGA_IDIE_WORKING_0550} from './data/alieIntake0550';
+import {pagaMobWorking0550} from './data/pagaMobWorking0550';
 import {PAGA_REVISION_OPEN_0550,pagaRevisionCandidate0550,pagaRevisionSelected0550,pagaCommercialChanges0550,pagaIncludedScope0550,pagaIncludedServices0550,pagaIncludedKit0550,pagaTrainingOption0550,pagaTwoYearSpareEvidence0550} from './data/supplierRevision0550';
 
 const scopeNotes={
@@ -45,6 +46,8 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
  const terms=display.quoteEvidence.terms.filter(term=>/^(FCA|Advance payment|Validity|Lead time|Warranty|Freight pickup)/i.test(term));
  const changes=section==='commercial'?pagaCommercialChanges0550(data,received||display):[];
  const showServiceRates=['B','C7','D','release'].includes(section);
+ const mobilization=['B','C7','D','release','mapping','preview'].includes(section)?
+  pagaMobWorking0550(data,CORE_TEAM,COMMERCIAL_POLICY):null;
  const idie=showServiceRates?PAGA_IDIE_WORKING_0550.map(service=>({...service,
   offer:data.offers.find(o=>o.id===service.offerId),
   line:data.lines.find(l=>l.selected&&l.systemToken==='TEL-PAGA'&&l.wbs==='B4'&&l.offerId===service.offerId),
@@ -56,6 +59,7 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
   ['bid.working-preview.step.7','SI · WP.7'],
   ...(owner?[['bid.budget.working.line.'+owner.id,'Working A1-05'],['bid.quotation.line.'+owner.id,'11.M']]:[]),
  ];
+ if(section==='preview'&&!mobilization)return null;
  return <aside className="p55-panel" aria-label="PAGA current quote scope">
   <h4>PAGA · INDUSTRONIC {display.quoteRef} · {vendorView?'ใบเสนอราคาหลักในทะเบียน':net?'Working Draft':'Received'}</h4>
   {vendorView&&net&&net.id!==display.id&&<p>ฐานที่เลือกใน Working A1-05 · {net.quoteRef}</p>}
@@ -77,7 +81,25 @@ export function PagaQuoteScope0550({data,section,onNavigate,disabled=false}){
       <td>{formatRate(role.protectedUsdDay)} USD/MD · เรตขาย ADDVALUE</td><td>OPEN</td><td>06 Execution · CORE_TEAM</td></tr>)}
     </tbody>
    </table></div>
-   <p>ใช้เรต ADDVALUE จากระบบสำหรับทีมเตรียมงานและปฏิบัติงานหน้างาน กำหนดคน-วัน PAGA ตอนจัดแผนงานและตรวจยอดร่วมใน Working B4 ก่อนลงราคาแยก</p>
+  <p>ใช้เรต ADDVALUE จากระบบสำหรับทีมเตรียมงานและปฏิบัติงานหน้างาน ตรวจคน-วันตามแผนและยอดร่วมใน Working B4 ก่อนจัดสรร</p>
+  </details>}
+  {mobilization&&<details open={section==='B'}>
+   <summary>PAGA · แผน 4 MOB และ FAT/iFAT กรุงเทพฯ</summary>
+   <p>Early Buildings · {mobilization.plan.earlyBuildings.join(', ')} · ส่งมอบ {mobilization.plan.earlyHandover}</p>
+   <div className="p55-table-wrap"><table className="p55-table">
+    <thead><tr><th>รอบ / สถานที่</th><th>ADDVALUE</th><th>ID-IE</th><th>ต้นทุน (THB)</th><th>ราคาขายร่าง (USD)</th></tr></thead>
+    <tbody>{mobilization.rows.map(row=><tr key={row.id}>
+     <td>{row.id} · {row.location}</td>
+     <td>{row.engineers} วิศวกร + {row.technicians} ช่าง · {row.days} วัน{row.travelDays>0?' + เดินทาง '+row.travelDays+' วัน/คน':''}<br/>{row.work}</td>
+     <td>{row.fatDays>0?row.fatDays+' วันตามแพ็กเกจ · ':row.supervisorDays>0?
+      row.supervisorDays+' คน-วัน + เดินทาง '+row.supervisorTravelDays+' วัน · ':''}{row.supervision}</td>
+     <td>{formatRate(row.costTHB)}</td><td>{formatRate(row.customerUSD)}</td>
+    </tr>)}</tbody>
+   </table></div>
+   <p>ค่าใช้จ่ายบุคลากรครั้งเดียว THB {formatRate(mobilization.personnelTHB)} · ต้นทุนรวม USD {formatRate(mobilization.costUSD)} ·
+    ราคาขายร่าง USD {formatRate(mobilization.customerUSD)} ก่อนหักงบส่วนกลาง</p>
+   <p>ยอดสุทธิรอกระทบยอด B1/B4/B7/D และค่าเดินทางร่วม · ยังต้องยืนยันวันเดินทางและ OT กับ ID-IE · Training และ post-start attendance ยังเปิดอยู่</p>
+   <small>{mobilization.plan.source} · {mobilization.plan.references}</small>
   </details>}
   {section==='commercial'&&<><p>เงื่อนไขจัดซื้อ OEM · {terms.join(' · ')}</p>
    {changes.length>0&&<><p>{(received||display).quoteRef} เทียบกับ -002</p><ul aria-label="PAGA commercial comparison">{changes.map(term=><li key={term.label}>{term.label} · {term.state==='SAME'?'ตรงกัน':term.state==='CHANGED'?'เปลี่ยนจาก '+term.prior+' เป็น '+term.current:'รอยืนยันเงื่อนไข'}</li>)}</ul></>}

@@ -1,0 +1,55 @@
+{
+  "version": "0550-paga-mob-20261113-1",
+  "packageOfferId": "OFFER-PAGA-A20261632-005-NET",
+  "source": "PJ2608-0550_PAGA_WBS_Early_Buildings.xlsx / Rev 1 / MOB Plan, Cost Inputs and Commissioning Matrix",
+  "earlyHandover": "2027-07-31",
+  "earlyBuildings": ["Accommodation Type 1 (80 POB)", "Catering", "Fire/Safety"],
+  "references": "MR Rev.B1 App.1.0, 1.4 and SDRL App.3 (B01.05, C02–C05, C07/C08.05, D04, D07–D09); SPE-0004 §11; PTTEP TEL-007, INT-001 and GEN-004; CDL-012 and TQ-007/008.",
+  "fatOfferId": "OFFER-IDIE-QO26169-LOCAL-FAT-DAY",
+  "supervisorOfferId": "OFFER-IDIE-QO26163R1-ENG-DAY",
+  "basis": {
+    "engineerTHBPerHour": 600, "technicianTHBPerHour": 500,
+    "localDayHours": 8, "siteDayHours": 10, "idieRegularHours": 8,
+    "airfareTHB": 20000, "transferTHB": 5000, "permitTHB": 3500,
+    "roomTHB": 2500, "perDiemTHB": 1000, "medicalTHB": 4500, "workRiskTHB": 6000,
+    "transitNights": 1, "uniqueTravelers": 4
+  },
+  "events": [
+    {
+      "id": "FAT-TH", "location": "Bangkok", "days": 5, "engineers": 1, "technicians": 2,
+      "travelDays": 0, "fatDays": 2, "supervisorDays": 0, "supervisorTravelDays": 0,
+      "work": "ADDVALUE executes local FAT/iFAT and closes evidence. OEM factory FAT remains in A1-05.",
+      "supervision": "D3–D4: OEM configuration, alarm and redundancy checks."
+    },
+    {
+      "id": "MOB-01", "location": "APF Early Buildings", "days": 7, "engineers": 1, "technicians": 2,
+      "travelDays": 2, "fatDays": 0, "supervisorDays": 3, "supervisorTravelDays": 2,
+      "work": "Permanent core, readiness, field tests and turnover for the three early buildings.",
+      "supervision": "D4–D6: first energization, tuning and alarm/fault interfaces, early acceptance."
+    },
+    {
+      "id": "MOB-02", "location": "APF remaining buildings", "days": 6, "engineers": 1, "technicians": 2,
+      "travelDays": 2, "fatDays": 0, "supervisorDays": 2, "supervisorTravelDays": 2,
+      "work": "Loop checks, remaining nodes, paging zones, interfaces and punch.",
+      "supervision": "D4–D5: bring-up, alarms, amplifier redundancy and fault indications."
+    },
+    {
+      "id": "MOB-03", "location": "ACP Office/Guard and Truck Loading", "days": 4, "engineers": 1, "technicians": 2,
+      "travelDays": 2, "fatDays": 0, "supervisorDays": 2, "supervisorTravelDays": 2,
+      "work": "Readiness, loop checks, ACP node, coverage and interfaces.",
+      "supervision": "D2–D3: energization, OEM setup, integration and exceptions."
+    },
+    {
+      "id": "MOB-04", "location": "APF / ACP final SAT/ISAT", "days": 6, "engineers": 1, "technicians": 2,
+      "travelDays": 2, "fatDays": 0, "supervisorDays": 3, "supervisorTravelDays": 2,
+      "work": "Integrated SAT, Early Buildings regression, punch, signed records and handover.",
+      "supervision": "D1–D3: performance, failover, linked alarms and OEM defects."
+    },
+    {
+      "id": "OFFSITE", "location": "ADDVALUE office", "days": 5, "engineers": 1, "technicians": 0,
+      "travelDays": 0, "fatDays": 0, "supervisorDays": 0, "supervisorTravelDays": 0,
+      "work": "Prepare ITP, RFC/OTP and SAT procedures (3 days). Final dossier and as-built records (2 days).",
+      "supervision": "OEM supplies or reviews its source documents."
+    }
+  ]
+}

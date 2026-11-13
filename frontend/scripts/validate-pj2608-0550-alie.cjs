@@ -369,6 +369,8 @@ if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
  const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550,c1AppendixHtml0550,c1AppendixWord0550}=require(root+'/project0550/data/c1Appendix0550.js');
  const {C1Appendix0550}=require(root+'/project0550/C1Appendix0550.jsx');
  const {PagaQuoteScope0550}=require(root+'/project0550/PagaQuoteScope0550.jsx');
+ const {preparePagaMobWorking0550,pagaMobWorking0550}=require(root+'/project0550/data/pagaMobWorking0550.js');
+ const {releaseBasisKey0550}=require(root+'/project0550/data/releaseIssue0550.js');
  const tokens=SYSTEMS.map(s=>s.token),today='2026-11-13',baseline=D.DATA_LAYER_META.datasetId;
  const seed=importLegacyVendorBasis0550(emptyBidWorkspace(baseline),{
   meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE,commercialSources:D.COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY,
@@ -451,7 +453,31 @@ if(process.env.GENESIS_ALIE_TEST_PAGA_SERVICES){
   assert(html.includes(role)&&html.includes(rate.toFixed(2)));
  }
  assert(html.includes('QO26163R1')&&html.includes('QO26169'));
- console.log('PASS current PAGA supplier basis: existing A1-05 owner, five ACP references, OPEN ID-IE B4/C7 workload and existing ADDVALUE rates. Draft NET customer USD:',netAmount);
+ const withPlan=preparePagaMobWorking0550(prepared);
+ assert.equal(preparePagaMobWorking0550(withPlan),withPlan);
+ assert.equal(withPlan.lines,prepared.lines);
+ assert.equal(withPlan.offers,prepared.offers);
+ assert.equal(withPlan.bidVolumes,prepared.bidVolumes);
+ assert.equal(withPlan.releaseRegister,prepared.releaseRegister);
+ assert.equal(releaseBasisKey0550(withPlan),releaseBasisKey0550(prepared));
+ const restoredPlan=validateBidWorkspace(JSON.parse(JSON.stringify(withPlan)),baseline,tokens);
+ const estimate=pagaMobWorking0550(restoredPlan,D.CORE_TEAM,COMMERCIAL_POLICY);
+ assert.equal(estimate.rows.filter(row=>row.travelDays>0).length,4);
+ assert.equal(estimate.rows.reduce((total,row)=>total+row.personDays,0),113);
+ assert.equal(estimate.costUSD,60049.85);
+ assert.equal(estimate.customerUSD,143781.79);
+ assert.equal(pagaMobWorking0550({...restoredPlan,offers:restoredPlan.offers.filter(o=>o.id!==estimate.plan.fatOfferId)},D.CORE_TEAM,COMMERCIAL_POLICY).costUSD,null);
+ const noOvertime={...restoredPlan,offers:restoredPlan.offers.map(o=>o.id===estimate.plan.supervisorOfferId?
+  {...o,quoteEvidence:{...o.quoteEvidence,rateBasis:''}}:o)};
+ assert.equal(pagaMobWorking0550(noOvertime,D.CORE_TEAM,COMMERCIAL_POLICY).costUSD,null);
+ assert.equal(pagaMobWorking0550({...restoredPlan,lines:restoredPlan.lines.filter(l=>l.id!==owner.id)},D.CORE_TEAM,COMMERCIAL_POLICY),null);
+ assert.throws(()=>validateBidWorkspace({...restoredPlan,repositoryBasisImport:{...restoredPlan.repositoryBasisImport,
+  pagaMobPlan:{...restoredPlan.repositoryBasisImport.pagaMobPlan,events:[]}}},baseline,tokens),/Invalid PAGA mobilization/);
+ for(const section of ['B','C7','D','mapping','preview']){
+  const output=renderToStaticMarkup(React.createElement(PagaQuoteScope0550,{data:restoredPlan,section}));
+  assert(output.includes('MOB-04')&&output.includes('Fire/Safety')&&output.includes('60,049.85'));
+ }
+ console.log('PASS current PAGA supplier basis and saved 4-MOB Working plan: estimate and internal views reconcile without changing A1-05, service owners or Release. Draft NET customer USD:',netAmount);
 }
 if(process.env.GENESIS_ALIE_TEST_LAYOUT){
  const actual=parseQuotedTable(fs.readFileSync(process.env.GENESIS_ALIE_TEST_LAYOUT,'utf8'));

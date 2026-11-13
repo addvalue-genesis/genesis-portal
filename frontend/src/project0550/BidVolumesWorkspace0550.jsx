@@ -259,7 +259,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
    ])}/>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
- {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping'].includes(panel))||
+ {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping','preview'].includes(panel))||
     (volume==='III'&&['overview','8','10','11','deviations'].includes(panel)))&&
   <PagaQuoteScope0550 data={data} section={volume==='III'?'commercial':panel} onNavigate={go} disabled={dirty}/>}
  {volume==='I'&&cctvEntScheduleNotes[panel]&&data.offers.some(mgwCctvEntOffer0550)&&

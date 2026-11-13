@@ -112,6 +112,24 @@ reference the package and the relevant quotation items. Per-site
 allocation remains open. The package carries one amount through
 Working, draft Release A1-05 and C1.
 
+### PAGA mobilization plan in Working
+
+The controlled Excel Rev 1 planning basis is loaded into the existing
+Working JSON when A1-05 selects the -005 NET offer. It shows four Myanmar
+mobilizations, the Bangkok FAT/iFAT and offsite document work. MOB-01 covers
+the three permanent Early Buildings and their 31 July 2027 handover.
+The Working B, draft Release and Volume I C7/D/M/P screens show each crew,
+supervisor window and estimate from the same basis. The normal-day
+supervision, Bangkok FAT and overtime rates come from the registered ID-IE
+evidence. The other inputs are planning allowances and live Working FX.
+
+The execution estimate is informational until the B1/B4/B7/D and shared
+travel owners are reconciled. The plan adds no selected Working line and
+does not affect the Release basis, native customer exports or issued history.
+Training, post-start attendance and Myanmar attendance and travel terms
+remain open. This follows ADR-0550-001 principles 2, 4–6 and 8–11 for
+source lineage, work responsibility, review and single cost ownership.
+
 Working B4 and draft C7 use two ID-IE Offer-linked rows. QO26169 covers
 Local FAT execution in Bangkok. QO26163R1 covers OEM site supervision
 for the ADDVALUE execution team at APF and ACP, subject to confirmation

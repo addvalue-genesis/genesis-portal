@@ -6,6 +6,7 @@ import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} fro
 import {isTowerFullQuote0550,TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
 import {pagaRevisionNet0550,validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
+import {validPagaMobPlan0550} from './pagaMobWorking0550';
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
 import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroup0550,mgwDetailGroupPrice0550} from "./mgwDetailPricing0550";
@@ -87,7 +88,8 @@ export function validateBidWorkspace(data,snapshotId,systems){
  validateSupplierRevisionImports0550(data.supplierRevisionImports);
  if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
  if(data.mgwDetailPricingImport!==undefined){const r=data.mgwDetailPricingImport;fields(r,["version","date","importedLineIds","conflicts","replacedLineIds","decision"]);if(r.decision!==undefined)string(r.decision,"MGW pricing decision");if(r.replacedLineIds!==undefined&&(!Array.isArray(r.replacedLineIds)||r.replacedLineIds.some(v=>typeof v!=="string"||v.length>100)))fail("Invalid replaced MGW owner list");string(r.version,"MGW pricing preparation version",100);date(r.date,"MGW pricing preparation date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW pricing preparation list");}}
- if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited","eurThbConversionVersion","tsiActivityBudget","bidProcess","bidCompletion","pricedVolumeDraftIds"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");
+ if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited","eurThbConversionVersion","tsiActivityBudget","bidProcess","bidCompletion","pricedVolumeDraftIds","pagaMobPlan"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");
+  if(r.pagaMobPlan!==undefined&&!validPagaMobPlan0550(r.pagaMobPlan))fail("Invalid PAGA mobilization planning basis");
   validateBidCompletion0550(r.bidCompletion);
   const pricedDrafts=r.pricedVolumeDraftIds;
   if(pricedDrafts!==undefined&&(!Array.isArray(pricedDrafts)||pricedDrafts.length>2000||new Set(pricedDrafts).size!==pricedDrafts.length||pricedDrafts.some(id=>typeof id!=='string'||!/^[\w.-]{1,100}$/.test(id))))fail('Invalid priced Volume I draft receipt');
