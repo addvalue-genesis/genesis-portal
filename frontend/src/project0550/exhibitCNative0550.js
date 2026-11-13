@@ -1,7 +1,7 @@
 // The HTML and DOCX bodies come from the supplied Word file, including merges,
 // notes and fixed labels. Only bidder response slots are substituted here.
 import template from './data/exhibitCNativeTemplate0550.json';
-import {CHEVALIER_PBX_SCHEDULE_NOTES_0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
+import {chevalierPbxScheduleNote0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {sumMoney0550} from './data/money0550';
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
@@ -377,7 +377,7 @@ function renderPage(view,page,format,currency='USD'){
   if(page.id==='C3'&&view.pagaSpares?.recommended.length){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
-  const pbxNote=CHEVALIER_PBX_SCHEDULE_NOTES_0550[page.id];
+  const pbxNote=view.chevalierPbxSupply&&chevalierPbxScheduleNote0550(view,page.id);
   if(view.chevalierPbxSupply&&pbxNote&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
    partialNote=[partialNote,'IP Telephony and PABX. '+pbxNote].filter(Boolean).join(' ');
   }

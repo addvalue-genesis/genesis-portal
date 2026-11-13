@@ -14,6 +14,7 @@ import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550
 import {c2WorkingAllocationProblems0550} from './commissioningSparePhases0550';
 import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './cabinetTag0550';
 import {CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,CHEVALIER_PBX_SUPPLY_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
+import {chevalierPbxSharedBudget0550} from './chevalierPbxBudget0550';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -236,8 +237,9 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const pagaCandidateQuote=pagaCandidate&&pagaCandidate.id!==pagaNet?.id
   ?{offer:pagaCandidate,items:pagaRevisionItems0550(data,pagaCandidate)}:null;
  const chevalierPbxSupply=model.provisional?.selected.some(line=>line.id===CHEVALIER_PBX_SUPPLY_0550&&line.pbxProducts?.length);
+ const pbxBudgetShares=chevalierPbxSharedBudget0550(data,model);
  return {...projected,c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
-  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),

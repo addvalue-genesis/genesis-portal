@@ -5,6 +5,7 @@ export const CHEVALIER_PBX_SUPPLY_0550='LINE-CHEVALIER-PBX-PRODUCTS';
 export const CHEVALIER_PBX_FIELD_0550='LINE-CHEVALIER-PBX-PROFESSIONAL-SERVICE';
 export const CHEVALIER_PBX_MA_0550='LINE-CHEVALIER-PBX-REMOTE-MA';
 export const CHEVALIER_PBX_REGISTER_0550='PJ2608-0550-CHEVALIER-CITT-QT-392-2026-REV01-ALIE-R2-20261113';
+export const CHEVALIER_PBX_BUDGET_PREFIX_0550='LINE-CHEVALIER-PBX-BUDGET-';
 export const CHEVALIER_PBX_SCHEDULE_NOTES_0550={
  A2:'Optional hardware and onsite support are available as quote references. Selection and scope remain OPEN.',
  C2:'Commissioning spares are OPEN. The optional hardware has no confirmed start-up allocation.',
@@ -18,16 +19,36 @@ export const CHEVALIER_PBX_SCHEDULE_NOTES_0550={
  E:'The two-year remote maintenance lot appears under A1 Others. Software licences and OEM support are in C1. Confirm import, type approval, duties and associated costs separately.',
  F:'The supplier excludes international freight and insurance. Reconcile the cargo insured value and any site cover with the separate project allowances.',
 };
+export function chevalierPbxScheduleNote0550(view,schedule){
+ const note=CHEVALIER_PBX_SCHEDULE_NOTES_0550[schedule];
+ const hasRows=view.bindings.some(b=>b.schedule===schedule&&b.lineId.startsWith(CHEVALIER_PBX_BUDGET_PREFIX_0550)&&Number.isFinite(b.amount));
+ if(hasRows&&schedule==='C2')return 'Commissioning spare estimates use planned quantities and CHEVALIER Base unit rates. Confirm the OEM list, quantities and logistics.';
+ if(hasRows&&schedule==='C6')return 'First-fill consumable kits are estimated for four sites. Confirm specification and existing inclusions.';
+ if(hasRows&&schedule==='C8')return 'Purchaser office, in-city transport and lunch are draft call-off rates. Confirm the applicable form and responsibility.';
+ const shares=view.pbxBudgetShares?.filter(row=>row.schedule===schedule||
+  schedule==='A2'&&['C3','C4'].includes(row.schedule))||[];
+ if(!shares.length)return note;
+ const available=shares.every(row=>row.funded);
+ const allocation=available?'Draft PABX scope references the existing project cost owners.':'The PABX estimate still needs reconciliation with the existing project cost owners.';
+ if(schedule==='D')return 'Supplier configuration and tests are in C7. '+allocation+' Confirm separate FAT/iFAT witness scope.';
+ if(schedule==='E'||schedule==='F')return note+' '+allocation;
+ return allocation+' Confirm final scope and allocation.';
+}
 export function chevalierPbxScheduleTrace0550(view){
  if(!view.workingPreview||!view.chevalierPbxSupply)return [];
  const linked=(id,schedule)=>view.bindings.some(b=>b.lineId===id&&b.schedule===schedule&&Number.isFinite(b.amount));
  const supply=linked(CHEVALIER_PBX_SUPPLY_0550,'C1'),field=linked(CHEVALIER_PBX_FIELD_0550,'C7'),ma=linked(CHEVALIER_PBX_MA_0550,'A1');
  return [
   ['A1',supply&&field&&ma?'Priced draft':'Allocation OPEN','Base summary from the Products, initial site service and remote maintenance Working owners.'],
-  ['A2','Option reference',CHEVALIER_PBX_SCHEDULE_NOTES_0550.A2],
+  ['A2','Draft option basis',chevalierPbxScheduleNote0550(view,'A2')],
   ['C1',supply?'Priced draft':'Allocation OPEN','One discounted Products lot with a 34-line breakdown.'],
-  ...['C2','C3','C4','C5','C6','C7','C8','D','E','F'].map(id=>[id,
-   (id==='C7'&&field)||(id==='E'&&ma)?'Priced draft / scope OPEN':'OPEN',CHEVALIER_PBX_SCHEDULE_NOTES_0550[id]]),
+  ...['C2','C3','C4','C5','C6','C7','C8','D','E','F'].map(id=>{
+   const estimate=view.bindings.some(b=>b.schedule===id&&b.lineId.startsWith(CHEVALIER_PBX_BUDGET_PREFIX_0550)&&Number.isFinite(b.amount));
+   const shares=view.pbxBudgetShares?.filter(row=>row.schedule===id)||[];
+   const status=(id==='C7'&&field)||(id==='E'&&ma)?'Priced draft / scope OPEN':
+    estimate?(id==='C8'?'Draft call-off rates':'Draft estimate'):shares.length?(shares.every(row=>row.funded)?'Shared budget draft':'Shared owner review OPEN'):'OPEN';
+   return [id,status,chevalierPbxScheduleNote0550(view,id)];
+  }),
   ['M','Working allocation','C1 Products, C7 initial site service and A1 Others remote maintenance.'],
   ['P','Draft preview and export','The preview and exports read the same Working allocations.'],
  ];

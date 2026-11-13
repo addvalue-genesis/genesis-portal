@@ -28,6 +28,7 @@ import {CORE_TEAM} from "./data";
 import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
 import {preparePricedVolumeDrafts0550} from "./data/bidVolumeWorkingPreview0550";
 import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
+import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
@@ -36,7 +37,7 @@ function prepareQuotation0550(data,today){
  const avl=preparePagaAvlDeviation0550(pbx);
  const based=pbx===data?avl:prepareSystemAvlDeviations0550(avl,deriveIntegration0550(avl,SYSTEMS,today));
  const priced=prepareBidCompletion0550(based,{policies:COMMERCIAL_POLICY,team:CORE_TEAM,pricing:()=>deriveBidWorkspace(based,systemTokens0550,today)},today);
- const working=applyDirectSupplierMarkup0550(priced);
+ const working=prepareChevalierPbxBudget0550(applyDirectSupplierMarkup0550(priced),COMMERCIAL_POLICY,today);
  return preparePricedVolumeDrafts0550(working,()=>deriveBidWorkspace(working,systemTokens0550,today),today);
 }
 export const useBidWorkspace=()=>useContext(Context);
@@ -137,7 +138,8 @@ export function BidWorkspaceProvider({children}){
   setBusy(true);
   try{
    const transformed=repairPagaEngineeringDrafts0550(reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(transform(data))));
-   const sourced=transformed.offers===data.offers?transformed:prepareChevalierPbxWorking0550(transformed,COMMERCIAL_POLICY,reviewDate);
+   const sourced=transformed.offers===data.offers?transformed:prepareChevalierPbxBudget0550(
+    prepareChevalierPbxWorking0550(transformed,COMMERCIAL_POLICY,reviewDate),COMMERCIAL_POLICY,reviewDate);
    const next=prepareSystemAvlDeviations0550(sourced,deriveIntegration0550(sourced,SYSTEMS,reviewDate));
    setData(await saveProject0550Bid(next,data.revision,action));
    setError("");

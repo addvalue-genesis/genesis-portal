@@ -191,6 +191,7 @@ if(process.env.GENESIS_ALIE_TEST_PAGA005){
 if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  const {importMrWorkingBasis0550}=require(root+'/project0550/data/mrWorkingBasis0550.js');
  const {prepareChevalierPbxWorking0550}=require(root+'/project0550/data/chevalierPbxWorking0550.js');
+ const {prepareChevalierPbxBudget0550}=require(root+'/project0550/data/chevalierPbxBudget0550.js');
  const {CHEVALIER_PBX_SUPPLY_0550:supply,CHEVALIER_PBX_FIELD_0550:field,CHEVALIER_PBX_MA_0550:ma,
   chevalierPbxQuote0550,chevalierPbxScheduleTrace0550}=require(root+'/project0550/data/chevalierPbxQuote0550.js');
  const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
@@ -265,6 +266,43 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  assert.deepEqual(bidVolumeSheets0550(c1View,'I').find(sheet=>sheet.name==='PABX Schedule Trace').rows.map(row=>row[0]),sections);
  assert.match(bidVolumeHtml0550(c1View,'I'),/Separate witnessed FAT\/iFAT scope and price are OPEN/);
  assert(Buffer.from(buildNativeExhibitDocx0550(c1View)).includes(Buffer.from('11.F · OPEN · The supplier excludes international freight and insurance.')));
+ const budgetInput={...selected,repositoryBasisImport:{version:'QA',snapshotId:selected.baselineSnapshotId,preparedOn:date,fxInherited:false}};
+ const prepareBudget=data=>prepareChevalierPbxBudget0550(data,COMMERCIAL_POLICY,date);
+ const budget=prepareBudget(budgetInput),budgetModel=derived(budget);
+ validateBidWorkspace(budget,budget.baselineSnapshotId,all);
+ assert.equal(prepareBudget(budget),budget);
+ const budgetView=deriveBidVolumeWorkingPreview0550(budget,budgetModel,SYSTEMS,date,deriveBidVolumes0550(budget,budgetModel,SYSTEMS,date));
+ const isBudget=line=>line.id.startsWith('LINE-CHEVALIER-PBX-BUDGET-');
+ const estimateRows=budgetModel.provisional.selected.filter(isBudget);
+ const estimatedC2=quote.products.filter(o=>['1.1.10','1.1.11','1.1.13'].includes(o.supplierQuoteRow.itemCode))
+  .reduce((sum,o)=>sum+o.unitCost*(o.supplierQuoteRow.itemCode==='1.1.10'?1:2),0);
+ assert.equal(estimateRows.length,4);
+ assert.equal(estimateRows.reduce((sum,line)=>sum+line.costTHB,0),estimatedC2+12000);
+ assert.equal(budgetView.scheduleRows('C2').filter(b=>isBudget(b.line)).length,3);
+ assert.equal(budgetView.scheduleRows('C6').filter(b=>isBudget(b.line)).length,1);
+ assert.deepEqual(budgetView.scheduleRows('C8').map(b=>[b.summary,b.quantity,b.treatment,b.line.customerTHB]),
+  [['OFFICE',8,'CALLOFF',8000],['TRANSPORT',8,'CALLOFF',16000],['WORKING_LUNCH',8,'CALLOFF',4000]]);
+ assert(budgetView.scheduleRows('C8').every(b=>!budgetView.active.some(l=>l.id===b.lineId)));
+ assert.equal(budgetView.pbxBudgetShares.length,11);
+ assert(budgetView.pbxBudgetShares.every(row=>budget.lines.find(l=>l.id===row.ownerId)===budgetInput.lines.find(l=>l.id===row.ownerId)));
+ assert(budgetView.pbxBudgetShares.every(row=>!row.funded));
+ assert.equal(budgetView.ready,false);
+ const estimateId=estimateRows[0].id;
+ const deletedBudget={...budget,lines:budget.lines.filter(l=>l.id!==estimateId),bidVolumes:{
+  ...budget.bidVolumes,bindings:budget.bidVolumes.bindings.filter(b=>b.lineId!==estimateId),
+ }};
+ assert.equal(prepareBudget(deletedBudget),deletedBudget);
+ const editedBudget={...budget,lines:budget.lines.map(l=>l.id===estimateId?{...l,quantity:3,selected:false}:l)};
+ assert.equal(prepareBudget(editedBudget),editedBudget);
+ const authoredC2={...budgetInput,lines:[...budgetInput.lines,{
+  ...budget.lines.find(l=>l.id===estimateId),id:'QA-AUTHORED-EX-PHONE-SPARE',systemToken:'TEL-IPP',
+ }]};
+ assert(!prepareBudget(authoredC2).bidVolumes.bindings.some(b=>b.schedule==='C2'));
+ assert.deepEqual(budget.offers,budgetInput.offers);
+ const budgetXlsx=bidVolumeSheets0550(budgetView,'I');
+ assert(budgetXlsx.find(sheet=>sheet.name==='Schedule C6').rows.some(r=>r.includes('First-fill labels, ties and cleaning material')));
+ assert(!JSON.stringify(budgetXlsx).includes('Owner / allowance OPEN'));
+ assert(Buffer.from(buildNativeExhibitDocx0550(budgetView)).includes(Buffer.from('11.C8 · Draft call-off rates')));
  const raw=selected.lines.find(l=>l.id===supply),full={...raw,id:'QA-PBX-NET',scopeKey:'QA.PBX.NET'};
  const duplicate=derived({...selected,lines:[...selected.lines,full]});
  assert(duplicate.lines.filter(l=>[supply,field,ma,full.id].includes(l.id)).every(l=>l.provisionalCustomerUSD===null));

@@ -27,7 +27,7 @@ import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {ScheduleResults0550} from './SchedulePriceDiagnostics0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
 import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
-import {CHEVALIER_PBX_SCHEDULE_NOTES_0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
+import {chevalierPbxScheduleNote0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {CommissioningBreakdown0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
 import {NATIVE_SUMMARIES_0550,NATIVE_FIELDS_0550,downloadNativeExhibit0550,nativeExhibitProblems0550} from './exhibitCNative0550';
 import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/changeImpact0550';
@@ -239,7 +239,14 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  {volume==='I'&&panel==='A1'&&<CommissioningBreakdown0550 view={displayView} systems={SYSTEMS} currency={currency} summary model={model} disabled={dirty} onNavigate={go} onOpenC3={()=>{setShowAllSchedules(true);choose('C3');}}/>}
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
  {volume==='I'&&displayView.chevalierPbxSupply&&['A2','D','E','F'].includes(panel)&&
-  <p className="p55-note"><strong>IP Telephony and PABX</strong> · {CHEVALIER_PBX_SCHEDULE_NOTES_0550[panel]}</p>}
+  <p className="p55-note"><strong>IP Telephony and PABX</strong> · {chevalierPbxScheduleNote0550(displayView,panel)}</p>}
+ {volume==='I'&&displayView.pbxBudgetShares?.some(row=>['mapping','preview'].includes(panel)||row.schedule===panel)&&
+  <Grid label="PABX shared budget · internal cost" heads={['Schedule','PABX scope','Estimate (THB)','Working cost owner','Basis']}
+   rows={displayView.pbxBudgetShares.filter(row=>['mapping','preview'].includes(panel)||row.schedule===panel).map(row=>[
+    row.schedule,row.description,Number.isFinite(row.costTHB)?row.costTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN',
+    <button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+row.ownerId)}>{row.ownerId}</button>,
+    (row.funded?'Shared owner · ':'Owner / allowance OPEN · ')+row.source,
+   ])}/>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
  {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping'].includes(panel))||

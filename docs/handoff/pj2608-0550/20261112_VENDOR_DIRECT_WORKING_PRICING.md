@@ -39,6 +39,30 @@ Working B4 carries the two supplier-procured service lots under the existing Pro
 
 Verification uses the original two-page PDF and the private Vendor register. It reconciles the 51 item prices, the fixed discount, the three Working owners and the C1, C7 and E amounts. Regression checks cover prior generated owners, overlapping NET, reviewed and authored work, all draft trace destinations and customer exports. Saved Windows consumption is pending verification.
 
+### CHEVALIER PABX working budget
+
+Startup prepares three C2 commissioning spare estimates from the registered
+CHEVALIER Base unit rates and one C6 Option for four first-fill kits. The
+existing B5 and C1 Working categories feed the native C2 and C6 bindings.
+C8 carries three unselected purchaser call-off rates for eight man-days.
+The existing schedule receipt preserves later edits and deletions.
+
+The Volume I schedule panels, 11.M and 11.P show PABX shares against the
+existing project owners for operating/capital spares, tools, handover,
+inspection, import, insurance and Ex phone mounting. The shares are internal
+estimates. They add no second price and are flagged for reconciliation if
+the owner has no available cost basis. The complete draft exports use the
+same bindings and PABX schedule status. Supplier rates remain in the
+private Vendor register. The applicable C8 form, spare logistics and
+scope, source and commercial reviews remain open.
+
+ADR-0550-001 principles 2, 5, 6 and 8–11 govern the distinction between source
+rates, estimates and shared owners, and preserve the reviewed and issued
+price paths. The private CHEVALIER fixture validates C2/C6, C8 exclusion
+from Base/Option, unchanged shared owners, edit/deletion preservation,
+and draft XLSX and Word output. Windows startup requires the current
+CHEVALIER register.
+
 ## 13 November · PAGA supply and service rates
 
 Working A1-05 selects the current INDUSTRONIC A20261632-005 NET against
