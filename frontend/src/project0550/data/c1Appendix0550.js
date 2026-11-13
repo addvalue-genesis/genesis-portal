@@ -402,7 +402,13 @@ export function deriveC1Appendix0550(view,currency='USD'){
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
   if(pbx){
-   item.components=b.line.pbxProducts.map(product=>({...product,source:product.description,note:'Included in supply lot'}));
+   const apfExPhone=!legacy&&targets.find(target=>target.key==='MR-B1-13-APF-07');
+   for(const product of b.line.pbxProducts){
+    const component={...product,source:product.description,note:'Included in supply lot'};
+    // The Ex phone is listed with its APF MR scope. Its package remains the sole price owner.
+    if(apfExPhone&&product.itemCode==='1.1.15')apfExPhone.components.push(component);
+    else item.components.push(component);
+   }
    if(view.workingPreview){
     item.internalNote='Shared equipment price. Confirm site and TAG placement, handset model allocation and the excluded interfaces.';
     problems.push('C1_PBX_MR_SCOPE_OPEN / '+item.key);

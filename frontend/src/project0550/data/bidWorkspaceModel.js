@@ -241,7 +241,9 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
   const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  const pbxProducts=pbxAllocation?.products?.map(item=>({description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit}));
+  const pbxProducts=pbxAllocation?.products?.map(item=>({
+   itemCode:item.supplierQuoteRow.itemCode,description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit,
+  }));
   return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(pbxProducts?{pbxProducts}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  };
  const equipment=new Map();

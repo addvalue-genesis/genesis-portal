@@ -194,7 +194,7 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  const {CHEVALIER_PBX_SUPPLY_0550:supply,CHEVALIER_PBX_FIELD_0550:field,CHEVALIER_PBX_MA_0550:ma,
   chevalierPbxQuote0550,chevalierPbxScheduleTrace0550}=require(root+'/project0550/data/chevalierPbxQuote0550.js');
  const {deriveBidVolumes0550}=require(root+'/project0550/data/bidVolumes0550.js');
- const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixHtml0550}=require(root+'/project0550/data/c1Appendix0550.js');
+ const {deriveC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixHtml0550,c1AppendixTable0550}=require(root+'/project0550/data/c1Appendix0550.js');
  const {offerSourceSections0550}=require(root+'/project0550/data/vendorBidTags0550.js');
  const {roundMoney0550}=require(root+'/project0550/data/money0550.js');
  const {a1OthersRows0550}=require(root+'/project0550/A1OthersBreakdown0550.jsx');
@@ -240,7 +240,19 @@ if(process.env.GENESIS_ALIE_TEST_CHEVALIER){
  for(const id of ['C2','C3','C4','C5','C6','C8'])assert(!view.scheduleRows(id).some(b=>[supply,field,ma].includes(b.lineId)));
  const c1View={...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550},c1=deriveC1Appendix0550(c1View);
  const row=c1.rows.find(r=>r.priceOwners?.some(b=>b.lineId===supply));
- assert.deepEqual([row.sn,row.quantity,row.unit,row.components.length,row.components[0].quantity],['1.3.P1',1,'Lot',34,2]);
+ assert.deepEqual([row.sn,row.quantity,row.unit,row.components.length,row.components[0].quantity],['1.3.P1',1,'Lot',33,2]);
+ const exPhone=c1.rows.find(r=>r.key==='MR-B1-13-APF-07');
+ const handset=exPhone.components.find(c=>c.itemCode==='1.1.15');
+ assert.equal(handset.quantity,3);
+ assert.match(handset.description,/Auteldac 6/);
+ assert.equal(handset.amount,null);
+ assert.equal(exPhone.amount,null);
+ assert.equal(exPhone.note,'Included in item '+row.sn);
+ assert(!row.components.some(c=>c.itemCode==='1.1.15'));
+ const thb=deriveC1Appendix0550(c1View,'THB');
+ assert.equal(thb.rows.find(r=>r.key===row.key).amount,expectedSell[0]);
+ const exported=c1AppendixTable0550(c1View).rows.filter(c=>String(c[1]).includes('Auteldac 6'));
+ assert.deepEqual(exported.map(c=>[c[0],c[3],c[5]]),[[exPhone.sn+'.'+(exPhone.components.indexOf(handset)+1),3,null]]);
  assert.equal(c1.rows.filter(r=>r.priceOwners?.some(b=>[supply,field,ma].includes(b.lineId))).length,1);
  assert.match(c1AppendixHtml0550(c1View),/R660/);
  const sections=['A1','A2','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','M','P'];
