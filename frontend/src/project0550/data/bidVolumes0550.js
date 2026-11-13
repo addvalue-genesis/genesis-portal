@@ -6,6 +6,7 @@ import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequire
 import {deriveTechnicalProposal0550,TECHNICAL_SECTIONS_0550,technicalRecordBasis0550} from './technicalProposal0550';
 import {mgwDetailGroup0550} from './mgwDetailPricing0550';
 import {sumMoney0550,displayPriceCheck0550} from './money0550';
+import {c8CalloffDraftRows0550,c8Country0550,legacyGeneratedC8Calloff0550} from './c8Calloff0550';
 
 export const SCHEDULES_0550=[
  {id:'A',title:'Initial Contract Price'},
@@ -112,6 +113,33 @@ export function saveBidVolumeRecord0550(data,collection,row,today,review=false){
  if(review)record.basisKey=volumeRecordBasis0550(next,collection,record);
  return next;
 }
+
+export function prepareC8Calloff0550(data,pack,today){
+ const receipt=data.repositoryBasisImport;
+ if(!receipt||!pack)return data;
+ const drafts=c8CalloffDraftRows0550(pack);
+ const bindings=data.bidVolumes?.bindings||[],lineById=new Map(data.lines.map(line=>[line.id,line]));
+ const recorded=new Set(receipt.pricedVolumeDraftIds||[]);
+ const occupied=new Set([...lineById.keys(),...bindings.map(b=>b.lineId),...recorded]);
+ const pending=drafts.filter(({line})=>!occupied.has(line.id));
+ if(!pending.length)return data;
+ const draftRoles=new Set(pending.map(({binding})=>binding.summary));
+ const retired=new Set(bindings.filter(b=>draftRoles.has(b.summary)&&recorded.has(b.lineId)&&
+  !data.lines.some(line=>line.coveredByLineId===b.lineId)&&
+  !data.technicalProposal?.equipmentDetails.some(detail=>detail.lineId===b.lineId)&&
+  !integrationRequirements0550(data).some(requirement=>requirement.workLineIds.includes(b.lineId))&&
+  legacyGeneratedC8Calloff0550({...b,line:lineById.get(b.lineId)})).map(b=>b.lineId));
+ if(data.lines.length-retired.size+pending.length>2000||bindings.length-retired.size+pending.length>2000||
+  recorded.size+pending.length>2000)return data;
+ let next={...data,lines:[...data.lines.filter(line=>!retired.has(line.id)),...pending.map(draft=>draft.line)],
+  bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:bindings.filter(b=>!retired.has(b.lineId))}};
+ for(const {line,binding} of pending){
+  next=saveBidVolumeRecord0550(next,'bindings',{...blankScheduleBinding0550(line.id),...binding},today);
+  recorded.add(line.id);
+ }
+ return {...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded]}};
+}
+
 const recordState=(data,collection,r,today,problems)=>{
  if(r.status!=='REVIEWED'||!trim(r.reviewer)||!r.reviewedOn||r.reviewedOn>today||!r.basisKey)problems.push('REVIEW_OPEN');
  const stale=Boolean(r.basisKey&&r.basisKey!==volumeRecordBasis0550(data,collection,r));if(stale)problems.push('STALE_DEPENDENCIES');
@@ -128,7 +156,10 @@ export function deriveBidVolumes0550(data,model,systems,today){
   if(!line)problems.push('WORKING_NOT_SELECTED_OR_MISSING');
   if(!trim(b.basis)||!trim(b.summary)||!trim(b.deliveryTerm))problems.push('ALLOCATION_BASIS_OR_DELIVERY_TERM_OPEN');
   const physical=data.technicalProposal?.equipmentDetails.find(e=>e.lineId===b.lineId);
-  if(b.schedule==='C8'&&line?.unit!=='MD')problems.push('C8_MAN_DAY_BASIS_OPEN');
+  if(b.schedule==='C8'){
+   const expected=c8Country0550(b)&&['AIRPORT','OFFICE_CONSUMABLES'].includes(b.summary)?'SET':'MD';
+   if(line?.unit!==expected)problems.push(expected==='SET'?'C8_NATIVE_QUANTITY_BASIS_OPEN':'C8_MAN_DAY_BASIS_OPEN');
+  }
   if(b.schedule==='C6'&&!trim(b.specification))problems.push('CONSUMABLE_SPECIFICATION_OPEN');
   const part=line?.wbs.startsWith('C')?'OPTION':'BASE';
   if(b.schedule==='A1'&&(b.treatment!=='BASE'||!['INSPECTION','PACKING','VENDOR_DOCUMENTS','OTHER'].includes(b.summary)))problems.push('DIRECT_A1_SUMMARY_ALLOCATION_OPEN');

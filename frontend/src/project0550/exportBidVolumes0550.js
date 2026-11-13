@@ -6,6 +6,7 @@ import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
+import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function scheduleTable0550(view,id){
  if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
@@ -31,7 +32,11 @@ export function scheduleTable0550(view,id){
  if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};
  if(['C2','C3','C4'].includes(id))return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:rows.map(b=>[b.mainEquipment,id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description,b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount])};
  if(id==='C7')return {heads:['Service / Personnel Category','Total Hours (h)','Rate (USD/h)','Total (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit==='MH'?b.quantity:'OPEN',b.unit==='MH'?b.unitPrice:'OPEN',b.amount,b.unit==='MH'?b.treatment:'Man-hour basis OPEN / '+b.treatment])};
- if(id==='C8')return {heads:['Description / Scope','Unit','Estimated Man-days','Unit Price (USD)','Total Price (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit,b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,b.treatment==='CALLOFF'?'Call-off rate / excluded from Base and Options':b.treatment])};
+ if(id==='C8')return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],rows:rows.map(b=>{
+  const country=c8Country0550(b);
+  return [country||'',b.line.description,country?c8Unit0550(b):b.unit,country||b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,
+   b.treatment==='CALLOFF'?[c8Revision0550(b),'Call-off / excluded from Base and Options'].filter(Boolean).join(' / '):b.treatment];
+ })};
  if(id==='C6')return {heads:['SN','Item Name','Specification','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.specification,b.unit,b.quantity,b.unitPrice,b.amount])};
  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.line.brand||b.line.offer?.brand||'OPEN',b.unit,b.quantity,b.unitPrice,b.amount])};
 }

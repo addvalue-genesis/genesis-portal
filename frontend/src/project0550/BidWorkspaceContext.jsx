@@ -33,6 +33,8 @@ import {prepareChevalierPbxWorking0550} from "./data/chevalierPbxWorking0550";
 import {prepareChevalierPbxBudget0550} from "./data/chevalierPbxBudget0550";
 import {prepareMgwCctvEntBudget0550} from "./data/mgwCctvEntBudget0550";
 import {prepareVersedDmrCabinet0550} from "./data/versedRack0550";
+import {fetchC8Calloff0550} from "./data/c8Calloff0550";
+import {prepareC8Calloff0550} from "./data/bidVolumes0550";
 const Context=createContext(null);
 const systemTokens0550=SYSTEMS.map(s=>s.token);
 function prepareQuotation0550(data,today){
@@ -57,6 +59,7 @@ export function BidWorkspaceProvider({children}){
  const reload=async()=>{
   if(lock.current)return;lock.current=true;setBusy(true);
   try{
+   const c8Request=fetchC8Calloff0550().catch(e=>({error:e.message}));
    let current=await loadProject0550Bid();
    const retired=retireLegacyTowerPricing0550(current);
    if(retired!==current)current=await saveProject0550Bid(retired,current.revision,"Cancel the legacy tower Part A pricing basis");
@@ -74,9 +77,10 @@ export function BidWorkspaceProvider({children}){
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
    const processed=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
-   const prepared=prepareQuotation0550(processed,reviewDate);
+   const c8=await c8Request;
+   const prepared=prepareQuotation0550(prepareC8Calloff0550(processed,c8?.error?null:c8,reviewDate),reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata, authorised TSI estimates and priced Volume I drafts / "+prepared.mgwQuoteImport.version);
-   setData(current);setError("");setRecovery(null);
+   setData(current);setError(c8?.error?'C8 · '+c8.error:"");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
    // must not prevent a valid Vendor register from reaching the existing07.1/07.2.
