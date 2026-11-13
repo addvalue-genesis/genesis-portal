@@ -127,3 +127,27 @@ selected basis, and customer HTML, Word and XLSX exclude the internal figures
 and links. C1 Appendix, supplier revision, Working Schedules, continuity
 checks and the production portal build passed. The owner's Windows view has
 yet to be verified after applying this change.
+
+## 13 November · PAGA Volume I allocation audit
+
+The audit reconstructed Working from the project fixture and Vendor registers
+available for commit `b624878`. The balances below describe the Working Preview.
+The user's saved Windows workspace was unavailable for inspection.
+
+| Volume I | PAGA allocation in the Working Preview |
+| --- | --- |
+| A1 / C1 | INDUSTRONIC A20261632-005 NET has one priced owner at A1-05. Appendix 1.4 row 1.4.P1 matches the draft Release amount. APF and ACP retain MR quantities and source-item references. Site-level pricing is open. |
+| A2 / C4 | PAGA has no separate priced Option or capital-spares allocation. C4 has a project allowance row for systems other than microwave. |
+| C2 | INDUSTRONIC items 25010–25040 are included in the A1-05 NET. Item 25010 is the commissioning kit. Additional commissioning spares remain open. |
+| C3 | The separate SP2 register for -002 has 21 entries with recommended quantities and 13 rate entries with blank recommended quantities. The reconstructed C3/A2 uses project allowances. Check applicability to -005 and overlap with C2 before allocating SP2. |
+| C5 / C6 / C8 | The OEM tools and software in items 18010, 18030, 18040 and 18050 are included in A1-05. Additional C5 tools use shared project allowances. C6 consumables and C8 purchaser facilities have no PAGA allocation. |
+| C7 | Working B4 links ID-IE QO26169 for Bangkok FAT and QO26163R1 for APF/ACP site supervision. ADDVALUE reuses its existing Senior Telecom Engineer and Chief Telecom Technician rates. PAGA service quantities and extensions remain open. OEM classroom training item 23070 is included in A1-05. |
+| D | OEM FAT at Wertheim, item 23010, is included in A1-05. D shows project-level FAT witness and iFAT support. A separate PAGA amount is open. |
+| E / F | B8 licence and authority costs, B2 cargo insurance and B9 project and personnel insurance use project owners. No PAGA-specific amount was found in either breakdown. |
+| M / P | M links the NET owner to C1 and both ID-IE B4 rows to C7. The draft Exhibit C uses the same Working allocations. D, E and F are available in their own views. |
+
+The ALIE validator passed with the private -002, -005 and PAGA ALIE R2 registers.
+The reconstruction also loaded SP2 and checked A1-05/C1 parity, C7 extensions,
+the D/E/F breakdowns, the M crosswalk and the draft Exhibit C HTML. Release was
+on hold. This is a documentation-only checkpoint of the pricing and ownership
+checks under ADR-0550-001 principles 5, 6 and 8–12. It records no new allocation.
