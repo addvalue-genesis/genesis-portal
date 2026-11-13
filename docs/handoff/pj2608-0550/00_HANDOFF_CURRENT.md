@@ -1,4 +1,4 @@
-Latest inspection estimate. [A1 S/N 2 and 11.D](20261113_A1_INSPECTION_BUDGET.md) use the same B4 Working owners for FAT/iFAT across 19 systems.
+Latest inspection estimate. [A1 S/N 2 and 11.D](20261113_A1_INSPECTION_BUDGET.md) use the same B4 Working owners for the Thailand three-phase test campaign across 19 systems. Customer price USD 105,175.82 per lot.
 
 Latest C8 form: [purchaser call-off total](20261113_C8_SINGLE_FORM.md). The customer draft shows one form and one total from the complete Working basis. SI diagnostics retain the supporting rows.
 

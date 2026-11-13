@@ -9,7 +9,7 @@
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
   "latestCheckpoint": "docs/handoff/pj2608-0550/20261113_A1_INSPECTION_BUDGET.md",
-  "latestInspectionDecision": "All-system witnessed FAT/iFAT is one A1 S/N 2 Lot with 11.D detail from the existing B4 Working records. Draft customer amount USD 145,638.69 at THB 31.50/USD. OEM PAGA FAT at Wertheim remains in A1-05.",
+  "latestInspectionDecision": "All-system witnessed FAT/iFAT is one A1 S/N 2 Lot with 11.D detail from the existing B4 Working records. Accepted customer amount USD 105,175.82 per Thailand iFAT / Pre-FAT / Integrated FAT lot at THB 31.50/USD. OEM PAGA FAT at Wertheim remains in A1-05.",
   "latestCctvDecision": "The EXW draft prices additional recording and VMS, OEM SAT travel and conditional post-CIF logistics. Shared-scope credits remain subject to Working owner reconciliation.",
   "latestTowerDecision": "Master Tower goods 30% / 20%, erection 30% / 5%. A1-11 goods and A1 Others / B4 erection retain the existing owners. C7 separately tracks field workloads. See the Master Tower checkpoint.",
   "latestFocDecision": "Use the LAY/PHI budget for Appendix 1.8 Draft. Retain distinct APF and ACP 24C local allowances and one APF T6 RG59 allowance in A1-13. Entertainment coax stays in Appendix 1.6. CAT6A goes to A1-01 and physical pipeline installation is a CDL-024 A2 option. Shared costs retain their project owners. Final endpoints and MTO remain open.",

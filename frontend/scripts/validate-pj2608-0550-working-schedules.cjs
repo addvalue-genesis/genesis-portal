@@ -51,17 +51,18 @@ try{
  const Registry=require(root+'/project0550/data/vendorRegister0550.js');
  const Tags=require(root+'/project0550/data/vendorBidTags0550.js');
  const focDate='2026-11-13';
- const {prepareInspectionBudget0550}=require(root+'/project0550/data/inspectionBudget0550.js');
+ const {prepareInspectionBudget0550,prepareLegacyInspectionBudget0550}=require(root+'/project0550/data/inspectionBudget0550.js');
  const {prepareTsiActivityBudget0550}=require(root+'/project0550/data/tsiActivityBudget0550.js');
  const {a1InspectionRows0550,A1InspectionBreakdown0550}=require(root+'/project0550/A1InspectionBreakdown0550.jsx');
  const {scheduleRollup0550}=require(root+'/project0550/data/scheduleRollup0550.js');
- const {sumMoney0550,roundMoney0550}=require(root+'/project0550/data/money0550.js');
+ const {sumMoney0550}=require(root+'/project0550/data/money0550.js');
  const inspectionSeed=prepareTsiActivityBudget0550(focMr.importMrWorkingBasis0550({
   ...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),fx:{thbPerUSD:31.5,thbPerEUR:38.0127,source:'Synthetic fixed FX',date:focDate},
   repositoryBasisImport:{version:'SYNTHETIC',snapshotId:D.DATA_LAYER_META.datasetId,preparedOn:focDate,fxInherited:false},
   mgwDetailPricingImport:{version:'SYNTHETIC',date:focDate,importedLineIds:[],conflicts:[],decision:Q.MGW_SUPERSEDED_0550},
  },D.COMMERCIAL_POLICY,focDate),D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
  const prepareInspection=input=>prepareInspectionBudget0550(input,D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
+ const legacyInspection=prepareLegacyInspectionBudget0550(inspectionSeed,D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
  const inspectionDraft=prepareInspection(inspectionSeed);
  validate(inspectionDraft);
  assert.equal(prepareInspection(inspectionDraft),inspectionDraft);
@@ -70,37 +71,33 @@ try{
  const inspectionView=releaseScheduleDraftView0550(inspectionDraft,inspectionModel,D.SYSTEMS,focDate);
  const inspectionRows=a1InspectionRows0550(inspectionView);
  assert.deepEqual(scheduleRollup0550(inspectionRows),{
-  knownUSD:145638.69,totalUSD:145638.69,priced:22,open:0,count:22,openIds:[],
+  knownUSD:105175.82,totalUSD:105175.82,priced:14,open:0,count:14,openIds:[],
  });
  const inspectionWorking=inspectionModel.provisional.selected.filter(l=>inspectionRows.some(b=>b.lineId===l.id));
- assert.equal(sumMoney0550(inspectionWorking.map(l=>l.customerUSD)),145638.69);
- assert.equal(sumMoney0550(inspectionWorking.map(l=>roundMoney0550(l.costTHB/31.5))),92643.54);
- assert.equal(sumMoney0550(inspectionWorking.map(l=>roundMoney0550(l.workingSellTHB/31.5))),125366.23);
+ assert.equal(sumMoney0550(inspectionWorking.map(l=>l.customerUSD)),105175.82);
+ assert.equal(sumMoney0550(inspectionWorking.map(l=>l.costTHB)),1394450);
+ assert(Math.abs(sumMoney0550(inspectionWorking.map(l=>l.workingSellTHB))-2995145.91)<0.04);
  assert(inspectionRows.every(b=>b.status==='DRAFT'&&b.line.customerRowCode==='B4'));
- assert(N.nativeSchedule0550(inspectionView,'A1').html.includes('145,638.69'));
+ assert(N.nativeSchedule0550(inspectionView,'A1').html.includes('105,175.82'));
  assert(require('react-dom/server').renderToStaticMarkup(require('react').createElement(A1InspectionBreakdown0550,
-  {view:inspectionView,currency:'USD'})).includes('145,638.69'));
+  {view:inspectionView,currency:'USD'})).includes('105,175.82'));
  assert.equal(inspectionView.ready,false);
  const idieLocal='LINE-IDIE-QO26169-LOCAL-FAT-DAY';
- const idieOffer={id:'OFFER-IDIE-QO26169-LOCAL-FAT-DAY',vendorId:'TEST-IDIE',currency:'THB',unit:'day',unitCost:28000};
- const linkedIdie=prepareInspection({...inspectionDraft,offers:[idieOffer]});
- assert.equal(linkedIdie.lines.find(l=>l.id===idieLocal).offerId,idieOffer.id);
- assert.equal(linkedIdie.lines.filter(l=>l.offerId===idieOffer.id).length,1);
- const savedIdie=inspectionDraft.lines.find(l=>l.id===idieLocal);
- const priorLocal={...savedIdie,offerId:idieOffer.id,vendorId:idieOffer.vendorId,manualCost:null,quantity:null,
-  sourceRef:'ID-IE local FAT execution. Confirm service days and crew. ADDVALUE handles temporary installation and cabling.'};
- const priorC7={...V.blankScheduleBinding0550(idieLocal),schedule:'C7',summary:'FIELD_SERVICE',basis:'SI DRAFT / prior automatic route'};
- const idieBefore=V.saveBidVolumeRecord0550({...inspectionSeed,offers:[idieOffer],lines:[...inspectionSeed.lines,priorLocal],
-  repositoryBasisImport:{...inspectionSeed.repositoryBasisImport,pricedVolumeDraftIds:[idieLocal]}},'bindings',priorC7,focDate);
- const movedIdie=prepareInspection(idieBefore);
- assert.equal(movedIdie.lines.find(l=>l.id===idieLocal).quantity,2);
- assert.equal(movedIdie.bidVolumes.bindings.find(b=>b.id===idieLocal).schedule,'A1');
- const editedC7={...idieBefore,bidVolumes:{...idieBefore.bidVolumes,bindings:[{...idieBefore.bidVolumes.bindings[0],basis:'User-authored scope'}]}};
- assert.equal(prepareInspection(editedC7).bidVolumes.bindings.find(b=>b.id===idieLocal).schedule,'C7');
- const removedInspection={...inspectionDraft,lines:inspectionDraft.lines.filter(l=>l.id!==idieLocal),
-  bidVolumes:{...inspectionDraft.bidVolumes,bindings:inspectionDraft.bidVolumes.bindings.filter(b=>b.lineId!==idieLocal)}};
+ const migratedInspection=prepareInspection(legacyInspection);
+ validate(migratedInspection);
+ assert.equal(prepareInspection(migratedInspection),migratedInspection);
+ const migratedView=releaseScheduleDraftView0550(migratedInspection,
+  W.deriveBidWorkspace(migratedInspection,tokens,focDate),D.SYSTEMS,focDate);
+ assert.equal(scheduleRollup0550(a1InspectionRows0550(migratedView)).totalUSD,105175.82);
+ assert.equal(migratedInspection.lines.find(l=>l.id===idieLocal).selected,false);
+ assert(!migratedInspection.bidVolumes.bindings.some(b=>b.id===idieLocal));
+ assert.equal(migratedInspection.lines.find(l=>l.id==='LINE-BID-INSPECTION-0550-MGW').selected,false);
+ const authoredInspection={...legacyInspection,lines:legacyInspection.lines.map(l=>l.id===idieLocal?{...l,quantity:3}:l)};
+ assert.equal(prepareInspection(authoredInspection),authoredInspection,'An authored overlapping owner must be reconciled first');
+ const removedInspection={...inspectionDraft,lines:inspectionDraft.lines.filter(l=>l.id!=='LINE-BID-INSPECTION-0550-TH-TOOLS'),
+  bidVolumes:{...inspectionDraft.bidVolumes,bindings:inspectionDraft.bidVolumes.bindings.filter(b=>b.id!=='LINE-BID-INSPECTION-0550-TH-TOOLS')}};
  assert.equal(prepareInspection(removedInspection),removedInspection,'Deleted Working estimate must not return');
- console.log('PASS all-system 11.D inspection: 22 unique Working owners, USD 92,643.54 cost, USD 125,366.23 ADDVALUE and USD 145,638.69 native A1 S/N 2.');
+ console.log('PASS Thailand iFAT, Pre-FAT and Integrated FAT: 14 unique Working owners and USD 105,175.82 in native A1 S/N 2 and 11.D.');
  const focSeed=G.prepareMgwDetailPricing0550(
   M.importMgwVendorBasis0550(focMr.importMrWorkingBasis0550(W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),D.COMMERCIAL_POLICY,focDate),focDate),
   D.COMMERCIAL_POLICY,focDate);

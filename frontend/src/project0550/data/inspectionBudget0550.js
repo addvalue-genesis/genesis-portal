@@ -6,7 +6,7 @@ import {mgwReplacementActive0550} from './mgwQuoteSelection0550';
 import pagaPlan from './pagaMobPlan0550.json';
 import {prepareTsiActivityBudget0550,TSI_ACTIVITY_PLAN_0550,TSI_INTERNAL_COST_THB_PER_HOUR_0550 as labourCost} from './tsiActivityBudget0550';
 import {importMrWorkingBasis0550} from './mrWorkingBasis0550';
-import {sumMoney0550} from './money0550';
+import {roundMoney0550,sumMoney0550} from './money0550';
 
 const reference='MR Rev.B1 Appendix 1.0 §2 / Appendix 4 / Exhibit C A1 S/N 2 and 11.D';
 const note='FAT/iFAT planning allowance. Verify supplier inclusions, witness scope and ITP.';
@@ -36,7 +36,7 @@ const active=line=>line.selected&&!line.coveredByLineId&&line.responsibility!=='
 const inspection=b=>b?.schedule==='A1'&&b.summary==='INSPECTION'&&b.treatment==='BASE';
 const same=(a,b)=>Boolean(a&&b&&integrationFingerprint0550(a)===integrationFingerprint0550(b));
 
-export function prepareInspectionBudget0550(data,policies,team,today){
+export function prepareLegacyInspectionBudget0550(data,policies,team,today){
  const receipt=data.repositoryBasisImport;
  if(!receipt?.tsiActivityBudget||today<'2026-11-13'||!mgwReplacementActive0550(data))return data;
  const external=policyDefaults0550(policies,EXTERNAL_ENGINEERING_POLICY_0550);
@@ -167,4 +167,142 @@ export function prepareInspectionBudget0550(data,policies,team,today){
   }
  }
  return next===data?data:{...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded]}};
+}
+
+const quoteFx=31.5;
+const acceptedBasis='Thailand iFAT / Pre-FAT / Integrated FAT · accepted bid estimate 2026-11-13';
+const roles=[
+ ['CHIEF','Chief Telecom Engineer'],['SENIOR','Senior Telecom Engineer'],
+ ['TECH','Chief Telecom Technician'],['SUPPORT','Project / Support Engineer'],['DOC','Document Controller'],
+];
+// Chief, senior, technician, support and document-control person-days.
+// OEM charges are included once per test block, including the ID-IE allowance.
+const testBlocks=[
+ ['PAGA','TEL-PAGA','PAGA',[0,5,10,0,0],56000,'5 Bangkok days; ID-IE QO26169: 2 days × THB 28,000'],
+ ['RADIO','TEL-RADIO-DTRS','DTRS/RoIP, Marine, Aeronautical and MF/HF',[0,2,4,1,0],63000,'4 systems; 2 OEM person-days'],
+ ['SATELLITE','TEL-VSAT','VSAT and Ku-Band',[0,1,1,0,0],31500,'2 systems; 1 OEM person-day'],
+ ['LAN','TEL-LAN','LAN/Wi-Fi/Firewall, PABX and Ex IP Phone & Sounder',[0,2,4,2,0],63000,'3 systems; 2 OEM person-days'],
+ ['CCTV','TEL-CCTV','CCTV and Video Conference',[0,1.5,3,1,0],31500,'2 systems; 1 OEM person-day'],
+ ['MET','TEL-MET','MET and AIS Monitoring',[0,1,1,0,0],31500,'2 systems; 1 OEM person-day'],
+ ['NDB','TEL-NDB','NDB',[0,1,1,0,0],31500,'1 OEM person-day'],
+ ['ENT','TEL-ES','Entertainment',[0,1,1,0,0],15750,'0.5 OEM person-day'],
+ ['FO','TEL-FO','Fiber Optic and Bulk Cables',[0,1,1,0,0],15750,'0.5 OEM person-day'],
+ ['DMR','TEL-DMR','Digital Microwave / WBB',[0,1.5,3,0.5,0],31500,'1 OEM person-day'],
+ ['TOWER','TEL-TELT','Telecom Tower APF / ACP',[0,1,1,0,0],31500,'1 OEM person-day'],
+ ['PRE','COMMON','Pre-FAT · integrated dry run',[3,3,6,0,1],126000,'3 test days; 4 OEM person-days'],
+ ['FAT','COMMON','Integrated FAT · COMPANY/PURCHASER witness',[3,6,9,0,2],220500,'3 test days; 7 OEM person-days'],
+ ['TOOLS','COMMON','Shared test facility, bench and calibration',[0,0,0,0,0],270000,'one allowance for all three phases'],
+];
+const blockId=key=>key==='PRE'?commonIds[1]:key==='FAT'?commonIds[0]:prefix+'TH-'+key;
+
+export function prepareInspectionBudget0550(data,policies,team,today){
+ const receipt=data.repositoryBasisImport;
+ if(!receipt?.tsiActivityBudget||today<'2026-11-13'||!mgwReplacementActive0550(data))return data;
+ const external=policyDefaults0550(policies,EXTERNAL_ENGINEERING_POLICY_0550);
+ const labour=policyDefaults0550(policies,'Professional Service');
+ const rates=roles.map(([,role])=>team.find(row=>row.role===role)?.protectedUsdDay);
+ if(!external||!labour||rates.some(rate=>!Number.isFinite(rate)||rate<=0))return data;
+
+ const bindings=new Map((data.bidVolumes?.bindings||[]).map(b=>[b.lineId,b]));
+ const lines=new Map(data.lines.map(line=>[line.id,line]));
+ const recorded=new Set(receipt.pricedVolumeDraftIds||[]);
+ const blockIds=testBlocks.map(([key])=>blockId(key));
+ // The shared bench line marks installation of this plan. Other recorded block
+ // IDs preserve intentional deletions if the shared bench was later removed.
+ if(recorded.has(blockId('TOOLS'))||blockIds.some(id=>!commonIds.includes(id)&&lines.has(id)))return data;
+
+ const cleanSeed=prepareTsiActivityBudget0550(importMrWorkingBasis0550({
+  ...data,lines:[],calculations:[],offers:[],mrWorkingImport:undefined,bidVolumes:undefined,
+  repositoryBasisImport:{...receipt,tsiActivityBudget:undefined,pricedVolumeDraftIds:[]},
+ },policies,today),policies,team,receipt.tsiActivityBudget.preparedOn);
+ const oldDraft=prepareLegacyInspectionBudget0550(cleanSeed,policies,team,today);
+ const oldLines=new Map(oldDraft.lines.map(line=>[line.id,line]));
+ const overlapIds=new Set([...(oldDraft.repositoryBasisImport.pricedVolumeDraftIds||[]),...commonIds]);
+ const localOffer=data.offers.find(offer=>offer.id===idieOfferId);
+ const isGeneratedIdie=line=>{
+  const expected=oldLines.get(idieLineId);
+  if(same(line,expected))return true;
+  if(!localOffer||line.offerId!==idieOfferId||line.vendorId!==localOffer.vendorId||
+   line.officialReview||line.calculationId||line.manualCost!==null||
+   !Object.entries(external).every(([key,value])=>line[key]===value))return false;
+  if(same(line,{...expected,offerId:localOffer.id,vendorId:localOffer.vendorId,manualCost:null}))return true;
+  return line.description==='PAGA Local FAT · Bangkok'&&line.scopeKey.startsWith('ALIE / ')&&
+   (line.quantity===null&&line.sourceRef.endsWith('temporary installation and cabling.')||
+    line.quantity===2&&line.sourceRef.includes('two planned Bangkok local FAT days.'));
+ };
+ const isGeneratedCommon=line=>{
+  const expected=cleanSeed.lines.find(row=>row.id===line.id);
+  const actualCalc=data.calculations.find(row=>row.id===line.calculationId);
+  const expectedCalc=cleanSeed.calculations.find(row=>row.id===expected?.calculationId);
+  if(!same(actualCalc,expectedCalc))return false;
+  if(same(line,expected)||same(line,oldLines.get(line.id)))return true;
+  const plan=TSI_ACTIVITY_PLAN_0550.find(p=>line.id==='REQ-MR-ACT-'+p.key);
+  return same({...line,sourceRef:line.sourceRef.split('\nINTERNAL COST ESTIMATE / ')[0],manualCost:null},expected)&&
+   line.sourceRef.includes('\nINTERNAL COST ESTIMATE / ')&&Number.isFinite(line.manualCost)&&
+   Math.abs(line.manualCost*data.fx.thbPerUSD-labourCost[plan.role]*plan.inputs.Hday)<0.01;
+ };
+ const replaceable=data.lines.filter(line=>{
+  if(!active(line)||!overlapIds.has(line.id)||line.officialReview)return false;
+  const binding=bindings.get(line.id);
+  const generatedBinding=!binding||binding.status==='DRAFT'&&(
+   inspection(binding)&&(binding.basis===note||binding.basis.startsWith('SI DRAFT / '))||
+   line.id===idieLineId&&binding.schedule==='C7'&&binding.basis.startsWith('SI DRAFT / '));
+  if(!generatedBinding)return false;
+  if(commonIds.includes(line.id))return isGeneratedCommon(line);
+  if(line.id===idieLineId)return isGeneratedIdie(line);
+  return same(line,oldLines.get(line.id));
+ });
+ const replaceableIds=new Set(replaceable.map(line=>line.id));
+ // An authored inspection scope or an independently priced ID-IE owner
+ // requires reconciliation before adding the accepted full-lot estimate.
+ if(data.lines.some(line=>active(line)&&!replaceableIds.has(line.id)&&
+  (inspection(bindings.get(line.id))||commonIds.includes(line.id)||line.offerId===idieOfferId)))return data;
+ if(commonIds.some(id=>!replaceableIds.has(id)||recorded.has(id)&&!bindings.has(id)))return data;
+ if(blockIds.some(id=>!commonIds.includes(id)&&(recorded.has(id)||bindings.has(id))))return data;
+ if(data.lines.length+blockIds.length-commonIds.length>2000||
+  bindings.size+blockIds.filter(id=>!bindings.has(id)).length>2000||
+  new Set([...recorded,...blockIds,idieLineId]).size>2000)return data;
+
+ let subtotal=0,allocated=0;
+ const drafts=testBlocks.map(([key,systemToken,label,days,oemTHB,detail])=>{
+  const internalTHB=days.reduce((sum,count,i)=>sum+count*8*labourCost[roles[i][0]],0);
+  const internalSellUSD=days.reduce((sum,count,i)=>sum+count*rates[i],0);
+  const externalSellUSD=oemTHB/quoteFx*(1+external.markupPct/100);
+  const sellRate=internalSellUSD+externalSellUSD;
+  subtotal+=internalSellUSD*(1+labour.primePct/100)+externalSellUSD*(1+external.primePct/100);
+  const roundedSubtotal=roundMoney0550(subtotal);
+  const customerUSD=roundMoney0550(roundedSubtotal-allocated);
+  allocated=roundedSubtotal;
+  const id=blockId(key);
+  const phase=commonIds.includes(id)||key==='TOOLS'?label:'iFAT · '+label;
+  const workload=days.map((count,i)=>count?roles[i][0]+' '+count+' MD':'').filter(Boolean).join(', ');
+  const sourceRef=[acceptedBasis,detail,workload,localOffer&&key==='PAGA'?localOffer.sourceRef:'',
+   'E10 internal rates + '+labour.primePct+'% SAMTEL; external E11 +'+external.markupPct+
+   '% ADDVALUE and E13 +'+external.primePct+'% SAMTEL. USD lot rounding distributed across blocks at THB '+quoteFx+'/USD.'].filter(Boolean).join(' / ');
+  return {
+   ...lines.get(id),id,scopeKey:lines.get(id)?.scopeKey||id,systemToken,description:phase,
+   wbs:'B4',customerRowCode:'B4',tagRef:'THAILAND',requirementRef:reference,sourceRef,
+   vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'USD',
+   manualCost:(internalTHB+oemTHB)/quoteFx,sellMode:'DIRECT',sellRate,markupPct:null,marginPct:null,
+   primePct:(customerUSD/sellRate-1)*100,selected:true,
+   ...(systemToken==='TEL-VSAT'?{satelliteScope:'TSI_SERVICES',scopeBasis:sourceRef}:{}),
+  };
+ });
+ const draftIds=new Set(blockIds);
+ const retired=new Set([...replaceableIds].filter(id=>!draftIds.has(id)));
+ const updatedLines=data.lines.filter(line=>!draftIds.has(line.id)).map(line=>retired.has(line.id)?
+  {...line,selected:false,customerRemark:'Previous inspection estimate. Review overseas/vendor scope separately from the accepted Thailand FAT lot.'}:line);
+ const sources=data.sourceIntake?.sources||[];
+ const mr=sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&
+  s.authority==='CURRENT_TENDER'&&s.content&&!sources.some(other=>other.replaces?.includes(s.id)));
+ let next={...data,lines:[...updatedLines,...drafts],...(data.bidVolumes?{
+  bidVolumes:{...data.bidVolumes,bindings:data.bidVolumes.bindings.filter(b=>!retired.has(b.lineId))},
+ }:{})};
+ for(const line of drafts){
+  const binding=bindings.get(line.id)||blankScheduleBinding0550(line.id);
+  next=saveBidVolumeRecord0550(next,'bindings',{...binding,schedule:'A1',summary:'INSPECTION',
+   sourceIds:binding.sourceIds.length?binding.sourceIds:mr.length===1?[mr[0].id]:[],
+   locator:line.sourceRef,basis:acceptedBasis},today);
+ }
+ return {...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...new Set([...recorded,...blockIds,idieLineId])]}};
 }
