@@ -670,4 +670,41 @@ if(process.env.PJ0550_MGW_CCTV_ENT_REGISTER){
  assert.match(appendix.c1AppendixHtml0550(view),/MGW quoted both monitor sizes together under the workstation/);
  assert.equal(R.deriveReleaseControl0550(prepared,W.deriveBidWorkspace(prepared,tokens,radioLotDate),radioLotDate).state,'HOLD');
  console.log('PASS MGW CCTV: 28 A1-06 owners, 16 priced MR rows, 7 standalone quote rows, USD/THB rollups, quantity/cabinet fallback and Release HOLD.',{cctvUSD:cctv.knownAmount});
+ const {prepareMgwCctvEntBudget0550,MGW_CCTV_ENT_BUDGET_PREFIX_0550:prefix}=require(root+'/project0550/data/mgwCctvEntBudget0550');
+ const prepareBudget=input=>prepareMgwCctvEntBudget0550(input,D.COMMERCIAL_POLICY,radioLotDate);
+ const budget=prepareBudget(prepared),budgetView=projectCctv(budget).view;
+ validate(budget);
+ assert.equal(prepareBudget(budget),budget);
+ assert.equal(budget.offers,prepared.offers);
+ const tags=require(root+'/project0550/data/vendorBidTags0550').offerSourceSections0550;
+ assert(pack.offers.every(offer=>tags(offer).join('/')==='A1/C1'));
+ const own=code=>budgetView.scheduleRows(code).filter(b=>b.lineId.startsWith(prefix));
+ assert.equal(own('C2').length,6);
+ assert.equal(own('C6').length,2);
+ assert.equal(own('C7').length,2);
+ assert.deepEqual(own('C7').map(b=>[b.line.systemToken,b.unit,b.quantity,b.amount,b.line.markupPct,b.line.contingencyPct,b.line.primePct]),
+  [['TEL-CCTV','MH',40,5280,10,null,20],['TEL-ES','MH',10,1320,10,null,20]]);
+ assert(own('C2').every(b=>b.quantity===1&&b.amount>0&&b.line.markupPct===5&&b.line.contingencyPct===5));
+ assert(own('C6').every(b=>b.treatment==='OPTION'&&b.amount>0));
+ assert.equal(own('C8').length,3);
+ assert(own('C8').every(b=>b.treatment==='CALLOFF'&&!b.line.selected&&b.amount>0));
+ assert.deepEqual(budgetView.scheduleRows('C1').filter(b=>b.line.systemToken==='TEL-CCTV').map(b=>b.amount),
+  view.scheduleRows('C1').filter(b=>b.line.systemToken==='TEL-CCTV').map(b=>b.amount));
+ const removed=own('C2')[0].lineId;
+ const withoutSpare={...budget,lines:budget.lines.filter(l=>l.id!==removed),
+  bidVolumes:{...budget.bidVolumes,bindings:budget.bidVolumes.bindings.filter(b=>b.lineId!==removed)}};
+ assert.equal(prepareBudget(withoutSpare),withoutSpare);
+ const external=budget.lines.find(l=>l.id===own('C7')[0].lineId);
+ const authored={...external,id:'TEST-AUTHORED-CCTV-SAT',scopeKey:'TEST-AUTHORED-CCTV-SAT'};
+ const withAuthored=prepareBudget({...prepared,lines:[...prepared.lines,authored]});
+ assert(withAuthored.lines.includes(authored));
+ assert(!withAuthored.lines.some(l=>l.id===external.id));
+ assert.equal(budgetView.mgwCctvEntBudgetShares.length,22);
+ assert(budgetView.mgwCctvEntBudgetShares.every(share=>!share.ownerId.startsWith(prefix)));
+ const purchase=budgetView.bindings.filter(b=>b.schedule==='C1'&&b.line?.systemToken==='TEL-ES'&&radioSelection.mgwCctvEntOffer0550(b.line.offer));
+ assert.equal(purchase.length,14);
+ assert.equal(R.deriveReleaseControl0550(budget,W.deriveBidWorkspace(budget,tokens,radioLotDate),radioLotDate).state,'HOLD');
+ console.log('PASS MGW CCTV / ENT SI budget:',{entGoodsUSD:sum(purchase.map(b=>b.amount))},Object.fromEntries(['C2','C6','C7','C8'].map(code=>[
+  code,own(code).map(b=>[b.line.systemToken,b.quantity,b.amount,b.treatment])
+ ])));
 }

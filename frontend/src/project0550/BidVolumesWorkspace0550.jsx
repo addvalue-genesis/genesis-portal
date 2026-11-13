@@ -61,6 +61,8 @@ const cctvEntScheduleNotes={
  F:'ตรวจประกันและจุดโอนความเสี่ยงตาม Incoterm',
  mapping:'เจ้าของราคา Working A1-06 (CCTV) และ A1-12 (Entertainment) ผูก C1 ตามรายการ ผู้รับผิดชอบและขอบเขตที่ค้างแสดงรายแถว',
 };
+const cctvEntBudgetVisible=(panel,schedule)=>panel===schedule||panel==='mapping'||panel==='preview'||
+ panel==='A1'&&['C5','C7','D','E','F'].includes(schedule)||panel==='A2'&&['C3','C4'].includes(schedule);
 const focScheduleNotes={
  A1:'สายและอุปกรณ์ FO ใช้เจ้าของราคาเดิมใน A1-13 ส่วนสาย CAT6A ใช้ A1-01 ทั้งสองหมวดย้อนดูรายบรรทัดได้ใน Appendix 1.8',
  A2:'ตรวจ Option งานติดตั้งสายและดึงหรือเป่าสาย FO จาก Working Part C',
@@ -246,6 +248,14 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
     row.schedule,row.description,Number.isFinite(row.costTHB)?row.costTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN',
     <button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+row.ownerId)}>{row.ownerId}</button>,
     (row.funded?'Shared owner · ':'Owner / allowance OPEN · ')+row.source,
+   ])}/>}
+ {volume==='I'&&displayView.mgwCctvEntBudgetShares?.some(row=>cctvEntBudgetVisible(panel,row.schedule))&&
+  <Grid label="CCTV and Entertainment shares of Working budget" heads={['Schedule','Scope','Estimated cost (THB)','Selling share ('+currency+')','Working owner / Basis']}
+   rows={displayView.mgwCctvEntBudgetShares.filter(row=>cctvEntBudgetVisible(panel,row.schedule)).map(row=>[
+    '11.'+row.schedule,row.description,Number.isFinite(row.costTHB)?row.costTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN',
+    Number.isFinite(currency==='THB'?row.amountTHB:row.amount)?(currency==='THB'?row.amountTHB:row.amount).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN',
+    <><button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+row.ownerId)}>{row.ownerId}</button>
+     <small>{row.source} · {row.funded?'Included in the Working owner':'Working price OPEN'}</small></>,
    ])}/>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}

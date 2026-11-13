@@ -16,7 +16,7 @@ const capitalOptions=[
  ['1.3','G450 media gateway'],['1.4','G450 R2 power supply'],
  ['1.7-M800C-ESBC','Mediant 800C'],['1.9','Auteldac 6'],
 ];
-const facilities=[
+export const purchaserFacilityPlanningRates0550=[
  ['OFFICE','Purchaser office support',1000],
  ['TRANSPORT','Purchaser in-city transportation',2000],
  ['WORKING_LUNCH','Purchaser working lunch',500],
@@ -57,7 +57,7 @@ export function prepareChevalierPbxBudget0550(data,policies,today){
   rows.push([make('C6',c6Description,'C1','C1',4,'SET',3000,c6Specification),
    {schedule:'C6',summary:'CONSUMABLES',treatment:'OPTION',specification:c6Specification}]);
  }
- for(const [summary,description,rate] of facilities){
+ for(const [summary,description,rate] of purchaserFacilityPlanningRates0550){
   if(bindings.some(binding=>binding.schedule==='C8'&&binding.summary===summary))continue;
   rows.push([make('C8-'+summary,description,'B8','B1',8,'MD',rate,'8 purchaser man-days (4 sites × 2 MD), call-off planning rate.',
    {selected:false,sellMode:'DIRECT',sellRate:rate,primePct:0,markupPct:null,contingencyPct:null,marginPct:null}),
