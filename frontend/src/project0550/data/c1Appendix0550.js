@@ -12,6 +12,7 @@ import {satelliteScope0550} from './satelliteScope0550';
 import {mrLineScope0550} from './mrWorkingBasis0550';
 import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
+import {radioLotIncludedLines0550} from './radioLotComponents0550';
 import {APF_DMR_CABINET_MR_0550,versedDmrCabinetWorking0550,versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
 import {CHEVALIER_PBX_SUPPLY_0550} from './chevalierPbxQuote0550';
 import chevalierLocation from './chevalierLocationBasis0550.json';
@@ -522,7 +523,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
  for(const rs of repeated)for(const r of rs)r.note=unique([r.note,...r.notes.filter(n=>/\binstall(?:ed|ation)?\b/i.test(n))].filter(Boolean)).join('; ');
  const all=[...rows,...extra];
  if(!legacy){
-  for(const row of all)row.components=c1ComponentPrices(row,detailsByOwner,currency);
+  for(const row of all){
+   row.components=c1ComponentPrices(row,detailsByOwner,currency);
+   const bom=(row.priceOwners||[]).flatMap(owner=>mgwRadioDtrsOffer0550(owner.line?.offer)?radioLotIncludedLines0550(owner.line.offer,owner.quantity):[]);
+   if(bom.length)row.components=[...row.components,...bom];
+  }
   all.sort((a,b)=>(mrOrder.get(a.key)??Number.MAX_SAFE_INTEGER)-(mrOrder.get(b.key)??Number.MAX_SAFE_INTEGER));
  }
  const groups=C1_APPENDICES_0550.map(s=>({id:s.id,title:legacy?s.title:'Scope of Supply for '+mrScopeNames[s.id],rows:all.filter(r=>r.appendix===s.id)}));
