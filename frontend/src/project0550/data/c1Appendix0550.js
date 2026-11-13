@@ -13,6 +13,12 @@ import {scheduleBindingTHB0550,scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
 import {versedLanRackOffer0550,versedLanRackReplaces0550} from './versedRack0550';
 import {CHEVALIER_PBX_SUPPLY_0550} from './chevalierPbxQuote0550';
+import chevalierLocation from './chevalierLocationBasis0550.json';
+
+const apfExPhoneMr='MR-B1-13-APF-07';
+const chevalierExPhoneItemCodes=new Set(chevalierLocation.groups.filter(group=>
+ group.classification==='BASE_PRICE'&&group.mrIds.length===1&&group.mrIds[0]===apfExPhoneMr)
+ .flatMap(group=>group.itemCodes));
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
 export const C1_APPENDIX_LAYOUT_0550='mr-appendix.v2';
@@ -402,11 +408,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};
   if(pbx){
-   const apfExPhone=!legacy&&targets.find(target=>target.key==='MR-B1-13-APF-07');
+   const apfExPhone=!legacy&&targets.find(target=>target.key===apfExPhoneMr);
    for(const product of b.line.pbxProducts){
     const component={...product,source:product.description,note:'Included in supply lot'};
-    // The Ex phone is listed with its APF MR scope. Its package remains the sole price owner.
-    if(apfExPhone&&product.itemCode==='1.1.15')apfExPhone.components.push(component);
+    // Show the quoted Ex phone and accessories under their APF MR reference.
+    if(apfExPhone&&chevalierExPhoneItemCodes.has(product.itemCode))apfExPhone.components.push(component);
     else item.components.push(component);
    }
    if(view.workingPreview){
