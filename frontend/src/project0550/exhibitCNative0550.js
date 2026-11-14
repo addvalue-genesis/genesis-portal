@@ -302,6 +302,14 @@ function nativePages(view,id,currency='USD',c2References){
     firstPage=false;
    });
   }
+  // Retain one original form when the customer export has no allocated spares.
+  if(issued(view)&&!pages.length){
+   const v=blankValues(id);
+   set(v,0,0,field(view,id,'vendorNameAddress'));
+   set(v,0,1,field(view,'A','agreementNo'));
+   set(v,0,2,'');set(v,0,3,'');set(v,1,1,'');
+   add(v);
+  }
  }
  if(id==='C7'){
   const site=rows.filter(b=>role(b)==='FIELD_SERVICE'),training=rows.filter(b=>role(b)==='TRAINING'),unknown=rows.filter(b=>!['FIELD_SERVICE','TRAINING'].includes(role(b)));
@@ -594,7 +602,7 @@ export function buildNativeExhibitDocx0550(view,only){
   });
  });
  const lastParagraph=xml.lastIndexOf('</w:p>');
- xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
+ if(lastParagraph!==-1)xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
  if(/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(xml))throw Error('Unsupported XML control character in Exhibit C');
  const parts={...template.parts,'word/document.xml':xml};
  for(const name of Object.keys(parts).filter(n=>/^word\/header\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:t[^>]*>[^<]*No\.:)(<\/w:t>)/g,(_,a,b)=>a+' '+escape(field(view,'A','agreementNo')||'OPEN')+b);
