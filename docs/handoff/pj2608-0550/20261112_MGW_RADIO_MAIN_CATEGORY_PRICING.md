@@ -47,3 +47,37 @@ The 13 Radio allowances total USD 140,660.22 at cost and USD 185,671.49
 at draft customer sell. The fixed-station allowance adds USD 3,524 at cost
 and USD 4,651.68 at sell compared with the preceding budget. MGW's USD
 700,501 quotation and GTPL source reference retain their original amounts.
+
+## 14 November · ACP shared Radio Console
+
+MR Rev.B1 Appendix 1.1 ACP item 5 and ACP LIS-0001 C1 identify one
+`CON-308-001` in the Control Room. ACP BLD-0001 C3 comment 2 confirms
+shared operation for VHF DMR, VHF-FM Marine and MF/HF SSB. DTS-0008 B1
+identifies a workstation client with dispatch audio/PTT accessories. Treat
+`RADIO-004` as the USD 1,988 hardware allowance for that position. MGW
+Q26-063 ver1.0 p10 lists one console without a hardware model or BOM.
+
+`RADIO-001` contains a workstation, Dell dispatch server, SmartPTT PLUS
+Core `GMVN6044B` and recording licence `GMVN6057A`. The Core includes one
+dispatcher entitlement, allocated to that workstation in the bid design.
+The 122 `GMVN6050A` licences are radio-device entitlements. Carry one
+`GMVN6054A` additional dispatcher entitlement for ACP at a USD 1,000 SI
+cost allowance. The Airsys equivalent-function benchmark is GBP 589.51
+ex VAT under a different part code. Verify hardware BOM, concurrent
+operation and audio/PTT/recording for all three radio interfaces at iFAT.
+This disposition covers ACP; the APF RoIP and console design remains a
+separate scope review.
+
+The two prices roll up once at A1-07 and C1 ACP Console. The position is
+USD 2,988 cost and USD 3,944.16 draft customer sell, including USD 1,320
+sell for the licence. Vendor 07.2 and the three Working system groups show
+the technical basis. C1 keeps it in internal trace. The MGW validator
+checks both owners, the combined C1 price and the separate source total.
+This applies ADR-0550-001 principles 3, 6, 11, 13 and 14.
+
+Sources: [MGW Q26-063](https://drive.google.com/file/d/1uWxdcJ6z1a7FFb0DV05es7YvRtnQApEQ/view),
+[ACP BLD-0001 C3](https://drive.google.com/file/d/1Vo1VIWWyw9HjgERhpCV3RJNcA-m5T17q/view),
+[DTS-0008 B1](https://drive.google.com/file/d/12B4W2XhJ549JkTFG1Ir4cURYhWuhs7tJ/view),
+[Core entitlement](https://shop.peitel.nl/en/Software-SmartPTT-PLUS-CORE/7000-00448400),
+[additional dispatcher entitlement](https://shop.peitel.com/Lizenz-SmartPTT-PLUS-ADD-DISPATCHER/7000-00448000),
+[licence cost benchmark](https://www.airsys.co.uk/application-smart-ptt/c-3429.html).

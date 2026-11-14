@@ -540,7 +540,9 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  assert.strictEqual(prepare(budget),budget);
  assert.strictEqual(budget.offers,radioLots.offers);
  const estimates=budget.lines.filter(line=>radioAppendix11Estimate0550.has(line.id));
- assert.equal(estimates.length,13);
+ assert.equal(estimates.length,14);
+ const consoleLicence=estimates.find(line=>line.id==='LINE-BID-RADIO-ACP-DISPATCH-LICENCE');
+ assert.deepEqual([consoleLicence.quantity,consoleLicence.manualCost,consoleLicence.customerRowCode],[1,1000,'A1-07']);
  const fixed=estimates.find(line=>line.id==='LINE-BID-RADIO-APF-DTRS-FIXED');
  assert.deepEqual([fixed.quantity,fixed.manualCost],[6,3524]);
  const fixedBinding=budget.bidVolumes.bindings.find(binding=>binding.lineId===fixed.id);
@@ -560,9 +562,9 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  const reviewedBinding={...oldBudget,bidVolumes:{...oldBudget.bidVolumes,bindings:oldBudget.bidVolumes.bindings.map(binding=>
   binding.lineId===fixed.id?{...binding,status:'REVIEWED'}:binding)}};
  assert.strictEqual(prepare(reviewedBinding),reviewedBinding);
- assert.equal(sum(estimates.map(line=>line.quantity*line.manualCost)),140660.22);
+ assert.equal(sum(estimates.map(line=>line.quantity*line.manualCost)),141660.22);
  const model=W.deriveBidWorkspace(budget,tokens,radioLotDate);
- assert.equal(sum(model.provisional.selected.filter(line=>radioAppendix11Estimate0550.has(line.id)).map(line=>line.customerUSD)),185671.49);
+ assert.equal(sum(model.provisional.selected.filter(line=>radioAppendix11Estimate0550.has(line.id)).map(line=>line.customerUSD)),186991.49);
  assert(model.official.lines.filter(line=>radioAppendix11Estimate0550.has(line.id)).every(line=>line.customerUSD===null));
  const projection=radioWithMr(budget).c1;
  assert(!projection.problems.includes('C1_OWNER_TOTAL_MISMATCH'));
@@ -570,7 +572,12 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  const ownerIds=rows.flatMap(row=>row.priceOwners.map(binding=>binding.lineId));
  assert.equal(new Set(ownerIds).size,ownerIds.length);
  assert.equal(ownerIds.filter(id=>id.startsWith('LINE-MGW-CURRENT-RADIO-')).length,18);
- assert.equal(ownerIds.filter(id=>radioAppendix11Estimate0550.has(id)).length,13);
+ assert.equal(ownerIds.filter(id=>radioAppendix11Estimate0550.has(id)).length,14);
+ const acpConsole=rows.find(row=>row.key==='MR-B1-11-ACP-05');
+ assert.equal(acpConsole.amount,3944.16);
+ assert.deepEqual(acpConsole.ownerIds,['LINE-MGW-CURRENT-RADIO-004',consoleLicence.id]);
+ assert.match(acpConsole.internalNote,/GMVN6054A/);
+ assert(!appendix.c1AppendixHtml0550(radioWithMr(budget).view).includes('GMVN6054A'));
  const quotedAt=(sn,item)=>rows.find(row=>row.sn===sn).quotedComponents.some(c=>c.offer.id.endsWith('-'+item));
  assert(quotedAt('1.1.6','RADIO-007')&&quotedAt('1.1.6','RADIO-015'));
  assert(quotedAt('1.1.10','RADIO-017'));
@@ -581,7 +588,7 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  const rateChanged={...budget,offers:budget.offers.map(offer=>offer.id.endsWith('-RADIO-012')?{...offer,unitCost:offer.unitCost+1}:offer)};
  assert(W.deriveBidWorkspace(rateChanged,tokens,radioLotDate).lines.find(line=>line.id==='LINE-BID-RADIO-APF-AERO-FIXED')
   .problems.some(problem=>problem.startsWith('RADIO_SI_ESTIMATE_SOURCE_CHANGED:')));
- console.log('PASS Appendix 1.1 SI budget: 13 owners, source preservation, provisional site allocations, no duplicate C1 price and no Official promotion.');
+ console.log('PASS Appendix 1.1 SI budget: 14 owners including the ACP dispatcher licence, source preservation, provisional site allocations, no duplicate C1 price and no Official promotion.');
 }
 const standaloneRadio=withRadioMr.c1.rows.filter(r=>r.pendingRadioPlacement);
 assert.deepEqual(standaloneRadio.flatMap(r=>r.priceOwners.map(b=>radioSelection.mgwCurrentItemKey0550(b.line.offer))).sort(),

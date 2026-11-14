@@ -254,7 +254,7 @@
     },
     "acpConsole": {
       "state": "CUS",
-      "note": "MR ระบุ Console เดี่ยว 1 Pc. BLD แสดง Console ที่จุดใช้งานและมีสายเชื่อม LAN.",
+      "note": "MR ระบุ Console ใช้งาน 1 จุด. BLD Comment 2 ยืนยันว่า ACP ใช้ Console ร่วมสำหรับ VHF DMR, VHF-FM Marine และ MF/HF SSB. DTS ระบุ Workstation PC สำหรับ Console Client. ฐานเสนอราคา SI ใช้ MGW RADIO-004 สำหรับ Hardware 1 ชุด และกันสิทธิ์ Dispatcher เพิ่มใน Working. ใบ RADIO-004 ระบุเพียง Radio Console 1 Pc โดยยังไม่มีรุ่นและ BOM.",
       "placements": [
         {
           "equipment": "Radio Console",
@@ -275,7 +275,7 @@
             ],
             [
               "bldAcp",
-              "sheet 3/4"
+              "Comment 2 / sheet 3 of 4"
             ],
             [
               "dtsDmr",

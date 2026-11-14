@@ -491,7 +491,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(r.provisionalRadio){
    r.amount=money(owned.map(b=>b.amount).filter(Number.isFinite));
    r.note=unique([...r.raws,...owned.map(b=>b.line)].map(line=>customerRemark(line,legacy)).filter(Boolean)).join(' · ');
-   r.internalNote=MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
+   r.internalNote=r.key==='MR-B1-11-ACP-05'?radioAppendix11Notices0550['ACP Radio Console']:MGW_RADIO_DTRS_QUOTED_SCOPE_0550;
    if(showRadioBudget&&owned.some(b=>radioAppendix11Estimate0550.has(b.lineId)))r.pendingRadioPlacement='ราคาตามใบเสนอราคาและ/หรืองบ SI ส่วนที่ขาด · Draft';
    problems.push('C1_RADIO_MR_SCOPE_OPEN / '+r.key);
   }else if(r.provisionalDmr){
