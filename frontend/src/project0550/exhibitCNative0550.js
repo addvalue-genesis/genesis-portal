@@ -36,6 +36,11 @@ const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',
 const role=b=>aliases[normalize(b.summary)]||normalize(b.summary);
 export const a1SummarySlot0550=b=>b.schedule==='C2'?5:b.schedule==='C5'?7:b.schedule==='C7'?8:b.schedule==='C8'?9:({GOODS:2,INSPECTION:3,PACKING:4,VENDOR_DOCUMENTS:10,OTHER:11}[role(b)]);
 const shared=(rows,key)=>{const values=[...new Set(rows.map(b=>b[key]||''))];return values.length===1&&values[0]?values[0]:'OPEN';};
+const issued=view=>view.customerIssue===true;
+const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
+const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(String(text||''));
+const customerRemarkText=rows=>{const notes=[];for(const b of rows){const text=String(b.line?.customerRemark||b.customerRemark||'').trim();if(text&&!internalRemark(text)&&!notes.includes(text))notes.push(text);}return notes.join('; ');};
+function resolveMainEquipmentTag(b,view){const raw=b.mainEquipment?.trim();const isGeneric=!raw||raw==='OPEN'||/^(PABX \/ IP Telephony|FOC and Cables|Equipment)$/i.test(raw);if(!isGeneric)return raw;const reqs=view.requirements||view.integrationWorkspace?.requirements||view.integration?.requirements||[];const req=reqs.find(r=>r.workLineIds?.includes(b.lineId)||r.id===b.line?.mrRequirementId||r.id==='REQDEF-'+b.line?.mrRequirementId);if(req){const tags=(req.tagBindings||[]).map(tb=>tb.tag).filter(Boolean);if(tags.length)return [...new Set(tags)].join(' / ');if(req.cabinetTag)return req.cabinetTag;}if(b.line?.cabinetTag)return b.line.cabinetTag;if(b.line?.physicalTag)return b.line.physicalTag;if(b.line?.tagRef&&!/^(APF|ACP|OFFSHORE|PROJECT)$/i.test(b.line.tagRef))return b.line.tagRef;return raw&&raw!=='OPEN'?raw:(issued(view)?'':'OPEN');}
 function words(n,currency='USD'){
  if(!Number.isFinite(n))return 'OPEN';
  const small=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],tens=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
@@ -99,9 +104,9 @@ function nativePages(view,id,currency='USD',c2References){
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
    const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,(view.workingPreview&&subtotalNote(view,bs)?(()=>{const p=scheduleRollup0550(bs);return p.priced+'/'+p.count+' priced; '+p.open+' OPEN. Known subtotal only'+(terms.has('')?' / Delivery term OPEN':'');})():(view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':'')));}
+   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,issued(view)?customerRemarkText(bs):(view.workingPreview&&subtotalNote(view,bs)?(()=>{const p=scheduleRollup0550(bs);return p.priced+'/'+p.count+' priced; '+p.open+' OPEN. Known subtotal only'+(terms.has('')?' / Delivery term OPEN':'');})():(view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':'')));}
    else{
-    if(r===6||r===7)set(v,r,1,bs.map(b=>b.line.description).join('; '));
+    if(r===6||r===7)set(v,r,1,issued(view)?customerRemarkText(bs):bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
     if(r===4){set(v,r,3,'MD');set(v,r,4,value(diemQty));if(!diemQty||terms.size>1)issues.push('A2 DIEM quantity/rate basis OPEN');}
     const rollup=view.workingPreview?scheduleRollup0550(bs):null,assigned=[];
@@ -114,7 +119,7 @@ function nativePages(view,id,currency='USD',c2References){
      if(Number.isFinite(termAmount))assigned.push(t+' '+currency+' '+number(termAmount));
     }
     const notes=[];
-    if(!view.workingPreview||r!==6&&r!==7)notes.push(view.workingPreview&&bs.length>3?bs.length+' quoted items':bs.map(b=>b.line.description).join('; '));
+    if(!view.workingPreview||r!==6&&r!==7)notes.push(issued(view)?customerRemarkText(bs):view.workingPreview&&bs.length>3?bs.length+' quoted items':bs.map(b=>b.line.description).join('; '));
     if(terms.has('')){
      issues.push('A2 customer term OPEN');
      if(view.workingPreview&&Number.isFinite(amount)){
@@ -184,7 +189,7 @@ function nativePages(view,id,currency='USD',c2References){
   // totals until bound in 11.M. These rows are never appended to view.bindings.
   const systems=view.c2Systems||c2References?spareSystemGroups0550(view,id,c2References):[{rows}];
   for(const system of systems){
-   if(system.draftRows?.length){
+   if(!issued(view)&&!system.rows.length&&system.draftRows?.length){
     chunks(system.draftRows,7).forEach((references,pi)=>{
      const v=blankValues(id),draftPriceRows=[];
      set(v,0,2,'OPEN');
@@ -208,11 +213,11 @@ function nativePages(view,id,currency='USD',c2References){
     continue;
    }
    let firstPage=true;
-   const groups=new Map();for(const b of system.rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
+   const groups=new Map();for(const b of system.rows){const key=resolveMainEquipmentTag(b,view);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size&&!issued(view))groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
     const v=blankValues(id),draftPriceRows=[];set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
-     const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description;
+     const r=i+4,description=issued(view)?customerDescription(id==='C2'?c2PartsDescription0550(b):b.line?.description||b.description):(id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description);
      [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
      prices(v,r,9,b,draftPriceRows);
     });
@@ -225,6 +230,17 @@ function nativePages(view,id,currency='USD',c2References){
     firstPage=false;
    });
   }
+  if(id==='C3'&&view.workingPreview&&pages.length){
+   const options=pages.flatMap(page=>page.priceRows||[]).filter(b=>b.treatment==='OPTION'&&!b.nonAdditive);
+   pages.at(-1).c3OptionTotal=sparePriceNote(options,currency);
+  }
+  if(issued(view)&&!pages.length){
+   const v=blankValues(id);
+   set(v,0,0,field(view,id,'vendorNameAddress'));
+   set(v,0,1,field(view,'A','agreementNo'));
+   set(v,0,2,'');set(v,0,3,'');set(v,1,1,'');
+   add(v);
+  }
  }
  if(id==='C7'){
   const site=rows.filter(b=>role(b)==='FIELD_SERVICE'),training=rows.filter(b=>role(b)==='TRAINING'),unknown=rows.filter(b=>!['FIELD_SERVICE','TRAINING'].includes(role(b)));
@@ -235,7 +251,7 @@ function nativePages(view,id,currency='USD',c2References){
    for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){
     const group=bs.slice(p*4,(p+1)*4);pageRows.push(...group);
     group.forEach((b,i)=>{
-     const name=b.line.description+(view.workingPreview&&b.treatment==='OPTION'?' (Option / A2)':'');
+     const name=issued(view)?customerDescription(b.line?.description||b.description):b.line.description+(view.workingPreview&&b.treatment==='OPTION'?' (Option / A2)':'');
      set(v,start+i,2,name);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');
      set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));
     });
@@ -269,7 +285,7 @@ function nativePages(view,id,currency='USD',c2References){
     set(v,r,3,country&&bs.length===1?value(bs[0].quantity)+' '+c8Unit0550(bs[0]):key==='AIRPORT'||!assigned.length?'':value(qty));
     set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
     set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
-    set(v,r,6,bs.map(b=>b.line.description+' / '+(country?(r===1?b.basis:'Estimated call-off'):b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
+    set(v,r,6,issued(view)?(customerRemarkText(bs)||(country?(r===1?bs[0].basis:'Estimated call-off'):bs[0].treatment)):bs.map(b=>b.line.description+' / '+(country?(r===1?b.basis:'Estimated call-off'):b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
     if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
    }
    const assigned=view.workingPreview&&!country?group.filter(b=>b.treatment!=='CALLOFF'):group;
@@ -418,7 +434,12 @@ function renderPage(view,page,format,currency='USD'){
  if(page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
   (page.id==='C2'&&page.priceRows?.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
  if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
- if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
+ if(page.c3OptionTotal&&!issued(view)){
+  const label=escape((view.c2SystemToken?'Schedule C3 system subtotal (Option): ':'Schedule C3 total (A2 Option): ')+page.c3OptionTotal);
+  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
+  else result+=`<p class="native-response"><strong>${label}</strong></p>`;
+ }
+ if(partialNote&&!issued(view)){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');
  else if(response?.trim())result+=`<p class="native-response"><b>BIDDER response:</b> ${escape(response).replace(/\n/g,'<br>')}</p>`;
@@ -455,7 +476,7 @@ export function nativeExhibitProblems0550(view,only){
 export function nativeExhibitHtml0550(view,only,includeCover=false){
  const ids=only?[only]:Object.keys(template.schedules);
  const cover=includeCover?`<article class="p55-native-paper"><h2>Volume I — Quotation</h2><p>${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p><p>${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}</p><h2>Power of Attorney / Undertaking</h2><p>${escape(view.getRecord('I.cover').content||'OPEN')}</p></article>`:'';
- const pbx=only?[]:chevalierPbxScheduleTrace0550(view);
+ const pbx=only||issued(view)?[]:chevalierPbxScheduleTrace0550(view);
  const appendix=pbx.length?`<article class="p55-native-paper"><h2>IP Telephony and PABX · Volume I draft trace</h2><table><thead><tr><th>Volume I</th><th>Draft status</th><th>Scope</th></tr></thead><tbody>${pbx.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')}</tbody></table></article>`:'';
  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${appendix}</body></html>`;
 }
@@ -479,7 +500,7 @@ export function buildNativeExhibitDocx0550(view,only){
   const block=only==='C2'&&view.c2Systems?blocks[only].replace(trailingBreak,''):blocks[only];
   xml=xml.slice(0,start)+block+xml.slice(end);
  }
- const pbx=only?[]:chevalierPbxScheduleTrace0550(view);
+ const pbx=only||issued(view)?[]:chevalierPbxScheduleTrace0550(view);
  if(pbx.length){
   const paragraph=text=>`<w:p><w:r><w:t xml:space="preserve">${escape(text)}</w:t></w:r></w:p>`;
   const appendix=paragraph('IP Telephony and PABX · Volume I draft trace')+
@@ -487,7 +508,7 @@ export function buildNativeExhibitDocx0550(view,only){
   const section=xml.lastIndexOf('<w:sectPr');
   xml=xml.slice(0,section)+appendix+xml.slice(section);
  }
- if(view.workingPreview)xml=xml.replace(/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/g,table=>{
+ if(view.workingPreview&&!issued(view))xml=xml.replace(/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/g,table=>{
   if(!table.includes('Component: '))return table;let index=0;
   return table.replace(/<w:tr(?:\s[^>]*)?>[\s\S]*?<\/w:tr>/g,row=>{
    const header=index++<2,component=row.includes('Component: ');if(!header&&!component)return row;
@@ -497,18 +518,22 @@ export function buildNativeExhibitDocx0550(view,only){
   });
  });
  const lastParagraph=xml.lastIndexOf('</w:p>');
- xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
+ if(lastParagraph!==-1)xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
  if(/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(xml))throw Error('Unsupported XML control character in Exhibit C');
  const parts={...template.parts,'word/document.xml':xml};
  for(const name of Object.keys(parts).filter(n=>/^word\/header\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:t[^>]*>[^<]*No\.:)(<\/w:t>)/g,(_,a,b)=>a+' '+escape(field(view,'A','agreementNo')||'OPEN')+b);
  if(Object.values(parts).some(s=>/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(s)))throw Error('Unsupported XML control character in Exhibit C');
  // A visible draft/authorized label in each native footer; original fields remain.
- for(const name of Object.keys(parts).filter(n=>/^word\/footer\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:p(?:\s[^>]*)?>)/,m=>m+`<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')} / </w:t></w:r>`);
+ if(!issued(view))for(const name of Object.keys(parts).filter(n=>/^word\/footer\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:p(?:\s[^>]*)?>)/,m=>m+`<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')} / </w:t></w:r>`);
  for(const [name,b64] of Object.entries(template.binary))parts[name]=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));
  return zipStore(parts);
 }
+export function officialExhibitGaps0550(view,only){
+ return nativeExhibitProblems0550({...view,customerIssue:true},only);
+}
 export function downloadNativeExhibit0550(view,format='docx',only){
- const html=format==='html',content=html?nativeExhibitHtml0550(view,only):buildNativeExhibitDocx0550(view,only),url=URL.createObjectURL(new Blob([content],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})),a=document.createElement('a');
+ const issuedView={...view,customerIssue:true};
+ const html=format==='html',content=html?nativeExhibitHtml0550(issuedView,only):buildNativeExhibitDocx0550(issuedView,only),url=URL.createObjectURL(new Blob([content],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})),a=document.createElement('a');
  const scope=only==='C2'&&view.c2SystemToken?'Schedule-C2-'+view.c2SystemToken:only?'Schedule-'+only:'All-Schedules';
- a.href=url;a.download=`PJ2608-0550_Exhibit-C_${scope}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_DRAFT.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ a.href=url;a.download=`PJ2608-0550_Exhibit-C_${scope}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_OFFICIAL.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

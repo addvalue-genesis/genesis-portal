@@ -1,10 +1,13 @@
 import React,{useMemo,useState} from 'react';
-import {a1SummarySlot0550,nativeSchedule0550,nativeExhibitProblems0550,nativeFormCss0550,nativeExhibitHtml0550,downloadNativeExhibit0550} from './exhibitCNative0550';
+import {a1SummarySlot0550,nativeSchedule0550,nativeExhibitProblems0550,nativeFormCss0550,nativeExhibitHtml0550,downloadNativeExhibit0550,officialExhibitGaps0550} from './exhibitCNative0550';
 import {MgwScheduleSource0550} from './WorkingSchedulePreview0550';
 import {ScheduleParentResults0550,SchedulePriceDiagnostics0550} from './SchedulePriceDiagnostics0550';
 import {C1Appendix0550} from './C1Appendix0550';
 import {C1_APPENDIX_LAYOUT_0550} from './data/c1Appendix0550';
-import {scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
+import {scheduleBindingTHB0550,scheduleRollup0550,scheduleViewTHB0550} from './data/scheduleRollup0550';
+import {c3AllowanceIds0550} from './data/bidCompletion0550';
+import {c3GoodsShares0550} from './data/c3GoodsAllowance0550';
+import {sumMoney0550} from './data/money0550';
 import {C8_CALLOFF_COUNTRIES_0550,C8_CALLOFF_ITEMS_0550,c8Country0550} from './data/c8Calloff0550';
 import {c2DraftRowsFromExisting0550,c2HasSystem0550,c2ProjectLotOverlaps0550,spareSystemGroups0550,spareEquationDraftRows0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
@@ -57,6 +60,39 @@ function A1DirectReview0550({view,currency,onNavigate,onAllocate,disabled}){
  </section>;
 }
 
+function C3GoodsBreakdown0550({view,currency,onNavigate,disabled}){
+ const basis=view.c3GoodsBasis;
+ if(!basis?.length)return null;
+ const options=view.scheduleRows('C3').filter(row=>row.treatment==='OPTION'&&!row.nonAdditive);
+ const allowances=options.filter(row=>c3AllowanceIds0550.includes(row.lineId));
+ const generated=allowances.filter(row=>row.line.spareBudget);
+ const shares=c3GoodsShares0550(basis,generated,currency);
+ const displayed=currency==='THB'?options.map(scheduleBindingTHB0550):options;
+ const bySystem=new Map((view.c2Systems||[]).map(system=>[system.token,system.name]));
+ const subtotal=scheduleRollup0550(displayed);
+ return <details className="p55-panel" open>
+  <summary>งบ C3 จากสินค้า Working A · {basis.length-1} ระบบ + COMMON</summary>
+  <p>วัสดุสิ้นเปลือง 2% และอะไหล่ทดแทน 1% ใช้รายการราคา Working C3 เดิม ยอดแสดงใน A1 ข้อ 5 และรวมใน A2 ครั้งเดียว</p>
+  {allowances.some(row=>!row.line.spareBudget)&&<p>งบ COMMON ที่แก้ไขด้วยมือยังอยู่ในยอดรวมและรอกระทบกับงบรายระบบ</p>}
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="Schedule C3 budget by system">
+   <thead><tr><th>ระบบ</th><th>ฐานต้นทุนสินค้า THB</th><th>ราคาขาย C3 {currency}</th><th>ฐานราคา</th></tr></thead>
+   <tbody>{shares.map(row=>{
+    const itemized=displayed.filter(binding=>binding.line.systemToken===row.systemToken&&!c3AllowanceIds0550.includes(binding.lineId));
+    const named=scheduleRollup0550(itemized);
+    const amount=row.replaced?named.knownUSD:sumMoney0550([row.amount,named.knownUSD].filter(Number.isFinite));
+    const sourceId=row.replaced?.[0]||row.owners[0];
+    const status=row.replaced?(named.open?'รายการอะไหล่ · มีราคา OPEN':'รายการอะไหล่ใน Working'):
+     row.companySupply?'COMPANY / EPC01 จัดหา':Number.isFinite(row.amount)?'งบร่าง · OEM list OPEN':'ฐานราคา OPEN';
+    return <tr key={row.systemToken}>
+     <th scope="row">{bySystem.get(row.systemToken)||row.systemToken}</th><td>{money(row.costTHB)}</td><td>{money(amount)}</td>
+     <td>{status}{sourceId&&onNavigate&&<button type="button" disabled={disabled} onClick={()=>onNavigate('bid.budget.working.line.'+sourceId)}>เปิด Working</button>}</td>
+    </tr>;
+   })}</tbody>
+   <tfoot><tr><th scope="row" colSpan={2}>C3 / A2 Option</th><td>{money(subtotal.knownUSD)}</td><td>{subtotal.open?`${subtotal.open} รายการราคา OPEN`:'Working Draft'}</td></tr></tfoot>
+  </table></div>
+ </details>;
+}
+
 export function LazyNativeExhibitC0550(props){
  const [open,setOpen]=useState(false);
  return <details open={open} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}><summary>{props.label}</summary>{open&&<NativeExhibitC0550 {...props}/>}</details>;
@@ -67,6 +103,7 @@ export function LazyNativeExhibitC0550(props){
 export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,c2Scope,onPrepareSpare,disabled=false,mrNavigationTarget}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
+ const [issueNote,setIssueNote]=useState('');
  const ws=useBidWorkspace();
  const references=useMemo(()=>{
   if(!['C2','C3','C4'].includes(id)||!view.workingPreview||!c2Scope)return undefined;
@@ -88,18 +125,25 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
  const c8Estimate=id==='C8'&&view.workingPreview?scheduleRollup0550(screenView.scheduleRows('C8').filter(c8Country0550)):null;
  const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
+ const issueMessage=only=>{
+  const gaps=officialExhibitGaps0550(only?formView:view,only);
+  setIssueNote(gaps.length?`Official export keeps the customer Exhibit C form. TBA is used where a complete official price is not available (${gaps.length}): ${gaps.slice(0,8).join(' · ')}${gaps.length>8?' · …':''}`:'Official export uses complete prices on the customer Exhibit C form.');
+ };
  const print=()=>{
+  issueMessage(id);
   const frame=document.createElement('iframe');frame.style.cssText='position:fixed;width:1px;height:1px;left:-10000px';
   frame.onload=()=>{frame.contentWindow.focus();frame.contentWindow.print();setTimeout(()=>frame.remove(),60000);};
-  frame.srcdoc=nativeExhibitHtml0550(formView,id);document.body.appendChild(frame);
+  frame.srcdoc=nativeExhibitHtml0550({...formView,customerIssue:true},id);document.body.appendChild(frame);
  };
  return <section aria-label={'Native Exhibit C Schedule '+id}>
   <style>{nativeFormCss0550}</style>
   {groups.length>0&&<label>ระบบใน Schedule {id} <select aria-label={id+' system form'} value={selected?.token||''} onChange={e=>setSystemChoice(e.target.value)} disabled={disabled}><option value="">แสดงทุกระบบ</option>{groups.map(group=><option key={group.token} value={group.token}>{group.token}{group.name===group.token?'':' · '+group.name} · {group.rows.length||(group.draftRows.length?'Draft reference':'OPEN')}</option>)}</select></label>}
   {groups.length>0&&<button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.group.'+({C2:'B5',C3:'C3',C4:'C2'}[id]),{workingSystem:selected?.token})}>เตรียมรายการ Working {({C2:'B5',C3:'C3',C4:'C2'}[id])}</button>}
-  <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(formView,'docx',id)}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>downloadNativeExhibit0550(view,'docx')}>Export Exhibit C Word ทั้งชุด</button></div>
+  <div className="p55-native-toolbar"><button type="button" disabled={disabled} onClick={()=>{issueMessage(id);downloadNativeExhibit0550(formView,'docx',id);}}>Export Schedule {id} Word (.docx)</button><button type="button" disabled={disabled} onClick={print}>พิมพ์ Schedule {id} / PDF</button><button type="button" disabled={disabled} onClick={()=>{issueMessage();downloadNativeExhibit0550(view,'docx');}}>Export Exhibit C Word ทั้งชุด</button></div>
+  {issueNote&&<p role="status">{issueNote}</p>}
   {id==='C1'?<C1Appendix0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled} mrNavigationTarget={mrNavigationTarget}/>:<p className="p55-native-help">แบบฟอร์มจาก Exhibit C rev-0 · Currency: {currency} · {count} รายการจาก Working · {view.workingPreview?'ร่างพร้อมการจัดหมวดแนะนำ / ราคาที่ยังรอทบทวน':'ข้อมูลที่บันทึก / ราคาที่ผ่านการทบทวน'} · ข้อมูลที่ขาดคง OPEN</p>}
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
+  {id==='C3'&&view.workingPreview&&<C3GoodsBreakdown0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>}
   {c8Estimate?.count>0&&<p>ยอดประมาณการ Call-off ตามประเทศ · {currency} {money(c8Estimate.count===C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length?c8Estimate.totalUSD:null)} · เรียกใช้ตามอนุมัติ แยกจากยอด A1 และ A2</p>}
   {id==='C2'&&view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference · {SPARE_DRAFT_NOTE_0550} · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}

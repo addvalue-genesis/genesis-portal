@@ -293,10 +293,16 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const ids=unique([...matches.map(resolveOwner),...tracedOwners]).filter(id=>byOwner.has(id));
   const excluded=matches.length>0&&matches.every(l=>mrLineScope0550({lines},l).excluded||satelliteScope0550(l).excluded);
   const quantities=unique(matches.map(l=>l.quantity)),quantity=r.canonicalIds?(matches.length?(quantities.length===1?quantities[0]:null):r.quantity):raw?raw.quantity:r.quantity;
-  const item={key:r.id,mr:r,appendix:'1.'+appendix(r),system:c1SystemLabel0550(r),site:r.site,
-   description:r.description,quantity,unit:r.canonicalIds?r.unit:raw?raw.unit:r.unit,
-   ...detail,ownerIds:excluded?[]:ids,raw,raws:matches,requirements:reqs,
-   amount:null,unitPrice:null,note:excluded?'By COMPANY':unique([response?.[0],...matches.map(l=>customerRemark(l,legacy).trim())].filter(Boolean)).join('; '),excluded,kind:'MR'};
+   const tags=reqs.flatMap(q=>(q.tagBindings||[]).map(tb=>tb.tag)).filter(Boolean);
+   const cabinetTags=reqs.map(q=>q.cabinetTag).concat(reqs.flatMap(q=>(q.tagBindings||[]).map(tb=>tb.cabinetTag))).filter(Boolean);
+   const physicalTags=unique([...tags,...cabinetTags]);
+   const tagText=physicalTags.length&&!legacy?'TAG: '+physicalTags.join(', '):'';
+   const remarks=unique([response?.[0],...matches.map(l=>customerRemark(l,legacy).trim()),tagText].filter(Boolean));
+   const note=excluded?'By COMPANY':remarks.join('; ');
+   const item={key:r.id,mr:r,appendix:'1.'+appendix(r),system:c1SystemLabel0550(r),site:r.site,
+    description:r.description,quantity,unit:r.canonicalIds?r.unit:raw?raw.unit:r.unit,
+    ...detail,ownerIds:excluded?[]:ids,raw,raws:matches,requirements:reqs,
+    amount:null,unitPrice:null,note,excluded,kind:'MR'};
   if(canonicalIds.some(id=>matches.filter(l=>l.mrRequirementId===id).length>1))problems.push('MULTIPLE_MR_WORKING_LINES / '+r.id);
   if(!excluded&&!(item.quantity>0))problems.push('C1_REQUIRED_QUANTITY_OPEN / '+r.id);
   for(const id of item.ownerIds){if(!ownerUse.has(id))ownerUse.set(id,[]);ownerUse.get(id).push(item);}
@@ -661,7 +667,11 @@ export function c1AppendixHtml0550(view){
 // exports remain byte-identical unless this version is explicitly selected.
 export function c1AppendixWord0550(view){
  const c1=deriveC1Appendix0550(view),legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550,e=escape;
- const draft=view.workingPreview&&!legacy;
+ const draft=view.workingPreview&&!legacy&&!view.customerIssue;
+ const cleanCustomerNote=text=>{
+  if(!text||legacy||!view.customerIssue)return text;
+  return String(text).split(/\s*;\s*|\s*·\s*/).filter(p=>p&&!/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(p)).join('; ');
+ };
  const p=(text,cell=false)=>`<w:p>${draft&&cell?'<w:pPr><w:spacing w:before="18" w:after="18" w:line="220" w:lineRule="auto"/></w:pPr>':''}<w:r>${draft&&cell?'<w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>':''}<w:t xml:space="preserve">${e(text)}</w:t></w:r></w:p>`;
  const row=(values,header=false,span=false)=>`<w:tr><w:trPr>${header?'<w:tblHeader/>':'<w:cantSplit/>'}</w:trPr>${values.map((v,i)=>`<w:tc><w:tcPr>${span&&i===0?'<w:gridSpan w:val="7"/>':''}</w:tcPr>${p(v,true)}</w:tc>`).join('')}</w:tr>`;
  const note=text=>draft?row([text],false,true):row(['',text,'','','','','']);
@@ -670,7 +680,7 @@ export function c1AppendixWord0550(view){
  const widths=legacy?[600,4200,700,700,1100,1100,1600]:draft?[1130,5480,710,720,1420,1420,2800]:[900,3900,700,700,1100,1100,1600];
  let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
-  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),r.note]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c1Display0550(c.exportPrice?c.unitPrice:null),c1Display0550(c.exportPrice?c.amount:null),c.note||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
+  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),cleanCustomerNote(r.note)]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c1Display0550(c.exportPrice?c.unitPrice:null),c1Display0550(c.exportPrice?c.amount:null),cleanCustomerNote(c.note)||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
   xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount??g.draftSubtotal),c1AppendixSubtotalLabel0550(g)]);
  }
  const priced=draft?scheduleRollup0550(c1.bindings):null;

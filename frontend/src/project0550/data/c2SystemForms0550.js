@@ -118,7 +118,9 @@ export function prepareEquationSpareWorking0550(data,draft,id){
 }
 
 export function c2PartsDescription0550({line,lineId}){
- return lineId?.startsWith('LINE-B5-LAN-STARTUP-')?line.description.replace(/^SI estimate · (?=LAN start-up spare · )/,''):line.description;
+ if(lineId?.startsWith('LINE-B5-LAN-STARTUP-'))return line.description.replace(/^SI estimate · (?=LAN start-up spare · )/,'');
+ const desc=line?.offer?.description||line?.description||'';
+ return desc.replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
 }
 
 const legacyProjectLots=new Set(COMMISSIONING_PHASES_0550.map(phase=>phase.legacyId));
@@ -251,8 +253,10 @@ export function spareSystemGroups0550(view,schedule,references){
  for(const row of rows){const token=row.line?.systemToken||'COMMON';if(!groups.has(token))groups.set(token,{token,name:token,rows:[]});groups.get(token).rows.push(row);}
  for(const token of references?.keys()||[])if(!groups.has(token))groups.set(token,{token,name:token,rows:[]});
  const result=[...groups.values()].filter(g=>g.rows.length||references?.get(g.token)?.length).filter(g=>!view.c2SystemToken||view.c2SystemToken===g.token).map(g=>{
-  const candidates=references?.get(g.token),rows=spareDisplayRows(g.rows,candidates);
-  return {...g,rows,draftRows:rows.length?[]:candidates||[],status:rows.length?'HAS_ROWS':'DRAFT_FROM_EQUATION'};
+  const candidates=references?.get(g.token),displayRows=spareDisplayRows(g.rows,candidates);
+  // Working C3 uses the same prices as A1 Item 5 and keeps SI references available for review.
+  const rows=schedule==='C3'&&view.workingPreview?g.rows:displayRows;
+  return {...g,rows,draftRows:displayRows.length?[]:candidates||[],status:rows.length?'HAS_ROWS':'DRAFT_FROM_EQUATION'};
  });
  return result.length?result:[{rows:[],draftRows:[],status:'AWAITING_SPARE_INPUTS'}];
 }
