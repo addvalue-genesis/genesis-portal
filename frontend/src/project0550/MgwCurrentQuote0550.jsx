@@ -101,7 +101,7 @@ function MgwRadioSource0550({data,sectionFilter}){
        {unpricedComponents.length>0&&<RadioLotBomTable0550 components={unpricedComponents} caption={'ขอบเขตที่ไม่มีราคาแยก · '+item}/>}
        <details><summary>{extra.target?'ขอบเขตตามใบ MGW · Location ที่แก้ไข':'ข้อความต้นฉบับ / ขอบเขต'}</summary><p className="p55-supplier-verbatim">{extra.target&&'Location: '+extra.sourceSite+'\n'}{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
-      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>แก้ Location ตามที่ยืนยัน</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
+      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW · MR Appendix 1.1 ยังไม่รับรองการหักจำนวน':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>แก้ Location ตามที่ยืนยัน</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
    })}</tbody>

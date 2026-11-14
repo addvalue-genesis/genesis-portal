@@ -541,9 +541,28 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  assert.strictEqual(budget.offers,radioLots.offers);
  const estimates=budget.lines.filter(line=>radioAppendix11Estimate0550.has(line.id));
  assert.equal(estimates.length,13);
- assert.equal(sum(estimates.map(line=>line.quantity*line.manualCost)),137136.22);
+ const fixed=estimates.find(line=>line.id==='LINE-BID-RADIO-APF-DTRS-FIXED');
+ assert.deepEqual([fixed.quantity,fixed.manualCost],[6,3524]);
+ const fixedBinding=budget.bidVolumes.bindings.find(binding=>binding.lineId===fixed.id);
+ const oldSource=fixed.sourceRef.replace(radioAppendix11Estimate0550.get(fixed.id).rateBasis,
+  'MR six fixed stations less one provisional GTPL reused fixed set. Use the MGW M8668i equipment lot as a fixed-station hardware proxy; final TAG and RF fit pending.');
+ const oldFixed={...fixed,quantity:5,sourceRef:oldSource};
+ const oldBudget={...budget,lines:budget.lines.map(line=>line===fixed?oldFixed:line),bidVolumes:{...budget.bidVolumes,
+  bindings:budget.bidVolumes.bindings.map(binding=>binding===fixedBinding?{...binding,locator:oldSource}:binding)}};
+ const migrated=prepare(oldBudget);
+ assert.deepEqual(migrated.lines,budget.lines);
+ assert.deepEqual(migrated.bidVolumes.bindings.find(binding=>binding.lineId===fixed.id),fixedBinding);
+ assert.strictEqual(prepare(migrated),migrated);
+ for(const changes of [{quantity:4},{manualCost:3600},{selected:false},{officialReview:{decision:'KEEP'}}]){
+  const edited={...oldBudget,lines:oldBudget.lines.map(line=>line===oldFixed?{...line,...changes}:line)};
+  assert.strictEqual(prepare(edited),edited,'Retain authored or reviewed Working inputs');
+ }
+ const reviewedBinding={...oldBudget,bidVolumes:{...oldBudget.bidVolumes,bindings:oldBudget.bidVolumes.bindings.map(binding=>
+  binding.lineId===fixed.id?{...binding,status:'REVIEWED'}:binding)}};
+ assert.strictEqual(prepare(reviewedBinding),reviewedBinding);
+ assert.equal(sum(estimates.map(line=>line.quantity*line.manualCost)),140660.22);
  const model=W.deriveBidWorkspace(budget,tokens,radioLotDate);
- assert.equal(sum(model.provisional.selected.filter(line=>radioAppendix11Estimate0550.has(line.id)).map(line=>line.customerUSD)),181019.81);
+ assert.equal(sum(model.provisional.selected.filter(line=>radioAppendix11Estimate0550.has(line.id)).map(line=>line.customerUSD)),185671.49);
  assert(model.official.lines.filter(line=>radioAppendix11Estimate0550.has(line.id)).every(line=>line.customerUSD===null));
  const projection=radioWithMr(budget).c1;
  assert(!projection.problems.includes('C1_OWNER_TOTAL_MISMATCH'));

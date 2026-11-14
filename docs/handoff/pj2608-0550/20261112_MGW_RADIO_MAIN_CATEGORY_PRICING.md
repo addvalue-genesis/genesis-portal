@@ -33,3 +33,17 @@ Working A prepares the reviewed MR quantity gaps from `radioAppendix11Budget0550
 The draft provisionally places the quoted APM console at APF, the RADIO-017 Marine lot at ACP and the two ambiguous feeder lots at APF and ABV01. The original quotation preserves its site labels. APF LAY-0001 C1 and LAY-0010 C4, ACP LAY-0001 C2 and LAY-0003 C1, and ABV01 LAY-0001 C1 support locations. MR feeder allowances of 500 + 500 / 700 / 150 m apply until an end-to-end cable takeoff is available. The Working and C1 panels show system notes. The model flags a changed reference rate or competing priced owner for review. Official review and archived issues retain their own approval paths.
 
 ADR-0550-001 principles 2–6 and 8–14 govern the MR quantity basis, trace and separate budget treatment. The regression covers the 13 estimates, four provisional site allocations, duplicate prevention, deletion and changed rates. The saved Windows workspace was unavailable for validation.
+
+## 14 November · CUS MR APF fixed radio quantity
+
+CUS MR Rev.B1 Appendix 1.1 page 9 item 1.0 requires six APF VHF DMR fixed
+radios. It gives no reuse credit for the GTPL move described in MGW Q26-063.
+Working A1-07 holds six sets on the existing fixed-station allowance, using
+USD 3,524 per set from RADIO-016 as a planning proxy. The targeted startup
+migration updates the previous untouched five-set draft and its draft locator.
+Authored and reviewed records retain their saved values.
+
+The 13 Radio allowances total USD 140,660.22 at cost and USD 185,671.49
+at draft customer sell. The fixed-station allowance adds USD 3,524 at cost
+and USD 4,651.68 at sell compared with the preceding budget. MGW's USD
+700,501 quotation and GTPL source reference retain their original amounts.
