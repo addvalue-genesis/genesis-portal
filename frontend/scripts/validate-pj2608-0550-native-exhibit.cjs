@@ -133,6 +133,21 @@ const view={...v,bindings:rows,scheduleRows:id=>rows.filter(b=>b.schedule===id),
 const dir=process.env.PJ0550_NATIVE_OUTPUT||path.join(os.tmpdir(),'0550-native-exhibit');fs.mkdirSync(dir,{recursive:true});
 for(const s of V.SCHEDULES_0550){const result=N.nativeSchedule0550(view,s.id);assert(result.html.replace(/<[^>]+>/g,'').includes('SCHEDULE '+s.id));assert(!result.html.includes('{{'));fs.writeFileSync(path.join(dir,s.id+'.html'),N.nativeExhibitHtml0550(view,s.id));fs.writeFileSync(path.join(dir,s.id+'.docx'),N.buildNativeExhibitDocx0550(view,s.id));}
 fs.writeFileSync(path.join(dir,'all.docx'),N.buildNativeExhibitDocx0550(view));fs.writeFileSync(path.join(dir,'all.html'),N.nativeExhibitHtml0550(view));
+const customerWithoutSpares={...view,customerIssue:true,workingPreview:true,c2Systems:D.SYSTEMS,
+ scheduleRows:id=>['C2','C3','C4'].includes(id)?[]:view.scheduleRows(id)};
+const customerPackage=Buffer.from(N.buildNativeExhibitDocx0550(customerWithoutSpares)).toString();
+for(const id of ['C2','C3','C4']){
+ const {html,pages}=N.nativeSchedule0550(customerWithoutSpares,id);
+ assert.equal(pages.length,1,'Export one native form per empty Schedule, not one per system');
+ assert.match(html,/<table\b/);
+ const word=Buffer.from(N.buildNativeExhibitDocx0550(customerWithoutSpares,id)).toString();
+ for(const doc of [word,customerPackage]){
+  const body=doc.match(/<w:body>([\s\S]*?)<\/w:body>/)?.[1];
+  assert.ok(body?.replace(/<[^>]+>/g,'').includes('SCHEDULE '+id),'Word contains the '+id+' form');
+  assert.match(body,/<w:tbl[ >]/);
+  assert.match(body,/<w:sectPr\b[^>]*>[\s\S]*<\/w:sectPr>$/);
+ }
+}
 assert(N.nativeSchedule0550(view,'A1').html.includes('whiteness'),'Preserve native wording, including source errors');
 const spareBindings=rows.filter(r=>['C2','C3'].includes(r.schedule)).map((r,i)=>({...r,amount:[100,75][i],deliveryTerm:'',line:{...r.line,customerTHB:[3200,2400][i],spareBudget:{rate:0.01,basisTHB:10000}}}));
 const lanDescription='LAN start-up spare · C9105AXI-H complete set';
