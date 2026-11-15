@@ -246,7 +246,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
  {volume==='I'&&panel==='D'&&<><button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button><A1InspectionBreakdown0550 view={displayView} currency={currency}/></>}
  {volume==='I'&&displayView.chevalierPbxSupply&&['A2','D','E','F'].includes(panel)&&
   <p className="p55-note"><strong>IP Telephony and PABX</strong> · {chevalierPbxScheduleNote0550(displayView,panel)}</p>}
- {volume==='I'&&displayView.pbxBudgetShares?.some(row=>['mapping','preview'].includes(panel)||row.schedule===panel)&&
+ {volume==='I'&&panel!=='preview'&&panel!=='C1'&&displayView.pbxBudgetShares?.some(row=>row.schedule===panel||panel==='mapping')&&
   <Grid label="PABX shared budget · internal cost" heads={['Schedule','PABX scope','Estimate (THB)','Working cost owner','Basis']}
    rows={displayView.pbxBudgetShares.filter(row=>['mapping','preview'].includes(panel)||row.schedule===panel).map(row=>[
     row.schedule,row.description,Number.isFinite(row.costTHB)?row.costTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN',
@@ -275,7 +275,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   </section>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
- {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping','preview'].includes(panel))||
+ {((volume==='I'&&['overview','A','A1','B','C','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping'].includes(panel))||
     (volume==='III'&&['overview','8','10','11','deviations'].includes(panel)))&&
   <PagaQuoteScope0550 data={data} section={volume==='III'?'commercial':panel} onNavigate={go} disabled={dirty}/>}
  {volume==='I'&&cctvEntScheduleNotes[panel]&&data.offers.some(mgwCctvEntOffer0550)&&
@@ -302,9 +302,9 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
      onClick={()=>go('bid.budget.working.line.'+binding.lineId)}>{binding.line.description}</button>)}
    </div>
   </aside>}
-  {volume==='I'&&[...VENDOR_VOLUME_TAGS_0550,'mapping','preview'].includes(panel)&&
+  {volume==='I'&&panel!=='preview'&&panel!=='C1'&&[...VENDOR_VOLUME_TAGS_0550,'mapping'].includes(panel)&&
    <VolumeOfferTagTrace0550 data={data} view={displayView} panel={panel} onNavigate={go} disabled={dirty}/>}
- {(panel==='overview'||volume==='I'&&['A','A1','C1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
+ {(panel==='overview'||volume==='I'&&['A','A1'].includes(panel))&&<MgwCurrentQuote0550 data={data} disabled={dirty} onNavigate={go}/>}
  {volume==='I'&&A1_OTHERS_PANELS_0550.some(p=>p.id===panel)&&<>
   <button type="button" onClick={()=>choose('A1')}>เปิด 11.A1 · ยอดรวม 1 Lot</button>
   <A1OthersBreakdown0550 panel={panel} view={displayView} currency={currency} onNavigate={go} disabled={dirty}/>

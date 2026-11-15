@@ -602,8 +602,8 @@ assert.equal(radioWithMr(radioLots,'THB').c1.rows.find(r=>r.sn==='1.1.2').amount
  sum(lotOwners.filter(l=>['RADIO-002','RADIO-010'].includes(radioSelection.mgwCurrentItemKey0550(l.offer))).map(l=>l.provisionalCustomerTHB)));
 const radioMrHtml=renderToStaticMarkup(React.createElement(C1Appendix0550,{view:withRadioMr.view}));
 assert.match(radioMrHtml.split('data-c1-mr-id="MR-B1-11-APF-02"')[1].split('</tr>')[0],/96,090\.72/);
-assert(radioMrHtml.includes('ราคาตาม Offer · รอตรวจขอบเขต MR'));
-assert(radioMrHtml.includes('รอยืนยันแถว MR / ไซต์'));
+assert(radioMrHtml.includes('Details shall be included not limit to Bulk Materials etc.'));
+assert(!radioMrHtml.includes('รอยืนยันแถว MR / ไซต์'));
 assert(!appendix.c1AppendixHtml0550(withRadioMr.view).includes('รอยืนยันแถว MR / ไซต์'));
 const authoredRadioMr=radioLots.lines.find(l=>l.mrRequirementId==='MR-B1-11-APF-02');
 const heldRadio=radioWithMr({...radioLots,lines:radioLots.lines.map(l=>l===authoredRadioMr?{...l,manualCost:100,currency:'USD'}:l)}).c1;

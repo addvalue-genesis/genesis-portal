@@ -1,16 +1,8 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
-import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
-import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
-import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './data/cabinetTag0550';
-import {MR_WORKING_CATALOG_0550} from './data/mrWorkingBasis0550';
-import {mgwCurrentItemKey0550} from './data/mgwQuoteSelection0550';
-import {versedLanRackOffer0550} from './data/versedRack0550';
 
-// Keep the native MR rows in order. In the interactive screen, put a separate
-// package-price block first so an expanded Appendix still reveals its price.
 const screenSites=(sites,nativeOrder)=>nativeOrder?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
 function PagaQuoteCosts0550({quote}){
@@ -54,11 +46,288 @@ function PagaPackageCosts0550({cost,onNavigate,disabled}){
  </details></td></tr>;
 }
 
+export function cleanCustomerNote0550(note){
+ if(!note)return '';
+ const str=String(note).trim();
+ const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix|MGW draft price|Quoted LAN equipment|Quoted 24-port patch panel|Offer items)\b/i;
+ const parts=str.split(/(?<=[.;\n])\s+/);
+ const clean=parts.filter(p=>!internalPattern.test(p)&&!/^(?:MR\s*Appendix|FOC\/BULK Rev\.01|SI budget estimate|Provisional budget|RITTAL cabinet supply|Draft uses|Verify|Confirm|Reconcile)\b/i.test(p.trim())).join(' ').trim();
+ return clean.replace(/;\s*$/,'').trim();
+}
+
+export function formatCustomerNote0550(r){
+ const raw=(r.note||'').trim();
+ const isThaiDraft=/ราคาตาม/.test(raw)||/[\u0E00-\u0E7F]/.test(raw)||/ราคาตาม/.test(r.pendingRadioPlacement||'');
+ if(isThaiDraft||r.provisionalRadio){
+  return 'Details shall be included not limit to Bulk Materials etc.';
+ }
+ if(!raw)return '';
+ const cleaned=cleanCustomerNote0550(raw);
+ return cleaned||'Details shall be included not limit to Bulk Materials etc.';
+}
+
+export function cleanItemTitle0550(r){
+ const desc=String(r.description||'').trim();
+ if(/comprised of/i.test(desc)||/^\(refer/i.test(desc)||desc.length>120){
+  if(r.appendix==='1.1'){
+   if(/marine/i.test(desc))return 'VHF-FM Marine Radio System';
+   if(/ssb|mf/i.test(desc))return 'MF/HF SSB Radio System';
+   if(/aero/i.test(desc))return 'VHF-AM Aeronautical Radio';
+   if(/roip|dispatch/i.test(desc))return 'RoIP Dispatch Console';
+   if(/antenna cable/i.test(desc))return 'Antenna Cables';
+   return 'VHF DMR Radio System';
+  }
+  if(r.appendix==='1.2')return 'VSAT System';
+  if(r.appendix==='1.3'){
+   if(/cctv/i.test(desc))return 'CCTV System';
+   if(/pabx|telephone/i.test(desc))return 'IP Telephone System';
+   if(/met/i.test(desc))return 'Meteorological System';
+   return 'Network System';
+  }
+  if(r.appendix==='1.4')return 'Public Address and General Alarm (PAGA) System';
+  if(r.appendix==='1.5')return 'Digital Microwave Radio';
+  if(r.appendix==='1.6')return 'Entertainment System';
+  if(r.appendix==='1.7')return 'Non-Directional Beacon (NDB)';
+  if(r.appendix==='1.8')return 'FOC and Cables';
+ }
+ const clean=desc.split('\n')[0].replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
+ return clean||desc;
+}
+
+export function formalScopeDescription0550(r){
+ const desc=(r.description||'').toLowerCase();
+ const sys=(r.system||'').toLowerCase();
+ const app=r.appendix||'';
+ if(app==='1.1'){
+  if(sys.includes('dmr')||desc.includes('dmr')||r.sn==='1.1.1'||r.key==='MR-B1-11-APF-01'){
+   return 'Complete VHF DMR Radio System per Company requirements and Material Requisition (MR), including Radio System Cabinet, Repeaters, Antennas, Servers, Fixed/Mobile/Handheld Radios, and accessories.';
+  }
+  if(sys.includes('marine')||desc.includes('marine')){
+   return 'Complete VHF-FM Marine Radio System per Company requirements and Material Requisition (MR), including Marine Radio Base Stations, Antennas, Transceivers, and accessories.';
+  }
+  if(sys.includes('ssb')||sys.includes('mf/hf')||desc.includes('ssb')||desc.includes('mf/hf')){
+   return 'Complete MF/HF SSB Radio System per Company requirements and Material Requisition (MR), including Transceiver Unit, Antenna Tuning Unit, Antenna, and accessories.';
+  }
+  if(sys.includes('aero')||desc.includes('aero')){
+   return 'Complete VHF-AM Aeronautical Radio System per Company requirements and Material Requisition (MR), including Base Station, Antennas, and accessories.';
+  }
+  if(sys.includes('roip')||sys.includes('console')||desc.includes('roip')||desc.includes('dispatch')){
+   return 'RoIP Dispatching Console Subsystem, Software Licenses, and Voice Recording System.';
+  }
+  if(sys.includes('cable')||desc.includes('antenna cable')){
+   return 'RF Feeder Cables, Jumper Cables, Connectors, Lightning Arresters, and Installation Accessories.';
+  }
+  if(sys.includes('tower')||desc.includes('tower')){
+   return 'Telecommunication Guyed Mast / Tower complete with aviation obstruction lighting, lightning protection, and climbing accessories.';
+  }
+ }
+ if(app==='1.2'){
+  if(sys.includes('ku')||desc.includes('ku')){
+   return 'KU/C-Band Satellite Internet System and accessories.';
+  }
+  return 'Complete Satellite Communication Terminal (VSAT) Subsystem including Antenna, Transceiver, BUC, LNB, Modem, and accessories.';
+ }
+ if(app==='1.3'){
+  if(sys.includes('cctv')||desc.includes('cctv')){
+   return 'Complete Industrial CCTV Surveillance System per Company requirements and MR, including Ex/Safe-area Fixed & PTZ Cameras, NVR/Server, VMS Software, Video Monitors, and accessories.';
+  }
+  if(sys.includes('pabx')||sys.includes('telephone')||desc.includes('pabx')||desc.includes('telephone')||desc.includes('phone')){
+   return 'Complete IP Telephony and PABX Communication System including IP-PBX Server, Media Gateways, Operator Consoles, IP Desk Phones, Explosion-proof Phones, and accessories.';
+  }
+  if(sys.includes('met')||desc.includes('met')||desc.includes('meteorological')){
+   return 'Complete Meteorological Monitoring System (MET) including Sensors, Weather Station, Display Unit, and accessories.';
+  }
+  if(sys.includes('wireless')||desc.includes('access point')){
+   return 'Industrial Wireless Access Points, Antennas, and mounting accessories.';
+  }
+  return 'Complete Industrial Local Area Network (LAN) System per Company requirements and MR, including Industrial Access/Distribution Switches, Firewall, Patch Panels, Cabinets, and accessories.';
+ }
+ if(app==='1.4'){
+  return 'Complete Public Address and General Alarm (PAGA) System per Company requirements and MR, including Central Equipment Cabinet, Access Panels, Loudspeakers, Flashing Beacons, and accessories.';
+ }
+ if(app==='1.5'){
+  return 'Complete Digital Microwave Radio Link System (1+1 / 2+0 Configuration) per Company requirements and MR, including Outdoor Units (ODUs), Indoor Units (IDUs), Antennas, and accessories.';
+ }
+ if(app==='1.6'){
+  return 'Communal Entertainment & TV Distribution System including TV receivers, distribution amplifiers, splitters, and coax cabling accessories.';
+ }
+ if(app==='1.7'){
+  return 'Non-Directional Beacon (NDB) Transmitter Subsystem, Antenna Tuning Unit (ATU), and accessories.';
+ }
+ if(app==='1.8'){
+  return 'Fiber Optic Cables, Distribution Panels (FODP), Patch Cords, Splicing Enclosures, and Termination Accessories.';
+ }
+ return 'Complete scope of supply per Company requirements and Material Requisition (MR), including primary equipment, enclosures, and accessories.';
+}
+
+const APF_DMR_BOM_RAW=[
+ {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:24000},
+ {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Lot',weight:8500},
+ {description:'VHF DMR Repeater',brand:'Motorola',model:'SLR5500',partNo:'SLR5500',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:48000},
+ {description:'Outdoor Antenna',brand:'OEM',model:'TQJ-150I',partNo:'TQJ-150I',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:4500},
+ {description:'Lighting Arresters',brand:'OEM',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:1800},
+ {description:'Carrier Combiner',brand:'OEM',model:'WLHL-150 F3',partNo:'WLHL-150 F3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:7200},
+ {description:'Channel Splitter',brand:'OEM',model:'WLFL-150-3',partNo:'WLFL-150-3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:5400},
+ {description:'Bandpass Duplexer',brand:'OEM',model:'WLSGQ-150',partNo:'WLSGQ-150',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:7600},
+ {description:'DMR Tier III Access Router',brand:'H3C',model:'MSR 3610-XS',partNo:'MSR 3610-XS',quantity:1,unit:'Set',remarks:'Included in Lot',weight:7500},
+ {description:'DELL PowerEdge Dispatching Server',brand:'Dell',model:'PowerEdge R740',partNo:'R740',quantity:1,unit:'Set',remarks:'Included in Lot',weight:32000},
+ {description:'Dispatching Software',brand:'Motorola',model:'SmartPTT PLUS',partNo:'GMVN6044B',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:18000},
+ {description:'Network Management System',brand:'Motorola',model:'NMS',partNo:'HKVN4315A',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:15000},
+ {description:'SmartPTT VHF-DMR IP Gateway',brand:'SmartPTT',model:'RG-2000',partNo:'RG-2000',quantity:1,unit:'Set',remarks:'Included in Lot',weight:9500},
+ {description:'DMR Tier III Repeater Software License',brand:'Motorola',model:'Software License',partNo:'HKVN4356A',quantity:3,unit:'Ea',remarks:'Included in Lot',weight:9000},
+ {description:'DMR Tier III Capacity Max System Controller License',brand:'Motorola',model:'Controller License',partNo:'HKVN4313A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:12000},
+ {description:'DMR Tier III Capacity Max MNIS VRC Gateway License',brand:'Motorola',model:'VRC Gateway License',partNo:'HKVN4317A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
+ {description:'DMR Tier III Capacity Max Single Voice Talkpath License',brand:'Motorola',model:'Voice Talkpath License',partNo:'HKVN4318A',quantity:5,unit:'Ea',remarks:'Included in Lot',weight:14500},
+ {description:'DMR Tier III Capacity Max MNIS Data Gateway License',brand:'Motorola',model:'Data Gateway License',partNo:'HKVN4321A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
+ {description:'DMR Tier III Repeater Connection License',brand:'Motorola',model:'Connection License',partNo:'HKVN4314A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:7500},
+ {description:'Capacity Max Connectivity License',brand:'Motorola',model:'Connectivity License',partNo:'GMVN6146A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:6500},
+ {description:'Dispatch Voice Recording License',brand:'Motorola',model:'Voice Recording License',partNo:'GMVN6057A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
+ {description:'End User Machine License',brand:'Motorola',model:'Subscriber License',partNo:'GMVN6050A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
+ {description:'VHF DMR Radio Mobile (APF)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:21,unit:'Sets',remarks:'With suction cup antenna',weight:68000},
+ {description:'VHF DMR Handheld Radio (ATEX)',brand:'Motorola',model:'MOTOTRBO XiR P8668Ex',partNo:'XiR P8668ex',quantity:96,unit:'Sets',remarks:'ATEX Zone 1 Certified',weight:245000},
+ {description:'Capacity Max Advantage Subscriber License',brand:'Motorola',model:'Advantage License',partNo:'HKVN4350A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
+ {description:'Six-Port Smart Charger',brand:'Motorola',model:'Multi-Unit Charger',partNo:'PMPN4296',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
+ {description:'ATEX Remote Speaker / Microphone',brand:'Motorola',model:'Remote Speaker Mic',partNo:'PMNN4067',quantity:1,unit:'Set',remarks:'ATEX Certified',weight:3500},
+ {description:'Dell Desktop PC Workstation',brand:'Dell',model:'OptiPlex Tower',partNo:'OptiPlex Tower',quantity:1,unit:'Set',remarks:'Intel Core i5 vPro',weight:8500},
+ {description:'Dell UltraSharp 24 Monitor',brand:'Dell',model:'UltraSharp 24',partNo:'U2424H',quantity:1,unit:'Set',remarks:'Included in Lot',weight:2500},
+ {description:'Desktop Loudspeaker & Microphone Box',brand:'OEM',model:'Desktop Audio Kit',partNo:'Desktop Kit',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
+];
+
+function inferBrand(desc='',r={}){
+ const text=(desc+' '+(r.description||'')).toLowerCase();
+ if(text.includes('ceragon'))return 'Ceragon';
+ if(text.includes('industronic'))return 'Industronic';
+ if(text.includes('cisco'))return 'Cisco';
+ if(text.includes('dell'))return 'Dell';
+ if(text.includes('sailor')||text.includes('cobham'))return 'Cobham Sailor';
+ if(text.includes('motorola')||text.includes('mototrbo'))return 'Motorola';
+ if(text.includes('jotron'))return 'Jotron';
+ if(text.includes('rittal'))return 'Rittal';
+ if(text.includes('hikvision'))return 'Hikvision';
+ if(text.includes('amphenol')||text.includes('procom')||text.includes('rfi'))return 'Amphenol Procom';
+ if(text.includes('alcatel')||text.includes('chevalier'))return 'Alcatel-Lucent';
+ if(text.includes('master tower')||text.includes('tower'))return 'Master Tower';
+ if(text.includes('schneider')||text.includes('apc'))return 'APC Schneider';
+ if(text.includes('belden')||text.includes('prysmian')||text.includes('draka'))return 'Draka / Prysmian';
+ if(r.mr?.brand)return r.mr.brand;
+ return 'OEM Standard';
+}
+
+function parseModelPartNo(desc=''){
+ const text=String(desc||'').trim();
+ let partNo='',model='';
+ const pn=text.match(/\b(?:P\/N|Part No\.?|Model|Type)[:\s]+([A-Za-z0-9_.-]+)/i);
+ if(pn){partNo=pn[1];model=pn[1];}
+ else{
+  const mc=text.match(/\b(IP-50CX|C9200-[A-Z0-9-]+|R660|TS-?8|DS-2[A-Z0-9-]+|6210|6222|6310|FT-857|MOTOTRBO|DR3000|SLR5500|XIR-P[0-9]+|M8668i|G26642|LS-5135S[A-Z0-9-]*|MSR\s*3610-XS|R740|GMVN[0-9]+[A-Z]?|HKVN[0-9]+[A-Z]?|RG-2000|TQJ-150I|LX-BLQ-400-N|WLHL-150\s*F3|WLFL-150-3|WLSGQ-150)\b/i);
+  if(mc){model=mc[1];partNo=mc[1];}
+ }
+ const cleanDesc=text.replace(/^(?:-\s*)?/,'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/;\s*quantity in metres per supplier quote.*$/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
+ return {cleanDesc:cleanDesc||text,model:model||'Standard EPC Model',partNo:partNo||'Per Specification'};
+}
+
+export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
+ const isDmrApf=r.sn==='1.1.1'||r.key==='MR-B1-11-APF-01'||(r.appendix==='1.1'&&r.site==='APF'&&/dmr/i.test(r.description));
+ let items=[];
+ if(isDmrApf){
+  const totalWeight=APF_DMR_BOM_RAW.reduce((acc,it)=>acc+(it.weight||1000),0);
+  let accumulated=0;
+  items=APF_DMR_BOM_RAW.map((item,idx)=>{
+   let amount=null,unitPrice=null;
+   if(Number.isFinite(r.amount)&&pricingMode==='ITEMIZED'){
+    if(idx===APF_DMR_BOM_RAW.length-1){
+     amount=Math.round((r.amount-accumulated)*100)/100;
+    }else{
+     amount=Math.round((r.amount*(item.weight||1000)/totalWeight)*100)/100;
+     accumulated+=amount;
+    }
+    unitPrice=item.quantity>0?Math.round((amount/item.quantity)*100)/100:amount;
+   }
+   return {...item,amount,unitPrice};
+  });
+  return items;
+ }
+
+ if(r.quotedComponents&&r.quotedComponents.length>0){
+  for(const c of r.quotedComponents){
+   const desc=c.offer?.description||c.description||'';
+   const brand=c.offer?.brand||inferBrand(desc,r);
+   const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+   items.push({
+    description:cleanDesc,
+    brand,
+    model,
+    partNo,
+    quantity:c.quantity??1,
+    unit:c.unit||'Ea',
+    unitPrice:c.unitPrice,
+    amount:c.amount,
+    remarks:c.included?'Included in OEM Equipment Package':'Included in Base Scope of Supply'
+   });
+  }
+ }
+ if(items.length===0&&r.components&&r.components.length>0){
+  for(const c of r.components){
+   const desc=c.description||'';
+   const brand=inferBrand(desc,r);
+   const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+   items.push({
+    description:cleanDesc,
+    brand,
+    model,
+    partNo,
+    quantity:c.quantity??1,
+    unit:c.unit||'Ea',
+    unitPrice:c.unitPrice,
+    amount:c.amount,
+    remarks:c.note||'Included in Base Scope of Supply'
+   });
+  }
+ }
+ if(items.length===0){
+  const desc=cleanItemTitle0550(r);
+  const brand=inferBrand(desc,r);
+  const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+  items.push({
+   description:cleanDesc||formalScopeDescription0550(r),
+   brand,
+   model,
+   partNo,
+   quantity:r.quantity??1,
+   unit:r.unit||'Lot',
+   unitPrice:r.unitPrice,
+   amount:r.amount,
+   remarks:'Primary Equipment Scope of Supply'
+  });
+ }
+
+ if(Number.isFinite(r.amount)&&pricingMode==='ITEMIZED'){
+  const hasItemized=items.some(it=>Number.isFinite(it.amount)&&it.amount>0);
+  if(!hasItemized){
+   const count=items.length;
+   let acc=0;
+   items=items.map((it,idx)=>{
+    let amt=null,up=null;
+    if(idx===count-1){
+     amt=Math.round((r.amount-acc)*100)/100;
+    }else{
+     amt=Math.round((r.amount/count)*100)/100;
+     acc+=amt;
+    }
+    up=it.quantity>0?Math.round((amt/it.quantity)*100)/100:amt;
+    return {...it,amount:amt,unitPrice:up};
+   });
+  }
+ }
+
+ return items;
+}
+
 export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mrNavigationTarget}){
  const projection=useMemo(()=>deriveC1Appendix0550(view,currency),[view,currency]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
- const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
- const trace=useRef(null),focusedRow=useRef(null);
+ const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[pricingMode,setPricingMode]=useState('LUMP_SUM');
+ const focusedRow=useRef(null);
  const location=useMemo(()=>{
   if(!mrNavigationTarget)return null;
   for(const group of projection.groups)for(const system of group.systems)for(const site of system.sites){
@@ -67,66 +336,55 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
   }
   return null;
  },[projection,mrNavigationTarget]);
+
  useEffect(()=>{
   if(!location)return;
   const {appendix,system,site,key}=location;
-  setOpened(old=>({...old,['APP:'+appendix]:true,['SYS:'+appendix+':'+system]:true,['SITE:'+appendix+':'+system+':'+site]:true}));
-  setSelected(key);
-  if(trace.current)trace.current.open=true;
+  setOpened(old=>({...old,['APP:'+appendix]:true,['SYS:'+appendix+':'+system]:true,['SITE:'+appendix+':'+system+':'+site]:true,[key]:true}));
   const timer=setTimeout(()=>{
    focusedRow.current?.scrollIntoView({block:'center'});
    focusedRow.current?.focus({preventScroll:true});
   },80);
   return ()=>clearTimeout(timer);
  },[location]);
+
  const screenSubtotal=projection.amount!==null?null:view.workingPreview?projection.pricedItemsSubtotal:
   documentMode?null:sumMoney0550(overview.map(group=>group.amount).filter(Number.isFinite));
  const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
  const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
  const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
- const active=projection.rows.find(r=>r.key===selected)||projection.rows[0];
- const containedMrIds=active?.mr?MR_WORKING_CATALOG_0550.rows.filter(r=>r.owner===active.mr.id).map(r=>r.id):[];
- const containedReqs=(view.c1Context?.requirements||[]).filter(r=>containedMrIds.includes(r.id.replace(/^REQDEF-/,'')));
- const traceCabinetTags=[...new Set([...(active?.requirements||[]),...containedReqs].flatMap(r=>mappedCabinetTags0550(r)))];
- const draftCabinet=[active?.mr?.id,...containedMrIds].map(draftCabinetTag0550).find(Boolean);
- const traceCabinetLabel=cabinetTagLabel0550(traceCabinetTags,draftCabinet);
- const navigate=(id,options)=>{if(!disabled)onNavigate?.(id,options);};
  const button=(key,label,component=false)=>documentMode?(component?null:<span>{label}</span>):<button type="button" className={component?'p55-c1-item-toggle':'p55-c1-group-toggle'} aria-expanded={expanded(key,component)} aria-label={label} onClick={()=>toggle(key,component)}><span aria-hidden="true">{expanded(key,component)?'−':'+'}</span>{!component&&<span>{label}</span>}</button>;
- const traceIds=active?Array.from(new Set([...(active.ownerIds||[]),...(active.raws||[]).map(l=>l.id)])):[];
+
  return <section className="p55-c1-workspace" aria-label="C1 Appendix workspace">
-  <style>{c1AppendixCss0550+'\n.c1-paga-cost{background:#f4f7f9}.c1-paga-cost summary{cursor:pointer;font-weight:600}@media print{.c1-paga-cost{display:none}}'}</style>
+  <style>{c1AppendixCss0550+`
+.c1-bom-subtable-row{background:#f8fafc;}
+.c1-bom-subtable-cell{padding:10px 14px!important;border:1px solid #b1c0cb!important;}
+.c1-bom-container{background:#fff;border:1px solid #005a9e;border-radius:4px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.05);}
+.c1-bom-header{background:#005a9e;color:#fff;padding:6px 12px;font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+.c1-bom-mode-badge{background:#fff;color:#005a9e;padding:2px 8px;border-radius:3px;font-size:11px;font-weight:bold;}
+.c1-bom-table{width:100%;border-collapse:collapse;font-size:12px;margin:0;}
+.c1-bom-table th{background:#eaf2f6;color:#0b2538;border:1px solid #b1c0cb;padding:6px 8px;font-weight:600;text-align:left;}
+.c1-bom-table td{border:1px solid #d1dde5;padding:5px 8px;vertical-align:middle;}
+.c1-bom-subtotal-row{background:#eaf2f6;font-weight:bold;}
+.p55-c1-mode-separator{display:inline-block;margin:0 6px;color:#8ba2b1;}
+.c1-paga-cost{background:#f4f7f9}.c1-paga-cost summary{cursor:pointer;font-weight:600}@media print{.c1-paga-cost{display:none}}
+`}</style>
   <div className="p55-c1-screen-head"><span>PJ2608-0550 / 11 · Quotation / C1</span><span>SI-OUT / Schedule C1</span></div>
-  <h3>C1 · ภาพรวมทั้ง 8 Appendix</h3>
+  <h3>Schedule C1 — Breakdown of Lump Sum Initial Contract Price</h3>
   <div className="p55-c1-controls">
-   <button type="button" aria-pressed={!documentMode} onClick={()=>setDocumentMode(false)}>ดูแบบ +/−</button>
-   <button type="button" aria-pressed={documentMode} onClick={()=>setDocumentMode(true)}>ดูเอกสารขยายครบ</button>
-   {!documentMode&&<><button type="button" onClick={()=>setAll('OVERVIEW')}>ยุบเหลือ 8 หมวด</button><button type="button" onClick={()=>setAll('MAIN')}>แสดงรายการหลักทั้งหมด</button><button type="button" onClick={()=>setAll('ALL')}>ขยายส่วนประกอบทั้งหมด</button></>}
+   <button type="button" aria-pressed={!documentMode} onClick={()=>setDocumentMode(false)}>Interactive View (+/−)</button>
+   <button type="button" aria-pressed={documentMode} onClick={()=>setDocumentMode(true)}>Expand All Document Mode</button>
+   <span className="p55-c1-mode-separator">|</span>
+   <button type="button" aria-pressed={pricingMode==='LUMP_SUM'} onClick={()=>setPricingMode('LUMP_SUM')}>Lump Sum Lot Mode (Default)</button>
+   <button type="button" aria-pressed={pricingMode==='ITEMIZED'} onClick={()=>setPricingMode('ITEMIZED')}>Itemized Pricing Mode</button>
+   {!documentMode&&<><span className="p55-c1-mode-separator">|</span><button type="button" onClick={()=>setAll('OVERVIEW')}>Collapse to 8 Appendices</button><button type="button" onClick={()=>setAll('MAIN')}>Show All System Rows</button><button type="button" onClick={()=>setAll('ALL')}>Expand All BOM Tables</button></>}
   </div>
   <nav className="p55-c1-jumps" aria-label="C1 Appendices">{projection.groups.filter(g=>g.id!=='OTHER').map(g=><button type="button" key={g.id} onClick={()=>{setOpened(s=>({...s,['APP:'+g.id]:true}));document.getElementById('p55-c1-app-'+g.id)?.scrollIntoView({block:'start'});}}>{g.id}</button>)}</nav>
-  <p className="p55-c1-screen-note">CUS · MR Rev.B1 → SI → VND → Working · ราคาขายจาก Working ที่เลือกตามมุมมองปัจจุบัน · “—” คือยังไม่แสดงค่า ไม่ใช่ศูนย์ · DRAFT จนกว่าจะผ่านการออก Release</p>
-  <details ref={trace} className="p55-c1-trace" aria-label="C1 internal trace"><summary>CUS ↔ SI ↔ VND / Working · Module ID และผลตรวจภายใน</summary>
-   <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.quotation.C1"/>
-   <label>รายการ C1 ที่ต้องการตรวจ<select aria-label="C1 trace row" value={active?.key||''} onChange={e=>setSelected(e.target.value)}>{projection.rows.map(r=><option key={r.key} value={r.key}>{r.sn} · {r.site} · {r.description}</option>)}</select></label>
-   {active&&<><p>{active.mr?.reference||active.description}</p>{active.internalNote&&<p>Working · {active.internalNote}</p>}
-    {traceCabinetLabel&&<p>{traceCabinetLabel}</p>}
-    {active.mr?.id.startsWith('MR-B1-11-')&&<button type="button" disabled={disabled} onClick={()=>navigate(RADIO_RELEASE_LOT_0550,{mrId:active.mr.id})}>10.7 · กลับ Release A1-07</button>}
-    {active.appendix==='1.8'&&[...new Set((active.priceOwners||[]).map(b=>b.line.customerRowCode).filter(Boolean))].map(code=>
-     <button type="button" key={code} disabled={disabled} onClick={()=>navigate('bid.budget.release.customer.'+code)}>10.7 · Release {code}</button>)}
-    {active.mr&&<><button type="button" disabled={disabled} onClick={()=>navigate('bid.documents.controlled-source-inventory.mr.page.'+(Number(active.mr.reference.match(/\/\s*p(\d+)/)?.[1]||0)+2))}>CUS · เปิด MR ต้นทาง</button>{(active.mr.canonicalIds||[active.mr.id]).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+id)}>SI-REQ · เปิดข้อกำหนด {active.mr.canonicalIds?id:''}</button>)}</>}
-    <button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.step.7')}>SI-WP-07 · Mapping กับ VND</button>
-    {traceIds.map(id=><div key={id}><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+id}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+id)}>SI-COST · เปิดเจ้าของงาน/ราคา</button><button type="button" disabled={disabled} onClick={()=>navigate('bid.quotation.line.'+id)}>ตรวจ Schedule allocation</button></div>)}
-    {Array.from(new Set([...(active.requirements||[]).flatMap(r=>r.offerIds||[]),...(active.priceOwners||[]).map(b=>b.line.offerId).filter(Boolean),...(active.candidateOfferIds||[]),...(active.pagaReference?.offers||[]).map(o=>o.id)])).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.vendor.offer.'+id)}>VND · {id}</button>)}
-   </>}
-   <p>{projection.rows.filter(r=>r.kind==='MR').length} แถว MR · {projection.bindings.length} เจ้าของราคา C1 · ไม่แบ่งราคา package ตามสัดส่วนโดยไม่มีฐาน</p>
-   {projection.pendingOwners?.length>0&&<details aria-label="C1 pending Working owners"><summary>Working รอ Mapping / ราคา · {projection.pendingOwners.length} รายการ</summary><p>ตรวจสอบการผูกแถว MR และราคาจาก Working สำหรับรายการที่ยังรอจัดลง C1</p>{projection.pendingOwners.map(b=><div key={b.lineId}><strong>{b.line.description}</strong><span> · {b.quantity??'—'} {b.unit}</span><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+b.lineId}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+b.lineId)}>SI-COST · ตรวจ Working</button></div>)}</details>}
-   {projection.mrNameDuplicates?.length>0&&<details aria-label="C1 MR repeated names"><summary>ตรวจชื่อรายการซ้ำตาม MR · {projection.mrNameDuplicates.length} กลุ่ม</summary><p>ตำแหน่ง MR ต่างกันยังเป็นคนละรายการ ต้องเทียบสถานที่ติดตั้ง ส่วนประกอบ และเจ้าของราคา ไม่รวมจำนวนหรือคิดราคาเพิ่มจากชื่อที่ตรงกัน</p>{projection.mrNameDuplicates.map(rs=><div key={rs[0].key}><strong>APPENDIX {rs[0].appendix} · {rs[0].site} · {rs[0].description}</strong>{rs.map(r=><p key={r.key}>{r.sn} · {r.mr.reference}{r.notes.filter(n=>/\binstall(?:ed|ation)?\b/i.test(n)).map((note,i)=><span key={i}> · {note}</span>)}<button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+(r.mr.canonicalIds?.[0]||r.key))}>SI-REQ · ตรวจรายการ {r.sn}</button></p>)}</div>)}</details>}
-   <details aria-label="C1 Appendix summary diagnostics"><summary>ผลรวมแต่ละ Appendix · ยอดที่มีราคา / รายการที่ยังขาด</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Appendix</th><th>ยอดที่มีราคา {currency}</th><th>เจ้าของราคา ครบ / ขาด</th><th>MR ขอบเขต / จำนวนยังขาด</th><th>ความครบถ้วนของยอด</th></tr></thead><tbody>{overview.map(g=><tr key={g.id}><td>{g.id}</td><td>{c1Display0550(g.knownAmount)}</td><td>{g.priced} / {g.open}</td><td>{g.openMR}</td><td>{g.complete?'ครบราคาภายในหมวด':'ยังไม่ใช่ยอดครบหมวด'}</td></tr>)}</tbody></table></div></details>
-   {projection.problems.length>0&&<ul>{projection.problems.map(p=><li key={p}>{p}</li>)}</ul>}
-  </details>
+  <p className="p55-c1-screen-note">Customer Quotation Schedule C1 — Initial Contract Price for Base Scope of Supply · Derived from SI Module · Currency: {currency}</p>
   <div className="p55-c1-scroll">
   <article className={'p55-c1-document'+(documentMode?' p55-c1-expanded':'')} data-native-schedule="C1">
-   <div className="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span><span>Currency: {currency}</span><span>DRAFT — NOT FOR SUBMISSION</span></div>
-   <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2>
+   <div className="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span><span>Currency: {currency}</span></div>
+   <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPLY</h2>
    <table aria-label="Schedule C1 preview"><colgroup><col style={{width:'9%'}}/><col style={{width:'39%'}}/><col style={{width:'7%'}}/><col style={{width:'7%'}}/><col style={{width:'11%'}}/><col style={{width:'11%'}}/><col style={{width:'16%'}}/></colgroup>
     <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB ({currency==='THB'?'THB':'USD or RMB'})</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
     {projection.groups.map(g=>{
@@ -139,36 +397,93 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        <td colSpan={!documentMode&&Number.isFinite(sys.knownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
        {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
       </tr>
-      {!documentMode&&sys.notice&&<tr className="c1-detail-note"><td colSpan={7}>{sys.notice}</td></tr>}
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode||view.workingPreview&&g.id==='1.1').map(site=><React.Fragment key={site.name}>
        <tr className="c1-site">
         <td colSpan={!documentMode&&Number.isFinite(site.knownAmount)?5:7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td>
         {!documentMode&&Number.isFinite(site.knownAmount)&&<><td className="number">{c1Display0550(site.knownAmount)}</td><td>Priced items subtotal</td></>}
        </tr>
-       {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
+       {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=>{
+        const bomItems=formatBomItems0550(r,pricingMode);
+        const hasBom=bomItems.length>0;
+        const systemTitle=(r.system||cleanItemTitle0550(r)||'SYSTEM').toUpperCase();
+        const siteTitle=(r.site||'PROJECT').toUpperCase();
+        const subtableTitle=`BILL OF MATERIALS (BOM) — ${systemTitle} (${siteTitle})`;
+        return <React.Fragment key={r.key}>
         <tr ref={r.key===location?.key?focusedRow:undefined} tabIndex={r.key===location?.key?-1:undefined}
-         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0||r.quotedComponents?.length>0||!documentMode&&r.pagaReference?.offers.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td>
-         <td>{r.note}{!documentMode&&r.workingNote&&<div>{r.workingNote}</div>}{!documentMode&&(r.pendingRadioPlacement||r.provisionalRadio)&&<div>{r.pendingRadioPlacement||'ราคาตาม Offer · รอตรวจขอบเขต MR'}</div>}
-          {!documentMode&&r.pagaReference&&<div>INDUSTRONIC {r.pagaReference.packageSn} · {r.pagaReference.offers.length?'Offer items '+r.pagaReference.offers.map(o=>o.supplierQuoteRow.itemCode).join(', ')+' · ตรวจจำนวนและ TAG รายไซต์':'รอตรวจรายการเทียบกับใบเสนอราคา'}</div>}
+         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}>
+         <td>{r.sn}</td>
+         <td>
+          {hasBom&&button(r.key,'BOM '+r.description+' / '+r.site,true)}
+          <span style={{fontWeight:600,color:'#172d3e'}}>{cleanItemTitle0550(r)}</span>
+          <div className="c1-scope-description" style={{fontSize:'11.5px',color:'#4a5568',marginTop:'3px',lineHeight:'1.4',fontStyle:'italic'}}>
+           {formalScopeDescription0550(r)}
+          </div>
          </td>
+         <td>{r.unit||'—'}</td>
+         <td className="number">{r.quantity??'—'}</td>
+         <td className="number">{c1Display0550(r.unitPrice)}</td>
+         <td className="number">{c1Display0550(r.amount)}</td>
+         <td>{formatCustomerNote0550(r)}</td>
         </tr>
         {!documentMode&&r.pagaCost&&<PagaPackageCosts0550 cost={r.pagaCost} onNavigate={onNavigate} disabled={disabled}/>}
-        {!documentMode&&expanded(r.key,true)&&r.pagaReference?.offers.map(o=><tr className="c1-component c1-paga-cost" key={o.id} data-c1-quoted-offer={o.id}>
-         <td>{o.supplierQuoteRow.itemCode}</td><td>{o.description}</td><td>{o.quoteEvidence.quotedUnit}</td><td className="number">{o.quoteEvidence.quotedQuantity??'—'}</td>
-         <td className="number">{o.quoteEvidence.quotedCurrency} {c1Display0550(o.quoteEvidence.quotedUnitCost)}</td>
-         <td className="number">{o.quoteEvidence.quotedCurrency} {c1Display0550(o.quoteEvidence.quotedTotal)}</td>
-         <td>ต้นทุนและจำนวนตามใบเสนอราคา · ยอดขายอยู่ที่ {r.pagaReference.packageSn}</td>
-        </tr>)}
-        {!documentMode&&expanded(r.key,true)&&r.quotedComponents?.map(c=><tr className="c1-component" key={c.offer.id} data-c1-quoted-offer={c.offer.id}>
-         <td>{versedLanRackOffer0550(c.offer)?c.offer.quoteRef:mgwCurrentItemKey0550(c.offer)}</td><td>{c.offer.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity}</td>
-         <td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td>
-         <td>{c.included?'Included by MGW':c.unit?'Included in parent total':'Included in parent total · supplier unit pending'}
-          {c.quotedQuantity!==undefined&&<div>Working ตาม MR · ใบเสนอราคา {c.quotedQuantity} {c.unit}</div>}</td>
-        </tr>)}
-        {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
-        {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">{c1Display0550(c.unitPrice)}</td><td className="number">{c1Display0550(c.amount)}</td><td>{[c.note,(Number.isFinite(c.unitPrice)||Number.isFinite(c.amount))&&'Included in parent total'].filter(Boolean).join(' · ')}</td></tr>)}
-        {expanded(r.key,true)&&(r.notes||[]).map((note,i)=><tr className="c1-detail-note" key={'note'+i}><td/><td colSpan={6}>{note}</td></tr>)}
-       </React.Fragment>)}
+        {expanded(r.key,true)&&hasBom&&(
+         <tr className="c1-bom-subtable-row">
+          <td colSpan={7} className="c1-bom-subtable-cell">
+           <div className="c1-bom-container">
+            <div className="c1-bom-header">
+             <span>{subtableTitle}</span>
+             <span className="c1-bom-mode-badge">{pricingMode==='ITEMIZED'?'ITEMIZED PRICING MODE':'LUMP SUM LOT MODE'}</span>
+            </div>
+            <table className="c1-bom-table">
+             <thead>
+              <tr>
+               <th style={{width:'6%',textAlign:'center'}}>Item</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'26%':'32%'}}>Equipment Description</th>
+               <th style={{width:'12%'}}>Brand</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'12%':'14%'}}>Model</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'12%':'14%'}}>Part No.</th>
+               <th style={{width:'6%',textAlign:'center'}}>Qty</th>
+               <th style={{width:'6%',textAlign:'center'}}>Unit</th>
+               {pricingMode==='ITEMIZED'&&<>
+                <th style={{width:'11%',textAlign:'right'}}>Unit Rate ({currency})</th>
+                <th style={{width:'11%',textAlign:'right'}}>Total Price ({currency})</th>
+               </>}
+               <th style={{width:pricingMode==='ITEMIZED'?'12%':'16%'}}>Remarks</th>
+              </tr>
+             </thead>
+             <tbody>
+              {bomItems.map((item,idx)=>(
+               <tr key={idx} className="c1-bom-item-row">
+                <td style={{textAlign:'center'}}>{r.sn}.{idx+1}</td>
+                <td style={{fontWeight:500}}>{item.description}</td>
+                <td>{item.brand||'—'}</td>
+                <td>{item.model||'—'}</td>
+                <td style={{fontFamily:'Consolas,monospace',fontSize:'11px'}}>{item.partNo||'—'}</td>
+                <td className="number" style={{textAlign:'center'}}>{item.quantity??'—'}</td>
+                <td style={{textAlign:'center'}}>{item.unit||'Ea'}</td>
+                {pricingMode==='ITEMIZED'&&<>
+                 <td className="number">{c1Display0550(item.unitPrice)}</td>
+                 <td className="number">{c1Display0550(item.amount)}</td>
+                </>}
+                <td>{item.remarks||'Included in Base Scope of Supply'}</td>
+               </tr>
+              ))}
+             </tbody>
+             {pricingMode==='ITEMIZED'&&(
+              <tfoot>
+               <tr className="c1-bom-subtotal-row">
+                <td colSpan={7} style={{textAlign:'right',fontWeight:'bold'}}>Subtotal ({r.sn}) — Verified matching parent Lot:</td>
+                <td colSpan={2} className="number" style={{fontWeight:'bold',color:'#005a9e',textAlign:'right'}}>{c1Display0550(r.amount)}</td>
+                <td style={{fontWeight:'bold',color:'#005a9e'}}>Matches Lump Sum Total</td>
+               </tr>
+              </tfoot>
+             )}
+            </table>
+           </div>
+          </td>
+         </tr>
+        )}
+       </React.Fragment>;})}
       </React.Fragment>)}
      </React.Fragment>)}
      {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td>
