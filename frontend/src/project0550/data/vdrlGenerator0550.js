@@ -10,6 +10,7 @@ export const VDRL_READY_SYSTEMS_0550 = [
   {token: 'TEL-PAGA', label: 'PAGA', primaryVendor: 'INDUSTRONIC', evidence: 'atomic lines A20261632-005 + IDIE service quotes'},
   {token: 'TEL-RADIO-DTRS', label: 'RADIO / DTRS / DMR', primaryVendor: 'MGW / Motorola', evidence: 'MGW Q26-063 RADIO + DTS TAGs'},
   {token: 'TEL-PABX', label: 'PABX', primaryVendor: 'CHEVALIER', evidence: 'CITT-QT-392-2026'},
+  {token: 'TEL-DMR', label: 'DMR (Digital Microwave Radio)', primaryVendor: 'CERAGON', evidence: 'CERAGON 26-30029 RevA1 R11 (IP-50CX 7 GHz 2+0, ACP-APF link) + DTS-0010 TAGs'},
   {token: 'TEL-LAN', label: 'LAN', primaryVendor: 'MGW', evidence: 'bulk + stock basis'},
   {token: 'TEL-CCTV', label: 'CCTV', primaryVendor: 'MGW', evidence: 'MGW CCTV offer'},
 ];
