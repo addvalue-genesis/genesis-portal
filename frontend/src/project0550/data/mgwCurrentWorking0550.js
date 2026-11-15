@@ -274,13 +274,14 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    conflicts.add(id+' / existing price owner retained; reconcile quoted scope');
    continue;
   }
+  const isAms01RadioExtra=key==='RADIO-016';
   const site=radio?(nativeMr.get(quotedRefs[0])?.site||(key==='RADIO-016'?'AMS01':mgwRadioSourceRow0550(offer)?.site)):
    lan||mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0];
   lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:site||'',
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    unit:(key==='RADIO-016'||e.quotedQuantity===1)?'Lot':offer.unit,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
-   coverageBasis:MGW_BASIS_REVIEW_0550,...inputs,
+   coverageBasis:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':MGW_BASIS_REVIEW_0550,scopeBasis:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':undefined,internalStatus:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':undefined,...inputs,...(isAms01RadioExtra?{customerRemark:'Non-MR vendor extra (MGW APM quote); not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'}:{}),
    ...(offer.id===patchPanel?.id?patchPanelDraftInputs(patchDraft):{})});
   if(radio)conflicts.delete(formerRadioMappingBlock(id));
   if(lan&&mr)conflicts.delete(formerLanMappingBlock(mr));

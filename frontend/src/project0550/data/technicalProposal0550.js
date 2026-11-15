@@ -74,7 +74,7 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
  // 0550's existing cost taxonomy: B5=startup/commissioning spares,
  // B6=tools, C1=installation services, C2=capital, C3=two-year spares.
  // Never import 0553's different B-category numbering here.
- const equipment=data.lines.filter(l=>["A","B5","B6","C2","C3"].includes(l.wbs)&&!mgwWorkingLineExcluded0550(data,l)).map(l=>{
+ const equipment=data.lines.filter(l=>["A","B5","B6","C2","C3"].includes(l.wbs)&&!mgwWorkingLineExcluded0550(data,l)&&l.id!=='LINE-MGW-CURRENT-RADIO-016'&&l.coverageBasis!=='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'&&!(l.systemToken==='TEL-RADIO-DTRS'&&l.tagRef==='AMS01')).map(l=>{
   const q=model.lines?.find(r=>r.id===l.id)||l,detail=p.equipmentDetails.find(d=>d.lineId===l.id),problems=[];
   if(!Number.isFinite(q.quantity)||q.quantity<=0)problems.push("QUANTITY_OPEN");
   if(!detail||!(detail.estimatedWeightKg>0)||!detail.dimensions.trim()||!detail.basis.trim()||!detail.sourceIds.length)problems.push("WEIGHT_DIMENSIONS_EVIDENCE_OPEN");

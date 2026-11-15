@@ -298,9 +298,11 @@ export function deriveC1Appendix0550(view,currency='USD'){
  }
  // THB uses the same Working selling-price basis and ownership as USD.
  const bindings=currency==='THB'?usdBindings.map(scheduleBindingTHB0550):usdBindings;
- const problems=[],byOwner=new Map(),conflictingOwners=new Set();
+ const problems=[],byOwner=new Map(),conflictingOwners=new Set(),pendingOwners=[];
  const resolveOwner=l=>{if(!l)return null;if(!l.coveredByLineId)return l.id;const scope=mrLineScope0550({lines},l);if(!scope.covered){problems.push('C1_COVERAGE_OWNER_UNRESOLVED / '+l.id);return null;}return scope.owner.id;};
  for(const [i,b] of bindings.entries()){
+  const isAms01Radio=b.lineId==='LINE-MGW-CURRENT-RADIO-016'||(b.line?.tagRef==='AMS01'&&(b.line?.systemToken==='TEL-RADIO-DTRS'||/dmr/i.test(b.line?.description||'')))||b.line?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION';
+  if(isAms01Radio){pendingOwners.push({...b,status:'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'});continue;}
   const previous=byOwner.get(b.lineId)?.binding;
   if(previous){
    problems.push('DUPLICATE_C1_OWNER / '+b.lineId);
@@ -402,7 +404,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
  const dmrAcp=dmrApf&&rows.find(r=>r.key==='MR-B1-15-ACP-01');
  // A package shared across MR rows remains a single additive price row. No
  // equal/proportional allocation, whole-group total, or per-TAG cost is invented.
- const extra=[],pendingOwners=[],candidatePackages=new Map();
+ const extra=[],candidatePackages=new Map();
  for(const {binding:b,usdPriced} of byOwner.values()){
   if(!Number.isFinite(b.amount)||!Number.isFinite(b.unitPrice))problems.push('C1_OWNER_PRICE_OPEN / '+b.lineId);
   if(groupedQuoteOwners.has(b.lineId))continue;

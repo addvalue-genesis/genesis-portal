@@ -108,6 +108,7 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
  return savedView.unallocated.map(line=>{
   if(previouslySaved.has(line.id))return {line,proposal:null,reason:'The previous draft was removed. Select a destination in 11.M to restore it.'};
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
+  if(raw?.id==='LINE-MGW-CURRENT-RADIO-016'||raw?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'||(raw?.systemToken==='TEL-RADIO-DTRS'&&raw?.tagRef==='AMS01'))return {line,proposal:null,reason:'Non-MR vendor extra (MGW APM quote) — not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'};
   if(!raw||!base)return {line,proposal:null,reason:'No source category rule; SI must decide the destination'};
   // SI spare drafts are deliberately absent from suggestions and auto-saves.
   // Only an explicit saved 11.M binding may enter Volume I A1/A2 totals.

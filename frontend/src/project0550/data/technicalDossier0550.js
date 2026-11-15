@@ -19,7 +19,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const record=view.records.find(r=>r.systemToken===systemToken&&r.sectionId===sectionId);
  const sourceIds=unique([...requirements.flatMap(r=>[...(r.sourceIds||[]),...(r.supplierSourceIds||[])]),...(record?.sourceIds||[])]);
  const tables=[];
- const currentMgw=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(systemToken));
+ const currentMgw=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(systemToken)&&!(systemToken==='TEL-RADIO-DTRS'&&o.id.includes('RADIO-016')));
  if(currentMgw.length&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
   const supplement=currentMgw.find(o=>mgwSupplementOffer0550(o)||mgwBulkOffer0550(o)||mgwRadioDtrsOffer0550(o));
   tables.push({title:supplement?supplement.quoteRef+' · supplier proposal':'Supplier proposal and drawing · LAN/PBX/FO',heads:['Technical basis','Open verification'],
