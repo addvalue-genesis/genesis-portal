@@ -2,6 +2,7 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
+import {APF_DMR_MR_12_ITEMS_0550} from './data/radioLotComponents0550';
 
 const screenSites=(sites,nativeOrder)=>nativeOrder?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
 
@@ -49,7 +50,7 @@ function PagaPackageCosts0550({cost,onNavigate,disabled}){
 export function cleanCustomerNote0550(note){
  if(!note)return '';
  const str=String(note).trim();
- const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix|MGW draft price|Quoted LAN equipment|Quoted 24-port patch panel|Offer items)\b/i;
+ const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix|MGW draft price|Quoted LAN equipment|Quoted 24-port patch panel|Offer items|OEM Standard|Per Specification)\b/i;
  const parts=str.split(/(?<=[.;\n])\s+/);
  const clean=parts.filter(p=>!internalPattern.test(p)&&!/^(?:MR\s*Appendix|FOC\/BULK Rev\.01|SI budget estimate|Provisional budget|RITTAL cabinet supply|Draft uses|Verify|Confirm|Reconcile)\b/i.test(p.trim())).join(' ').trim();
  return clean.replace(/;\s*$/,'').trim();
@@ -68,7 +69,7 @@ export function formatCustomerNote0550(r){
 
 export function cleanItemTitle0550(r){
  const desc=String(r.description||'').trim();
- if(/comprised of/i.test(desc)||/^\(refer/i.test(desc)||desc.length>120){
+ if(/comprised of/i.test(desc)||/^\(refer/i.test(desc)||desc.length>120||/—\s*quoted equipment/i.test(desc)){
   if(r.appendix==='1.1'){
    if(/marine/i.test(desc))return 'VHF-FM Marine Radio System';
    if(/ssb|mf/i.test(desc))return 'MF/HF SSB Radio System';
@@ -90,7 +91,7 @@ export function cleanItemTitle0550(r){
   if(r.appendix==='1.7')return 'Non-Directional Beacon (NDB)';
   if(r.appendix==='1.8')return 'FOC and Cables';
  }
- const clean=desc.split('\n')[0].replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
+ const clean=desc.split('\n')[0].replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/comprised of\s*:\s*$/i,'').replace(/\s*—\s*quoted equipment$/i,'').trim();
  return clean||desc;
 }
 
@@ -160,38 +161,7 @@ export function formalScopeDescription0550(r){
  return 'Complete scope of supply per Company requirements and Material Requisition (MR), including primary equipment, enclosures, and accessories.';
 }
 
-const APF_DMR_BOM_RAW=[
- {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:24000},
- {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Lot',weight:8500},
- {description:'VHF DMR Repeater',brand:'Motorola',model:'SLR5500',partNo:'SLR5500',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:48000},
- {description:'Outdoor Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:4500},
- {description:'Lighting Arresters',brand:'PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:1800},
- {description:'Carrier Combiner',brand:'Amphenol Procom',model:'WLHL-150 F3',partNo:'WLHL-150 F3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:7200},
- {description:'Channel Splitter',brand:'Amphenol Procom',model:'WLFL-150-3',partNo:'WLFL-150-3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:5400},
- {description:'Bandpass Duplexer',brand:'Amphenol Procom',model:'WLSGQ-150',partNo:'WLSGQ-150',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:7600},
- {description:'DMR Tier III Access Router',brand:'H3C',model:'MSR 3610-XS',partNo:'MSR 3610-XS',quantity:1,unit:'Set',remarks:'Included in Lot',weight:7500},
- {description:'DELL PowerEdge Dispatching Server',brand:'Dell',model:'PowerEdge R740',partNo:'PowerEdge R740',quantity:1,unit:'Set',remarks:'Included in Lot',weight:32000},
- {description:'Dispatching Software',brand:'Motorola',model:'SmartPTT PLUS',partNo:'GMVN6044B',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:18000},
- {description:'Network Management System',brand:'Motorola',model:'NMS',partNo:'HKVN4315A',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:15000},
- {description:'SmartPTT VHF-DMR IP Gateway',brand:'SmartPTT',model:'RG-2000',partNo:'RG-2000',quantity:1,unit:'Set',remarks:'Included in Lot',weight:9500},
- {description:'DMR Tier III Repeater Software License',brand:'Motorola',model:'Software License',partNo:'HKVN4356A',quantity:3,unit:'Ea',remarks:'Included in Lot',weight:9000},
- {description:'DMR Tier III Capacity Max System Controller License',brand:'Motorola',model:'Controller License',partNo:'HKVN4313A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:12000},
- {description:'DMR Tier III Capacity Max MNIS VRC Gateway License',brand:'Motorola',model:'VRC Gateway License',partNo:'HKVN4317A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
- {description:'DMR Tier III Capacity Max Single Voice Talkpath License',brand:'Motorola',model:'Voice Talkpath License',partNo:'HKVN4318A',quantity:5,unit:'Ea',remarks:'Included in Lot',weight:14500},
- {description:'DMR Tier III Capacity Max MNIS Data Gateway License',brand:'Motorola',model:'Data Gateway License',partNo:'HKVN4321A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
- {description:'DMR Tier III Repeater Connection License',brand:'Motorola',model:'Connection License',partNo:'HKVN4314A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:7500},
- {description:'Capacity Max Connectivity License',brand:'Motorola',model:'Connectivity License',partNo:'GMVN6146A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:6500},
- {description:'Dispatch Voice Recording License',brand:'Motorola',model:'Voice Recording License',partNo:'GMVN6057A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
- {description:'End User Machine License',brand:'Motorola',model:'Subscriber License',partNo:'GMVN6050A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
- {description:'VHF DMR Radio Mobile (APF)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:21,unit:'Sets',remarks:'With suction cup antenna',weight:68000},
- {description:'VHF DMR Handheld Radio (ATEX)',brand:'Motorola',model:'MOTOTRBO XiR P8668Ex',partNo:'XiR-P8668Ex',quantity:96,unit:'Sets',remarks:'ATEX Zone 1 Certified',weight:245000},
- {description:'Capacity Max Advantage Subscriber License',brand:'Motorola',model:'Advantage License',partNo:'HKVN4350A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
- {description:'Six-Port Smart Charger',brand:'Motorola',model:'Multi-Unit Charger',partNo:'PMPN4296',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
- {description:'ATEX Remote Speaker / Microphone',brand:'Motorola',model:'Remote Speaker Mic',partNo:'PMNN4067',quantity:1,unit:'Set',remarks:'ATEX Certified',weight:3500},
- {description:'Dell Desktop PC Workstation',brand:'Dell',model:'OptiPlex Tower',partNo:'OptiPlex Tower',quantity:1,unit:'Set',remarks:'Intel Core i5 vPro',weight:8500},
- {description:'Dell UltraSharp 24 Monitor',brand:'Dell',model:'UltraSharp 24',partNo:'U2424H',quantity:1,unit:'Set',remarks:'Included in Lot',weight:2500},
- {description:'Desktop Loudspeaker & Microphone Box',brand:'Motorola',model:'Desktop Audio Kit',partNo:'Desktop Kit',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
-];
+const APF_DMR_BOM_RAW=APF_DMR_MR_12_ITEMS_0550;
 
 const ACP_DMR_BOM_RAW=[
  {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
@@ -201,6 +171,13 @@ const ACP_DMR_BOM_RAW=[
  {description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:14000},
  {description:'VHF DMR Fixed Radio Station',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:2,unit:'Sets',remarks:'With desktop power & mounting kit',weight:10000},
  {description:'Radio Dispatch Console Workstation',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Lot',weight:6823.36},
+];
+
+const AMS_DMR_BOM_RAW=[
+ {description:'VHF DMR Mobile Radio Station (Desktop)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Set',remarks:'Desktop mobile station complete with desk mic & power supply',weight:2500},
+ {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:500},
+ {description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea',remarks:'Included in Base Scope of Supply',weight:200},
+ {description:'RF Feeder Cables, Jumpers & Installation Accessories',brand:'Yongding / Amphenol',model:'HCAAYZ-50-12 / Jumper Kit',partNo:'HCAAYZ-50-12',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:324}
 ];
 
 function inferBrand(desc='',r={}){
@@ -383,6 +360,7 @@ function parseModelPartNo(desc='',r={}){
 export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  const isDmrApf=r.sn==='1.1.1'||r.key==='MR-B1-11-APF-01'||(r.appendix==='1.1'&&r.site==='APF'&&/dmr/i.test(r.description));
  const isDmrAcp=r.sn==='1.1.9'||r.key==='MR-B1-11-ACP-01'||(r.appendix==='1.1'&&r.site==='ACP'&&/dmr/i.test(r.description));
+ const isDmrAms=r.sn==='1.1.P1'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-016'||(r.appendix==='1.1'&&r.site==='AMS01'&&/dmr/i.test(r.description));
  let items=[];
 
  if(isDmrApf){
@@ -411,6 +389,25 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
    let amount=null,unitPrice=null;
    if(Number.isFinite(r.amount)&&pricingMode==='ITEMIZED'){
     if(idx===ACP_DMR_BOM_RAW.length-1){
+     amount=Math.round((r.amount-accumulated)*100)/100;
+    }else{
+     amount=Math.round((r.amount*(item.weight||1000)/totalWeight)*100)/100;
+     accumulated+=amount;
+    }
+    unitPrice=item.quantity>0?Math.round((amount/item.quantity)*100)/100:amount;
+   }
+   return {...item,amount,unitPrice};
+  });
+  return items;
+ }
+
+ if(isDmrAms){
+  const totalWeight=AMS_DMR_BOM_RAW.reduce((acc,it)=>acc+(it.weight||1000),0);
+  let accumulated=0;
+  items=AMS_DMR_BOM_RAW.map((item,idx)=>{
+   let amount=null,unitPrice=null;
+   if(Number.isFinite(r.amount)&&pricingMode==='ITEMIZED'){
+    if(idx===AMS_DMR_BOM_RAW.length-1){
      amount=Math.round((r.amount-accumulated)*100)/100;
     }else{
      amount=Math.round((r.amount*(item.weight||1000)/totalWeight)*100)/100;
@@ -596,7 +593,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
            {formalScopeDescription0550(r)}
           </div>
          </td>
-         <td>{r.unit||'—'}</td>
+         <td>{r.unit||(r.sn==='1.1.P1'||r.key?.includes('RADIO-016')?'Lot':'—')}</td>
          <td className="number">{r.quantity??'—'}</td>
          <td className="number">{c1Display0550(r.unitPrice)}</td>
          <td className="number">{c1Display0550(r.amount)}</td>

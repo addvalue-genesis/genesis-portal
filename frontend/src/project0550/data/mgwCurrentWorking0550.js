@@ -198,7 +198,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   const code=source?.systemTokens.length===1&&MGW_RADIO_CUSTOMER_CODES_0550[source.systemTokens[0]];
   if(!radioRemaining||!code||code==='A1-07'||line.customerRowCode!=='A1-07'||!line.selected||line.officialReview||
    line.id!=='LINE-MGW-CURRENT-'+mgwCurrentItemKey0550(offer)||line.scopeKey!==line.id||
-   line.wbs!=='A'||line.systemToken!==source.systemTokens[0]||line.description!==offer.description+' — quoted equipment'||
+   line.wbs!=='A'||line.systemToken!==source.systemTokens[0]||(line.description!==offer.description+' — quoted equipment'&&line.description!==offer.description)||
    line.requirementRef!==mgwCurrentMr0550(offer).join(' / ')||line.coveredByLineId||
    line.coverageBasis!==MGW_BASIS_REVIEW_0550||line.customerRemark!==MGW_RADIO_DTRS_QUOTED_SCOPE_0550)return line;
   return {...line,customerRowCode:code};
@@ -276,8 +276,9 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   }
   const site=radio?(nativeMr.get(quotedRefs[0])?.site||(key==='RADIO-016'?'AMS01':mgwRadioSourceRow0550(offer)?.site)):
    lan||mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0];
-  lines.push({id,systemToken,wbs:'A',description:radio?offer.description+' — quoted equipment':offer.description,scopeKey:id,tagRef:site||'',
+  lines.push({id,systemToken,wbs:'A',description:key==='RADIO-016'?offer.description:(radio?offer.description+' — quoted equipment':offer.description),scopeKey:id,tagRef:site||'',
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
+   unit:key==='RADIO-016'?'Lot':offer.unit,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs,
    ...(offer.id===patchPanel?.id?patchPanelDraftInputs(patchDraft):{})});

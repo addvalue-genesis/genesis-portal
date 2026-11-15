@@ -73,7 +73,7 @@ export function c1SystemLabel0550(r){
 export function cleanCustomerText0550(text){
  if(!text)return '';
  const str=String(text).trim();
- const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix)\b/i;
+ const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix|OEM Standard|Per Specification)\b/i;
  const parts=str.split(/(?<=[.;\n])\s+/);
  const clean=parts.filter(p=>!internalPattern.test(p)&&!/^(?:MR\s*Appendix|FOC\/BULK Rev\.01|SI budget estimate|Provisional budget|RITTAL cabinet supply|Draft uses|Verify|Confirm|Reconcile)\b/i.test(p.trim())).join(' ').trim();
  return clean.replace(/;\s*$/,'').trim();
@@ -396,7 +396,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
     target.provisionalRadio=true;
     if(target.key==='MR-B1-11-APF-06')target.system='RoIP Dispatch Console';
     target.components.push({description:b.line.description,quantity:b.quantity,unit:b.unit,amount:b.amount,
-     unitPrice:b.unitPrice,note:'SI budget estimate',source:b.line.description});
+     unitPrice:b.unitPrice,note:'Included in Lot',source:b.line.description});
     continue;
    }
   }
@@ -441,15 +441,18 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const supplement=!legacy&&mgwSupplementOffer0550(b.line.offer);
   const metOffer=!legacy&&view.workingPreview&&usdPriced&&token==='TEL-MET'&&mgwMetPackage(b.line.offer)?b.line.offer:null;
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
-  const itemDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
+  const rawDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
+  const itemDescription=rawDescription.replace(/\s*—\s*quoted equipment$/i,'');
   const terms=(supplement||radio||lan)?b.line.offer.quoteEvidence.terms:[];
   const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
-  const unitOpen=directRadio&&radioUnitOpen(b.line.offer);
+  const isAms01Radio=b.lineId==='LINE-MGW-CURRENT-RADIO-016'||(radio&&(b.line.tagRef==='AMS01'||b.line.description?.includes('AMS01')));
+  const unitOpen=directRadio&&radioUnitOpen(b.line.offer)&&!isAms01Radio;
   const site=targets.length?unique(targets.map(t=>t.site)).join(' / '):
    mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT';
+  const packageUnit=isAms01Radio?'Lot':(unitOpen?'':(b.unit||''));
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site,
-   description:itemDescription,quantity:b.quantity,unit:unitOpen?'':b.unit,
+   description:itemDescription,quantity:b.quantity,unit:packageUnit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
    ownerIds:[b.lineId],priceOwners:[b],requirements:[],targets:targets.map(t=>t.key)};

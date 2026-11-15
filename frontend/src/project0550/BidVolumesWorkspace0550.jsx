@@ -34,7 +34,7 @@ import {NATIVE_SUMMARIES_0550,NATIVE_FIELDS_0550,downloadNativeExhibit0550,nativ
 import {buildChangeGraph0550,affectedRecords0550,INPUT_RULES_0550} from './data/changeImpact0550';
 
 // Display focus only; canonical schedules, allocations and full-package exports stay complete.
-export function quotationSchedules0550(showAll=true){return SCHEDULES_0550.filter(s=>showAll||s.id==='C1'||s.id==='C2');}
+export function quotationSchedules0550(showAll=false){return SCHEDULES_0550.filter(s=>showAll||s.id==='C1'||s.id==='C2');}
 const metNdbScheduleNotes={
  B:'เงื่อนไขชำระเงิน งวดส่งมอบ และ Incoterm ยังรอใบเสนอราคาที่แก้ไข · TQ-032',
  C2:'ขอรายการอะไหล่และจำนวน OEM แยก Pre-commissioning / Commissioning / Start-up · TQ-031',

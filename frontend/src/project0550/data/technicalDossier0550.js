@@ -6,7 +6,7 @@ import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
 import {DMR_PART_B_0550,CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
-import {radioLotIncludedLines0550} from './radioLotComponents0550';
+import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550} from './radioLotComponents0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
 const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference catalogue: '+MGW_QUOTE_0550.sourceName+' / p'+r.page+' / '+r.section+' / item '+(r.sn||r.id):o.quoteEvidence?.locator||'Source locator OPEN — review the canonical supplier Offer ID';};
@@ -33,6 +33,9 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
     (o.quoteEvidence.quotedQuantity===null||mgwRadioDtrsOffer0550(o)&&o.quoteEvidence.classification==='OPTION'?'Quantity OPEN':o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit)+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
   const radioRows=currentMgw.filter(o=>mgwRadioDtrsOffer0550(o)&&o.components?.length).flatMap(o=>radioLotIncludedLines0550(o,o.quoteEvidence.quotedQuantity).map(line=>[o.id,(line.quantity??'—')+' '+(line.unit||''),line.description,line.note]));
   if(radioRows.length)tables.push({title:'Radio lot contents · included in the lot price · not additive',heads:['Offer','Quantity in this lot','Description / part','Note'],rows:radioRows});
+ }
+ if(systemToken==='TEL-RADIO-DTRS'&&['description','parameters','equipment'].includes(sectionId)){
+  tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','Equipment Description','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,item.description,item.brand,item.model,item.partNo,String(item.quantity),item.unit,item.remarks])});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){

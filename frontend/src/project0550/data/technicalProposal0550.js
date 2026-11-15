@@ -79,7 +79,7 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
   if(!detail||!(detail.estimatedWeightKg>0)||!detail.dimensions.trim()||!detail.basis.trim()||!detail.sourceIds.length)problems.push("WEIGHT_DIMENSIONS_EVIDENCE_OPEN");
   if(detail?.sourceIds.some(id=>!sources.some(s=>s.id===id&&s.readState!=="METADATA_ONLY"&&!["HISTORICAL","REPLACED_COPY","UNCONFIRMED"].includes(s.authority))||sources.some(s=>s.replaces?.includes(id))))problems.push("EQUIPMENT_SOURCE_UNREAD_OR_MISSING");
   const lotContents=mgwRadioDtrsOffer0550(q.offer)?radioLotIncludedLines0550(q.offer,q.quantity):[];
-  return {id:l.id,systemToken:l.systemToken,description:l.description,brand:l.brand||q.offer?.brand||"",quantity:q.quantity,unit:q.unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,lotContents,problems};
+  return {id:l.id,systemToken:l.systemToken,description:l.description,brand:l.brand||q.offer?.brand||(l.id==="REQ-MR-B1-11-APF-01"?"Motorola / TUTENG":(l.systemToken==="TEL-RADIO-DTRS"?"Motorola":""))||"",quantity:q.quantity,unit:q.unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,lotContents,problems};
  });
  const records=systemRows.flatMap(s=>TECHNICAL_SECTIONS_0550.map(section=>{
   const r=p.records.find(r=>r.systemToken===s.token&&r.sectionId===section.id)||blankTechnicalRecord0550(section.id,s.token),problems=[];

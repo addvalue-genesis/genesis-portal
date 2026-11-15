@@ -5,6 +5,21 @@ export const RADIO_GTPL_SEPARATOR_0550='\nLocation: APM\nVHF DMR Radio System GT
 export const RADIO_GTPL_INSTALLATION_SITE_0550='APF';
 export const RADIO_ACCESSORIES_SEPARATOR_0550='\nVHF DMR Radio System Accessaries MOTOROLA\n';
 
+export const APF_DMR_MR_12_ITEMS_0550 = [
+  { itemNo: '1', description: 'Radio System Cabinet', brand: 'TUTENG', model: 'G26642', partNo: 'G26642', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 24000 },
+  { itemNo: '2', description: 'VHF Dipole DMR Antenna Tx', brand: 'Amphenol Procom', model: '4-Stack Dipole Array', partNo: 'WL-150-4S', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 5000 },
+  { itemNo: '3', description: 'VHF Dipole DMR Antenna Rx', brand: 'Amphenol Procom', model: '4-Stack Dipole Array', partNo: 'WL-150-4S', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 5000 },
+  { itemNo: '4', description: 'VHF Omni DMR Antenna', brand: 'Amphenol Procom', model: 'TQJ-150I', partNo: 'TQJ-150I', quantity: 2, unit: 'Ea.', remarks: 'Included in Lot', weight: 4500 },
+  { itemNo: '5', description: 'VHF DMR Repeater', brand: 'Motorola', model: 'MOTOTRBO SLR5500', partNo: 'SLR5500', quantity: 3, unit: 'Ea.', remarks: 'Included in Lot', weight: 48000 },
+  { itemNo: '6', description: 'VHF CCMS server', brand: 'Dell', model: 'PowerEdge R740', partNo: 'PowerEdge R740', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 32000 },
+  { itemNo: '7', description: 'VHF RM server', brand: 'Dell', model: 'PowerEdge R740', partNo: 'PowerEdge R740', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 32000 },
+  { itemNo: '8', description: 'VHF DMR Fixed Radio', brand: 'Motorola', model: 'MOTOTRBO M8668i', partNo: 'M8668i', quantity: 6, unit: 'Ea.', remarks: 'Included in Lot', weight: 25000 },
+  { itemNo: '9', description: 'VHF DMR Mobile Radio', brand: 'Motorola', model: 'MOTOTRBO M8668i', partNo: 'M8668i', quantity: 21, unit: 'Ea.', remarks: 'Included in Lot', weight: 68000 },
+  { itemNo: '10', description: 'VHF Dispatch Panel', brand: 'Motorola / SmartPTT', model: 'SmartPTT PLUS Dispatch Panel', partNo: 'CON-308-001', quantity: 1, unit: 'Ea.', remarks: 'Included in Lot', weight: 18000 },
+  { itemNo: '11', description: 'VHF DMR Handheld Radio (ATEX or 13:19UL)', brand: 'Motorola', model: 'MOTOTRBO XiR P8668Ex', partNo: 'XiR-P8668Ex', quantity: 98, unit: 'Ea.', remarks: 'ATEX Zone 1 Certified (covering APF, AMS01, ABV01, ACP, and MOGE)', weight: 245000 },
+  { itemNo: '12', description: 'Etc. / Bulk Materials & Accessories', brand: 'Amphenol / PolyPhaser', model: 'Bulk Materials & Accessories per Appendix 2', partNo: 'ACC-DMR-BULK', quantity: 1, unit: 'Lot', remarks: 'Included in Lot (refer to documents/drawings in Appendix 2)', weight: 10000 },
+];
+
 export function radioGtplLocationDisplay0550(text){
  return text.replace(RADIO_GTPL_SEPARATOR_0550,'\nLocation: '+RADIO_GTPL_INSTALLATION_SITE_0550+'\nVHF DMR Radio System GTPL\n');
 }
