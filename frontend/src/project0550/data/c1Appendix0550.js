@@ -359,7 +359,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(radio){
    target.provisionalRadio=true;
    if(showRadioBudget&&target.key==='MR-B1-11-APF-06')target.system='RoIP Dispatch Console';
-   else if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
+   else if(target.key==='MR-B1-11-ABV01-02')target.system=systemNames['TEL-RADIO-DTRS'];
+    else if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
   }else if(cctv)target.provisionalCctv=true;
   else if(fiberPanel){
    target.provisionalFiberPanel=true;
