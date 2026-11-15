@@ -2,9 +2,13 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550,sanitizeCustomerText0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
-import {APF_DMR_MR_12_ITEMS_0550} from './data/radioLotComponents0550';
+import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550} from './data/radioLotComponents0550';
 
-const screenSites=(sites,nativeOrder)=>nativeOrder?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
+const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
+const screenSites=(sites,nativeOrder)=>{
+ const valid=sites.filter(s=>s.name!=='APM').map(s=>({...s,rows:s.rows.filter(r=>!isNonMrApmRow(r))})).filter(s=>s.rows.length>0);
+ return nativeOrder?valid:[...valid.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...valid.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
+};
 
 function PagaQuoteCosts0550({quote}){
  const {offer,items}=quote,evidence=offer.quoteEvidence,totals=evidence.commercialTotals;
@@ -442,12 +446,16 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  const isDmrAcp=r.sn==='1.1.9'||r.key==='MR-B1-11-ACP-01'||(r.appendix==='1.1'&&r.site==='ACP'&&/dmr/i.test(r.description));
  const isDmrAbv=r.sn==='1.1.15'||r.key==='MR-B1-11-ABV01-01'||(r.appendix==='1.1'&&r.site==='ABV01'&&/dmr/i.test(r.description));
  const isDmrAms=r.key==='OWNER:LINE-MGW-CURRENT-RADIO-016'||(r.appendix==='1.1'&&r.site==='AMS01'&&/dmr/i.test(r.description));
+ const isMarineApf=r.sn==='1.1.2'||r.key==='MR-B1-11-APF-02'||(r.appendix==='1.1'&&r.site==='APF'&&/marine/i.test(r.description));
+ const isMarineAcp=r.sn==='1.1.10'||r.key==='MR-B1-11-ACP-02'||(r.appendix==='1.1'&&r.site==='ACP'&&/marine/i.test(r.description));
  let items=[];
 
  if(isDmrApf)return buildStaticBomItems(APF_DMR_BOM_RAW,r,pricingMode);
  if(isDmrAcp)return buildStaticBomItems(ACP_DMR_BOM_RAW,r,pricingMode);
  if(isDmrAbv)return buildStaticBomItems(ABV_DMR_BOM_RAW,r,pricingMode);
  if(isDmrAms)return buildStaticBomItems(AMS_DMR_BOM_RAW,r,pricingMode);
+ if(isMarineApf)return buildStaticBomItems(APF_MARINE_MR_6_ITEMS_0550,r,pricingMode);
+ if(isMarineAcp)return buildStaticBomItems(ACP_MARINE_MR_4_ITEMS_0550,r,pricingMode);
 
  if(r.quotedComponents&&r.quotedComponents.length>0){
   for(const c of r.quotedComponents){
@@ -599,10 +607,13 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
      const heading=g.title.toUpperCase();
      return <tbody key={g.id}>
      <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
-     {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
+     {expanded('APP:'+g.id)&&g.systems.map(sys=>{
+      const apmExcludedAmt=sys.sites.flatMap(s=>s.rows).filter(isNonMrApmRow).reduce((acc,r)=>acc+(Number.isFinite(r.amount)?r.amount:0),0);
+      const displayKnownAmount=Number.isFinite(sys.knownAmount)?Math.round((sys.knownAmount-apmExcludedAmt)*100)/100:null;
+      return <React.Fragment key={sys.name}>
       <tr className="c1-system">
-       <td colSpan={!documentMode&&Number.isFinite(sys.knownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
-       {!documentMode&&Number.isFinite(sys.knownAmount)&&<><td className="number">{c1Display0550(sys.knownAmount)}</td><td>Priced items subtotal</td></>}
+       <td colSpan={!documentMode&&Number.isFinite(displayKnownAmount)?5:7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td>
+       {!documentMode&&Number.isFinite(displayKnownAmount)&&<><td className="number">{c1Display0550(displayKnownAmount)}</td><td>Priced items subtotal</td></>}
       </tr>
       {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode||view.workingPreview&&g.id==='1.1').map(site=><React.Fragment key={site.name}>
        <tr className="c1-site">
@@ -696,7 +707,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
         )}
        </React.Fragment>;})}
       </React.Fragment>)}
-     </React.Fragment>)}
+     </React.Fragment>;})}
      {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td>
       <td className="number">{c1Display0550(g.amount??g.draftSubtotal)}</td><td>{c1AppendixSubtotalLabel0550(g)}</td></tr>}
     </tbody>;})}

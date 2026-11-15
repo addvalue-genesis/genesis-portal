@@ -6,6 +6,9 @@
     {"id":"REVIEW_FLAG_DMR_CAPACITY_MAX","scope":"APF / ACP / ABV01","summary":"Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios)."},
     {"id":"REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET","scope":"1.1.5 / 1.1.7 / 1.1.16","summary":"Verify RF Link Budget attenuation on 1/2\" feeder cable (150 m / 60 m tower) for potential Phase-2 7/8\" upgrade clarification."}
   ],
+  "nonMrVendorExtras": [
+    {"id":"LINE-MGW-CURRENT-RADIO-006","system":"TEL-RADIO-MARINE","status":"NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION","mgwSite":"APM","mgwCostUSD":27478,"customerSellUSD":36270.96,"note":"Unallocated MGW VHF-FM Marine Radio System (2 Lots, APM vendor label not in Customer MR). Excluded from customer-facing C1/11.P and tracked internally in 10.2 SI as NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION."}
+  ],
   "layouts": [
     "APF LAY-0001 C1 sheet 3/4 and LAY-0010 C4 overall",
     "ACP LAY-0001 C2 sheet 3/3, LAY-0003 C1 overall and BLD-0001 C3",
