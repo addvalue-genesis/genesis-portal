@@ -70,6 +70,25 @@ export function c1SystemLabel0550(r){
  if(appendix(r)==='3'&&/Access Point/i.test(r.description))return 'Wireless LAN';
  return systemNames[r.systemToken]||r.systemToken||'Equipment';
 }
+export function sanitizeCustomerText0550(text=''){
+ if(!text)return '';
+ let s=String(text);
+ s=s.replace(/\bRadio Console(?:\s*(?:\/|-)\s*|\s+)MGW\b/gi,'VHF DMR Dispatch Console');
+ s=s.replace(/\s*[-—]\s*quoted equipment\b/gi,'');
+ s=s.replace(/\[INTERNAL TRACE\]/gi,'');
+ s=s.replace(/\b(?:MGW|SI budget estimate|Draft(?:\s*uses|\s*only)?|OEM Standard|Per Specification)\b/gi,'');
+ s=s.replace(/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|quoted scope|MR Appendix|FOC\/BULK Rev\.01|RITTAL cabinet supply)\b/gi,'');
+ s=s.replace(/\b(?:ราคาตามใบเสนอราคา|รอตรวจการจัดราคา|รอยืนยัน|ตรวจใบเสนอราคา|ประมาณการ|Budget estimate)\b/gi,'');
+ s=s.replace(/\s*·\s*·+/g,' · ')
+    .replace(/^\s*·\s*/,'')
+    .replace(/\s*·\s*$/,'')
+    .replace(/\s*;\s*;/g,';')
+    .replace(/^\s*;\s*/,'')
+    .replace(/\s*;\s*$/,'')
+    .trim();
+ return s.replace(/;\s*$/,'').trim();
+}
+
 export function cleanCustomerText0550(text){
  if(!text)return '';
  const str=String(text).trim();
@@ -442,7 +461,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const metOffer=!legacy&&view.workingPreview&&usdPriced&&token==='TEL-MET'&&mgwMetPackage(b.line.offer)?b.line.offer:null;
   const fallbackDescription=(systemNames[token]||'Equipment')+' — supply package';
   const rawDescription=!legacy||mgwCurrentOffer0550(b.line.offer)?b.line.description||fallbackDescription:fallbackDescription;
-  const itemDescription=rawDescription.replace(/\s*—\s*quoted equipment$/i,'');
+  const itemDescription=rawDescription.replace(/\s*[-—]\s*quoted equipment$/i,'');
   const terms=(supplement||radio||lan)?b.line.offer.quoteEvidence.terms:[];
   const componentText=radio?(terms[0]||'').split('\n').filter(t=>/^~\s*\d+\s*x /i.test(t)&&!/GTPL contractor/i.test(t)).map(t=>t.replace(/^~\s*/,'')):
    terms.filter(t=>t.startsWith('BOM: ')).map(t=>t.slice(5));
@@ -450,7 +469,8 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const unitOpen=directRadio&&radioUnitOpen(b.line.offer)&&!isAms01Radio;
   const site=targets.length?unique(targets.map(t=>t.site)).join(' / '):
    mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT';
-  const packageUnit=isAms01Radio?'Lot':(unitOpen?'':(b.unit||''));
+  const isLumpSumPackage=b.quantity===1||isAms01Radio;
+  const packageUnit=isAms01Radio?'Lot':(unitOpen?'':((isLumpSumPackage&&(!b.unit||b.unit==='—'||b.unit==='U'))?'Lot':(b.unit||'')));
   const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site,
    description:itemDescription,quantity:b.quantity,unit:packageUnit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',

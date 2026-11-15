@@ -8,6 +8,7 @@ import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
 import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550} from './radioLotComponents0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
+import {sanitizeCustomerText0550} from './c1Appendix0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
 const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference catalogue: '+MGW_QUOTE_0550.sourceName+' / p'+r.page+' / '+r.section+' / item '+(r.sn||r.id):o.quoteEvidence?.locator||'Source locator OPEN — review the canonical supplier Offer ID';};
 const unique=a=>[...new Set(a.filter(Boolean))];
@@ -21,21 +22,22 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const currentMgw=data.offers.filter(o=>mgwCurrentOffer0550(o)&&o.quoteEvidence.systemTokens.includes(systemToken));
  if(currentMgw.length&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
   const supplement=currentMgw.find(o=>mgwSupplementOffer0550(o)||mgwBulkOffer0550(o)||mgwRadioDtrsOffer0550(o));
-  tables.push({title:supplement?supplement.quoteRef+' · supplier proposal':'MGW LAN/PBX/FO · supplier proposal and drawing',heads:['Technical basis','Open verification'],
+  tables.push({title:supplement?supplement.quoteRef+' · supplier proposal':'Supplier proposal and drawing · LAN/PBX/FO',heads:['Technical basis','Open verification'],
    rows:[supplement?[supplement.quoteEvidence.fileName+' / '+supplement.quoteEvidence.sourceUrl,
     mgwSupplementOpen0550(supplement,systemToken)+' Delivery basis and terms remain open.'+
     (systemToken==='TEL-MET'?' / '+MGW_MET_NDB_0550.deviationsUrl:'')]:
     [MGW_CURRENT_SCOPE_0550+' Drawing: ASK LAN,PABX BLD Model.pdf, p1 · '+MGW_CURRENT_BLD_0550,MGW_CURRENT_OPEN_0550]]});
  }
  if(currentMgw.length&&sectionId==='equipment'){
-  tables.push({title:'MGW quoted BOM · supplier quantities and equipment data',heads:['Offer / PDF locator','Equipment / model detail','Quoted quantity / treatment'],
-   rows:currentMgw.map(o=>[o.id+' / '+o.quoteEvidence.locator,o.brand+' / '+o.description+'\n'+o.quoteEvidence.terms.filter(t=>!t.startsWith('Supplier technical drawing:')&&!t.startsWith(MGW_SECTION_SUBTOTAL_0550)&&!t.startsWith('Quoted grand total USD:')).join('\n'),
+  tables.push({title:'Quoted BoQ · supplier quantities and equipment data',heads:['Offer / PDF locator','Equipment / model detail','Quoted quantity / treatment'],
+   rows:currentMgw.map(o=>[o.id+' / '+o.quoteEvidence.locator,sanitizeCustomerText0550(o.brand)+' / '+sanitizeCustomerText0550(o.description)+'\n'+o.quoteEvidence.terms.filter(t=>!t.startsWith('Supplier technical drawing:')&&!t.startsWith(MGW_SECTION_SUBTOTAL_0550)&&!t.startsWith('Quoted grand total USD:')).map(sanitizeCustomerText0550).filter(Boolean).join('\n'),
     (o.quoteEvidence.quotedQuantity===null||mgwRadioDtrsOffer0550(o)&&o.quoteEvidence.classification==='OPTION'?'Quantity OPEN':o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit)+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
-  const radioRows=currentMgw.filter(o=>mgwRadioDtrsOffer0550(o)&&o.components?.length).flatMap(o=>radioLotIncludedLines0550(o,o.quoteEvidence.quotedQuantity).map(line=>[o.id,(line.quantity??'—')+' '+(line.unit||''),line.description,line.note]));
+  const radioRows=currentMgw.filter(o=>mgwRadioDtrsOffer0550(o)&&o.components?.length).flatMap(o=>radioLotIncludedLines0550(o,o.quoteEvidence.quotedQuantity).map(line=>[o.id,(line.quantity??'—')+' '+(line.unit||''),sanitizeCustomerText0550(line.description),sanitizeCustomerText0550(line.note)]))
+   .filter(r=>!r[1].endsWith('x')&&!r[3].toLowerCase().includes('included in lot'));
   if(radioRows.length)tables.push({title:'Radio lot contents · included in the lot price · not additive',heads:['Offer','Quantity in this lot','Description / part','Note'],rows:radioRows});
  }
  if(systemToken==='TEL-RADIO-DTRS'&&['description','parameters','equipment'].includes(sectionId)){
-  tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','Equipment Description','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,item.description,item.brand,item.model,item.partNo,String(item.quantity),item.unit,item.remarks])});
+  tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','Equipment Description','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){

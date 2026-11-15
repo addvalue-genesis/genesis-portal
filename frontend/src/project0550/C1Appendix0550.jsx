@@ -1,6 +1,6 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {bidOwnerStyle} from './bidPresentation0550';
-import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
+import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550,sanitizeCustomerText0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550} from './data/radioLotComponents0550';
 
@@ -48,12 +48,7 @@ function PagaPackageCosts0550({cost,onNavigate,disabled}){
 }
 
 export function cleanCustomerNote0550(note){
- if(!note)return '';
- const str=String(note).trim();
- const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix|MGW draft price|Quoted LAN equipment|Quoted 24-port patch panel|Offer items|OEM Standard|Per Specification)\b/i;
- const parts=str.split(/(?<=[.;\n])\s+/);
- const clean=parts.filter(p=>!internalPattern.test(p)&&!/^(?:MR\s*Appendix|FOC\/BULK Rev\.01|SI budget estimate|Provisional budget|RITTAL cabinet supply|Draft uses|Verify|Confirm|Reconcile)\b/i.test(p.trim())).join(' ').trim();
- return clean.replace(/;\s*$/,'').trim();
+ return sanitizeCustomerText0550(note);
 }
 
 export function formatCustomerNote0550(r){
@@ -74,7 +69,7 @@ export function cleanItemTitle0550(r){
    if(/marine/i.test(desc))return 'VHF-FM Marine Radio System';
    if(/ssb|mf/i.test(desc))return 'MF/HF SSB Radio System';
    if(/aero/i.test(desc))return 'VHF-AM Aeronautical Radio';
-   if(/roip|dispatch/i.test(desc))return 'RoIP Dispatch Console';
+   if(/roip|dispatch/i.test(desc))return 'VHF DMR Dispatch Console';
    if(/antenna cable/i.test(desc))return 'Antenna Cables';
    return 'VHF DMR Radio System';
   }
@@ -91,8 +86,8 @@ export function cleanItemTitle0550(r){
   if(r.appendix==='1.7')return 'Non-Directional Beacon (NDB)';
   if(r.appendix==='1.8')return 'FOC and Cables';
  }
- const clean=desc.split('\n')[0].replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/comprised of\s*:\s*$/i,'').replace(/\s*—\s*quoted equipment$/i,'').trim();
- return clean||desc;
+ const rawTitle=desc.split('\n')[0].replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
+ return sanitizeCustomerText0550(rawTitle)||desc;
 }
 
 export function formalScopeDescription0550(r){
@@ -164,20 +159,20 @@ export function formalScopeDescription0550(r){
 const APF_DMR_BOM_RAW=APF_DMR_MR_12_ITEMS_0550;
 
 const ACP_DMR_BOM_RAW=[
- {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
- {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
- {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
- {description:'VHF DMR Antenna 4 Stack',brand:'Amphenol Procom',model:'4-Stack Dipole Array',partNo:'WL-150-4S',quantity:1,unit:'Set',remarks:'Included in Lot',weight:2000},
- {description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:14000},
+ {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:4500},
+ {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
+ {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
+ {description:'VHF DMR Antenna 4 Stack',brand:'Amphenol Procom',model:'4-Stack Dipole Array',partNo:'WL-150-4S',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:2000},
+ {description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Base Scope of Supply',weight:14000},
  {description:'VHF DMR Fixed Radio Station',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:2,unit:'Sets',remarks:'With desktop power & mounting kit',weight:10000},
- {description:'Radio Dispatch Console Workstation',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Lot',weight:6823.36},
+ {description:'VHF DMR Dispatch Console',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:6823.36},
 ];
 
 const AMS_DMR_BOM_RAW=[
  {description:'VHF DMR Mobile Radio Station (Desktop)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Set',remarks:'Desktop mobile station complete with desk mic & power supply',weight:2500},
  {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:500},
  {description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea',remarks:'Included in Base Scope of Supply',weight:200},
- {description:'RF Feeder Cables, Jumpers & Installation Accessories',brand:'Yongding / Amphenol',model:'HCAAYZ-50-12 / Jumper Kit',partNo:'HCAAYZ-50-12',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:324}
+ {description:'RF Feeder Cables, Jumpers & Installation Accessories',brand:'Yongding / Amphenol',model:'HCAAYZ-50-12 / Jumper Kit',partNo:'HCAAYZ-50-12',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:324}
 ];
 
 function inferBrand(desc='',r={}){
@@ -379,7 +374,33 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
    }
    return {...item,amount,unitPrice};
   });
-  return items;
+  const seen=new Map();
+  const deduped=[];
+  for(const it of items){
+   const u=String(it.unit||'').trim().toLowerCase();
+   const rem=String(it.remarks||it.note||'').toLowerCase();
+   if(u==='x'||rem.includes('included in lot'))continue;
+   const desc=sanitizeCustomerText0550(it.description||'');
+   const norm=(it.itemCode||it.partNo||it.model||desc.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+   if(!norm)continue;
+   if(seen.has(norm)){
+    const ex=seen.get(norm);
+    if(Number.isFinite(it.quantity)&&Number.isFinite(ex.quantity))ex.quantity+=it.quantity;
+    if(Number.isFinite(it.amount)&&Number.isFinite(ex.amount))ex.amount+=it.amount;
+   }else{
+    const cleanItem={
+     ...it,
+     description:desc,
+     brand:sanitizeCustomerText0550(it.brand||''),
+     model:sanitizeCustomerText0550(it.model||''),
+     partNo:sanitizeCustomerText0550(it.partNo||''),
+     remarks:sanitizeCustomerText0550(it.remarks||'Included in Base Scope of Supply')
+    };
+    seen.set(norm,cleanItem);
+    deduped.push(cleanItem);
+   }
+  }
+  return deduped;
  }
 
  if(isDmrAcp){
@@ -398,7 +419,33 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
    }
    return {...item,amount,unitPrice};
   });
-  return items;
+  const seen=new Map();
+  const deduped=[];
+  for(const it of items){
+   const u=String(it.unit||'').trim().toLowerCase();
+   const rem=String(it.remarks||it.note||'').toLowerCase();
+   if(u==='x'||rem.includes('included in lot'))continue;
+   const desc=sanitizeCustomerText0550(it.description||'');
+   const norm=(it.itemCode||it.partNo||it.model||desc.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+   if(!norm)continue;
+   if(seen.has(norm)){
+    const ex=seen.get(norm);
+    if(Number.isFinite(it.quantity)&&Number.isFinite(ex.quantity))ex.quantity+=it.quantity;
+    if(Number.isFinite(it.amount)&&Number.isFinite(ex.amount))ex.amount+=it.amount;
+   }else{
+    const cleanItem={
+     ...it,
+     description:desc,
+     brand:sanitizeCustomerText0550(it.brand||''),
+     model:sanitizeCustomerText0550(it.model||''),
+     partNo:sanitizeCustomerText0550(it.partNo||''),
+     remarks:sanitizeCustomerText0550(it.remarks||'Included in Base Scope of Supply')
+    };
+    seen.set(norm,cleanItem);
+    deduped.push(cleanItem);
+   }
+  }
+  return deduped;
  }
 
  if(isDmrAms){
@@ -417,7 +464,33 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
    }
    return {...item,amount,unitPrice};
   });
-  return items;
+  const seen=new Map();
+  const deduped=[];
+  for(const it of items){
+   const u=String(it.unit||'').trim().toLowerCase();
+   const rem=String(it.remarks||it.note||'').toLowerCase();
+   if(u==='x'||rem.includes('included in lot'))continue;
+   const desc=sanitizeCustomerText0550(it.description||'');
+   const norm=(it.itemCode||it.partNo||it.model||desc.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+   if(!norm)continue;
+   if(seen.has(norm)){
+    const ex=seen.get(norm);
+    if(Number.isFinite(it.quantity)&&Number.isFinite(ex.quantity))ex.quantity+=it.quantity;
+    if(Number.isFinite(it.amount)&&Number.isFinite(ex.amount))ex.amount+=it.amount;
+   }else{
+    const cleanItem={
+     ...it,
+     description:desc,
+     brand:sanitizeCustomerText0550(it.brand||''),
+     model:sanitizeCustomerText0550(it.model||''),
+     partNo:sanitizeCustomerText0550(it.partNo||''),
+     remarks:sanitizeCustomerText0550(it.remarks||'Included in Base Scope of Supply')
+    };
+    seen.set(norm,cleanItem);
+    deduped.push(cleanItem);
+   }
+  }
+  return deduped;
  }
 
  if(r.quotedComponents&&r.quotedComponents.length>0){
@@ -494,7 +567,33 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
   }
  }
 
- return items;
+ const seen=new Map();
+ const deduped=[];
+ for(const it of items){
+  const u=String(it.unit||'').trim().toLowerCase();
+  const rem=String(it.remarks||it.note||'').toLowerCase();
+  if(u==='x'||rem.includes('included in lot'))continue;
+  const desc=sanitizeCustomerText0550(it.description||'');
+  const norm=(it.itemCode||it.partNo||it.model||desc.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+  if(!norm)continue;
+  if(seen.has(norm)){
+   const ex=seen.get(norm);
+   if(Number.isFinite(it.quantity)&&Number.isFinite(ex.quantity))ex.quantity+=it.quantity;
+   if(Number.isFinite(it.amount)&&Number.isFinite(ex.amount))ex.amount+=it.amount;
+  }else{
+   const cleanItem={
+    ...it,
+    description:desc,
+    brand:sanitizeCustomerText0550(it.brand||''),
+    model:sanitizeCustomerText0550(it.model||''),
+    partNo:sanitizeCustomerText0550(it.partNo||''),
+    remarks:sanitizeCustomerText0550(it.remarks||'Included in Base Scope of Supply')
+   };
+   seen.set(norm,cleanItem);
+   deduped.push(cleanItem);
+  }
+ }
+ return deduped;
 }
 
 export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mrNavigationTarget}){
@@ -593,7 +692,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
            {formalScopeDescription0550(r)}
           </div>
          </td>
-         <td>{r.unit||(r.sn==='1.1.P1'||r.key?.includes('RADIO-016')?'Lot':'—')}</td>
+         <td>{r.unit&&r.unit!=='—'&&r.unit!=='U'?r.unit:(r.quantity===1||r.kind==='PACKAGE'||r.sn?.includes('.P')||r.sn==='1.1.P1'?'Lot':'—')}</td>
          <td className="number">{r.quantity??'—'}</td>
          <td className="number">{c1Display0550(r.unitPrice)}</td>
          <td className="number">{c1Display0550(r.amount)}</td>

@@ -3,6 +3,7 @@ import {radioLotIncludedLines0550} from "./radioLotComponents0550";
 import {mgwWorkingLineExcluded0550,mgwHistoricalOffer0550,supplierOfferExcluded0550,MGW_SCOPE_EXCLUDED_0550} from "./mgwVendorBasis0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {workingOffers0550} from './workingOffers0550';
+import {sanitizeCustomerText0550} from "./c1Appendix0550";
 // ADR-0550-001 §§1–4,6,8–14. Authoring records link canonical SI data;
 // derivation/export never approves engineering or creates a customer issue.
 import {integrationFingerprint0550,integrationRecordBasis0550,integrationTopologyBasis0550,integrationRequirements0550} from "./integrationWorkspace0550";
@@ -78,8 +79,9 @@ export function deriveTechnicalProposal0550(data,model,systems,today){
   if(!Number.isFinite(q.quantity)||q.quantity<=0)problems.push("QUANTITY_OPEN");
   if(!detail||!(detail.estimatedWeightKg>0)||!detail.dimensions.trim()||!detail.basis.trim()||!detail.sourceIds.length)problems.push("WEIGHT_DIMENSIONS_EVIDENCE_OPEN");
   if(detail?.sourceIds.some(id=>!sources.some(s=>s.id===id&&s.readState!=="METADATA_ONLY"&&!["HISTORICAL","REPLACED_COPY","UNCONFIRMED"].includes(s.authority))||sources.some(s=>s.replaces?.includes(id))))problems.push("EQUIPMENT_SOURCE_UNREAD_OR_MISSING");
-  const lotContents=mgwRadioDtrsOffer0550(q.offer)?radioLotIncludedLines0550(q.offer,q.quantity):[];
-  return {id:l.id,systemToken:l.systemToken,description:l.description,brand:l.brand||q.offer?.brand||(l.id==="REQ-MR-B1-11-APF-01"?"Motorola / TUTENG":(l.systemToken==="TEL-RADIO-DTRS"?"Motorola":""))||"",quantity:q.quantity,unit:q.unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,lotContents,problems};
+  const lotContents=mgwRadioDtrsOffer0550(q.offer)?radioLotIncludedLines0550(q.offer,q.quantity).filter(l=>String(l.unit||'').toLowerCase()!=='x'&&!String(l.note||'').toLowerCase().includes('included in lot')):[];
+  const unit=q.quantity===1&&(!q.unit||q.unit==='—'||q.unit==='U')?'Lot':q.unit;
+  return {id:l.id,systemToken:l.systemToken,description:sanitizeCustomerText0550(l.description),brand:sanitizeCustomerText0550(l.brand||q.offer?.brand||(l.id==="REQ-MR-B1-11-APF-01"?"Motorola / TUTENG":(l.systemToken==="TEL-RADIO-DTRS"?"Motorola":""))||""),quantity:q.quantity,unit,selected:l.selected,responsibility:l.responsibility||"CLARIFICATION",sourceRef:l.sourceRef,requirementRef:l.requirementRef,tagRef:l.tagRef,coveredByLineId:l.coveredByLineId||"",detail:detail||null,lotContents,problems};
  });
  const records=systemRows.flatMap(s=>TECHNICAL_SECTIONS_0550.map(section=>{
   const r=p.records.find(r=>r.systemToken===s.token&&r.sectionId===section.id)||blankTechnicalRecord0550(section.id,s.token),problems=[];

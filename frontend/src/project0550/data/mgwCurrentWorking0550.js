@@ -276,9 +276,9 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
   }
   const site=radio?(nativeMr.get(quotedRefs[0])?.site||(key==='RADIO-016'?'AMS01':mgwRadioSourceRow0550(offer)?.site)):
    lan||mgwSupplementOffer0550(offer)?key.split('-')[1]:offer.description.split(' · ')[0];
-  lines.push({id,systemToken,wbs:'A',description:key==='RADIO-016'?offer.description:(radio?offer.description+' — quoted equipment':offer.description),scopeKey:id,tagRef:site||'',
+  lines.push({id,systemToken,wbs:'A',description:offer.description,scopeKey:id,tagRef:site||'',
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
-   unit:key==='RADIO-016'?'Lot':offer.unit,
+   unit:(key==='RADIO-016'||e.quotedQuantity===1)?'Lot':offer.unit,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
    coverageBasis:MGW_BASIS_REVIEW_0550,...inputs,
    ...(offer.id===patchPanel?.id?patchPanelDraftInputs(patchDraft):{})});
