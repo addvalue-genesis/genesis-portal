@@ -32,15 +32,20 @@ All main system rows and detailed descriptions must use formal Oil & Gas EPC sco
 
 ---
 
-## 3. Expandable BOM Sub-table Structure & Equipment Data Standards
-When expanding (`+` / `-`) any system line item in `bid.quotation.C1` or `11.P`, the system must render a formal, bordered Bill of Materials (BOM) sub-table with separated specification columns:
+## 3. Expandable BOM Sub-table Structure & Golden Prototype Standard
+When expanding (`+` / `-`) any system line item in `bid.quotation.C1`, `11.P`, or `bid.technical`, the system must render a formal, bordered Bill of Materials (BOM) sub-table using the **Golden Prototype Standard** column order:
 
-$$\text{Item} \quad|\quad \text{Equipment Description} \quad|\quad \text{Brand} \quad|\quad \text{Model} \quad|\quad \text{Part No.} \quad|\quad \text{Qty} \quad|\quad \text{Unit} \quad|\quad \text{Remarks}$$
+$$\text{Item} \quad|\quad \text{MR Description} \quad|\quad \text{Tag No.} \quad|\quad \text{Offered Equipment} \quad|\quad \text{Brand} \quad|\quad \text{Model} \quad|\quad \text{Part No.} \quad|\quad \text{Qty} \quad|\quad \text{Unit} \quad|\quad \text{Remarks}$$
 
+* **Strict Separation of `MR Description` vs `Offered Equipment`:**
+  * **`MR Description`:** Strictly preserves exact Customer MR Appendix 1 wording (e.g., `Radio System Cabinet`, `VHF Dipole DMR Antenna Tx`, `VHF DMR Repeater`) without overwriting it with vendor model names.
+  * **`Tag No.`:** Displays verified Customer Equipment Tag Numbers from Appendix 2 / tag evidence (`APF-CAB-0004`, `APF-VHF-ANT-0001`, `RAD-308-001`, `RAD-308`, etc.), or `"Per Appendix 2 Drawing"` where unnumbered in Appendix 2. Never invent fake tag numbers.
+  * **`Offered Equipment` + `Brand / Model / Part No.`:** Displays actual supplier-offered equipment descriptions and manufacturer specs from `7 VND` (MGW) or verified `10.2 SI` / secondary vendor records.
+* **Location-First Grouping:** System groups must follow Customer MR site-first structure (e.g., `ABV01` groups Item `1.0` `VHF DMR Radio System` and Item `2.0` `Antenna Cable` `150 m` together under `VHF DMR Radio System / ABV01`, with clean section subtotal recalculation and unchanged Appendix Grand Total).
 * **Site-Level Allocation:** Each sub-table must accurately represent the equipment assigned to that specific Location (`APF`, `ACP`, `ABV01`, `AMS01`).
-* **Zero Generic Placeholders Rule:** Fallback strings such as `OEM Standard`, `Standard EPC Model`, and `Per Specification` are strictly forbidden. All items must carry real vendor Brand, Model, and Part No. derived from the Master Equipment / Vendor Offer catalog (e.g. TUTENG Cabinet `G26642`, H3C/Motorola Switch `LS-5135S-24T4S-EI`, Motorola `M8668i`, SmartPTT `RG-2000`, Amphenol Procom `TQJ-150I` / `WL-150-4S`, Dell `OptiPlex Workstation / CON-308-001`, Sailor `SAILOR 6210 / 6320`, Jotron `TR-910 / TRON TR30 AIR`, Hikvision `DS-2DY7436IXG-CXLWF316L`, Avaya `J179 / J159`, Rittal `TS-8`, etc.).
-* **Purge Internal SI Budget Rows:** Internal SI budget allowances (such as `ACP E&I Cabin...` or draft engineering reserves) must never appear as sub-items in customer-facing BOM tables. Equipment items must roll up cleanly to the parent Lot total (e.g. ACP `40,323.36`).
-* **Remarks Column:** Displays formal EPC technical notes (e.g., `"Included in Lot"`, `"ATEX Zone 1 Certified"`, `"Outdoor Marine Grade SUS316L"`). Replace any remaining `SI budget estimate` text with `"Included in Lot"`.
+* **Zero Generic Placeholders Rule:** Fallback strings such as `OEM Standard`, `Standard EPC Model`, and `Per Specification` are strictly forbidden. All items must carry real vendor Brand, Model, and Part No. derived from the Master Equipment / Vendor Offer catalog (e.g. TUTENG Cabinet `G26642`, Rittal `VX IT 42U`, H3C/Motorola Switch `LS-5135S-24T4S-EI`, Motorola `M8668i`, SmartPTT `RG-2000`, Amphenol Procom `TQJ-150I` / `WL-150-4S`, Dell `OptiPlex Workstation / CON-308-001`, Sailor `SAILOR 6210 / 6320`, Jotron `TR-910 / TRON TR30 AIR`, Hikvision `DS-2DY7436IXG-CXLWF316L`, Avaya `J179 / J159`, etc.).
+* **Purge Internal SI Budget Rows & `REVIEW_FLAG` Isolation:** Internal SI budget allowances (such as `ACP E&I Cabin...`) and internal engineering `reviewFlags` metadata (stored in `10.2 SI` / data layer for Phase-2 verification such as Combiner/Multicoupler, Ex-certification, Capacity Max licenses, and RF Link Budget checks) must **never** appear in customer-facing `C1`, `11.P`, `bid.technical`, or Word exports.
+* **Remarks Column:** Displays formal EPC technical notes (e.g., `"Included in Base Scope of Supply"`, `"Included in Lot"`, `"ATEX Zone 1 Certified"`). Replace any remaining `SI budget estimate` text with `"Included in Lot"`.
 
 ---
 

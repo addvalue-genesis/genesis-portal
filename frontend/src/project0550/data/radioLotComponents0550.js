@@ -5,6 +5,13 @@ export const RADIO_GTPL_SEPARATOR_0550='\nLocation: APM\nVHF DMR Radio System GT
 export const RADIO_GTPL_INSTALLATION_SITE_0550='APF';
 export const RADIO_ACCESSORIES_SEPARATOR_0550='\nVHF DMR Radio System Accessaries MOTOROLA\n';
 
+export const VHF_DMR_REVIEW_FLAGS_0550 = [
+  { id: 'REVIEW_FLAG_DMR_COMBINER', scope: 'APF (1.1.1)', tagNo: 'APF-CAB-0004', summary: 'Verify Tx Combiner & Rx Multicoupler inclusion inside APF-CAB-0004 (3 Repeaters sharing 1 Tx + 1 Rx Dipole antenna).' },
+  { id: 'REVIEW_FLAG_DMR_HANDHELD_EX', scope: 'APF (1.1.1.11)', summary: 'Verify ATEX / IECEx / UL (TIA-4950) Ex-certification on all 98 Ea. VHF DMR Handheld Radios.' },
+  { id: 'REVIEW_FLAG_DMR_CAPACITY_MAX', scope: 'APF / ACP / ABV01', summary: 'Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios).' },
+  { id: 'REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET', scope: '1.1.5 / 1.1.7 / 1.1.16', summary: 'Verify RF Link Budget attenuation on 1/2" feeder cable (150 m / 60 m tower) for potential Phase-2 7/8" upgrade clarification.' },
+];
+
 export const APF_DMR_MR_12_ITEMS_0550 = [
   { itemNo: '1', tagNo: 'APF-CAB-0004', mrDescription: 'Radio System Cabinet', offeredEquipment: '42U 19" Floor-Mounted Telecom Equipment Cabinet', description: 'Radio System Cabinet', brand: 'TUTENG', model: 'G26642', partNo: 'G26642', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 24000 },
   { itemNo: '2', tagNo: 'APF-VHF-ANT-0001', mrDescription: 'VHF Dipole DMR Antenna Tx', offeredEquipment: 'VHF 4-Stack Dipole Array Antenna (Tx)', description: 'VHF Dipole DMR Antenna Tx', brand: 'Amphenol Procom', model: '4-Stack Dipole Array', partNo: 'WL-150-4S', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 5000 },
