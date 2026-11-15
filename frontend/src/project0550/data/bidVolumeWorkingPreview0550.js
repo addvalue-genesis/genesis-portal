@@ -1,3 +1,4 @@
+import {preparePreservationPacking0550} from './bidVolumes0550';
 import {pagaRevisionNet0550,pagaRevisionSelected0550,pagaRevisionCandidate0550,pagaRevisionItems0550,pagaIncludedScope0550,pagaIncludedKit0550,pagaTwoYearSpareEvidence0550} from './supplierRevision0550';
 import {TRAINING_OJT_DAYS_0550,TRAINING_OJT_OWNER_0550,TRAINING_THAI_OWNER_0550,trainingBudgetPending0550,trainingRev01Owner0550} from './trainingBudget0550';
 import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
@@ -159,6 +160,7 @@ export function saveScheduleAllocationDrafts0550(data,plan,today){
 }
 // Keep a receipt for each automatically saved identity so deletions stay authored.
 export function preparePricedVolumeDrafts0550(data,pricing,today){
+ data=preparePreservationPacking0550(data,today);
  const receipt=data.repositoryBasisImport;
  if(!receipt?.bidCompletion)return data;
  const recorded=new Set(receipt.pricedVolumeDraftIds||[]);
@@ -253,7 +255,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const trainingSiteDays=bindings.some(b=>b.schedule==='C7'&&b.summary==='TRAINING'&&
   b.quantity===TRAINING_OJT_DAYS_0550*2*10&&trainingRev01Owner0550(b.line,TRAINING_OJT_OWNER_0550))?TRAINING_OJT_DAYS_0550:null;
  return {...projected,trainingSiteDays,trainingBudgetPending:trainingBudgetPending0550(data,today),c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
-  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,mgwCctvEntBudgetShares,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,mgwCctvEntBudgetShares,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),c3GoodsBasis:model.c3GoodsBasis,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),

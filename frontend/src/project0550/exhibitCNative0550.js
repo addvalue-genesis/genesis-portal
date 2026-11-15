@@ -7,7 +7,7 @@ import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
-import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550} from './data/c1Appendix0550';
+import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
 import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
@@ -39,7 +39,7 @@ const shared=(rows,key)=>{const values=[...new Set(rows.map(b=>b[key]||''))];ret
 const issued=view=>view.customerIssue===true;
 const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
 const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(String(text||''));
-const customerRemarkText=rows=>{const notes=[];for(const b of rows){const text=String(b.line?.customerRemark||b.customerRemark||'').trim();if(text&&!internalRemark(text)&&!notes.includes(text))notes.push(text);}return notes.join('; ');};
+const customerRemarkText=rows=>{const notes=[];for(const b of rows){const raw=String(b.line?.customerRemark||b.customerRemark||'').trim();const text=cleanCustomerText0550(raw);if(text&&!internalRemark(text)&&!notes.includes(text))notes.push(text);}return notes.join('; ');};
 function resolveMainEquipmentTag(b,view){const raw=b.mainEquipment?.trim();const isGeneric=!raw||raw==='OPEN'||/^(PABX \/ IP Telephony|FOC and Cables|Equipment)$/i.test(raw);if(!isGeneric)return raw;const reqs=view.requirements||view.integrationWorkspace?.requirements||view.integration?.requirements||[];const req=reqs.find(r=>r.workLineIds?.includes(b.lineId)||r.id===b.line?.mrRequirementId||r.id==='REQDEF-'+b.line?.mrRequirementId);if(req){const tags=(req.tagBindings||[]).map(tb=>tb.tag).filter(Boolean);if(tags.length)return [...new Set(tags)].join(' / ');if(req.cabinetTag)return req.cabinetTag;}if(b.line?.cabinetTag)return b.line.cabinetTag;if(b.line?.physicalTag)return b.line.physicalTag;if(b.line?.tagRef&&!/^(APF|ACP|OFFSHORE|PROJECT)$/i.test(b.line.tagRef))return b.line.tagRef;return raw&&raw!=='OPEN'?raw:(issued(view)?'':'OPEN');}
 function words(n,currency='USD'){
  if(!Number.isFinite(n))return 'OPEN';
@@ -86,15 +86,18 @@ function nativePages(view,id,currency='USD',c2References){
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
  const prices=(v,r,start,b,draftPriceRows)=>{
-  const t=term(b);
-  set(v,r,start,t==='CIF'?number(b.unitPrice):'');set(v,r,start+1,t==='FOB'?number(b.unitPrice):'');
-  set(v,r,start+2,t==='CIF'?number(b.amount):'');set(v,r,start+3,t==='FOB'?number(b.amount):'');
+  let t=term(b);
+  if(!t&&issued(view)&&['C2','C3','C4','C5'].includes(id))t='CIF';
+  const unitPrice=Number.isFinite(b.unitPrice)?b.unitPrice:b.line?.sellRate??b.line?.manualCost??b.line?.unitCost;
+  const amount=Number.isFinite(b.amount)?b.amount:(Number.isFinite(unitPrice)&&Number.isFinite(b.quantity)?unitPrice*b.quantity:null);
+  set(v,r,start,t==='CIF'?number(unitPrice):'');set(v,r,start+1,t==='FOB'?number(unitPrice):'');
+  set(v,r,start+2,t==='CIF'?number(amount):'');set(v,r,start+3,t==='FOB'?number(amount):'');
   if(t)return;
   issues.push('Customer CIF/FOB term OPEN: '+b.lineId);
-  const show=view.workingPreview&&!b.nonAdditive&&Number.isFinite(b.amount);
+  const show=view.workingPreview&&!b.nonAdditive&&Number.isFinite(amount);
   if(show)draftPriceRows.push([r,start]);
-  set(v,r,start,show&&Number.isFinite(b.unitPrice)?currency+' '+number(b.unitPrice):'OPEN');
-  set(v,r,start+2,show?currency+' '+number(b.amount):'OPEN');
+  set(v,r,start,show&&Number.isFinite(unitPrice)?currency+' '+number(unitPrice):'OPEN');
+  set(v,r,start+2,show?currency+' '+number(amount):'OPEN');
  };
  if(id==='A'){add();return {pages,issues};}
  if(id==='A1'||id==='A2'){
@@ -104,7 +107,7 @@ function nativePages(view,id,currency='USD',c2References){
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
    const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,issued(view)?customerRemarkText(bs):(view.workingPreview&&subtotalNote(view,bs)?(()=>{const p=scheduleRollup0550(bs);return p.priced+'/'+p.count+' priced; '+p.open+' OPEN. Known subtotal only'+(terms.has('')?' / Delivery term OPEN':'');})():(view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':'')));}
+   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));const a1FormNote={2:'Breakdown in Form C-1',3:'Breakdown in 11.D',5:'Breakdown in Form C-2',7:'Breakdown in Form C-5',8:'Site Service Time shall be specified.',9:'Breakdown in Form C-8',10:'Breakdown in 11.E / 11.F',11:'Breakdown in 11.E / 11.F'}[r];if(a1FormNote&&!view.workingPreview){set(v,r,7,a1FormNote);}else if(a1FormNote&&view.workingPreview){const p=scheduleRollup0550(bs);const previewNote=subtotalNote(view,bs)?(p.priced+'/'+p.count+' priced'+(p.open?', '+p.open+' OPEN':'')):a1FormNote;set(v,r,7,a1FormNote+(previewNote!==a1FormNote?' · '+previewNote:''));}else{set(v,r,7,issued(view)?customerRemarkText(bs):cleanCustomerText0550(bs.map(b=>b.line.description).join('; ')));}}
    else{
     if(r===6||r===7)set(v,r,1,issued(view)?customerRemarkText(bs):bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;

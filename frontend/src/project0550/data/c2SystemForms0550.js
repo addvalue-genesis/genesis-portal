@@ -120,7 +120,15 @@ export function prepareEquationSpareWorking0550(data,draft,id){
 export function c2PartsDescription0550({line,lineId}){
  if(lineId?.startsWith('LINE-B5-LAN-STARTUP-'))return line.description.replace(/^SI estimate · (?=LAN start-up spare · )/,'');
  const desc=line?.offer?.description||line?.description||'';
- return desc.replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
+ const cleaned=desc
+  .replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'')
+  .replace(/^(?:CCTV|ENT|LAN|PABX|TEL-[A-Z0-9]+)\s*·\s*/i,'')
+  .replace(/^(?:Commissioning spare set|LAN start-up spare|Entertainment)\s*·\s*/i,'')
+  .replace(/^(?:APF|ACP|ABV01|AMS01)\s*·\s*/i,'')
+  .trim();
+ const tag=line?.physicalTag||line?.tagRef;
+ const showTag=tag&&!/^(?:APF|ACP|ABV01|AMS01|PROJECT|OFFSHORE)$/i.test(tag);
+ return showTag?`${cleaned} (${tag})`:cleaned;
 }
 
 const legacyProjectLots=new Set(COMMISSIONING_PHASES_0550.map(phase=>phase.legacyId));

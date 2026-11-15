@@ -18,7 +18,8 @@ import {addvalueSell0550} from "../bidWorkingBasis0550";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {c3AllowanceIds0550,generatedBidEstimate0550,mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {c3GoodsBasis0550} from './c3GoodsAllowance0550';
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -26,7 +27,7 @@ import {validateReleaseRegister0550} from "./releaseIssue0550";
 import {validateSourceControl0550} from "./sourceReadiness0550";
 import {validateTechnicalProposal0550} from "./technicalProposal0550";
 import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
-import {validateBidVolumes0550} from "./bidVolumes0550";
+import {PRESERVATION_PACKING_OWNER_0550,preservationPackingOverlap0550,validateBidVolumes0550} from "./bidVolumes0550";
 import {validateBidPunchPlans} from "../../common/governance/bidPunch";
 import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
 import {chevalierPbxAllocation0550,chevalierPbxOwnerCode0550,chevalierPbxQuote0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
@@ -124,13 +125,16 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const pagaOwners=eligible.filter(l=>l.systemToken==='TEL-PAGA'&&l.wbs==='A'&&pagaNetIds.has(l.offerId));
  const pbxQuote=chevalierPbxQuote0550(data.offers);
  const hasPbxAllocation=data.lines.some(l=>l.selected&&chevalierPbxOwnerCode0550(l.id));
- const priceLine=(l,spareCostBasisTHB)=>{
+ const priceLine=(l,spareCostBasisTHB,c3BasisTHB)=>{
   const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
   const retiredMgw=mgwHistoricalLine0550(data,l);
   const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
   const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...radioAppendix11PriceProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   const pbxAllocation=chevalierPbxAllocation0550(pbxQuote,l,offer);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
+  if(selected&&l.id===PRESERVATION_PACKING_OWNER_0550&&preservationPackingOverlap0550(data)){
+   problems.push('PACKING_SCOPE_OVERLAP: reconcile the allowance with the existing packing owner');
+  }
   if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}
   if(!l.description.trim()||!l.sourceRef.trim()||!l.scopeKey.trim())problems.push("Description, scope key and source/basis required");
   if(counts.get(l.scopeKey.trim().toLowerCase())>1&&selected)problems.push("DUPLICATE_SCOPE_OWNER");
@@ -186,11 +190,12 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   let spareBudget;
   if(mgwDependentEstimateOpen0550(data,l)){
    const rate=spareBudgetRate0550(l.id);
+   const spareBasisTHB=c3AllowanceIds0550.includes(l.id)?c3BasisTHB:spareCostBasisTHB;
    // The existing receipt check only allows an untouched generated estimate.
    // This calculation uses current cost owners and is a draft price basis only.
-   if(selected&&rate&&spareCostBasisTHB>0){
-    spareBudget={rate,basisTHB:spareCostBasisTHB};
-    costRate=round(spareCostBasisTHB*rate);
+   if(selected&&rate&&finite(spareBasisTHB)&&spareBasisTHB>=0){
+    spareBudget={rate,basisTHB:spareBasisTHB};
+    costRate=round(spareBasisTHB*rate);
     problems.push(SPARE_BUDGET_REVIEW_0550);
    }else{
     costRate=null;
@@ -225,9 +230,9 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
    !(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&
    !["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p);
   // The spare provision consumes procurement cost, before any sell/Prime checks.
-  const spareProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
-   !problems.some(p=>p.startsWith("MGW_UNIT_OPEN:"))&&
+  const c3ProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
    Math.abs(costNative)<=Number.MAX_SAFE_INTEGER/100&&!problems.some(draftBlocker)?round(costNative*factor):null;
+  const spareProcurementCostTHB=problems.some(p=>p.startsWith("MGW_UNIT_OPEN:"))?null:c3ProcurementCostTHB;
   const addvalueSell=addvalueSell0550(l,costNative,quantity);
   if(addvalueSell===null)problems.push("Working sell inputs OPEN/invalid");
   const customerNative=addvalueSell!==null&&nonnegative(l.primePct)?eq("E13",{sell:addvalueSell,primeMarkup:l.primePct/100}):null;
@@ -249,7 +254,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const pbxProducts=pbxAllocation?.products?.map(item=>({
    itemCode:item.supplierQuoteRow.itemCode,description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit,
   }));
-  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(pbxProducts?{pbxProducts}:{}),spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(pbxProducts?{pbxProducts}:{}),c3ProcurementCostTHB,spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  };
  const equipment=new Map();
  if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){
@@ -257,7 +262,25 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  }
  const spareCostBasisTHB=sumMoney0550([...equipment.values()]
   .map(line=>line.spareProcurementCostTHB).filter(finite));
- const lines=data.lines.map(line=>equipment.get(line.id)??priceLine(line,spareCostBasisTHB));
+ const c3Bindings=new Set((data.bidVolumes?.bindings||[]).filter(b=>b.schedule==='C3'&&b.treatment==='OPTION').map(b=>b.lineId));
+ const activeAllowances=eligible.filter(line=>c3AllowanceIds0550.includes(line.id));
+ const allocatedAllowances=activeAllowances.filter(line=>c3Bindings.has(line.id));
+ const allowSystemReplacement=equipment.size>0&&allocatedAllowances.length>0&&activeAllowances.every(line=>generatedBidEstimate0550(data,line));
+ const c3NamedLines=new Map();
+ const namedPrices=new Map();
+ for(const line of eligible){
+  if(!allowSystemReplacement||line.wbs!=='C3'||line.systemToken==='COMMON'||!c3Bindings.has(line.id))continue;
+  const priced=priceLine(line,spareCostBasisTHB);
+  if(!finite(priced.provisionalCustomerTHB)||!finite(priced.provisionalCustomerUSD))continue;
+  namedPrices.set(line.id,priced);
+  if(!c3NamedLines.has(line.systemToken))c3NamedLines.set(line.systemToken,[]);
+  c3NamedLines.get(line.systemToken).push(line.id);
+ }
+ const c3GoodsBasis=equipment.size?c3GoodsBasis0550(data,[...equipment.values()],systemTokens,pbxQuote).map(row=>
+  ({...row,replaced:c3NamedLines.get(row.systemToken)||null})):[];
+ const c3BasisTHB=c3GoodsBasis.some(row=>row.costTHB>0)?
+  sumMoney0550(c3GoodsBasis.filter(row=>!row.replaced).map(row=>row.costTHB).filter(finite))??0:null;
+ const lines=data.lines.map(line=>equipment.get(line.id)??namedPrices.get(line.id)??priceLine(line,spareCostBasisTHB,c3BasisTHB));
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
  const sum=(rows,key)=>sumMoney0550(rows.map(r=>r[key]));
@@ -268,6 +291,6 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  const baseScopeOpen=requirementGaps.some(g=>!g.code||!g.code.startsWith("C")),optionScopeOpen=requirementGaps.some(g=>!g.code||g.code.startsWith("C"));
  const result={requirementGaps,lines,selected,groups,complete:complete&&!requirementGaps.length,missingSystems,missingWbs,baseTHB:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0&&requirementGaps.length===0,revision:data.revision};
  const provisional=deriveProvisionalPricing(data,result);
- return {...result,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional,
+ return {...result,c3GoodsBasis,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional,
   b5StartupAllowance:deriveB5StartupAllowance0550(data,provisional.selected)};
 }

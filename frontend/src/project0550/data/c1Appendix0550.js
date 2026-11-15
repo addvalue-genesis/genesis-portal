@@ -68,11 +68,19 @@ export function c1SystemLabel0550(r){
  if(appendix(r)==='3'&&/Access Point/i.test(r.description))return 'Wireless LAN';
  return systemNames[r.systemToken]||r.systemToken||'Equipment';
 }
+export function cleanCustomerText0550(text){
+ if(!text)return '';
+ const str=String(text).trim();
+ const internalPattern=/\b(?:reconcile|verify|confirm|before release|before issue|subject to review|subject to confirmation|review pending|confirmation pending|SI estimate|SI budget estimate|overlap to be reviewed|Draft scope review|Provisional budget|separately included under Base services|Working owner|allocation pending|NOT FOR SUBMISSION|รอตรวจขอบเขต|อ้างอิงชุด|Draft uses|quoted scope|MR Appendix)\b/i;
+ const parts=str.split(/(?<=[.;\n])\s+/);
+ const clean=parts.filter(p=>!internalPattern.test(p)&&!/^(?:MR\s*Appendix|FOC\/BULK Rev\.01|SI budget estimate|Provisional budget|RITTAL cabinet supply|Draft uses|Verify|Confirm|Reconcile)\b/i.test(p.trim())).join(' ').trim();
+ return clean.replace(/;\s*$/,'').trim();
+}
 const customerRemark=(line,legacy)=>{
  const remark=(line.customerRemark||'').trim();
  if(!legacy&&(remark===MGW_RADIO_DTRS_QUOTED_SCOPE_0550||
   (line.mgwDetailGroupId&&remark===mgwDetailCustomerRemark0550(line.mgwDetailGroupId))))return '';
- return legacy?line.customerRemark||'':remark;
+ return legacy?line.customerRemark||'':cleanCustomerText0550(remark);
 };
 export function c1Component0550(text){
  const source=String(text).replace(/^-\s*/,''),m=source.match(/\b(\d+)\s*(Ea\.?|Sets?\.?)(?=\s|$)/i);
@@ -669,8 +677,9 @@ export function c1AppendixWord0550(view){
  const c1=deriveC1Appendix0550(view),legacy=view.c1LayoutVersion===C1_APPENDIX_LAYOUT_LEGACY_0550,e=escape;
  const draft=view.workingPreview&&!legacy&&!view.customerIssue;
  const cleanCustomerNote=text=>{
-  if(!text||legacy||!view.customerIssue)return text;
-  return String(text).split(/\s*;\s*|\s*·\s*/).filter(p=>p&&!/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(p)).join('; ');
+  if(!text||legacy)return text;
+  const filtered=String(text).split(/\s*;\s*|\s*·\s*/).filter(p=>p&&!/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(p)).join('; ');
+  return cleanCustomerText0550(filtered);
  };
  const p=(text,cell=false)=>`<w:p>${draft&&cell?'<w:pPr><w:spacing w:before="18" w:after="18" w:line="220" w:lineRule="auto"/></w:pPr>':''}<w:r>${draft&&cell?'<w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>':''}<w:t xml:space="preserve">${e(text)}</w:t></w:r></w:p>`;
  const row=(values,header=false,span=false)=>`<w:tr><w:trPr>${header?'<w:tblHeader/>':'<w:cantSplit/>'}</w:trPr>${values.map((v,i)=>`<w:tc><w:tcPr>${span&&i===0?'<w:gridSpan w:val="7"/>':''}</w:tcPr>${p(v,true)}</w:tc>`).join('')}</w:tr>`;

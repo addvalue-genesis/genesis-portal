@@ -7,7 +7,7 @@ import {applyGoodsSellBasis0550,EXTERNAL_ENGINEERING_FORMULA_0550,EXTERNAL_ENGIN
  LEGACY_SERVICE_FORMULA_0550,matchesLegacyGoodsBasis0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import licensingBudget from './licensingBudgetBasis0550.json';
-import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
+import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550,TSI_INTERNAL_COST_THB_PER_MH_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
 import {lanStockBasis0550} from './lanStockBasis0550';
 import {evaluateServiceEquation} from '../serviceEquationRuntime';
@@ -30,6 +30,9 @@ const spareBudgetRates = new Map([
  ['C3-D02',0.02], ['C3-D03',0.01],
 ]);
 export const spareBudgetRate0550=lineId=>spareBudgetRates.get(lineId.replace(/^REQ-MR-ACT-/,''));
+export const c3AllowanceIds0550=['REQ-MR-ACT-C3-D02','REQ-MR-ACT-C3-D03'];
+export const kuSupportEquipmentTHB0550=120000;
+export const kuSupportLotTHB0550=kuSupportEquipmentTHB0550+12*20000;
 const mgwDependentEstimateIds=new Set([
  'REQ-MR-ACT-B2-D01','REQ-MR-ACT-B2-D02','REQ-MR-ACT-B2-D04','REQ-MR-ACT-B3-D01',
  'LINE-BID-OEM-TRAINING-TRAVEL-0550','REQ-MR-ACT-B9-D01','REQ-MR-ACT-C2-D03','REQ-MR-WARRANTY',
@@ -37,6 +40,10 @@ const mgwDependentEstimateIds=new Set([
 ]);
 export function mgwDependentEstimateOpen0550(data,line){
  if(!mgwReplacementActive0550(data)||!mgwDependentEstimateIds.has(line.id))return false;
+ return generatedBidEstimate0550(data,line);
+}
+
+export function generatedBidEstimate0550(data,line){
  const receipt=data.repositoryBasisImport?.bidCompletion?.rows.find(r=>r.lineId===line.id);
  return receipt?.kind==='ESTIMATE'&&receipt.inputKey===lineKey(data,line);
 }
@@ -619,7 +626,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
    else if(/-RTR$/.test(native.id)){rate=350000;basis='Cisco8300-class router budget THB350000/SET; MR quantity retained. Planning allowance including licence/accessory exposure, not a Cisco quotation or approved model/licence configuration. Supply responsibility remains under clarification.';}
    else if(/-KIT$/.test(native.id)){rate=15000;basis='VSAT supporting installation kit/accessories budget THB15000/SET; MR quantity retained. COMPANY terminal hardware is excluded.';}
    else if(native.unit==='m'){rate=300;basis='VSAT supporting cable budget THB300/m; native MR cable length retained. Cable type/installation/route requires confirmation; terminal hardware remains COMPANY supply.';}
-  }else if(native.systemToken==='TEL-VSAT-KU'){rate=360000;basis='KU/C Internet bid allowance per site: THB120000 supporting terminal/accessory hardware plus12 planning months × THB20000/month service provision. This is an explicit12-month commercial assumption, not a provider offer or confirmed service specification/responsibility.';}
+  }else if(native.systemToken==='TEL-VSAT-KU'){rate=kuSupportLotTHB0550;basis='KU/C Internet bid allowance per site: THB120000 supporting terminal/accessory hardware plus12 planning months × THB20000/month service provision. This is an explicit12-month commercial assumption, not a provider offer or confirmed service specification/responsibility.';}
   else if(/-08$/.test(native.id)){rate=50000;basis='Audio-conference endpoint budget THB50000 per native MR Lot; native quantity retained. Manufacturer, codec, licences and network integration require confirmation.';}
   else {rate=280000;basis='Video-conference room-package budget THB280000 per native MR Lot; native quantity retained. Manufacturer, camera/audio/codec/licences and compatibility require confirmation.';}
   if(finite(rate)&&safe(native.id)){if(!supportPlans.has(native.systemToken))supportPlans.set(native.systemToken,[]);supportPlans.get(native.systemToken).push({lineId:native.id,quantity:native.quantity,unit:native.unit,rate,basis});}
@@ -703,12 +710,11 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(team&&data.repositoryBasisImport.tsiActivityBudget){
   const labourExpected=prepareTsiActivityBudget0550({projectId:data.projectId,repositoryBasisImport:{},lines:clone(defaults),calculations:[]},policies,team,data.repositoryBasisImport.tsiActivityBudget.preparedOn);
   const expected=prepareTsiExpenseBudget0550(labourExpected,policies,team,data.repositoryBasisImport.tsiActivityBudget.preparedOn);
-  const costMH={PM:875,CHIEF:750,SENIOR:600,TECH:500,SUPPORT:562.5,DOC:400,ADMIN:250};
   for(const plan of [...TSI_ACTIVITY_PLAN_0550,{lineId:"REQ-MR-ACT-B4-D07",role:"TECH"}]){
    const id=plan.lineId||'REQ-MR-ACT-'+plan.key,n=at(id),base=expected.lines.find(l=>l.id===id);
    const calculation=data.calculations.find(c=>c.id===base?.calculationId),expectedCalc=expected.calculations.find(c=>c.id===base?.calculationId);
    if(n<0||!base||!same(lines[n],base)||!same(calculation,expectedCalc))continue;
-   const thbRate=costMH[plan.role]*(base.unit==='MD'?8:1),rate=thbRate/data.fx.thbPerUSD;
+   const thbRate=TSI_INTERNAL_COST_THB_PER_MH_0550[plan.role]*(base.unit==='MD'?8:1),rate=thbRate/data.fx.thbPerUSD;
    lines[n]={...lines[n],manualCost:rate,sourceRef:base.sourceRef+'\nINTERNAL COST ESTIMATE / '+today+': planning '+thbRate+' THB/'+base.unit+' ÷ saved THB/USD '+data.fx.thbPerUSD+'; '+plan.role+' workload cost assumption, not a payroll/subcontract quote. Protected selling rate unchanged.'};
    rows.push({lineId:id,kind:'COST_ESTIMATE',basis:'Explicit internal labour planning cost '+thbRate+' THB/'+base.unit+' at saved FX; selling inputs unchanged. Cost grade '+plan.role+'.',offerIds:[],ownerIds:[]});
   }

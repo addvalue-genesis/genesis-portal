@@ -13,7 +13,7 @@ export function ScheduleParentResults0550({rows,id,system,currency,workingPrevie
  const displayed=currency==='THB'?rows.map(scheduleBindingTHB0550):rows;
  const treatments=[
   ['BASE','11.A1 · Base','bid.quotation.A1'],
-  ['OPTION',id==='C3'?'11.A2 · Option (อ้างอิงใน Notes ของ 11.A1)':'11.A2 · Option','bid.quotation.A2'],
+  ['OPTION',id==='C3'?'11.A2 · Option (อ้างอิงที่ 11.A1 ข้อ 5)':'11.A2 · Option','bid.quotation.A2'],
   ['CALLOFF','Call-off · เรตตามการเรียกใช้',null]
  ];
  const results=treatments.map(([treatment,label,target])=>({treatment,label,target,...scheduleRollup0550(displayed.filter(row=>row.treatment===treatment))})).filter(result=>result.count);
@@ -26,7 +26,7 @@ export function ScheduleParentResults0550({rows,id,system,currency,workingPrevie
    {target&&onNavigate?<button type="button" disabled={disabled} onClick={()=>onNavigate(target)}>{label}</button>:label}
    {' · '}<strong>{treatment==='CALLOFF'?result.count+' แถว · ดูเรตต่อหน่วยจาก Working':describe(result)}</strong>
   </li>)}</ul>:<p><strong>OPEN</strong> · ยังไม่มีรายการจัดลง Schedule นี้</p>}
-  {selected&&<p>ผลเฉพาะระบบ {system} · <strong>{describe(selected)}</strong>{!selected.count&&' · ยังไม่มี Working B5 จัดลงระบบนี้'}</p>}
+  {selected&&<p>ผลเฉพาะระบบ {system} · <strong>{describe(selected)}</strong>{!selected.count&&' · ยังไม่มี Working '+({C2:'B5',C3:'C3',C4:'C2'}[id]||id)+' จัดลงระบบนี้'}</p>}
  </section>;
 }
 

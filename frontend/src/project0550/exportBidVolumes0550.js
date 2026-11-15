@@ -22,7 +22,14 @@ export function scheduleTable0550(view,id){
  if(['A1','A2'].includes(id)){
   const part=id==='A1'?'BASE':'OPTION',groups=new Map();
   for(const b of view.bindings.filter(b=>b.line&&b.treatment===part)){const key=b.summary||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}
-  return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...[...groups].map(([name,bs])=>[name,'Lot',1,view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')+(view.workingPreview?' / '+rollupNote0550(scheduleRollup0550(bs)):'')]),['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
+  const draftRows=[...groups].map(([name,bs])=>[name,'Lot',1,view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')+(view.workingPreview?' / '+rollupNote0550(scheduleRollup0550(bs)):'')]);
+  if(id==='A1'&&view.workingPreview){
+   const c3=scheduleRollup0550(view.scheduleRows('C3').filter(b=>b.treatment==='OPTION'&&!b.nonAdditive));
+   const conflict=view.bindings.some(b=>b.line&&b.schedule==='C3'&&b.treatment==='BASE');
+   draftRows.push(['Item 5 · Two years Operation Spare parts','Lot',1,'',conflict?'OPEN':c3.knownUSD??'OPEN',
+    conflict?'Review Base allocation in 11.M':'C3 / A2 Option reference. '+rollupNote0550(c3)]);
+  }
+  return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...draftRows,['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
  }
  if(id==='B'){
   const payment=paymentSchedule0550(view),response=view.getRecord('I.B').content||'OPEN';
@@ -30,7 +37,14 @@ export function scheduleTable0550(view,id){
   return {heads:['Payment milestone','Percentage / response'],rows:[['Advance','10%'],['Engineering approval','5%'],['Major materials PO','15%'],['Ready for shipment / FAT / B/L or AWB','30%'],['Site receipt','20%'],['PAC','10%'],['FAC','10%'],['BIDDER response',response]]};
  }
  if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};
- if(['C2','C3','C4'].includes(id))return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:rows.map(b=>[b.mainEquipment,id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description,b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount])};
+ if(['C2','C3','C4'].includes(id)){
+  const details=rows.map(b=>[b.mainEquipment,id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description,b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount]);
+  if(id==='C3'&&view.workingPreview){
+   const subtotal=scheduleRollup0550(rows.filter(b=>b.treatment==='OPTION'&&!b.nonAdditive));
+   details.push(['','Schedule C3 total (A2 Option)','','','','','',rollupNote0550(subtotal),'','','','',subtotal.knownUSD??'OPEN']);
+  }
+  return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:details};
+ }
  if(id==='C7')return {heads:['Service / Personnel Category','Total Hours (h)','Rate (USD/h)','Total (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit==='MH'?b.quantity:'OPEN',b.unit==='MH'?b.unitPrice:'OPEN',b.amount,b.unit==='MH'?b.treatment:'Man-hour basis OPEN / '+b.treatment])};
  if(id==='C8')return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],rows:rows.map(b=>{
   const country=c8Country0550(b);

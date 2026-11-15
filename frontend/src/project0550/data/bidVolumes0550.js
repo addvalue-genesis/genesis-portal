@@ -5,6 +5,7 @@ import {SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
 import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequirements0550} from './integrationWorkspace0550';
 import {deriveTechnicalProposal0550,TECHNICAL_SECTIONS_0550,technicalRecordBasis0550} from './technicalProposal0550';
 import {mgwDetailGroup0550} from './mgwDetailPricing0550';
+import {mgwQuoteItem0550,mgwWorkingLineExcluded0550} from './mgwVendorBasis0550';
 import {sumMoney0550,displayPriceCheck0550} from './money0550';
 import {c8CalloffDraftRows0550,c8Country0550,legacyGeneratedC8Calloff0550} from './c8Calloff0550';
 
@@ -111,6 +112,56 @@ export function saveBidVolumeRecord0550(data,collection,row,today,review=false){
  const p=data.bidVolumes||emptyBidVolumes0550(),record={...authored,status:review?'REVIEWED':'DRAFT',reviewedOn:review?today:'',basisKey:''};
  const next={...data,bidVolumes:{...p,[collection]:[...p[collection].filter(r=>r.id!==row.id),record]}};
  if(review)record.basisKey=volumeRecordBasis0550(next,collection,record);
+ return next;
+}
+
+export const PRESERVATION_PACKING_OWNER_0550='LINE-B2-PRESERVATION-PACKING-0550';
+const myanmarStorageOwner='LINE-TSI-BUDGET-MYANMAR-STORAGE-0550';
+export function preservationPackingOverlap0550(data){
+ const bindings=data.bidVolumes?.bindings||[];
+ const packingOwners=new Set(bindings.filter(b=>b.schedule==='A1'&&b.summary==='PACKING').map(b=>b.lineId));
+ const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
+ return data.lines.some(line=>{
+  if([PRESERVATION_PACKING_OWNER_0550,myanmarStorageOwner].includes(line.id)||!line.selected||line.coveredByLineId||line.responsibility==='COMPANY')return false;
+  const offer=offers.get(line.offerId);
+  if(mgwWorkingLineExcluded0550(data,line,offer))return false;
+  return packingOwners.has(line.id)||line.mgwDetailGroupId==='SERVICES-004'||
+   mgwQuoteItem0550(offer)?.id==='MGW-Q26-063-SERVICES-004';
+ });
+}
+
+export function preparePreservationPacking0550(data,today){
+ const receipt=data.repositoryBasisImport;
+ if(data.projectId!=='PJ2608-0550'||!receipt||today<'2026-11-13')return data;
+ const bindings=data.bidVolumes?.bindings||[],recorded=receipt.pricedVolumeDraftIds||[];
+ const locator='PJ2608-0550_A1_Preservation_Packing_Storage_Rev00.xlsx / A1 Plan and Cost Build / https://chatgpt.com/library?file_id=libfile_3df5bc2f7dd88191b6cb32724a9b48a3&account_id=personal';
+ const candidates=[
+  {id:PRESERVATION_PACKING_OWNER_0550,wbs:'B2',scopeKey:PRESERVATION_PACKING_OWNER_0550,
+   description:'Preservation and packing for shipment',tagRef:'Thailand consolidation / Yangon Port',cost:329000+190000,
+   basis:'THB 329,000 for Thailand staging, preservation and packing plus THB 190,000 for Yangon Port preservation and inspection. Yangon scope, packing quantities and supplier inclusions remain open.'},
+  {id:myanmarStorageOwner,wbs:'B4',scopeKey:'TSI.MYANMAR.STORAGE.CONTAINERS',
+   description:'Myanmar site preservation — two 20 ft storage containers, delivery, placement and collection',tagRef:'APF / ACP',cost:2*(6*18000+65000),
+   basis:'APF and ACP: two 20 ft containers. Rental THB 216,000 and empty-container delivery, placement and collection THB 130,000. C7 Rev.05 references these rates under A1 Item 3. Confirm CNEEC/COMPANY provision.'},
+ ];
+ const occupied=new Set([...recorded,...data.lines.map(line=>line.id),...bindings.map(binding=>binding.lineId)]);
+ const pending=candidates.filter(candidate=>!occupied.has(candidate.id)&&
+  (candidate.id===PRESERVATION_PACKING_OWNER_0550?!preservationPackingOverlap0550(data):
+   !data.lines.some(line=>line.selected&&!line.coveredByLineId&&line.scopeKey.trim().toLowerCase()===candidate.scopeKey.toLowerCase())));
+ if(!pending.length||Math.max(data.lines.length,bindings.length,recorded.length)+pending.length>2000)return data;
+ const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(source=>source.replaces||[]));
+ const sourceIds=sources.filter(source=>source.authority==='CURRENT_TENDER'&&source.readState==='TEXT_READ'&&source.content&&!replaced.has(source.id)&&
+  /Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(source.title||'')).map(source=>source.id);
+ const lines=pending.map(({id,wbs,scopeKey,description,tagRef,cost,basis})=>({
+  id,systemToken:'COMMON',wbs,scopeKey,description,tagRef,requirementRef:'Exhibit C Schedule A1 S/N 3',sourceRef:locator+' / '+basis,
+  vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:cost,
+  sellMode:'DIRECT',sellRate:cost,markupPct:null,marginPct:null,primePct:0,selected:true,customerRowCode:wbs,
+  customerRemark:'Draft preservation and packing allowance at cost. Confirm the scope and supplier inclusions before issue.',brand:'',
+ }));
+ let next={...data,lines:[...data.lines,...lines],
+  repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded,...pending.map(row=>row.id)]}};
+ for(const {id,basis} of pending)next=saveBidVolumeRecord0550(next,'bindings',{
+   ...blankScheduleBinding0550(id),schedule:'A1',summary:'PACKING',deliveryTerm:'CIF',sourceIds,locator,basis,
+  },today);
  return next;
 }
 
