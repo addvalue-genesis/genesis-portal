@@ -9,6 +9,8 @@ import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
+import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
+import {c5SpecialToolsRows0550} from './data/c5ToolsScope0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
 import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 
@@ -23,7 +25,7 @@ const shownSum=(view,rows)=>view.workingPreview&&!issued(view)?scheduleRollup055
 const subtotalNote=(view,rows)=>view.workingPreview&&!issued(view)?rollupNote0550(scheduleRollup0550(rows)):'';
 const moneyText=(view,amount)=>issued(view)?(Number.isFinite(amount)?number(amount):'TBA'):number(amount);
 const shown=(view,v)=>issued(view)?(v===null||v===undefined||v===''?'':String(v)):value(v);
-const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(String(text||''));
+const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|Draft\s+controller|Draft\s+preservation|Draft\s+startup|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด|reconcile|Full Outdoor|Hot Standby|Cable material supply|Shared supply for|Includes two R660|RITTAL Microwave|PAGA package with the OEM|One tower with quoted/i.test(String(text||''));
 const customerRemarkText=rows=>{
  const notes=[];
  for(const b of rows){
@@ -96,7 +98,8 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
  const eligible=view.bindings.filter(b=>b.line&&b.treatment===part);
  const title={2:'GOODS',3:'Inspection and tests',4:'Preservation and packing',5:'Commissioning spares',6:'Two-year operation spares',7:'Special tools',8:'Field service including training',9:'Facilities',10:'Vendor documents',11:'Others'};
  for(const [r,bs] of groups){
-  const amount=sum(bs),note=customerRemarkText(bs);
+  const additive=bs.filter(b=>!b.nonAdditive&&Number.isFinite(b.amount));
+  const amount=additive.length?roundMoney0550(additive.reduce((a,b)=>a+b.amount,0)):(Number.isFinite(view.baseAssigned)&&r===2?view.baseAssigned:sum(bs));
   if(!Number.isFinite(amount))issues.push((title[r]||'row '+r)+' price TBA');
   if(base&&r===8){
    const days=field(view,'C7','sitePeriodDays').trim();
@@ -108,13 +111,18 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
   if(base&&r===9){
    const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;
    set(v,r,3,'Day');set(v,r,4,qty??'');set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'TBA');set(v,r,6,moneyText(view,amount));
-   set(v,r,7,'');
+   set(v,r,7,'Breakdown in Form C-8');
    continue;
   }
   if(base){
    set(v,r,3,'Lot');set(v,r,4,1);set(v,r,5,moneyText(view,amount));set(v,r,6,moneyText(view,amount));
    let remark='';
-   if(r===11){
+   if(r===2)remark='Breakdown in Form C-1';
+   else if(r===3)remark='Breakdown in 11.D';
+   else if(r===5)remark='Breakdown in Form C-2';
+   else if(r===6)remark='Breakdown in Form C-3';
+   else if(r===7)remark='Breakdown in Form C-5';
+   else if(r===11){
     const parts=[];
     if(bs.some(b=>isLicensingCostLine0550(b.lineId)))parts.push('Telecom import, radio and operating licence coordination (as applicable)');
     if(bs.some(b=>b.line?.a1OthersEstimate))parts.push('Includes estimated freight, handling and insurance where applicable.');
@@ -156,22 +164,27 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
  }
 }
 function nativePages(view,id,currency='USD',c2References){
- const rows=id==='C1'&&view.workingPreview&&!issued(view)?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
+ const baseRows=id==='C1'&&view.workingPreview&&!issued(view)?view.nativeC1:view.scheduleRows(id);
+ const isV1=view.nativeExhibitVersion==='exhibit-c-native-v1';
+ const rows=!isV1&&id==='C4'&&(!baseRows||!baseRows.length)?c4CapitalSparesRows0550(view):
+            !isV1&&id==='C5'&&(!baseRows||!baseRows.length)?c5SpecialToolsRows0550(view):baseRows;
+ const pages=[],issues=[];
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
  const prices=(v,r,start,b,draftPriceRows)=>{
   let t=term(b);
   if(!t&&issued(view)&&['C2','C3','C4','C5'].includes(id))t='CIF';
-  const unitPrice=Number.isFinite(b.unitPrice)?b.unitPrice:b.line?.sellRate??b.line?.manualCost??b.line?.unitCost;
-  const amount=Number.isFinite(b.amount)?b.amount:(Number.isFinite(unitPrice)&&Number.isFinite(b.quantity)?unitPrice*b.quantity:null);
+  const unitPrice=Number.isFinite(b.unitPrice)?b.unitPrice:b.line?.sellRate??b.line?.customerUSD??b.line?.manualCost??b.line?.unitCost;
+  const qty=Number.isFinite(b.quantity)?b.quantity:1;
+  const amount=Number.isFinite(b.amount)?b.amount:(Number.isFinite(unitPrice)?unitPrice*qty:null);
   set(v,r,start,t==='CIF'?moneyText(view,unitPrice):'');set(v,r,start+1,t==='FOB'?moneyText(view,unitPrice):'');
   set(v,r,start+2,t==='CIF'?moneyText(view,amount):'');set(v,r,start+3,t==='FOB'?moneyText(view,amount):'');
   if(t)return;
   issues.push('Customer CIF/FOB term OPEN: '+b.lineId);
   const show=view.workingPreview&&!issued(view)&&!b.nonAdditive&&Number.isFinite(amount);
   if(show)draftPriceRows.push([r,start]);
-  set(v,r,start,show&&Number.isFinite(unitPrice)?currency+' '+number(unitPrice):(issued(view)?'TBA':'OPEN'));
-  set(v,r,start+2,show?currency+' '+number(amount):(issued(view)?'TBA':'OPEN'));
+  set(v,r,start,show&&Number.isFinite(unitPrice)?currency+' '+number(unitPrice):(issued(view)?(Number.isFinite(unitPrice)?currency+' '+number(unitPrice):'TBA'):'OPEN'));
+  set(v,r,start+2,show?currency+' '+number(amount):(issued(view)?(Number.isFinite(amount)?currency+' '+number(amount):'TBA'):'OPEN'));
  };
  if(id==='A'){add();return {pages,issues};}
  if(id==='A1'||id==='A2'){
@@ -181,8 +194,23 @@ function nativePages(view,id,currency='USD',c2References){
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   if(issued(view)){fillOfficialSummary0550(view,id,currency,v,set,groups,issues);add(v,'');return {pages,issues};}
   for(const [r,bs] of groups){
-   const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));const a1FormNote={2:'Breakdown in Form C-1',3:'Breakdown in 11.D',5:'Breakdown in Form C-2',7:'Breakdown in Form C-5',8:'Site Service Time shall be specified.',9:'Breakdown in Form C-8',10:'Breakdown in 11.E / 11.F',11:'Breakdown in 11.E / 11.F'}[r];if(a1FormNote&&!view.workingPreview){set(v,r,7,a1FormNote);}else if(a1FormNote&&view.workingPreview){const p=scheduleRollup0550(bs);const previewNote=subtotalNote(view,bs)?(p.priced+'/'+p.count+' priced'+(p.open?'; '+p.open+' OPEN':'')):a1FormNote;set(v,r,7,a1FormNote+(previewNote!==a1FormNote?' · '+previewNote:''));}else{set(v,r,7,issued(view)?customerRemarkText(bs):cleanCustomerText0550(bs.map(b=>b.line.description).join('; ')));}}
+   const additive=bs.filter(b=>!b.nonAdditive&&Number.isFinite(b.amount));
+   const amount=shownSum(view,additive.length?additive:bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
+   if(base){
+    set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));
+    if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}
+    set(v,r,6,number(amount));
+    const a1FormNote={2:'Breakdown in Form C-1',3:'Breakdown in 11.D',4:'',5:'Breakdown in Form C-2',6:'Breakdown in Form C-3',7:'Breakdown in Form C-5',8:'Site Service Time shall be specified.',9:'Breakdown in Form C-8',10:'',11:'Breakdown in 11.E / 11.F'}[r];
+    if(a1FormNote!==undefined&&!view.workingPreview){
+     set(v,r,7,a1FormNote);
+    }else if(a1FormNote!==undefined&&view.workingPreview){
+     const p=scheduleRollup0550(bs);
+     const previewNote=subtotalNote(view,bs)?(p.priced+'/'+p.count+' priced'+(p.open?'; '+p.open+' OPEN':'')):a1FormNote;
+     set(v,r,7,a1FormNote+(previewNote&&previewNote!==a1FormNote?' · '+previewNote:''));
+    }else{
+     set(v,r,7,issued(view)?customerRemarkText(bs):cleanCustomerText0550(bs.map(b=>b.line?.description||b.description).join('; ')));
+    }
+   }
    else{
     if(r===6||r===7)set(v,r,1,issued(view)?customerRemarkText(bs):bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
@@ -297,7 +325,7 @@ function nativePages(view,id,currency='USD',c2References){
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
     const v=blankValues(id),draftPriceRows=[];set(v,0,0,shown(view,field(view,id,'vendorNameAddress')));set(v,0,1,shown(view,field(view,'A','agreementNo')));set(v,0,2,issued(view)&&main==='OPEN'?'':main);set(v,0,3,issued(view)?shown(view,shared(bs,'vendorEquipmentNo')==='OPEN'?'':shared(bs,'vendorEquipmentNo')):shared(bs,'vendorEquipmentNo'));set(v,1,1,issued(view)?shown(view,shared(bs,'referenceDrawings')==='OPEN'?'':shared(bs,'referenceDrawings')):shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
-     const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):(b.line?.description||b.description);
+     const r=i+4,description=id==='C2'?c2PartsDescription0550(b):(b.line?.description||b.description);
      const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(issued(view)?'':'OPEN');
      [issued(view)?customerDescription(description):description,shown(view,b.partNo),shown(view,b.interchangeA),shown(view,b.interchangeB),shown(view,b.quantity),shown(view,b.delivery),weight,shown(view,b.origin),shown(view,b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
      prices(v,r,9,b,draftPriceRows);
@@ -597,7 +625,7 @@ export function buildNativeExhibitDocx0550(view,only){
  const ids=only?[only]:Object.keys(template.schedules);
  const trailingBreak=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/;
  const trailingParagraph=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<\/w:p>$/;
- const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)&&!issued(view)
+ const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
   ?c1AppendixWord0550(view):nativePages(view,id).pages.map((page,index)=>{
    const xml=renderPage(view,page,'xml');
    if(!only||!view.workingPreview)return xml;

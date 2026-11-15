@@ -13,7 +13,8 @@ import {c2DraftRowsFromExisting0550,c2HasSystem0550,c2ProjectLotOverlaps0550,spa
 import {commissioningPhase0550} from './data/commissioningSparePhases0550';
 import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 import {useBidWorkspace} from './BidWorkspaceContext';
-import {c5EquationDraftRows0550,c5SelectedSystems0550,c5UnmappedSystems0550,C5_TOOLS_DRAFT_NOTE_0550} from './data/c5ToolsScope0550';
+import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
+import {c5SpecialToolsRows0550,c5EquationDraftRows0550,c5SelectedSystems0550,c5UnmappedSystems0550,C5_TOOLS_DRAFT_NOTE_0550} from './data/c5ToolsScope0550';
 
 const a1DirectRows=[
  [3,'S/N 2 · Inspection and tests'],
@@ -116,8 +117,21 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const groups=useMemo(()=>['C2','C3','C4'].includes(id)&&(view.c2Systems||references?.size)?spareSystemGroups0550(view,id,references).filter(g=>g.token):[],[id,view,references]);
  const selected=groups.find(group=>group.token===systemChoice);
  const unresolved=useMemo(()=>id==='C2'&&groups.length?view.scheduleRows('C2').filter(row=>!c2HasSystem0550(row)):[],[view,groups,id]);
- const formView=useMemo(()=>groups.length?{...view,c2SystemToken:selected?.token,
-  scheduleRows:schedule=>schedule===id?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)}:view,[view,groups,selected,id]);
+ const formView=useMemo(()=>{
+  if(groups.length){
+   return {...view,c2SystemToken:selected?.token,
+    scheduleRows:schedule=>schedule===id?(selected?selected.rows:groups.flatMap(group=>group.rows)):view.scheduleRows(schedule)};
+  }
+  if(id==='C4'){
+   const c4Rows=c4CapitalSparesRows0550(view);
+   return {...view,scheduleRows:schedule=>schedule==='C4'?c4Rows:view.scheduleRows(schedule)};
+  }
+  if(id==='C5'){
+   const c5Rows=c5SpecialToolsRows0550(view);
+   return {...view,scheduleRows:schedule=>schedule==='C5'?c5Rows:view.scheduleRows(schedule)};
+  }
+  return view;
+ },[view,groups,selected,id]);
  const hasPricedTools=id==='C5'&&view.scheduleRows('C5').some(row=>row.quantity>0&&Number.isFinite(row.amount));
  const toolDrafts=useMemo(()=>id!=='C5'||!view.workingPreview||hasPricedTools||!ws?.data||!ws?.model?[]:c5EquationDraftRows0550(ws.data,ws.model),[id,view.workingPreview,hasPricedTools,ws?.data,ws?.model]);
  const toolSystems=useMemo(()=>toolDrafts.length?c5SelectedSystems0550(ws.data,ws.model):[],[toolDrafts,ws?.data,ws?.model]);

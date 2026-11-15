@@ -5,6 +5,8 @@ import {SCHEDULES_0550,QUALIFICATIONS_0550,paymentSchedule0550} from './data/bid
 import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
+import {c5SpecialToolsRows0550} from './data/c5ToolsScope0550';
 import {chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -38,7 +40,8 @@ export function scheduleTable0550(view,id){
  }
  if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};
  if(['C2','C3','C4'].includes(id)){
-  const details=rows.map(b=>[b.mainEquipment,id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description,b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount]);
+  const effectiveRows=id==='C4'&&!rows.length?c4CapitalSparesRows0550(view):rows;
+  const details=effectiveRows.map(b=>[b.mainEquipment,id==='C2'?c2PartsDescription0550(b):(b.line?.description||b.description),b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount]);
   if(id==='C3'&&view.workingPreview){
    const subtotal=scheduleRollup0550(rows.filter(b=>b.treatment==='OPTION'&&!b.nonAdditive));
    details.push(['','Schedule C3 total (A2 Option)','','','','','',rollupNote0550(subtotal),'','','','',subtotal.knownUSD??'OPEN']);
@@ -57,6 +60,10 @@ export function scheduleTable0550(view,id){
     return [country||'',b.line.description,country?c8Unit0550(b):b.unit,country||b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,
      b.treatment==='CALLOFF'?[c8Revision0550(b),'Call-off / excluded from Base and Options'].filter(Boolean).join(' / '):b.treatment];
    })]};
+ }
+ if(id==='C5'){
+  const effectiveRows=!rows.length?c5SpecialToolsRows0550(view):rows;
+  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:effectiveRows.map((b,i)=>[i+1,b.line?.description||b.description,(b.line?.brand||b.brand||'OPEN')+' / '+(b.line?.model||b.model||'Standard'),b.unit,b.quantity,b.unitPrice,b.amount])};
  }
  if(id==='C6')return {heads:['SN','Item Name','Specification','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.specification,b.unit,b.quantity,b.unitPrice,b.amount])};
  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.line.brand||b.line.offer?.brand||'OPEN',b.unit,b.quantity,b.unitPrice,b.amount])};

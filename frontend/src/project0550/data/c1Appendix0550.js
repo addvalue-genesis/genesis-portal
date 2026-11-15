@@ -684,7 +684,7 @@ export function c1AppendixWord0550(view){
  const draft=view.workingPreview&&!legacy&&!view.customerIssue;
  const cleanCustomerNote=text=>{
   if(!text||legacy)return text;
-  const filtered=String(text).split(/\s*;\s*|\s*·\s*/).filter(p=>p&&!/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(p)).join('; ');
+  const filtered=String(text).split(/\s*;\s*|\s*·\s*/).filter(p=>p&&!/\bOPEN\b|Working owner|Working draft|Draft budget|Draft\s+controller|Draft\s+preservation|Draft\s+startup|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด|reconcile|Full Outdoor|Hot Standby|Cable material supply|Shared supply for|Includes two R660|RITTAL Microwave|PAGA package with the OEM|One tower with quoted/i.test(p)).join('; ');
   return cleanCustomerText0550(filtered);
  };
  const p=(text,cell=false)=>`<w:p>${draft&&cell?'<w:pPr><w:spacing w:before="18" w:after="18" w:line="220" w:lineRule="auto"/></w:pPr>':''}<w:r>${draft&&cell?'<w:rPr><w:sz w:val="18"/><w:szCs w:val="18"/></w:rPr>':''}<w:t xml:space="preserve">${e(text)}</w:t></w:r></w:p>`;
@@ -695,7 +695,7 @@ export function c1AppendixWord0550(view){
  const widths=legacy?[600,4200,700,700,1100,1100,1600]:draft?[1130,5480,710,720,1420,1420,2800]:[900,3900,700,700,1100,1100,1600];
  let xml=p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY')+(legacy?'':p('Currency: USD'))+'<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(n=>`<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('')+'</w:tblBorders></w:tblPr><w:tblGrid>'+widths.map(w=>`<w:gridCol w:w="${w}"/>`).join('')+'</w:tblGrid>'+header;
  for(const g of c1.groups){xml+=row([groupTitle(g)],false,true);
-  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),cleanCustomerNote(r.note)]);if(r.intro)xml+=note(r.intro);r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c1Display0550(c.exportPrice?c.unitPrice:null),c1Display0550(c.exportPrice?c.amount:null),cleanCustomerNote(c.note)||'']);});for(const remark of r.notes||[])xml+=note(remark);}}}
+  for(const s of g.systems){xml+=row([s.name],false,true);for(const site of s.sites){xml+=row([site.name],false,true);for(const r of site.rows){xml+=row([r.sn,r.description,r.unit||'—',r.quantity??'—',c1Display0550(r.unitPrice),c1Display0550(r.amount),cleanCustomerNote(r.note)]);if(r.intro&&cleanCustomerNote(r.intro))xml+=note(cleanCustomerNote(r.intro));r.components.forEach((c,i)=>{xml+=row([r.sn+'.'+(i+1),c.description,c.unit||'—',c.quantity??'—',c1Display0550(c.exportPrice?c.unitPrice:null),c1Display0550(c.exportPrice?c.amount:null),cleanCustomerNote(c.note)||'']);});for(const remark of r.notes||[])if(cleanCustomerNote(remark))xml+=note(cleanCustomerNote(remark));}}}
   xml+=row([groupSubtotal(g),'','','','',c1Display0550(g.amount??g.draftSubtotal),c1AppendixSubtotalLabel0550(g)]);
  }
  const priced=draft?scheduleRollup0550(c1.bindings):null;

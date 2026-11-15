@@ -117,17 +117,24 @@ export function prepareEquationSpareWorking0550(data,draft,id){
  return {workspace:{...data,calculations,lines:[...data.lines,line]},lineId:id};
 }
 
-export function c2PartsDescription0550({line,lineId}){
- if(lineId?.startsWith('LINE-B5-LAN-STARTUP-'))return line.description.replace(/^SI estimate · (?=LAN start-up spare · )/,'');
+export function c2PartsDescription0550(item){
+ const line=item?.line||item;
+ const lineId=item?.lineId||line?.id;
+ if(lineId?.startsWith('LINE-B5-LAN-STARTUP-'))return (line?.description||'').replace(/^SI estimate · (?=LAN start-up spare · )/,'');
  const desc=line?.offer?.description||line?.description||'';
- const cleaned=desc
-  .replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'')
-  .replace(/^(?:CCTV|ENT|LAN|PABX|TEL-[A-Z0-9]+)\s*·\s*/i,'')
-  .replace(/^(?:Commissioning spare set|LAN start-up spare|Entertainment)\s*·\s*/i,'')
-  .replace(/^(?:APF|ACP|ABV01|AMS01)\s*·\s*/i,'')
-  .trim();
+ let cleaned=desc;
+ let prev;
+ do {
+  prev = cleaned;
+  cleaned = cleaned
+   .replace(/^(?:PROJECT|SI estimate|Working draft offer|Draft startup spare allowance)\s*·\s*/i,'')
+   .replace(/^(?:CCTV|ENT|LAN|PABX|TEL-[A-Z0-9_-]+|RADIO|DMR|VSAT|FOC|BULK)\s*·\s*/i,'')
+   .replace(/^(?:Commissioning spare set|LAN start-up spare|Entertainment|Spares? set|Startup spare)\s*·\s*/i,'')
+   .replace(/^(?:APF|ACP|ABV01|AMS01)\s*·\s*/i,'')
+   .trim();
+ } while (cleaned !== prev);
  const tag=line?.physicalTag||line?.tagRef;
- const showTag=tag&&!/^(?:APF|ACP|ABV01|AMS01|PROJECT|OFFSHORE)$/i.test(tag);
+ const showTag=tag&&!/^(?:APF|ACP|ABV01|AMS01|PROJECT|OFFSHORE|SHARED)$/i.test(tag);
  return showTag?`${cleaned} (${tag})`:cleaned;
 }
 
