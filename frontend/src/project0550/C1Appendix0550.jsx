@@ -159,28 +159,28 @@ export function formalScopeDescription0550(r){
 const APF_DMR_BOM_RAW=APF_DMR_MR_12_ITEMS_0550;
 
 const ACP_DMR_BOM_RAW=[
- {tagNo:'RAD-308-001',description:'Rittal Radio System Cabinet (42U 19" Floor Mounted)',brand:'Rittal',model:'VX IT 42U 800x1000x2200',partNo:'VX25 / VX IT',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:4500},
- {tagNo:'Per Appendix 2 Drawing',description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
- {tagNo:'Per Appendix 2 Drawing',description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
- {tagNo:'Per Appendix 2 Drawing',description:'VHF DMR Antenna 4 Stack',brand:'Amphenol Procom',model:'4-Stack Dipole Array',partNo:'WL-150-4S',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:2000},
- {tagNo:'ACP-ROIP-IGW-001 to 004',description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Base Scope of Supply',weight:14000},
- {tagNo:'ACP-RAD-308-002 / 003',description:'VHF DMR Fixed Radio Station',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:2,unit:'Sets',remarks:'With desktop power & mounting kit',weight:10000},
- {tagNo:'CON-308-001 / ACP-CON-308-001',description:'VHF DMR Dispatch Console',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:6823.36},
- {tagNo:'Per Appendix 2 Drawing',description:'Bulk Materials & Installation Accessories (RF Jumpers, Grounding, Mounting Hardware)',brand:'Amphenol / Rittal',model:'Installation Kit',partNo:'ACC-DMR-ACP',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:0},
+ {tagNo:'RAD-308-001',mrDescription:'Radio System Cabinet',offeredEquipment:'Rittal Radio System Cabinet (42U 19" Floor Mounted)',description:'Rittal Radio System Cabinet (42U 19" Floor Mounted)',brand:'Rittal',model:'VX IT 42U 800x1000x2200',partNo:'VX25 / VX IT',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:4500},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'DMR Access Switch',offeredEquipment:'DMR Tier III Access Switch',description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'VHF Omni DMR Antenna',offeredEquipment:'VHF DMR Omni Antenna',description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:1500},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'VHF Dipole DMR Antenna',offeredEquipment:'VHF DMR Antenna 4 Stack',description:'VHF DMR Antenna 4 Stack',brand:'Amphenol Procom',model:'4-Stack Dipole Array',partNo:'WL-150-4S',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:2000},
+ {tagNo:'ACP-ROIP-IGW-001 to 004',mrDescription:'RoIP IP Gateway',offeredEquipment:'SmartPTT VHF DMR IP Gateway',description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Base Scope of Supply',weight:14000},
+ {tagNo:'ACP-RAD-308-002 / 003',mrDescription:'VHF DMR Fixed Radio',offeredEquipment:'VHF DMR Fixed Radio Station',description:'VHF DMR Fixed Radio Station',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:2,unit:'Sets',remarks:'With desktop power & mounting kit',weight:10000},
+ {tagNo:'CON-308-001 / ACP-CON-308-001',mrDescription:'VHF Dispatch Console',offeredEquipment:'VHF DMR Dispatch Console',description:'VHF DMR Dispatch Console',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:6823.36},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'Etc. / Bulk Materials & Accessories',offeredEquipment:'Bulk Materials & Installation Accessories (RF Jumpers, Grounding, Mounting Hardware)',description:'Bulk Materials & Installation Accessories (RF Jumpers, Grounding, Mounting Hardware)',brand:'Amphenol / Rittal',model:'Installation Kit',partNo:'ACC-DMR-ACP',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:0},
 ];
 
 const ABV_DMR_BOM_RAW=[
- {tagNo:'RAD-308',description:'VHF DMR Mobile Radio Station (Fixed-Use)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Ea.',remarks:'Fixed-use station with mounting bracket, power supply & interface kit',weight:750},
- {tagNo:'Per Appendix 2 Drawing',description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Ea.',remarks:'Included in Base Scope of Supply',weight:0},
- {tagNo:'Per Appendix 2 Drawing',description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea.',remarks:'Included in Base Scope of Supply',weight:0},
- {tagNo:'Per Appendix 2 Drawing',description:'RF Jumper Cables, Connectors & Installation Accessories',brand:'Amphenol / Motorola',model:'Fixed-Use Installation Kit',partNo:'ACC-DMR-ABV01',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:0},
+ {tagNo:'RAD-308',mrDescription:'VHF DMR Mobile Radio',offeredEquipment:'VHF DMR Mobile Radio Station (Fixed-Use)',description:'VHF DMR Mobile Radio Station (Fixed-Use)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Ea.',remarks:'Fixed-use station with mounting bracket, power supply & interface kit',weight:750},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'VHF Omni DMR Antenna',offeredEquipment:'VHF DMR Omni Antenna',description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Ea.',remarks:'Included in Base Scope of Supply',weight:0},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'Coaxial RF Surge Arrester',offeredEquipment:'Coaxial RF Lightning Surge Protector',description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea.',remarks:'Included in Base Scope of Supply',weight:0},
+ {tagNo:'Per Appendix 2 Drawing',mrDescription:'Antenna Cable & Installation Accessories',offeredEquipment:'RF Jumper Cables, Connectors & Installation Accessories',description:'RF Jumper Cables, Connectors & Installation Accessories',brand:'Amphenol / Motorola',model:'Fixed-Use Installation Kit',partNo:'ACC-DMR-ABV01',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:0},
 ];
 
 const AMS_DMR_BOM_RAW=[
- {description:'VHF DMR Mobile Radio Station (Desktop)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Set',remarks:'Desktop mobile station complete with desk mic & power supply',weight:2500},
- {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:500},
- {description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea',remarks:'Included in Base Scope of Supply',weight:200},
- {description:'RF Feeder Cables, Jumpers & Installation Accessories',brand:'Yongding / Amphenol',model:'HCAAYZ-50-12 / Jumper Kit',partNo:'HCAAYZ-50-12',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:324}
+ {mrDescription:'VHF DMR Mobile Radio',offeredEquipment:'VHF DMR Mobile Radio Station (Desktop)',description:'VHF DMR Mobile Radio Station (Desktop)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:1,unit:'Set',remarks:'Desktop mobile station complete with desk mic & power supply',weight:2500},
+ {mrDescription:'VHF Omni DMR Antenna',offeredEquipment:'VHF DMR Omni Antenna',description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Base Scope of Supply',weight:500},
+ {mrDescription:'Coaxial RF Surge Arrester',offeredEquipment:'Coaxial RF Lightning Surge Protector',description:'Coaxial RF Lightning Surge Protector',brand:'Amphenol / PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:1,unit:'Ea',remarks:'Included in Base Scope of Supply',weight:200},
+ {mrDescription:'Antenna Cable & Installation Accessories',offeredEquipment:'RF Feeder Cables, Jumpers & Installation Accessories',description:'RF Feeder Cables, Jumpers & Installation Accessories',brand:'Yongding / Amphenol',model:'HCAAYZ-50-12 / Jumper Kit',partNo:'HCAAYZ-50-12',quantity:1,unit:'Lot',remarks:'Included in Base Scope of Supply',weight:324}
 ];
 
 function inferBrand(desc='',r={}){
@@ -375,14 +375,22 @@ function resolveBomTagNo(it,r){
  return 'Per Appendix 2 Drawing';
 }
 
+function resolveMrDescription(it,r){
+ if(it.mrDescription)return sanitizeCustomerText0550(it.mrDescription);
+ const mrTitle=sanitizeCustomerText0550(cleanItemTitle0550(r)||'');
+ const offered=sanitizeCustomerText0550(it.offeredEquipment||it.description||'');
+ return mrTitle&&mrTitle.toLowerCase()!==offered.toLowerCase()?mrTitle:offered;
+}
+
 function dedupeBomItems(items,r){
  const seen=new Map(),deduped=[];
  for(const it of items){
   const u=String(it.unit||'').trim().toLowerCase();
   const rem=String(it.remarks||it.note||'').toLowerCase();
   if(u==='x'||rem.includes('included in lot'))continue;
-  const desc=sanitizeCustomerText0550(it.description||'');
-  const norm=(it.itemCode||it.partNo||it.model||desc.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+  const offered=sanitizeCustomerText0550(it.offeredEquipment||it.description||'');
+  const mrDesc=resolveMrDescription(it,r);
+  const norm=(it.itemCode||it.partNo||it.model||offered.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
   if(!norm)continue;
   if(seen.has(norm)){
    const ex=seen.get(norm);
@@ -392,7 +400,9 @@ function dedupeBomItems(items,r){
    const cleanItem={
     ...it,
     tagNo:resolveBomTagNo(it,r),
-    description:desc,
+    mrDescription:mrDesc,
+    offeredEquipment:offered,
+    description:offered,
     brand:sanitizeCustomerText0550(it.brand||''),
     model:sanitizeCustomerText0550(it.model||''),
     partNo:sanitizeCustomerText0550(it.partNo||''),
@@ -634,27 +644,29 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
             <table className="c1-bom-table">
              <thead>
               <tr>
-               <th style={{width:'5%',textAlign:'center'}}>Item</th>
-               <th style={{width:'12%'}}>Tag No.</th>
-               <th style={{width:pricingMode==='ITEMIZED'?'22%':'26%'}}>Equipment Description</th>
-               <th style={{width:'11%'}}>Brand</th>
-               <th style={{width:pricingMode==='ITEMIZED'?'11%':'13%'}}>Model</th>
-               <th style={{width:pricingMode==='ITEMIZED'?'11%':'13%'}}>Part No.</th>
-               <th style={{width:'5%',textAlign:'center'}}>Qty</th>
-               <th style={{width:'5%',textAlign:'center'}}>Unit</th>
+               <th style={{width:'4%',textAlign:'center'}}>Item</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'14%':'17%'}}>MR Description</th>
+               <th style={{width:'11%'}}>Tag No.</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'16%':'20%'}}>Offered Equipment</th>
+               <th style={{width:'10%'}}>Brand</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'10%':'12%'}}>Model</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'9%':'11%'}}>Part No.</th>
+               <th style={{width:'4%',textAlign:'center'}}>Qty</th>
+               <th style={{width:'4%',textAlign:'center'}}>Unit</th>
                {pricingMode==='ITEMIZED'&&<>
-                <th style={{width:'10%',textAlign:'right'}}>Unit Rate ({currency})</th>
-                <th style={{width:'10%',textAlign:'right'}}>Total Price ({currency})</th>
+                <th style={{width:'9%',textAlign:'right'}}>Unit Rate ({currency})</th>
+                <th style={{width:'9%',textAlign:'right'}}>Total Price ({currency})</th>
                </>}
-               <th style={{width:pricingMode==='ITEMIZED'?'11%':'15%'}}>Remarks</th>
+               <th style={{width:pricingMode==='ITEMIZED'?'9%':'12%'}}>Remarks</th>
               </tr>
              </thead>
              <tbody>
               {bomItems.map((item,idx)=>(
                <tr key={idx} className="c1-bom-item-row">
                 <td style={{textAlign:'center'}}>{r.sn}.{idx+1}</td>
+                <td style={{fontWeight:500}}>{item.mrDescription||item.description}</td>
                 <td style={{fontFamily:'Consolas,monospace',fontSize:'11px'}}>{item.tagNo||'Per Appendix 2 Drawing'}</td>
-                <td style={{fontWeight:500}}>{item.description}</td>
+                <td>{item.offeredEquipment||item.description}</td>
                 <td>{item.brand||'—'}</td>
                 <td>{item.model||'—'}</td>
                 <td style={{fontFamily:'Consolas,monospace',fontSize:'11px'}}>{item.partNo||'—'}</td>
@@ -671,7 +683,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
              {pricingMode==='ITEMIZED'&&(
               <tfoot>
                <tr className="c1-bom-subtotal-row">
-                <td colSpan={8} style={{textAlign:'right',fontWeight:'bold'}}>Subtotal ({r.sn}) — Verified matching parent Lot:</td>
+                <td colSpan={9} style={{textAlign:'right',fontWeight:'bold'}}>Subtotal ({r.sn}) — Verified matching parent Lot:</td>
                 <td colSpan={2} className="number" style={{fontWeight:'bold',color:'#005a9e',textAlign:'right'}}>{c1Display0550(r.amount)}</td>
                 <td style={{fontWeight:'bold',color:'#005a9e'}}>Matches Lump Sum Total</td>
                </tr>

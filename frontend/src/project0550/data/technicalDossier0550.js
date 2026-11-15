@@ -37,7 +37,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
   if(radioRows.length)tables.push({title:'Radio lot contents · included in the lot price · not additive',heads:['Offer','Quantity in this lot','Description / part','Note'],rows:radioRows});
  }
  if(systemToken==='TEL-RADIO-DTRS'&&['description','parameters','equipment'].includes(sectionId)){
-  tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','Tag No.','Equipment Description','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+  tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
