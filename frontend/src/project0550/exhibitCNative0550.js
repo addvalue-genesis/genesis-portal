@@ -101,22 +101,26 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
   if(base&&r===8){
    const days=field(view,'C7','sitePeriodDays').trim();
    set(v,r,3,'Day');set(v,r,4,days);set(v,r,5,days?days+' days included in Lump Sum':'');set(v,r,6,moneyText(view,amount));
-   if(note)set(v,r,7,note);
+   set(v,r,7,'Site Service Time shall be specified.');
    if(!days)issues.push('Field service period TBA');
    continue;
   }
   if(base&&r===9){
    const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;
    set(v,r,3,'Day');set(v,r,4,qty??'');set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'TBA');set(v,r,6,moneyText(view,amount));
-   if(note)set(v,r,7,note);
+   set(v,r,7,'');
    continue;
   }
   if(base){
    set(v,r,3,'Lot');set(v,r,4,1);set(v,r,5,moneyText(view,amount));set(v,r,6,moneyText(view,amount));
-   let remark=note;
-   if(r===11&&bs.some(b=>isLicensingCostLine0550(b.lineId)))remark=[remark,'Telecom import, radio and operating licence coordination (as applicable)'].filter(Boolean).join(' / ');
-   if(r===11&&bs.some(b=>b.line.a1OthersEstimate))remark=[remark,'Includes estimated freight, handling and insurance where applicable.'].filter(Boolean).join(' / ');
-   if(remark)set(v,r,7,remark);
+   let remark='';
+   if(r===11){
+    const parts=[];
+    if(bs.some(b=>isLicensingCostLine0550(b.lineId)))parts.push('Telecom import, radio and operating licence coordination (as applicable)');
+    if(bs.some(b=>b.line?.a1OthersEstimate))parts.push('Includes estimated freight, handling and insurance where applicable.');
+    remark=parts.join(' / ')||'Please specify.';
+   }
+   set(v,r,7,remark);
    continue;
   }
   if(r===6||r===7){

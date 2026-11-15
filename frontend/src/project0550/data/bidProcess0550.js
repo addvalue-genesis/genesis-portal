@@ -117,7 +117,7 @@ function prepareCeragonR11(data,policies,today,handled){
   requirementRef:'MR Rev.B1 Appendix 1.5 / APF and ACP / one shared link',
   sourceRef:offer.sourceRef+' / '+today+' / R11 selected: one Working Lot. Original quotation option quantity remains zero.',
   vendorId:offer.vendorId,offerId:offer.id,brand:offer.brand,
-  customerRemark:CERAGON_R11_CONFIGURATION_0550+' '+CERAGON_R11_OPEN_SCOPE_0550
+  customerRemark:CERAGON_R11_CONFIGURATION_0550
  };
  const lines=data.lines.map(l=>l===old?owner:l.id===CERAGON_DISH_ALLOWANCE_0550&&l.selected?{...l,selected:false}:l);
  return {...data,lines:old?lines:[...lines,owner]};
