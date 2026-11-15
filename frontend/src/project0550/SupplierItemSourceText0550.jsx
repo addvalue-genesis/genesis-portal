@@ -3,6 +3,9 @@ import {MgwRadioTagEvidence0550} from './MgwRadioTagEvidence0550';
 import {VENDOR_PHYSICAL_TAG_FIELDS_0550,offerSourceSections0550} from './data/vendorBidTags0550';
 import {amount} from './BidControls';
 import {nativeSupplierItem0550,supplierBoqRows0550,supplierItemLabel0550,supplierItemSourceText0550,supplierCostProjection0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
+import {RadioLotBomTable0550} from './RadioLotBom0550';
+import {radioGtplLocationDisplay0550} from './data/radioLotComponents0550';
+import {mgwRadioSourceModel0550,mgwRadioSourceRow0550} from './data/mgwQuoteSelection0550';
 import {isTowerSourceItem0550,towerOfferScope0550} from './data/towerTenderScope0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 
@@ -303,6 +306,7 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true,dat
  const rows=supplierBoqRows0550(offer),native=nativeSupplierItem0550(offer);
  const details=texts.filter(text=>!rows.some(row=>text===row.text));
  const sections=offerSourceSections0550(offer);
+ const radioSource=mgwRadioSourceRow0550(offer);
  return <div data-supplier-source-text={offer.id}>
   <button type="button" aria-haspopup="dialog" onClick={()=>dialog.current.showModal()}>ดูรายละเอียด Supplier{rows.length?' · BoQ '+rows.length+' แถว':''}</button>
   <dialog ref={dialog} className="p55-supplier-evidence" aria-label={'รายละเอียด Supplier '+(offer.supplierQuoteRow?.itemCode||offer.quoteRef||offer.id)}>
@@ -323,6 +327,7 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true,dat
     {showPrice&&<> · เรต {amount(native.rate,native.currency)} · ยอดต้นฉบับ {Number.isFinite(native.total)?amount(native.total,native.currency):native.totalText||'—'}</>}
     <br/><code>{native.locator}</code>{native.url&&<> · <a href={native.url} target="_blank" rel="noopener noreferrer">เปิดต้นฉบับ</a></>}</p>}
    {rows.length>0&&<><p>BoQ อ้างอิง Offer นี้ · ราคาแยกต่อ P/N ไม่ปรากฏในหลักฐานที่บันทึก</p><SupplierBoqTable0550 rows={rows}/></>}
+   {offer.components?.length>0&&<RadioLotBomTable0550 components={offer.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(offer)} sourceBrand={radioSource?.brand} sourceModel={mgwRadioSourceModel0550(radioSource)}/>}
    {sourceSection?.components.length>0&&<>
     <p>ส่วนประกอบที่รวมใน Item นี้ · จำนวนต่อ 1 {native.unit} ตามข้อความ Supplier</p>
     <div className="p55-table-wrap"><table className="p55-table p55-supplier-boq" aria-label="Included component BOM">
@@ -336,7 +341,7 @@ export function SupplierItemSourceText0550({offer,requirement,showPrice=true,dat
     <p>ส่วนประกอบใช้ราคาแพ็กเกจเดิม · จำนวนข้างต้นเป็นจำนวนในใบเสนอราคาฉบับที่เปิดดู</p>
    </>}
    {sourceSection&&<details><summary>ข้อความ Item จากต้นฉบับ · {sourceSection.locator}</summary><p className="p55-supplier-verbatim">{sourceSection.text}</p></details>}
-   {details.length>0&&<details open={!rows.length}><summary>ข้อความ Supplier / เงื่อนไขที่บันทึก</summary>{details.map((text,i)=><p key={i} className="p55-supplier-verbatim">{text}</p>)}</details>}
+   {details.length>0&&<details open={!rows.length}><summary>ข้อความ Supplier / เงื่อนไขที่บันทึก</summary>{details.map((text,i)=><p key={i} className="p55-supplier-verbatim">{radioGtplLocationDisplay0550(text)}</p>)}</details>}
    {!texts.length&&!sourceSection&&<p>ยังไม่มีข้อความรายละเอียดต้นฉบับของ Item นี้ในข้อมูลที่โหลด · ตรวจใบเสนอราคาต้นฉบับ</p>}
    <details data-supplier-source-ref={offer.id}><summary>ข้อความรายการเต็ม / แหล่งอ้างอิงที่บันทึก</summary><p className="p55-supplier-verbatim">{offer.description}</p>{offer.sourceRef&&<p className="p55-supplier-verbatim">{offer.sourceRef}</p>}</details>
   </dialog>

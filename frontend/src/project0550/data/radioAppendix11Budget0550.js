@@ -1,5 +1,5 @@
 import plan from './radioAppendix11Budget0550.json';
-import {GOODS_FORMULA_0550,GOODS_POLICY_TITLE_0550,policyDefaults0550} from '../bidWorkingBasis0550';
+import {GOODS_FORMULA_0550,GOODS_POLICY_TITLE_0550,matchesWorkingDefault0550,policyDefaults0550} from '../bidWorkingBasis0550';
 import {blankScheduleBinding0550,saveBidVolumeRecord0550} from './bidVolumes0550';
 import {mgwCurrentItemKey0550,mgwRadioDtrsOffer0550} from './mgwQuoteSelection0550';
 import {roundMoney0550} from './money0550';
@@ -11,6 +11,8 @@ export const radioAppendix11Estimate0550=new Map(plan.estimates.map(row=>[row.id
 const hasPrice=line=>line.offerId||line.calculationId||line.mgwDetailGroupId||Number.isFinite(line.manualCost)||Number.isFinite(line.sellRate);
 const warning='SI budget estimate · MR scope and supplier overlap to be reviewed.';
 const sourceDocs=['MM-ASK-1A-APF-TEL-MR-0001','MM-ASK-1A-APF-TEL-DTS-0007','MM-ASK-1A-APF-TEL-DTS-0008'];
+const apfFixedId='LINE-BID-RADIO-APF-DTRS-FIXED';
+const legacyApfFixedBasis='MR six fixed stations less one provisional GTPL reused fixed set. Use the MGW M8668i equipment lot as a fixed-station hardware proxy; final TAG and RF fit pending.';
 
 export function prepareRadioAppendix11Budget0550(data,policies,today,replaceGeneratedDtrsHandheld){
  const receipt=data.repositoryBasisImport;
@@ -34,8 +36,9 @@ export function prepareRadioAppendix11Budget0550(data,policies,today,replaceGene
   source.revision==='B1'&&source.authority==='CURRENT_TENDER'&&source.content).map(source=>source.id);
  let next=data;
  for(const item of plan.estimates){
-  if(recorded.has(item.id)||next.lines.length>=2000||recorded.size>=2000||(next.bidVolumes?.bindings.length||0)>=2000)continue;
   const previous=data.lines.find(line=>line.id===item.id);
+  const migrateApfFixed=item.id===apfFixedId&&recorded.has(item.id)&&previous?.quantity===5&&previous.sourceRef.includes(legacyApfFixedBasis);
+  if(!migrateApfFixed&&(recorded.has(item.id)||next.lines.length>=2000||recorded.size>=2000||(next.bidVolumes?.bindings.length||0)>=2000))continue;
   if(occupied.has(item.id)&&!previous)continue;
   const native=data.lines.find(line=>line.mrRequirementId===item.mr);
   const offer=quoted.get(item.reference);
@@ -52,6 +55,14 @@ export function prepareRadioAppendix11Budget0550(data,policies,today,replaceGene
    quantity:item.quantity,unit:item.unit,currency:'USD',manualCost:rate,selected:true,tagRef:native.tagRef,
    requirementRef:item.mr+' / '+native.requirementRef,sourceRef,vendorId:'',offerId:'',calculationId:'',resultKey:'value',
    ...goods,customerRemark:warning};
+  if(migrateApfFixed){
+   const previousSource=sourceRef.replace(item.rateBasis,legacyApfFixedBasis);
+   const binding=bindings.find(row=>row.lineId===item.id);
+   if(binding?.status==='REVIEWED'||!matchesWorkingDefault0550(previous,{...line,quantity:5,sourceRef:previousSource}))continue;
+   next={...next,lines:next.lines.map(row=>row===previous?{...previous,quantity:line.quantity,sourceRef}:row)};
+   if(binding?.locator===previousSource)next=saveBidVolumeRecord0550(next,'bindings',{...binding,locator:sourceRef},today);
+   continue;
+  }
   const updated=previous?(replaceGeneratedDtrsHandheld?.(next,previous,line)??next):{...next,lines:[...next.lines,line]};
   if(updated===next)continue;
   next=saveBidVolumeRecord0550(updated,'bindings',{
@@ -76,6 +87,9 @@ export function radioAppendix11PriceProblems0550(data,line){
  const conflict=data.lines.some(owner=>owner.selected&&!owner.coveredByLineId&&owner.wbs==='A'&&hasPrice(owner)&&
   !radioAppendix11Estimate0550.has(owner.id)&&(owner.mrRequirementId===item.mr||owner.requirementRef.includes(item.mr))&&
   !mgwRadioDtrsOffer0550(data.offers.find(offer=>offer.id===owner.offerId)));
+ if(!conflict&&line.id===apfFixedId&&line.sourceRef.includes(legacyApfFixedBasis)){
+  return ['MR_SCOPE_BASIS_OPEN: CUS MR calls for six APF fixed stations. Verify the saved reuse allowance before issue.'];
+ }
  return conflict?['RADIO_SI_ESTIMATE_OVERLAP: reconcile the priced MR owner with the SI allowance']:
   ['MR_SCOPE_BASIS_OPEN: SI radio allowance pending design and supplier reconciliation'];
 }

@@ -6,7 +6,7 @@ import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
 import {chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
-import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function scheduleTable0550(view,id){
  if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
@@ -46,11 +46,18 @@ export function scheduleTable0550(view,id){
   return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:details};
  }
  if(id==='C7')return {heads:['Service / Personnel Category','Total Hours (h)','Rate (USD/h)','Total (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit==='MH'?b.quantity:'OPEN',b.unit==='MH'?b.unitPrice:'OPEN',b.amount,b.unit==='MH'?b.treatment:'Man-hour basis OPEN / '+b.treatment])};
- if(id==='C8')return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],rows:rows.map(b=>{
-  const country=c8Country0550(b);
-  return [country||'',b.line.description,country?c8Unit0550(b):b.unit,country||b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,
-   b.treatment==='CALLOFF'?[c8Revision0550(b),'Call-off / excluded from Base and Options'].filter(Boolean).join(' / '):b.treatment];
- })};
+ if(id==='C8'){
+  const total=c8CalloffTotal0550(view,rows);
+  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
+  if(c8SingleForm0550(view)||(total&&!facilities.length))return {heads:['Description / Scope of Supply','Unit','Total Price (USD)','Notes'],
+   rows:[[C8_TOTAL_DESCRIPTION_0550,'Lot',total?.amount??'OPEN',C8_TOTAL_NOTE_0550]]};
+  return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],
+   rows:[...(total?[['',C8_TOTAL_DESCRIPTION_0550,'Lot','','',total.amount??'OPEN',C8_TOTAL_NOTE_0550]]:[]),...facilities.map(b=>{
+    const country=c8Country0550(b);
+    return [country||'',b.line.description,country?c8Unit0550(b):b.unit,country||b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,
+     b.treatment==='CALLOFF'?[c8Revision0550(b),'Call-off / excluded from Base and Options'].filter(Boolean).join(' / '):b.treatment];
+   })]};
+ }
  if(id==='C6')return {heads:['SN','Item Name','Specification','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.specification,b.unit,b.quantity,b.unitPrice,b.amount])};
  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.line.brand||b.line.offer?.brand||'OPEN',b.unit,b.quantity,b.unitPrice,b.amount])};
 }
@@ -87,5 +94,5 @@ export function buildBidVolumeXlsx0550(view,volume,frozenSheets){
 }
 export function bidVolumeHtml0550(view,volume,frozenSheets){if(volume==='I'&&!frozenSheets)return nativeExhibitHtml0550(view,undefined,true);return `<!doctype html><html lang="en"><meta charset="utf-8"><title>PJ2608-0550 Volume ${esc(volume)}</title><style>body{font:14px Arial;margin:24px;color:#172e43}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #d9d9d9;padding:8px;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f7}h2{break-before:page}thead{display:table-header-group}pre{white-space:pre-wrap}@page{size:A4 landscape;margin:14mm}</style><h1>PJ2608-0550 / Volume ${esc(volume)}</h1><p>${esc(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p>${(frozenSheets||bidVolumeSheets0550(view,volume)).map(s=>`<h2>${esc(s.name)}</h2><table><thead><tr>${s.heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(s.rows.length?s.rows:[['OPEN']]).map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table><pre>${esc(s.note||'')}</pre>`).join('')}</html>`;}
 export function downloadBidVolume0550(view,volume,format='xlsx'){
- const html=format==='html',url=URL.createObjectURL(new Blob([html?bidVolumeHtml0550(view,volume):buildBidVolumeXlsx0550(view,volume)],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=`PJ2608-0550_Volume-${volume}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_DRAFT.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const html=format==='html',source=html&&volume==='I'?{...view,customerIssue:true}:view,url=URL.createObjectURL(new Blob([html?bidVolumeHtml0550(source,volume):buildBidVolumeXlsx0550(view,volume)],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=`PJ2608-0550_Volume-${volume}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_${html&&volume==='I'?'OFFICIAL':'DRAFT'}.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

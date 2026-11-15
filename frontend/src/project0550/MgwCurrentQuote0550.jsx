@@ -1,5 +1,7 @@
 import React from 'react';
 import {amount} from './BidControls';
+import {RadioLotBomTable0550} from './RadioLotBom0550';
+import {parseRadioLotComponents0550,RADIO_ACCESSORIES_SEPARATOR_0550,RADIO_GTPL_INSTALLATION_SITE_0550,RADIO_GTPL_SEPARATOR_0550} from './data/radioLotComponents0550';
 import {sumMoney0550} from './data/money0550';
 import {MGW_QUOTE_0550, mgwHistoricalOffer0550} from './data/mgwVendorBasis0550';
 import {mgwServiceAllocation0550} from './data/mgwDetailPricing0550';
@@ -12,7 +14,7 @@ import {
  MGW_BULK_0550, MGW_BULK_OPEN_0550, mgwBulkOffer0550,
  MGW_RADIO_AERO_0550, MGW_RADIO_CUSTOMER_CODES_0550, MGW_RADIO_DTRS_0550, MGW_RADIO_DTRS_OPEN_0550,
  MGW_RADIO_MARINE_0550, MGW_RADIO_REMAINING_0550, MGW_RADIO_SSB_0550, mgwRadioDtrsOffer0550,
- mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwFiberPanelOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwReplacementActive0550,
+ mgwCctvEntOffer0550, mgwCurrentIncluded0550, mgwFiberPanelOffer0550, mgwLanEquipmentOffer0550, mgwLanPbxFoOffer0550, mgwMetNdbOffer0550, mgwRadioSourceModel0550, mgwReplacementActive0550,
 } from './data/mgwQuoteSelection0550';
 
 const radioSourceRows=MGW_QUOTE_0550.rows.filter(row=>row.section==='RADIO');
@@ -25,13 +27,17 @@ const radioSourceMr={
 };
 const radioMrById=new Map(mrCatalog.rows.filter(row=>row.id.startsWith('MR-B1-11-')).map(row=>[row.id,row]));
 const radioMrSource=radioMrById.get('MR-B1-11-APF-01')?.componentReview?.sources.find(source=>source.label.includes('Rev.B1'));
+export const MGW_GTPL_SOURCE_TARGET_0550={
+ id:'bid.vendor.offers.mgw.radio.gtpl',number:'07.2',tab:'documents',
+ title:'MGW Q26-063 · VHF DMR Radio System · GTPL · GRS#2 → APF',
+};
 const radioUnpriced={
  'RADIO-005':{
-  separator:'\nLocation: APM\nVHF DMR Radio System GTPL\n',
-  title:'VHF DMR Radio System · GTPL relocation', sourceSite:'APM', site:'ติดตั้งที่ APF ตามหมายเหตุผู้เสนอ', price:'—',
+  separator:RADIO_GTPL_SEPARATOR_0550,target:MGW_GTPL_SOURCE_TARGET_0550.id,
+  title:'VHF DMR Radio System · GTPL relocation', sourceSite:RADIO_GTPL_INSTALLATION_SITE_0550, site:'GRS#2 → '+RADIO_GTPL_INSTALLATION_SITE_0550+' Control Building / เสาโทรคมนาคมใหม่ 60 ม.', price:'—',
  },
  'RADIO-009':{
-  separator:'\nVHF DMR Radio System Accessaries MOTOROLA\n',
+  separator:RADIO_ACCESSORIES_SEPARATOR_0550,
   title:'VHF DMR Radio System Accessories · Motorola Option', sourceSite:'APF', site:'APF', price:'TBD',
  },
 };
@@ -66,6 +72,9 @@ function MgwRadioSource0550({data,sectionFilter}){
     const continuation=MGW_QUOTE_0550.radioDetailContinuations[item];
     const [rawDetail,unpricedDetail]=extra?row.detail.split(extra.separator):[row.detail];
     const detail=continuation?rawDetail.replace(continuation.anchor,continuation.text):rawDetail;
+    const model=mgwRadioSourceModel0550(row);
+    const components=parseRadioLotComponents0550(detail);
+    const unpricedComponents=unpricedDetail?parseRadioLotComponents0550(unpricedDetail,{defaultIncluded:item==='RADIO-009',defaultGroup:item==='RADIO-009'?'Accessories':'Remark'}):[];
     const sections=itemSections(item);
     const optionItem=item==='RADIO-009'?'RADIO-009-OPTION':null;
     const extraSections=optionItem?itemSections(optionItem):[];
@@ -75,9 +84,10 @@ function MgwRadioSource0550({data,sectionFilter}){
     const owners=current?data.lines.filter(line=>line.selected&&line.offerId===current.id):[];
     return <React.Fragment key={row.id}>
      {isVisible(sections)&&<tr>
-      <td><strong>{row.description} · {row.brand}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
+      <td><strong>{[row.description,row.brand,model].filter(Boolean).join(' · ')}</strong><small>{item} · PDF {row.page}{continuation&&'–'+continuation.page}</small>
        <small>Volume I · {sections.map(tag=>'11.'+tag).join(' · ')}</small>
-       <details><summary>รายการย่อย / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
+       {components.length>0&&<RadioLotBomTable0550 components={components} caption={'BOM ต่อชุด · '+item} sourceBrand={row.brand} sourceModel={model}/>}
+       <details><summary>ข้อความต้นฉบับ / BOM</summary><p className="p55-supplier-verbatim">{detail}</p></details>
        <MgwRadioTagEvidence0550 item={item}/></td>
       <td>{owners.length===1?owners[0].customerRowCode:code}{shared&&<small>ใช้ร่วมหลายระบบ</small>}
        <small>{owners.length===1?'10.2 · '+owners[0].id:owners.length>1?'OPEN · ตรวจเจ้าของราคาซ้ำ':'OPEN · รอเจ้าของราคา Working'}</small></td>
@@ -85,12 +95,13 @@ function MgwRadioSource0550({data,sectionFilter}){
       <td>{row.site}</td><td>{row.quantity} {row.sourceUnit||'· หน่วยไม่ระบุ'}</td>
       <td>{amount(row.unitCost,currency)}</td><td>{amount(row.extended,currency)}</td>
      </tr>}
-     {unpricedDetail&&isVisible(extraSections)&&<tr>
+     {unpricedDetail&&isVisible(extraSections)&&<tr data-component-key={extra.target}>
       <td><strong>{extra.title}</strong><small>PDF {row.page}</small>
        {extraSections.length>0&&<small>Volume I · {extraSections.map(tag=>'11.'+tag).join(' · ')}</small>}
-       <details><summary>รายการย่อย / ขอบเขต</summary><p className="p55-supplier-verbatim">{unpricedDetail}</p></details>
+       {unpricedComponents.length>0&&<RadioLotBomTable0550 components={unpricedComponents} caption={'ขอบเขตที่ไม่มีราคาแยก · '+item}/>}
+       <details><summary>{extra.target?'ขอบเขตตามใบ MGW · Location ที่แก้ไข':'ข้อความต้นฉบับ / ขอบเขต'}</summary><p className="p55-supplier-verbatim">{extra.target&&'Location: '+extra.sourceSite+'\n'}{unpricedDetail}</p></details>
        {optionItem&&<MgwRadioTagEvidence0550 item={optionItem}/>}</td>
-      <td>—</td><td>{extra.site}</td><td>{extra.sourceSite}</td><td>—</td><td>—</td><td>{extra.price}</td>
+      <td>{extra.target?'อ้างอิง · งานย้ายโดย GTPL ตามใบ MGW · MR Appendix 1.1 ยังไม่รับรองการหักจำนวน':'—'}</td><td>{extra.site}</td><td>{extra.sourceSite}{extra.target&&<small>แก้ Location ตามที่ยืนยัน</small>}</td><td>—</td><td>—</td><td>{extra.price}</td>
      </tr>}
     </React.Fragment>;
    })}</tbody>

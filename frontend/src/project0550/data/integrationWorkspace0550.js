@@ -13,6 +13,7 @@ import {evaluateServiceEquation,bidQuantityUnit0550} from "../serviceEquationRun
 import {DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "../workingPreviewStages0550";
 import {SUBVENDOR_REFERENCE_0550,subvendorRow0550,subvendorReferenceProblems0550,isSubvendorDeclarationSource0550} from "./subvendorReference0550";
 import {documentReadingUnits0550} from "./documentReadingUnits0550";
+import {offerWithoutRadioComponents0550} from "./radioLotComponents0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
 export const emptyIntegration0550=()=>({schema:INTEGRATION_SCHEMA_0550,requirements:[],proofs:[],activities:[],scopeReviews:[],particulars:[],avlChecks:[],deviations:[],documentReviews:[]});
 export const blankDocumentReview0550=id=>({id,systemTokens:[],expectedPages:null,reviewedPages:"",notesReviewed:false,colourReviewed:false,appendicesReviewed:false,categories:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
@@ -52,20 +53,21 @@ export function integrationTopologyBasis0550(data,token){
 export function integrationRecordBasis0550(data,collection,r){
  const w={...emptyIntegration0550(),...data.integrationWorkspace},reqs=integrationRequirements0550(data),req=collection==="requirements"?r:reqs.find(q=>q.id===r.requirementId);
  const ids=[...new Set([...(collection==="documentReviews"?[r.id]:[]),...(r.sourceIds||[]),...(r.approvalSourceIds||[]),...(r.references||[]).map(x=>x.sourceId),...(req?.sourceIds||[]),...(req?.supplierSourceIds||[]),...(req?.tagBindings||[]).map(b=>b.sourceId)])];
- const common={record:clean(r),requirement:clean(req),sources:ids.map(id=>sourcesFor(data,[id])[0]||{id,missing:true}),offers:[...new Set([...(req?.offerIds||[]),...(req?.tagBindings||[]).flatMap(b=>b.offerIds)])].map(id=>data.offers.find(o=>o.id===id)||{id,missing:true}),lines:(req?.workLineIds||[]).map(id=>lineBasis(data.lines.find(l=>l.id===id))||{id,missing:true})};
+ const pricedOffer=id=>offerWithoutRadioComponents0550(data.offers.find(o=>o.id===id))||{id,missing:true};
+ const common={record:clean(r),requirement:clean(req),sources:ids.map(id=>sourcesFor(data,[id])[0]||{id,missing:true}),offers:[...new Set([...(req?.offerIds||[]),...(req?.tagBindings||[]).flatMap(b=>b.offerIds)])].map(pricedOffer),lines:(req?.workLineIds||[]).map(id=>lineBasis(data.lines.find(l=>l.id===id))||{id,missing:true})};
  if(req?.tagBindings?.length)common.tagDocuments=[...new Set(req.tagBindings.flatMap(b=>b.vdrlIds))].map(id=>data.bidVolumes?.vdrl?.find(v=>v.id===id)||{id,missing:true});
  if(req)common.topology=integrationTopologyBasis0550(data,req.systemToken);
  if(req&&ceragonR11RequirementSite0550(req)&&ceragonR11Selected0550(data)){
   common.dmrDts=ceragonR11Dts0550(data);
-  common.dmrOffer=data.offers.find(o=>o.id===CERAGON_R11_0550)||null;
+  common.dmrOffer=offerWithoutRadioComponents0550(data.offers.find(o=>o.id===CERAGON_R11_0550));
  }
  if(collection==="proofs")common.calculation=data.calculations.find(c=>c.id===r.calculationId)||null;
  if(req&&collection!=="particulars")common.particulars=w.particulars.filter(p=>particularApplies0550(p,req)).map(p=>({record:p,sources:p.references.map(ref=>sourcesFor(data,[ref.sourceId])[0]||{id:ref.sourceId,missing:true})}));
  if(collection==="avlChecks"){
-  common.offer=data.offers.find(o=>o.id===r.offerId)||null;
+  common.offer=offerWithoutRadioComponents0550(data.offers.find(o=>o.id===r.offerId));
   if(r.vendorListRowId)common.vendorDeclaration={source:SUBVENDOR_REFERENCE_0550.source,row:subvendorRow0550(r.vendorListRowId)};
  }
- if(collection==="deviations"){common.avl=w.avlChecks.find(a=>a.id===r.avlCheckId)||null;common.proposedOffers=r.offerIds.map(id=>data.offers.find(o=>o.id===id)||{id,missing:true});}
+ if(collection==="deviations"){common.avl=w.avlChecks.find(a=>a.id===r.avlCheckId)||null;common.proposedOffers=r.offerIds.map(pricedOffer);}
  if(collection==="requirements"){
   common.proofs=w.proofs.filter(p=>p.requirementId===r.id).map(p=>({...p,calculation:data.calculations.find(c=>c.id===p.calculationId)||null}));
   common.activities=w.activities.filter(a=>a.requirementId===r.id).map(a=>({...a,line:lineBasis(data.lines.find(l=>l.id===a.workLineId)),calculation:data.calculations.find(c=>c.id===a.calculationId)||null}));

@@ -1,5 +1,11 @@
 Latest training plan: [FAT and training in Thailand, OJT in Myanmar, and Punch List](20261113_TRAINING_BUDGET_C7_REV01.md). Rev01 covers one customer training cohort in Thailand and six Myanmar OJT blocks. Use the existing Working cost owners to reconcile the draft before updating D or C7.
 
+Latest inspection estimate. [A1 S/N 2 and 11.D](20261113_A1_INSPECTION_BUDGET.md) use the same B4 Working owners for the Thailand three-phase test campaign across 19 systems. Customer price USD 105,175.82 per lot.
+
+Latest C8 form: [purchaser call-off total](20261113_C8_SINGLE_FORM.md). The customer draft shows one form and one total from the complete Working basis. SI diagnostics retain the supporting rows.
+
+Latest CCTV estimate: [Goods Only / EXW budget](20261113_CCTV_EXW_BUDGET.md). The estimate prices OEM SAT travel, APF/ACP recording, VMS entitlements and the Yangon-to-site responsibility scenario. The Excel and Git checkpoint record the draft calculation.
+
 Latest PAGA display: [Appendix 1.4 supplier cost detail](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--appendix-14-supplier-cost-detail). The 11.C1 Working Preview shows original EUR costs directly below the PAGA package and identifies the revision selected in A1-05.
 
 Latest FOC and Cables update: [LAY/PHI pricing and CDL-024](20261112_VENDOR_DIRECT_WORKING_PRICING.md#13-november--focbulk-lay-budget). Appendix 1.8 uses existing MR Working owners, including CAT6A under A1-01. The pipeline physical installation is an A2 draft. Volume I shows shared-scope estimates for reconciliation against the project owners.

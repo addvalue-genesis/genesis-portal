@@ -94,6 +94,53 @@ try{
  assert.equal(applyTraining(manualAllocation),manualAllocation);
  console.log('PASS Training Rev01: Thailand A1, Myanmar OJT C7, existing owner replacement, no duplicate travel, protected edits and draft rate rounding.');
  const focDate='2026-11-13';
+ const {prepareInspectionBudget0550,prepareLegacyInspectionBudget0550}=require(root+'/project0550/data/inspectionBudget0550.js');
+ const {prepareTsiActivityBudget0550}=require(root+'/project0550/data/tsiActivityBudget0550.js');
+ const {a1InspectionRows0550,A1InspectionBreakdown0550}=require(root+'/project0550/A1InspectionBreakdown0550.jsx');
+ const {scheduleRollup0550}=require(root+'/project0550/data/scheduleRollup0550.js');
+ const {sumMoney0550}=require(root+'/project0550/data/money0550.js');
+ const inspectionSeed=prepareTsiActivityBudget0550(focMr.importMrWorkingBasis0550({
+  ...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),fx:{thbPerUSD:31.5,thbPerEUR:38.0127,source:'Synthetic fixed FX',date:focDate},
+  repositoryBasisImport:{version:'SYNTHETIC',snapshotId:D.DATA_LAYER_META.datasetId,preparedOn:focDate,fxInherited:false},
+  mgwDetailPricingImport:{version:'SYNTHETIC',date:focDate,importedLineIds:[],conflicts:[],decision:Q.MGW_SUPERSEDED_0550},
+ },D.COMMERCIAL_POLICY,focDate),D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
+ const prepareInspection=input=>prepareInspectionBudget0550(input,D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
+ const legacyInspection=prepareLegacyInspectionBudget0550(inspectionSeed,D.COMMERCIAL_POLICY,D.CORE_TEAM,focDate);
+ const inspectionDraft=prepareInspection(inspectionSeed);
+ validate(inspectionDraft);
+ assert.equal(prepareInspection(inspectionDraft),inspectionDraft);
+ const inspectionIntegration=I.deriveIntegration0550(inspectionDraft,D.SYSTEMS,focDate);
+ const inspectionModel={...W.deriveBidWorkspace(inspectionDraft,tokens,focDate,inspectionIntegration),integration:inspectionIntegration};
+ const inspectionView=releaseScheduleDraftView0550(inspectionDraft,inspectionModel,D.SYSTEMS,focDate);
+ const inspectionRows=a1InspectionRows0550(inspectionView);
+ assert.deepEqual(scheduleRollup0550(inspectionRows),{
+  knownUSD:105175.82,totalUSD:105175.82,priced:14,open:0,count:14,openIds:[],
+ });
+ const inspectionWorking=inspectionModel.provisional.selected.filter(l=>inspectionRows.some(b=>b.lineId===l.id));
+ assert.equal(sumMoney0550(inspectionWorking.map(l=>l.customerUSD)),105175.82);
+ assert.equal(sumMoney0550(inspectionWorking.map(l=>l.costTHB)),1394450);
+ assert(Math.abs(sumMoney0550(inspectionWorking.map(l=>l.workingSellTHB))-2995145.91)<0.04);
+ assert(inspectionRows.every(b=>b.status==='DRAFT'&&b.line.customerRowCode==='B4'));
+ assert(N.nativeSchedule0550(inspectionView,'A1').html.includes('105,175.82'));
+ assert(require('react-dom/server').renderToStaticMarkup(require('react').createElement(A1InspectionBreakdown0550,
+  {view:inspectionView,currency:'USD'})).includes('105,175.82'));
+ assert.equal(inspectionView.ready,false);
+ const idieLocal='LINE-IDIE-QO26169-LOCAL-FAT-DAY';
+ const migratedInspection=prepareInspection(legacyInspection);
+ validate(migratedInspection);
+ assert.equal(prepareInspection(migratedInspection),migratedInspection);
+ const migratedView=releaseScheduleDraftView0550(migratedInspection,
+  W.deriveBidWorkspace(migratedInspection,tokens,focDate),D.SYSTEMS,focDate);
+ assert.equal(scheduleRollup0550(a1InspectionRows0550(migratedView)).totalUSD,105175.82);
+ assert.equal(migratedInspection.lines.find(l=>l.id===idieLocal).selected,false);
+ assert(!migratedInspection.bidVolumes.bindings.some(b=>b.id===idieLocal));
+ assert.equal(migratedInspection.lines.find(l=>l.id==='LINE-BID-INSPECTION-0550-MGW').selected,false);
+ const authoredInspection={...legacyInspection,lines:legacyInspection.lines.map(l=>l.id===idieLocal?{...l,quantity:3}:l)};
+ assert.equal(prepareInspection(authoredInspection),authoredInspection,'An authored overlapping owner must be reconciled first');
+ const removedInspection={...inspectionDraft,lines:inspectionDraft.lines.filter(l=>l.id!=='LINE-BID-INSPECTION-0550-TH-TOOLS'),
+  bidVolumes:{...inspectionDraft.bidVolumes,bindings:inspectionDraft.bidVolumes.bindings.filter(b=>b.id!=='LINE-BID-INSPECTION-0550-TH-TOOLS')}};
+ assert.equal(prepareInspection(removedInspection),removedInspection,'Deleted Working estimate must not return');
+ console.log('PASS Thailand iFAT, Pre-FAT and Integrated FAT: 14 unique Working owners and USD 105,175.82 in native A1 S/N 2 and 11.D.');
  const focSeed=G.prepareMgwDetailPricing0550(
   M.importMgwVendorBasis0550(focMr.importMrWorkingBasis0550(W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),D.COMMERCIAL_POLICY,focDate),focDate),
   D.COMMERCIAL_POLICY,focDate);
@@ -151,6 +198,8 @@ try{
  assert.equal(revised.offers.find(o=>o.id===apl01.id).quoteEvidence.quotedQuantity,2800);
  assert.equal(lineById(revised,option).manualCost,186050);
  assert.equal(lineById(revised,'REQ-MR-B1-18-APF-18').offerId,held.id);
+ assert(originalFoc.mgwDetailPricingImport.conflicts.includes(Q.MGW_APF_RG59_OVERLAP_0550));
+ assert(!revised.mgwDetailPricingImport.conflicts.includes(Q.MGW_APF_RG59_OVERLAP_0550));
  assert.equal(revised.lines.filter(l=>l.offerId===apl01.id&&l.selected).length,1);
  const revisedModel=W.deriveBidWorkspace(revised,tokens,focDate);
  const revisedView=releaseScheduleDraftView0550(revised,revisedModel,D.SYSTEMS,focDate);

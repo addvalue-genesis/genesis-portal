@@ -1,8 +1,8 @@
 import {PagaQuoteScope0550} from './PagaQuoteScope0550';
 import {chevalierPbxSource0550} from './data/chevalierPbxQuote0550';
-import {MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
+import {MGW_GTPL_SOURCE_TARGET_0550,MgwCurrentQuote0550} from "./MgwCurrentQuote0550";
 import {VENDOR_VOLUME_TAGS_0550,VENDOR_OFFER_TAG_FIELDS_0550,VENDOR_PHYSICAL_TAG_FIELDS_0550,offerLinkedSections0550,offerSourceSections0550} from './data/vendorBidTags0550';
-import {mgwFocSupplyOffer0550} from './data/mgwQuoteSelection0550';
+import {MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550,mgwAeroFixedDraftUnit0550,mgwFocSupplyOffer0550,mgwRadioSourceModel0550,mgwRadioSourceRow0550} from './data/mgwQuoteSelection0550';
 import {scheduleAllocationPlan0550} from './data/bidVolumeWorkingPreview0550';
 import {mgwCurrentMr0550,mgwCurrentOffer0550,mgwRadioDtrsOffer0550} from "./data/mgwQuoteSelection0550";
 import {CERAGON_R11_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './data/ceragonSelection0550';
@@ -17,6 +17,7 @@ import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
 import {SupplierItemSourceText0550,SupplierQuoteBoq0550,SupplierTowerBom0550,SupplierPagaBom0550} from './SupplierItemSourceText0550';
+import {RadioLotBomTable0550} from './RadioLotBom0550';
 import {supplierItemLabel0550,supplierQuotedSection0550} from './data/supplierCostProjection0550';
 import {requirementSupplierOfferIds0550} from './data/mrSupplierLinks0550';
 import {QUOTE_EXTENSION_DAYS_0550,quoteValidity0550} from './data/quoteValidity0550';
@@ -153,7 +154,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
  useEffect(()=>{
   if(!navigationTarget)return;
   const targetOffer=entries.find(({offer})=>navigationTarget==='bid.vendor.offer.'+offer.id);
-  if(targetOffer)setSectionFilter('');
+  if(targetOffer||navigationTarget===MGW_GTPL_SOURCE_TARGET_0550.id)setSectionFilter('');
   if(targetOffer||navigationTarget===archivedKey||entries.some(({offer})=>navigationTarget==='bid.vendor.'+offer.vendorId)||
    navigationTarget==='bid.vendor.'+archived?.vendorId||navigationTarget==='bid.vendor.'+mgwVendorId)setMode('company');
  },[entries,archivedKey,archived,mgwVendorId,navigationTarget]);
@@ -163,6 +164,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow,towerScope=towerOfferScope0550(o),commercial=e?.commercialTotals;
   const validity=quoteValidity0550(o,reviewDate);
   const sourceSection=supplierQuotedSection0550(data,o);
+  const radioSource=mgwRadioSourceRow0550(o),radioModel=mgwRadioSourceModel0550(radioSource);
   const atom=o.atomicLines?.[0];
   const equipment=o.bidTags?.lineClass?.includes('EQUIP');
   const netRate=atom?null:vendorQuoteNetUnitRate0550(o,packageQuotes.get(s?.parentOfferId));
@@ -172,12 +174,16 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   const allocated=entry.allocatedWorking.filter(u=>u.current&&activeSupply0550(u.line)),stale=entry.allocatedWorking.filter(u=>!u.current);
   const sourceQty=mgwRadioDtrsOffer0550(o)&&e.classification==='OPTION'?'TBD':e?.quotedQuantity??s?.quantity??r?.quantity;
   const sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
+  const draftUnit=mgwAeroFixedDraftUnit0550(o);
   const usageSystems=entry.systemTokens.filter(token=>!entry.sourceSystemTokens.includes(token));
   const mappedRacks=[...new Set((requirementsByOffer.get(o.id)||[]).flatMap(r=>mappedCabinetTags0550(r,{offerId:o.id})))];
   const draftRack=entry.location?.requirements.map(r=>draftCabinetTag0550(r.id)).find(Boolean);
   const rackLabel=cabinetTagLabel0550(mappedRacks,draftRack);
-  return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
-   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/><small>{o.brand}</small>
+  const lotBom=o.components?.length?<tr className="p55-radio-lot-bom-row" data-radio-lot-bom={o.id}><td colSpan={6}>
+   <RadioLotBomTable0550 components={o.components} caption={'BOM ต่อชุด · '+supplierItemLabel0550(o)} sourceBrand={radioSource?.brand} sourceModel={radioModel}/>
+  </td></tr>:null;
+  return <React.Fragment key={o.id}><tr data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
+   <td><strong>{s?.itemCode&&<small>Item {s.itemCode}</small>}{supplierItemLabel0550(o)}</strong>{sourceSection?.part&&<small>P/N {sourceSection.part}</small>}<small>{[o.brand,radioModel].filter(Boolean).join(' · ')}</small><SupplierItemSourceText0550 offer={o} data={data} sourceSection={sourceSection}/>
     <small>ขอบเขตใบเสนอราคา: {mgwProjectWideService0550(o)?'COMMON · ค่าแรงระดับโครงการ / B1':entry.sourceSystemTokens.join(' / ')||'ยังไม่ระบุระบบ'}</small>
     <OfferLocation location={entry.location} onNavigate={onNavigate}/>
     <small>Volume I · {sectionsByOffer.get(o.id).map(tag=>'11.'+tag).join(' · ')||'OPEN'}</small>
@@ -198,7 +204,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
      <p>{o.sourceRef}</p>
     </details>
    </td>
-   <td>{entry.referenceOnly?<>{entry.working.map(l=>(l.quantity??'OPEN')+' '+l.unit).join(' / ')||'Working basis'}<small>จำนวนที่ใช้ใน Working</small></>:<>{sourceQty===undefined?'ไม่ระบุ':sourceQty} {sourceUnit||'หน่วยรอยืนยัน'}{e&&<small>จำนวนอ้างอิงใน Quote</small>}{r&&<small>{r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป':'จำนวนต้นฉบับ ไม่แทนจำนวน MR'}</small>}</>}</td>
+   <td>{entry.referenceOnly?<>{entry.working.map(l=>(l.quantity??'OPEN')+' '+l.unit).join(' / ')||'Working basis'}<small>จำนวนที่ใช้ใน Working</small></>:<>{sourceQty===undefined?'ไม่ระบุ':sourceQty} {sourceUnit||'หน่วยรอยืนยัน'}{e&&<small>จำนวนอ้างอิงใน Quote</small>}{r&&<small>{r.kind==='COVER_ONLY'?'ยอดเหมาหน้าสรุป':'จำนวนต้นฉบับ ไม่แทนจำนวน MR'}</small>}</>}{draftUnit===o.unit&&<small>{MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550}</small>}</td>
    <td><strong>{amount(e?e.quotedUnitCost:o.unitCost,e?.quotedCurrency||o.currency)}</strong><small>/ {e?.quotedUnit||o.unit}</small>{entry.referenceOnly&&<small>ฐาน Working เดิมรวมหลายใบเสนอราคา · ดูต้นฉบับแยกฉบับ</small>}{e&&<><small>{e.rateBasis}</small>{(o.unitCost!==e.quotedUnitCost||o.currency!==e.quotedCurrency||o.unit!==e.quotedUnit)&&<small>เรตที่บันทึกไว้ {amount(o.unitCost,o.currency)} / {o.unit}</small>}</>}
     {netRate!==null&&<small>เรตสุทธิอ้างอิง {netRate.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:4})} {e.quotedCurrency} / {e.quotedUnit} · {s.discountable?'ใช้ส่วนลด':'ไม่อยู่ในฐานส่วนลด'}</small>}
     {e?.classification==='OPTION'&&<small>{selectedR11&&o.id===CERAGON_R11_0550?'OPTION ในใบต้นฉบับ · เลือกใช้ 1 Lot ใน Working':'OPTION · ยังไม่รวมในฐานโดยอัตโนมัติ'}</small>}
@@ -218,7 +224,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
     {onNavigate&&requirementsByOffer.has(o.id)&&<details><summary>SI Mapping · {requirementsByOffer.get(o.id).length} ข้อ</summary>{requirementsByOffer.get(o.id).map(r=><div key={r.id}><button type="button" onClick={()=>onNavigate('bid.working-preview.requirement.'+r.id)}>{r.site? r.site+' · ':''}{r.title||r.id}</button></div>)}</details>}
     {onNavigate&&[...new Map([...selected,...allocated.map(u=>u.line),...referenceSelected].map(line=>[line.id,line])).values()].map(line=><div key={line.id}><button type="button" onClick={()=>onNavigate('bid.budget.working.line.'+line.id)}>10.2 · {line.wbs} · {line.description}</button></div>)}
    </td>
-  </tr>;
+  </tr>{lotBom}</React.Fragment>;
  };
  const renderRows=quote=><div className="p55-table-wrap"><table className="p55-table" aria-label={'Vendor costs '+quote.title}><thead><tr><th>รายการ / ระบบ</th><th>จำนวน / หน่วยต้นฉบับ</th><th>ต้นทุน / หน่วยเรต<br/>Unit Price ต้นฉบับ</th><th>Total Price ต้นฉบับ</th><th>วันที่ / เงื่อนไข</th><th>Offer ID / การใช้ใน Working</th></tr></thead>
   {rowSections.map(([type,label])=>{
@@ -270,6 +276,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
     {[...VENDOR_VOLUME_TAGS_0550,'M','P'].map(tag=><option key={tag} value={tag}>11.{tag}</option>)}
    </select></label>
    <span>{entries.length} Offer IDs · ต้นทุนตามสกุล/หน่วยต้นฉบับ</span>
+   {onNavigate&&<button type="button" onClick={()=>onNavigate(MGW_GTPL_SOURCE_TARGET_0550.id)}>MGW · งานย้ายวิทยุ GTPL</button>}
   </div>
   {sectionFilter&&<p>แสดง Item ที่มี TAG 11.{sectionFilter} · ยอดใบเสนอราคาแสดงเต็มฉบับ</p>}
   <p>แต่ละ Offer อยู่ในกลุ่มเดียวตามขอบเขตต้นฉบับ · งานหลายระบบอยู่ในกลุ่มงานร่วม · แยก Base, Option และรายการอ้างอิง · ระบบที่ใช้ Offer ใน Mapping / Working ดูได้ในแต่ละแถว</p>
@@ -282,6 +289,7 @@ export function VendorOfferGroups0550({data,model,reviewDate,onEdit,onNavigate,n
   </>}
   {groups.map(g=><details key={mode+g.key} className="p55-vnd-group" data-vnd-group={g.key} data-component-key={mode==='company'?'bid.vendor.'+g.key:undefined} style={bidOwnerStyle(g.system)}>
    <summary><Toggle/>{g.title} · {new Set(g.children.flatMap(c=>c.quotes.filter(q=>!q.referenceOnly).map(q=>q.key))).size} ใบเสนอราคา · {g.offerIds.size} Offer IDs{mode==='company'&&<> {' '}<ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.'+g.key}/></>}</summary>
+   {mode==='system'&&g.key==='TEL-RADIO-DTRS'&&onNavigate&&<button type="button" onClick={()=>onNavigate(MGW_GTPL_SOURCE_TARGET_0550.id)}>เปิดขอบเขตงานย้าย GTPL ตามใบ MGW</button>}
    {mode==='company'&&<>
     {g.key===mgwVendorId&&<MgwCurrentQuote0550 data={data} showRadioSource sectionFilter={sectionFilter}/>}
     {g.key==='LEGACY-VENDOR-INDUSTRONIC'&&<PagaQuoteScope0550 data={data} section="vendor" onNavigate={onNavigate}/>}

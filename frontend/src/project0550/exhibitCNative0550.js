@@ -10,7 +10,7 @@ import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
 import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
-import {c8Country0550,c8Revision0550,c8Unit0550} from './data/c8Calloff0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -18,8 +18,22 @@ const escape=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const number=v=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
 const value=v=>v===null||v===undefined||v===''?'OPEN':String(v);
 const sum=rows=>sumMoney0550(rows.map(b=>b.amount));
-const shownSum=(view,rows)=>view.workingPreview?scheduleRollup0550(rows).knownUSD:sum(rows);
-const subtotalNote=(view,rows)=>view.workingPreview?rollupNote0550(scheduleRollup0550(rows)):'';
+const issued=view=>view.customerIssue===true;
+const shownSum=(view,rows)=>view.workingPreview&&!issued(view)?scheduleRollup0550(rows).knownUSD:sum(rows);
+const subtotalNote=(view,rows)=>view.workingPreview&&!issued(view)?rollupNote0550(scheduleRollup0550(rows)):'';
+const moneyText=(view,amount)=>issued(view)?(Number.isFinite(amount)?number(amount):'TBA'):number(amount);
+const shown=(view,v)=>issued(view)?(v===null||v===undefined||v===''?'':String(v)):value(v);
+const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(String(text||''));
+const customerRemarkText=rows=>{
+ const notes=[];
+ for(const b of rows){
+  const raw=String(b.line?.customerRemark||b.customerRemark||'').trim();
+  const text=cleanCustomerText0550(raw);
+  if(text&&!internalRemark(text)&&!notes.includes(text))notes.push(text);
+ }
+ return notes.join('; ');
+};
+const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
 const sparePriceNote=(rows,currency)=>{
  const subtotal=scheduleRollup0550(rows);
  const status=subtotal.open?'; '+subtotal.priced+'/'+subtotal.count+' priced; '+subtotal.open+' OPEN':'';
@@ -36,10 +50,6 @@ const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',
 const role=b=>aliases[normalize(b.summary)]||normalize(b.summary);
 export const a1SummarySlot0550=b=>b.schedule==='C2'?5:b.schedule==='C5'?7:b.schedule==='C7'?8:b.schedule==='C8'?9:({GOODS:2,INSPECTION:3,PACKING:4,VENDOR_DOCUMENTS:10,OTHER:11}[role(b)]);
 const shared=(rows,key)=>{const values=[...new Set(rows.map(b=>b[key]||''))];return values.length===1&&values[0]?values[0]:'OPEN';};
-const issued=view=>view.customerIssue===true;
-const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
-const internalRemark=text=>/\bOPEN\b|Working owner|Working draft|Draft budget|KNOWN SUBTOTAL|allocation pending|PROJECT\s*·|owner ledger|NOT FOR SUBMISSION|CIF\/FOB pending|Customer delivery term|priced items|priced;|11\.[A-Z0-9]|รอตรวจขอบเขต|อ้างอิงชุด/i.test(String(text||''));
-const customerRemarkText=rows=>{const notes=[];for(const b of rows){const raw=String(b.line?.customerRemark||b.customerRemark||'').trim();const text=cleanCustomerText0550(raw);if(text&&!internalRemark(text)&&!notes.includes(text))notes.push(text);}return notes.join('; ');};
 function resolveMainEquipmentTag(b,view){const raw=b.mainEquipment?.trim();const isGeneric=!raw||raw==='OPEN'||/^(PABX \/ IP Telephony|FOC and Cables|Equipment)$/i.test(raw);if(!isGeneric)return raw;const reqs=view.requirements||view.integrationWorkspace?.requirements||view.integration?.requirements||[];const req=reqs.find(r=>r.workLineIds?.includes(b.lineId)||r.id===b.line?.mrRequirementId||r.id==='REQDEF-'+b.line?.mrRequirementId);if(req){const tags=(req.tagBindings||[]).map(tb=>tb.tag).filter(Boolean);if(tags.length)return [...new Set(tags)].join(' / ');if(req.cabinetTag)return req.cabinetTag;}if(b.line?.cabinetTag)return b.line.cabinetTag;if(b.line?.physicalTag)return b.line.physicalTag;if(b.line?.tagRef&&!/^(APF|ACP|OFFSHORE|PROJECT)$/i.test(b.line.tagRef))return b.line.tagRef;return raw&&raw!=='OPEN'?raw:(issued(view)?'':'OPEN');}
 function words(n,currency='USD'){
  if(!Number.isFinite(n))return 'OPEN';
@@ -81,8 +91,68 @@ function fill(id,values,format,currency,draftPriceRows=[]){
   return escape(v).replace(/\n/g,format==='xml'?'</w:t><w:br/><w:t xml:space="preserve">':'<br>');
  });
 }
+function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
+ const base=id==='A1',part=base?'BASE':'OPTION';
+ const eligible=view.bindings.filter(b=>b.line&&b.treatment===part);
+ const title={2:'GOODS',3:'Inspection and tests',4:'Preservation and packing',5:'Commissioning spares',6:'Two-year operation spares',7:'Special tools',8:'Field service including training',9:'Facilities',10:'Vendor documents',11:'Others'};
+ for(const [r,bs] of groups){
+  const amount=sum(bs),note=customerRemarkText(bs);
+  if(!Number.isFinite(amount))issues.push((title[r]||'row '+r)+' price TBA');
+  if(base&&r===8){
+   const days=field(view,'C7','sitePeriodDays').trim();
+   set(v,r,3,'Day');set(v,r,4,days);set(v,r,5,days?days+' days included in Lump Sum':'');set(v,r,6,moneyText(view,amount));
+   if(note)set(v,r,7,note);
+   if(!days)issues.push('Field service period TBA');
+   continue;
+  }
+  if(base&&r===9){
+   const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;
+   set(v,r,3,'Day');set(v,r,4,qty??'');set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'TBA');set(v,r,6,moneyText(view,amount));
+   if(note)set(v,r,7,note);
+   continue;
+  }
+  if(base){
+   set(v,r,3,'Lot');set(v,r,4,1);set(v,r,5,moneyText(view,amount));set(v,r,6,moneyText(view,amount));
+   let remark=note;
+   if(r===11&&bs.some(b=>isLicensingCostLine0550(b.lineId)))remark=[remark,'Telecom import, radio and operating licence coordination (as applicable)'].filter(Boolean).join(' / ');
+   if(r===11&&bs.some(b=>b.line.a1OthersEstimate))remark=[remark,'Includes estimated freight, handling and insurance where applicable.'].filter(Boolean).join(' / ');
+   if(remark)set(v,r,7,remark);
+   continue;
+  }
+  if(r===6||r===7){
+   const names=bs.map(b=>customerDescription(b.line.description)).filter(name=>name&&!internalRemark(name));
+   if(names.length)set(v,r,1,[...new Set(names)].join('; '));
+  }
+  const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
+  if(r===4){set(v,r,3,'MD');set(v,r,4,diemQty??'');if(!diemQty)issues.push('DIEM quantity TBA');}
+  else{set(v,r,3,'Lot');set(v,r,4,1);}
+  const terms=new Set(bs.map(term));
+  let priced=Number.isFinite(amount)&&!terms.has('');
+  for(const [t,rate,total] of [['CIF',5,7],['FOB',6,8]]){
+   const selected=bs.filter(b=>term(b)===t);
+   if(!selected.length)continue;
+   const termAmount=sum(selected);
+   const rateAmount=r===4&&diemQty>0&&terms.size===1&&Number.isFinite(termAmount)?termAmount/diemQty:r===4?null:termAmount;
+   if(!Number.isFinite(termAmount)||!Number.isFinite(rateAmount)&&r===4)priced=false;
+   set(v,r,rate,moneyText(view,rateAmount));set(v,r,total,moneyText(view,termAmount));
+  }
+  if(!priced){issues.push((title[r]||'row '+r)+' price TBA');set(v,r,5,'TBA');set(v,r,6,'');set(v,r,7,'TBA');set(v,r,8,'');}
+  if(note)set(v,r,9,note);
+ }
+ if(base){
+  const complete=Number.isFinite(view.baseAssigned);
+  set(v,12,1,'In figures: '+(complete?currency+' '+number(view.baseAssigned):'TBA')+'\nIn Words: '+(complete?words(view.baseAssigned,currency):'TBA'));
+  if(!complete)issues.push('Lump sum total TBA until every base price is complete');
+ }else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
+  const bs=eligible.filter(b=>term(b)===t),total=sum(bs);
+  const pending=eligible.some(b=>!term(b))||!Number.isFinite(view.optionsAssigned);
+  const show=!pending&&bs.length&&Number.isFinite(total);
+  set(v,r,2,'In figures: '+(show?currency+' '+number(total):'TBA')+'\nIn Words: '+(show?words(total,currency):'TBA'));
+  if(!show)issues.push((t==='CIF'?'Overseas CIF':'China FOB')+' total TBA');
+ }
+}
 function nativePages(view,id,currency='USD',c2References){
- const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
+ const rows=id==='C1'&&view.workingPreview&&!issued(view)?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='',metadata)=>pages.push({id,values,detail,...metadata});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
  const prices=(v,r,start,b,draftPriceRows)=>{
@@ -90,14 +160,14 @@ function nativePages(view,id,currency='USD',c2References){
   if(!t&&issued(view)&&['C2','C3','C4','C5'].includes(id))t='CIF';
   const unitPrice=Number.isFinite(b.unitPrice)?b.unitPrice:b.line?.sellRate??b.line?.manualCost??b.line?.unitCost;
   const amount=Number.isFinite(b.amount)?b.amount:(Number.isFinite(unitPrice)&&Number.isFinite(b.quantity)?unitPrice*b.quantity:null);
-  set(v,r,start,t==='CIF'?number(unitPrice):'');set(v,r,start+1,t==='FOB'?number(unitPrice):'');
-  set(v,r,start+2,t==='CIF'?number(amount):'');set(v,r,start+3,t==='FOB'?number(amount):'');
+  set(v,r,start,t==='CIF'?moneyText(view,unitPrice):'');set(v,r,start+1,t==='FOB'?moneyText(view,unitPrice):'');
+  set(v,r,start+2,t==='CIF'?moneyText(view,amount):'');set(v,r,start+3,t==='FOB'?moneyText(view,amount):'');
   if(t)return;
   issues.push('Customer CIF/FOB term OPEN: '+b.lineId);
-  const show=view.workingPreview&&!b.nonAdditive&&Number.isFinite(amount);
+  const show=view.workingPreview&&!issued(view)&&!b.nonAdditive&&Number.isFinite(amount);
   if(show)draftPriceRows.push([r,start]);
-  set(v,r,start,show&&Number.isFinite(unitPrice)?currency+' '+number(unitPrice):'OPEN');
-  set(v,r,start+2,show?currency+' '+number(amount):'OPEN');
+  set(v,r,start,show&&Number.isFinite(unitPrice)?currency+' '+number(unitPrice):(issued(view)?'TBA':'OPEN'));
+  set(v,r,start+2,show?currency+' '+number(amount):(issued(view)?'TBA':'OPEN'));
  };
  if(id==='A'){add();return {pages,issues};}
  if(id==='A1'||id==='A2'){
@@ -105,9 +175,10 @@ function nativePages(view,id,currency='USD',c2References){
   const draftPriceRows=[];
   const slot=base?a1SummarySlot0550:b=>b.schedule==='C4'?3:b.schedule==='C7'?4:b.schedule==='C6'?5:b.schedule==='C3'?6:7;
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
+  if(issued(view)){fillOfficialSummary0550(view,id,currency,v,set,groups,issues);add(v,'');return {pages,issues};}
   for(const [r,bs] of groups){
    const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));const a1FormNote={2:'Breakdown in Form C-1',3:'Breakdown in 11.D',5:'Breakdown in Form C-2',7:'Breakdown in Form C-5',8:'Site Service Time shall be specified.',9:'Breakdown in Form C-8',10:'Breakdown in 11.E / 11.F',11:'Breakdown in 11.E / 11.F'}[r];if(a1FormNote&&!view.workingPreview){set(v,r,7,a1FormNote);}else if(a1FormNote&&view.workingPreview){const p=scheduleRollup0550(bs);const previewNote=subtotalNote(view,bs)?(p.priced+'/'+p.count+' priced'+(p.open?', '+p.open+' OPEN':'')):a1FormNote;set(v,r,7,a1FormNote+(previewNote!==a1FormNote?' · '+previewNote:''));}else{set(v,r,7,issued(view)?customerRemarkText(bs):cleanCustomerText0550(bs.map(b=>b.line.description).join('; ')));}}
+   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));const a1FormNote={2:'Breakdown in Form C-1',3:'Breakdown in 11.D',5:'Breakdown in Form C-2',7:'Breakdown in Form C-5',8:'Site Service Time shall be specified.',9:'Breakdown in Form C-8',10:'Breakdown in 11.E / 11.F',11:'Breakdown in 11.E / 11.F'}[r];if(a1FormNote&&!view.workingPreview){set(v,r,7,a1FormNote);}else if(a1FormNote&&view.workingPreview){const p=scheduleRollup0550(bs);const previewNote=subtotalNote(view,bs)?(p.priced+'/'+p.count+' priced'+(p.open?'; '+p.open+' OPEN':'')):a1FormNote;set(v,r,7,a1FormNote+(previewNote!==a1FormNote?' · '+previewNote:''));}else{set(v,r,7,issued(view)?customerRemarkText(bs):cleanCustomerText0550(bs.map(b=>b.line.description).join('; ')));}}
    else{
     if(r===6||r===7)set(v,r,1,issued(view)?customerRemarkText(bs):bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
@@ -141,6 +212,7 @@ function nativePages(view,id,currency='USD',c2References){
     set(v,r,9,notes.join(' / '));
    }
    if(base&&r===11&&view.workingPreview&&bs.some(b=>isLicensingCostLine0550(b.lineId)))v.A1_11_7+=' / Telecom import, radio and operating licence coordination (as applicable)';
+   if(base&&r===11&&view.workingPreview&&bs.some(b=>b.line.a1OthersEstimate))v.A1_11_7+=' / Includes estimated freight, handling and insurance where applicable.';
    if(base&&r===5&&view.workingPreview&&bs.some(b=>b.line.spareBudget))v.A1_5_7+=' / Draft budget allowance; OEM breakdown OPEN';
   }
   if(base&&view.workingPreview){
@@ -156,7 +228,7 @@ function nativePages(view,id,currency='USD',c2References){
    if(!groups.has(9)){
     const countryRates=view.scheduleRows('C8').some(c8Country0550);
     set(v,9,5,'');set(v,9,6,countryRates||view.tenderScheduleBasis?.facilitiesConflict?'See C8':'OPEN');
-    set(v,9,7,countryRates?'Call-off estimates by country. See C8.':view.tenderScheduleBasis?.facilitiesConflict?
+    set(v,9,7,countryRates?'Estimated Call-off Total. See C8.':view.tenderScheduleBasis?.facilitiesConflict?
      'Call-off form and any Base exceptions require confirmation. See C8.':'Confirm facilities scope, days and rates in C8.');
    }
    if(!groups.has(5)){
@@ -185,7 +257,7 @@ function nativePages(view,id,currency='USD',c2References){
  }
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,issued(view)?customerDescription(b.line.description):b.line.description);if(id==='C1'){const termText=b.deliveryTerm&&!/OPEN/i.test(b.deliveryTerm)?b.deliveryTerm:'';set(v,r,2,b.unit);set(v,r,3,shown(view,b.quantity));set(v,r,4,b.nonAdditive?'Included':moneyText(view,b.unitPrice));set(v,r,5,b.nonAdditive?'Included':moneyText(view,b.amount));set(v,r,6,issued(view)?(customerRemarkText([b])||termText):(b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN'));}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,shown(view,b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,shown(view,b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?(issued(view)?currency+' '+moneyText(view,shownSum(view,rows.filter(b=>!b.nonAdditive))):currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):'')):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
  }
  if(['C2','C3','C4'].includes(id)){
   // Draft from SI equation — not allocated to Schedule. Does not enter Volume I
@@ -215,17 +287,19 @@ function nativePages(view,id,currency='USD',c2References){
     });
     continue;
    }
+   if(issued(view)&&!(system.rows||[]).length)continue;
    let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=resolveMainEquipmentTag(b,view);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size&&!issued(view))groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
-    const v=blankValues(id),draftPriceRows=[];set(v,0,0,value(field(view,id,'vendorNameAddress')));set(v,0,1,value(field(view,'A','agreementNo')));set(v,0,2,main);set(v,0,3,shared(bs,'vendorEquipmentNo'));set(v,1,1,shared(bs,'referenceDrawings'));
+    const v=blankValues(id),draftPriceRows=[];set(v,0,0,shown(view,field(view,id,'vendorNameAddress')));set(v,0,1,shown(view,field(view,'A','agreementNo')));set(v,0,2,issued(view)&&main==='OPEN'?'':main);set(v,0,3,issued(view)?shown(view,shared(bs,'vendorEquipmentNo')==='OPEN'?'':shared(bs,'vendorEquipmentNo')):shared(bs,'vendorEquipmentNo'));set(v,1,1,issued(view)?shown(view,shared(bs,'referenceDrawings')==='OPEN'?'':shared(bs,'referenceDrawings')):shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
-     const r=i+4,description=issued(view)?customerDescription(id==='C2'?c2PartsDescription0550(b):b.line?.description||b.description):(id==='C2'&&view.workingPreview?c2PartsDescription0550(b):b.line.description);
-     [description,value(b.partNo),value(b.interchangeA),value(b.interchangeB),value(b.quantity),value(b.delivery),b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):'OPEN',value(b.origin),value(b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
+     const r=i+4,description=id==='C2'&&view.workingPreview?c2PartsDescription0550(b):(b.line?.description||b.description);
+     const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(issued(view)?'':'OPEN');
+     [issued(view)?customerDescription(description):description,shown(view,b.partNo),shown(view,b.interchangeA),shown(view,b.interchangeB),shown(view,b.quantity),shown(view,b.delivery),weight,shown(view,b.origin),shown(view,b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
      prices(v,r,9,b,draftPriceRows);
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
-    if(system.status==='AWAITING_B5')pendingPhases.forEach((phase,i)=>{
+    if(system.status==='AWAITING_B5'&&!issued(view))pendingPhases.forEach((phase,i)=>{
      set(v,i+4,0,phase.title+' spares');
      for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
     });
@@ -254,16 +328,16 @@ function nativePages(view,id,currency='USD',c2References){
    for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){
     const group=bs.slice(p*4,(p+1)*4);pageRows.push(...group);
     group.forEach((b,i)=>{
-     const name=issued(view)?customerDescription(b.line?.description||b.description):b.line.description+(view.workingPreview&&b.treatment==='OPTION'?' (Option / A2)':'');
-     set(v,start+i,2,name);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');
-     set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));
+     const name=b.line.description+(view.workingPreview&&!issued(view)&&b.treatment==='OPTION'?' (Option / A2)':'');
+     set(v,start+i,2,issued(view)?customerDescription(name):name);set(v,start+i,3,b.unit==='MH'?shown(view,b.quantity):(issued(view)?'':'OPEN'));
+     set(v,start+i,4,b.unit==='MH'?moneyText(view,b.unitPrice):(issued(view)?'TBA':'OPEN'));set(v,start+i,5,moneyText(view,b.amount));
     });
-    set(v,subtotal,1,number(shownSum(view,group)));
+    set(v,subtotal,1,issued(view)?(group.length?moneyText(view,shownSum(view,group)):''):number(shownSum(view,group)));
    }
-   set(v,11,1,unknown.length&&!view.workingPreview?'OPEN':number(shownSum(view,pageRows)));
+   set(v,11,1,issued(view)?(pageRows.length?moneyText(view,shownSum(view,pageRows)):(unknown.length?'TBA':'')):(unknown.length&&!view.workingPreview?'OPEN':number(shownSum(view,pageRows))));
    const siteDays=field(view,id,'sitePeriodDays'),trainingDays=field(view,id,'trainingPeriodDays');
-   set(v,1,6,view.workingPreview&&!siteDays.trim()?'Site service period to confirm':value(siteDays)+' days');
-   set(v,6,6,view.workingPreview&&!trainingDays.trim()?'Training period to confirm':value(trainingDays)+' days');
+   set(v,1,6,issued(view)?(siteDays.trim()?siteDays+' days':''):(view.workingPreview&&!siteDays.trim()?'Site service period to confirm':value(siteDays)+' days'));
+   set(v,6,6,issued(view)?(trainingDays.trim()?trainingDays+' days':''):(view.workingPreview&&!trainingDays.trim()?'Training period to confirm':value(trainingDays)+' days'));
    add(v,p?'Continuation '+(p+1):'',view.workingPreview?{pageNumber:p+1,pageCount:count}:undefined);
   }
  }
@@ -271,8 +345,17 @@ function nativePages(view,id,currency='USD',c2References){
   const rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
   if(view.workingPreview&&view.tenderScheduleBasis?.facilitiesConflict)issues.push(facilitiesFormCheck);
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
+  const total=c8CalloffTotal0550(view,rows);
+  if(total?.amount===null)issues.push('Estimated Call-off Total OPEN: reconcile quantities, prices and the C8 source revision in Working.');
+  const singleForm=c8SingleForm0550(view);
+  if(singleForm||total){
+   add({},'',{c8CalloffTotal:total||{amount:null,revision:''}});
+   if(singleForm)return {pages,issues};
+  }
+  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
+  if(total&&!facilities.length)return {pages,issues};
   const groups=new Map();
-  for(const b of rows){
+  for(const b of facilities){
    const country=c8Country0550(b)||'';
    if(!groups.has(country))groups.set(country,[]);
    groups.get(country).push(b);
@@ -286,8 +369,8 @@ function nativePages(view,id,currency='USD',c2References){
     const assigned=view.workingPreview&&!country?bs.filter(b=>b.treatment!=='CALLOFF'):bs;
     const qty=assigned.length&&assigned.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?assigned.reduce((n,b)=>n+b.quantity,0):null;
     set(v,r,3,country&&bs.length===1?value(bs[0].quantity)+' '+c8Unit0550(bs[0]):key==='AIRPORT'||!assigned.length?'':value(qty));
-    set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');
-    set(v,r,5,assigned.length?number(shownSum(view,assigned)):'');
+    set(v,r,4,bs.length===1?moneyText(view,bs[0].unitPrice):(issued(view)?'TBA':'OPEN'));
+    set(v,r,5,assigned.length?moneyText(view,shownSum(view,assigned)):'');
     set(v,r,6,issued(view)?(customerRemarkText(bs)||(country?(r===1?bs[0].basis:'Estimated call-off'):bs[0].treatment)):bs.map(b=>b.line.description+' / '+(country?(r===1?b.basis:'Estimated call-off'):b.treatment==='CALLOFF'&&view.workingPreview?'Call-off rate only':b.treatment)).join('; '));
     if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);
    }
@@ -295,16 +378,16 @@ function nativePages(view,id,currency='USD',c2References){
    const ratesOnly=view.workingPreview&&group.length&&!assigned.length;
    const amount=country?(new Set(assigned.map(role)).size===Object.keys(rowMap).length&&assigned.length===Object.keys(rowMap).length?
     scheduleRollup0550(assigned).totalUSD:null):shownSum(view,assigned);
-   set(v,6,1,ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(amount));
+   set(v,6,1,issued(view)?moneyText(view,amount):(ratesOnly?'Call-off rates only':assigned.some(b=>!rowMap[role(b)])?'OPEN':number(amount)));
    const detail=country?[country,...revisions,'Call-off estimate'].join(' · '):groups.size>1?'Other saved facilities':'';
    add(v,detail,{c8Country:country});
   }
  }
  return {pages,issues};
 }
-function paymentTable(rows,format){
+function scheduleTableMarkup(rows,format,widths=[1900,10700,1900]){
  if(format==='xml'){
-  const grid=[1900,10700,1900].map(width=>'<w:gridCol w:w="'+width+'"/>').join('');
+  const grid=widths.map(width=>'<w:gridCol w:w="'+width+'"/>').join('');
   const borders=['top','left','bottom','right','insideH','insideV'].map(edge=>'<w:'+edge+' w:val="single"/>').join('');
   const body=rows.map(row=>'<w:tr>'+row.map(cell=>{
    const paragraphs=cell.split('\n').map(line=>'<w:p><w:r><w:t xml:space="preserve">'+escape(line)+'</w:t></w:r></w:p>').join('');
@@ -316,24 +399,34 @@ function paymentTable(rows,format){
  const row=cells=>'<tr>'+cells.map(cell=>'<td>'+escape(cell).replace(/\n/g,'<br>')+'</td>').join('')+'</tr>';
  return '<table><thead>'+row(rows[0])+'</thead><tbody>'+rows.slice(1).map(row).join('')+'</tbody></table>';
 }
+function replaceScheduleTable(source,format,rows,widths){
+ return source.replace(format==='xml'?/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/:/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/,
+  ()=>scheduleTableMarkup(rows,format,widths));
+}
 function renderPage(view,page,format,currency='USD'){
  let result=fill(page.id,page.values,format,currency,page.draftPriceRows);
+ if(page.c8CalloffTotal){
+  const {amount}=page.c8CalloffTotal;
+  const price=amount===null?(issued(view)?'TBA':'OPEN'):currency+' '+number(amount);
+  result=replaceScheduleTable(result,format,[['Description / Scope of Supply','Unit','Total Price'],
+   [C8_TOTAL_DESCRIPTION_0550,'Lot',price]],[10300,1700,2500]);
+ }
  if(page.c8Country){
   const label=escape(page.detail);
   result=format==='xml'?'<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>'+label+'</w:t></w:r></w:p>'+result:
    '<p><strong>'+label+'</strong></p>'+result;
  }
- if(view.workingPreview&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
- if(view.workingPreview&&page.id==='C7'&&page.pageCount>1){
+ if(view.workingPreview&&!issued(view)&&page.id==='A2')result=result.replace('Contract Price for Base Scope','Contract Price for Optional Scope');
+ if(view.workingPreview&&!issued(view)&&page.id==='C7'&&page.pageCount>1){
   result=result.replace('TOTAL (Sub-total 1.0+2.0)',`Page ${page.pageNumber} of ${page.pageCount} subtotal`);
  }
  const payment=page.id==='B'&&paymentSchedule0550(view);
- if(payment){
+ if(payment&&!(issued(view)&&!payment.rows.length)){
   const rows=payment.rows.length?[['No.','Payment Terms','Percentage of Initial Contract Price for Base Scope of Supply'],...payment.rows,['Total','','100.00%']]:
    [['OPEN','Confirm the current tender payment schedule before issue.','']];
-  result=result.replace(format==='xml'?/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/:/<table(?:\s[^>]*)?>[\s\S]*?<\/table>/,()=>paymentTable(rows,format));
+  result=replaceScheduleTable(result,format,rows);
  }
- if(page.systemToken){
+ if(page.systemToken&&!issued(view)){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
   const label=escape(heading+(page.systemStatus==='DRAFT_FROM_EXISTING'?' · DRAFT — source costs for SI reference':
    page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
@@ -344,24 +437,31 @@ function renderPage(view,page,format,currency='USD'){
    const text=words(amount,currency).replace(/ only$/,'');
    return currency==='THB'?text:text.replace(/^United States Dollars /,'');
   };
-  if(view.workingPreview&&format==='xml'){
+  if((view.workingPreview||issued(view))&&format==='xml'){
    // Word splits two of the native blanks across adjacent runs.
    result=result.replace(/_{5,}(?:<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?<w:t\b[^>]*>_{5,})+/g,'_____');
   }
-  const wording=view.workingPreview?draftWords:amount=>words(amount,currency);
-  const vals=['OPEN','OPEN',number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
-  result=result.replace(/_{5,}/g,(match,offset)=>escape(vals[i++]||'OPEN')+
-   (view.workingPreview&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
-  if(view.workingPreview)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
-   .replace(/\b(OPEN)only\b/g,'$1 only');
+  if(issued(view)){
+   const base=view.baseAssigned,option=view.optionsAssigned,both=Number.isFinite(base)&&Number.isFinite(option)?sumMoney0550([base,option]):null;
+   const text=n=>Number.isFinite(n)?number(n):null,word=n=>Number.isFinite(n)?draftWords(n):null;
+   const vals=[text(both),word(both),text(base),word(base),text(option),word(option)];let i=0;
+   result=result.replace(/_{5,}/g,match=>{const next=vals[i++];return next==null?match:escape(next);});
+  }else{
+   const wording=view.workingPreview?draftWords:amount=>words(amount,currency);
+   const vals=['OPEN','OPEN',number(view.baseAssigned),wording(view.baseAssigned),number(view.optionsAssigned),wording(view.optionsAssigned)];let i=0;
+   result=result.replace(/_{5,}/g,(match,offset)=>escape(vals[i++]||'OPEN')+
+    (view.workingPreview&&format==='html'&&result.slice(offset+match.length).startsWith('only')?' ':''));
+   if(view.workingPreview)result=result.replace(/(OPEN|\d|[a-z])(<\/w:t><\/w:r><w:r\b[^>]*>(?:<w:rPr>(?:(?!<\/w:rPr>)[\s\S])*<\/w:rPr>)?)<w:t>only<\/w:t>/g,'$1$2<w:t xml:space="preserve"> only</w:t>')
+    .replace(/\b(OPEN)only\b/g,'$1 only');
+  }
  }
- if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
+ if(view.workingPreview&&!issued(view)&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
   const note='[1] Component quantities follow the MGW package basis stored in Working; MR reconciliation remains pending. Included components form part of their parent package amount and are not charged again.';
   if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>${escape(note)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
   else result+=`<p class="native-response">${escape(note)}</p>`;
  }
  let partialNote='';
- if(view.workingPreview){
+ if(view.workingPreview&&!issued(view)){
   if(page.id==='A'){
    const available=['BASE','OPTION'].map(treatment=>{
     const rollup=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===treatment));
@@ -404,7 +504,7 @@ function renderPage(view,page,format,currency='USD'){
    }
   }
   if(page.id==='C8'){
-   partialNote=subtotalNote(view,view.scheduleRows('C8').filter(b=>b.treatment!=='CALLOFF'))||partialNote;
+   if(!c8SingleForm0550(view))partialNote=subtotalNote(view,view.scheduleRows('C8').filter(b=>b.treatment!=='CALLOFF'))||partialNote;
    if(view.tenderScheduleBasis?.facilitiesConflict)partialNote=[partialNote,facilitiesFormCheck].filter(Boolean).join(' ');
   }
   const training=view.tenderScheduleBasis?.training;
@@ -430,20 +530,21 @@ function renderPage(view,page,format,currency='USD'){
    partialNote=[partialNote,`INDUSTRONIC SP2 lists ${view.pagaSpares.recommended.length} recommended PAGA spare lines. Reconcile with the included kit and the Option allowance before allocating a separate selling price.`].filter(Boolean).join(' ');
   }
   const pbxNote=view.chevalierPbxSupply&&chevalierPbxScheduleNote0550(view,page.id);
-  if(view.chevalierPbxSupply&&pbxNote&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
+  if(view.chevalierPbxSupply&&pbxNote&&!page.c8CalloffTotal&&(!page.systemToken||['TEL-PABX','TEL-IPP'].includes(page.systemToken))){
    partialNote=[partialNote,'IP Telephony and PABX. '+pbxNote].filter(Boolean).join(' ');
   }
  }
- if(page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
+ if(!issued(view)&&page.draftPriceRows?.length&&!['DRAFT_FROM_EXISTING','DRAFT_FROM_EQUATION'].includes(page.systemStatus))partialNote=[partialNote,'Prices spanning CIF and FOB are pending allocation.'+
   (page.id==='C2'&&page.priceRows?.some(b=>b.line.spareBudget)?' Draft budget allowance. OEM breakdown OPEN.':'')].filter(Boolean).join(' ');
- if(page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
+ if(!issued(view)&&page.spareRows?.length&&page.pendingPhases?.length)partialNote=[partialNote,'Awaiting Working B5: '+page.pendingPhases.map(phase=>phase.title).join(', ')+'.'].filter(Boolean).join(' ');
  if(page.c3OptionTotal&&!issued(view)){
   const label=escape((view.c2SystemToken?'Schedule C3 system subtotal (Option): ':'Schedule C3 total (A2 Option): ')+page.c3OptionTotal);
   if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
   else result+=`<p class="native-response"><strong>${label}</strong></p>`;
  }
- if(partialNote&&!issued(view)){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
- const response=view.getRecord('I.'+page.id).content;
+ if(page.c8CalloffTotal)partialNote=[C8_TOTAL_NOTE_0550,partialNote].filter(Boolean).join(' ');
+ if(partialNote&&(!issued(view)||page.c8CalloffTotal)){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
+ const response=issued(view)?'':view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');
  else if(response?.trim())result+=`<p class="native-response"><b>BIDDER response:</b> ${escape(response).replace(/\n/g,'<br>')}</p>`;
  return result;
@@ -451,10 +552,14 @@ function renderPage(view,page,format,currency='USD'){
 const logo='data:image/png;base64,'+template.binary['word/media/image1.png'];
 export const nativeFormCss0550=`.p55-native-paper{box-sizing:border-box;width:1120px;max-width:none;min-height:720px;background:white;color:#000;padding:28px 40px;margin:0 auto 24px;font:13px Arial,sans-serif;box-shadow:0 1px 8px #0002}.p55-native-paper *{box-sizing:border-box}.p55-native-paper header{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid black;margin-bottom:24px;font-size:11px}.p55-native-paper header img{width:100px;height:auto}.p55-native-paper h2{font:bold 15px Arial;text-align:center;color:#000;margin:18px 0 22px}.p55-native-paper p{margin:0;white-space:pre-wrap;line-height:1.2}.p55-native-paper>p{margin:10px 0}.p55-native-paper table{width:100%;border-collapse:collapse;table-layout:fixed;margin:0 0 14px;color:#000;font:12px Arial}.p55-native-paper td{border:1px solid #000;padding:3px 4px;vertical-align:middle;overflow-wrap:break-word;line-height:1.12;min-height:23px}.p55-native-paper tr{height:23px;break-inside:avoid}.p55-native-paper thead td{text-align:center;font-weight:bold;background:#fff}.p55-native-paper footer{display:flex;justify-content:space-between;border-top:1px solid #000;margin-top:24px;padding-top:4px;font:10px 'Times New Roman',serif}.p55-native-paper .native-status{font:10px Arial;text-align:right;margin:4px 0;color:#555}.p55-native-paper .native-response{margin-top:14px}.p55-native-scroll{max-width:100%;overflow:auto;background:#e8edf2;padding:18px 12px}.p55-native-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.p55-native-help{font-size:13px}.p55-native-issues{color:#8a4200}@media print{body{margin:0}.p55-native-paper{width:auto;min-height:0;box-shadow:none;margin:0;padding:0;break-before:page}.p55-native-paper:first-child{break-before:auto}.p55-native-paper table{font-size:10px}.p55-native-paper header img{width:85px}thead{display:table-header-group}@page{size:A4 landscape;margin:12mm}}`;
 export function nativeSchedule0550(view,id,currency='USD',c2References){
- if(id==='C1'&&isC1Appendix0550(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
+ if(id==='C1'&&isC1Appendix0550(view)&&!issued(view))return {html:c1AppendixHtml0550(view),issues:deriveC1Appendix0550(view).problems,pages:[{id:'C1',values:{},detail:'MR Appendix 1.1–1.8'}]};
  const {pages,issues}=nativePages(view,id,currency,c2References),label=view.outputLabel||'DRAFT — NOT FOR SUBMISSION';
  const sourceLabel=id==='B'&&paymentSchedule0550(view)?'Schedule B · Current tender':'Source page '+template.schedules[id].page+' of 18';
- const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${sourceLabel}${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
+ const agreement=field(view,'A','agreementNo')||(issued(view)?'':'OPEN');
+ const html=pages.map(page=>{
+  const status=issued(view)?'':`<p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>`;
+  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(agreement)}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${issued(view)?'Exhibit C - Commercial Terms':sourceLabel+(page.detail?' / '+escape(page.detail):'')}</span></footer></article>`;
+ }).join('');
  return {html,issues,pages};
 }
 export function nativeExhibitProblems0550(view,only){
@@ -473,22 +578,22 @@ export function nativeExhibitProblems0550(view,only){
   }
  }
  for(const [r,key] of [['FIELD_SERVICE','sitePeriodDays'],['TRAINING','trainingPeriodDays']])if((!only||only==='C7')&&view.scheduleRows('C7').some(b=>role(b)===r)&&!field(view,'C7',key).trim())problems.push('C7 / '+key+' OPEN');
- if((!only||only==='C1')&&isC1Appendix0550(view))problems.push(...deriveC1Appendix0550(view).problems.map(p=>'C1 / '+p));
+ if((!only||only==='C1')&&isC1Appendix0550(view)&&!issued(view))problems.push(...deriveC1Appendix0550(view).problems.map(p=>'C1 / '+p));
  return problems;
 }
 export function nativeExhibitHtml0550(view,only,includeCover=false){
  const ids=only?[only]:Object.keys(template.schedules);
- const cover=includeCover?`<article class="p55-native-paper"><h2>Volume I — Quotation</h2><p>${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p><p>${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}</p><h2>Power of Attorney / Undertaking</h2><p>${escape(view.getRecord('I.cover').content||'OPEN')}</p></article>`:'';
+ const cover=includeCover&&!issued(view)?`<article class="p55-native-paper"><h2>Volume I — Quotation</h2><p>${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p><p>${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}</p><h2>Power of Attorney / Undertaking</h2><p>${escape(view.getRecord('I.cover').content||'OPEN')}</p></article>`:'';
  const pbx=only||issued(view)?[]:chevalierPbxScheduleTrace0550(view);
  const appendix=pbx.length?`<article class="p55-native-paper"><h2>IP Telephony and PABX · Volume I draft trace</h2><table><thead><tr><th>Volume I</th><th>Draft status</th><th>Scope</th></tr></thead><tbody>${pbx.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')}</tbody></table></article>`:'';
- return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${appendix}</body></html>`;
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)&&!issued(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${appendix}</body></html>`;
 }
 export function buildNativeExhibitDocx0550(view,only){
  if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
  const ids=only?[only]:Object.keys(template.schedules);
  const trailingBreak=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/;
  const trailingParagraph=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<\/w:p>$/;
- const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
+ const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)&&!issued(view)
   ?c1AppendixWord0550(view):nativePages(view,id).pages.map((page,index)=>{
    const xml=renderPage(view,page,'xml');
    if(!only||!view.workingPreview)return xml;

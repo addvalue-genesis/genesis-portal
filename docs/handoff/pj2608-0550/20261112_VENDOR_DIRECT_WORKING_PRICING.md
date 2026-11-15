@@ -239,10 +239,17 @@ Windows workspace and bid issuance are separate from these checks.
 
 Working reuses the original Appendix 1.8 requirement IDs for the LAY/PHI
 allowances. The APL01 Working quantity is 5,600 m at the live BULK offer rate.
-The supplier's 2,800 m quantity and extension stay in 07.2. APF RG59 is a
-priced draft pending route reconciliation with the two different Entertainment
-coax descriptions. The AMS01 cable allowances use the live ABV01 BULK rates.
-CAT6A is allocated to A1-01 and displayed in Appendix 1.8.
+The supplier's 2,800 m quantity and extension stay in 07.2. PHI Rev.B1
+Table 7-9 and the APF and ACP LAY drawings support separate local FO scopes.
+Keep 5,060 m each on MR APF-02 and ACP-01. The shared APL02 trunk is
+budgeted once under FOC-WITH-PIPELINE. Keep the MGW Bulk item 1.18 allowance
+of 940 m RG59 on MR APF-18 (T6) in A1-13. Entertainment SPE-0012 and
+DTS-0011 specify satellite distribution coax (RG6/RG11 and RG6).
+MGW Entertainment RF400-75 and RF6 stay under Appendix 1.6. Working clears
+the old overlap flag once the RG59 allowance has its selected owner.
+Final route endpoints, terminations and procurement MTO remain open.
+The AMS01 cable allowances use the live ABV01 BULK rates. CAT6A is allocated
+to A1-01 and displayed in Appendix 1.8.
 
 CDL-024 physical pipeline installation uses C1-D03 once as an A2 draft,
 replacing the untouched generated estimate where applicable. An independently

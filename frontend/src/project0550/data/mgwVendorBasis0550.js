@@ -53,7 +53,14 @@ export function reconcileMgwWorkingScope0550(data){
 const rows=new Map(catalog.rows.map(r=>[r.id,r]));
 const descriptionOf=r=>r.section+" / "+r.site+" / "+r.description;
 const descriptionCounts=new Map();catalog.rows.forEach(r=>descriptionCounts.set(descriptionOf(r),(descriptionCounts.get(descriptionOf(r))||0)+1));
-export const mgwQuoteItem0550=offer=>rows.get(offer?.mgwQuoteLineId)||rows.get(offer?.id?.replace(/^OFFER-/,""));
+// Radio register offers are OFFER-MGW-Q26-063-RADIO-DTRS-RADIO-001. The catalogue row is MGW-Q26-063-RADIO-001.
+const radioBatchItem=/^OFFER-MGW-Q26-063-RADIO-DTRS-(RADIO-\d{3})$/;
+export const mgwQuoteItem0550=offer=>{
+ const byLine=rows.get(offer?.mgwQuoteLineId);
+ if(byLine)return byLine;
+ const id=typeof offer?.id==="string"?offer.id:"";
+ return rows.get(id.replace(/^OFFER-/,""))||rows.get("MGW-Q26-063-"+(radioBatchItem.exec(id)?.[1]||""));
+};
 export const mgwOffersFor0550=(data,systemToken,wbs="A")=>data.offers.filter(o=>{const r=mgwQuoteItem0550(o);return r&&!supplierOfferExcluded0550(data,o,systemToken)&&r.wbs[0]===wbs[0]&&(wbs==="A"?mgwOfferSystemTokens0550(o).includes(systemToken):r.wbs===wbs);});
 export function mgwOfferProblems0550(offer,line){
  if(mgwRadioDtrsOffer0550(offer)&&offer.quoteEvidence.quotedUnit==='Not stated'&&!offer.unitBasis?.trim())

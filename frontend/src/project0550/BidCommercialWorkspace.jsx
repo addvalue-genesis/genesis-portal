@@ -272,6 +272,8 @@ function WorkingHierarchy({model,integration,working,data,b5StartupAllowance,onE
  <MgwWorkingQuotes data={data} code={code} part={part} onEdit={onEdit} onNavigate={onNavigate}/>
  {part==='A'&&radioAppendix11Notices0550[code]&&<p className="p55-note">{radioAppendix11Notices0550[code]}</p>}
  {part==='A'&&code==='TEL-RADIO-DTRS'&&<p className="p55-note"><strong>RoIP · </strong>{radioAppendix11Notices0550['RoIP Dispatch Console']}</p>}
+ {part==='A'&&['TEL-RADIO-DTRS','TEL-RADIO-MARINE','TEL-RADIO-SSB'].includes(code)&&
+  <p className="p55-note">{radioAppendix11Notices0550['ACP Radio Console']}</p>}
  {part==='A'&&code==='COMMON'&&<p className="p55-note"><strong>Appendix 1.1 · RF feeder · </strong>{radioAppendix11Notices0550['Antenna Cables']}</p>}
  {code==='TEL-LAN'&&<LanCusStandards0550 data={data} onNavigate={onNavigate}/>}
  <button type="button" onClick={()=>onNew({systemToken:part==="A"?code:"COMMON",wbs:part==="A"?"A":code,...(code==='B5'?{customerRowCode:'B5'}:{})})}>เตรียมรายการใน {code}</button>

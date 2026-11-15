@@ -100,7 +100,7 @@ export const MGW_RADIO_002_SITE_NOTE_0550 = 'RADIO-002 maps to APF (MR-B1-11-APF
 export const MGW_RADIO_003_SITE_NOTE_0550 = 'RADIO-003 maps to APF (MR-B1-11-APF-03) per instruction of 12 Nov 2026. The quotation prints ACO.';
 export const MGW_RADIO_DTRS_QUOTED_SCOPE_0550 = 'Quoted equipment only. MR quantities, equipment interfaces and refreshed quotation remain open.';
 export const MGW_RADIO_DTRS_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026. '+MGW_RADIO_001_SITE_NOTE_0550+
- ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and GTPL relocation. Confirm APM (AMS01) unit and ABV01 supply.';
+ ' The APF lots cover the quoted equipment only. Confirm ACP supply. APF offers 96 handhelds vs MR 98, and 26 mobiles vs MR 21. Reconcile fixed radios, both licence layers and the scope of GTPL relocation from GRS#2 to APF. Confirm the RADIO-016 unit at AMS01 and ABV01 supply.';
 export const MGW_RADIO_MARINE_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
  ' RADIO-002 installation site is APF (MR-B1-11-APF-02), confirmed by the user on 12 Nov 2026. ACO is a typo on the quotation.'+
  ' The lot covers the quoted equipment only: two fixed marine radios, one antenna, one IP gateway and one power supply unit. Reconcile the quoted quantity (2 Lot) with the MR quantity and confirm the refreshed quotation.';
@@ -109,7 +109,8 @@ export const MGW_RADIO_SSB_OPEN_0550 = 'Q26-063 ver1.0 · original quote validit
 export const MGW_RADIO_AERO_OPEN_0550 = 'Q26-063 ver1.0 · original quote validity through 8 Nov 2026.'+
  ' RADIO-012 and RADIO-013 map to APF (MR-B1-11-APF-04). The lots cover the quoted fixed AM VHF telephone and portable airband radios only. Reconcile MR quantity, antennas, gateways and the refreshed quotation.';
 const bulkSections=[['APF',21],['ACP',20],['ABV01',12],['FOC-WITH-PIPELINE',9]];
-export const MGW_BULK_OPEN_0550='Cable supply rates only. Confirm take-off and route endpoints, reconcile APF Entertainment coax and the two 24-core site runs, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
+export const MGW_APF_RG59_OVERLAP_0550='REQ-MR-B1-18-APF-18 / current MGW Offer awaits Working reconciliation (verify RG59 route against Entertainment coax)';
+export const MGW_BULK_OPEN_0550='Cable supply rates only. The APF and ACP 24-core allowances cover separate local runs per PHI Table 7-9. APF RG59 is budgeted on Appendix 1.8 T6 and Entertainment coax on Appendix 1.6. Confirm final take-off and route endpoints, and complete the unpriced AMS01 and VTA scope. Commercial terms and installation remain open.';
 export const MGW_CURRENT_BATCHES_0550 = [MGW_CURRENT_BATCH_0550,MGW_MET_NDB_0550.batchId,MGW_CCTV_ENT_0550.batchId,MGW_BULK_0550.batchId,MGW_RADIO_DTRS_0550.batchId,MGW_RADIO_MARINE_0550.batchId,MGW_RADIO_SSB_0550.batchId,MGW_RADIO_AERO_0550.batchId,MGW_RADIO_REMAINING_0550.batchId];
 export const MGW_SECTION_SUBTOTAL_0550 = 'Quoted section subtotal USD: ';
 export const MGW_CCTV_ENT_SECTIONS_0550 = [
@@ -235,6 +236,14 @@ const radioSourceByOfferId=new Map(quote.rows.filter(row=>row.section==='RADIO')
  MGW_RADIO_DTRS_0550.prefix+row.id.slice('MGW-Q26-063-'.length),row,
 ]));
 export const mgwRadioSourceRow0550=offer=>mgwRadioDtrsOffer0550(offer)?radioSourceByOfferId.get(offer.id):undefined;
+export const mgwRadioSourceModel0550=row=>row?.detail?.match(/^Description:[ \t]*(?:\r?\n[ \t]*)?([^\r\n]+)/i)?.[1].trim();
+export function mgwAeroFixedDraftUnit0550(offer){
+ const row=mgwRadioSourceRow0550(offer);
+ if(row?.id==='MGW-Q26-063-RADIO-012'&&row.unit===null&&offer.quoteEvidence.quotedUnit==='Not stated'&&
+  offer.quoteEvidence.quotedQuantity===1&&!offer.unitBasis?.trim())return 'SET';
+ return null;
+}
+export const MGW_AERO_FIXED_DRAFT_UNIT_NOTE_0550='Working Draft · 1 SET = Jotron TR-910 พร้อมอุปกรณ์ตาม Comprising · ใบ MGW ไม่ระบุหน่วย';
 export function mgwRadioPrintedExtension0550(offer,line){
  const row=mgwRadioSourceRow0550(offer),e=offer?.quoteEvidence;
  return Boolean(row&&e.classification==='RATE'&&row.unit===null&&e.quotedUnit==='Not stated'&&

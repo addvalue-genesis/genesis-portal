@@ -96,7 +96,7 @@ for(const id of ['A','A1','A2','C5','C6','C7','C8']){
 assert(N.nativeExhibitHtml0550(dual,'A1').includes('USD 1,234.56'));
 assert(word.includes('<w:gridSpan w:val="2"/>'));assert(word.includes('<w:vMerge w:val="restart"/>'));
 // Guard exact historical v1 rendering against the pre-change a0d4f948 baseline.
-const legacy={proposal:{documentNo:'SYNTHETIC-V1',revision:'TEST'},outputLabel:'AUTHORIZED COPY / SYNTHETIC / 2026-11-03',bindings:[],scheduleRows:()=>[],getRecord:()=>({nativeFields:{},content:''}),baseAssigned:null,optionsAssigned:null};
+const legacy={proposal:{documentNo:'SYNTHETIC-V1',revision:'TEST'},outputLabel:'AUTHORIZED COPY / SYNTHETIC / 2026-11-03',nativeExhibitVersion:'exhibit-c-native-v1',bindings:[],scheduleRows:()=>[],getRecord:()=>({nativeFields:{},content:''}),baseAssigned:null,optionsAssigned:null};
 const hash=x=>require('node:crypto').createHash('sha256').update(x).digest('hex');
 assert.equal(hash(N.nativeExhibitHtml0550(legacy)),'c79d51d9455a4a9d08e6e3c1c89dba49113ad8eb73bc881f481fba1c23532629');
 assert.equal(hash(N.buildNativeExhibitDocx0550(legacy)),'483b6798186c84a26cd1100974b2e511f76a71ae17b04860d40bcb901ff3be3c');

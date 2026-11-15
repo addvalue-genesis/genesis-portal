@@ -38,33 +38,93 @@ const before=JSON.stringify(fixture),v=V.deriveBidVolumes0550(fixture,derive(fix
  assert.equal(saved.optionsAssigned,v.optionsAssigned);
  assert.equal(preview.scheduleRows('C8').length,20);
  assert.equal(saved.active.some(line=>line.id.startsWith('LINE-C8-CALLOFF-')),false);
+ const {scheduleTable0550}=require(root+'/project0550/exportBidVolumes0550.js');
+ const {scheduleViewTHB0550}=require(root+'/project0550/data/scheduleRollup0550.js');
+ const {C8_SINGLE_FORM_NATIVE_0550,C8_TOTAL_NATIVE_0550}=require(root+'/project0550/data/c8Calloff0550.js');
  const form=N.nativeSchedule0550(preview,'C8');
- const page=form.pages.find(page=>page.c8Country==='Myanmar');
- assert.equal(form.pages.length,4);
+ assert.equal(form.pages.length,1);
+ assert.deepEqual(form.pages[0].c8CalloffTotal,{amount:604,revision:'Rev03'});
+ assert.match(form.html,/Estimated Call-off Total/);
+ assert.match(form.html,/USD 604\.00/);
+ assert.match(form.html,/Excluded from Schedule A1 and Schedule A2 totals/);
+ assert.doesNotMatch(form.html,/Myanmar|Unit Price|Estimated Man-Days/);
+ assert.match(N.nativeSchedule0550(scheduleViewTHB0550(preview),'C8','THB').html,/THB [\d,]+\.\d{2}/);
+ assert.match(N.nativeExhibitHtml0550(preview,'C8'),/USD 604\.00/);
+ const docx=Buffer.from(N.buildNativeExhibitDocx0550(preview,'C8')).toString();
+ assert.match(docx,/USD 604\.00/);
+ assert.doesNotMatch(docx,/Myanmar|Unit Price|Estimated Man-Days/);
+ const sheet=scheduleTable0550(preview,'C8');
+ assert.equal(sheet.rows.length,1);
+ assert.equal(sheet.rows[0][2],604);
+ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+ const {NativeExhibitC0550}=require(root+'/project0550/NativeExhibitC0550.jsx');
+ assert.match(renderToStaticMarkup(React.createElement(NativeExhibitC0550,{view:preview,id:'C8'})),/USD 604\.00/);
+ assert.equal(P.nativeExhibitVersionForWorkspace0550(prepared),C8_SINGLE_FORM_NATIVE_0550);
+ assert.equal(N.nativeSchedule0550(saved,'C8').pages[0].c8CalloffTotal.amount,null);
+ const reviewedRows=preview.scheduleRows('C8').map(b=>({...b,state:'REVIEWED'}));
+ const reviewed={...saved,nativeExhibitVersion:C8_SINGLE_FORM_NATIVE_0550,scheduleRows:id=>id==='C8'?reviewedRows:saved.scheduleRows(id)};
+ assert.match(N.nativeSchedule0550(reviewed,'C8').html,/USD 604\.00/);
+ assert.equal(scheduleTable0550(reviewed,'C8').rows[0][2],604);
+ const otherRows=[
+  {...reviewedRows[0],lineId:'TEST-C8-BASE',treatment:'BASE',amount:700,unitPrice:700,line:{description:'TEST FACILITIES BASE'}},
+  {...reviewedRows[0],lineId:'TEST-C8-LEGACY',amount:800,unitPrice:800,line:{description:'TEST FACILITIES LEGACY'}},
+ ];
+ const withOther={...reviewed,scheduleRows:id=>id==='C8'?[...reviewedRows,...otherRows]:reviewed.scheduleRows(id)};
+ const single=N.nativeSchedule0550(withOther,'C8');
+ assert.equal(single.pages.length,1);
+ assert.match(single.html,/USD 604\.00/);
+ assert.doesNotMatch(single.html,/TEST FACILITIES|700\.00|800\.00/);
+ assert.deepEqual(scheduleTable0550(withOther,'C8'),sheet);
+ assert.equal(N.nativeSchedule0550({...withOther,nativeExhibitVersion:C8_TOTAL_NATIVE_0550},'C8').pages.length,2);
+ const withoutBasis={...preview,scheduleRows:id=>id==='C8'?otherRows:preview.scheduleRows(id)};
+ assert.equal(N.nativeSchedule0550(withoutBasis,'C8').pages.length,1);
+ assert.equal(scheduleTable0550(withoutBasis,'C8').rows[0][2],'OPEN');
+ const history={...reviewed,nativeExhibitVersion:'exhibit-c-schedule-b-rev1.v4'};
+ const oldForm=N.nativeSchedule0550(history,'C8');
+ const page=oldForm.pages.find(page=>page.c8Country==='Myanmar');
+ assert.equal(oldForm.pages.length,4);
  assert.equal(page.values.C8_1_3,'6 person-day');
  assert.equal(page.values.C8_3_3,'1 round trip');
  assert.equal(page.values.C8_4_3,'3 set-day');
  assert.equal(page.values.C8_6_1,'151.00');
- assert.match(Buffer.from(N.buildNativeExhibitDocx0550(preview,'C8')).toString(),/Myanmar · Rev03 · Call-off estimate/);
- const sheet=require(root+'/project0550/exportBidVolumes0550.js').scheduleTable0550(preview,'C8');
- assert.deepEqual(sheet.rows.find(row=>row[0]==='Myanmar'&&row[2]==='round trip').slice(3,6),[1,19,19]);
+ assert.deepEqual(scheduleTable0550(history,'C8').rows.find(row=>row[0]==='Myanmar'&&row[2]==='round trip').slice(3,6),[1,19,19]);
  const first=preview.scheduleRows('C8')[0].lineId;
  const deleted={...prepared,lines:prepared.lines.filter(line=>line.id!==first),
   bidVolumes:{...prepared.bidVolumes,bindings:prepared.bidVolumes.bindings.filter(binding=>binding.lineId!==first)}};
  assert.equal(V.prepareC8Calloff0550(deleted,pack,today),deleted);
+ const incomplete={...preview,scheduleRows:id=>preview.scheduleRows(id).filter(b=>b.lineId!==first)};
+ assert.equal(N.nativeSchedule0550(incomplete,'C8').pages[0].c8CalloffTotal.amount,null);
+ assert.equal(scheduleTable0550(incomplete,'C8').rows[0][2],'OPEN');
+ const reviewedData=prepared.bidVolumes.bindings.filter(b=>b.schedule==='C8').reduce((data,b)=>
+  V.saveBidVolumeRecord0550(data,'bindings',{...b,sourceIds:[fixture.sourceIntake.sources[0].id],reviewer:'TEST'},today,true),prepared);
+ // Supply reviewed prices to the freeze renderer without asserting approval of the budget import.
+ const reviewedPrices=new Map(reviewedRows.map(b=>[b.lineId,b.amount]));
+ const reviewedModel={...model,official:{...model.official,lines:model.official.lines.map(line=>
+  reviewedPrices.has(line.id)?{...line,customerUSD:reviewedPrices.get(line.id)}:line)}};
+ const frozen=P.freezeBidPackageOutput0550(reviewedData,reviewedModel,'C8-TEST',today);
+ P.validateFrozenBidPackage0550(frozen);
+ assert.equal(frozen.nativeExhibitVersion,C8_SINGLE_FORM_NATIVE_0550);
+ assert.match(frozen.htmlI,/USD 604\.00/);
+ assert.match(Buffer.from(frozen.docxI,'base64').toString(),/USD 604\.00/);
+ assert.equal(frozen.I.find(s=>s.name==='Schedule C8').rows[0][2],604);
  if(process.env.PJ0550_C8_FIXTURE){
   const actual=JSON.parse(fs.readFileSync(process.env.PJ0550_C8_FIXTURE,'utf8'));
   const project=V.prepareC8Calloff0550(input,actual,today),model=derive(project);
   const saved=V.deriveBidVolumes0550(project,model,D.SYSTEMS,today);
   const view=require(root+'/project0550/data/bidVolumeWorkingPreview0550.js')
    .deriveBidVolumeWorkingPreview0550(project,model,D.SYSTEMS,today,saved);
-  const pages=N.nativeSchedule0550(view,'C8').pages;
+  const pages=N.nativeSchedule0550({...view,nativeExhibitVersion:'exhibit-c-schedule-b-rev1.v4'},'C8').pages;
   const totals=actual.countries.map(({people,days,airportTrips,rates})=>{
    const qty=[people*days,people*days,airportTrips,days,people*days];
    return rates.reduce((sum,[,rate],index)=>sum+rate*qty[index],0)
     .toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
   });
   assert.deepEqual(pages.map(page=>page.values.C8_6_1),totals);
+  const total=totals.reduce((sum,amount)=>sum+Number(amount.replaceAll(',','')),0);
+  const form=N.nativeSchedule0550(view,'C8');
+  assert.equal(form.pages.length,1);
+  assert.equal(form.pages[0].c8CalloffTotal.amount,total);
+  assert.equal(scheduleTable0550(view,'C8').rows[0][2],total);
  }
 }
 const b={...v.bindings[0],partNo:'TEST-PART',mainEquipment:'TEST-EQ',vendorEquipmentNo:'TEST-VENDOR-EQ',referenceDrawings:'TEST-DWG',interchangeA:'1',interchangeB:'1',specification:'TEST SPEC',origin:'TEST COUNTRY',shippingFrom:'TEST PORT',delivery:'TEST 12 weeks',physical:{estimatedWeightKg:12},deliveryTerm:'CIF Yangon / synthetic'};
@@ -134,6 +194,15 @@ for(const [term,expected] of [['CIF',['50.00','','100.00','']],['FOB',['','50.00
 assert.match(N.nativeExhibitHtml0550(spareView,'C3'),/USD 75\.00.*CIF\/FOB allocation OPEN/);
 assert.match(N.nativeSchedule0550(spareView,'C3').html,/class="native-c2-draft-price"><p[^>]*>USD 75\.00/);
 assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
+const officialSpare=N.nativeSchedule0550({...spareView,customerIssue:true},'A1');
+assert.equal(officialSpare.pages[0].values.A1_5_6,'100.00','Complete official row price is unchanged');
+assert.equal(officialSpare.pages[0].values.A1_6_6,'','Two-year spares stay off the base price columns');
+assert.match(officialSpare.pages[0].values.A1_12_1,/In figures: USD 100\.00/);
+assert.doesNotMatch(officialSpare.html,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Site service period to confirm/);
+assert.match(officialSpare.html,/whiteness/);
+const officialDoc=Buffer.from(N.buildNativeExhibitDocx0550({...spareView,customerIssue:true},'A1')).toString();
+assert.doesNotMatch(officialDoc,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Working owner|priced items/);
+assert.match(officialDoc,/whiteness/);
 const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
 assert.deepEqual(priceCells(N.nativeSchedule0550(thbView,'C2','THB').pages[0]),['THB 1,600.00','','THB 3,200.00','']);
 assert.match(N.nativeSchedule0550(thbView,'A1','THB').pages[0].values.A1_6_7,/THB 2,400\.00/);
@@ -222,8 +291,9 @@ assert.match(c7Native.html,/tender site day of 10 hours/);
 assert.equal(N.nativeSchedule0550(draftServices,'A1').pages[0].values.A1_8_6,'400.00');
 const c8Native=N.nativeSchedule0550(draftServices,'C8');
 assert.match(c8Native.html,/omit C8/);
-assert.equal(c8Native.pages[0].values.C8_1_5,'');
-assert.equal(c8Native.pages[0].values.C8_6_1,'Call-off rates only');
+assert.equal(c8Native.pages.length,1);
+assert.equal(c8Native.pages[0].c8CalloffTotal.amount,null);
+assert.doesNotMatch(c8Native.html,/Call-off rates only|Unit Price/);
 assert.match(Buffer.from(N.buildNativeExhibitDocx0550(draftServices,'C7')).toString(),/Page 2 of 2 subtotal/);
 assert(N.nativeSchedule0550(view,'A2').html.includes('colspan="2"'));assert(N.nativeSchedule0550(view,'C2').html.includes('rowspan="2"'));
 const overflow={...view,scheduleRows:id=>id==='C1'?Array.from({length:35},(_,i)=>({...b,line:{...b.line,description:'OVERFLOW-'+(i+1)}})):view.scheduleRows(id)};

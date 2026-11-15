@@ -2,6 +2,7 @@ import "../project0550/deviationRelease0550.css";
 import "../project0550/mrSourceReader0550.css";
 import {RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "../project0550/data/towerLegacyPricing0550";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
+import {mgwRadioSourceModel0550,mgwRadioSourceRow0550} from "../project0550/data/mgwQuoteSelection0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import {workspaceAlias0550} from '../project0550/workspaceLabels0550';
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from "react";
@@ -44,6 +45,7 @@ import {BidCommercialWorkspace} from "../project0550/BidCommercialWorkspace";
 import {EquationWorkbench} from "../project0550/EquationWorkbench";
 import {DeviationWorkspace0550} from "../project0550/ParticularDeviationWorkspace0550";
 import {VendorWorkspace} from "../project0550/VendorWorkspace";
+import {MGW_GTPL_SOURCE_TARGET_0550} from "../project0550/MgwCurrentQuote0550";
 import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
 import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
 import {BID_TABS} from "../project0550/biddingNavigation";
@@ -2089,7 +2091,7 @@ export function ProjectModuleSearch0550({directory,onJump}){
  const [showDirectory,setShowDirectory]=useState(false),[copyState,setCopyState]=useState("");
  const moduleIndex=directory.entries;
  const query=moduleQuery.trim().replace(/^PJ2608-0550\s*\/\s*/i,"").toLowerCase();
- const matches=query?moduleIndex.filter(m=>BID_TAG_TARGETS_0550[query]?m.id===BID_TAG_TARGETS_0550[query]:[m.id,m.title,m.number,m.legacyNumber,m.alias||workspaceAlias0550(m.id)].join(" ").toLowerCase().includes(query)):[];
+ const matches=query?[...moduleIndex,MGW_GTPL_SOURCE_TARGET_0550].filter(m=>BID_TAG_TARGETS_0550[query]?m.id===BID_TAG_TARGETS_0550[query]:[m.id,m.title,m.number,m.legacyNumber,m.alias||workspaceAlias0550(m.id)].join(" ").toLowerCase().includes(query)):[];
  const copyAll=async()=>{
   try{await navigator.clipboard.writeText(moduleDirectoryText0550(moduleIndex));setCopyState("copied");}
   catch{setCopyState("select");}
@@ -2159,7 +2161,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(model?.lines||[]).flatMap(r=>[{id:r.sourceModuleId,title:r.description+" / Source",tab:"budget"},{id:r.releaseModuleId,title:r.description+" / Release",tab:"budget"}]),
     ...(data?.calculations||[]).map(c=>({id:"bid.engineering.calculation."+c.id,title:c.title,tab:"engineering"})),
     ...(data?.vendors||[]).map(v=>({id:"bid.vendor."+v.id,title:v.name,tab:"documents"})),
-    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:o.quoteRef+" / "+o.description,tab:"documents"})),
+    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:[o.quoteRef,[o.description,o.brand,mgwRadioSourceModel0550(mgwRadioSourceRow0550(o))].filter(Boolean).join(" · ")].join(" / "),tab:"documents"})),
     ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
     ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
     ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),
@@ -2176,7 +2178,7 @@ function Project0550Bidding({ lang = "th" }) {
   const componentNumbers=useMemo(()=>({projectId:"PJ2608-0550",numbers:directory.numbers}),[directory]);
   const workingSystemTarget=useRef(null);
   const jump=useCallback((m,options)=>{if(technicalDirty)return;workingSystemTarget.current=options?.workingSystem;setMrNavigationTarget(options?.mrId||null);setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
-  const navigate=useCallback((id,options)=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m,options);},[moduleIndex,jump]);
+  const navigate=useCallback((id,options)=>{const m=id===MGW_GTPL_SOURCE_TARGET_0550.id?MGW_GTPL_SOURCE_TARGET_0550:moduleIndex.find(m=>m.id===id);if(m)jump(m,options);},[moduleIndex,jump]);
   const openSource=useCallback(id=>jump({id,tab:"documents",area:"A"}),[jump]);
   const legacyBudget=useMemo(()=><LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>,[]);
   const budgetTarget=useRef({});

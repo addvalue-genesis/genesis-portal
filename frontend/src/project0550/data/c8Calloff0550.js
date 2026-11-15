@@ -1,7 +1,10 @@
+import {sumMoney0550} from './money0550';
+
 // The rates are read from project DATA at runtime. The public bundle carries
 // only the form structure and the rules for preparing Working allocations.
 export const C8_CALLOFF_SCHEMA_0550='genesis.0550.c8-calloff.v1';
 export const C8_CALLOFF_ENDPOINT_0550='/api/local/pj2608-0550/c8-calloff';
+const maxBytes=16384;
 export const C8_CALLOFF_COUNTRIES_0550=['Thailand','Germany','China','Myanmar'];
 export const C8_CALLOFF_ITEMS_0550=[
  ['OFFICE','Office / workstations','MD','person-day'],
@@ -16,6 +19,26 @@ const prefix='LINE-C8-CALLOFF-';
 export const c8Country0550=binding=>binding.treatment==='CALLOFF'&&
  C8_CALLOFF_COUNTRIES_0550.find(country=>binding.lineId===prefix+country.toUpperCase()+'-'+binding.summary);
 export const c8Revision0550=binding=>binding.line?.sourceRef?.match(/^C8 (Rev\d{2})\b/)?.[1]||'';
+
+export const C8_TOTAL_NATIVE_0550='exhibit-c-c8-calloff-total.v5';
+export const C8_SINGLE_FORM_NATIVE_0550='exhibit-c-c8-single-form.v6';
+export const C8_TOTAL_DESCRIPTION_0550='Estimated Call-off Total';
+export const C8_TOTAL_NOTE_0550='Subject to Purchaser call-off approval. Excluded from Schedule A1 and Schedule A2 totals.';
+export const c8SingleForm0550=view=>!view.nativeExhibitVersion||view.nativeExhibitVersion===C8_SINGLE_FORM_NATIVE_0550;
+
+export function c8CalloffTotal0550(view,rows){
+ if(!c8SingleForm0550(view)&&view.nativeExhibitVersion!==C8_TOTAL_NATIVE_0550)return null;
+ const items=rows.filter(c8Country0550);
+ if(!items.length)return null;
+ const revisions=new Set(items.map(c8Revision0550));
+ const revision=revisions.size===1?[...revisions][0]:'';
+ const expected=C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length;
+ const complete=items.length===expected&&new Set(items.map(b=>b.lineId)).size===expected&&revision&&
+  items.every(b=>c8Unit0550(b)&&!b.nonAdditive&&(view.workingPreview||b.state==='REVIEWED'));
+ return {amount:complete?sumMoney0550(items.map(b=>b.amount)):null,revision};
+}
+
+export const c8OtherFacilities0550=b=>!c8Country0550(b)&&(b.treatment!=='CALLOFF'||b.state==='REVIEWED');
 
 export function validateC8Calloff0550(pack){
  const positive=n=>Number.isFinite(n)&&n>0&&n<=1e7;
@@ -36,9 +59,17 @@ export async function fetchC8Calloff0550(fetcher=fetch){
  const response=await fetcher(C8_CALLOFF_ENDPOINT_0550,{cache:'no-store',signal:AbortSignal.timeout(10000)});
  if(response.status===404||response.ok&&!response.headers.get('content-type')?.includes('application/json'))return null;
  if(!response.ok)throw Error('C8_CALLOFF_DATA_UNAVAILABLE');
- const body=await response.text();
- if(body.length>16384)throw Error('C8_CALLOFF_DATA_INVALID');
- return validateC8Calloff0550(JSON.parse(body));
+ return parseC8Calloff0550(await response.text());
+}
+
+function parseC8Calloff0550(body){
+ if(new Blob([body]).size>maxBytes)throw Error('C8_CALLOFF_DATA_INVALID');
+ return validateC8Calloff0550(JSON.parse(body.replace(/^\uFEFF/,'')));
+}
+
+export async function readC8CalloffFile0550(file){
+ if(file.size>maxBytes)throw Error('C8_CALLOFF_DATA_INVALID');
+ return parseC8Calloff0550(await file.text());
 }
 
 export function c8CalloffDraftRows0550(pack){

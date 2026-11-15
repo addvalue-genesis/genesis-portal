@@ -18,8 +18,9 @@ import {cabinetTagLabel0550,draftCabinetTag0550,mappedCabinetTags0550} from './c
 import {versedDmrCabinetWorking0550} from './versedRack0550';
 import {CHEVALIER_PBX_FIELD_0550,CHEVALIER_PBX_MA_0550,CHEVALIER_PBX_SUPPLY_0550,chevalierPbxOwnerCode0550} from './chevalierPbxQuote0550';
 import {chevalierPbxSharedBudget0550} from './chevalierPbxBudget0550';
-import {mgwCctvEntSharedBudget0550} from './mgwCctvEntBudget0550';
+import {entertainmentSiteBudget0550,mgwCctvEntSharedBudget0550} from './mgwCctvEntBudget0550';
 import {towerErectionAllocation0550,TOWER_ERECTION_SCHEDULE_BASIS_0550} from './towerTenderScope0550';
+import pagaMobPlan from './pagaMobPlan0550.json';
 
 const rules={
  A:['C1','GOODS','Equipment → Exhibit C C1 / A1 Goods'],
@@ -126,6 +127,7 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
    schedule='A1';summary='OTHER';reason='Shared SI travel / mobilisation expense → A1 Others; retain one existing owner, not C7 labour hours or C8 purchaser facilities';
   }
   if(['MR-ACT-B4-D01','MR-ACT-B4-D02'].includes(raw.mrRequirementId)){schedule='A1';summary='INSPECTION';reason='FAT / IFAT support → A1 Inspection and tests; source review pending';}
+  if(raw.wbs==='B4'&&raw.offerId===pagaMobPlan.fatOfferId){schedule='A1';summary='INSPECTION';reason='Bangkok Local FAT → A1 Inspection and tests';}
   if(schedule==='A1'&&raw.wbs==='B1'&&['MR-ACT-B1-D02','MR-ACT-B1-D03','MR-ACT-B1-D04'].includes(raw.mrRequirementId)){summary='VENDOR_DOCUMENTS';reason='Design / CAL-RPT / VDRL documents → A1 Vendor Documents; source review pending';}
   const quotedIds=raw.mgwDetailGroupId?mgwDetailGroup0550(raw.mgwDetailGroupId)?.rowIds||[]:[mgwQuoteItem0550(offer)?.id].filter(Boolean);
   if(quotedIds.length===1&&!raw.wbs.startsWith('C')){
@@ -255,7 +257,8 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const trainingSiteDays=bindings.some(b=>b.schedule==='C7'&&b.summary==='TRAINING'&&
   b.quantity===TRAINING_OJT_DAYS_0550*2*10&&trainingRev01Owner0550(b.line,TRAINING_OJT_OWNER_0550))?TRAINING_OJT_DAYS_0550:null;
  return {...projected,trainingSiteDays,trainingBudgetPending:trainingBudgetPending0550(data,today),c1Context:{...projected.c1Context,lanOffers:data.offers.filter(mgwLanEquipmentOffer0550),
-  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,mgwCctvEntBudgetShares,pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),c3GoodsBasis:model.c3GoodsBasis,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
+  pagaItems,pagaCandidateQuote},bindings,scheduleRows:id=>bindings.filter(b=>b.schedule===id&&b.line),nativeC1,mgwSections,mgwBulkSupply,chevalierPbxSupply,pbxBudgetShares,mgwCctvEntBudgetShares,
+  entertainmentSiteBudget:entertainmentSiteBudget0550(data,model),pagaNet,pagaKit:pagaNet?pagaIncludedKit0550(data,pagaNet):null,pagaScope:pagaNet?pagaIncludedScope0550(data,pagaNet):'',pagaSpares:pagaTwoYearSpareEvidence0550(data,pagaNet),c3GoodsBasis:model.c3GoodsBasis,allocationPlan:plan,workingPreview:true,ready:false,state:'WORKING_DRAFT_NOT_REVIEWED',outputLabel:'WORKING PREVIEW — DRAFT — NOT FOR SUBMISSION / selected scope; allocation and prices pending review',
   previewStats:{active:projected.active.length,saved:savedView.bindings.filter(b=>projected.active.some(l=>l.id===b.lineId)).length,autoSaved:bindings.filter(b=>b.line&&b.status==='DRAFT'&&autoDrafts.has(b.lineId)).length,suggested:saveableCount,unresolved:plan.length-saveableCount,priced:priced.length,unpriced:unknown.length,knownUSD:sumMoney0550(priced.map(l=>l.customerUSD))},
   packageReferences:[...references].map(([lineId,allocation])=>({lineId,allocation,nonAdditive:true,coverageAccepted:false})),
   priceGaps:unknown.map(l=>{const w=model.lines.find(w=>w.id===l.id),problems=[...new Set([...(w?.provisionalProblems||[]),...(w?.problems||[]).filter(p=>p.includes('FX'))])];return {id:l.id,description:l.description,problems:problems.length?problems:['Working selling / quantity / FX inputs OPEN']};}),

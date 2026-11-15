@@ -31,7 +31,7 @@ async function directories(dir) {
 function defaultRoots() {
   return process.platform === 'win32' ? ['N',...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.replace('N','')].map(letter=>letter+':'+path.sep) : [];
 }
-async function discoverProjects({roots = defaultRoots(), projectDir = process.env.GENESIS_0550_PROJECT_DIR} = {}) {
+async function discoverProjects({roots = defaultRoots(), projectDir = process.env.GENESIS_0550_PROJECT_DIR, scanAllRoots = false} = {}) {
   if (projectDir) return [path.resolve(projectDir)];
   const projects=[];
   for (const root of roots) {
@@ -46,7 +46,7 @@ async function discoverProjects({roots = defaultRoots(), projectDir = process.en
     for(const container of [root,path.join(root,'My Drive'),path.join(root,'ไดรฟ์ของฉัน')])
       projects.push(...(await directories(container).catch(()=>[])).filter(d=>PROJECT.test(path.basename(d))));
     // Once the project mount is found, do not probe unrelated drive letters.
-    if(projects.length)break;
+    if(projects.length&&!scanAllRoots)break;
   }
   return [...new Set(projects)];
 }
@@ -163,14 +163,20 @@ function permitted(req) {
   }catch{return false;}
 }
 async function loadDriveC8Calloff(options){
- const projects=await discoverProjects(options),bodies=new Set();
- for(const project of projects){
-  try{
-   const {intake}=await readJson(path.join(project,'90_SYSTEM_WORKING','DATA',C8_FILE),16384);
-   if(intake?.schema!=='genesis.0550.c8-calloff.v1'||intake.projectId!=='PJ2608-0550')throw fail('C8_CALLOFF_DATA_INVALID');
-   bodies.add(canonical(intake));
-  }catch(e){if(e.code!=='ENOENT')throw e;}
- }
+ const projects=await discoverProjects(options),visited=new Set(),bodies=new Set();
+ const collect=async candidates=>{
+  for(const project of candidates){
+   if(visited.has(project))continue;
+   visited.add(project);
+   try{
+    const {intake}=await readJson(path.join(project,'90_SYSTEM_WORKING','DATA',C8_FILE),16384);
+    if(intake?.schema!=='genesis.0550.c8-calloff.v1'||intake.projectId!=='PJ2608-0550')throw fail('C8_CALLOFF_DATA_INVALID');
+    bodies.add(canonical(intake));
+   }catch(e){if(e.code!=='ENOENT')throw e;}
+  }
+ };
+ await collect(projects);
+ if(!bodies.size)await collect(await discoverProjects({...options,projectDir:null,scanAllRoots:true}));
  if(!bodies.size)throw fail('C8_CALLOFF_NOT_FOUND',404);
  if(bodies.size>1)throw fail('C8_CALLOFF_DATA_CONFLICT',409);
  return [...bodies][0];

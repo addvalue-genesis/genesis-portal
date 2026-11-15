@@ -103,6 +103,7 @@ export function LazyNativeExhibitC0550(props){
 export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate,c2Scope,onPrepareSpare,disabled=false,mrNavigationTarget}){
  view=useMemo(()=>id==='C1'?{...view,c1LayoutVersion:C1_APPENDIX_LAYOUT_0550}:view,[view,id]);
  const [systemChoice,setSystemChoice]=useState('');
+ const [c8LoadMessage,setC8LoadMessage]=useState('');
  const [issueNote,setIssueNote]=useState('');
  const ws=useBidWorkspace();
  const references=useMemo(()=>{
@@ -123,6 +124,7 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
  const screenView=useMemo(()=>currency==='THB'?scheduleViewTHB0550(formView):formView,[formView,currency]);
  const form=useMemo(()=>id==='C1'?null:nativeSchedule0550(screenView,id,currency,references),[screenView,id,currency,references]),count=id==='A1'?view.bindings.filter(b=>b.line&&b.treatment==='BASE').length:id==='A2'?view.bindings.filter(b=>b.line&&b.treatment==='OPTION').length:formView.scheduleRows(id).length;
  const problems=useMemo(()=>nativeExhibitProblems0550(formView,id),[formView,id]);
+ const hasC8Calloff=id==='C8'&&view.scheduleRows('C8').some(c8Country0550);
  const c8Estimate=id==='C8'&&view.workingPreview?scheduleRollup0550(screenView.scheduleRows('C8').filter(c8Country0550)):null;
  const overlaps=useMemo(()=>id==='C2'?c2ProjectLotOverlaps0550(view.scheduleRows('C2')):[],[view,id]);
  const issueMessage=only=>{
@@ -145,6 +147,16 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
   {/^C[2-8]$/.test(id)&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} system={selected?.token} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {id==='C3'&&view.workingPreview&&<C3GoodsBreakdown0550 view={view} currency={currency} onNavigate={onNavigate} disabled={disabled}/>}
   {c8Estimate?.count>0&&<p>ยอดประมาณการ Call-off ตามประเทศ · {currency} {money(c8Estimate.count===C8_CALLOFF_COUNTRIES_0550.length*C8_CALLOFF_ITEMS_0550.length?c8Estimate.totalUSD:null)} · เรียกใช้ตามอนุมัติ แยกจากยอด A1 และ A2</p>}
+  {id==='C8'&&view.workingPreview&&!hasC8Calloff&&ws?.importC8Calloff&&<div className="p55-panel" aria-label="C8 price data">
+   <p>ยังไม่มีราคา Call-off รายประเทศใน Working หาก Drive ยังไม่ซิงก์ ให้เลือกไฟล์ราคาโครงการจาก DATA เพื่อโหลดเฉพาะ C8</p>
+   <label>โหลดไฟล์ราคา C8 <input type="file" accept=".json,application/json" disabled={disabled||ws.busy} onChange={async e=>{
+    const input=e.currentTarget;
+    const file=input.files?.[0];
+    input.value='';
+    if(file)setC8LoadMessage(await ws.importC8Calloff(file));
+   }}/></label>
+   {c8LoadMessage&&<p role="status">{c8LoadMessage}</p>}
+  </div>}
   {id==='C2'&&view.workingPreview&&selected?.token==='TEL-LAN'&&<LanC2Open0550 rows={selected.rows}/>}
   {groups.some(group=>group.draftRows.length>0)&&<p className="p55-native-help">Draft reference · {SPARE_DRAFT_NOTE_0550} · ยอดข้อเสนอและ Word/PDF ใช้รายการที่จัดลง Schedule</p>}
   {toolDrafts.length>0&&<details className="p55-panel" open><summary>SI · Special Tools ตามระบบใน Working (Draft · {toolDrafts.length} ประเภท)</summary>
@@ -178,7 +190,8 @@ export function NativeExhibitC0550({view,id,currency='USD',onAllocate,onNavigate
     {' '}<button type="button" disabled={disabled} onClick={()=>onAllocate?.(lots[0].lineId)}>ตรวจการจัดหมวด 11.M</button>
    </li>)}</ul>
   </div>}
-  <details className="p55-c1-internal-diagnostics" open={id!=='C1'}><summary>SI · ตรวจราคา / การจัดหมวดภายใน</summary>
+  <details className="p55-c1-internal-diagnostics" open={id!=='C1'&&id!=='C8'}><summary>SI · ตรวจราคา / การจัดหมวดภายใน</summary>
+  {id==='C8'&&<ScheduleParentResults0550 rows={view.scheduleRows(id)} id={id} currency={currency} workingPreview={view.workingPreview} onNavigate={onNavigate} disabled={disabled}/>}
   {unresolved.length>0&&<section className="p55-native-issues" aria-label="C2 rows awaiting system assignment">
    <h4>รายการ C2 รอระบุระบบ · {unresolved.length} แถว</h4>
    <p>เก็บรายการ Working เดิมไว้ตรวจทานใน SI ยอดทั้งโครงการยังอ้างอิงรายการเดิม เมื่อยืนยันระบบและ Main Equipment No. แล้วให้จัดลงฟอร์มของระบบนั้น</p>

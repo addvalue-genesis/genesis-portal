@@ -188,7 +188,7 @@ export function preparePagaIdieWorking0550(data,policies,today){
    atom.anchor.system==='TEL-PAGA'&&atom.route.line_class==='SERVICE_SITE');
   if(!row||!quoteValidity0550(row.offer,today).current)continue;
   const id=offerId.replace(/^OFFER-/,'LINE-');
-  if(data.lines.some(line=>line.id===id||line.offerId===offerId||line.scopeKey===alieScopeKey(row.atom))){
+  if(repo.pricedVolumeDraftIds?.includes(id)||data.lines.some(line=>line.id===id||line.offerId===offerId||line.scopeKey===alieScopeKey(row.atom))){
    handled.add(offerId);
    continue;
   }

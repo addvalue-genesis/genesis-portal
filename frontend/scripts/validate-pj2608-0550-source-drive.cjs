@@ -1,9 +1,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path'),http=require('node:http'),babel=require('@babel/core');
-const {discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES}=require('./source-drive-0550.cjs');
+const {discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveC8Calloff,createMiddleware,permitted,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES}=require('./source-drive-0550.cjs');
 const root=path.resolve(__dirname,'../src'),oldJS=require.extensions['.js'];
 require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compile(babel.transformFileSync(file,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,file):oldJS(mod,file);
 (async()=>{
  const {selectAutomaticSource,fetchAutomaticSource}=require(path.join(root,'project0550/data/sourceAutoLoad.js'));
+ const {fetchC8Calloff0550,readC8CalloffFile0550}=require(path.join(root,'project0550/data/c8Calloff0550.js'));
  const {emptyBidWorkspace,deriveBidWorkspace}=require(path.join(root,'project0550/data/bidWorkspaceModel.js'));
  const {SYSTEMS,DATA_LAYER_META}=require(path.join(root,'project0550/data.js'));
  const tokens=SYSTEMS.map(s=>s.token),workspace=emptyBidWorkspace(DATA_LAYER_META.datasetId);
@@ -45,11 +46,26 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
   assert(!permitted({...request,headers:{...request.headers,origin:'https://evil.example'}}));
   assert(!permitted({...request,headers:{...request.headers,host:'evil.example'}}));
   assert(!permitted({...request,headers:{...request.headers,'sec-fetch-site':'cross-site'}}));
-  const middleware=createMiddleware(()=>loadDriveIntake({roots:[tmp]}));
+  const firstMount=path.join(tmp,'other-drive'),alternate=path.join(firstMount,'PJ2608-0550 Previous');
+  await fs.mkdir(alternate,{recursive:true});
+  const c8={schema:'genesis.0550.c8-calloff.v1',projectId:'PJ2608-0550',revision:'Rev03',
+   sourceFilename:'PJ2608-0550_C8_CallOff_Budget_Rev03.xlsx',
+   countries:['Thailand','Germany','China','Myanmar'].map(name=>({name,people:4,days:3,airportTrips:1,rates:Array.from({length:5},()=>[10,12])}))};
+  const c8File=path.join(dir,'PJ2608-0550_C8_CallOff.json');
+  await fs.writeFile(c8File,JSON.stringify(c8));
+  assert.deepEqual(JSON.parse(await loadDriveC8Calloff({projectDir:alternate,roots:[firstMount,tmp]})),c8);
+  assert.deepEqual(JSON.parse(await loadDriveC8Calloff({projectDir:null,roots:[firstMount,tmp]})),c8);
+  assert.deepEqual(await readC8CalloffFile0550(new Blob([JSON.stringify(c8)])),c8);
+  await assert.rejects(readC8CalloffFile0550(new Blob([JSON.stringify(intake)])),/C8_CALLOFF_DATA_INVALID/);
+  const middleware=createMiddleware(()=>loadDriveIntake({roots:[tmp]}),undefined,undefined,
+   ()=>loadDriveC8Calloff({projectDir:alternate,roots:[firstMount,tmp]}));
   server=http.createServer((req,res)=>middleware(req,res,()=>{res.statusCode=404;res.end();}));
   await new Promise((resolve,reject)=>{server.once('error',reject);server.listen(0,'127.0.0.1',resolve);});
   const base='http://127.0.0.1:'+server.address().port;
   const fetcher=(url,options)=>fetch(base+url,options);
+  assert.deepEqual(await fetchC8Calloff0550(fetcher),c8);
+  await fs.unlink(c8File);
+  assert.equal(await fetchC8Calloff0550(fetcher),null);
   assert.deepEqual(await fetchAutomaticSource(fetcher),intake);
   const remote=await fetch(base+'/api/local/pj2608-0550/source-intake',{headers:{origin:'https://evil.example'}});assert.equal(remote.status,403);
   const post=await fetch(base+'/api/local/pj2608-0550/source-intake',{method:'POST'});assert.equal(post.status,405);

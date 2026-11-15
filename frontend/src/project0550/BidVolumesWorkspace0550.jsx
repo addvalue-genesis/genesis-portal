@@ -261,6 +261,18 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
     <><button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+row.ownerId)}>{row.ownerId}</button>
      <small>{row.source} · {row.funded?'Included in the Working owner':'Working price OPEN'}</small></>,
    ])}/>}
+ {volume==='I'&&cctvEntBudgetVisible(panel,'C7')&&displayView.entertainmentSiteBudget&&
+  <section aria-label="Entertainment APF site labour">
+   <p className="p55-note"><strong>Entertainment APF · ADDVALUE ทำ SAT</strong> · MGW จัดหาอุปกรณ์ EXW จีน
+    แผน 3 MOB ให้ตรวจปริมาณและต้นทุนที่งบร่วมครอบคลุมก่อนลงส่วนเพิ่ม</p>
+   {displayView.entertainmentSiteBudget.legacyEstimateSelected&&
+    <p className="p55-note">ตรวจรายการ MGW OEM SAT ที่ยังถูกเลือกใน Working ก่อนจัดสรรค่าแรง ADDVALUE</p>}
+   <Grid label="Entertainment APF · existing ADDVALUE site budget" heads={['งาน','Working owner','ฐานราคา']}
+    rows={displayView.entertainmentSiteBudget.owners.map(({id,description,priced})=>[
+     description,<button type="button" disabled={dirty} onClick={()=>go('bid.budget.working.line.'+id)}>{id}</button>,
+     priced?'มีราคาขายในงบร่วม':'ราคางบร่วม OPEN',
+    ])}/>
+  </section>}
  {volume==='I'&&metNdbScheduleNotes[panel]&&data.offers.some(mgwMetNdbOffer0550)&&
   <p className="p55-note"><strong>MGW MET/NDB · OPEN</strong> · {metNdbScheduleNotes[panel]}</p>}
  {((volume==='I'&&['overview','A','A1','B','C','C1','C2','C3','C4','C5','C6','C7','C8','D','E','F','mapping','preview'].includes(panel))||
@@ -318,7 +330,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
     status,scope,
    ])}/>}
  {panel==='deviations'&&<><h3>Commercial Deviation register</h3><p>ข้อแตกต่างจากเงื่อนไขลูกค้า พร้อมหลักฐานการยอมรับ · ความไม่ตรงของข้อมูลภายในให้แก้ที่ต้นทางก่อน</p><button type="button" disabled={dirty} onClick={()=>setDeviationId(newId('CDEV'))}>เพิ่ม Commercial Deviation</button>{deviationId&&<RecordEditor key={deviationId} collection="commercialDeviations" initial={view.proposal.commercialDeviations.find(r=>r.id===deviationId)||blankCommercialDeviation0550(deviationId)} onDirtyChange={setDirty}/>}<Grid label="Commercial deviations" heads={['Title','Clause / Proposal','Decision / Review','Edit']} rows={view.commercialDeviations.map(d=>[d.title,d.locator+' / '+d.proposal,d.decision+' / '+d.state,<button type="button" disabled={dirty} onClick={()=>setDeviationId(d.id)}>แก้ไข / ทบทวน</button>])}/></>}
- {panel==='preview'&&<><h3>Preview / Export · DRAFT</h3>{volume==='I'&&<button type="button" disabled={dirty} onClick={()=>downloadNativeExhibit0550(displayView,'docx')}>Export Exhibit C Word ต้นฉบับ (.docx)</button>}<p>Word และ HTML ของ Volume I ใช้แบบฟอร์มต้นฉบับเดียวกับหน้าจอ · Excel เป็นตารางข้อมูลประกอบ · เปิด HTML เพื่อ Print to PDF · OPEN ยังคงแสดงในร่าง ไม่ถือว่าอนุมัติหรือส่งลูกค้า</p><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume)}>Export Volume {volume} XLSX</button><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume,'html')}>Export HTML / Print to PDF</button>{volume==='I'?visibleSchedules.map(s=><LazyNativeExhibitC0550 key={s.id} currency={currency} label={'11.'+s.id+' · '+s.title} disabled={dirty} onNavigate={go} view={displayView} id={s.id} c2Scope={['C2','C3','C4'].includes(s.id)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>):<Grid label="Volume III preview" heads={['Item','Requirement','Response','State']} rows={QUALIFICATIONS_0550.map(q=>[q.id,q.title,view.getRecord('III.'+q.id).content||'OPEN',view.getRecord('III.'+q.id).state])}/>}</>}
+ {panel==='preview'&&<><h3>Preview / Export · DRAFT</h3>{volume==='I'&&<button type="button" disabled={dirty} onClick={()=>downloadNativeExhibit0550(displayView,'docx')}>Export Exhibit C Word ต้นฉบับ (.docx)</button>}<p>หน้าจอยังเป็นร่าง Working สำหรับใช้ภายใน · Word และ HTML/PDF ที่ส่งออกเป็นแบบฟอร์ม Exhibit C ของลูกค้า พร้อมราคาที่ครบเท่านั้น · ช่องที่ราคายังไม่ครบเป็น TBA · Excel ยังเป็นตารางข้อมูลประกอบภายใน</p><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume)}>Export Volume {volume} XLSX</button><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume,'html')}>Export HTML / Print to PDF</button>{volume==='I'?visibleSchedules.map(s=><LazyNativeExhibitC0550 key={s.id} currency={currency} label={'11.'+s.id+' · '+s.title} disabled={dirty} onNavigate={go} view={displayView} id={s.id} c2Scope={['C2','C3','C4'].includes(s.id)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>):<Grid label="Volume III preview" heads={['Item','Requirement','Response','State']} rows={QUALIFICATIONS_0550.map(q=>[q.id,q.title,view.getRecord('III.'+q.id).content||'OPEN',view.getRecord('III.'+q.id).state])}/>}</>}
  </section></div>;
 }
 
