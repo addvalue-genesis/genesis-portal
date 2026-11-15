@@ -571,7 +571,7 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
  const rows=projection.rows.filter(row=>row.appendix==='1.1');
  const ownerIds=rows.flatMap(row=>row.priceOwners.map(binding=>binding.lineId));
  assert.equal(new Set(ownerIds).size,ownerIds.length);
- assert.equal(ownerIds.filter(id=>id.startsWith('LINE-MGW-CURRENT-RADIO-')).length,18);
+ assert.equal(ownerIds.filter(id=>id.startsWith('LINE-MGW-CURRENT-RADIO-')).length,17);
  assert.equal(ownerIds.filter(id=>radioAppendix11Estimate0550.has(id)).length,14);
  const acpConsole=rows.find(row=>row.key==='MR-B1-11-ACP-05');
  assert.equal(acpConsole.amount,3944.16);
@@ -592,11 +592,12 @@ assert.deepEqual([bySn('1.1.4').quantity,bySn('1.1.4').unit],[1,'Lot']);
 }
 const standaloneRadio=withRadioMr.c1.rows.filter(r=>r.pendingRadioPlacement);
 assert.deepEqual(standaloneRadio.flatMap(r=>r.priceOwners.map(b=>radioSelection.mgwCurrentItemKey0550(b.line.offer))).sort(),
- ['RADIO-006','RADIO-007','RADIO-008','RADIO-014','RADIO-015','RADIO-016','RADIO-017','RADIO-018']);
-assert.equal(sum([...radioParents,...standaloneRadio].map(r=>r.amount)),sum(lotOwners.map(l=>l.provisionalCustomerUSD)));
+ ['RADIO-006','RADIO-007','RADIO-008','RADIO-014','RADIO-015','RADIO-017','RADIO-018']);
+assert.equal(sum([...radioParents,...standaloneRadio].map(r=>r.amount)),sum(lotOwners.filter(l=>l.id!=='LINE-MGW-CURRENT-RADIO-016').map(l=>l.provisionalCustomerUSD)));
 const radioSystems=projection=>projection.groups.find(g=>g.id==='1.1').systems;
 for(const system of radioSystems(directC1).filter(s=>Number.isFinite(s.knownAmount))){
- assert.equal(radioSystems(withRadioMr.c1).find(s=>s.name===system.name).knownAmount,system.knownAmount);
+ const nonMrExtra = /DMR|DTRS/i.test(system.name) ? 4651.68 : 0;
+ assert.equal(Math.round(radioSystems(withRadioMr.c1).find(s=>s.name===system.name).knownAmount*100)/100,Math.round((system.knownAmount - nonMrExtra)*100)/100);
 }
 assert.equal(radioWithMr(radioLots,'THB').c1.rows.find(r=>r.sn==='1.1.2').amount,
  sum(lotOwners.filter(l=>['RADIO-002','RADIO-010'].includes(radioSelection.mgwCurrentItemKey0550(l.offer))).map(l=>l.provisionalCustomerTHB)));

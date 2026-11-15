@@ -194,6 +194,9 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
  if(!policy)return next;
  const offers=new Map(next.offers.map(o=>[o.id,o]));
  const lines=next.lines.map(line=>{
+  if(line.id==='LINE-MGW-CURRENT-RADIO-016'&&(line.coverageBasis===MGW_BASIS_REVIEW_0550||!line.coverageBasis)){
+   return {...line,coverageBasis:'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION',scopeBasis:'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION',customerRemark:'Non-MR vendor extra (MGW APM quote); not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'};
+  }
   const offer=offers.get(line.offerId),source=mgwRadioSourceRow0550(offer);
   const code=source?.systemTokens.length===1&&MGW_RADIO_CUSTOMER_CODES_0550[source.systemTokens[0]];
   if(!radioRemaining||!code||code==='A1-07'||line.customerRowCode!=='A1-07'||!line.selected||line.officialReview||
@@ -281,7 +284,7 @@ export function prepareMgwCurrentWorking0550(data,policies,today){
    requirementRef:quotedRefs.join(' / '),calculationId:'',resultKey:'value',quantity:e.quotedQuantity,
    unit:(key==='RADIO-016'||e.quotedQuantity===1)?'Lot':offer.unit,
    sellMode:'MARGIN',markupPct:null,marginPct:null,primePct:null,selected:true,customerRowCode,
-   coverageBasis:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':MGW_BASIS_REVIEW_0550,scopeBasis:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':undefined,internalStatus:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':undefined,...inputs,...(isAms01RadioExtra?{customerRemark:'Non-MR vendor extra (MGW APM quote); not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'}:{}),
+   coverageBasis:isAms01RadioExtra?'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION':MGW_BASIS_REVIEW_0550,...(isAms01RadioExtra?{scopeBasis:'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION',customerRemark:'Non-MR vendor extra (MGW APM quote); not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'}:{}),...inputs,
    ...(offer.id===patchPanel?.id?patchPanelDraftInputs(patchDraft):{})});
   if(radio)conflicts.delete(formerRadioMappingBlock(id));
   if(lan&&mr)conflicts.delete(formerLanMappingBlock(mr));

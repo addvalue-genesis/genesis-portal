@@ -2,7 +2,7 @@
 // notes and fixed labels. Only bidder response slots are substituted here.
 import template from './data/exhibitCNativeTemplate0550.json';
 import {chevalierPbxScheduleNote0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
-import {sumMoney0550} from './data/money0550';
+import {sumMoney0550, roundMoney0550} from './data/money0550';
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';

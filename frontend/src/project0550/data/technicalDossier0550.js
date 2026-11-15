@@ -14,7 +14,7 @@ const supplierLocator0550=o=>{const r=mgwQuoteItem0550(o);return r?'Reference ca
 const unique=a=>[...new Set(a.filter(Boolean))];
 export function technicalDossier0550(data,model,view,systemToken,sectionId){
  const requirements=(model.integration.requirements||[]).filter(r=>r.systemToken===systemToken),ids=requirements.map(r=>r.id);
- const lines=data.lines.filter(l=>l.systemToken===systemToken),offers=[...new Map(lines.flatMap(l=>workingOffers0550(data,l)).map(o=>[o.id,o])).values()];
+ const lines=data.lines.filter(l=>l.systemToken===systemToken&&l.id!=='LINE-MGW-CURRENT-RADIO-016'&&l.coverageBasis!=='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'),offers=[...new Map(lines.flatMap(l=>workingOffers0550(data,l)).map(o=>[o.id,o])).values()].filter(o=>!(systemToken==='TEL-RADIO-DTRS'&&o.id.includes('RADIO-016')));
  const proofs=model.integration.proofs.filter(p=>ids.includes(p.requirementId)),activities=model.integration.activities.filter(a=>ids.includes(a.requirementId)),deviations=model.integration.deviations.filter(d=>d.systemToken===systemToken);
  const record=view.records.find(r=>r.systemToken===systemToken&&r.sectionId===sectionId);
  const sourceIds=unique([...requirements.flatMap(r=>[...(r.sourceIds||[]),...(r.supplierSourceIds||[])]),...(record?.sourceIds||[])]);
@@ -33,7 +33,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
    rows:currentMgw.map(o=>[o.id+' / '+o.quoteEvidence.locator,sanitizeCustomerText0550(o.brand)+' / '+sanitizeCustomerText0550(o.description)+'\n'+o.quoteEvidence.terms.filter(t=>!t.startsWith('Supplier technical drawing:')&&!t.startsWith(MGW_SECTION_SUBTOTAL_0550)&&!t.startsWith('Quoted grand total USD:')).map(sanitizeCustomerText0550).filter(Boolean).join('\n'),
     (o.quoteEvidence.quotedQuantity===null||mgwRadioDtrsOffer0550(o)&&o.quoteEvidence.classification==='OPTION'?'Quantity OPEN':o.quoteEvidence.quotedQuantity+' '+o.quoteEvidence.quotedUnit)+' / '+(mgwCurrentIncluded0550(o)?'Included':o.quoteEvidence.classification==='OPTION'?'Option':'Quoted supply')])});
   const radioRows=currentMgw.filter(o=>mgwRadioDtrsOffer0550(o)&&o.components?.length).flatMap(o=>radioLotIncludedLines0550(o,o.quoteEvidence.quotedQuantity).map(line=>[o.id,(line.quantity??'—')+' '+(line.unit||''),sanitizeCustomerText0550(line.description),sanitizeCustomerText0550(line.note)]))
-   .filter(r=>!r[1].endsWith('x')&&!r[3].toLowerCase().includes('included in lot'));
+
   if(radioRows.length)tables.push({title:'Radio lot contents · included in the lot price · not additive',heads:['Offer','Quantity in this lot','Description / part','Note'],rows:radioRows});
  }
  if(systemToken==='TEL-RADIO-DTRS'&&['description','parameters','equipment'].includes(sectionId)){

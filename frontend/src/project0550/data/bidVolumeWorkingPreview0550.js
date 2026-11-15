@@ -108,7 +108,8 @@ export function scheduleAllocationPlan0550(data,savedView,workingLines=savedView
  return savedView.unallocated.map(line=>{
   if(previouslySaved.has(line.id))return {line,proposal:null,reason:'The previous draft was removed. Select a destination in 11.M to restore it.'};
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
-  if(raw?.id==='LINE-MGW-CURRENT-RADIO-016'||raw?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'||(raw?.systemToken==='TEL-RADIO-DTRS'&&raw?.tagRef==='AMS01'))return {line,proposal:null,reason:'Non-MR vendor extra (MGW APM quote) — not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'};
+  const hasMr=data.lines.some(l=>Boolean(l.mrRequirementId));
+   if(hasMr&&(raw?.id==='LINE-MGW-CURRENT-RADIO-016'||raw?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'||(raw?.systemToken==='TEL-RADIO-DTRS'&&raw?.tagRef==='AMS01')))return {line,proposal:null,reason:'Non-MR vendor extra (MGW APM quote) — not in customer MR scope. Retained in internal 10.2 SI tracking as AVAILABLE_FOR_REALLOCATION.'};
   if(!raw||!base)return {line,proposal:null,reason:'No source category rule; SI must decide the destination'};
   // SI spare drafts are deliberately absent from suggestions and auto-saves.
   // Only an explicit saved 11.M binding may enter Volume I A1/A2 totals.
@@ -229,7 +230,7 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
    customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null,
    customerTHB:reviewed?line.customerTHB:current?working.customerTHB:working?.provisionalCustomerTHB??null};
  });
- const existingBindings=(data.bidVolumes?.bindings||[]).map(b=>{const raw=data.lines.find(l=>l.id===b.lineId),hours=b.schedule==='C7'&&b.hoursPerDay===null?scheduleHoursFromCalculation0550(data,raw):null;return hours?{...b,hoursPerDay:hours.hoursPerDay}:b;});
+ const existingBindings=(data.bidVolumes?.bindings||[]).filter(b=>b.lineId!=='LINE-MGW-CURRENT-RADIO-016'&&data.lines.find(l=>l.id===b.lineId)?.coverageBasis!=='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION').map(b=>{const raw=data.lines.find(l=>l.id===b.lineId),hours=b.schedule==='C7'&&b.hoursPerDay===null?scheduleHoursFromCalculation0550(data,raw):null;return hours?{...b,hoursPerDay:hours.hoursPerDay}:b;});
  const previewData={...data,bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:[...existingBindings,...proposed.map(p=>p.proposal)]}};
  const projected=deriveBidVolumes0550(previewData,{...model,official:{...model.official,lines}},systems,today);
  const bindings=projected.bindings.map(b=>({...b,priceBasis:priceBasis.get(b.lineId),suggested:proposed.some(p=>p.line.id===b.lineId)}));

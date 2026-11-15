@@ -300,8 +300,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
  const bindings=currency==='THB'?usdBindings.map(scheduleBindingTHB0550):usdBindings;
  const problems=[],byOwner=new Map(),conflictingOwners=new Set(),pendingOwners=[];
  const resolveOwner=l=>{if(!l)return null;if(!l.coveredByLineId)return l.id;const scope=mrLineScope0550({lines},l);if(!scope.covered){problems.push('C1_COVERAGE_OWNER_UNRESOLVED / '+l.id);return null;}return scope.owner.id;};
+ const hasMrContext=lines.some(l=>Boolean(l?.mrRequirementId));
  for(const [i,b] of bindings.entries()){
-  const isAms01Radio=b.lineId==='LINE-MGW-CURRENT-RADIO-016'||(b.line?.tagRef==='AMS01'&&(b.line?.systemToken==='TEL-RADIO-DTRS'||/dmr/i.test(b.line?.description||'')))||b.line?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION';
+  const isAms01Radio=hasMrContext&&(b.lineId==='LINE-MGW-CURRENT-RADIO-016'||(b.line?.tagRef==='AMS01'&&(b.line?.systemToken==='TEL-RADIO-DTRS'||/dmr/i.test(b.line?.description||'')))||b.line?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION');
   if(isAms01Radio){pendingOwners.push({...b,status:'NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'});continue;}
   const previous=byOwner.get(b.lineId)?.binding;
   if(previous){
@@ -653,7 +654,7 @@ export function c1AppendixOverview0550(projection){
  const chargedIn=new Map();
  for(const g of projection.groups)for(const r of g.rows)for(const b of r.priceOwners||[])if(!chargedIn.has(b.lineId))chargedIn.set(b.lineId,g.id);
  return projection.groups.map(g=>{
-  const owners=g.rows.flatMap(r=>r.priceOwners||[]),pending=(projection.pendingOwners||[]).filter(b=>(C1_APPENDICES_0550.find(a=>a.systems.includes(b.line.systemToken))?.id||'OTHER')===g.id);
+  const owners=g.rows.flatMap(r=>r.priceOwners||[]),pending=(projection.pendingOwners||[]).filter(b=>b.status!=='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'&&b.lineId!=='LINE-MGW-CURRENT-RADIO-016'&&b.line?.coverageBasis!=='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'&&(C1_APPENDICES_0550.find(a=>a.systems.includes(b.line.systemToken))?.id||'OTHER')===g.id);
   const rollup=scheduleRollup0550([...owners,...pending]);
   const openMR=g.rows.filter(openMr).length;
   const keys=unique([...g.rows.map(r=>r.key),...owners.map(b=>b.lineId),...pending.map(b=>b.lineId)]);
