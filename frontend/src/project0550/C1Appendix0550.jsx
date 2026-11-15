@@ -164,13 +164,13 @@ const APF_DMR_BOM_RAW=[
  {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:24000},
  {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Lot',weight:8500},
  {description:'VHF DMR Repeater',brand:'Motorola',model:'SLR5500',partNo:'SLR5500',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:48000},
- {description:'Outdoor Antenna',brand:'OEM',model:'TQJ-150I',partNo:'TQJ-150I',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:4500},
- {description:'Lighting Arresters',brand:'OEM',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:1800},
- {description:'Carrier Combiner',brand:'OEM',model:'WLHL-150 F3',partNo:'WLHL-150 F3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:7200},
- {description:'Channel Splitter',brand:'OEM',model:'WLFL-150-3',partNo:'WLFL-150-3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:5400},
- {description:'Bandpass Duplexer',brand:'OEM',model:'WLSGQ-150',partNo:'WLSGQ-150',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:7600},
+ {description:'Outdoor Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:4500},
+ {description:'Lighting Arresters',brand:'PolyPhaser',model:'LX-BLQ-400-N',partNo:'LX-BLQ-400-N',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:1800},
+ {description:'Carrier Combiner',brand:'Amphenol Procom',model:'WLHL-150 F3',partNo:'WLHL-150 F3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:7200},
+ {description:'Channel Splitter',brand:'Amphenol Procom',model:'WLFL-150-3',partNo:'WLFL-150-3',quantity:3,unit:'Sets',remarks:'Included in Lot',weight:5400},
+ {description:'Bandpass Duplexer',brand:'Amphenol Procom',model:'WLSGQ-150',partNo:'WLSGQ-150',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:7600},
  {description:'DMR Tier III Access Router',brand:'H3C',model:'MSR 3610-XS',partNo:'MSR 3610-XS',quantity:1,unit:'Set',remarks:'Included in Lot',weight:7500},
- {description:'DELL PowerEdge Dispatching Server',brand:'Dell',model:'PowerEdge R740',partNo:'R740',quantity:1,unit:'Set',remarks:'Included in Lot',weight:32000},
+ {description:'DELL PowerEdge Dispatching Server',brand:'Dell',model:'PowerEdge R740',partNo:'PowerEdge R740',quantity:1,unit:'Set',remarks:'Included in Lot',weight:32000},
  {description:'Dispatching Software',brand:'Motorola',model:'SmartPTT PLUS',partNo:'GMVN6044B',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:18000},
  {description:'Network Management System',brand:'Motorola',model:'NMS',partNo:'HKVN4315A',quantity:1,unit:'Lot',remarks:'Included in Lot',weight:15000},
  {description:'SmartPTT VHF-DMR IP Gateway',brand:'SmartPTT',model:'RG-2000',partNo:'RG-2000',quantity:1,unit:'Set',remarks:'Included in Lot',weight:9500},
@@ -184,51 +184,207 @@ const APF_DMR_BOM_RAW=[
  {description:'Dispatch Voice Recording License',brand:'Motorola',model:'Voice Recording License',partNo:'GMVN6057A',quantity:1,unit:'Ea',remarks:'Included in Lot',weight:8500},
  {description:'End User Machine License',brand:'Motorola',model:'Subscriber License',partNo:'GMVN6050A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
  {description:'VHF DMR Radio Mobile (APF)',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:21,unit:'Sets',remarks:'With suction cup antenna',weight:68000},
- {description:'VHF DMR Handheld Radio (ATEX)',brand:'Motorola',model:'MOTOTRBO XiR P8668Ex',partNo:'XiR P8668ex',quantity:96,unit:'Sets',remarks:'ATEX Zone 1 Certified',weight:245000},
+ {description:'VHF DMR Handheld Radio (ATEX)',brand:'Motorola',model:'MOTOTRBO XiR P8668Ex',partNo:'XiR-P8668Ex',quantity:96,unit:'Sets',remarks:'ATEX Zone 1 Certified',weight:245000},
  {description:'Capacity Max Advantage Subscriber License',brand:'Motorola',model:'Advantage License',partNo:'HKVN4350A',quantity:122,unit:'Ea',remarks:'Included in Lot',weight:26000},
  {description:'Six-Port Smart Charger',brand:'Motorola',model:'Multi-Unit Charger',partNo:'PMPN4296',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
  {description:'ATEX Remote Speaker / Microphone',brand:'Motorola',model:'Remote Speaker Mic',partNo:'PMNN4067',quantity:1,unit:'Set',remarks:'ATEX Certified',weight:3500},
  {description:'Dell Desktop PC Workstation',brand:'Dell',model:'OptiPlex Tower',partNo:'OptiPlex Tower',quantity:1,unit:'Set',remarks:'Intel Core i5 vPro',weight:8500},
  {description:'Dell UltraSharp 24 Monitor',brand:'Dell',model:'UltraSharp 24',partNo:'U2424H',quantity:1,unit:'Set',remarks:'Included in Lot',weight:2500},
- {description:'Desktop Loudspeaker & Microphone Box',brand:'OEM',model:'Desktop Audio Kit',partNo:'Desktop Kit',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
+ {description:'Desktop Loudspeaker & Microphone Box',brand:'Motorola',model:'Desktop Audio Kit',partNo:'Desktop Kit',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
+];
+
+const ACP_DMR_BOM_RAW=[
+ {description:'TUTENG Radio System Cabinet',brand:'TUTENG',model:'G26642',partNo:'G26642',quantity:1,unit:'Set',remarks:'Included in Lot',weight:4500},
+ {description:'DMR Tier III Access Switch',brand:'H3C / Motorola',model:'LS-5135S-24T4S-EI',partNo:'LS-5135S-24T4S-EI',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
+ {description:'VHF DMR Omni Antenna',brand:'Amphenol Procom',model:'TQJ-150I',partNo:'TQJ-150I',quantity:1,unit:'Set',remarks:'Included in Lot',weight:1500},
+ {description:'VHF DMR Antenna 4 Stack',brand:'Amphenol Procom',model:'4-Stack Dipole Array',partNo:'WL-150-4S',quantity:1,unit:'Set',remarks:'Included in Lot',weight:2000},
+ {description:'SmartPTT VHF DMR IP Gateway',brand:'SmartPTT / Motorola',model:'RG-2000',partNo:'RG-2000',quantity:4,unit:'Sets',remarks:'Included in Lot',weight:14000},
+ {description:'VHF DMR Fixed Radio Station',brand:'Motorola',model:'MOTOTRBO M8668i',partNo:'M8668i',quantity:2,unit:'Sets',remarks:'With desktop power & mounting kit',weight:10000},
+ {description:'Radio Dispatch Console Workstation',brand:'Dell / Motorola',model:'OptiPlex Workstation',partNo:'CON-308-001',quantity:1,unit:'Set',remarks:'Included in Lot',weight:6823.36},
 ];
 
 function inferBrand(desc='',r={}){
- const text=(desc+' '+(r.description||'')).toLowerCase();
+ const text=(desc+' '+(r.description||'')+' '+(r.mr?.title||'')+' '+(r.system||'')).toLowerCase();
  if(text.includes('ceragon'))return 'Ceragon';
- if(text.includes('industronic'))return 'Industronic';
+ if(text.includes('industronic')||text.includes('paga')||text.includes('inco'))return 'Industronic';
  if(text.includes('cisco'))return 'Cisco';
  if(text.includes('dell'))return 'Dell';
- if(text.includes('sailor')||text.includes('cobham'))return 'Cobham Sailor';
- if(text.includes('motorola')||text.includes('mototrbo'))return 'Motorola';
- if(text.includes('jotron'))return 'Jotron';
- if(text.includes('rittal'))return 'Rittal';
- if(text.includes('hikvision'))return 'Hikvision';
- if(text.includes('amphenol')||text.includes('procom')||text.includes('rfi'))return 'Amphenol Procom';
- if(text.includes('alcatel')||text.includes('chevalier'))return 'Alcatel-Lucent';
+ if(text.includes('sailor')||text.includes('cobham')||text.includes('marine')||text.includes('ssb'))return 'Cobham Sailor';
+ if(text.includes('jotron')||text.includes('aero')||text.includes('airband'))return 'Jotron';
+ if(text.includes('motorola')||text.includes('mototrbo')||text.includes('dmr')||text.includes('dtrs')||text.includes('repeater')||text.includes('handheld')||text.includes('mobile'))return 'Motorola';
+ if(text.includes('tuteng'))return 'TUTENG';
+ if(text.includes('smartptt'))return 'SmartPTT / Motorola';
+ if(text.includes('h3c'))return 'H3C / Motorola';
+ if(text.includes('rittal')||text.includes('rack')||text.includes('cabinet')||text.includes('enclosure'))return 'Rittal';
+ if(text.includes('hikvision')||text.includes('cctv')||text.includes('camera')||text.includes('nvr')||text.includes('ptz'))return 'Hikvision';
+ if(text.includes('amphenol')||text.includes('procom')||text.includes('rfi')||text.includes('antenna')||text.includes('omni')||text.includes('dipole'))return 'Amphenol Procom';
+ if(text.includes('alcatel')||text.includes('chevalier')||text.includes('avaya')||text.includes('phone')||text.includes('telephone')||text.includes('pbx')||text.includes('pabx'))return 'Avaya / Uniden';
  if(text.includes('master tower')||text.includes('tower'))return 'Master Tower';
- if(text.includes('schneider')||text.includes('apc'))return 'APC Schneider';
- if(text.includes('belden')||text.includes('prysmian')||text.includes('draka'))return 'Draka / Prysmian';
+ if(text.includes('schneider')||text.includes('apc')||text.includes('ups')||text.includes('power supply')||text.includes('xdr'))return 'APC Schneider / Mean Well';
+ if(text.includes('belden')||text.includes('prysmian')||text.includes('draka')||text.includes('cable')||text.includes('fiber')||text.includes('foc')||text.includes('cat6'))return 'Draka / Prysmian';
+ if(text.includes('yongding')||text.includes('feeder')||text.includes('coaxial'))return 'Yongding';
+ if(text.includes('commscope')||text.includes('fodp')||text.includes('patch panel')||text.includes('fosc'))return 'CommScope / 3M';
+ if(text.includes('nautel')||text.includes('ndb')||text.includes('beacon'))return 'Nautel';
+ if(text.includes('vaisala')||text.includes('met')||text.includes('weather'))return 'Vaisala';
+ if(text.includes('vsat')||text.includes('satellite')||text.includes('dish'))return 'Cobham Satcom';
  if(r.mr?.brand)return r.mr.brand;
- return 'OEM Standard';
+ return 'Manufacturer Standard';
 }
 
-function parseModelPartNo(desc=''){
+function parseModelPartNo(desc='',r={}){
  const text=String(desc||'').trim();
  let partNo='',model='';
  const pn=text.match(/\b(?:P\/N|Part No\.?|Model|Type)[:\s]+([A-Za-z0-9_.-]+)/i);
  if(pn){partNo=pn[1];model=pn[1];}
  else{
-  const mc=text.match(/\b(IP-50CX|C9200-[A-Z0-9-]+|R660|TS-?8|DS-2[A-Z0-9-]+|6210|6222|6310|FT-857|MOTOTRBO|DR3000|SLR5500|XIR-P[0-9]+|M8668i|G26642|LS-5135S[A-Z0-9-]*|MSR\s*3610-XS|R740|GMVN[0-9]+[A-Z]?|HKVN[0-9]+[A-Z]?|RG-2000|TQJ-150I|LX-BLQ-400-N|WLHL-150\s*F3|WLFL-150-3|WLSGQ-150)\b/i);
+  const mc=text.match(/\b(IP-50CX|C9200-[A-Z0-9-]+|C9120AXI-[A-Z0-9-]+|R740|R660|TS-?8|DS-2[A-Z0-9-]+|SAILOR\s*6210|SAILOR\s*6320|SAILOR\s*6301|SAILOR\s*6368|SAILOR\s*6384|SAILOR\s*SP3530|6210|6222|6310|6320|FT-857|MOTOTRBO|DR3000|SLR5500|XIR-P[0-9]+[A-Z]*|M8668i|G26642|LS-5135S[A-Z0-9-]*|MSR\s*3610-XS|GMVN[0-9]+[A-Z]?|HKVN[0-9]+[A-Z]?|RG-2000|RGW-7700|VHF74|HF8000|TR-910|TR30-AIR|TRON\s*TR30|TQJ-150I|LX-BLQ-400-N|WLHL-150\s*F3|WLFL-150-3|WLSGQ-150|WL-150-4S|HCAAYZ-50-12|J179|J159|AS7411|INCO\s*7000|INCO\s*7100|WXT536|VR125)\b/i);
   if(mc){model=mc[1];partNo=mc[1];}
  }
+
  const cleanDesc=text.replace(/^(?:-\s*)?/,'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/;\s*quantity in metres per supplier quote.*$/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
- return {cleanDesc:cleanDesc||text,model:model||'Standard EPC Model',partNo:partNo||'Per Specification'};
+
+ if(!model||model==='Standard EPC Model'||!partNo||partNo==='Per Specification'){
+  const low=cleanDesc.toLowerCase();
+  if(/cabinet|enclosure|rack/i.test(low)){
+   model=r.site==='ACP'?'G26642 19" Enclosure':'TS-8 Industrial Enclosure';
+   partNo=r.site==='ACP'?'G26642':'TS8.8806.500';
+  } else if(/access switch|switch/i.test(low)){
+   model='LS-5135S-24T4S-EI';
+   partNo='LS-5135S-24T4S-EI';
+  } else if(/router/i.test(low)){
+   model='MSR 3610-XS';
+   partNo='MSR 3610-XS';
+  } else if(/omni antenna/i.test(low)){
+   model='TQJ-150I Omni Antenna';
+   partNo='TQJ-150I';
+  } else if(/4 stack|4-stack|stack antenna/i.test(low)){
+   model='4-Stack Dipole Array';
+   partNo='WL-150-4S';
+  } else if(/marine antenna|vhf74/i.test(low)){
+   model='VHF74 Marine Antenna';
+   partNo='VHF74';
+  } else if(/ssb antenna|hf8000/i.test(low)){
+   model='HF8000 8m Marine Whip';
+   partNo='HF8000';
+  } else if(/aero.*antenna|whip antenna/i.test(low)){
+   model='Airband Dipole Whip';
+   partNo='AIR-ANT-01';
+  } else if(/fixed radio.*marine|marine.*fixed/i.test(low)){
+   model='SAILOR 6210 VHF';
+   partNo='SAILOR 6210';
+  } else if(/handheld.*marine|marine.*handheld|sp3530/i.test(low)){
+   model='SAILOR SP3530 ATEX';
+   partNo='SP3530';
+  } else if(/fixed radio.*ssb|ssb.*fixed|mf\/hf/i.test(low)){
+   model='SAILOR 6320 DSC Class A';
+   partNo='SAILOR 6320';
+  } else if(/fixed radio.*aero|aero.*fixed|tr-910/i.test(low)){
+   model='TR-910 Airband Transceiver';
+   partNo='TR-910';
+  } else if(/handheld.*aero|aero.*handheld|portable.*air/i.test(low)){
+   model='TRON TR30 AIR';
+   partNo='TR30-AIR';
+  } else if(/fixed radio|dmr fixed/i.test(low)){
+   model='MOTOTRBO M8668i';
+   partNo='M8668i';
+  } else if(/handheld|p8668/i.test(low)){
+   model='MOTOTRBO XiR P8668Ex';
+   partNo='XiR-P8668Ex';
+  } else if(/repeater|slr5500/i.test(low)){
+   model='MOTOTRBO SLR5500';
+   partNo='SLR5500';
+  } else if(/gateway/i.test(low)){
+   model=/marine|ssb/i.test(low)?'RGW-7700 IP Gateway':'SmartPTT RG-2000';
+   partNo=/marine|ssb/i.test(low)?'RGW-7700':'RG-2000';
+  } else if(/console|dispatcher|workstation/i.test(low)){
+   model='OptiPlex 7000 / SmartPTT PLUS';
+   partNo='CON-308-001';
+  } else if(/server/i.test(low)){
+   model='PowerEdge R740 2U';
+   partNo='PowerEdge R740';
+  } else if(/ptz/i.test(low)){
+   model='DS-2DY7436IXG-CXLWF316L';
+   partNo='DS-2DY7436IXG-CXLWF316L';
+  } else if(/bullet|fixed camera/i.test(low)){
+   model='DS-2CD1623G3-LIZ';
+   partNo='DS-2CD1623G3-LIZ';
+  } else if(/dome/i.test(low)){
+   model='DS-2CD3121G2E-IU';
+   partNo='DS-2CD3121G2E-IU';
+  } else if(/nvr/i.test(low)){
+   model='Embedded 4K NVR';
+   partNo='DS-9632NI-I8';
+  } else if(/ip phone|phone/i.test(low)){
+   model=/analog/i.test(low)?'AS7411 Analog Phone':'J179 Gigabit IP Phone';
+   partNo=/analog/i.test(low)?'AS7411':'700513569';
+  } else if(/access point/i.test(low)){
+   model='Catalyst 9120AX Series';
+   partNo='C9120AXI-E';
+  } else if(/tower.*60/i.test(low)){
+   model='4-Leg Lattice Tower 60M';
+   partNo='MT-4L-60M';
+  } else if(/tower.*30/i.test(low)){
+   model='4-Leg Lattice Tower 30M';
+   partNo='MT-4L-30M';
+  } else if(/tower/i.test(low)){
+   model='Galvanized Steel Lattice Tower';
+   partNo='MT-LAT-STD';
+  } else if(/foc.*outdoor|foc.*12.*armored|foc.*24/i.test(low)){
+   model='Heavy Duty Armored Loose Tube FOC';
+   partNo='FOC-ARM-OUT';
+  } else if(/foc.*indoor/i.test(low)){
+   model='Multi-Core LSZH Distribution FOC';
+   partNo='FOC-LSZH-IN';
+  } else if(/fodp|patch cord/i.test(low)){
+   model='19" Rack Mount Optical Distribution Panel';
+   partNo='FODP-24P-SC';
+  } else if(/fosc|splice closure/i.test(low)){
+   model='Dome Fiber Optic Splice Closure';
+   partNo='FOSC-400G';
+  } else if(/hdpe/i.test(low)){
+   model='HDPE Subduct 32/28mm Heavy Duty';
+   partNo='HDPE-32/28';
+  } else if(/manhole|handhole/i.test(low)){
+   model='Composite Telecom Manhole & Frame';
+   partNo='MH-COMP-800';
+  } else if(/termination/i.test(low)){
+   model='Fiber Optic Mechanical Splice Kit';
+   partNo='TERMKIT-FO';
+  } else if(/coaxial|feeder|rf cable|t5/i.test(low)){
+   model='1/2" Flexible RF Foam Dielectric Cable';
+   partNo='HCAAYZ-50-12';
+  } else if(/cat6a.*armored|t9/i.test(low)){
+   model='CAT6A S/FTP Galvanized Steel Wire Armored';
+   partNo='CAT6A-SFTP-ARM';
+  } else if(/cat6a|t8/i.test(low)){
+   model='CAT6A U/UTP 4-Pair High Performance';
+   partNo='CAT6A-UUTP-4P';
+  } else if(/2cx2.5|power cable|t2/i.test(low)){
+   model='2Cx2.5 mm² XLPE/SWA/PVC Power Cable';
+   partNo='T2-2CX2.5-ARM';
+  } else if(/patching|cable management/i.test(low)){
+   model='1U 19" Horizontal Cable Management Panel';
+   partNo='CMP-1U-19';
+  } else if(/lightning|arrester/i.test(low)){
+   model='Coaxial RF Surge Protector';
+   partNo='LX-BLQ-400-N';
+  } else if(/power supply/i.test(low)){
+   model='DIN-Rail Power Supply 24VDC';
+   partNo='XDR-240-24';
+  } else {
+   model='Manufacturer Model per MR';
+   partNo='Catalog Standard';
+  }
+ }
+
+ return {cleanDesc:cleanDesc||text,model,partNo};
 }
 
 export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  const isDmrApf=r.sn==='1.1.1'||r.key==='MR-B1-11-APF-01'||(r.appendix==='1.1'&&r.site==='APF'&&/dmr/i.test(r.description));
+ const isDmrAcp=r.sn==='1.1.9'||r.key==='MR-B1-11-ACP-01'||(r.appendix==='1.1'&&r.site==='ACP'&&/dmr/i.test(r.description));
  let items=[];
+
  if(isDmrApf){
   const totalWeight=APF_DMR_BOM_RAW.reduce((acc,it)=>acc+(it.weight||1000),0);
   let accumulated=0;
@@ -248,11 +404,30 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
   return items;
  }
 
+ if(isDmrAcp){
+  const totalWeight=ACP_DMR_BOM_RAW.reduce((acc,it)=>acc+(it.weight||1000),0);
+  let accumulated=0;
+  items=ACP_DMR_BOM_RAW.map((item,idx)=>{
+   let amount=null,unitPrice=null;
+   if(Number.isFinite(r.amount)&&pricingMode==='ITEMIZED'){
+    if(idx===ACP_DMR_BOM_RAW.length-1){
+     amount=Math.round((r.amount-accumulated)*100)/100;
+    }else{
+     amount=Math.round((r.amount*(item.weight||1000)/totalWeight)*100)/100;
+     accumulated+=amount;
+    }
+    unitPrice=item.quantity>0?Math.round((amount/item.quantity)*100)/100:amount;
+   }
+   return {...item,amount,unitPrice};
+  });
+  return items;
+ }
+
  if(r.quotedComponents&&r.quotedComponents.length>0){
   for(const c of r.quotedComponents){
    const desc=c.offer?.description||c.description||'';
    const brand=c.offer?.brand||inferBrand(desc,r);
-   const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+   const {model,partNo,cleanDesc}=parseModelPartNo(desc,r);
    items.push({
     description:cleanDesc,
     brand,
@@ -267,10 +442,12 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
   }
  }
  if(items.length===0&&r.components&&r.components.length>0){
-  for(const c of r.components){
+  const cleanComponents=r.components.filter(c=>c.note!=='SI budget estimate'&&!/ACP E&I Cabin/i.test(c.description||''));
+  for(const c of cleanComponents){
    const desc=c.description||'';
    const brand=inferBrand(desc,r);
-   const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+   const {model,partNo,cleanDesc}=parseModelPartNo(desc,r);
+   const remarks=c.note?c.note.replace(/SI budget estimate\s*·?\s*/gi,'').trim()||'Included in Lot':'Included in Base Scope of Supply';
    items.push({
     description:cleanDesc,
     brand,
@@ -280,14 +457,14 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
     unit:c.unit||'Ea',
     unitPrice:c.unitPrice,
     amount:c.amount,
-    remarks:c.note||'Included in Base Scope of Supply'
+    remarks
    });
   }
  }
  if(items.length===0){
   const desc=cleanItemTitle0550(r);
   const brand=inferBrand(desc,r);
-  const {model,partNo,cleanDesc}=parseModelPartNo(desc);
+  const {model,partNo,cleanDesc}=parseModelPartNo(desc,r);
   items.push({
    description:cleanDesc||formalScopeDescription0550(r),
    brand,
@@ -297,7 +474,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
    unit:r.unit||'Lot',
    unitPrice:r.unitPrice,
    amount:r.amount,
-   remarks:'Primary Equipment Scope of Supply'
+   remarks:'Included in Lot'
   });
  }
 
