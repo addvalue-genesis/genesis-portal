@@ -214,7 +214,9 @@ function OfficialCustomerSheet({model,priced,itemized,currency}){
     if(row.kind==="highlight")return <tr key={index} className="p553-sheet-highlight"><td colSpan={span}>{row.cells[0]}</td></tr>;
     if(row.kind==="note")return <tr key={index} className="b3bf-note"><td colSpan={span}>{row.cells[0]}</td></tr>;
     if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-testid={priced?"b3bf-total":undefined}><td colSpan={6}>{row.cells[0]}</td><td className="p553-price-cell">{priced?row.cells[6]:""}</td><td>{row.cells[7]}</td></tr>;
-    return <tr key={index} className="p553-mr-preview-row" data-testid={row.kind==="a1"?"b3bf-a1":undefined}>{row.cells.map((value,cell)=><td key={cell} className={priceCell(cell)?"p553-price-cell":"b3bf-pre"}>{value}</td>)}</tr>;
+    const rowClass=row.kind==="bfhead"?"b3bf-bfhead":row.kind==="day"?"b3bf-day":"p553-mr-preview-row";
+    const testId=row.kind==="a1"?"b3bf-a1":row.kind==="bfhead"?"b3bf-head":row.kind==="day"?"b3bf-day":undefined;
+    return <tr key={index} className={rowClass} data-testid={testId}>{row.cells.map((value,cell)=><td key={cell} className={priceCell(cell)?"p553-price-cell":"b3bf-pre"}>{value}</td>)}</tr>;
    })}</tbody>
   </table></div>
  </div>;
@@ -274,6 +276,9 @@ const CSS=`
 .b3bf-sheet td,.b3bf-bom td,.b3bf-carve td,.b3bf-carve th{border:1px solid #d1dde5;padding:5px 7px;vertical-align:top}
 .b3bf-num{text-align:right;font-variant-numeric:tabular-nums;white-space:normal}
 .b3bf-sec td{background:#dbe9f3;font-weight:700}
+.p553-customer-table tr.b3bf-bfhead td{background:#dbe9f3;font-weight:700}
+.p553-customer-table tr.b3bf-day td{background:#f7fafc;font-weight:400;color:#345}
+.p553-customer-table tr.b3bf-day td:nth-child(2){padding-left:18px}
 .b3bf-site td{background:#f4f8fb;font-weight:600}
 .b3bf-ref td{color:#5b6b78}
 .b3bf-tg{border:0;background:none;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;padding:0;text-align:left}

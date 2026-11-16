@@ -16,10 +16,10 @@ import MTO from "./snapshots/mr0001.mto.rev04.sourceRows.json";
 
 export const B3BF_JUTAL_NOTE_0553="Note: Installation and cable routing are by the Jutal team. / งานติดตั้งและเดินสายโดยทีม Jutal";
 // Item 7 (VND) for this additional proposal only. Jack 2026-11-16: USD 1,000 and
-// USD 800 are already ADDVALUE selling prices, and MOB/DEMOB stays as instructed.
-// Sell = that VND cost × 1.00. Not posted into the 10.2/10.3.1 B3 dossier.
-export const B3BF_ITEM7_NOTE_0553="Jack 2026-11-16: no markup, USD 1,000/800 are ADDVALUE selling prices";
-export const B3BF_ITEM7_EQUATION_0553="VND cost = 9 × (1,000 + 800) USD + 2 × 1 × 1,000 USD = 16,200 + 2,000 = 18,200 USD; × 31.5 = 573,300 THB";
+// USD 800 are already ADDVALUE selling prices. MOB/DEMOB is USD 2,000 per person
+// round trip. Sell = that VND cost × 1.00. Not posted into the 10.2/10.3.1 B3 dossier.
+export const B3BF_ITEM7_NOTE_0553="Jack 2026-11-16: no markup. USD 1,000/800 are ADDVALUE selling prices. MOB/DEMOB is USD 2,000 per person round trip";
+export const B3BF_ITEM7_EQUATION_0553="VND cost = 9 × (1,000 + 800) USD + 2 × 1 × 2,000 USD = 16,200 + 4,000 = 20,200 USD; × 31.5 = 636,300 THB";
 export const B3BF_LAST_LINE_NOTE_0553="Note: Working days on the Greenfield/base B3 scope have been reduced by 5 working days. / ปรับลดวันทำงานไปที่ Greenfield/base B3 ลดลง 5 วันทำงาน";
 export const B3BF_NET_CALENDAR_DAYS_0553=9;
 export const B3BF_SITE_DAYS_0553=Object.freeze({ZPQ:2,ZWP8:2,ZWP11:2});
@@ -139,13 +139,13 @@ function item7Vnd(senior,specialist,days,fxTHBPerUSD,seniorLineUSD,specialistLin
  ];
  const sellUSD=round(vndUSD*sellFactor),sellTHB=round(vndTHB*sellFactor);
  if(senior.usdPerPersonDay!==1000||specialist.usdPerPersonDay!==800||days!==9||
-    labourUSD!==16200||mobPersons!==2||mobTrips!==1||mobUsdPerPersonTrip!==1000||mobUSD!==2000||
-    vndUSD!==18200||fxTHBPerUSD!==31.5||vndTHB!==573300||
+    labourUSD!==16200||mobPersons!==2||mobTrips!==1||mobUsdPerPersonTrip!==2000||mobUSD!==4000||
+    vndUSD!==20200||fxTHBPerUSD!==31.5||vndTHB!==636300||
     round(seniorLineUSD+specialistLineUSD)!==labourUSD||round(labourUSD+mobUSD)!==vndUSD||
     round(vndUSD*fxTHBPerUSD)!==vndTHB||sellFactor!==1||sellUSD!==vndUSD||sellTHB!==vndTHB||
     lines[0].totalUSD!==9000||lines[0].totalTHB!==283500||
     lines[1].totalUSD!==7200||lines[1].totalTHB!==226800||
-    lines[2].totalUSD!==2000||lines[2].totalTHB!==63000)
+    lines[2].totalUSD!==4000||lines[2].totalTHB!==126000)
   throw Error("Item 7 VND cost is not the ADDVALUE selling price at factor 1.00");
  return {
   id:"ITEM-7-VND",label:"Item 7 (VND)",
@@ -157,7 +157,7 @@ function item7Vnd(senior,specialist,days,fxTHBPerUSD,seniorLineUSD,specialistLin
   teamDays:days,labourUSD,mobPersons,mobTrips,mobUsdPerPersonTrip,mobUSD,
   vndCostUSD:vndUSD,fxTHBPerUSD,vndCostTHB:vndTHB,sellUSD,sellTHB,
   lines,equation:B3BF_ITEM7_EQUATION_0553,
-  sellEquation:"Sell = VND cost × 1.00 = 18,200 USD / 573,300 THB",
+  sellEquation:"Sell = VND cost × 1.00 = 20,200 USD / 636,300 THB",
   note:B3BF_ITEM7_NOTE_0553
  };
 }
@@ -179,7 +179,7 @@ function build(){
  const specialistLineUSD=round(days*specialist.usdPerPersonDay);
  const proposalTHB=round(days*teamDayTHB);
  const proposalUSD=round(days*teamDayUSD);
- const mobPersons=2,mobTrips=1,mobUsdPerPersonTrip=1000;
+ const mobPersons=2,mobTrips=1,mobUsdPerPersonTrip=2000;
  const mobUSD=round(mobPersons*mobTrips*mobUsdPerPersonTrip);
  const mobTHB=round(mobUSD*fxTHBPerUSD);
  const grandTotalTHB=round(proposalTHB+mobTHB);
@@ -196,7 +196,7 @@ function build(){
     round(seniorLineUSD*fxTHBPerUSD)!==seniorLineTHB||round(specialistLineUSD*fxTHBPerUSD)!==specialistLineTHB||
     seniorLineTHB!==283500||specialistLineTHB!==226800||proposalTHB!==510300||
     round(seniorLineTHB+specialistLineTHB)!==proposalTHB||
-    mobUSD!==2000||mobTHB!==63000||grandTotalTHB!==573300||grandTotalUSD!==18200||
+    mobUSD!==4000||mobTHB!==126000||grandTotalTHB!==636300||grandTotalUSD!==20200||
     senior.directCostTHB!==null||specialist.directCostTHB!==null||
     round(mobUSD*fxTHBPerUSD)!==mobTHB||round(grandTotalUSD*fxTHBPerUSD)!==grandTotalTHB||
     sat.satTeamDays!==28||sat.satWorkingSellTHB!==1587600||sat.siteSurveyTeamDays!==5||
@@ -230,8 +230,8 @@ function build(){
    unitRateTHB:round(mobUsdPerPersonTrip*fxTHBPerUSD),unitRateUSD:mobUsdPerPersonTrip,
    totalTHB:mobTHB,totalUSD:mobUSD,countsInSubtotal:false,includedInAdditional:true,
    officialRemarks:"Included in B3-BF",
-   remarks:"Jack instruction 2026-11-16, USD 1,000/person/trip. Ticket + POB. Not the survey MOB labour already in base B3.",
-   unpricedRemarks:"Jack instruction 2026-11-16. Ticket + POB. Not the survey MOB labour already in base B3."},
+   remarks:"Jack instruction 2026-11-16, USD 2,000 per person round trip × 2 persons. Ticket + POB. Not the survey MOB labour already in base B3.",
+   unpricedRemarks:"Jack instruction 2026-11-16. Ticket + POB, 2 persons × 1 round trip. Not the survey MOB labour already in base B3."},
   {id:"BF.INFO",kind:"info",internalOnly:true,activity:"Greenfield/base B3 reduced by 5 working days",
    countsInSubtotal:false,unitRateTHB:null,totalTHB:null,
    remarks:"Carve-out basis OPEN. No price effect in this proposal. Base B3 is not modified."},
@@ -263,7 +263,7 @@ function build(){
  if(partB.length!==14||partB.some(row=>row.priceTHB!==null)||!partB.some(row=>row.code==="B3"&&row.note==="Original quotation, unchanged"))
   throw Error("Part B reference lines must stay unpriced");
  const openItems=[
-  {id:"mob",topic:"MOB/DEMOB",detail:"Ticket + POB is included at Jack instruction 2026-11-16, USD 1,000/person/trip, 2 persons × 1 trip. This is not the survey MOB labour already in base B3.",unpricedDetail:"Ticket + POB is included at Jack instruction 2026-11-16, 2 persons × 1 trip. This is not the survey MOB labour already in base B3."},
+  {id:"mob",topic:"MOB/DEMOB",detail:"Ticket + POB is included at Jack instruction 2026-11-16, USD 2,000 per person round trip × 2 persons = USD 4,000. This is not the survey MOB labour already in base B3.",unpricedDetail:"Ticket + POB is included at Jack instruction 2026-11-16, 2 persons × 1 round trip. This is not the survey MOB labour already in base B3."},
   {id:"pob",internalOnly:true,topic:"Accommodation / POB / medical / visa",detail:"Offshore POB, accommodation, meals, medical and offshore certificates are OPEN (TBA) and are not counted."},
   {id:"split",topic:"Per-site split",detail:"Jack decision 2026-11-16: 9 team-days = ZPQ 2 + ZWP8 2 + ZWP11 2 offshore working days + 1 MOB labour day + 1 DEMOB labour day + 1 punch-list day. Ticket + POB cash stays a separate line."},
   {id:"carve",topic:"Carve-out basis C1 vs C2",detail:"Carve-out basis is OPEN: C1 brownfield survey 5 team-days, or C2 five SAT team-days. Neither is applied to this proposal. Base B3 is not modified."},
@@ -342,7 +342,7 @@ export function b3BrownfieldExportFileName0553({audience="official",extension}={
  if(!["csv","xlsx","doc","html"].includes(ext))throw Error("Unsupported brownfield export extension "+ext);
  return named+"."+ext;
 }
- const UNPRICED_LEAK=/793,?800|856,?800|573,?300|510,?300|403,?200|340,?200|283,?500|226,?800|189,?000|151,?200|63,?000|56,?700|31,?500|27,?200|25,?200|18,?200|16,?200|12,?800|10,?800|441,?000|352,?800|252,?000|2,?322,?450|452,?850|1,?587,?600|14,?000|11,?200|9,?000|7,?200|6,?000|4,?800|1,?800|1,?000|(?:^|[^\d.,])800(?:[^\d]|$)|31\.5|\bUSD\b|\bTHB\b/;
+ const UNPRICED_LEAK=/793,?800|856,?800|636,?300|573,?300|510,?300|403,?200|340,?200|283,?500|226,?800|189,?000|151,?200|126,?000|63,?000|56,?700|31,?500|27,?200|25,?200|20,?200|18,?200|16,?200|12,?800|10,?800|441,?000|352,?800|252,?000|2,?322,?450|452,?850|1,?587,?600|14,?000|11,?200|9,?000|7,?200|6,?000|4,?800|4,?000|2,?000|1,?800|1,?000|(?:^|[^\d.,])800(?:[^\d]|$)|31\.5|\bUSD\b|\bTHB\b/;
 export function b3BrownfieldOfficialScopeText0553(model){
  const senior=model?.bomLines?.find(entry=>entry.id==="BF.1.1");
  const specialist=model?.bomLines?.find(entry=>entry.id==="BF.1.2");
@@ -353,10 +353,24 @@ export function b3BrownfieldOfficialScopeText0553(model){
  const plan=(model.dayPlan||[]).map(row=>row.label+" "+row.days).join(", ");
  if(plan!=="ZPQ 2, ZWP8 2, ZWP11 2, MOB 1, DEMOB 1, Punch list 1")
   throw Error("Official scope day plan is not the 9-day split");
- return [
-  "• 2 persons: "+senior.activity+" + "+specialist.activity,
-  "• 9 days: 6 offshore working days (ZPQ 2, ZWP8 2, ZWP11 2) + 2 days MOB/DEMOB + 1 day punch list; MOB/DEMOB ticket+POB, "+model.mobPersons+" persons × "+model.mobTrips+" trip"
- ].join("\n");
+ return "2 persons: "+senior.activity+" + "+specialist.activity;
+}
+function customerA1Preview0553(model){
+ const part=(model.baseCustomerPreview?.partA||[]).find(entry=>entry.code==="A1");
+ if(!part||part.mr!=="MR-0001"||!part.description||!part.locations?.length)
+  throw Error("Official A1 requires the MR-0001 customer preview");
+ return {
+  tag:part.mr,
+  description:part.description,
+  specification:"Locations: "+part.locations.join(", ")
+ };
+}
+function dayBreakdownLabel0553(row){
+ if(row.kind==="site")return "Offshore working";
+ if(row.kind==="mob")return "MOB labour";
+ if(row.kind==="demob")return "DEMOB labour";
+ if(row.kind==="punch")return "Punch list";
+ throw Error("Unknown brownfield day kind "+row.kind);
 }
 export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemized=true,currency="thb"}={}){
  if(!model||model.id!=="PJ2608-0553-B3BF-ADDITIONAL")throw Error("Official schedule requires the additional-proposal model");
@@ -368,23 +382,32 @@ export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemiz
  const ticket=model.bomLines.find(entry=>entry.id==="BF.1.4");
  if(!senior||!specialist||!ticket)throw Error("Official schedule is missing the B3-BF price lines");
  const scope=b3BrownfieldOfficialScopeText0553(model);
+ const a1Preview=customerA1Preview0553(model);
  const rows=[];
  rows.push(line(["Part A: BASIC","A部分：基本"],"section"));
- rows.push(line(["A1. Brownfield inspection, testing & certification"],"subheading"));
- rows.push(line(["A1","B3-BF","Brownfield inspection, testing & certification — additional",scope,"1 lot","","",""],"a1"));
+ rows.push(line(["A1. Main Equipment"],"subheading"));
+ rows.push(line(["A1",a1Preview.tag+"\nMULTI-TAG / customer grouping subject to approval",a1Preview.description,a1Preview.specification,"1 lot","","",""],"a1"));
  rows.push(line(["Part B: OTHERS","B部分：其它"],"section"));
+ rows.push(line(["B3-BF","","Brownfield Additional",scope,"1 lot","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"2 persons"],"bfhead"));
  rows.push(line(["B3-BF.1","",senior.activity,"9 person-days","9 day",show({thb:senior.unitRateTHB,usd:senior.unitRateUSD}),show({thb:senior.totalTHB,usd:senior.totalUSD}),""],"bf"));
  rows.push(line(["B3-BF.2","",specialist.activity,"9 person-days","9 day",show({thb:specialist.unitRateTHB,usd:specialist.unitRateUSD}),show({thb:specialist.totalTHB,usd:specialist.totalUSD}),""],"bf"));
- rows.push(line(["B3-BF.3","","MOB/DEMOB (ticket + POB)","2 persons × 1 trip","2 trip",show({thb:ticket.unitRateTHB,usd:ticket.unitRateUSD}),show({thb:ticket.totalTHB,usd:ticket.totalUSD}),""],"bf"));
+ rows.push(line(["B3-BF.3","","MOB/DEMOB (ticket + POB)","2 persons × 1 round trip","2 trip",show({thb:ticket.unitRateTHB,usd:ticket.unitRateUSD}),show({thb:ticket.totalTHB,usd:ticket.totalUSD}),""],"bf"));
+ for(const day of model.dayPlan)rows.push(line(["",day.label,dayBreakdownLabel0553(day),"",day.days+" day","","",""],"day"));
  rows.push(line(["Total Additional (B3-BF) — 2 persons","","","","","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"Labour + MOB/DEMOB + punch list"],"total"));
  rows.push(line(["Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items."],"highlight"));
  rows.push(line([model.jutalNote],"note"));
  rows.push(line([model.lastLineNote],"note"));
  const columns=RELEASE_CUSTOMER_COLUMNS_0553.scope;
  if(rows.filter(row=>row.kind==="a1").length!==1)throw Error("Official schedule must contain one A1 row");
+ if(rows.filter(row=>row.kind==="bfhead").length!==1)throw Error("Official schedule must contain one B3-BF heading");
+ if(rows.filter(row=>row.kind==="day").length!==6)throw Error("Official schedule must list the 9-day breakdown");
  if(rows.some(row=>["A2","A3","A4"].includes(row.cells[0])))throw Error("Official schedule must not contain A2, A3 or A4");
  const a1=rows.find(row=>row.kind==="a1");
  if(a1.cells[5]!==""||a1.cells[6]!=="")throw Error("A1 price cells must stay blank");
+ if(rows.filter(row=>row.kind==="day").some(row=>row.cells[5]!==""||row.cells[6]!==""))throw Error("Day breakdown rows must stay unpriced");
+ const pricedLines=rows.filter(row=>row.kind==="bf");
+ if(round(senior.totalTHB+specialist.totalTHB+ticket.totalTHB)!==model.grandTotalTHB)throw Error("B3-BF breakdown does not add up to the heading total");
+ if(pricedLines.map(row=>row.cells[0]).join(",")!=="B3-BF.1,B3-BF.2,B3-BF.3")throw Error("B3-BF breakdown order changed");
  return Object.freeze({columns,rows:Object.freeze(rows),project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",title:"Scope of supply"});
 }
 export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized,version="internal",currency="thb"}={}){
@@ -506,8 +529,8 @@ export function buildB3BrownfieldOfficialDocHtml0553(model,options={}){
  const docNo=b3BrownfieldDocumentNumber0553();
  const html=`<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc(docNo)}</title><!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View></w:WordDocument></xml><![endif]--><style>body{font-family:Arial,sans-serif;font-size:11pt}table{border-collapse:collapse;width:100%}td,th{border:1px solid #8aa;padding:4px;vertical-align:top}th{background:#0b2538;color:#fff}</style></head><body><h1>Scope of supply / 供货范围</h1><p>Project: ZAWTIKA DEVELOPMENT PROJECT PHASE 1F<br>Document: ${esc(docNo)}<br>Additional proposal. One combined price for 2 persons (labour + MOB/DEMOB ticket and POB).</p><table><thead><tr>${schedule.columns.map(header=>`<th>${esc(header)}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></body></html>`;
  if(FORBIDDEN_BF_EXPORT.test(html))throw Error("Word export contains a split price or the base B3 amount");
- if(view.priced&&view.currency==="thb"&&!html.includes("573,300.00"))throw Error("Word export is missing the combined THB total");
- if(view.priced&&view.currency==="usd"&&!html.includes("18,200.00 USD"))throw Error("Word export is missing the combined USD total");
+ if(view.priced&&view.currency==="thb"&&!html.includes("636,300.00"))throw Error("Word export is missing the combined THB total");
+ if(view.priced&&view.currency==="usd"&&!html.includes("20,200.00 USD"))throw Error("Word export is missing the combined USD total");
  if(!view.priced&&UNPRICED_LEAK.test(html))throw Error("Unpriced Word export contains a money figure");
  return html;
 }
@@ -524,20 +547,24 @@ export async function buildB3BrownfieldOfficialXlsx0553(file,model,options={}){
  let xml=new TextDecoder().decode(await readEntry(sheetEntry));
  if(!xml.includes("<f>SUM(E8:E22)</f><v>8</v>"))throw Error("Part A quantity formula is not the original template");
  const a1=schedule.rows.find(row=>row.kind==="a1");
+ const heading=schedule.rows.find(row=>row.kind==="bfhead");
  const pricedLines=schedule.rows.filter(row=>row.kind==="bf");
+ const days=schedule.rows.filter(row=>row.kind==="day");
  const total=schedule.rows.find(row=>row.kind==="total");
  const notes=schedule.rows.filter(row=>row.kind==="note").map(row=>row.cells[0]);
- if(!a1||pricedLines.length!==3||!total||notes.length!==2)throw Error("Official schedule cannot be written to the template");
+ if(!a1||!heading||pricedLines.length!==3||days.length!==6||!total||notes.length!==2)throw Error("Official schedule cannot be written to the template");
  if(a1.cells[5]!==""||a1.cells[6]!=="")throw Error("A1 price cells must stay blank");
+ if(heading.cells[5]!=="")throw Error("B3-BF heading unit price must stay blank");
  const writes=new Map();
  const put=(cell,value)=>{if(writes.has(cell))throw Error("Duplicate brownfield cell "+cell);writes.set(cell,value);};
- put("A8","A1");put("B8",a1.cells[1]);put("C8",a1.cells[2]);put("D8",a1.cells[3]);
- put("E8","1 lot");put("F8","");put("G8","");put("H8","");
- pricedLines.forEach((row,index)=>{
-  const line=9+index;
+ const writeRow=(line,row)=>{
   put("A"+line,row.cells[0]);put("B"+line,row.cells[1]);put("C"+line,row.cells[2]);put("D"+line,row.cells[3]);
   put("E"+line,row.cells[4]);put("F"+line,row.cells[5]);put("G"+line,row.cells[6]);put("H"+line,row.cells[7]);
- });
+ };
+ writeRow(8,a1);
+ writeRow(9,heading);
+ pricedLines.forEach((row,index)=>writeRow(10+index,row));
+ days.forEach((row,index)=>writeRow(13+index,row));
  put("A38",total.cells[0]);
  put("G38",total.cells[6]);
  const docNo=b3BrownfieldDocumentNumber0553();
@@ -546,8 +573,8 @@ export async function buildB3BrownfieldOfficialXlsx0553(file,model,options={}){
  put("A39","Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.\n"+notes.join("\n"));
  const written=[...writes.values()].map(value=>String(value)).join("\n");
  if(FORBIDDEN_BF_EXPORT.test(written))throw Error("Brownfield Excel export contains a split price or the base B3 amount");
- if(view.priced&&view.currency==="thb"&&!written.includes("573,300.00"))throw Error("Brownfield Excel export is missing the combined THB total");
- if(view.priced&&view.currency==="usd"&&!written.includes("18,200.00 USD"))throw Error("Brownfield Excel export is missing the combined USD total");
+ if(view.priced&&view.currency==="thb"&&!written.includes("636,300.00"))throw Error("Brownfield Excel export is missing the combined THB total");
+ if(view.priced&&view.currency==="usd"&&!written.includes("20,200.00 USD"))throw Error("Brownfield Excel export is missing the combined USD total");
  if(!view.priced&&UNPRICED_LEAK.test(written))throw Error("Unpriced brownfield Excel contains a money figure");
  xml=xml.replace("<f>SUM(E8:E22)</f><v>8</v>","<f>SUM(E8:E22)</f><v>1</v>");
  for(const [cell,value] of writes)xml=replaceBrownfieldCell(xml,cell,value);
