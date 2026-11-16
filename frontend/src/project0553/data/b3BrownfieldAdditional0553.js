@@ -380,7 +380,7 @@ function templatePartBLines0553(){
  return lines;
 }
 function templateLine(entry){
- return {kind:"template",cells:padOfficialCells([entry.code,entry.description,"","",entry.qty,"","",entry.remark])};
+ return {kind:"template",cells:padOfficialCells([entry.code,entry.description,"","",entry.qty,"Quoted","",entry.remark])};
 }
 export function b3BrownfieldOfficialMatrix0553(schedule){
  return schedule.rows.map(row=>padOfficialCells(row.cells));
@@ -410,17 +410,18 @@ export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemiz
  if(!senior||!specialist||!ticket)throw Error("Official schedule is missing the B3-BF price lines");
  const scope=b3BrownfieldOfficialScopeText0553(model);
  const a1Preview=customerA1Preview0553(model);
+ const lump=show({thb:model.grandTotalTHB,usd:model.grandTotalUSD});
  const rows=[];
  rows.push(line(["Part A: BASIC\nA部分：基本"],"section"));
  rows.push(line(["A1. Main Equipment"],"subheading"));
- rows.push(line(["A1",a1Preview.tag+"\nMULTI-TAG / customer grouping subject to approval",a1Preview.description,a1Preview.specification,"1 lot","","",""],"a1"));
+ rows.push(line(["A1",a1Preview.tag+"\nMULTI-TAG / customer grouping subject to approval",a1Preview.description,a1Preview.specification,"1 lot","Quoted","",""],"a1"));
  rows.push(line(["Part B: OTHERS\nB部分：其它"],"section"));
  for(const entry of templatePartBLines0553()){
   if(entry.code==="B3"){
-   rows.push(line(["B3","Brownfield Additional\n"+scope,"","","1 lot","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"2 persons"],"bfhead"));
-   rows.push(line(["B3-BF.1",senior.activity+"\n9 person-days","","","9 day",show({thb:senior.unitRateTHB,usd:senior.unitRateUSD}),show({thb:senior.totalTHB,usd:senior.totalUSD}),""],"bf"));
-   rows.push(line(["B3-BF.2",specialist.activity+"\n9 person-days","","","9 day",show({thb:specialist.unitRateTHB,usd:specialist.unitRateUSD}),show({thb:specialist.totalTHB,usd:specialist.totalUSD}),""],"bf"));
-   rows.push(line(["B3-BF.3","MOB/DEMOB (ticket + POB)\n2 persons × 1 round trip","","","2 trip",show({thb:ticket.unitRateTHB,usd:ticket.unitRateUSD}),show({thb:ticket.totalTHB,usd:ticket.totalUSD}),""],"bf"));
+   rows.push(line(["B3","Brownfield Additional\n"+scope,"","","1 lot",lump,lump,"2 persons"],"bfhead"));
+   rows.push(line(["B3-BF.1",senior.activity+"\n9 person-days","","","9 day","","",""],"bf"));
+   rows.push(line(["B3-BF.2",specialist.activity+"\n9 person-days","","","9 day","","",""],"bf"));
+   rows.push(line(["B3-BF.3","MOB/DEMOB (ticket + POB)\n2 persons × 1 round trip","","","2 trip","","",""],"bf"));
   }else rows.push(templateLine(entry));
  }
  rows.push(line(["Total 合计","","","","","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"Labour + MOB/DEMOB + punch list"],"total"));
@@ -434,10 +435,13 @@ export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemiz
  if(rows.some(row=>row.kind==="day"))throw Error("Official schedule must not list the day breakdown");
  if(rows.some(row=>["A2","A3","A4"].includes(row.cells[0])))throw Error("Official schedule must not contain A2, A3 or A4");
  const a1=rows.find(row=>row.kind==="a1");
- if(a1.cells[5]!==""||a1.cells[6]!=="")throw Error("A1 price cells must stay blank");
- if(rows.filter(row=>row.kind==="template").some(row=>row.cells[5]!==""||row.cells[6]!==""))
-  throw Error("Template B lines other than B3 must stay unpriced");
+ if(a1.cells[5]!=="Quoted"||a1.cells[6]!=="")throw Error("A1 unit price must read Quoted and its sub-total must stay blank");
+ if(rows.filter(row=>row.kind==="template").some(row=>row.cells[5]!=="Quoted"||row.cells[6]!==""))
+  throw Error("Template B lines must show Quoted with a blank sub-total");
+ const headingRow=rows.find(row=>row.kind==="bfhead");
+ if(headingRow.cells[5]!==lump||headingRow.cells[6]!==lump)throw Error("B3 unit price and sub-total must both be the lump sum");
  const pricedLines=rows.filter(row=>row.kind==="bf");
+ if(pricedLines.some(row=>row.cells[5]!==""||row.cells[6]!==""))throw Error("B3-BF breakdown price cells must stay blank");
  if(round(senior.totalTHB+specialist.totalTHB+ticket.totalTHB)!==model.grandTotalTHB)throw Error("B3 breakdown does not add up to the heading total");
  if(pricedLines.map(row=>row.cells[0]).join(",")!=="B3-BF.1,B3-BF.2,B3-BF.3")throw Error("B3-BF breakdown order changed");
  const b3=rows.findIndex(row=>row.cells[0]==="B3"),b4=rows.findIndex(row=>row.cells[0]==="B4");
