@@ -38,11 +38,11 @@ export const L3_TAB_GROUPS_0553 = [
 // Global generic identity engine, applied here only to PJ2608-0553.
 export const TAB_SEMANTIC_0553=Object.freeze([
  {route:"overview",code:"BID-GOV",locationCode:"L3-B-01",workflowIds:["WF-01"],sourcePaths:["frontend/src/pages/PJ26080553.jsx"]},
- {route:"engineering",code:"BID-FPR",locationCode:"L3-B-02",workflowIds:["WF-02"],sourcePaths:["frontend/src/project0553/engineeringViewModel.js"]},
+ {route:"engineering",code:"BID-FPR",locationCode:"L3-B-02",workflowIds:["WF-02"],sourcePaths:["frontend/src/project0553/engineeringViewModel.js","frontend/src/project0553/SiSynthEq0553.jsx","frontend/src/project0553/data/siVerificationEquations0553.js"]},
  {route:"architecture",code:"BID-ARC",locationCode:"L3-B-03",workflowIds:["WF-03"],sourcePaths:["frontend/src/project0553/architectureManifest.js"]},
- {route:"systems",code:"BID-REQ",locationCode:"L3-B-04",workflowIds:["WF-04"],sourcePaths:["frontend/src/project0553/systemsBinding.js"]},
+ {route:"systems",code:"BID-REQ",locationCode:"L3-B-04",workflowIds:["WF-04"],sourcePaths:["frontend/src/project0553/systemsBinding.js","frontend/src/project0553/SiSynthEq0553.jsx"]},
  {route:"schematic",code:"BID-ENG-SCH",locationCode:"L3-B-05.3",workflowIds:["WF-05"],sourcePaths:["frontend/src/project0553/ScadaSchematic0553.jsx"]},
- {route:"execution",code:"BID-EXE",locationCode:"L3-B-06",workflowIds:["WF-06"],sourcePaths:["frontend/src/pages/PJ26080553.jsx"]},
+ {route:"execution",code:"BID-EXE",locationCode:"L3-B-06",workflowIds:["WF-06"],sourcePaths:["frontend/src/pages/PJ26080553.jsx","frontend/src/project0553/SiSynthEq0553.jsx"]},
  {route:"documents",code:"BID-VEN",locationCode:"L3-B-07",workflowIds:["WF-07","WF-09"],sourcePaths:["frontend/src/project0553/VendorProductCatalog0553.jsx"]},
  {route:"risk",code:"BID-RSK",locationCode:"L3-B-08",workflowIds:["WF-08"],sourcePaths:["frontend/src/project0553/bidReview.js"]},
  {route:"registry",code:"BID-DAT",locationCode:"L3-B-09",workflowIds:[],sourcePaths:["frontend/src/project0553/DataCodeRegistry0553.jsx"]},
