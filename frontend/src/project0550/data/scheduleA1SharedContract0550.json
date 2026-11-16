@@ -1,17 +1,19 @@
 {
   "contract": "PJ2608-0550 Schedule A1 shared line items (10.2 SI / Master Schedule)",
-  "version": "0.1.0-skeleton",
+  "version": "0.2.0-skeleton",
   "status": "DRAFT - NOT WIRED INTO ANY SCREEN OR EXPORT",
   "currency": "USD",
+  "numberingNote": "User confirmed: SN 5 appears twice in the ownership contract — once for the C-3 Option (Two years Operation Spares) and once for Tools (C-5). This differs from the sequential numbering currently in exhibitCNative0550.js / customer form rendering (where Tools was SN 6 and Field Service SN 7). The Shared Contract follows the user's specified numbering. Other teams: do not assume sequential uniqueness of SN 5 when reading this contract.",
   "rules": [
     "WORKSTREAM_A_FORM_C writes only items whose sourceForm starts with C-. It never writes a1DirectItems.",
     "WORKSTREAM_B_A1_DIRECT writes only a1DirectItems (sourceForm A1_DIRECT) and the rollup block. It never changes Form C schemas.",
-    "sn follows the customer Exhibit C Schedule A1 form; template row = sn + 1 (see a1SummarySlot0550 in exhibitCNative0550.js).",
+    "sn follows the user-specified ownership numbering (see numberingNote). sn is NOT unique: use itemKey as the unique id. templateRow is the row used by a1SummarySlot0550 in exhibitCNative0550.js today.",
     "A null price means OPEN/TBA. A rollup total stays null while any base item is OPEN (same rule as scheduleRollup0550).",
     "isOption items are excluded from the A1 base total; options belong to Schedule A2."
   ],
   "snMap": [
     {
+      "itemKey": "A1-SN1-C1",
       "sn": "1",
       "templateRow": 2,
       "owner": "WORKSTREAM_A_FORM_C",
@@ -20,6 +22,7 @@
       "codeSelector": "summary GOODS"
     },
     {
+      "itemKey": "A1-SN2-INSPECTION",
       "sn": "2",
       "templateRow": 3,
       "owner": "WORKSTREAM_B_A1_DIRECT",
@@ -29,6 +32,7 @@
       "breakdownRef": "11.D"
     },
     {
+      "itemKey": "A1-SN3-PACKING",
       "sn": "3",
       "templateRow": 4,
       "owner": "WORKSTREAM_B_A1_DIRECT",
@@ -37,6 +41,7 @@
       "codeSelector": "summary PACKING"
     },
     {
+      "itemKey": "A1-SN4-C2",
       "sn": "4",
       "templateRow": 5,
       "owner": "WORKSTREAM_A_FORM_C",
@@ -45,31 +50,35 @@
       "codeSelector": "schedule C2"
     },
     {
+      "itemKey": "A1-SN5-OPTION-C3",
       "sn": "5",
       "templateRow": 6,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-3",
-      "title": "Two-year operation spares",
+      "title": "Two years Operation Spare parts",
       "codeSelector": "A2 option (schedule C3)",
       "isOption": true
     },
     {
-      "sn": "6",
+      "itemKey": "A1-SN5-TOOLS-C5",
+      "sn": "5",
       "templateRow": 7,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-5",
-      "title": "Special tools",
+      "title": "Special Tools for Commissioning and Maintenance",
       "codeSelector": "schedule C5"
     },
     {
-      "sn": "7",
+      "itemKey": "A1-SN6-C7",
+      "sn": "6",
       "templateRow": 8,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-7",
-      "title": "Field service including training",
+      "title": "Field Service including Training at SITE",
       "codeSelector": "schedule C7"
     },
     {
+      "itemKey": "A1-SN8-C8",
       "sn": "8",
       "templateRow": 9,
       "owner": "WORKSTREAM_A_FORM_C",
@@ -78,6 +87,7 @@
       "codeSelector": "schedule C8"
     },
     {
+      "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
       "sn": "9",
       "templateRow": 10,
       "owner": "WORKSTREAM_B_A1_DIRECT",
@@ -86,6 +96,7 @@
       "codeSelector": "summary VENDOR_DOCUMENTS"
     },
     {
+      "itemKey": "A1-OTHERS",
       "sn": "10",
       "templateRow": 11,
       "owner": "WORKSTREAM_B_A1_DIRECT",
@@ -97,6 +108,7 @@
   ],
   "formCItems": [
     {
+      "itemKey": "A1-SN1-C1",
       "sn": "1",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-1",
@@ -115,6 +127,7 @@
       "customerNotes": "Breakdown in Form C-1"
     },
     {
+      "itemKey": "A1-SN4-C2",
       "sn": "4",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-2",
@@ -133,10 +146,11 @@
       "customerNotes": "Breakdown in Form C-2"
     },
     {
+      "itemKey": "A1-SN5-OPTION-C3",
       "sn": "5",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-3",
-      "description": "Two-year operation spares (option, excluded from A1 base)",
+      "description": "Two years Operation Spare parts (option, excluded from A1 base)",
       "breakdownRef": "Form C-3",
       "unit": "Lot",
       "qty": 1,
@@ -151,10 +165,11 @@
       "customerNotes": "Breakdown in Form C-3"
     },
     {
-      "sn": "6",
+      "itemKey": "A1-SN5-TOOLS-C5",
+      "sn": "5",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-5",
-      "description": "Special tools",
+      "description": "Special Tools for Commissioning and Maintenance",
       "breakdownRef": "Form C-5",
       "unit": "Lot",
       "qty": 1,
@@ -169,10 +184,11 @@
       "customerNotes": "Breakdown in Form C-5"
     },
     {
-      "sn": "7",
+      "itemKey": "A1-SN6-C7",
+      "sn": "6",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-7",
-      "description": "Field service including training",
+      "description": "Field Service including Training at SITE",
       "breakdownRef": "Form C-7",
       "unit": "Day",
       "qty": null,
@@ -187,6 +203,7 @@
       "customerNotes": "Site Service Time shall be specified."
     },
     {
+      "itemKey": "A1-SN8-C8",
       "sn": "8",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-8",
@@ -207,6 +224,7 @@
   ],
   "a1DirectItems": [
     {
+      "itemKey": "A1-SN2-INSPECTION",
       "sn": "2",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -227,6 +245,7 @@
       "codeSelector": "BASE bindings with schedule A1, summary INSPECTION"
     },
     {
+      "itemKey": "A1-SN3-PACKING",
       "sn": "3",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -247,6 +266,7 @@
       "codeSelector": "BASE bindings with schedule A1, summary PACKING"
     },
     {
+      "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
       "sn": "9",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -267,6 +287,7 @@
       "codeSelector": "BASE bindings with schedule A1, summary VENDOR_DOCUMENTS"
     },
     {
+      "itemKey": "A1-OTHERS",
       "sn": "10",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -292,13 +313,13 @@
     "a1DirectKnownUsd": 549104.84,
     "formCKnownUsd": null,
     "baseTotalUsd": null,
-    "openSns": [
-      "1",
-      "4",
-      "6",
-      "7",
-      "8"
-    ],
-    "note": "KNOWN SUBTOTAL ONLY. Base total stays null until every base sn is priced."
+    "note": "KNOWN SUBTOTAL ONLY. Base total stays null until every base sn is priced.",
+    "openItemKeys": [
+      "A1-SN1-C1",
+      "A1-SN4-C2",
+      "A1-SN5-TOOLS-C5",
+      "A1-SN6-C7",
+      "A1-SN8-C8"
+    ]
   }
 }
