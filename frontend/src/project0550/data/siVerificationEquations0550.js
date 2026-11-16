@@ -23,6 +23,13 @@ export const SI_SYNTH_EQUATIONS_0550 = [
     formula: 'μ(s) = { MGW: Cost × 1.05 × 1.05 × 1.20 | Direct (DMR/PAGA/Tower): Governed Contract Rate }; ΔCost_Impact = $0.00 (unless verified MR delta)',
     control: 'Strict Rev00 C-1 ceiling preservation, non-AVL brands logged in Tab 14 Deviation List (§10 R1/R3), and 100-record Volume II sync.',
   },
+  {
+    id: 'EQ-DISP',
+    name: 'Golden Prototype Display & 10-Column BOM Rendering Equation (D_Proto)',
+    homeTab: 'SI-CAL (02 First Principles) → C1 / 11.P / bid.technical',
+    formula: 'D_Proto(r) = LocFirst(r) ⊗ Parent(r) ⊗ BOM_10(r) ⊗ Mode(LUMP_SUM | ITEMIZED) ⊗ Sanitize(r) ; |P_parent − Σ P_sub| ≤ 0.01',
+    control: 'Site-first MR grouping (APF/ACP/ABV01/AMS01), verbatim MR Description (keyed by mrDescription+partNo), LIS-0001 Tag No., real 7 VND/VERSED Brand/Model/PartNo, zero internal/Thai leaks.',
+  },
 ];
 
 export const SI_LEARNED_RULES_0550 = [
