@@ -79,6 +79,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
    <button type="button" onClick={()=>window.print()}>Print</button>
   </div>
   {exportNote&&<p className="b3bf-export-note" role="status">{exportNote}</p>}
+  {!official&&priced&&<Item7Vnd model={model} money={money} itemized={itemized}/>}
   <div className="b3bf-doc">
    {official&&<OfficialCustomerSheet model={model} priced={priced} itemized={itemized} currency={currency}/>}
    {!official&&<><p className="b3bf-stand">ADDITIONAL PROPOSAL — B3 BROWNFIELD INSPECTION, TESTING &amp; CERTIFICATION<br/><small>Standalone. The original quotation / Scope of Supply is not modified.</small></p>
@@ -185,7 +186,6 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
    <p className="b3bf-foot">{model.exclusion} The per-site day split stays OPEN.</p>
    </>}
   </div>
-  {!official&&priced&&<p className="b3bf-cost" data-testid="b3bf-cost-basis">{model.costBasis.note}</p>}
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
    <h3>Open items</h3>
    <ul>{model.openItems.map(item=><li key={item.id}><strong>{item.topic}.</strong> {priced?item.detail:(item.unpricedDetail||item.detail)}</li>)}</ul>
@@ -219,6 +219,28 @@ function OfficialCustomerSheet({model,priced,itemized,currency}){
    })}</tbody>
   </table></div>
  </div>;
+}
+function Item7Vnd({model,money,itemized}){
+ const item=model.item7;
+ const lines=itemized?item.lines:[];
+ return <section className="b3bf-cost" data-testid="b3bf-cost-basis">
+  <h3>Item 7 (VND)</h3>
+  <p data-testid="b3bf-vnd-equation">{item.equation}</p>
+  <p data-testid="b3bf-vnd-sell">{item.sellEquation}</p>
+  <p>{item.note}</p>
+  <table>
+   <thead><tr><th>Line</th><th>ADDVALUE selling price</th><th>Qty</th><th>VND cost</th></tr></thead>
+   <tbody>
+    {lines.map(line=><tr key={line.id}>
+     <td>{line.id}</td>
+     <td>{line.activity}{line.usdPerDay?" · USD "+line.usdPerDay.toLocaleString("en-US")+"/day":" · USD "+line.usdPerPersonTrip.toLocaleString("en-US")+"/person/trip"}</td>
+     <td>{line.kind==="mob"?line.persons+" × "+line.trips+" trip":line.persons+" × "+line.days+" days"}</td>
+     <td className="b3bf-num">{money(line.totalTHB,line.totalUSD)}</td>
+    </tr>)}
+    <tr><td>Sell</td><td colSpan={2}>VND cost × {item.sellFactor.toFixed(2)}. No SAMTEL markup and no profit.</td><td className="b3bf-num">{money(item.sellTHB,item.sellUSD)}</td></tr>
+   </tbody>
+  </table>
+ </section>;
 }
 function Mark({kind,children}){
  return <span className={kind==="open"?"b3bf-open":kind==="company"||kind==="jutal"?"b3bf-by":"b3bf-open"}>{children}</span>;
@@ -280,7 +302,10 @@ const CSS=`
 .b3bf-totals span,.b3bf-totals small{display:block;color:#4d6474;font-size:11px}
 .b3bf-totals strong{display:block;margin:3px 0;font-size:15px}
 .b3bf-foot{font-size:11.5px;color:#4a5568;line-height:1.45}
-.b3bf-cost{margin-top:12px;border:1px solid #e0a800;background:#fff8e1;padding:8px 10px;line-height:1.45}
+.b3bf-cost{margin:0 0 12px;border:1px solid #e0a800;background:#fff8e1;padding:8px 10px;line-height:1.45}
+.b3bf-cost h3{margin:0 0 6px;font-size:14px}
+.b3bf-cost table{width:100%;border-collapse:collapse;margin-top:6px}
+.b3bf-cost td,.b3bf-cost th{border:1px solid #e6d7a2;padding:4px 6px;text-align:left;vertical-align:top}
 .b3bf-openpanel{margin-top:14px;border:2px dashed #a4161a;background:#fffafa;padding:10px 14px}
 .b3bf-openpanel h3{margin:0 0 8px;color:#a4161a;font-size:14px}
 .b3bf-openpanel li{margin:4px 0}

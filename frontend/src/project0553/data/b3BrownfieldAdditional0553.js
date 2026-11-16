@@ -15,20 +15,11 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import MTO from "./snapshots/mr0001.mto.rev04.sourceRows.json";
 
 export const B3BF_JUTAL_NOTE_0553="Note: Installation and cable routing are by the Jutal team. / งานติดตั้งและเดินสายโดยทีม Jutal";
-// Item 7 (vendor / VND) and item 10 (budget) are not named columns in this repo.
-// Item 7 maps to quoted vendor cost (MGW quotedVendorCostTHB / GEQ C_labor). It is
-// null for this labour and for MOB/DEMOB. Item 10 maps to the selected working
-// budget, which already stores these role rates as working SELL. Do not add 5%.
-export const B3BF_COST_BASIS_0553=Object.freeze({
- item7VendorCost:"NOT_ESTABLISHED",
- item10Budget:"SELECTED_SAT_WORKING_SELL",
- labourPriceClass:"USER_SELECTED_SAT_WORKING_SELL_ONLY",
- directCostTHB:null,
- mobPriceClass:"INSTRUCTED_PRICE_NOT_VENDOR_COST",
- samtelFivePctApplied:false,
- candidateSellTHB:null,
- note:"Item 7 (vendor / VND) cost is not established for this labour or for MOB/DEMOB ticket+POB (direct cost is null; BF airfare/POB cash is not established). Item 10 (budget) is the selected SAT working sell, 56,700 THB/team-day, not a cost. USD 1,000/person/trip is an instructed price. Candidate 856,800 × 1.05 = 899,640 THB / 28,560 USD is not applied."
-});
+// Item 7 (VND) for this additional proposal only. Jack 2026-11-16: USD 1,000 and
+// USD 800 are already ADDVALUE selling prices, and MOB/DEMOB stays as instructed.
+// Sell = that VND cost × 1.00. Not posted into the 10.2/10.3.1 B3 dossier.
+export const B3BF_ITEM7_NOTE_0553="Jack 2026-11-16: no markup, USD 1,000/800 are ADDVALUE selling prices";
+export const B3BF_ITEM7_EQUATION_0553="VND cost = 14 × (1,000 + 800) USD + 2 × 1 × 1,000 USD = 25,200 + 2,000 = 27,200 USD; × 31.5 = 856,800 THB";
 export const B3BF_LAST_LINE_NOTE_0553="Note: Working days on the Greenfield/base B3 scope have been reduced by 5 working days. / ปรับลดวันทำงานไปที่ Greenfield/base B3 ลดลง 5 วันทำงาน";
 export const B3BF_NET_CALENDAR_DAYS_0553=14;
 export const B3BF_CARVEOUT_DAYS_0553=5;
@@ -127,6 +118,38 @@ function referencePartB(){
   note:row.code==="B3"?"Original quotation, unchanged":"Reference base scope"
  }));
 }
+function item7Vnd(senior,specialist,days,fxTHBPerUSD,seniorLineUSD,specialistLineUSD,seniorLineTHB,specialistLineTHB,labourUSD,mobPersons,mobTrips,mobUsdPerPersonTrip,mobUSD,mobTHB,vndUSD,vndTHB){
+ const sellFactor=1;
+ const lines=[
+  {id:"VND.7.1",kind:"labour",activity:senior.role,persons:1,days,unit:"person-day",
+   usdPerDay:senior.usdPerPersonDay,totalUSD:seniorLineUSD,totalTHB:seniorLineTHB},
+  {id:"VND.7.2",kind:"labour",activity:specialist.role,persons:1,days,unit:"person-day",
+   usdPerDay:specialist.usdPerPersonDay,totalUSD:specialistLineUSD,totalTHB:specialistLineTHB},
+  {id:"VND.7.3",kind:"mob",activity:"MOB/DEMOB (ticket + POB)",persons:mobPersons,trips:mobTrips,days:null,unit:"person-trip",
+   usdPerPersonTrip:mobUsdPerPersonTrip,totalUSD:mobUSD,totalTHB:mobTHB}
+ ];
+ const sellUSD=round(vndUSD*sellFactor),sellTHB=round(vndTHB*sellFactor);
+ if(senior.usdPerPersonDay!==1000||specialist.usdPerPersonDay!==800||days!==14||
+    labourUSD!==25200||mobPersons!==2||mobTrips!==1||mobUsdPerPersonTrip!==1000||mobUSD!==2000||
+    vndUSD!==27200||fxTHBPerUSD!==31.5||vndTHB!==856800||
+    round(seniorLineUSD+specialistLineUSD)!==labourUSD||round(labourUSD+mobUSD)!==vndUSD||
+    round(vndUSD*fxTHBPerUSD)!==vndTHB||sellFactor!==1||sellUSD!==vndUSD||sellTHB!==vndTHB||
+    lines[0].totalUSD!==14000||lines[1].totalUSD!==11200||lines[2].totalUSD!==2000)
+  throw Error("Item 7 VND cost is not the ADDVALUE selling price at factor 1.00");
+ return {
+  id:"ITEM-7-VND",label:"Item 7 (VND)",
+  source:"Jack instruction 2026-11-16",
+  priceClass:"ADDVALUE_SELLING_PRICE",
+  postedToDossier:false,postedToRelease:false,
+  markupFactor:sellFactor,sellFactor,samtelPct:0,addvalueProfitPct:0,omissionPct:0,
+  seniorUsdPerDay:senior.usdPerPersonDay,specialistUsdPerDay:specialist.usdPerPersonDay,
+  teamDays:days,labourUSD,mobPersons,mobTrips,mobUsdPerPersonTrip,mobUSD,
+  vndCostUSD:vndUSD,fxTHBPerUSD,vndCostTHB:vndTHB,sellUSD,sellTHB,
+  lines,equation:B3BF_ITEM7_EQUATION_0553,
+  sellEquation:"Sell = VND cost × 1.00 = 27,200 USD / 856,800 THB",
+  note:B3BF_ITEM7_NOTE_0553
+ };
+}
 function build(){
  const satBefore=snapshot(selectB3SelectedSatSurveyPrice0553);
  const chinaBefore=snapshot(selectB9ChinaWorkingBudget0553);
@@ -163,9 +186,7 @@ function build(){
     seniorLineTHB!==441000||specialistLineTHB!==352800||proposalTHB!==793800||
     round(seniorLineTHB+specialistLineTHB)!==proposalTHB||
     mobUSD!==2000||mobTHB!==63000||grandTotalTHB!==856800||grandTotalUSD!==27200||
-    round(grandTotalTHB*1.05)!==899640||round(grandTotalUSD*1.05)!==28560||
-    B3BF_COST_BASIS_0553.samtelFivePctApplied!==false||B3BF_COST_BASIS_0553.directCostTHB!==null||
-    B3BF_COST_BASIS_0553.candidateSellTHB!==null||senior.directCostTHB!==null||specialist.directCostTHB!==null||
+    senior.directCostTHB!==null||specialist.directCostTHB!==null||
     round(mobUSD*fxTHBPerUSD)!==mobTHB||round(grandTotalUSD*fxTHBPerUSD)!==grandTotalTHB||
     sat.satTeamDays!==28||sat.satWorkingSellTHB!==1587600||sat.siteSurveyTeamDays!==5||
     carveC1THB!==252000||carveC2THB!==283500||sat.veexWorkingSellTHB!==30000||
@@ -236,6 +257,7 @@ function build(){
   {id:"zpq-band",topic:"ZPQ radio DMR SLR5300 vs TETRA",detail:"Existing ZPQ radio DMR SLR5300 vs TETRA is OPEN. Confirm the band before LNA/BDA selection."},
   {id:"commissioning",topic:"Commissioning responsibility",detail:"Commissioning responsibility is OPEN (BOD §10.5 / SPE §7.3.3 vendor vs BOD §7.2 EPCI)."}
  ];
+ const item7=item7Vnd(senior,specialist,days,fxTHBPerUSD,seniorLineUSD,specialistLineUSD,seniorLineTHB,specialistLineTHB,proposalUSD,mobPersons,mobTrips,mobUsdPerPersonTrip,mobUSD,mobTHB,grandTotalUSD,grandTotalTHB);
  return freeze({
   id:"PJ2608-0553-B3BF-ADDITIONAL",
   title:"Additional Proposal — B3 Brownfield: Inspection, Testing & Certification (ZPQ / ZWP8 / ZWP11)",
@@ -260,7 +282,7 @@ function build(){
    c2:{id:"C2",basis:"5 of 28 SAT team-days",days:5,valueTHB:carveC2THB}
   },
   bomLines,jutalNote:B3BF_JUTAL_NOTE_0553,lastLineNote:B3BF_LAST_LINE_NOTE_0553,
-  costBasis:B3BF_COST_BASIS_0553,siteRows,a1Rows,
+  item7,costBasis:item7,siteRows,a1Rows,
   otherPartA:otherPartA(),partB,openItems,baseCustomerPreview
  });
 }
@@ -404,6 +426,8 @@ export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized,versio
   shown(formatB3BrownfieldMoney0553(model,model.grandTotalTHB,model.grandTotalUSD,currency)),"",
   currency==="usd"?"USD":currency==="both"?"THB / USD":"THB");
  if(!official&&money){
+  push("VND.7",model.item7.equation,"","","",shown(formatB3BrownfieldMoney0553(model,model.item7.vndCostTHB,model.item7.vndCostUSD,currency)),"",model.item7.note+" "+model.item7.sellEquation);
+  if(itemized!==false)for(const line of model.item7.lines)push(line.id,line.activity,line.unit,String(line.days??line.trips??""),"",shown(formatB3BrownfieldMoney0553(model,line.totalTHB,line.totalUSD,currency)),"","Item 7 VND. Sell factor 1.00");
   push("","Carve-out C1 "+model.carveOut.c1.basis,"day",String(model.carveOut.c1.days),"","","",formatB3BrownfieldMoney0553(model,model.carveOut.c1.valueTHB,null,"thb")+" OPEN — not applied; not in the Amount column");
   push("","Carve-out C2 "+model.carveOut.c2.basis,"day",String(model.carveOut.c2.days),"","","",formatB3BrownfieldMoney0553(model,model.carveOut.c2.valueTHB,null,"thb")+" OPEN — not applied; not in the Amount column");
  }
