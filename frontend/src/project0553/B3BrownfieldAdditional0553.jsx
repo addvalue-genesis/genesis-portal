@@ -127,7 +127,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      {shown("bf")&&<tr>
       <td>BF.1</td>
       <td><button type="button" className="b3bf-tg" aria-expanded={shown("bom")} onClick={()=>toggle("bom")}>BOM</button> <strong>Brownfield site inspection, testing &amp; certification services</strong>
-       <div className="b3bf-desc">Existing 2-person team, {model.netCalendarDays} offshore working days (ZPQ 2, ZWP8 2, ZWP11 2). Travel days are excluded. MOB/DEMOB is ticket + POB cash, not extra working days. Brownfield SCADA WiMAX radio links at ZPQ, ZWP8 and ZWP11.</div></td>
+       <div className="b3bf-desc">Existing 2-person team, 9 team-days: 6 offshore working days (ZPQ 2, ZWP8 2, ZWP11 2) + 2 days MOB/DEMOB + 1 day punch list. MOB/DEMOB ticket + POB is a separate cash line. Brownfield SCADA WiMAX radio links at ZPQ, ZWP8 and ZWP11.</div></td>
       <td>Lot</td><td className="b3bf-num">1</td>
       {priced&&<td className="b3bf-num">—</td>}
       {priced&&<td className="b3bf-num" data-testid="b3bf-lot">{money(model.grandTotalTHB,model.grandTotalUSD)}</td>}
@@ -159,15 +159,15 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
       </table>
      </div></td></tr>}
      {shown("bf")&&<tr className="b3bf-site">
-      <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("site")} onClick={()=>toggle("site")}>BF.2 · Per-site allocation of the 6 offshore working days</button></td>
+      <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("site")} onClick={()=>toggle("site")}>BF.2 · Day breakdown, 9 team-days</button></td>
      </tr>}
-     {shown("bf")&&shown("site")&&model.siteRows.map(site=><tr key={site.sn}>
-      <td>{site.sn}</td>
-      <td>{site.site} — {site.description}</td>
-      <td>day</td><td className="b3bf-num">{site.days}</td>
-      {priced&&<td className="b3bf-num">—</td>}{priced&&<td className="b3bf-num">—</td>}
-      <td>Included in the 6-day total · travel excluded · {site.jbText} · {site.installer}</td>
-     </tr>)}
+     {shown("bf")&&shown("site")&&<tr><td colSpan={cols}><table data-testid="b3bf-day-plan">
+      <thead><tr><th>Day</th><th>Team-days</th><th>Notes</th></tr></thead>
+      <tbody>
+       {model.dayPlan.map(row=><tr key={row.id}><td>{row.label}</td><td className="b3bf-num">{row.days}</td><td>{row.kind==="site"?(model.siteRows.find(site=>site.site===row.id)?.jbText||""):"Labour day. Ticket + POB cash is separate."}</td></tr>)}
+       <tr><td>Total</td><td className="b3bf-num">{model.netCalendarDays}</td><td>ZPQ 2 + ZWP8 2 + ZWP11 2 + MOB 1 + DEMOB 1 + Punch list 1</td></tr>
+      </tbody>
+     </table></td></tr>}
      <tr className="b3bf-sec b3bf-ref">
       <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("ref")} onClick={()=>toggle("ref")}>PART B — original quotation items (reference base scope, not priced)</button></td>
      </tr>
@@ -182,7 +182,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      </tr>}
     </tbody>
    </table></div>
-   <p className="b3bf-foot">{model.exclusion} Offshore working days are ZPQ 2, ZWP8 2 and ZWP11 2. Travel days are excluded.</p>
+   <p className="b3bf-foot">{model.exclusion} The 9 team-days are ZPQ 2, ZWP8 2, ZWP11 2, MOB 1, DEMOB 1 and punch list 1.</p>
    </>}
   </div>
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
@@ -227,6 +227,13 @@ function Item7Vnd({model,money,itemized}){
   <p data-testid="b3bf-vnd-equation">{item.equation}</p>
   <p data-testid="b3bf-vnd-sell">{item.sellEquation}</p>
   <p>{item.note}</p>
+  <table data-testid="b3bf-day-plan">
+   <thead><tr><th>Day</th><th>Team-days</th></tr></thead>
+   <tbody>
+    {model.dayPlan.map(row=><tr key={row.id}><td>{row.label}</td><td className="b3bf-num">{row.days}</td></tr>)}
+    <tr><td>Total</td><td className="b3bf-num">{model.netCalendarDays}</td></tr>
+   </tbody>
+  </table>
   <table>
    <thead><tr><th>Line</th><th>ADDVALUE selling price</th><th>Qty</th><th>VND cost</th></tr></thead>
    <tbody>
