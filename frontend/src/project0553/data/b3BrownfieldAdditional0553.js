@@ -5,6 +5,8 @@ import {selectB3SelectedSatSurveyPrice0553} from "./b3SelectedSatSurveyPrice0553
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorkingSell0553";
 import {PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
+import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./officialWorkbookTemplate0553";
+import {RELEASE_CUSTOMER_COLUMNS_0553,buildReleaseCommercialModel0553} from "./releaseCommercialModel0553";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 import {MR0003_MR0004_SCOPE_C1} from "./mr0003Mr0004ScopeC1";
 import {MR0002_BDA_DEVIATION_REV00_0553} from "./mr0002DeviationBdaRev00_0553";
@@ -88,9 +90,26 @@ function otherPartA(){
    status:NOT_IN_SCOPE,priceTHB:null}
  ];
 }
+function customerScopeName0553(code){
+ const rows=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(sheet=>sheet.name==="Scope of supply")?.rows||[];
+ return rows.find(row=>row[1]===code)?.[2]||code;
+}
+function baseCustomerPreview0553(release){
+ const partA=(release.a||[]).map(part=>({
+  code:part.code,mr:part.mr,description:part.description,
+  locations:[...new Set((part.sourceRows||[]).map(row=>row.site).filter(Boolean))],
+  previewSellTHB:part.previewSellTHB
+ }));
+ const b3=(release.b||[]).find(row=>row.code==="B3");
+ const name=customerScopeName0553("B3");
+ if(partA.length!==4||!partA.some(part=>Number.isFinite(part.previewSellTHB))||
+    name==="B3"||!b3?.executionActivities?.releaseText||!b3.serviceCommercialBasis?.compactText)
+  throw Error("Base Scope of Supply preview is missing Part A prices or the B3 description");
+ return {source:"buildReleaseCommercialModel0553",partA,b3:{name,releaseText:b3.executionActivities.releaseText,compactText:b3.serviceCommercialBasis.compactText}};
+}
 function referencePartB(){
  return PART_BC_WBS_SOURCE_0553.summary.filter(row=>/^B\d+$/.test(row.code)).map(row=>({
-  code:row.code,priceTHB:null,
+  code:row.code,priceTHB:null,customerDescription:customerScopeName0553(row.code),
   note:row.code==="B3"?"Original quotation, unchanged":"Reference base scope"
  }));
 }
@@ -129,6 +148,10 @@ function build(){
     china.fatWorkingSellTHB!==452850||purchased.selectedIncrementalWorkingSellTHB!==0||
     baseB3WorkingSellTHB!==2322450)
   throw Error("B3 brownfield additional price does not match the read-only B3 basis");
+ const baseCustomerPreview=baseCustomerPreview0553(buildReleaseCommercialModel0553());
+ const partAPreviewSum=round(baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0));
+ if(partAPreviewSum===proposalTHB||partAPreviewSum===0)
+  throw Error("Base Part A prices must stay out of the additional-proposal total");
  if(satBefore!==snapshot(selectB3SelectedSatSurveyPrice0553)||
     chinaBefore!==snapshot(selectB9ChinaWorkingBudget0553)||
     purchasedBefore!==snapshot(selectB3MgwPurchasedFatWorkingSell0553))
@@ -210,7 +233,7 @@ function build(){
    c2:{id:"C2",basis:"5 of 28 SAT team-days",days:5,valueTHB:carveC2THB}
   },
   bomLines,jutalNote:B3BF_JUTAL_NOTE_0553,lastLineNote:B3BF_LAST_LINE_NOTE_0553,siteRows,a1Rows,
-  otherPartA:otherPartA(),partB,openItems
+  otherPartA:otherPartA(),partB,openItems,baseCustomerPreview
  });
 }
 let cache=null;
@@ -252,9 +275,61 @@ export function b3BrownfieldExportFileName0553({audience="official",extension}={
  return named+"."+ext;
 }
 const UNPRICED_LEAK=/793,?800|56,?700|31,?500|25,?200|441,?000|352,?800|252,?000|283,?500|2,?322,?450|452,?850|1,?587,?600|14,?000|11,?200|1,?800|1,?000|(?:^|[^\d.,])800(?:[^\d]|$)|31\.5|\bUSD\b|\bTHB\b/;
+function formatBasePreviewThb0553(value,currency){
+ if(!Number.isFinite(value))return "—";
+ const text=money2(value);
+ return currency==="thb"?text:text+" THB";
+}
+export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemized=true,currency="thb"}={}){
+ if(!model||model.id!=="PJ2608-0553-B3BF-ADDITIONAL")throw Error("Official schedule requires the additional-proposal model");
+ void itemized;
+ const preview=model.baseCustomerPreview;
+ if(!preview?.partA||!preview.b3)throw Error("Official schedule requires the base customer preview");
+ const show=n=>priced?formatB3BrownfieldMoney0553(model,n.thb,n.usd,currency):"";
+ const line=(cells,kind="line")=>({kind,cells});
+ const rows=[];
+ rows.push(line(["Part A: BASIC","A部分：基本"],"section"));
+ for(const part of preview.partA){
+  const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
+  const price=priced?formatBasePreviewThb0553(part.previewSellTHB,currency):"";
+  rows.push(line([part.code,part.mr,part.description,locations,"1 lot",price,price,"Quoted"]));
+ }
+ rows.push(line(["Part B: OTHERS","B部分：其它"],"section"));
+ const b3Spec=[preview.b3.releaseText,priced?preview.b3.compactText:""].filter(Boolean).join("\n");
+ const senior=model.bomLines.find(entry=>entry.id==="BF.1.1");
+ const specialist=model.bomLines.find(entry=>entry.id==="BF.1.2");
+ const bfSpec=model.netCalendarDays+" team-days, "+model.teamPersons+" persons ("+senior.activity+" + "+specialist.activity+")."+
+  (priced?"\nUSD "+money2(model.seniorUsdPerDay)+" / "+money2(model.specialistUsdPerDay)+" per person/day @"+model.fxTHBPerUSD+".":"");
+ const additional=show({thb:model.proposalTHB,usd:model.proposalUSD});
+ for(const row of model.partB){
+  if(row.code==="B3"){
+   rows.push(line(["B3","",preview.b3.name,b3Spec,"1 lot","",priced?"Quoted":"","Quoted"]));
+   rows.push(line(["B3-BF","","Brownfield inspection, testing & certification — additional",bfSpec,"1 lot",additional,additional,""]));
+  }else rows.push(line([row.code,"",row.customerDescription,"","1 lot","",priced?"Quoted":"","Quoted"]));
+ }
+ rows.push(line(["Total Additional (B3-BF)","","","","","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),""],"total"));
+ rows.push(line([model.jutalNote],"note"));
+ rows.push(line([model.lastLineNote],"note"));
+ const columns=priced?RELEASE_CUSTOMER_COLUMNS_0553.scope:[...RELEASE_CUSTOMER_COLUMNS_0553.scope.slice(0,5),RELEASE_CUSTOMER_COLUMNS_0553.scope[7]];
+ return Object.freeze({columns,rows:Object.freeze(rows),project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",title:"Scope of supply"});
+}
 export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized,version="internal",currency="thb"}={}){
  if(!model||model.id!=="PJ2608-0553-B3BF-ADDITIONAL")throw Error("Brownfield CSV requires the additional-proposal model");
  const official=version==="official";
+ if(official){
+  const schedule=selectB3BrownfieldOfficialSchedule0553(model,{priced,itemized,currency});
+  const drop=cells=>priced?cells:[...cells.slice(0,5),cells[7]||""];
+  const lines=[
+   ["Scope of supply / 供货范围"],
+   ["Project","ZAWTIKA DEVELOPMENT PROJECT PHASE 1F"],
+   ["Document",b3BrownfieldDocumentNumber0553()],
+   schedule.columns
+  ];
+  for(const row of schedule.rows)lines.push(row.kind==="section"?[row.cells[0]+" / "+row.cells[1]]:drop(row.cells));
+  const text=lines.map(row=>row.map(csvCell).join(",")).join("\n");
+  if(priced===false&&UNPRICED_LEAK.test(text))throw Error("Unpriced brownfield export contains a money figure");
+  return text;
+ }
  const money=priced!==false;
  const showRates=money&&itemized!==false;
  const showBreakdown=showRates;

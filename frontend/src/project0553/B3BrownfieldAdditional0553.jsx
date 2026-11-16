@@ -1,5 +1,6 @@
 import React,{useMemo,useState} from "react";
-import {b3BrownfieldExportFileName0553,buildB3BrownfieldAdditionalCsv0553,formatB3BrownfieldMoney0553,selectB3BrownfieldAdditional0553} from "./data/b3BrownfieldAdditional0553";
+import {b3BrownfieldDocumentNumber0553,b3BrownfieldExportFileName0553,buildB3BrownfieldAdditionalCsv0553,formatB3BrownfieldMoney0553,selectB3BrownfieldAdditional0553,selectB3BrownfieldOfficialSchedule0553} from "./data/b3BrownfieldAdditional0553";
+import "./releaseWorkbook0553.css";
 
 function downloadCsv(model,view){
  const csv=buildB3BrownfieldAdditionalCsv0553(model,view);
@@ -34,7 +35,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
   <div className="b3bf-head"><span>PJ2608-0553 / Additional Proposal / B3-BF</span><span>{viewLabel}</span></div>
   <h2>{model.title}</h2>
   <p className="b3bf-doctitle" data-testid="b3bf-doc-title">{docName}</p>
-  <p className="b3bf-context">{model.context} This tab reads the current B3 rates and the MR0001 MTO. It does not change the original Scope of Supply or the base B3 amount.</p>
+  {!official&&<p className="b3bf-context">{model.context} This tab reads the current B3 rates and the MR0001 MTO. It does not change the original Scope of Supply or the base B3 amount.</p>}
   <div className="b3bf-controls" role="toolbar" aria-label="Brownfield additional proposal view">
    <button type="button" aria-pressed={!doc} onClick={()=>setDoc(false)}>Interactive View (+/−)</button>
    <button type="button" aria-pressed={doc} onClick={()=>setDoc(true)}>Expand All Document Mode</button>
@@ -56,7 +57,8 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
    <button type="button" onClick={()=>window.print()}>Print</button>
   </div>
   <div className="b3bf-doc">
-   <p className="b3bf-stand">ADDITIONAL PROPOSAL — B3 BROWNFIELD INSPECTION, TESTING &amp; CERTIFICATION<br/><small>Standalone. The original quotation / Scope of Supply is not modified.</small></p>
+   {official&&<OfficialCustomerSheet model={model} priced={priced} itemized={itemized} currency={currency}/>}
+   {!official&&<><p className="b3bf-stand">ADDITIONAL PROPOSAL — B3 BROWNFIELD INSPECTION, TESTING &amp; CERTIFICATION<br/><small>Standalone. The original quotation / Scope of Supply is not modified.</small></p>
    <div className="b3bf-scroll"><table className="b3bf-sheet">
     <colgroup>
      <col className="b3bf-c-sn"/><col className="b3bf-c-desc"/><col className="b3bf-c-unit"/><col className="b3bf-c-qty"/>
@@ -157,7 +159,8 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      </tr>}
     </tbody>
    </table></div>
-   <p className="b3bf-foot">{model.exclusion}{!official&&" MOB/DEMOB and the per-site day split stay OPEN."}</p>
+   <p className="b3bf-foot">{model.exclusion} MOB/DEMOB and the per-site day split stay OPEN.</p>
+   </>}
   </div>
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
    <h3>Open items</h3>
@@ -171,11 +174,27 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
     </tbody>
    </table>}
   </aside>}
-  {official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
-   <h3>Open items</h3>
-   <ul>{model.openItems.filter(item=>!item.internalOnly).map(item=><li key={item.id}><strong>{item.topic}.</strong> TBA</li>)}</ul>
-  </aside>}
  </section>;
+}
+function OfficialCustomerSheet({model,priced,itemized,currency}){
+ const schedule=selectB3BrownfieldOfficialSchedule0553(model,{priced,itemized,currency});
+ const shown=row=>priced?row.cells:[...row.cells.slice(0,5),row.cells[7]||""];
+ const span=schedule.columns.length;
+ return <div className="p553-native-sheet" data-testid="b3bf-official-sheet">
+  <div className="p553-native-title">Scope of supply<br/>供货范围</div>
+  <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span><strong>Document</strong><span>{b3BrownfieldDocumentNumber0553()}</span></div>
+  <div className="p553-sheet-scroll"><table className="p553-customer-table">
+   <thead><tr>{schedule.columns.map(header=><th key={header}>{header.split(" / ").map((part,index)=><React.Fragment key={part+index}>{index>0&&<br/>}{part}</React.Fragment>)}</th>)}</tr></thead>
+   <tbody>{schedule.rows.map((row,index)=>{
+    const cells=shown(row);
+    if(row.kind==="section")return <tr key={index} className="p553-sheet-section"><td colSpan={span}>{row.cells[0]}<br/>{row.cells[1]}</td></tr>;
+    if(row.kind==="note")return <tr key={index} className="b3bf-note"><td colSpan={span}>{row.cells[0]}</td></tr>;
+    if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-testid={priced?"b3bf-total":undefined}><td colSpan={priced?6:5}>{row.cells[0]}</td>{priced&&<td className="p553-price-cell">{row.cells[6]}</td>}<td>{row.cells[7]}</td></tr>;
+    if(row.kind==="tba")return <tr key={index}><td colSpan={span}>{row.cells[0]} — TBA</td></tr>;
+    return <tr key={index} className={row.kind==="detail"?"b3bf-official-detail":"p553-mr-preview-row"}>{cells.map((value,cell)=><td key={cell} className={(priced&&(cell===5||cell===6)?"p553-price-cell ":"")+"b3bf-pre"}>{value}</td>)}</tr>;
+   })}</tbody>
+  </table></div>
+ </div>;
 }
 function Mark({kind,children}){
  return <span className={kind==="open"?"b3bf-open":kind==="company"||kind==="jutal"?"b3bf-by":"b3bf-open"}>{children}</span>;
@@ -220,6 +239,8 @@ const CSS=`
 .b3bf-rate{color:#2c5d7a;font-weight:400}
 .b3bf-src{font-family:Consolas,monospace;font-size:10.5px;color:#7a8a96;font-weight:400}
 .b3bf-pre{white-space:pre-line}
+.b3bf .p553-customer-table td.p553-price-cell{white-space:normal}
+.b3bf-official-detail td{background:#f8fbfd;font-weight:400}
 .b3bf-doctitle{font-family:Consolas,monospace;font-size:12px;margin:0 0 8px}
 .b3bf-controls button:disabled{opacity:.45;cursor:not-allowed}
 .b3bf-total td{background:#0b2538;color:#fff;font-weight:700}

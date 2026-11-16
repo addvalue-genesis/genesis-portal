@@ -112,12 +112,57 @@ for(const [label,text] of [["priced csv",pricedCsv],["unpriced csv",unpricedCsv]
  assert.ok(text.lastIndexOf(NOTE)>text.lastIndexOf(data.B3BF_JUTAL_NOTE_0553),label+": Greenfield note must follow the Jutal note");
 }
 const officialHtml=render({initialPriced:true,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
+const officialThb=render({initialPriced:true,initialItemized:false,initialVersion:"official",initialCurrency:"thb"});
 const officialCsv=data.buildB3BrownfieldAdditionalCsv0553(model,{priced:true,itemized:true,version:"official",currency:"both"});
-assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("A1 · MR-0001"));
-assert.ok(officialHtml.indexOf("A1 · MR-0001")<officialHtml.indexOf("B3-BF · Brownfield inspection"));
+const baseMoney=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const partASum=model.baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0);
+const officialSchedule=data.selectB3BrownfieldOfficialSchedule0553(model,{priced:true,itemized:true,currency:"thb"});
+assert.equal(model.baseCustomerPreview.source,"buildReleaseCommercialModel0553");
+assert.notEqual(model.grandTotalTHB,partASum);
+assert.equal(model.grandTotalTHB,793800);
+assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS"));
+assert.ok(officialHtml.indexOf("Part A: BASIC")<officialHtml.indexOf(">B3<")&&officialHtml.indexOf(">B3<")<officialHtml.indexOf(">B3-BF<"));
+assert.ok(officialHtml.indexOf(">B3-BF<")<officialHtml.indexOf("Total Additional (B3-BF)"));
+assert.ok(officialThb.includes("Total Additional (B3-BF)")&&officialThb.includes("793,800.00")&&!officialThb.includes("25,200"));
+for(const part of model.baseCustomerPreview.partA){
+ const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
+ const price=Number.isFinite(part.previewSellTHB)?baseMoney(part.previewSellTHB):"—";
+ const row=officialSchedule.rows.find(entry=>entry.cells[0]===part.code);
+ assert.equal(row.cells[5],price);
+ assert.equal(row.cells[6],price);
+ assert.equal(row.cells[7],"Quoted");
+ assert.equal(row.cells[3],locations);
+ assert.ok(officialThb.includes(locations)&&officialThb.includes(part.description));
+ if(Number.isFinite(part.previewSellTHB)){
+  assert.ok(officialThb.includes(price),"official THB missing base price "+part.code);
+  assert.ok(officialCsv.includes(price));
+ }
+}
+const b3Row=officialSchedule.rows.find(entry=>entry.cells[0]==="B3");
+const bfRow=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF");
+assert.equal(b3Row.cells[2],model.baseCustomerPreview.b3.name);
+assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.releaseText));
+assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.compactText));
+assert.equal(b3Row.cells[6],"Quoted");
+assert.ok(officialThb.includes("Included SAT: 2 persons")&&officialThb.includes("Proposed standby"));
+assert.ok(bfRow.cells[3].includes("14 team-days")&&bfRow.cells[5]==="793,800.00"&&bfRow.cells[6]==="793,800.00"&&bfRow.cells[7]==="");
+assert.ok(officialThb.includes("14 team-days")&&officialThb.includes("USD 1,000.00 / 800.00 per person/day @31.5"));
+for(const code of ["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14"]){
+ assert.ok(officialHtml.includes(">"+code+"<"),"official view missing "+code);
+ assert.ok(officialCsv.includes("\n"+code+","),"official csv missing "+code);
+}
+assert.ok(officialHtml.includes("Quoted")&&officialHtml.includes(">B3-BF<"));
+assert.ok(!officialHtml.includes("Supplied under base")&&!officialHtml.includes("Breakdown (incl. in B3-BF)")&&!officialHtml.includes("Net additional")&&!officialHtml.includes("TBA"));
+assert.ok(!officialHtml.includes("2,322,450")&&!officialCsv.includes("2,322,450"));
 assert.ok(!officialHtml.includes("BF.1.3")&&!officialHtml.includes("Existing SAT role rate")&&!officialHtml.includes("Offshore POB"));
-assert.ok(!officialCsv.includes("BF.1.3")&&!officialCsv.includes("Existing SAT role rate")&&!officialCsv.includes("Offshore POB"));
-assert.ok(officialCsv.includes("25,200.00 USD")&&officialCsv.includes("793,800.00"));
+assert.ok(!officialCsv.includes("BF.1.3")&&!officialCsv.includes("Existing SAT role rate")&&!officialCsv.includes("Offshore POB")&&!officialCsv.includes("Breakdown (incl. in B3-BF)"));
+assert.ok(officialCsv.includes("25,200.00 USD")&&officialCsv.includes("793,800.00")&&officialCsv.includes("Quoted")&&officialCsv.includes("Total Additional (B3-BF)"));
+assert.ok(officialCsv.split("\n").at(-1).includes(NOTE));
+assert.ok(officialCsv.lastIndexOf(NOTE)>officialCsv.lastIndexOf(data.B3BF_JUTAL_NOTE_0553));
+const officialUnpriced=render({initialPriced:false,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
+assert.ok(!officialUnpriced.includes("793,800")&&!officialUnpriced.includes("25,200")&&!officialUnpriced.includes("1,000.00")&&officialUnpriced.includes("Quoted"));
+assert.ok(officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("Included SAT")&&!officialUnpriced.includes("TBA"));
+for(const part of model.baseCustomerPreview.partA)if(Number.isFinite(part.previewSellTHB))assert.ok(!officialUnpriced.includes(baseMoney(part.previewSellTHB)));
 assert.ok(pricedHtml.includes("BF.1.3")&&pricedHtml.includes("Existing SAT role rate")&&pricedHtml.includes("Offshore POB"));
 const leak=/793,?800|56,?700|25,?200|441,?000|352,?800|14,?000|11,?200|1,?800|1,?000|31\.5/;
 for(const view of [
@@ -137,8 +182,9 @@ const nav=fs.readFileSync(path.join(frontend,"src/project0553/lifecycleNavigatio
 assert.ok(page.includes('tab==="b3bf"&&<B3BrownfieldAdditional0553/>'));
 assert.ok(nav.includes('["b3bf","10B B3 Brownfield Additional"]'));
 assert.ok(nav.includes('tabs:["documents","budget"]'));
-assert.ok(!fs.readFileSync(path.join(root,"project0553/data/b3BrownfieldAdditional0553.js"),"utf8").includes("buildReleaseCommercialModel0553"));
-assert.ok(!fs.readFileSync(path.join(root,"project0553/data/b3BrownfieldAdditional0553.js"),"utf8").includes("priceAorCFromCost0553"));
+const brownfieldSource=fs.readFileSync(path.join(root,"project0553/data/b3BrownfieldAdditional0553.js"),"utf8");
+assert.ok(brownfieldSource.includes("buildReleaseCommercialModel0553"));
+assert.ok(!brownfieldSource.includes("priceAorCFromCost0553"));
 const satAfter=require(path.join(root,"project0553/data/b3SelectedSatSurveyPrice0553.js")).selectB3SelectedSatSurveyPrice0553();
 assert.equal(satAfter.satWorkingSellTHB,1587600);
 assert.equal(satAfter.satTeamDaySellTHB,56700);
