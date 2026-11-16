@@ -195,6 +195,7 @@
     "validate:pj0550-si-spare-drafts": "node scripts/validate-pj2608-0550-si-spare-drafts.cjs",
     "validate:pj0550-native-exhibit": "node scripts/validate-pj2608-0550-native-exhibit.cjs",
     "validate:pj0550-working-schedules": "node scripts/validate-pj2608-0550-working-schedules.cjs",
+    "validate:pj0550-a1-linkage": "node scripts/validate-pj2608-0550-a1-linkage.cjs",
     "validate:pj0550-working-schedules-browser": "node scripts/validate-pj2608-0550-working-schedules-browser.cjs",
     "validate:pj0550-live-dossier": "node scripts/validate-pj2608-0550-live-dossier.cjs",
     "validate:pj0550-lifecycle-cost-drivers": "node scripts/validate-pj2608-0550-lifecycle-cost-drivers.cjs",

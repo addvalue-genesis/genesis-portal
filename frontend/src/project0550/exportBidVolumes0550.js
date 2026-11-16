@@ -1,5 +1,6 @@
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
-import {nativeExhibitHtml0550} from './exhibitCNative0550';
+import {nativeExhibitHtml0550,a1SummarySlot0550} from './exhibitCNative0550';
+import {a1DisplaySn0550} from './data/a1DisplaySn0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {SCHEDULES_0550,QUALIFICATIONS_0550,paymentSchedule0550} from './data/bidVolumes0550';
 import {sumMoney0550} from './data/money0550';
@@ -30,6 +31,15 @@ export function scheduleTable0550(view,id){
    const conflict=view.bindings.some(b=>b.line&&b.schedule==='C3'&&b.treatment==='BASE');
    draftRows.push(['Item 5 · Two years Operation Spare parts','Lot',1,'',conflict?'OPEN':c3.knownUSD??'OPEN',
     conflict?'Review Base allocation in 11.M':'C3 / A2 Option reference. '+rollupNote0550(c3)]);
+  }
+  if(id==='A1'){
+   // A1 sheet matches the internal screen: the SN column is the internal sequential
+   // displaySn (1 GOODS ... 10 Others), not the customer-form S/N. The official
+   // customer Word form (exhibitCNativeTemplate0550.json / buildNativeExhibitDocx0550)
+   // keeps its own S/N text, which has SN 5 twice. Labels and order only; amounts unchanged.
+   const snOf=(row,i)=>i<groups.size?a1DisplaySn0550(a1SummarySlot0550(groups.get([...groups.keys()][i])[0])):a1DisplaySn0550(6);
+   const numbered=draftRows.map((row,i)=>[snOf(row,i)??'',...row]).sort((a,b)=>(a[0]===''?99:a[0])-(b[0]===''?99:b[0]));
+   return {heads:['SN','Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...numbered,['','Lump Sum Base','Lot',1,view.baseAssigned,view.baseAssigned,'OPEN until complete mapping / review']]};
   }
   return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...draftRows,['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
  }

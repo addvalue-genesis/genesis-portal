@@ -63,6 +63,7 @@ export function releaseScheduleChecks0550(view){
    }
    for(const line of view.unallocated)add('Working owner awaiting Schedule allocation',line.id);
   }else{
+   // 4 and 9 are A1 template rows (a1SummarySlot0550), not S/N: row 4 = Packing, row 9 = C-8 Facilities.
    if(id==='A1'&&!printed.some(b=>a1SummarySlot0550(b)===4))add('Confirm packing scope and Working owner, excluding packing already included in equipment packages.');
    if(id==='A1'&&!printed.some(b=>a1SummarySlot0550(b)===9))add('Confirm C8 facilities form and whether any facilities are included in Base.');
    if(!printed.length&&record.state!=='REVIEWED')add('No Working rows on this form. Confirm scope and allocation.');
