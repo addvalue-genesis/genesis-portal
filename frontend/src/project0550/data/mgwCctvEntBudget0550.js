@@ -191,3 +191,16 @@ export function mgwCctvEntSharedBudget0550(model){
   });
  });
 }
+
+
+export const CCTV_REVIEW_FLAGS_0550 = [
+ { id: 'REVIEW_FLAG_CCTV_ATEX_CERT', scope: 'APF (1.3.1)', summary: 'Verify ATEX / IECEx Zone 1 certificates (Ex II 2GD Ex db IIC T6 Gb / Ex tb IIIC T80°C Db, IP68) on all 20 Sets of Hikvision DS-2DY7436IXG-CXLWF316L.' },
+ { id: 'REVIEW_FLAG_CCTV_EX_JBOX_FIBER', scope: 'APF (1.3.1)', summary: 'Verify DS-2XE2705-M04(316L)(O-STD) Ex-Proof Junction Box integrated single-mode SC fiber optic media converter, 4 Ex cable glands, and 24VAC/230VAC power interface.' },
+ { id: 'REVIEW_FLAG_CCTV_QTY_RECON', scope: 'APF (1.3.1 / 1.3.2)', summary: 'Reconcile MGW CCTV-011 (24 SET quoted on p.15 vs 20 SET MR-B1-13-APF-01 + 2 SET MR-B1-13-APF-02 = 22 SET MR PTZ requirement); 2 excess sets tracked in 10.2 SI.' },
+];
+
+export const APF_CCTV_PTZ_EX_BOM_0550 = [
+ { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'CCTV Camera complete with junction box with fiber optic media converter', offeredEquipment: 'Hazardous Area Explosion-Proof PTZ Camera Station (ATEX Ex II 2GD Ex db IIC T6 Gb / Ex tb IIIC T80°C Db, IP68, SUS316L, 36x Optical Zoom, 200m IR, Wiper & Sunshade)', description: 'Hazardous Area Explosion-Proof PTZ Camera Station (ATEX Ex II 2GD Ex db IIC T6 Gb / Ex tb IIIC T80°C Db, IP68, SUS316L, 36x Optical Zoom, 200m IR, Wiper & Sunshade)', brand: 'Hikvision', model: 'DS-2DY7436IXG-CXLWF316L', partNo: 'DS-2DY7436IXG-CXLWF316L', quantity: 20, unit: 'Set', remarks: 'Included in Base Scope of Supply', weight: 75000 },
+ { itemNo: '2', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Ex-Proof Junction Box with Fiber Optic Media Converter (per MR)', offeredEquipment: 'Ex-Proof Fiber Optic Junction Box c/w Single-Mode SC Fiber Media Converter & 4 Ex Cable Glands (ATEX & IECEx Certified, IP68, SUS316L)', description: 'Ex-Proof Fiber Optic Junction Box c/w Single-Mode SC Fiber Media Converter & 4 Ex Cable Glands (ATEX & IECEx Certified, IP68, SUS316L)', brand: 'Hikvision', model: 'DS-2XE2705-M04(316L)(O-STD)', partNo: 'DS-2XE2705-M04(316L)(O-STD)', quantity: 20, unit: 'Set', remarks: 'Included in Base Scope of Supply (complete with PTZ camera assembly)', weight: 20000 },
+ { itemNo: '3', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Etc. (per Appendix 2 Drawings)', offeredEquipment: 'SUS316L Wall/Pole Mounting Brackets, Ex Cable Glands, Fiber Patch Cords & Bulk Installation Accessories', description: 'SUS316L Wall/Pole Mounting Brackets, Ex Cable Glands, Fiber Patch Cords & Bulk Installation Accessories', brand: 'Hikvision / Panduit', model: 'EX-MNT-316L-KIT', partNo: 'EX-MNT-316L-KIT', quantity: 20, unit: 'Lot', remarks: 'Details shall be included not limit to Bulk Materials etc.', weight: 5000 },
+];
