@@ -37,7 +37,7 @@ const customerRemarkText=rows=>{
  }
  return notes.join('; ');
 };
-const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').trim();
+const customerDescription=text=>String(text||'').replace(/^(?:PROJECT|SI estimate|Working draft offer|ประมาณการ)\s*·\s*/i,'').trim();
 const sparePriceNote=(rows,currency)=>{
  const subtotal=scheduleRollup0550(rows);
  const status=subtotal.open?'; '+subtotal.priced+'/'+subtotal.count+' priced; '+subtotal.open+' OPEN':'';
@@ -151,7 +151,7 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
    set(v,r,rate,moneyText(view,rateAmount));set(v,r,total,moneyText(view,termAmount));
   }
   if(!priced){issues.push((title[r]||'row '+r)+' price TBA');set(v,r,5,'TBA');set(v,r,6,'');set(v,r,7,'TBA');set(v,r,8,'');}
-  const a2OfficialNote={3:'Breakdown in Form C-4. Recommended 10-year capital spares.',4:'Per Form C-7 (Optional site service / DIEM rates).',5:'Breakdown in Form C-6. Filling materials and consumables.',6:'Breakdown in Form C-3. Two-year operating spares.'}[r];
+  const a2OfficialNote={3:'Breakdown in Form C-4. Recommended 10-year capital spares.',4:'Per Form C-7 (Optional site service / DIEM rates).',5:'Breakdown in Form C-6. Filling materials and consumables.',6:'Breakdown in Form C-3. Two-year operating spares.',7:'Optional site installation and interconnecting works (subject to Purchase Order).'}[r];
   const note=a2OfficialNote||customerRemarkText(bs);
   if(note)set(v,r,9,note);
  }
@@ -666,9 +666,9 @@ export function buildNativeExhibitDocx0550(view,only){
  const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
   ?(issued(view)?officialC1Word0550(view):c1AppendixWord0550(view)):nativePages(view,id).pages.map((page,index)=>{
    const xml=renderPage(view,page,'xml');
-   if(issued(view)&&['A1','A2','C2','C3','C4','C5','C6','C7','C8'].includes(id)){
+   if(issued(view)&&['A1','A2','B','C5','C6','C7','C8','C2','C3','C4'].includes(id)){
     const sz=['C2','C3','C4'].includes(id)?'16':'18';
-    return xml.replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`).replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`).replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>TBA<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell);
+    return xml.replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`).replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`).replace(/<w:rPr>(?!.*?<w:sz\b)/g,`<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`).replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>TBA<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell);
    }
    if(!only||!view.workingPreview)return xml;
    const content=xml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>

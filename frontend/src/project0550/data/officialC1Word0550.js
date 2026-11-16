@@ -33,6 +33,7 @@ import {
 } from './appendix13To18Boms0550';
 
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const ARIAL_FONTS = '<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
 
 function resolveStaticBomForWord(r) {
   if (r.sn === '1.1.1' || r.key === 'MR-B1-11-APF-01') return APF_DMR_MR_12_ITEMS_0550;
@@ -89,17 +90,20 @@ const cleanOfficialNote = text => {
 
 export function officialC1Word0550(view) {
   const c1 = deriveC1Appendix0550(view);
-  const p = (text, bold = false, sz = '16') =>
-    `<w:p><w:pPr><w:spacing w:before="20" w:after="20" w:line="220" w:lineRule="auto"/></w:pPr><w:r><w:rPr>${bold ? '<w:b/>' : ''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr><w:t xml:space="preserve">${esc(text)}</w:t></w:r></w:p>`;
+  const heading = text =>
+    `<w:p><w:pPr><w:pStyle w:val="2"/><w:outlineLvl w:val="1"/><w:keepNext/><w:spacing w:before="120" w:after="80"/><w:jc w:val="center"/></w:pPr><w:r><w:rPr>${ARIAL_FONTS}<w:b/><w:bCs/><w:sz w:val="22"/><w:szCs w:val="22"/></w:rPr><w:t xml:space="preserve">${esc(text)}</w:t></w:r></w:p>`;
+  const p = (text, bold = false, sz = '18', align = 'left') =>
+    `<w:p><w:pPr><w:spacing w:before="24" w:after="24" w:line="220" w:lineRule="auto"/><w:jc w:val="${align}"/></w:pPr><w:r><w:rPr>${ARIAL_FONTS}${bold ? '<w:b/><w:bCs/>' : ''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr><w:t xml:space="preserve">${esc(text)}</w:t></w:r></w:p>`;
   const row = (values, header = false, span = false, bold = false) =>
     `<w:tr><w:trPr>${header ? '<w:tblHeader/>' : '<w:cantSplit/>'}</w:trPr>${values
       .map((v, i) => {
         const noWrap = !span && (i === 0 || i === 2 || i === 3 || i === 4 || i === 5) ? '<w:noWrap/>' : '';
-        return `<w:tc><w:tcPr>${span && i === 0 ? '<w:gridSpan w:val="7"/>' : ''}${noWrap}${header ? '<w:shd w:fill="EAF2F6"/>' : ''}</w:tcPr>${p(v, header || bold)}</w:tc>`;
+        const align = header ? 'center' : (i === 0 || i === 2 || i === 3) ? 'center' : (i === 4 || i === 5) ? 'right' : 'left';
+        return `<w:tc><w:tcPr>${span && i === 0 ? '<w:gridSpan w:val="7"/>' : ''}${noWrap}${header ? '<w:shd w:fill="EAF2F6"/>' : ''}<w:vAlign w:val="center"/></w:tcPr>${p(v, header || bold, '18', align)}</w:tc>`;
       })
       .join('')}</w:tr>`;
   const headerCell = (text, properties = '') =>
-    `<w:tc><w:tcPr>${properties}<w:shd w:fill="EAF2F6"/></w:tcPr>${p(text, true)}</w:tc>`;
+    `<w:tc><w:tcPr>${properties}<w:shd w:fill="EAF2F6"/><w:vAlign w:val="center"/></w:tcPr>${p(text, true, '18', 'center')}</w:tc>`;
 
   const header =
     '<w:tr><w:trPr><w:tblHeader/></w:trPr>' +
@@ -113,11 +117,11 @@ export function officialC1Word0550(view) {
     headerCell('', '<w:vMerge/>') +
     '</w:tr>';
 
-  const widths = [950, 5600, 750, 750, 1350, 1350, 2600];
+  const widths = [900, 5600, 750, 750, 1400, 1400, 2600];
   let xml =
-    p('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPLY', true, '20') +
+    heading('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPLY') +
     p('Currency: USD', false, '18') +
-    '<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblBorders>' +
+    '<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="70" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="70" w:type="dxa"/></w:tblCellMar><w:tblBorders>' +
     ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(n => `<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('') +
     '</w:tblBorders></w:tblPr><w:tblGrid>' +
     widths.map(w => `<w:gridCol w:w="${w}"/>`).join('') +
@@ -133,8 +137,8 @@ export function officialC1Word0550(view) {
         if (!mrRows.length) continue;
         if (site.name) xml += row([site.name], false, true, true);
         for (const r of mrRows) {
-          const priceUnit = r.unitPrice > 0 ? c1Display0550(r.unitPrice) : 'Included';
-          const priceTotal = r.amount > 0 ? c1Display0550(r.amount) : 'Included';
+          const priceUnit = Number.isFinite(r.unitPrice) && r.unitPrice > 0 ? c1Display0550(r.unitPrice) : (r.nonAdditive ? 'Included' : 'TBA');
+          const priceTotal = Number.isFinite(r.amount) && r.amount > 0 ? c1Display0550(r.amount) : (r.nonAdditive ? 'Included' : 'TBA');
           xml += row([r.sn, r.description, r.unit || '—', r.quantity ?? '—', priceUnit, priceTotal, cleanOfficialNote(r.note)], false, false, true);
           const bom = resolveStaticBomForWord(r);
           if (bom && bom.length) {
@@ -160,6 +164,6 @@ export function officialC1Word0550(view) {
     xml +
     row(['TOTAL — BASE SCOPE OF SUPPLY (USD)', '', '', '', '', Number.isFinite(c1.amount) ? c1Display0550(c1.amount) : 'TBA', ''], false, false, true) +
     '</w:tbl>' +
-    p('Schedule C1 — Base Scope of Supply', false, '16')
+    p('Schedule C1 — Base Scope of Supply', false, '18')
   );
 }
