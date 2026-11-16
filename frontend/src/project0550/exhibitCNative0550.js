@@ -150,7 +150,8 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
    set(v,r,rate,moneyText(view,rateAmount));set(v,r,total,moneyText(view,termAmount));
   }
   if(!priced){issues.push((title[r]||'row '+r)+' price TBA');set(v,r,5,'TBA');set(v,r,6,'');set(v,r,7,'TBA');set(v,r,8,'');}
-  const note=customerRemarkText(bs);
+  const a2OfficialNote={3:'Breakdown in Form C-4. Recommended 10-year capital spares.',4:'Per Form C-7 (Optional site service / DIEM rates).',5:'Breakdown in Form C-6. Filling materials and consumables.',6:'Breakdown in Form C-3. Two-year operating spares.'}[r];
+  const note=a2OfficialNote||customerRemarkText(bs);
   if(note)set(v,r,9,note);
  }
  if(base){
@@ -293,7 +294,7 @@ function nativePages(view,id,currency='USD',c2References){
  }
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,issued(view)?customerDescription(b.line.description):b.line.description);if(id==='C1'){const termText=b.deliveryTerm&&!/OPEN/i.test(b.deliveryTerm)?b.deliveryTerm:'';set(v,r,2,b.unit);set(v,r,3,shown(view,b.quantity));set(v,r,4,b.nonAdditive?'Included':moneyText(view,b.unitPrice));set(v,r,5,b.nonAdditive?'Included':moneyText(view,b.amount));set(v,r,6,issued(view)?(customerRemarkText([b])||termText):(b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN'));}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,shown(view,b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,shown(view,b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?(issued(view)?currency+' '+moneyText(view,shownSum(view,rows.filter(b=>!b.nonAdditive))):currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):'')):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id),draftPriceRows=[];group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,issued(view)?customerDescription(b.line.description):b.line.description);if(id==='C1'){const termText=b.deliveryTerm&&!/OPEN/i.test(b.deliveryTerm)?b.deliveryTerm:'';set(v,r,2,b.unit);set(v,r,3,shown(view,b.quantity));set(v,r,4,b.nonAdditive?'Included':moneyText(view,b.unitPrice));set(v,r,5,b.nonAdditive?'Included':moneyText(view,b.amount));set(v,r,6,issued(view)?(customerRemarkText([b])||termText):(b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN'));}else{const offset=id==='C6'?1:0;if(offset){const rawSpec=shown(view,b.specification);const cleanSpec=issued(view)?String(rawSpec||'').replace(/\s*[×x]\s*THB\s*[\d,]+(?:\.\d+)?\s*using the existing[^:]*:/gi,':').replace(/\s*Confirm take-off[^.]*\.?/gi,'').replace(/\s*Excludes installation stock[^.]*\.?/gi,'').replace(/^One (?:first-fill )?kit per site/i,'First-fill consumables kit per site').replace(/\s+/g,' ').trim():rawSpec;set(v,r,2,cleanSpec);}set(v,r,2+offset,b.unit);set(v,r,3+offset,shown(view,b.quantity));prices(v,r,4+offset,b,draftPriceRows);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?(issued(view)?currency+' '+moneyText(view,shownSum(view,rows.filter(b=>!b.nonAdditive))):currency+' '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):'')):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'',id==='C1'?undefined:{priceRows:group,draftPriceRows});});
  }
  if(['C2','C3','C4'].includes(id)){
   // Draft from SI equation — not allocated to Schedule. Does not enter Volume I
@@ -355,7 +356,8 @@ function nativePages(view,id,currency='USD',c2References){
      const effectiveBinding=id==='C2'&&c1Lookup&&!term(b)?{...b,deliveryTerm:c2DeliveryTermFromC10550(b,c1Row)}:b;
      const masterEntry=id==='C2'&&c1Lookup?c2MasterEntry0550(system.token,c1Row?.key):null;
      const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(c1Lookup?(masterEntry?.totalWeightKg||'TBC (Per Vendor Packing List)'):(issued(view)?'':'OPEN'));
-     const deliveryVal=c1Lookup&&(!b.delivery||b.delivery==='OPEN')?(masterEntry?.delivery||(effectiveBinding.deliveryTerm==='FOB'?'FOB Major Port in China — Per Project Schedule 11.M':'CIF Yangon, Myanmar — Per Project Schedule 11.M')):shown(view,b.delivery);
+     const rawDelivery=c1Lookup&&(!b.delivery||b.delivery==='OPEN')?(masterEntry?.delivery||(effectiveBinding.deliveryTerm==='FOB'?'FOB Major Port in China — Per Project Schedule 11.M':'CIF Yangon, Myanmar — Per Project Schedule 11.M')):shown(view,b.delivery);
+     const deliveryVal=issued(view)?String(rawDelivery||'').replace(/\s*[—-]\s*Per Project Schedule\s*11\.M/gi,'').replace('FOB Major Port in China','FOB China Port').replace('CIF Yangon, Myanmar','CIF Yangon Port').trim():rawDelivery;
      const originVal=c1Lookup&&(!b.origin||b.origin==='OPEN')?(masterEntry?.pointOfManufacture||'Per Vendor Certificate of Origin'):shown(view,b.origin);
      const shipVal=c1Lookup&&(!b.shippingFrom||b.shippingFrom==='OPEN')?(masterEntry?.shippingFrom||(effectiveBinding.deliveryTerm==='FOB'?'Shanghai, China':'Singapore')):shown(view,b.shippingFrom);
      [issued(view)?customerDescription(description):description,vendorPart,shown(view,b.interchangeA),interchangeB,shown(view,b.quantity),deliveryVal,weight,originVal,shipVal].forEach((x,c)=>set(v,r,c,x));
@@ -663,6 +665,10 @@ export function buildNativeExhibitDocx0550(view,only){
  const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
   ?c1AppendixWord0550(view):nativePages(view,id).pages.map((page,index)=>{
    const xml=renderPage(view,page,'xml');
+   if(issued(view)&&['A1','A2','C2','C3','C4','C5','C6','C7','C8'].includes(id)){
+    const sz=['C2','C3','C4'].includes(id)?'16':'18';
+    return xml.replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`).replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`).replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>TBA<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell);
+   }
    if(!only||!view.workingPreview)return xml;
    const content=xml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>
     /<w:t\b[^>]*>\s*[^\s<]|<w:(?:drawing|object|br|sectPr)\b/.test(paragraph)?paragraph:'');

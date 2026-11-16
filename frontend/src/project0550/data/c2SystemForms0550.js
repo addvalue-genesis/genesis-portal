@@ -387,7 +387,8 @@ export function formatC2PartsDescriptionFromC10550(item,c1Row,resolvedTag=''){
  const uniqueTags=[...new Set(reqTags)];
  const cleanResolved=resolvedTag&&!/^(?:OPEN|PROJECT|OFFSHORE|SHARED|AMS01)$/i.test(resolvedTag)?resolvedTag:'';
  const tagRef=uniqueTags.length?uniqueTags.join(' / '):(cleanResolved||c1Row?.site||'');
- return `${verbatim} — Pre-Commissioning & Commissioning Spare${tagRef?` (Tag No.: ${tagRef})`:''}`;
+ const cleanTag=(tagRef&&!/startup stock pool/i.test(tagRef))?tagRef:(c1Row?.site&&!/^(?:PROJECT|SHARED)$/i.test(c1Row.site)?c1Row.site:'Per Appendix 2');
+ return `${verbatim} — Commissioning Spare (Tag: ${cleanTag})`;
 }
 
 export function formatC2VendorSerialParts0550(item,c1Row,fallback='OPEN'){
@@ -399,7 +400,10 @@ export function formatC2VendorSerialParts0550(item,c1Row,fallback='OPEN'){
  const sysToken=line?.systemToken||item?.systemToken||c1Row?.mr?.systemToken;
  const masterEntry=c2MasterEntry0550(sysToken,c1Row?.key||line?.mrRequirementId);
  if(!brand&&!model&&!partNo)return masterEntry?.vendorSerialPartsNo||fallback;
- return `${brand||'OEM'} / Model: ${model||masterEntry?.vendorSerialPartsNo?.match(/Model:\s*([^/]+)/)?.[1]?.trim()||'Standard'} / P/N: ${partNo||masterEntry?.vendorSerialPartsNo?.match(/P\/N:\s*([^(]+)/)?.[1]?.trim()||'Standard'} (Serial No.: To be advised upon delivery)`;
+ const rawModel=model||masterEntry?.vendorSerialPartsNo?.match(/Model:\s*([^/]+)/)?.[1]?.trim()||'';
+ const cleanModel=rawModel&&!/^Standard$/i.test(rawModel)?`Model: ${rawModel} / `:'';
+ const cleanPart=partNo||masterEntry?.vendorSerialPartsNo?.match(/P\/N:\s*([^(]+)/)?.[1]?.trim()||'';
+ return `${brand||'OEM'} / ${cleanModel}${cleanPart?`P/N: ${cleanPart} `:''}(S/N: TBA upon delivery)`;
 }
 
 const chinaPattern=/\b(?:china|prc|cn|shanghai|shenzhen|beijing|guangzhou|hangzhou|ningbo|rmb|cny)\b/i;

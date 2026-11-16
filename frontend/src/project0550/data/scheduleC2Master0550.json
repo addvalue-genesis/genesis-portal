@@ -247,7 +247,7 @@
           "systemToken": "TEL-CCTV",
           "systemName": "CCTV System",
           "mainEquipmentNo": "TEL-CCTV · APF-CCTV-01 / ACP-CCTV-01",
-          "vendorEquipmentNo": "AXIS-PELCO-CCTV",
+          "vendorEquipmentNo": "HIKVISION-CCTV-SYS",
           "referenceDrawings": "10008-ASK-TEL-DWG-1305 / MR Appendix 1.3",
           "entries": []
         }
