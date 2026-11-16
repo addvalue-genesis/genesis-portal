@@ -13,6 +13,7 @@ import {MR0003_MR0004_SCOPE_C1} from "./mr0003Mr0004ScopeC1";
 import {MR0002_BDA_DEVIATION_REV00_0553} from "./mr0002DeviationBdaRev00_0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import MTO from "./snapshots/mr0001.mto.rev04.sourceRows.json";
+import {ADDVALUE_DOCUMENT_COMPANY_CODE_0553} from "./addvalueDocumentCode0553";
 
 export const B3BF_JUTAL_NOTE_0553="Note: Installation and cable routing are by the Jutal team. / งานติดตั้งและเดินสายโดยทีม Jutal";
 // Item 7 (VND) for this additional proposal only. Jack 2026-11-16: USD 1,000 and
@@ -320,18 +321,22 @@ export function formatB3BrownfieldMoney0553(model,thbValue,usdValue,currency){
  if(currency==="both")return thb&&usd?thb+" THB / "+usd+" USD":thb||usd;
  return thb;
 }
-// No ADDVALUE/PTTEP vendor-number helper exists in this repo. Client documents use
-// MM-ZTK-1F-GEN-TEL-<doctype>-<seq>. Vendor numbering per 10008-STD-6-GEN-002-R02
-// adds a vendor-package segment. ADV, QUO, 0001 and Rev.00 are assumptions.
+// Client documents use MM-ZTK-1F-GEN-<company>-TEL-<doctype>-<seq>.
+// The company code is ADDVALUE_DOCUMENT_COMPANY_CODE_0553 (ADDV, never ADV).
+// QUO, 0001 and Rev.00 remain numbering assumptions.
 export const B3BF_EXPORT_NAME_0553=Object.freeze({
  standard:"10008-STD-6-GEN-002-R02",
  country:"MM",projectField:"ZTK",phase:"1F",area:"GEN",
- vendorPackage:"ADV",discipline:"TEL",docType:"QUO",seq:"0001",revision:"00",
- open:Object.freeze(["vendorPackage ADV","docType QUO","seq 0001","revision 00"])
+ vendorPackage:ADDVALUE_DOCUMENT_COMPANY_CODE_0553,discipline:"TEL",docType:"QUO",seq:"0001",revision:"00",
+ open:Object.freeze(["docType QUO","seq 0001","revision 00"])
 });
 export function b3BrownfieldDocumentNumber0553(){
  const a=B3BF_EXPORT_NAME_0553;
- return `${a.country}-${a.projectField}-${a.phase}-${a.area}-${a.vendorPackage}-${a.discipline}-${a.docType}-${a.seq} Rev.${a.revision}`;
+ if(a.vendorPackage!==ADDVALUE_DOCUMENT_COMPANY_CODE_0553||a.vendorPackage==="ADV")
+  throw Error("Document company code must be ADDV, not ADV");
+ const number=`${a.country}-${a.projectField}-${a.phase}-${a.area}-${a.vendorPackage}-${a.discipline}-${a.docType}-${a.seq} Rev.${a.revision}`;
+ if(number.includes("-ADV-")||!number.includes("-ADDV-"))throw Error("Document number must use -ADDV-");
+ return number;
 }
 export function b3BrownfieldExportFileName0553({audience="official",extension}={}){
  const base=b3BrownfieldDocumentNumber0553();

@@ -59,12 +59,25 @@ assert.equal(data.B3BF_JUTAL_NOTE_0553,"Note: Installation and cable routing are
 assert.equal(model.jutalNote,data.B3BF_JUTAL_NOTE_0553);
 assert.equal(model.bomLines.at(-2).text,model.jutalNote);
 assert.ok(!model.bomLines.some(line=>["BF.1.5","BF.1.6","BF.1.7"].includes(line.id)));
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"csv"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.csv");
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal",extension:"csv"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00_INTERNAL.csv");
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"official"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00");
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00_INTERNAL");
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"xlsx"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.xlsx");
-assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"doc"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.doc");
+const DOC="MM-ZTK-1F-GEN-ADDV-TEL-QUO-0001 Rev.00";
+assert.equal(data.b3BrownfieldDocumentNumber0553(),DOC);
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"csv"}),DOC+".csv");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal",extension:"csv"}),DOC+"_INTERNAL.csv");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official"}),DOC);
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal"}),DOC+"_INTERNAL");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"xlsx"}),DOC+".xlsx");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"doc"}),DOC+".doc");
+const companyCode=require(path.join(root,"project0553/data/addvalueDocumentCode0553.js")).ADDVALUE_DOCUMENT_COMPANY_CODE_0553;
+assert.equal(companyCode,"ADDV");
+assert.equal(data.B3BF_EXPORT_NAME_0553.vendorPackage,companyCode);
+for(const name of [data.b3BrownfieldDocumentNumber0553(),
+ data.b3BrownfieldExportFileName0553({audience:"official",extension:"csv"}),
+ data.b3BrownfieldExportFileName0553({audience:"internal",extension:"csv"}),
+ data.b3BrownfieldExportFileName0553({audience:"official",extension:"xlsx"}),
+ data.b3BrownfieldExportFileName0553({audience:"official",extension:"doc"}),
+ data.b3BrownfieldExportFileName0553({audience:"official",extension:"html"})]){
+ assert.ok(name.includes("-ADDV-")&&!name.includes("-ADV-"),"document number must use ADDV: "+name);
+}
 assert.throws(()=>data.b3BrownfieldExportFileName0553({extension:"docx"}));
 assert.equal(model.partATHB,0);
 assert.equal(model.partBReferencePriceTHB,null);
@@ -168,6 +181,8 @@ assert.ok(!pricedHtml.includes("899,640")&&!pricedHtml.includes("899640"));
 assert.ok(pricedCsv.includes(data.B3BF_ITEM7_EQUATION_0553)&&pricedCsv.includes("Sell factor 1.00"));
 assert.ok(!officialHtml.includes(data.B3BF_ITEM7_EQUATION_0553)&&!officialHtml.includes("899,640"));
 assert.ok(officialHtml.includes("20,200.00 USD")&&officialHtml.includes("636,300.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS")&&officialHtml.includes("A1. Main Equipment"));
+assert.ok(officialHtml.includes(DOC)&&!officialHtml.includes("-ADV-"),"official screen document number must use ADDV");
+assert.ok(officialCsv.includes(DOC)&&!officialCsv.includes("-ADV-"),"official CSV document number must use ADDV");
 assert.ok(officialHtml.includes("data-testid=\"b3bf-a1\"")&&officialHtml.includes("data-testid=\"b3bf-head\""));
 assert.ok(!officialHtml.includes(">A2<")&&!officialHtml.includes(">A3<")&&!officialHtml.includes(">A4<"));
 assert.ok(officialHtml.includes("Total 合计"));
@@ -345,7 +360,8 @@ async function checkOfficialExports(){
  const bytes=Uint8Array.from(Buffer.from(template.base64,"base64"));
  const file={name:template.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)};
  const xlsx=await data.buildB3BrownfieldOfficialXlsx0553(file,model,{priced:true,currency:"thb"});
- assert.equal(xlsx.filename,"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.xlsx");
+ assert.equal(xlsx.filename,"MM-ZTK-1F-GEN-ADDV-TEL-QUO-0001 Rev.00.xlsx");
+ assert.ok(!xlsx.filename.includes("-ADV-"));
  const zip=native.entriesFromZip(xlsx.bytes);
  const sheet=new TextDecoder().decode(await native.readEntry(zip.find(entry=>entry.name==="xl/worksheets/sheet1.xml")));
  assert.ok(sheet.includes("636,300.00")&&sheet.includes("Quoted")&&sheet.includes("MR-0001 SCADA / AVIAT / Cisco")&&sheet.includes("B3-BF.3")&&!sheet.includes("126,000.00")&&!sheet.includes("283,500.00")&&sheet.includes("Brownfield Additional"));
@@ -354,6 +370,7 @@ async function checkOfficialExports(){
  assert.ok(!sheet.includes("2,322,450")&&!sheet.includes("2322450")&&!sheet.includes("573,300")&&!sheet.includes("18,200"));
  const html=data.buildB3BrownfieldOfficialDocHtml0553(model,{priced:true,currency:"both"});
  assert.ok(html.includes("636,300.00 THB / 20,200.00 USD")&&html.includes("Quoted")&&html.includes("Labour + MOB/DEMOB + punch list")&&html.includes("xmlns:w=\"urn:schemas-microsoft-com:office:word\""));
+ assert.ok(html.includes(DOC)&&!html.includes("-ADV-"),"Word document number must use ADDV");
  assert.ok(!html.includes("573,300")&&!html.includes("18,200")&&!html.includes("2,322,450")&&!html.includes("126,000.00")&&!html.includes("9,000.00")&&!html.includes("Offshore working"));
  const bare=data.buildB3BrownfieldOfficialDocHtml0553(model,{priced:false,currency:"usd"});
  assert.ok(!bare.includes("636,300")&&!bare.includes("20,200")&&bare.includes("Brownfield Additional")&&!bare.includes("Offshore working"));
