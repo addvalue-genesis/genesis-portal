@@ -28,6 +28,7 @@ import {RADIO_RELEASE_LOT_0550} from './releaseHierarchy0550';
 import {NativeExhibitC0550,LazyNativeExhibitC0550} from './NativeExhibitC0550';
 import {ScheduleResults0550} from './SchedulePriceDiagnostics0550';
 import {A1InspectionBreakdown0550} from './A1InspectionBreakdown0550';
+import {CostImpactRevCheck0550} from './CostImpactRevCheck0550';
 import {A1_OTHERS_PANELS_0550,A1OthersBreakdown0550} from './A1OthersBreakdown0550';
 import {chevalierPbxScheduleNote0550,chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
 import {CommissioningBreakdown0550,CommissioningSpareQuotes0550} from './CommissioningSpares0550';
@@ -202,7 +203,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
   let lineId;
   if(await change(d=>{const prepared=prepareEquationSpareWorking0550(d,draft,newId('LINE'));lineId=prepared.lineId;return prepared.workspace;},'Prepare SI spare Working owner for explicit 11.M allocation'))openAllocation(lineId);
  };
- const panels=volume==='I'?[['overview','11.0 Overview / Cross-check'],['cover','11.1 Power of Attorney / Undertaking'],...visibleSchedules.map(s=>[s.id,'11.'+s.id+' / '+s.title]),['D','11.D Supporting Breakdown'],...A1_OTHERS_PANELS_0550.map(({id,number,title})=>[id,number+' '+title]),['mapping','11.M Schedule allocation'],['preview','11.P Preview / Export']]:[['overview','13.0 Overview'],...QUALIFICATIONS_0550.map(q=>[q.id,'13.'+q.id+' / '+q.title]),['deviations','13.D Commercial Deviations'],['preview','13.P Preview / Export']];
+ const panels=volume==='I'?[['overview','11.0 Overview / Cross-check'],['cover','11.1 Power of Attorney / Undertaking'],...visibleSchedules.map(s=>[s.id,'11.'+s.id+' / '+s.title]),['D','11.D Supporting Breakdown'],...A1_OTHERS_PANELS_0550.map(({id,number,title})=>[id,number+' '+title]),['mapping','11.M Schedule allocation'],['preview','11.P Preview / Export'],['cost-impact','11.12 Cost Impact & Rev Check']]:[['overview','13.0 Overview'],...QUALIFICATIONS_0550.map(q=>[q.id,'13.'+q.id+' / '+q.title]),['deviations','13.D Commercial Deviations'],['preview','13.P Preview / Export']];
  const changeScheduleScope=value=>{if(dirty)return;const all=value==='ALL';setShowAllSchedules(all);if(!all&&SCHEDULES_0550.some(s=>s.id===panel)&&!quotationSchedules0550().some(s=>s.id===panel))choose('C1');};
  const key=(volume==='I'?'I.':'III.')+panel,record=view.getRecord(key),schedule=SCHEDULES_0550.find(s=>s.id===panel),table=schedule?scheduleTable0550(view,panel):null;
  const focServiceSchedule=/^C[2-8]$/.test(panel);
@@ -332,6 +333,7 @@ export function BidVolumesWorkspace0550({volume='I',navigationTarget,mrNavigatio
    ])}/>}
  {panel==='deviations'&&<><h3>Commercial Deviation register</h3><p>ข้อแตกต่างจากเงื่อนไขลูกค้า พร้อมหลักฐานการยอมรับ · ความไม่ตรงของข้อมูลภายในให้แก้ที่ต้นทางก่อน</p><button type="button" disabled={dirty} onClick={()=>setDeviationId(newId('CDEV'))}>เพิ่ม Commercial Deviation</button>{deviationId&&<RecordEditor key={deviationId} collection="commercialDeviations" initial={view.proposal.commercialDeviations.find(r=>r.id===deviationId)||blankCommercialDeviation0550(deviationId)} onDirtyChange={setDirty}/>}<Grid label="Commercial deviations" heads={['Title','Clause / Proposal','Decision / Review','Edit']} rows={view.commercialDeviations.map(d=>[d.title,d.locator+' / '+d.proposal,d.decision+' / '+d.state,<button type="button" disabled={dirty} onClick={()=>setDeviationId(d.id)}>แก้ไข / ทบทวน</button>])}/></>}
  {panel==='preview'&&<><h3>Preview / Export · DRAFT</h3>{volume==='I'&&<button type="button" disabled={dirty} onClick={()=>downloadNativeExhibit0550(displayView,'docx')}>Export Exhibit C Word ต้นฉบับ (.docx)</button>}<p>หน้าจอยังเป็นร่าง Working สำหรับใช้ภายใน · Word และ HTML/PDF ที่ส่งออกเป็นแบบฟอร์ม Exhibit C ของลูกค้า พร้อมราคาที่ครบเท่านั้น · ช่องที่ราคายังไม่ครบเป็น TBA · Excel ยังเป็นตารางข้อมูลประกอบภายใน</p><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume)}>Export Volume {volume} XLSX</button><button type="button" disabled={dirty} onClick={()=>downloadBidVolume0550(volume==='I'?displayView:view,volume,'html')}>Export HTML / Print to PDF</button>{volume==='I'?visibleSchedules.map(s=><LazyNativeExhibitC0550 key={s.id} currency={currency} label={'11.'+s.id+' · '+s.title} disabled={dirty} onNavigate={go} view={displayView} id={s.id} c2Scope={['C2','C3','C4'].includes(s.id)?{data,model}:undefined} onPrepareSpare={prepareSpare} onAllocate={openAllocation}/>):<Grid label="Volume III preview" heads={['Item','Requirement','Response','State']} rows={QUALIFICATIONS_0550.map(q=>[q.id,q.title,view.getRecord('III.'+q.id).content||'OPEN',view.getRecord('III.'+q.id).state])}/>}</>}
+ {volume==='I'&&panel==='cost-impact'&&<CostImpactRevCheck0550 data={data} model={model} displayView={displayView} systems={SYSTEMS} onNavigate={go} onChange={change} disabled={dirty} busy={busy}/>}
  </section></div>;
 }
 

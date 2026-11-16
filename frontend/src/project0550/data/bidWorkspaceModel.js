@@ -32,8 +32,9 @@ import {validateBidPunchPlans} from "../../common/governance/bidPunch";
 import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
 import {chevalierPbxAllocation0550,chevalierPbxOwnerCode0550,chevalierPbxQuote0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
 import {chevalierPbxCostConflict0550} from './chevalierPbxWorking0550';
+import {validateCostImpactRevisions0550} from './costImpactRev0550';
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct","costImpactRevisions"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -107,6 +108,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  validateIntegration0550(data);
  validateTechnicalProposal0550(data.technicalProposal,[...new Set([...systems,...(data.integrationWorkspace?.requirements||[]).map(r=>r.systemToken)])]);
  validateBidVolumes0550(data);
+ validateCostImpactRevisions0550(data.costImpactRevisions);
  validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
  return data;
 }
