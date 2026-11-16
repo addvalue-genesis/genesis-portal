@@ -150,6 +150,7 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
    set(v,r,rate,moneyText(view,rateAmount));set(v,r,total,moneyText(view,termAmount));
   }
   if(!priced){issues.push((title[r]||'row '+r)+' price TBA');set(v,r,5,'TBA');set(v,r,6,'');set(v,r,7,'TBA');set(v,r,8,'');}
+  const note=customerRemarkText(bs);
   if(note)set(v,r,9,note);
  }
  if(base){
