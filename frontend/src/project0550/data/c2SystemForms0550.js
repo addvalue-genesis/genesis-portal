@@ -9,6 +9,38 @@ import {mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {sourceAmountTHB0550} from './supplierCostProjection0550';
 import {addvalueSell0550} from '../bidWorkingBasis0550';
 
+const isC1AppendixView0550=view=>view?.c1LayoutVersion==='mr-appendix.v2'||view?.c1LayoutVersion==='mr-appendix.v1';
+
+export const C2_APPENDIX_GROUPS_0550=[
+ {id:'1.1',title:'APPENDIX 1.1 · SCOPE OF SUPPLY FOR VHF AND MF/HF',tokens:['TEL-RADIO-DTRS','TEL-RADIO-MARINE','TEL-RADIO-SSB','TEL-RADIO-AERO','TEL-TELT']},
+ {id:'1.2',title:'APPENDIX 1.2 · SATELLITE / MICROWAVE COMMUNICATION',tokens:['TEL-DMR','TEL-VSAT','TEL-VSAT-KU']},
+ {id:'1.3',title:'APPENDIX 1.3 · NETWORK & LAN',tokens:['TEL-LAN']},
+ {id:'1.4',title:'APPENDIX 1.4 · IP TELEPHONY / PABX / VIDEO CONF / EX-TEL',tokens:['TEL-IPP','TEL-PABX','TEL-LAN-VCS']},
+ {id:'1.5',title:'APPENDIX 1.5 · PUBLIC ADDRESS AND GENERAL ALARM (PAGA)',tokens:['TEL-PAGA']},
+ {id:'1.6',title:'APPENDIX 1.6 · CCTV SYSTEM',tokens:['TEL-CCTV']},
+ {id:'1.7',title:'APPENDIX 1.7 · FIBER OPTIC / ENTERTAINMENT',tokens:['TEL-FO','TEL-ES']},
+ {id:'1.8',title:'APPENDIX 1.8 & COMMON · MET / NDB / AIS / COMMON',tokens:['TEL-MET','TEL-NDB','TEL-AIS','COMMON']},
+];
+
+const c2AppendixMetaByToken=new Map();
+C2_APPENDIX_GROUPS_0550.forEach((group,groupIdx)=>{
+ group.tokens.forEach((token,tokenIdx)=>{
+  c2AppendixMetaByToken.set(token,{appendixId:group.id,appendixTitle:group.title,order:groupIdx*100+tokenIdx});
+ });
+});
+
+export function c2AppendixMeta0550(token){
+ return c2AppendixMetaByToken.get(token)||{appendixId:'1.8',appendixTitle:'APPENDIX 1.8 & COMMON · MET / NDB / AIS / COMMON',order:9999};
+}
+
+export function sortSystemsByC2Appendix0550(systems=[]){
+ return [...systems].sort((a,b)=>{
+  const oa=c2AppendixMeta0550(a.token).order,ob=c2AppendixMeta0550(b.token).order;
+  if(oa!==ob)return oa-ob;
+  return String(a.token||'').localeCompare(String(b.token||''));
+ });
+}
+
 export const SPARE_DRAFT_NOTE_0550='Draft from SI equation — not allocated to Schedule. Does not enter Volume I totals until bound in 11.M.';
 const countUnits=new Set(['Pc','U','SET']);
 const knownNumber=n=>typeof n==='number'&&Number.isFinite(n);
@@ -245,16 +277,35 @@ function spareDisplayRows(rows,references){
 
 // Draft layout only. A project-level Working allowance is not a system spare form.
 // Always include every non-COMMON system, even when no B5 rows are allocated yet.
+const c2SiteRank0550=site=>{
+ const s=String(site||'').trim().toUpperCase();
+ return s==='APF'?0:s==='ACP'?1:s==='ABV01'?2:3;
+};
+const isNonMrAms01Row0550=row=>row?.lineId==='LINE-MGW-CURRENT-RADIO-016'||row?.line?.coverageBasis==='NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION'||(row?.line?.tagRef==='AMS01'&&row?.line?.systemToken==='TEL-RADIO-DTRS');
+const c2MrSeq0550=row=>{
+ const id=row?.line?.mrRequirementId||row?.requirementRef||'';
+ const m=String(id).match(/^MR-B1-1\d+-([A-Z0-9]+)-(\d{2})$/);
+ return m?[c2SiteRank0550(m[1]),Number(m[2])]:[c2SiteRank0550(row?.line?.tagRef),999];
+};
 export function c2SystemGroups0550(view,references){
- const groups=new Map((view.c2Systems||[]).filter(({token})=>token!=='COMMON').map(({token,name})=>[token,{token,name,rows:[]}]));
+ const c1Layout=isC1AppendixView0550(view);
+ const groups=new Map((view.c2Systems||[]).filter(({token})=>token!=='COMMON').map(({token,name})=>[token,{token,name,...c2AppendixMeta0550(token),rows:[]}]));
  for(const row of view.scheduleRows('C2')){
-  if(!c2HasSystem0550(row))continue;
+  if(!c2HasSystem0550(row)||(c1Layout&&isNonMrAms01Row0550(row)))continue;
   const token=row.line.systemToken;
-  if(!groups.has(token))groups.set(token,{token,name:token,rows:[]});
+  if(!groups.has(token))groups.set(token,{token,name:token,...c2AppendixMeta0550(token),rows:[]});
   groups.get(token).rows.push(row);
  }
- return [...groups.values()].filter(group=>!view.c2SystemToken||group.token===view.c2SystemToken).map(group=>{
+ return (c1Layout?sortSystemsByC2Appendix0550([...groups.values()]):[...groups.values()]).filter(group=>!view.c2SystemToken||group.token===view.c2SystemToken).map(group=>{
   group.rows=spareDisplayRows(group.rows,references?.get(group.token));
+  if(c1Layout&&group.rows.length>1){
+   group.rows=[...group.rows].sort((a,b)=>{
+    const [sa,na]=c2MrSeq0550(a),[sb,nb]=c2MrSeq0550(b);
+    if(sa!==sb)return sa-sb;
+    if(na!==nb)return na-nb;
+    return String(a.lineId||'').localeCompare(String(b.lineId||''));
+   });
+  }
   const phases=new Set(group.rows.map(row=>row.line&&commissioningPhase0550(row.line)));
   const pendingPhases=COMMISSIONING_PHASES_0550.filter(phase=>!phases.has(phase.id));
   const draftRows=group.rows.length?[]:references?.get(group.token)||[];
@@ -274,4 +325,74 @@ export function spareSystemGroups0550(view,schedule,references){
   return {...g,rows,draftRows:displayRows.length?[]:candidates||[],status:rows.length?'HAS_ROWS':'DRAFT_FROM_EQUATION'};
  });
  return result.length?result:[{rows:[],draftRows:[],status:'AWAITING_SPARE_INPUTS'}];
+}
+
+export function stripC2InternalPhrases0550(text=''){
+ return String(text||'')
+  .replace(/\b(?:start-up\s+spares?|startup\s+spares?|complete\s+set|project\s+startup\s+stock\s+pool|Working\s+B5|Draft)\b/gi,'')
+  .replace(/\s*[·—-]\s*(?=[·—-]|$)/g,' ')
+  .replace(/^\s*[·—-]\s*/,'')
+  .replace(/\s{2,}/g,' ')
+  .trim();
+}
+
+export function buildC1LookupForC20550(view,deriveC1){
+ if(!isC1AppendixView0550(view)||!view?.c1Context||!deriveC1)return null;
+ const c1=deriveC1(view);
+ const byMrId=new Map(),byOwnerId=new Map(),bySystem=new Map();
+ for(const r of c1.rows||[]){
+  if(r.key)byMrId.set(r.key,r);
+  for(const cid of r.mr?.canonicalIds||[])byMrId.set(cid,r);
+  for(const oid of r.ownerIds||[])if(!byOwnerId.has(oid))byOwnerId.set(oid,r);
+  const sys=r.mr?.systemToken;
+  if(sys){
+   if(!bySystem.has(sys))bySystem.set(sys,[]);
+   bySystem.get(sys).push(r);
+  }
+ }
+ const resolve=item=>{
+  if(!item)return null;
+  const line=item.line||item;
+  const mrId=line.mrRequirementId||item.requirementRef||line.requirementRef;
+  if(mrId&&byMrId.has(mrId))return byMrId.get(mrId);
+  const parentId=item.workingLineId||line.calculation?.inputs?.workingLineId||item.lineId||line.id;
+  if(parentId&&byOwnerId.has(parentId))return byOwnerId.get(parentId);
+  const sys=line.systemToken||item.systemToken;
+  const sysRows=sys?bySystem.get(sys):null;
+  if(!sysRows?.length)return null;
+  const tag=String(line.tagRef||'').trim().toUpperCase();
+  return (tag&&sysRows.find(r=>String(r.site||'').trim().toUpperCase()===tag))||sysRows[0];
+ };
+ return {c1,byMrId,byOwnerId,bySystem,resolve};
+}
+
+export function formatC2PartsDescriptionFromC10550(item,c1Row,resolvedTag=''){
+ const rawDesc=c1Row?.description||c2PartsDescription0550(item);
+ const verbatim=stripC2InternalPhrases0550(rawDesc)||rawDesc;
+ const reqTags=(c1Row?.requirements||[]).flatMap(q=>(q.tagBindings||[]).map(tb=>tb.tag).concat(q.cabinetTag?[q.cabinetTag]:[])).filter(Boolean);
+ const uniqueTags=[...new Set(reqTags)];
+ const cleanResolved=resolvedTag&&!/^(?:OPEN|PROJECT|OFFSHORE|SHARED|AMS01)$/i.test(resolvedTag)?resolvedTag:'';
+ const tagRef=uniqueTags.length?uniqueTags.join(' / '):(cleanResolved||c1Row?.site||'');
+ return `${verbatim} — Pre-Commissioning & Commissioning Spare${tagRef?` (Tag Ref: ${tagRef})`:''}`;
+}
+
+export function formatC2VendorSerialParts0550(item,c1Row,fallback='OPEN'){
+ const line=item?.line||item;
+ const offer=line?.offer||c1Row?.quotedComponents?.[0]?.offer||c1Row?.priceOwners?.[0]?.line?.offer;
+ const brand=offer?.brand||offer?.manufacturer||'';
+ const model=offer?.model||'';
+ const partNo=item?.partNo||offer?.partNo||(fallback!=='OPEN'?fallback:'');
+ if(!brand&&!model&&!partNo)return fallback;
+ return `${brand||'OEM'} / Model: ${model||'Per C1 BOM'} / P/N: ${partNo||'TBA'} (Serial No.: To be advised upon delivery)`;
+}
+
+const chinaPattern=/\b(?:china|prc|cn|shanghai|shenzhen|beijing|guangzhou|hangzhou|ningbo|rmb|cny)\b/i;
+export function c2DeliveryTermFromC10550(item,c1Row){
+ const existing=item?.deliveryTerm||'';
+ if(/\bCIF\b/i.test(existing)&&!/\bFOB\b/i.test(existing))return 'CIF';
+ if(/\bFOB\b/i.test(existing)&&!/\bCIF\b/i.test(existing))return 'FOB';
+ const line=item?.line||item;
+ const offer=line?.offer||c1Row?.quotedComponents?.[0]?.offer||c1Row?.priceOwners?.[0]?.line?.offer;
+ const text=[item?.origin,item?.shippingFrom,offer?.origin,offer?.shippingFrom,offer?.currency,line?.currency].filter(Boolean).join(' ');
+ return chinaPattern.test(text)?'FOB':'CIF';
 }

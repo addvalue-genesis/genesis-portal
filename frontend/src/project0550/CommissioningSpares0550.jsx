@@ -6,6 +6,7 @@ import {evaluateServiceEquation} from './serviceEquationRuntime';
 import {lanStockBasis0550} from './data/lanStockBasis0550';
 import {LanCusLine0550,LanCusStandards0550} from './LanCusBasis0550';
 import {useBidWorkspace} from './BidWorkspaceContext';
+import {sortSystemsByC2Appendix0550} from './data/c2SystemForms0550';
 
 const money=(amount,currency)=>Number.isFinite(amount)?`${currency} ${amount.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}`:'OPEN';
 const subtotal=(rollup,currency)=>rollup.priced?money(rollup.knownUSD,currency):'OPEN';
@@ -121,7 +122,7 @@ export function B5StartupEstimate0550({allowance,currency='USD',disabled,onNavig
 }
 
 export function CommissioningBreakdown0550({view,systems,currency,summary,onNavigate,onAllocate,disabled,onOpenC3,model}){
- const {groups,bySystem,unclassified,total,operations,operationRows}=commissioningBreakdown0550(view,systems,currency);
+ const {groups,bySystem,unclassified,total,operations,operationRows}=commissioningBreakdown0550(view,sortSystemsByC2Appendix0550(systems),currency);
  const working=new Map(model.lines.map(line=>[line.id,line]));
  const b5Lines=model.lines.filter(line=>line.wbs==='B5'&&!line.mrScopeState?.covered&&!line.mrScopeState?.excluded&&!line.satelliteScopeState?.excluded&&!line.bidPriceAllocation);
  const link=(id,label)=> <Trace id={id} label={label} disabled={disabled} onNavigate={onNavigate}/>;

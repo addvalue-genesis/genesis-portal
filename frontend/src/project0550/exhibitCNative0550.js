@@ -8,7 +8,7 @@ import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
-import {c2PartsDescription0550,c2SystemGroups0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
+import {buildC1LookupForC20550,c2DeliveryTermFromC10550,c2PartsDescription0550,c2SystemGroups0550,formatC2PartsDescriptionFromC10550,formatC2VendorSerialParts0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
 import {c5SpecialToolsRows0550} from './data/c5ToolsScope0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
@@ -295,6 +295,8 @@ function nativePages(view,id,currency='USD',c2References){
   // Draft from SI equation — not allocated to Schedule. Does not enter Volume I
   // totals until bound in 11.M. These rows are never appended to view.bindings.
   const systems=view.c2Systems||c2References?spareSystemGroups0550(view,id,c2References):[{rows}];
+  const c1Lookup=id==='C2'?buildC1LookupForC20550(view,deriveC1Appendix0550):null;
+  const seenAppendices=new Set();
   for(const system of systems){
    if(!issued(view)&&!system.rows.length&&system.draftRows?.length){
     chunks(system.draftRows,7).forEach((references,pi)=>{
@@ -305,8 +307,11 @@ function nativePages(view,id,currency='USD',c2References){
      references.forEach((reference,i)=>{
       const r=i+4;
       const cost=reference.equationDraft?'Source cost: '+(Number.isFinite(reference.totalCost)?reference.currency+' '+number(reference.totalCost):'OPEN'):'';
-      set(v,r,0,[reference.description,reference.note,reference.source,cost,...(reference.issues||[])].filter(Boolean).join('\n'));
-      set(v,r,1,reference.partNo|| (reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN'));
+      const c1Row=c1Lookup?.resolve(reference);
+      const refDesc=c1Lookup?formatC2PartsDescriptionFromC10550(reference,c1Row):reference.description;
+      set(v,r,0,[refDesc,reference.note,reference.source,cost,...(reference.issues||[])].filter(Boolean).join('\n'));
+      const refPart=c1Lookup?formatC2VendorSerialParts0550(reference,c1Row,reference.partNo||(reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN')):(reference.partNo||(reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN'));
+      set(v,r,1,refPart);
       set(v,r,4,Number.isFinite(reference.quantity)?[reference.quantity,reference.unit].filter(Boolean).join(' '):'OPEN');
       const total=reference.equationDraft?(currency==='THB'?reference.customerTHB:reference.amount):reference.totalCost;
       const rate=reference.equationDraft?(reference.quantity>0&&Number.isFinite(total)?total/reference.quantity:reference.quantity===0&&total===0?0:null):reference.unitCost;
@@ -315,7 +320,9 @@ function nativePages(view,id,currency='USD',c2References){
       set(v,r,11,Number.isFinite(total)?shownCurrency+' '+number(total):'OPEN');
       draftPriceRows.push([r,9]);
      });
-     add(v,pi?'Reference continuation '+(pi+1):equationDraft?'SI equation Draft':'Source cost reference',{systemToken:system.token,systemName:system.name,systemStatus:equationDraft?'DRAFT_FROM_EQUATION':system.status,draftPriceRows});
+     const isAppendixFirst=pi===0&&Boolean(system.appendixId)&&!seenAppendices.has(system.appendixId);
+     if(isAppendixFirst)seenAppendices.add(system.appendixId);
+     add(v,pi?'Reference continuation '+(pi+1):equationDraft?'SI equation Draft':'Source cost reference',{systemToken:system.token,systemName:system.name,systemStatus:equationDraft?'DRAFT_FROM_EQUATION':system.status,draftPriceRows,...(isAppendixFirst?{isAppendixFirst:true,appendixId:system.appendixId,appendixTitle:system.appendixTitle}:{})});
     });
     continue;
    }
@@ -325,17 +332,23 @@ function nativePages(view,id,currency='USD',c2References){
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
     const v=blankValues(id),draftPriceRows=[];set(v,0,0,shown(view,field(view,id,'vendorNameAddress')));set(v,0,1,shown(view,field(view,'A','agreementNo')));set(v,0,2,issued(view)&&main==='OPEN'?'':main);set(v,0,3,issued(view)?shown(view,shared(bs,'vendorEquipmentNo')==='OPEN'?'':shared(bs,'vendorEquipmentNo')):shared(bs,'vendorEquipmentNo'));set(v,1,1,issued(view)?shown(view,shared(bs,'referenceDrawings')==='OPEN'?'':shared(bs,'referenceDrawings')):shared(bs,'referenceDrawings'));
     group.forEach((b,i)=>{
-     const r=i+4,description=id==='C2'?c2PartsDescription0550(b):(b.line?.description||b.description);
+     const c1Row=c1Lookup?.resolve(b);
+     const r=i+4,description=id==='C2'?(c1Lookup?formatC2PartsDescriptionFromC10550(b,c1Row,main):(view.workingPreview?c2PartsDescription0550(b):(b.line?.description||b.description))):(b.line?.description||b.description);
      const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(issued(view)?'':'OPEN');
-     [issued(view)?customerDescription(description):description,shown(view,b.partNo),shown(view,b.interchangeA),shown(view,b.interchangeB),shown(view,b.quantity),shown(view,b.delivery),weight,shown(view,b.origin),shown(view,b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
-     prices(v,r,9,b,draftPriceRows);
+     const vendorPart=id==='C2'&&c1Lookup?formatC2VendorSerialParts0550(b,c1Row,shown(view,b.partNo)):shown(view,b.partNo);
+     const interchangeB=id==='C2'&&c1Lookup&&(!b.interchangeB||b.interchangeB==='OPEN')&&Number.isFinite(c1Row?.quantity)?String(c1Row.quantity):shown(view,b.interchangeB);
+     const effectiveBinding=id==='C2'&&c1Lookup&&!term(b)?{...b,deliveryTerm:c2DeliveryTermFromC10550(b,c1Row)}:b;
+     [issued(view)?customerDescription(description):description,vendorPart,shown(view,b.interchangeA),interchangeB,shown(view,b.quantity),shown(view,b.delivery),weight,shown(view,b.origin),shown(view,b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
+     prices(v,r,9,effectiveBinding,draftPriceRows);
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
-    if(system.status==='AWAITING_B5'&&!issued(view))pendingPhases.forEach((phase,i)=>{
+    if(system.status==='AWAITING_B5'&&!issued(view)&&isC1Appendix0550(view)){set(v,4,0,'Nil / Not Applicable — Covered under Base Scope');['—','—','—','Nil','—','—','—','—','—','—','—','—'].forEach((val,idx)=>set(v,4,idx+1,val));}else if(system.status==='AWAITING_B5'&&!issued(view))pendingPhases.forEach((phase,i)=>{
      set(v,i+4,0,phase.title+' spares');
      for(let column=1;column<=12;column++)set(v,i+4,column,'OPEN');
     });
-    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,draftPriceRows,...(system.token?{systemToken:system.token,systemName:system.name,systemStatus:system.status,spareRows:group,pendingPhases}:{})});
+    const isAppendixFirst=firstPage&&Boolean(system.appendixId)&&!seenAppendices.has(system.appendixId);
+    if(isAppendixFirst)seenAppendices.add(system.appendixId);
+    add(v,main+(pi?' / Continuation '+(pi+1):''),{priceRows:group,draftPriceRows,...(system.token?{systemToken:system.token,systemName:system.name,systemStatus:system.status,spareRows:group,pendingPhases}:{}),...(isAppendixFirst?{isAppendixFirst:true,appendixId:system.appendixId,appendixTitle:system.appendixTitle}:{})});
     firstPage=false;
    });
   }
@@ -462,7 +475,8 @@ function renderPage(view,page,format,currency='USD'){
   const heading='System: '+page.systemToken+(page.systemName===page.systemToken?'':' / '+page.systemName);
   const label=escape(heading+(page.systemStatus==='DRAFT_FROM_EXISTING'?' · DRAFT — source costs for SI reference':
    page.systemStatus==='AWAITING_B5'?' · OPEN — awaiting Working B5 allocations':''));
-  result=(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
+  const appHeading=page.isAppendixFirst&&page.appendixTitle?(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${escape(page.appendixTitle)}</w:t></w:r></w:p>`:`<h3>${escape(page.appendixTitle)}</h3>`):'';
+  result=appHeading+(format==='xml'?`<w:p><w:pPr><w:keepNext/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${label}</w:t></w:r></w:p>`:`<p><strong>${label}</strong></p>`)+result;
  }
  if(page.id==='A'){
   const draftWords=amount=>{
