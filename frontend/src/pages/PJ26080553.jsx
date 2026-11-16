@@ -25,6 +25,7 @@ import { ENGINEERING_VIEW_MODEL_0553 } from "../project0553/engineeringViewModel
 import {B1B2EquationAudit0553} from "../project0553/B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "../project0553/B3EquationAudit0553";
 import {B5EquationAudit0553} from "../project0553/B5EquationAudit0553";
+import {B3BrownfieldAdditional0553} from "../project0553/B3BrownfieldAdditional0553";
 import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
 import { SYSTEMS_0553, SYSTEM_GROUPS_0553 } from "../project0553/systemsBinding";
@@ -72,6 +73,7 @@ export function PJ26080553() {
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
   {id:"bid.budget.pricing.official",name:"10.3.4 — Official Release English USD",tab:"budget",keywords:"official quotation USD Excel export"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
+  {id:"bid.b3bf",name:"10B B3 Brownfield Additional",tab:"b3bf",keywords:"brownfield additional proposal ZPQ ZWP8 ZWP11"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
   {id:"bid.budget.working.bc.cost-lines",name:"10.2 — Part B/C WBS Cost Lines / Evidence-Backed Resource Ledger",tab:"budget",keywords:"B1 B2 B3 B6 B9 B10 B11 964 man-hour 39 offshore days 78 man-days special tools cost rate source annex first principles"},
   {id:"bid.budget.working.bc.execution-audit",name:"10.2 B/C — Execution, Permits, MOB/DEMOB & Tools Audit",tab:"budget",keywords:"annex 4 annex 6 pack shipment special tools logistics license transport 01 08 10.2"},
@@ -159,6 +161,7 @@ export function PJ26080553() {
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/><B1B2EquationAudit0553/><B3EquationAudit0553/><B5EquationAudit0553/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
    {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationOwner={navOwner} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
+   {tab==="b3bf"&&<B3BrownfieldAdditional0553/>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack">
     <VendorProductCatalog0553/>
