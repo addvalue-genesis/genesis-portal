@@ -1,0 +1,34 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const babel=require("@babel/core");
+const root=path.resolve(__dirname,"../src");
+const frontend=path.resolve(__dirname,"..");
+const compile=(module,file)=>{
+ const transformed=babel.transformFileSync(file,{babelrc:false,configFile:false,cwd:frontend,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+ module._compile(transformed.code,file);
+};
+const original=require.extensions[".js"];
+require.extensions[".js"]=(module,file)=>file.startsWith(root+path.sep)?compile(module,file):original(module,file);
+require.extensions[".jsx"]=(module,file)=>file.startsWith(root+path.sep)?compile(module,file):original(module,file);
+require.extensions[".css"]=()=>{};
+const data=require(path.join(root,"project0553/data/siVerificationEquations0553.js"));
+const facts=require(path.join(root,"project0553/projectFacts.js")).PROJECT_0553_FACTS;
+const card=data.selectSiSynthScorecard0553();
+assert.equal(card.id,"SI-SYNTH-EQ");
+assert.deepEqual(card.equations.map(equation=>equation.id),["EQ-UI","EQ-CUS","EQ-VND"]);
+assert.ok(card.equations.every(equation=>equation.status==="OPEN"&&equation.formula==null));
+assert.deepEqual(card.learnedRules,[]);
+assert.deepEqual(card.rows.map(row=>row.mr),["COMMON",...facts.systems.map(system=>system.mr)]);
+assert.equal(card.releaseAllowed,false);
+assert.ok(card.rows.every(row=>row.state==="OPEN"));
+for(const row of card.rows.filter(item=>item.mr!=="COMMON"))assert.equal(typeof row.mtoRows,"number");
+const page=fs.readFileSync(path.join(root,"pages/PJ26080553.jsx"),"utf8");
+assert.ok(page.includes('tab==="engineering"')&&page.includes('<SiSynthEq0553 view="definitions"/>'));
+assert.ok(page.includes('tab==="systems"')&&page.includes('<SiSynthEq0553 view="registry"/>'));
+assert.ok(page.includes('tab==="execution"')&&page.includes('<SiSynthEq0553 view="scorecard"/>'));
+const pkg=JSON.parse(fs.readFileSync(path.join(frontend,"package.json"),"utf8"));
+assert.equal(pkg.scripts["validate:pj0553-si-equations"],"node scripts/validate-pj0553-si-equations.cjs");
+assert.ok(pkg.scripts["build:0553"].includes("validate-pj0553-si-equations.cjs"));
+const anti=fs.readFileSync(path.join(frontend,"..","ANTIGRAVITY.md"),"utf8");
+assert.ok(anti.includes("SI-SYNTH-EQ")&&anti.includes("bid.engineering")&&anti.includes("bid.systems")&&anti.includes("bid.execution"));
+console.log("PASS 0553 SI-SYNTH-EQ registry: 3 equations OPEN; scorecard covers COMMON + "+facts.systems.map(system=>system.mr).join(", "));
