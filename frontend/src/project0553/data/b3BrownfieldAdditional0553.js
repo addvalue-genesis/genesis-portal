@@ -148,7 +148,7 @@ function build(){
     china.fatWorkingSellTHB!==452850||purchased.selectedIncrementalWorkingSellTHB!==0||
     baseB3WorkingSellTHB!==2322450)
   throw Error("B3 brownfield additional price does not match the read-only B3 basis");
- const baseCustomerPreview=baseCustomerPreview0553(buildReleaseCommercialModel0553());
+ const baseCustomerPreview={...baseCustomerPreview0553(buildReleaseCommercialModel0553({thbPerUsd:fxTHBPerUSD})),thbPerUsd:fxTHBPerUSD};
  const partAPreviewSum=round(baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0));
  if(partAPreviewSum===proposalTHB||partAPreviewSum===0)
   throw Error("Base Part A prices must stay out of the additional-proposal total");

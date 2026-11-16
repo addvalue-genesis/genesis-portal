@@ -118,6 +118,8 @@ const baseMoney=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFrac
 const partASum=model.baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0);
 const officialSchedule=data.selectB3BrownfieldOfficialSchedule0553(model,{priced:true,itemized:true,currency:"thb"});
 assert.equal(model.baseCustomerPreview.source,"buildReleaseCommercialModel0553");
+assert.equal(model.baseCustomerPreview.thbPerUsd,31.5);
+assert.deepEqual(model.baseCustomerPreview.partA.map(part=>part.previewSellTHB),[7643874.13,4088522.84,1203800,9213750]);
 assert.notEqual(model.grandTotalTHB,partASum);
 assert.equal(model.grandTotalTHB,793800);
 assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS"));
