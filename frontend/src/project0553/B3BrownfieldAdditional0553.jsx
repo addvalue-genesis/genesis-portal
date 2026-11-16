@@ -107,7 +107,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
        <div className="b3bf-desc">Existing 2-person team, {model.netCalendarDays} net calendar days, covering brownfield SCADA WiMAX radio links at ZPQ, ZWP8 and ZWP11.</div></td>
       <td>Lot</td><td className="b3bf-num">1</td>
       {priced&&<td className="b3bf-num">—</td>}
-      {priced&&<td className="b3bf-num" data-testid="b3bf-lot">{money(model.proposalTHB,model.proposalUSD)}</td>}
+      {priced&&<td className="b3bf-num" data-testid="b3bf-lot">{money(model.grandTotalTHB,model.grandTotalUSD)}</td>}
       <td>Net additional</td>
      </tr>}
      {shown("bf")&&shown("bom")&&<tr><td colSpan={cols}><div className="b3bf-bom">
@@ -126,8 +126,8 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
          <td className="b3bf-num">{line.days??"—"}</td>
          <td>{line.unit}</td>
          {priced&&itemized&&<td className="b3bf-num">{line.kind==="check"?"(= BF.1.1 + BF.1.2)":line.display?<Mark kind={line.kind}>{official?"TBA":line.display}</Mark>:money(line.unitRateTHB,line.unitRateUSD)}</td>}
-         {priced&&itemized&&<td className="b3bf-num">{line.countsInSubtotal?("("+(money(line.totalTHB,line.totalUSD)||"—")+")"):"—"}</td>}
-         <td>{official?(line.officialRemarks||""):line.remarks}</td>
+         {priced&&itemized&&<td className="b3bf-num">{line.countsInSubtotal||line.includedInAdditional?("("+(money(line.totalTHB,line.totalUSD)||"—")+")"):"—"}</td>}
+         <td>{official?(line.officialRemarks||""):(priced?line.remarks:(line.unpricedRemarks||line.remarks))}</td>
         </tr>)}
         {!official&&<tr><td>BF.INFO</td><td colSpan={bomCols-1}>Greenfield/base B3 reduced by 5 working days. Carve-out basis OPEN. No price effect in this proposal. Base B3 is not modified.</td></tr>}
         <tr className="b3bf-note"><td colSpan={bomCols} data-testid="b3bf-jutal-note">{model.jutalNote}</td></tr>
@@ -159,12 +159,12 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      </tr>}
     </tbody>
    </table></div>
-   <p className="b3bf-foot">{model.exclusion} MOB/DEMOB and the per-site day split stay OPEN.</p>
+   <p className="b3bf-foot">{model.exclusion} The per-site day split stays OPEN.</p>
    </>}
   </div>
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
    <h3>Open items</h3>
-   <ul>{model.openItems.map(item=><li key={item.id}><strong>{item.topic}.</strong> {item.detail}</li>)}</ul>
+   <ul>{model.openItems.map(item=><li key={item.id}><strong>{item.topic}.</strong> {priced?item.detail:(item.unpricedDetail||item.detail)}</li>)}</ul>
    {priced&&<table className="b3bf-carve">
     <caption>Carve-out illustration only — not an Amount column and not applied to this proposal or to base B3 ({money(model.baseReadOnly.workingSellTHB,null)} remains the unchanged base).</caption>
     <thead><tr><th>Basis</th><th>Read from current B3</th><th>Days</th><th>Illustration</th><th>Status</th></tr></thead>
