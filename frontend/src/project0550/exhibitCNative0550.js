@@ -8,7 +8,8 @@ import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
-import {buildC1LookupForC20550,c2DeliveryTermFromC10550,c2PartsDescription0550,c2SystemGroups0550,formatC2PartsDescriptionFromC10550,formatC2VendorSerialParts0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
+import {buildC1LookupForC20550,c2DeliveryTermFromC10550,c2MasterEntry0550,c2MasterSystemMeta0550,c2PartsDescription0550,c2SystemGroups0550,formatC2PartsDescriptionFromC10550,formatC2VendorSerialParts0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
+import {formatPttepFileName0550,normalizePttepRev0550,revisionHistoryHtml0550,revisionHistoryWordXml0550} from './data/pttepDocControl0550';
 import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
 import {c5SpecialToolsRows0550} from './data/c5ToolsScope0550';
 import {paymentSchedule0550} from './data/bidVolumes0550';
@@ -177,8 +178,10 @@ function nativePages(view,id,currency='USD',c2References){
   const unitPrice=Number.isFinite(b.unitPrice)?b.unitPrice:b.line?.sellRate??b.line?.customerUSD??b.line?.manualCost??b.line?.unitCost;
   const qty=Number.isFinite(b.quantity)?b.quantity:1;
   const amount=Number.isFinite(b.amount)?b.amount:(Number.isFinite(unitPrice)?unitPrice*qty:null);
-  set(v,r,start,t==='CIF'?moneyText(view,unitPrice):'');set(v,r,start+1,t==='FOB'?moneyText(view,unitPrice):'');
-  set(v,r,start+2,t==='CIF'?moneyText(view,amount):'');set(v,r,start+3,t==='FOB'?moneyText(view,amount):'');
+  const c2Usd=id==='C2'&&isC1Appendix0550(view);
+  const cellPrice=amt=>c2Usd&&Number.isFinite(amt)?currency+' '+moneyText(view,amt):moneyText(view,amt);
+  set(v,r,start,t==='CIF'?cellPrice(unitPrice):'');set(v,r,start+1,t==='FOB'?cellPrice(unitPrice):'');
+  set(v,r,start+2,t==='CIF'?cellPrice(amount):'');set(v,r,start+3,t==='FOB'?cellPrice(amount):'');
   if(t)return;
   issues.push('Customer CIF/FOB term OPEN: '+b.lineId);
   const show=view.workingPreview&&!issued(view)&&!b.nonAdditive&&Number.isFinite(amount);
@@ -301,15 +304,22 @@ function nativePages(view,id,currency='USD',c2References){
    if(!issued(view)&&!system.rows.length&&system.draftRows?.length){
     chunks(system.draftRows,7).forEach((references,pi)=>{
      const v=blankValues(id),draftPriceRows=[];
-     set(v,0,2,'OPEN');
+     const masterMeta=id==='C2'&&c1Lookup?c2MasterSystemMeta0550(system.token):null;
+     set(v,0,0,shown(view,field(view,id,'vendorNameAddress'))||'TSI / Contractor');
+     set(v,0,1,shown(view,field(view,'A','agreementNo')));
+     set(v,0,2,masterMeta?.mainEquipmentNo||'OPEN');
+     set(v,0,3,masterMeta?.vendorEquipmentNo||'OPEN');
+
      const equationDraft=references.some(r=>r.equationDraft);
-     set(v,1,1,equationDraft?SPARE_DRAFT_NOTE_0550:'Internal reference · 07 Vendor / 10.2 Working A/B/C · C2 allocation OPEN');
+     set(v,1,1,c1Lookup?(masterMeta?.referenceDrawings||'Per MR Appendix 2'):(equationDraft?SPARE_DRAFT_NOTE_0550:'Internal reference · 07 Vendor / 10.2 Working A/B/C · C2 allocation OPEN'));
+
+
      references.forEach((reference,i)=>{
       const r=i+4;
       const cost=reference.equationDraft?'Source cost: '+(Number.isFinite(reference.totalCost)?reference.currency+' '+number(reference.totalCost):'OPEN'):'';
       const c1Row=c1Lookup?.resolve(reference);
       const refDesc=c1Lookup?formatC2PartsDescriptionFromC10550(reference,c1Row):reference.description;
-      set(v,r,0,[refDesc,reference.note,reference.source,cost,...(reference.issues||[])].filter(Boolean).join('\n'));
+      set(v,r,0,c1Lookup?refDesc:[refDesc,reference.note,reference.source,cost,...(reference.issues||[])].filter(Boolean).join('\n'));
       const refPart=c1Lookup?formatC2VendorSerialParts0550(reference,c1Row,reference.partNo||(reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN')):(reference.partNo||(reference.quoteItem?'Quote item '+reference.quoteItem:'OPEN'));
       set(v,r,1,refPart);
       set(v,r,4,Number.isFinite(reference.quantity)?[reference.quantity,reference.unit].filter(Boolean).join(' '):'OPEN');
@@ -330,15 +340,24 @@ function nativePages(view,id,currency='USD',c2References){
    let firstPage=true;
    const groups=new Map();for(const b of system.rows){const key=resolveMainEquipmentTag(b,view);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size&&!issued(view))groups.set('OPEN',[]);
    for(const [main,bs] of groups)chunks(bs,7).forEach((group,pi)=>{
-    const v=blankValues(id),draftPriceRows=[];set(v,0,0,shown(view,field(view,id,'vendorNameAddress')));set(v,0,1,shown(view,field(view,'A','agreementNo')));set(v,0,2,issued(view)&&main==='OPEN'?'':main);set(v,0,3,issued(view)?shown(view,shared(bs,'vendorEquipmentNo')==='OPEN'?'':shared(bs,'vendorEquipmentNo')):shared(bs,'vendorEquipmentNo'));set(v,1,1,issued(view)?shown(view,shared(bs,'referenceDrawings')==='OPEN'?'':shared(bs,'referenceDrawings')):shared(bs,'referenceDrawings'));
+    const masterMeta=id==='C2'&&c1Lookup?c2MasterSystemMeta0550(system.token):null;
+    const hdrMain=main==='OPEN'&&masterMeta?.mainEquipmentNo?masterMeta.mainEquipmentNo:main;
+    const rawVendorEq=shared(bs,'vendorEquipmentNo'),hdrVendorEq=rawVendorEq==='OPEN'&&masterMeta?.vendorEquipmentNo?masterMeta.vendorEquipmentNo:rawVendorEq;
+    const rawRefDwg=shared(bs,'referenceDrawings'),hdrRefDwg=rawRefDwg==='OPEN'&&masterMeta?.referenceDrawings?masterMeta.referenceDrawings:rawRefDwg;
+    const v=blankValues(id),draftPriceRows=[];set(v,0,0,shown(view,field(view,id,'vendorNameAddress'))||(c1Lookup?'TSI / Contractor':'OPEN'));set(v,0,1,shown(view,field(view,'A','agreementNo')));set(v,0,2,issued(view)&&hdrMain==='OPEN'?'':hdrMain);set(v,0,3,issued(view)?shown(view,hdrVendorEq==='OPEN'?'':hdrVendorEq):hdrVendorEq);set(v,1,1,issued(view)?shown(view,hdrRefDwg==='OPEN'?'':hdrRefDwg):hdrRefDwg);
     group.forEach((b,i)=>{
      const c1Row=c1Lookup?.resolve(b);
      const r=i+4,description=id==='C2'?(c1Lookup?formatC2PartsDescriptionFromC10550(b,c1Row,main):(view.workingPreview?c2PartsDescription0550(b):(b.line?.description||b.description))):(b.line?.description||b.description);
-     const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(issued(view)?'':'OPEN');
+
      const vendorPart=id==='C2'&&c1Lookup?formatC2VendorSerialParts0550(b,c1Row,shown(view,b.partNo)):shown(view,b.partNo);
      const interchangeB=id==='C2'&&c1Lookup&&(!b.interchangeB||b.interchangeB==='OPEN')&&Number.isFinite(c1Row?.quantity)?String(c1Row.quantity):shown(view,b.interchangeB);
      const effectiveBinding=id==='C2'&&c1Lookup&&!term(b)?{...b,deliveryTerm:c2DeliveryTermFromC10550(b,c1Row)}:b;
-     [issued(view)?customerDescription(description):description,vendorPart,shown(view,b.interchangeA),interchangeB,shown(view,b.quantity),shown(view,b.delivery),weight,shown(view,b.origin),shown(view,b.shippingFrom)].forEach((x,c)=>set(v,r,c,x));
+     const masterEntry=id==='C2'&&c1Lookup?c2MasterEntry0550(system.token,c1Row?.key):null;
+     const weight=b.physical?.estimatedWeightKg>0&&b.quantity!==null?number(b.physical.estimatedWeightKg*b.quantity):(c1Lookup?(masterEntry?.totalWeightKg||'TBC (Per Vendor Packing List)'):(issued(view)?'':'OPEN'));
+     const deliveryVal=c1Lookup&&(!b.delivery||b.delivery==='OPEN')?(masterEntry?.delivery||(effectiveBinding.deliveryTerm==='FOB'?'FOB Major Port in China — Per Project Schedule 11.M':'CIF Yangon, Myanmar — Per Project Schedule 11.M')):shown(view,b.delivery);
+     const originVal=c1Lookup&&(!b.origin||b.origin==='OPEN')?(masterEntry?.pointOfManufacture||'Per Vendor Certificate of Origin'):shown(view,b.origin);
+     const shipVal=c1Lookup&&(!b.shippingFrom||b.shippingFrom==='OPEN')?(masterEntry?.shippingFrom||(effectiveBinding.deliveryTerm==='FOB'?'Shanghai, China':'Singapore')):shown(view,b.shippingFrom);
+     [issued(view)?customerDescription(description):description,vendorPart,shown(view,b.interchangeA),interchangeB,shown(view,b.quantity),deliveryVal,weight,originVal,shipVal].forEach((x,c)=>set(v,r,c,x));
      prices(v,r,9,effectiveBinding,draftPriceRows);
     });
     const pendingPhases=firstPage?system.pendingPhases||[]:[];
@@ -632,7 +651,8 @@ export function nativeExhibitHtml0550(view,only,includeCover=false){
  const cover=includeCover&&!issued(view)?`<article class="p55-native-paper"><h2>Volume I — Quotation</h2><p>${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p><p>${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}</p><h2>Power of Attorney / Undertaking</h2><p>${escape(view.getRecord('I.cover').content||'OPEN')}</p></article>`:'';
  const pbx=only||issued(view)?[]:chevalierPbxScheduleTrace0550(view);
  const appendix=pbx.length?`<article class="p55-native-paper"><h2>IP Telephony and PABX · Volume I draft trace</h2><table><thead><tr><th>Volume I</th><th>Draft status</th><th>Scope</th></tr></thead><tbody>${pbx.map(row=>'<tr>'+row.map(cell=>'<td>'+escape(cell)+'</td>').join('')+'</tr>').join('')}</tbody></table></article>`:'';
- return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)&&!issued(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${appendix}</body></html>`;
+ const revHist=(issued(view)||includeCover)?revisionHistoryHtml0550(view.revisionHistory):'';
+ return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)&&!issued(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${revHist}${appendix}</body></html>`;
 }
 export function buildNativeExhibitDocx0550(view,only){
  if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
@@ -689,5 +709,8 @@ export function downloadNativeExhibit0550(view,format='docx',only){
  const issuedView={...view,customerIssue:true};
  const html=format==='html',content=html?nativeExhibitHtml0550(issuedView,only):buildNativeExhibitDocx0550(issuedView,only),url=URL.createObjectURL(new Blob([content],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.wordprocessingml.document'})),a=document.createElement('a');
  const scope=only==='C2'&&view.c2SystemToken?'Schedule-C2-'+view.c2SystemToken:only?'Schedule-'+only:'All-Schedules';
- a.href=url;a.download=`PJ2608-0550_Exhibit-C_${scope}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_OFFICIAL.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const docType=['C2','C3'].includes(only)?'SPIR':'MTO';
+ const revCode=normalizePttepRev0550(view.proposal?.revision,'A1');
+ const pkg=only==='C2'&&view.c2SystemToken?(view.c2SystemToken.replace(/^TEL-/,'').split('-')[0]||'TEQ'):'TEQ';
+ a.href=url;a.download=formatPttepFileName0550({pkg,docType,rev:revCode,ext:format});a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

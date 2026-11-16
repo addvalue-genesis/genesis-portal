@@ -1,0 +1,17 @@
+{
+  "schema": "genesis.0550.snapshot-registry.v1",
+  "projectId": "PJ2608-0550",
+  "activeRevision": "INT-00",
+  "revisions": [
+    {
+      "revCode": "INT-00",
+      "purposeOfIssue": "Internal IDC / WIP Baseline",
+      "fileName": "MM-ASK-00-GEN-TEQ-TEL-MTO-0001_INTERNAL Rev.INT-00_20261116-0700.json",
+      "savedAt": "2026-11-16T07:00:00+07:00",
+      "gitCommit": "896f8132",
+      "changeNote": "Initial immutable baseline freeze (Schedule A1 Goods USD 4,649,195.28; Base Working USD 5,569,206.50)",
+      "imported": false,
+      "immutable": true
+    }
+  ]
+}

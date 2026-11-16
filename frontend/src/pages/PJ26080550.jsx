@@ -48,6 +48,7 @@ import {VendorWorkspace} from "../project0550/VendorWorkspace";
 import {MGW_GTPL_SOURCE_TARGET_0550} from "../project0550/MgwCurrentQuote0550";
 import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
 import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
+import {SnapshotVersionManager0550} from "../project0550/SnapshotVersionManager0550";
 import {BID_TABS} from "../project0550/biddingNavigation";
 import {TechnicalProposalWorkspace0550,TECHNICAL_PANELS_0550} from "../project0550/TechnicalProposalWorkspace0550.jsx";
 import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
@@ -2244,7 +2245,7 @@ function Project0550Bidding({ lang = "th" }) {
 
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace navigationTarget={navigationTarget} onNavigate={navigate}/></> : null}
-          {activeTab === "registry" ? <><BidDataControls/><InputImpact0550 onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></> : null}
+          {activeTab === "registry" ? <><SnapshotVersionManager0550 onNavigate={navigate}/><BidDataControls/><InputImpact0550 onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></> : null}
           {activeTab === "quotation" || activeTab === "commercial" ? <BidVolumesWorkspace0550 key={activeTab} volume={activeTab==="quotation"?"I":"III"} navigationTarget={navigationTarget} mrNavigationTarget={mrNavigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={navigate}/> : null}
           {activeTab === "technical" ? <TechnicalProposalWorkspace0550 navigationTarget={navigationTarget} mrNavigationTarget={mrNavigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={navigate}/> : null}
           {activeTab === "deviations" ? <DeviationWorkspace0550 onDirtyChange={setTechnicalDirty} navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}

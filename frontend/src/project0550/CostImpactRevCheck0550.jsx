@@ -9,6 +9,8 @@ import {
  nextRevisionCode0550,
  promoteCostImpactRevision0550,
 } from './data/costImpactRev0550';
+import scheduleC2Master from './data/scheduleC2Master0550.json';
+import {getSnapshotByRev0550,listSnapshotRevisions0550} from './data/snapshotManager0550';
 
 const fmtUSD=v=>Number.isFinite(v)?'USD '+v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
 const fmtSignedUSD=v=>{
@@ -27,6 +29,13 @@ export function CostImpactRevCheck0550({data,model,displayView,systems=[],onNavi
  const [promoteModalOpen,setPromoteModalOpen]=useState(false);
  const [promoteNote,setPromoteNote]=useState('');
  const [statusMsg,setStatusMsg]=useState('');
+ const pttepSnapshots=useMemo(()=>listSnapshotRevisions0550(),[]);
+ const [snapA,setSnapA]=useState(()=>pttepSnapshots[0]?.revCode||'INT-00');
+ const [snapB,setSnapB]=useState(()=>pttepSnapshots.at(-1)?.revCode||'INT-00');
+ const snapAData=useMemo(()=>getSnapshotByRev0550(snapA),[snapA]);
+ const snapBData=useMemo(()=>getSnapshotByRev0550(snapB),[snapB]);
+ const c2WorkingTotal=useMemo(()=>(displayView?.scheduleRows?.('C2')||[]).reduce((s,b)=>s+(Number.isFinite(b.amount)?b.amount:0),0),[displayView]);
+ const c2Delta=Math.round((c2WorkingTotal-scheduleC2Master.reconciledA1Item4USD)*100)/100;
 
  const baselineRev=revisions.find(r=>r.revision===selectedRev)||revisions[0];
  const nextRev=nextRevisionCode0550(revisions);
@@ -103,6 +112,19 @@ export function CostImpactRevCheck0550({data,model,displayView,systems=[],onNavi
     Excluded from all customer-facing Word / PDF / HTML / XLSX exports
    </span>
   </div>
+
+  <section className="p55-panel" style={{marginBottom:'12px'}}>
+   <h4 style={{margin:'0 0 6px 0'}}>PTTEP Snapshot Comparison (09 Data / Trace) &amp; Schedule C2 A1 Item 4 Reconciliation</h4>
+   <div style={{display:'flex',flexWrap:'wrap',gap:'12px',alignItems:'center',fontSize:'0.9em'}}>
+    <label>Snapshot A <select value={snapA} onChange={e=>setSnapA(e.target.value)}>{pttepSnapshots.map(r=><option key={r.revCode} value={r.revCode}>{r.revCode}{r.imported?' [IMPORTED]':''} · {r.savedAt}</option>)}</select></label>
+    <label>Snapshot B <select value={snapB} onChange={e=>setSnapB(e.target.value)}>{pttepSnapshots.map(r=><option key={r.revCode} value={r.revCode}>{r.revCode}{r.imported?' [IMPORTED]':''} · {r.savedAt}</option>)}</select></label>
+    <span>A C1 Ceiling: <strong>{fmtUSD(snapAData?.scheduleA1Baseline?.c1CeilingUsd)}</strong></span>
+    <span>B C1 Ceiling: <strong>{fmtUSD(snapBData?.scheduleA1Baseline?.c1CeilingUsd)}</strong></span>
+    <span>C2 Master (A1 Item 4): <strong>{fmtUSD(scheduleC2Master.reconciledA1Item4USD)}</strong> ({scheduleC2Master.pricedCount} priced / {scheduleC2Master.openCount} OPEN)</span>
+    <span>Current C2 Delta vs A1 Item 4: <strong>{fmtSignedUSD(c2Delta)}</strong></span>
+    {onNavigate&&<button type="button" onClick={()=>onNavigate('bid.data')}>Open 09 Data / Trace</button>}
+   </div>
+  </section>
 
   <section className="p55-panel" style={{marginBottom:'12px'}}>
    <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:'12px'}}>

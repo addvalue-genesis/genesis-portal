@@ -1,0 +1,89 @@
+{
+  "schema": "genesis.0550.full-state-snapshot.v1",
+  "projectId": "PJ2608-0550",
+  "pttepDocControl": {
+    "documentNo": "MM-ASK-00-GEN-TEQ-TEL-MTO-0001",
+    "revCode": "INT-00",
+    "purposeOfIssue": "Internal IDC / WIP Baseline",
+    "fileName": "MM-ASK-00-GEN-TEQ-TEL-MTO-0001_INTERNAL Rev.INT-00_20261116-0700.json",
+    "savedAt": "2026-11-16T07:00:00+07:00",
+    "gitCommit": "896f8132",
+    "changeNote": "Initial immutable baseline freeze (Schedule A1 Goods USD 4,649,195.28; Base Working USD 5,569,206.50)"
+  },
+  "siEquationsAndInputs": {
+    "fxRates": {
+      "source": "BOT / Project FX",
+      "date": "2026-11-04",
+      "thbPerUSD": 31.5,
+      "thbPerEUR": 36.2,
+      "thbPerRMB": 4.45
+    },
+    "pricingRules": {
+      "standard": "5% + 5% + 20% (E10/E11/E12 + E13 Prime)",
+      "dmrCeragon": "Ceragon R11/R12 whole-link & ODU custom rule",
+      "pagaIndustronic": "INDUSTRONIC A20261632-005 EUR custom rule",
+      "telecomTower": "Master Tower goods 30%/20%, erection 30%/5%"
+    },
+    "workingB5Spares": {
+      "reconciledA1Item4USD": 47492.76,
+      "pricedCount": 12,
+      "openCount": 3
+    }
+  },
+  "scheduleA1Baseline": {
+    "c1CeilingUsd": 4649195.28,
+    "baseSubtotalUsd": 5569206.5,
+    "pricedLines": 237,
+    "totalLines": 344,
+    "openLines": 107,
+    "a1DirectItems": [
+      { "sn": 1, "title": "GOODS (Form C-1)", "amountUsd": 4649195.28 },
+      { "sn": 4, "title": "Commissioning spares (Form C-2)", "amountUsd": 47492.76 }
+    ]
+  },
+  "schedulesC1ToC8": {
+    "C1": { "appendixCount": 8, "mrRows": 179 },
+    "C2": { "masterSchema": "genesis.0550.schedule-c2-master.v1", "reconciledUSD": 47492.76 },
+    "C3": { "treatment": "OPTION" },
+    "C4": { "treatment": "OPTION" },
+    "C5": { "treatment": "BASE" },
+    "C6": { "treatment": "OPTION" },
+    "C7": { "treatment": "BASE" },
+    "C8": { "treatment": "CALLOFF" }
+  },
+  "bidTechnicalAndFlags": {
+    "technical": [],
+    "vdrl": [],
+    "commercialDeviations": [],
+    "reviewFlags": ["A_INPUT_OPEN", "C2_THREE_OPEN_ROWS"]
+  },
+  "revisionHistory": [
+    {
+      "rev": "INT-00",
+      "purpose": "Internal IDC / WIP",
+      "date": "2026-11-16",
+      "description": "Initial immutable baseline freeze",
+      "prepared": "SI Lead",
+      "checked": "Commercial Lead",
+      "approved": "Internal WIP"
+    },
+    {
+      "rev": "R1",
+      "purpose": "IDC",
+      "date": "2026-11-14",
+      "description": "Inter-discipline check across 19 telecom systems + COMMON",
+      "prepared": "SI Lead",
+      "checked": "Engineering Mgr",
+      "approved": "Project Mgr"
+    },
+    {
+      "rev": "A1",
+      "purpose": "IFR / IFI",
+      "date": "2026-11-16",
+      "description": "Issued for Review — Exhibit C Commercial Terms & Schedules A1–C8",
+      "prepared": "TSI Proposal",
+      "checked": "Commercial Mgr",
+      "approved": "Authorized Signatory"
+    }
+  ]
+}

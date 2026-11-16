@@ -8,6 +8,20 @@ import {evaluateServiceEquation,SPARE_EQUATION_SCHEDULES_0550} from '../serviceE
 import {mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
 import {sourceAmountTHB0550} from './supplierCostProjection0550';
 import {addvalueSell0550} from '../bidWorkingBasis0550';
+import scheduleC2Master from './scheduleC2Master0550.json';
+
+const c2MasterSystemMap=new Map();
+for(const app of scheduleC2Master.appendices||[]){
+ for(const sys of app.systems||[]){
+  c2MasterSystemMap.set(sys.systemToken,{...sys,appendixId:app.id,appendixTitle:app.title});
+ }
+}
+export const c2MasterSystemMeta0550=token=>c2MasterSystemMap.get(token)||null;
+export const c2MasterEntry0550=(token,mrId)=>{
+ const sys=c2MasterSystemMap.get(token);
+ if(!sys?.entries?.length)return null;
+ return (mrId&&sys.entries.find(e=>e.mrId===mrId))||sys.entries[0];
+};
 
 const isC1AppendixView0550=view=>view?.c1LayoutVersion==='mr-appendix.v2'||view?.c1LayoutVersion==='mr-appendix.v1';
 
@@ -373,7 +387,7 @@ export function formatC2PartsDescriptionFromC10550(item,c1Row,resolvedTag=''){
  const uniqueTags=[...new Set(reqTags)];
  const cleanResolved=resolvedTag&&!/^(?:OPEN|PROJECT|OFFSHORE|SHARED|AMS01)$/i.test(resolvedTag)?resolvedTag:'';
  const tagRef=uniqueTags.length?uniqueTags.join(' / '):(cleanResolved||c1Row?.site||'');
- return `${verbatim} — Pre-Commissioning & Commissioning Spare${tagRef?` (Tag Ref: ${tagRef})`:''}`;
+ return `${verbatim} — Pre-Commissioning & Commissioning Spare${tagRef?` (Tag No.: ${tagRef})`:''}`;
 }
 
 export function formatC2VendorSerialParts0550(item,c1Row,fallback='OPEN'){
@@ -382,8 +396,10 @@ export function formatC2VendorSerialParts0550(item,c1Row,fallback='OPEN'){
  const brand=offer?.brand||offer?.manufacturer||'';
  const model=offer?.model||'';
  const partNo=item?.partNo||offer?.partNo||(fallback!=='OPEN'?fallback:'');
- if(!brand&&!model&&!partNo)return fallback;
- return `${brand||'OEM'} / Model: ${model||'Per C1 BOM'} / P/N: ${partNo||'TBA'} (Serial No.: To be advised upon delivery)`;
+ const sysToken=line?.systemToken||item?.systemToken||c1Row?.mr?.systemToken;
+ const masterEntry=c2MasterEntry0550(sysToken,c1Row?.key||line?.mrRequirementId);
+ if(!brand&&!model&&!partNo)return masterEntry?.vendorSerialPartsNo||fallback;
+ return `${brand||'OEM'} / Model: ${model||masterEntry?.vendorSerialPartsNo?.match(/Model:\s*([^/]+)/)?.[1]?.trim()||'Standard'} / P/N: ${partNo||masterEntry?.vendorSerialPartsNo?.match(/P\/N:\s*([^(]+)/)?.[1]?.trim()||'Standard'} (Serial No.: To be advised upon delivery)`;
 }
 
 const chinaPattern=/\b(?:china|prc|cn|shanghai|shenzhen|beijing|guangzhou|hangzhou|ningbo|rmb|cny)\b/i;

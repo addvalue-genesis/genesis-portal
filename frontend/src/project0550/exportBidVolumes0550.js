@@ -2,6 +2,7 @@ import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {nativeExhibitHtml0550,a1SummarySlot0550} from './exhibitCNative0550';
 import {a1DisplaySn0550} from './data/a1DisplaySn0550';
 import {zipStore} from './exportOriginalPriceForm';
+import {formatPttepFileName0550,normalizePttepRev0550} from './data/pttepDocControl0550';
 import {SCHEDULES_0550,QUALIFICATIONS_0550,paymentSchedule0550} from './data/bidVolumes0550';
 import {sumMoney0550} from './data/money0550';
 import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
@@ -111,5 +112,10 @@ export function buildBidVolumeXlsx0550(view,volume,frozenSheets){
 }
 export function bidVolumeHtml0550(view,volume,frozenSheets){if(volume==='I'&&!frozenSheets)return nativeExhibitHtml0550(view,undefined,true);return `<!doctype html><html lang="en"><meta charset="utf-8"><title>PJ2608-0550 Volume ${esc(volume)}</title><style>body{font:14px Arial;margin:24px;color:#172e43}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #d9d9d9;padding:8px;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f7}h2{break-before:page}thead{display:table-header-group}pre{white-space:pre-wrap}@page{size:A4 landscape;margin:14mm}</style><h1>PJ2608-0550 / Volume ${esc(volume)}</h1><p>${esc(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p>${(frozenSheets||bidVolumeSheets0550(view,volume)).map(s=>`<h2>${esc(s.name)}</h2><table><thead><tr>${s.heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(s.rows.length?s.rows:[['OPEN']]).map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table><pre>${esc(s.note||'')}</pre>`).join('')}</html>`;}
 export function downloadBidVolume0550(view,volume,format='xlsx'){
- const html=format==='html',source=html&&volume==='I'?{...view,customerIssue:true}:view,url=URL.createObjectURL(new Blob([html?bidVolumeHtml0550(source,volume):buildBidVolumeXlsx0550(view,volume)],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=`PJ2608-0550_Volume-${volume}_${view.proposal.revision.replace(/[^\w.-]/g,'_')}_${html&&volume==='I'?'OFFICIAL':'DRAFT'}.${format}`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const html=format==='html',source=html&&volume==='I'?{...view,customerIssue:true}:view;
+ const docType=volume==='VDRL'?'VDR':volume==='III'?'SPE':'MTO';
+ const rev=normalizePttepRev0550(view.proposal?.revision,'A1');
+ const fileName=formatPttepFileName0550({docType,rev,ext:html?'html':'xlsx'});
+ const url=URL.createObjectURL(new Blob([html?bidVolumeHtml0550(source,volume):buildBidVolumeXlsx0550(view,volume)],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+
 }
