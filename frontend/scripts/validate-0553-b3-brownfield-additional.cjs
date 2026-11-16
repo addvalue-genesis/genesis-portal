@@ -123,7 +123,7 @@ assert.equal(model.grandTotalTHB,793800);
 assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS"));
 assert.ok(officialHtml.indexOf("Part A: BASIC")<officialHtml.indexOf(">B3<")&&officialHtml.indexOf(">B3<")<officialHtml.indexOf(">B3-BF<"));
 assert.ok(officialHtml.indexOf(">B3-BF<")<officialHtml.indexOf("Total Additional (B3-BF)"));
-assert.ok(officialThb.includes("Total Additional (B3-BF)")&&officialThb.includes("793,800.00")&&!officialThb.includes("25,200"));
+assert.ok(officialThb.includes("Total Additional (B3-BF)")&&officialThb.includes("793,800.00")&&!officialThb.includes("25,200.00 USD"));
 for(const part of model.baseCustomerPreview.partA){
  const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
  const row=officialSchedule.rows.find(entry=>entry.cells[0]===part.code);
@@ -139,12 +139,14 @@ for(const money of PART_A_MONEY){
 const b3Row=officialSchedule.rows.find(entry=>entry.cells[0]==="B3");
 const bfRow=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF");
 assert.equal(b3Row.cells[2],model.baseCustomerPreview.b3.name);
-assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.releaseText));
-assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.compactText));
+assert.equal(b3Row.cells[3],"");
 assert.equal(b3Row.cells[6],"Quoted");
-assert.ok(officialThb.includes("Included SAT: 2 persons")&&officialThb.includes("Proposed standby"));
-assert.ok(bfRow.cells[3].includes("14 team-days")&&bfRow.cells[5]==="25,200.00 USD"&&bfRow.cells[6]==="25,200.00 USD"&&bfRow.cells[7]==="");
-assert.ok(officialThb.includes("14 team-days")&&officialThb.includes("USD 1,000.00 / 800.00 per person/day @31.5"));
+assert.ok(bfRow.cells[3].includes("• "+model.bomLines.find(entry=>entry.id==="BF.1.1").activity));
+assert.ok(bfRow.cells[3].includes("• 14 team-days × 1,800.00 USD/team-day = 25,200.00 USD"));
+assert.ok(!bfRow.cells[3].includes("31.5")&&!bfRow.cells[3].includes("SAMTEL preparation"));
+assert.ok(bfRow.cells[5]==="25,200.00 USD"&&bfRow.cells[6]==="25,200.00 USD"&&bfRow.cells[7]==="");
+assert.ok(officialThb.includes("• 14 team-days × 56,700.00 THB/team-day = 793,800.00 THB"));
+assert.ok(!officialThb.includes("31.5")&&!officialThb.includes("SAMTEL preparation")&&!officialThb.includes("Proposed standby"));
 for(const code of ["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14"]){
  assert.ok(officialHtml.includes(">"+code+"<"),"official view missing "+code);
  assert.ok(officialCsv.includes("\n"+code+","),"official csv missing "+code);
@@ -155,11 +157,12 @@ assert.ok(!officialHtml.includes("2,322,450")&&!officialCsv.includes("2,322,450"
 assert.ok(!officialHtml.includes("BF.1.3")&&!officialHtml.includes("Existing SAT role rate")&&!officialHtml.includes("Offshore POB"));
 assert.ok(!officialCsv.includes("BF.1.3")&&!officialCsv.includes("Existing SAT role rate")&&!officialCsv.includes("Offshore POB")&&!officialCsv.includes("Breakdown (incl. in B3-BF)"));
 assert.ok(officialCsv.includes("25,200.00 USD")&&officialCsv.includes("793,800.00")&&officialCsv.includes("Quoted")&&officialCsv.includes("Total Additional (B3-BF)"));
+assert.ok(!officialCsv.includes("31.5")&&!officialCsv.includes("SAMTEL preparation")&&!officialHtml.includes("31.5")&&!officialUsd.includes("31.5"));
 assert.ok(officialCsv.split("\n").at(-1).includes(NOTE));
 assert.ok(officialCsv.lastIndexOf(NOTE)>officialCsv.lastIndexOf(data.B3BF_JUTAL_NOTE_0553));
 const officialUnpriced=render({initialPriced:false,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
 assert.ok(!officialUnpriced.includes("793,800")&&!officialUnpriced.includes("25,200")&&!officialUnpriced.includes("1,000.00")&&officialUnpriced.includes("Quoted"));
-assert.ok(officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("Included SAT")&&!officialUnpriced.includes("TBA"));
+assert.ok(officialUnpriced.includes("14 team-days")&&officialUnpriced.includes("Quoted")&&!officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("31.5")&&!officialUnpriced.includes("TBA"));
 for(const money of PART_A_MONEY)assert.ok(!officialUnpriced.includes(money));
 assert.ok(pricedHtml.includes("BF.1.3")&&pricedHtml.includes("Existing SAT role rate")&&pricedHtml.includes("Offshore POB"));
 const leak=/793,?800|56,?700|25,?200|441,?000|352,?800|14,?000|11,?200|1,?800|1,?000|31\.5/;

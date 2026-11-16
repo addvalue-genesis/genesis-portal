@@ -285,15 +285,25 @@ export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemiz
   rows.push(line([part.code,part.mr,part.description,locations,"1 lot",priced?"Quoted":"",priced?"Quoted":"","Quoted"]));
  }
  rows.push(line(["Part B: OTHERS","B部分：其它"],"section"));
- const b3Spec=[preview.b3.releaseText,priced?preview.b3.compactText:""].filter(Boolean).join("\n");
  const senior=model.bomLines.find(entry=>entry.id==="BF.1.1");
  const specialist=model.bomLines.find(entry=>entry.id==="BF.1.2");
- const bfSpec=model.netCalendarDays+" team-days, "+model.teamPersons+" persons ("+senior.activity+" + "+specialist.activity+")."+
-  (priced?"\nUSD "+money2(model.seniorUsdPerDay)+" / "+money2(model.specialistUsdPerDay)+" per person/day @"+model.fxTHBPerUSD+".":"");
+ const roleBullet=(entry)=>{
+  if(!priced)return "• "+entry.activity;
+  if(currency==="usd")return "• "+entry.activity+" — "+money2(entry.unitRateUSD)+" USD/day × "+entry.days+" = "+money2(entry.totalUSD)+" USD";
+  if(currency==="both")return "• "+entry.activity+" — "+money2(entry.unitRateTHB)+" THB/day ("+money2(entry.unitRateUSD)+" USD/day) × "+entry.days+" = "+money2(entry.totalTHB)+" THB / "+money2(entry.totalUSD)+" USD";
+  return "• "+entry.activity+" — "+money2(entry.unitRateTHB)+" THB/day × "+entry.days+" = "+money2(entry.totalTHB)+" THB";
+ };
+ const teamBullet=priced?(currency==="usd"
+  ?"• "+model.netCalendarDays+" team-days × "+money2(model.teamDayUSD)+" USD/team-day = "+money2(model.proposalUSD)+" USD"
+  :currency==="both"
+   ?"• "+model.netCalendarDays+" team-days × "+money2(model.teamDayTHB)+" THB/team-day = "+money2(model.proposalTHB)+" THB / "+money2(model.proposalUSD)+" USD"
+   :"• "+model.netCalendarDays+" team-days × "+money2(model.teamDayTHB)+" THB/team-day = "+money2(model.proposalTHB)+" THB")
+  :"• "+model.netCalendarDays+" team-days";
+ const bfSpec=[roleBullet(senior),roleBullet(specialist),teamBullet].join("\n");
  const additional=show({thb:model.proposalTHB,usd:model.proposalUSD});
  for(const row of model.partB){
   if(row.code==="B3"){
-   rows.push(line(["B3","",preview.b3.name,b3Spec,"1 lot","",priced?"Quoted":"","Quoted"]));
+   rows.push(line(["B3","",preview.b3.name,"","1 lot","",priced?"Quoted":"","Quoted"]));
    rows.push(line(["B3-BF","","Brownfield inspection, testing & certification — additional",bfSpec,"1 lot",additional,additional,""]));
   }else rows.push(line([row.code,"",row.customerDescription,"","1 lot","",priced?"Quoted":"","Quoted"]));
  }
