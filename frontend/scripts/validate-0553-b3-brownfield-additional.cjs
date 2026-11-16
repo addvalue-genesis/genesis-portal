@@ -170,14 +170,15 @@ assert.ok(!officialHtml.includes(data.B3BF_ITEM7_EQUATION_0553)&&!officialHtml.i
 assert.ok(officialHtml.includes("20,200.00 USD")&&officialHtml.includes("636,300.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS")&&officialHtml.includes("A1. Main Equipment"));
 assert.ok(officialHtml.includes("data-testid=\"b3bf-a1\"")&&officialHtml.includes("data-testid=\"b3bf-head\""));
 assert.ok(!officialHtml.includes(">A2<")&&!officialHtml.includes(">A3<")&&!officialHtml.includes(">A4<"));
-assert.ok(officialHtml.includes("Total Additional (B3-BF) — 2 persons"));
+assert.ok(officialHtml.includes("Total 合计"));
 assert.ok(officialHtml.includes("Brownfield Additional"));
 assert.ok(officialHtml.includes("2 persons: Senior Telecom Systems Integration Engineer + Senior RF/Telecom Field Specialist"));
-assert.ok(officialHtml.includes(">ZPQ<")&&officialHtml.includes(">ZWP8<")&&officialHtml.includes(">ZWP11<")&&officialHtml.includes(">MOB<")&&officialHtml.includes(">DEMOB<")&&officialHtml.includes(">Punch list<"));
+assert.ok(!officialHtml.includes("Offshore working")&&!officialHtml.includes("MOB labour")&&!officialHtml.includes(">ZPQ<")&&!officialHtml.includes(">Punch list<"));
 assert.ok(!officialHtml.includes("31.5")&&!officialHtml.includes("@31.5")&&!officialHtml.includes("Quoted"));
-assert.ok(officialHtml.indexOf("Part A: BASIC")<officialHtml.indexOf(">A1<")&&officialHtml.indexOf(">A1<")<officialHtml.indexOf(">B3-BF<"));
-assert.ok(officialHtml.indexOf(">B3-BF<")<officialHtml.indexOf(">B3-BF.1<")&&officialHtml.indexOf(">B3-BF.1<")<officialHtml.indexOf(">B3-BF.3<"));
-assert.ok(officialHtml.indexOf(">B3-BF.3<")<officialHtml.indexOf(">ZPQ<")&&officialHtml.indexOf(">Punch list<")<officialHtml.indexOf("Total Additional (B3-BF) — 2 persons"));
+assert.ok(officialHtml.indexOf("Part A: BASIC")<officialHtml.indexOf(">A1<")&&officialHtml.indexOf(">A1<")<officialHtml.indexOf("Part B: OTHERS"));
+assert.ok(officialHtml.indexOf(">B1<")<officialHtml.indexOf(">B2<")&&officialHtml.indexOf(">B2<")<officialHtml.indexOf(">B3<"));
+assert.ok(officialHtml.indexOf(">B3<")<officialHtml.indexOf(">B3-BF.1<")&&officialHtml.indexOf(">B3-BF.3<")<officialHtml.indexOf(">B4<"));
+assert.ok(officialHtml.indexOf(">B14<")<officialHtml.indexOf("Total 合计"));
 const a1Preview=model.baseCustomerPreview.partA.find(part=>part.code==="A1");
 const a1Row=officialSchedule.rows.find(entry=>entry.kind==="a1");
 assert.equal(a1Preview.mr,"MR-0001");
@@ -198,8 +199,8 @@ for(const money of PART_A_MONEY){
 const seniorLine=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF.1");
 const specialistLine=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF.2");
 const ticketLine=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF.3");
-assert.equal(seniorLine.cells[2],model.bomLines.find(entry=>entry.id==="BF.1.1").activity);
-assert.equal(specialistLine.cells[2],model.bomLines.find(entry=>entry.id==="BF.1.2").activity);
+assert.ok(seniorLine.cells[1].startsWith(model.bomLines.find(entry=>entry.id==="BF.1.1").activity));
+assert.ok(specialistLine.cells[1].startsWith(model.bomLines.find(entry=>entry.id==="BF.1.2").activity));
 assert.equal(seniorLine.cells[5],"1,000.00 USD");
 assert.equal(seniorLine.cells[6],"9,000.00 USD");
 assert.equal(specialistLine.cells[5],"800.00 USD");
@@ -207,30 +208,34 @@ assert.equal(specialistLine.cells[6],"7,200.00 USD");
 assert.equal(ticketLine.cells[5],"2,000.00 USD");
 assert.equal(ticketLine.cells[6],"4,000.00 USD");
 const heading=officialSchedule.rows.find(entry=>entry.kind==="bfhead");
-assert.equal(heading.cells[0],"B3-BF");
-assert.equal(heading.cells[2],"Brownfield Additional");
+assert.equal(heading.cells[0],"B3");
+assert.ok(heading.cells[1].startsWith("Brownfield Additional"));
 assert.equal(heading.cells[5],"");
 assert.equal(heading.cells[6],"20,200.00 USD");
-assert.deepEqual(officialSchedule.rows.filter(entry=>entry.kind==="day").map(entry=>[entry.cells[1],entry.cells[4],entry.cells[6]]),[["ZPQ","2 day",""],["ZWP8","2 day",""],["ZWP11","2 day",""],["MOB","1 day",""],["DEMOB","1 day",""],["Punch list","1 day",""]]);
+assert.equal(officialSchedule.rows.filter(entry=>entry.kind==="day").length,0);
+assert.deepEqual(officialSchedule.rows.filter(entry=>entry.kind==="template").map(entry=>entry.cells[0]),["B1","B2","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14"]);
 assert.ok(!seniorLine.cells[3].includes("31.5")&&!a1Row.cells[3].includes("31.5"));
 assert.ok(officialThb.includes("31,500.00")&&officialThb.includes("25,200.00")&&officialThb.includes("283,500.00")&&officialThb.includes("226,800.00"));
 assert.ok(!officialThb.includes("31.5")&&!officialThb.includes("SAMTEL preparation")&&!officialThb.includes("Proposed standby"));
 for(const code of ["B1","B2","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14"]){
- assert.ok(!officialHtml.includes(">"+code+"<"),"official view must not list "+code);
- assert.ok(!officialCsv.includes("\n"+code+","),"official csv must not list "+code);
+ assert.ok(officialHtml.includes(">"+code+"<"),"official view must keep template line "+code);
+ assert.ok(officialCsv.includes("\n"+code+","),"official csv must keep template line "+code);
+ const templateRow=officialSchedule.rows.find(entry=>entry.cells[0]===code);
+ assert.equal(templateRow.cells[5],"");
+ assert.equal(templateRow.cells[6],"");
 }
 assert.ok(officialHtml.includes(">A1<")&&officialHtml.includes(">B3-BF.1<"));
 assert.ok(!officialHtml.includes("Supplied under base")&&!officialHtml.includes("Quoted")&&!officialHtml.includes("TBA"));
 assert.ok(!officialHtml.includes("2,322,450")&&!officialCsv.includes("2,322,450"));
 assert.ok(!officialHtml.includes("BF.1.3")&&!officialHtml.includes("Existing SAT role rate")&&!officialHtml.includes("Offshore POB"));
 assert.ok(!officialCsv.includes("BF.1.3")&&!officialCsv.includes("Existing SAT role rate")&&!officialCsv.includes("Offshore POB"));
-assert.ok(officialCsv.includes("20,200.00 USD")&&officialCsv.includes("636,300.00")&&officialCsv.includes("9,000.00 USD")&&officialCsv.includes("4,000.00 USD")&&officialCsv.includes("MR-0001 SCADA / AVIAT / Cisco")&&officialCsv.includes("Total Additional (B3-BF) — 2 persons"));
+assert.ok(officialCsv.includes("20,200.00 USD")&&officialCsv.includes("636,300.00")&&officialCsv.includes("9,000.00 USD")&&officialCsv.includes("4,000.00 USD")&&officialCsv.includes("MR-0001 SCADA / AVIAT / Cisco")&&officialCsv.includes("Total 合计"));
 assert.ok(!officialCsv.includes("31.5")&&!officialCsv.includes("SAMTEL preparation")&&!officialHtml.includes("31.5")&&!officialUsd.includes("31.5"));
 assert.ok(officialCsv.split("\n").at(-1).includes(NOTE));
 assert.ok(officialCsv.lastIndexOf(NOTE)>officialCsv.lastIndexOf(data.B3BF_JUTAL_NOTE_0553));
 const officialUnpriced=render({initialPriced:false,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
 assert.ok(!officialUnpriced.includes("510,300")&&!officialUnpriced.includes("636,300")&&!officialUnpriced.includes("126,000")&&!officialUnpriced.includes("63,000")&&!officialUnpriced.includes("20,200")&&!officialUnpriced.includes("4,000")&&!officialUnpriced.includes("16,200")&&!officialUnpriced.includes("2,000.00")&&!officialUnpriced.includes("Quoted")&&officialUnpriced.includes("MOB/DEMOB"));
-assert.ok(officialUnpriced.includes("MR-0001 SCADA / AVIAT / Cisco")&&officialUnpriced.includes("Punch list")&&officialUnpriced.includes("1 day")&&!officialUnpriced.includes("Quoted")&&!officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("31.5")&&!officialUnpriced.includes("TBA"));
+assert.ok(officialUnpriced.includes("MR-0001 SCADA / AVIAT / Cisco")&&officialUnpriced.includes("Brownfield Additional")&&officialUnpriced.includes(">B3<")&&!officialUnpriced.includes("Offshore working")&&!officialUnpriced.includes("Quoted")&&!officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("31.5")&&!officialUnpriced.includes("TBA"));
 for(const money of PART_A_MONEY)assert.ok(!officialUnpriced.includes(money));
 assert.ok(pricedHtml.includes("BF.1.3")&&pricedHtml.includes("Existing SAT role rate")&&pricedHtml.includes("Offshore POB"));
 const leak=/793,?800|856,?800|636,?300|573,?300|510,?300|403,?200|340,?200|283,?500|226,?800|189,?000|151,?200|126,?000|63,?000|56,?700|31,?500|25,?200|20,?200|18,?200|16,?200|12,?800|10,?800|441,?000|352,?800|14,?000|11,?200|9,?000|7,?200|6,?000|4,?800|4,?000|2,?000|1,?800|1,?000|31\.5/;
@@ -269,6 +274,63 @@ assert.equal(satAfter.satWorkingSellTHB,1587600);
 assert.equal(satAfter.satTeamDaySellTHB,56700);
 const template=require(path.join(root,"project0553/data/nativeReleaseTemplate0553.json"));
 const native=require(path.join(root,"project0553/nativeWorkingDraft0553.js"));
+function parseCsv(text){
+ const rows=[];let row=[];let field="";let quoted=false;
+ for(let i=0;i<text.length;i++){
+  const char=text[i];
+  if(quoted){
+   if(char==='"'&&text[i+1]==='"'){field+='"';i++;}
+   else if(char==='"')quoted=false;
+   else field+=char;
+  }else if(char==='"')quoted=true;
+  else if(char===","){row.push(field);field="";}
+  else if(char==="\n"){row.push(field);rows.push(row);row=[];field="";}
+  else if(char!=="\r")field+=char;
+ }
+ if(field.length||row.length){row.push(field);rows.push(row);}
+ return rows;
+}
+function htmlText(value){
+ return value.replace(/<br\s*\/?>/gi,"\n").replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&apos;/g,"'");
+}
+function wordMatrix(html){
+ const body=html.slice(html.indexOf("<tbody>"),html.indexOf("</tbody>"));
+ return [...body.matchAll(/<tr>([\s\S]*?)<\/tr>/g)].map(row=>[...row[1].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)].map(cell=>htmlText(cell[1])));
+}
+function excelMatrix(xml,rows){
+ const decode=value=>value.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+ return rows.map(row=>"ABCDEFGH".split("").map(column=>{
+  const match=xml.match(new RegExp('<c\\b[^>]*\\br="'+column+row+'"[^>]*?(?:/>|>([\\s\\S]*?)</c>)'));
+  const text=match&&match[1]&&match[1].match(/<t[^>]*>([\s\S]*?)<\/t>/);
+  return text?decode(text[1]):"";
+ }));
+}
+function screenMatrix(html){
+ const sheet=html.slice(html.indexOf('data-testid="b3bf-official-sheet"'));
+ return [...sheet.matchAll(/<tr\b([^>]*)>([\s\S]*?)<\/tr>/g)].flatMap(row=>{
+  const kind=(row[1].match(/data-kind="([^"]+)"/)||[])[1];
+  if(!kind)return [];
+  const cells=[...row[2].matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)].map(cell=>htmlText(cell[1]));
+  if(kind==="section"||kind==="subheading"||kind==="highlight"||kind==="note")return [[cells[0],...Array(7).fill("")]];
+  if(kind==="total")return [[cells[0],"","","","","",cells[1],cells[2]]];
+  if(kind==="a1")return [cells];
+  return [[cells[0],cells[1],"","",cells[2],cells[3],cells[4],cells[5]]];
+ });
+}
+function assertOfficialExportsMatch(model,file,pricedSheet,pricedWord){
+ const view={priced:true,itemized:true,currency:"thb"};
+ const schedule=data.selectB3BrownfieldOfficialSchedule0553(model,view);
+ const matrix=data.b3BrownfieldOfficialMatrix0553(schedule);
+ const csvRows=parseCsv(data.buildB3BrownfieldAdditionalCsv0553(model,{...view,version:"official"}));
+ const csvMatrix=csvRows.slice(csvRows.findIndex(row=>row[0]==="S.N / 序号")+1);
+ assert.deepEqual(csvMatrix,matrix,"official CSV rows differ from the screen");
+ assert.deepEqual(wordMatrix(pricedWord),data.b3BrownfieldOfficialMatrix0553(data.selectB3BrownfieldOfficialSchedule0553(model,{priced:true,itemized:true,currency:"both"})),"official Word rows differ from the screen");
+ assert.deepEqual(excelMatrix(pricedSheet,data.b3BrownfieldOfficialExcelRows0553(schedule)),matrix,"official Excel rows differ from the screen");
+ const screen=screenMatrix(render({initialPriced:true,initialItemized:true,initialVersion:"official",initialCurrency:"thb"}));
+ assert.deepEqual(screen,matrix,"official screen rows differ from the export model");
+ assert.equal(data.b3BrownfieldOfficialExcelRows0553(schedule).join(","),"6,7,8,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44");
+ void file;
+}
 async function checkOfficialExports(){
  const bytes=Uint8Array.from(Buffer.from(template.base64,"base64"));
  const file={name:template.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)};
@@ -276,18 +338,19 @@ async function checkOfficialExports(){
  assert.equal(xlsx.filename,"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.xlsx");
  const zip=native.entriesFromZip(xlsx.bytes);
  const sheet=new TextDecoder().decode(await native.readEntry(zip.find(entry=>entry.name==="xl/worksheets/sheet1.xml")));
- assert.ok(sheet.includes("636,300.00")&&sheet.includes("MR-0001 SCADA / AVIAT / Cisco")&&sheet.includes("B3-BF.3")&&sheet.includes("126,000.00")&&!sheet.includes(">A2<"));
- assert.ok(sheet.includes("Brownfield Additional")&&sheet.includes("Punch list")&&sheet.includes("ZPQ"));
- assert.ok(sheet.includes("<f>SUM(E8:E22)</f>"));
- assert.ok(!sheet.includes("2,322,450")&&!sheet.includes("2322450")&&!sheet.includes("573,300")&&!sheet.includes("18,200")&&!sheet.includes(">A2<")&&!sheet.includes(">A3<")&&!sheet.includes(">A4<"));
+ assert.ok(sheet.includes("636,300.00")&&sheet.includes("MR-0001 SCADA / AVIAT / Cisco")&&sheet.includes("B3-BF.3")&&sheet.includes("126,000.00")&&sheet.includes("Brownfield Additional"));
+ assert.ok(!sheet.includes("Offshore working")&&!sheet.includes(">A2<")&&!sheet.includes(">A3<")&&!sheet.includes(">A4<"));
+ assert.ok(!sheet.includes("<f>SUM(E8:E22)</f>"));
+ assert.ok(!sheet.includes("2,322,450")&&!sheet.includes("2322450")&&!sheet.includes("573,300")&&!sheet.includes("18,200"));
  const html=data.buildB3BrownfieldOfficialDocHtml0553(model,{priced:true,currency:"both"});
  assert.ok(html.includes("636,300.00 THB / 20,200.00 USD")&&html.includes("Labour + MOB/DEMOB + punch list")&&html.includes("xmlns:w=\"urn:schemas-microsoft-com:office:word\""));
- assert.ok(!html.includes("573,300")&&!html.includes("18,200")&&!html.includes("2,322,450")&&html.includes("126,000.00 THB / 4,000.00 USD"));
+ assert.ok(!html.includes("573,300")&&!html.includes("18,200")&&!html.includes("2,322,450")&&html.includes("126,000.00 THB / 4,000.00 USD")&&!html.includes("Offshore working"));
  const bare=data.buildB3BrownfieldOfficialDocHtml0553(model,{priced:false,currency:"usd"});
- assert.ok(!bare.includes("636,300")&&!bare.includes("20,200")&&bare.includes("Punch list"));
+ assert.ok(!bare.includes("636,300")&&!bare.includes("20,200")&&bare.includes("Brownfield Additional")&&!bare.includes("Offshore working"));
  const bareXlsx=await data.buildB3BrownfieldOfficialXlsx0553(file,model,{priced:false,currency:"usd"});
  const bareSheet=new TextDecoder().decode(await native.readEntry(native.entriesFromZip(bareXlsx.bytes).find(entry=>entry.name==="xl/worksheets/sheet1.xml")));
- assert.ok(!bareSheet.includes("636,300")&&!bareSheet.includes("20,200")&&bareSheet.includes("Punch list"));
+ assert.ok(!bareSheet.includes("636,300")&&!bareSheet.includes("20,200")&&bareSheet.includes("Brownfield Additional")&&!bareSheet.includes("Offshore working"));
+ assertOfficialExportsMatch(model,file,sheet,html);
  console.log("PASS 0553 B3 brownfield additional: 9 x 56,700 = 510,300; MOB/DEMOB 126,000; combined official total 636,300; base B3 unchanged");
 }
 checkOfficialExports().catch(error=>{console.error(error);process.exit(1);});

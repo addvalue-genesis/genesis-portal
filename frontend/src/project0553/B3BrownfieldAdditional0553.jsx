@@ -209,14 +209,16 @@ function OfficialCustomerSheet({model,priced,itemized,currency}){
   <div className="p553-sheet-scroll"><table className="p553-customer-table">
    <thead><tr>{schedule.columns.map(header=><th key={header}>{header.split(" / ").map((part,index)=><React.Fragment key={part+index}>{index>0&&<br/>}{part}</React.Fragment>)}</th>)}</tr></thead>
    <tbody>{schedule.rows.map((row,index)=>{
-    if(row.kind==="section")return <tr key={index} className="p553-sheet-section"><td colSpan={span}>{row.cells[0]}<br/>{row.cells[1]}</td></tr>;
-    if(row.kind==="subheading")return <tr key={index} className="p553-sheet-subheading"><td colSpan={span}>{row.cells[0]}</td></tr>;
-    if(row.kind==="highlight")return <tr key={index} className="p553-sheet-highlight"><td colSpan={span}>{row.cells[0]}</td></tr>;
-    if(row.kind==="note")return <tr key={index} className="b3bf-note"><td colSpan={span}>{row.cells[0]}</td></tr>;
-    if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-testid={priced?"b3bf-total":undefined}><td colSpan={6}>{row.cells[0]}</td><td className="p553-price-cell">{priced?row.cells[6]:""}</td><td>{row.cells[7]}</td></tr>;
-    const rowClass=row.kind==="bfhead"?"b3bf-bfhead":row.kind==="day"?"b3bf-day":"p553-mr-preview-row";
-    const testId=row.kind==="a1"?"b3bf-a1":row.kind==="bfhead"?"b3bf-head":row.kind==="day"?"b3bf-day":undefined;
-    return <tr key={index} className={rowClass} data-testid={testId}>{row.cells.map((value,cell)=><td key={cell} className={priceCell(cell)?"p553-price-cell":"b3bf-pre"}>{value}</td>)}</tr>;
+    const lines=text=>String(text||"").split("\n").map((part,partIndex)=><React.Fragment key={partIndex}>{partIndex>0&&<br/>}{part}</React.Fragment>);
+    if(row.kind==="section")return <tr key={index} className="p553-sheet-section" data-kind={row.kind}><td colSpan={span}>{lines(row.cells[0])}{row.cells[1]&&<><br/>{row.cells[1]}</>}</td></tr>;
+    if(row.kind==="subheading")return <tr key={index} className="p553-sheet-subheading" data-kind={row.kind}><td colSpan={span}>{lines(row.cells[0])}</td></tr>;
+    if(row.kind==="highlight")return <tr key={index} className="p553-sheet-highlight" data-kind={row.kind}><td colSpan={span}>{lines(row.cells[0])}</td></tr>;
+    if(row.kind==="note")return <tr key={index} className="b3bf-note" data-kind={row.kind}><td colSpan={span}>{lines(row.cells[0])}</td></tr>;
+    if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-kind={row.kind} data-testid={priced?"b3bf-total":undefined}><td colSpan={6}>{lines(row.cells[0])}</td><td className="p553-price-cell">{priced?row.cells[6]:""}</td><td>{row.cells[7]}</td></tr>;
+    if(row.kind==="template"||row.kind==="bfhead"||row.kind==="bf")return <tr key={index} className={row.kind==="bfhead"?"b3bf-bfhead":"p553-mr-preview-row"} data-kind={row.kind} data-testid={row.kind==="bfhead"?"b3bf-head":row.cells[0]==="B3-BF.3"?"b3bf-mob":undefined}>
+     <td>{row.cells[0]}</td><td colSpan={3} className="b3bf-pre">{lines(row.cells[1])}</td><td>{row.cells[4]}</td>
+     <td className={priceCell(5)?"p553-price-cell":""}>{row.cells[5]}</td><td className={priceCell(6)?"p553-price-cell":""}>{row.cells[6]}</td><td>{row.cells[7]}</td></tr>;
+    return <tr key={index} className="p553-mr-preview-row" data-kind={row.kind} data-testid={row.kind==="a1"?"b3bf-a1":undefined}>{row.cells.map((value,cell)=><td key={cell} className={priceCell(cell)?"p553-price-cell":"b3bf-pre"}>{value}</td>)}</tr>;
    })}</tbody>
   </table></div>
  </div>;
