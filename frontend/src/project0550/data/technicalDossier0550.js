@@ -6,7 +6,7 @@ import {emptyBidVolumes0550,blankVdrl0550} from './bidVolumes0550';
 import {DMR_PART_B_0550,CERAGON_R11_0550,CERAGON_R11_CONFIGURATION_0550,CERAGON_R11_OPEN_SCOPE_0550,ceragonR11Selected0550} from './ceragonSelection0550';
 import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
-import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550} from './radioLotComponents0550';
+import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './radioLotComponents0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 import {sanitizeCustomerText0550} from './c1Appendix0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
@@ -38,6 +38,7 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  }
  if(systemToken==='TEL-RADIO-DTRS'&&['description','parameters','equipment'].includes(sectionId)){
   tables.push({title:'MR Appendix 1 (APF Item 1) VHF DMR Radio System BoQ · 12-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_DMR_MR_12_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+  tables.push({title:'MR Appendix 1 (APF Item 6) RoIP Dispatch Console System BoQ · 7-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_ROIP_MR_7_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
  }
  if(systemToken==='TEL-RADIO-MARINE'&&['description','parameters','equipment'].includes(sectionId)){
   tables.push({title:'MR Appendix 1 (APF Item 2) VHF-FM Marine Radio System BoQ · 6-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_MARINE_MR_6_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
@@ -45,6 +46,10 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  }
  if(systemToken==='TEL-RADIO-AERO'&&['description','parameters','equipment'].includes(sectionId)){
   tables.push({title:'MR Appendix 1 (APF Item 4) VHF-AM Aeronautical Radio System BoQ · 5-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_AERO_MR_5_ITEMS_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+ }
+ if(systemToken==='TEL-TELT'&&['description','parameters','equipment'].includes(sectionId)){
+  tables.push({title:'MR Appendix 1 (APF Item 8) Telecom Tower 60m BoQ · 3-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_TOWER_60M_BOM_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+  tables.push({title:'MR Appendix 1 (ACP Item 6) Telecom Tower 30m BoQ · 3-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:ACP_TOWER_30M_BOM_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){

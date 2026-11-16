@@ -358,9 +358,9 @@ export function deriveC1Appendix0550(view,currency='USD'){
   const radio=target.appendix==='1.1',cctv=target.mr.systemToken==='TEL-CCTV',fiberPanel=target.appendix==='1.8';
   if(radio){
    target.provisionalRadio=true;
-   if(showRadioBudget&&target.key==='MR-B1-11-APF-06')target.system='RoIP Dispatch Console';
+   if(target.key==='MR-B1-11-APF-06'||target.key==='MR-B1-11-ACP-05')target.system='RoIP Dispatch Console';
    else if(target.key==='MR-B1-11-ABV01-02')target.system=systemNames['TEL-RADIO-DTRS'];
-    else if(prices.every(b=>mgwRadioSourceRow0550(b.line.offer)?.systemTokens.length>1))target.system=sharedRadioLabel;
+    else if(/antenna cable/i.test(target.description))target.system='Antenna Cables';
   }else if(cctv)target.provisionalCctv=true;
   else if(fiberPanel){
    target.provisionalFiberPanel=true;
@@ -475,7 +475,7 @@ export function deriveC1Appendix0550(view,currency='USD'){
    mgwCurrentOffer0550(b.line.offer)?b.line.tagRef:'PROJECT';
   const isLumpSumPackage=b.quantity===1||isAms01Radio;
   const packageUnit=isAms01Radio?'Lot':(unitOpen?'':((isLumpSumPackage&&(!b.unit||b.unit==='—'||b.unit==='U'))?'Lot':(b.unit||'')));
-  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?sharedRadioLabel:systemNames[token]||'Other Base Supply',site,
+  const item={key:'OWNER:'+b.lineId,kind:'PACKAGE',appendix:section||'OTHER',system:sharedRadio?(/antenna cable/i.test(itemDescription)?'Antenna Cables':'RoIP Dispatch Console'):systemNames[token]||'Other Base Supply',site,
    description:itemDescription,quantity:b.quantity,unit:packageUnit,
    amount:Number.isFinite(b.amount)?b.amount:null,unitPrice:unitOpen?null:b.unitPrice,note:customerRemark(b.line,legacy),internalNote:!legacy&&customerRemark(b.line,legacy)!==(b.line.customerRemark||'')?b.line.customerRemark:'',
    components:componentText.map(t=>c1Component0550(t.replace(/^(\d+)\s*x /,'$1 Ea. '))),
