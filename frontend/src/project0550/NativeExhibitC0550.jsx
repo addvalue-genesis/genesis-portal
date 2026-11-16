@@ -15,13 +15,16 @@ import {LanCusSpareCoverage0550} from './LanCusBasis0550';
 import {useBidWorkspace} from './BidWorkspaceContext';
 import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
 import {c5SpecialToolsRows0550,c5EquationDraftRows0550,c5SelectedSystems0550,c5UnmappedSystems0550,C5_TOOLS_DRAFT_NOTE_0550} from './data/c5ToolsScope0550';
+import {a1InternalLabel0550} from './data/a1DisplaySn0550';
 
+// Internal review only: labels show the internal sequential number (displaySn)
+// plus the official form S/N. The customer form itself still has SN 5 twice.
 const a1DirectRows=[
- [3,'S/N 2 · Inspection and tests'],
- [4,'S/N 3 · Preservation and packing for shipment'],
- [10,'S/N 9 · Vendor Documents'],
+ [3,'Inspection and tests'],
+ [4,'Preservation and packing for shipment'],
+ [10,'Vendor Documents'],
  [11,'Others (Please specify)'],
-];
+].map(([slot,title])=>[slot,a1InternalLabel0550(slot,title)]);
 const money=value=>Number.isFinite(value)?value.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
 
 function LanC2Open0550({rows}){

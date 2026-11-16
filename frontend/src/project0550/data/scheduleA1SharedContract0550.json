@@ -1,9 +1,10 @@
 {
   "contract": "PJ2608-0550 Schedule A1 shared line items (10.2 SI / Master Schedule)",
-  "version": "0.3.0-skeleton",
+  "version": "0.4.0-skeleton",
   "status": "DRAFT - NOT WIRED INTO ANY SCREEN OR EXPORT",
   "currency": "USD",
   "numberingNote": "SN 5 appears twice on the customer form itself (once for Two years Operation Spare parts → C-3 Option, once for Special Tools → C-5). The UI already renders this correctly by using internal row numbers, not the SN value. Do not assume SN is unique; use itemKey to distinguish the two SN 5 rows. Previous note that claimed Tools=SN 6 and Field Service=SN 7 was incorrect (it was based on internal row position, not form text).",
+  "displaySnNote": "displaySn is INTERNAL-ONLY sequential numbering (1-10) for internal screens. The official customer form, its template and the official export keep the form SN (1, 2, 3, 4, 5, 5, 6, 8, 9, …), including the duplicate SN 5. Never print displaySn on a customer document.",
   "rules": [
     "WORKSTREAM_A_FORM_C writes only items whose sourceForm starts with C-. It never writes a1DirectItems.",
     "WORKSTREAM_B_A1_DIRECT writes only a1DirectItems (sourceForm A1_DIRECT) and the rollup block. It never changes Form C schemas.",
@@ -15,6 +16,7 @@
     {
       "itemKey": "A1-SN1-C1",
       "sn": "1",
+      "displaySn": "1",
       "templateRow": 2,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-1",
@@ -24,6 +26,7 @@
     {
       "itemKey": "A1-SN2-INSPECTION",
       "sn": "2",
+      "displaySn": "2",
       "templateRow": 3,
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -34,6 +37,7 @@
     {
       "itemKey": "A1-SN3-PACKING",
       "sn": "3",
+      "displaySn": "3",
       "templateRow": 4,
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -43,6 +47,7 @@
     {
       "itemKey": "A1-SN4-C2",
       "sn": "4",
+      "displaySn": "4",
       "templateRow": 5,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-2",
@@ -52,6 +57,7 @@
     {
       "itemKey": "A1-SN5-OPTION-C3",
       "sn": "5",
+      "displaySn": "5",
       "templateRow": 6,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-3",
@@ -62,6 +68,7 @@
     {
       "itemKey": "A1-SN5-TOOLS-C5",
       "sn": "5",
+      "displaySn": "6",
       "templateRow": 7,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-5",
@@ -71,6 +78,7 @@
     {
       "itemKey": "A1-SN6-C7",
       "sn": "6",
+      "displaySn": "7",
       "templateRow": 8,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-7",
@@ -80,6 +88,7 @@
     {
       "itemKey": "A1-SN8-C8",
       "sn": "8",
+      "displaySn": "8",
       "templateRow": 9,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-8",
@@ -89,6 +98,7 @@
     {
       "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
       "sn": "9",
+      "displaySn": "9",
       "templateRow": 10,
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -98,6 +108,7 @@
     {
       "itemKey": "A1-OTHERS",
       "sn": "…",
+      "displaySn": "10",
       "templateRow": 11,
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
@@ -110,6 +121,7 @@
     {
       "itemKey": "A1-SN1-C1",
       "sn": "1",
+      "displaySn": "1",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-1",
       "description": "GOODS",
@@ -129,6 +141,7 @@
     {
       "itemKey": "A1-SN4-C2",
       "sn": "4",
+      "displaySn": "4",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-2",
       "description": "Commissioning spares",
@@ -148,6 +161,7 @@
     {
       "itemKey": "A1-SN5-OPTION-C3",
       "sn": "5",
+      "displaySn": "5",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-3",
       "description": "Two years Operation Spare parts (option, excluded from A1 base)",
@@ -167,6 +181,7 @@
     {
       "itemKey": "A1-SN5-TOOLS-C5",
       "sn": "5",
+      "displaySn": "6",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-5",
       "description": "Special Tools for Commissioning and Maintenance",
@@ -186,6 +201,7 @@
     {
       "itemKey": "A1-SN6-C7",
       "sn": "6",
+      "displaySn": "7",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-7",
       "description": "Field Service including Training at SITE",
@@ -205,6 +221,7 @@
     {
       "itemKey": "A1-SN8-C8",
       "sn": "8",
+      "displaySn": "8",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-8",
       "description": "Facilities and Services for COMPANY and PURCHASER",
@@ -226,6 +243,7 @@
     {
       "itemKey": "A1-SN2-INSPECTION",
       "sn": "2",
+      "displaySn": "2",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
       "description": "Inspection and tests with witness by COMPANY and PURCHASER",
@@ -247,6 +265,7 @@
     {
       "itemKey": "A1-SN3-PACKING",
       "sn": "3",
+      "displaySn": "3",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
       "description": "Preservation and packing",
@@ -268,6 +287,7 @@
     {
       "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
       "sn": "9",
+      "displaySn": "9",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
       "description": "Vendor documents",
@@ -289,6 +309,7 @@
     {
       "itemKey": "A1-OTHERS",
       "sn": "…",
+      "displaySn": "10",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
       "description": "Others (Please specify)",
