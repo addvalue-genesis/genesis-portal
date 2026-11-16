@@ -4,7 +4,7 @@ import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,ACP_CONSOLE_BOM_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './data/radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_VSAT_CABLE_BOM_0550,YANGON_VSAT_CABLE_BOM_0550,APF_VSAT_OFFSHORE_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './data/satelliteScope0550';
-import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550} from './data/mgwCctvEntBudget0550';
+import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550,APF_CCTV_MON_27_BOM_0550,APF_CCTV_MON_75_BOM_0550} from './data/mgwCctvEntBudget0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -60,7 +60,7 @@ export function cleanCustomerNote0550(note){
 export function formatCustomerNote0550(r){
  const raw=(r.note||'').trim();
  const isThaiDraft=/ราคาตาม/.test(raw)||/[\u0E00-\u0E7F]/.test(raw)||/ราคาตาม/.test(r.pendingRadioPlacement||'');
- if(isThaiDraft||r.provisionalRadio||r.key==='MR-B1-13-APF-11'||r.key==='MR-B1-13-APF-02'||/enclosure allowance pending rack reconciliation|MGW draft price|\bOPEN\s*·|\bprice\s*·\s*scope\b|reconciliation pending/i.test(raw)){
+ if(isThaiDraft||r.provisionalRadio||r.key==='MR-B1-13-APF-11'||r.key==='MR-B1-13-APF-02'||r.key==='MR-B1-13-APF-12'||r.key==='MR-B1-13-APF-13'||/enclosure allowance pending rack reconciliation|MGW draft price|\bOPEN\s*·|\bprice\s*·\s*scope\b|reconciliation pending|monitor sizes together/i.test(raw)){
   return 'Details shall be included not limit to Bulk Materials etc.';
  }
  if(!raw)return '';
@@ -480,6 +480,8 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(r.key==='MR-B1-13-APF-01'||r.sn==='1.3.1')return buildStaticBomItems(APF_CCTV_PTZ_EX_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-02'||r.sn==='1.3.2')return buildStaticBomItems(APF_CCTV_PTZ_EX_2_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-11'||r.sn==='1.3.11')return buildStaticBomItems(APF_CCTV_CABINET_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-13-APF-12'||r.sn==='1.3.12')return buildStaticBomItems(APF_CCTV_MON_27_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-13-APF-13'||r.sn==='1.3.13')return buildStaticBomItems(APF_CCTV_MON_75_BOM_0550,r,pricingMode);
  if(isAntennaCable){
   const cableQty=Number(r.quantity)||500;
   return buildStaticBomItems([{itemNo:'1',tagNo:'Per Appendix 2 Drawing',mrDescription:'Antenna Cable',offeredEquipment:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',description:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',brand:'Yongding / Amphenol',model:'1/2" Flexible RF Foam Dielectric Cable',partNo:'HCAAYZ-50-12',quantity:cableQty,unit:r.unit||'m',remarks:'Included in Base Scope of Supply (per Appendix 2 drawings)',weight:1000}],r,pricingMode);
@@ -650,8 +652,14 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
        </tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=>{
         const apf01Unit=r.key==='MR-B1-13-APF-02'&&!Number.isFinite(r.amount)?site.rows.find(x=>x.key==='MR-B1-13-APF-01')?.unitPrice:null;
-        const displayUnitPrice=Number.isFinite(r.unitPrice)?r.unitPrice:Number.isFinite(apf01Unit)?apf01Unit:null;
-        const displayAmount=Number.isFinite(r.amount)?r.amount:Number.isFinite(apf01Unit)?Math.round(apf01Unit*(Number(r.quantity)||2)*100)/100:null;
+        const monPkg=site.rows.find(x=>x.kind==='PACKAGE'&&x.priceOwners?.some(b=>/CCTV-APF-12|CCTV-020|CCTV-021/i.test(b.line?.offerId||''))&&Number.isFinite(x.amount));
+        const monPart12=monPkg?Math.round((monPkg.amount*5530/12172)*100)/100:null;
+        const monPart13=monPkg?Math.round((monPkg.amount-monPart12)*100)/100:null;
+        const isMon12=r.key==='MR-B1-13-APF-12'&&!Number.isFinite(r.amount)&&Number.isFinite(monPart12);
+        const isMon13=r.key==='MR-B1-13-APF-13'&&!Number.isFinite(r.amount)&&Number.isFinite(monPart13);
+        const isMonPkg=monPkg&&r===monPkg&&site.rows.some(x=>x.key==='MR-B1-13-APF-12')&&site.rows.some(x=>x.key==='MR-B1-13-APF-13');
+        const displayAmount=isMon12?monPart12:isMon13?monPart13:isMonPkg?0:Number.isFinite(r.amount)?r.amount:Number.isFinite(apf01Unit)?Math.round(apf01Unit*(Number(r.quantity)||2)*100)/100:null;
+        const displayUnitPrice=isMon12||isMon13?Math.round((displayAmount/(Number(r.quantity)||2))*100)/100:isMonPkg?0:Number.isFinite(r.unitPrice)?r.unitPrice:Number.isFinite(apf01Unit)?apf01Unit:null;
         const bomItems=formatBomItems0550(displayAmount!==r.amount?{...r,amount:displayAmount,unitPrice:displayUnitPrice}:r,pricingMode);
         const hasBom=bomItems.length>0;
         const systemTitle=(r.system||cleanItemTitle0550(r)||'SYSTEM').toUpperCase();

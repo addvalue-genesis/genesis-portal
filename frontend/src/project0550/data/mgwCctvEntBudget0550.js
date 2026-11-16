@@ -244,3 +244,13 @@ export const CCTV_TPLINK_DEVIATION_0550 = {
  approvalDecision: 'PENDING',
  problems: [],
 };
+
+export const APF_CCTV_MON_27_BOM_0550 = [
+ { itemNo: '1', tagNo: 'Control Room / Security Bldg', mrDescription: 'CCTV Monitor size 27" (Installed in Control Room and Security Building)', offeredEquipment: 'Dell 27" Commercial CCTV Display Monitor c/w HDMI/DP Cables & Desk Stand', description: 'Dell 27" Commercial CCTV Display Monitor c/w HDMI/DP Cables & Desk Stand', brand: 'Dell', model: '27" Commercial Monitor', partNo: 'DELL-27-MON', quantity: 2, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 1500 },
+ { itemNo: '2', tagNo: 'Control Room / Security Bldg', mrDescription: 'CCTV Workstation & Client Software (per Appendix 2 Drawings)', offeredEquipment: 'Dell OptiPlex Tower Plus 7020 (Core i7, 16GB DDR5, 512GB, Win11 Pro) c/w Keyboard/Mouse, Hikvision Joystick & VMS Client Software', description: 'Dell OptiPlex Tower Plus 7020 (Core i7, 16GB DDR5, 512GB, Win11 Pro) c/w Keyboard/Mouse, Hikvision Joystick & VMS Client Software', brand: 'Dell / Hikvision', model: 'OptiPlex Tower Plus 7020', partNo: 'OPTIPLEX-7020-27', quantity: 2, unit: 'Set', remarks: 'Details shall be included not limit to Bulk Materials etc.', weight: 8500 },
+];
+
+export const APF_CCTV_MON_75_BOM_0550 = [
+ { itemNo: '1', tagNo: 'Control Room / Security Bldg', mrDescription: 'Big Screen CCTV Monitor size 75" (Installed in Control Room and Security Building)', offeredEquipment: 'TCL 75" 4K UHD Commercial Large-Format CCTV Display Monitor c/w Wall/Floor Mount & HDMI/DP Cables', description: 'TCL 75" 4K UHD Commercial Large-Format CCTV Display Monitor c/w Wall/Floor Mount & HDMI/DP Cables', brand: 'TCL', model: '75" 4K Commercial Display', partNo: 'TCL-75-MON', quantity: 2, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 2800 },
+ { itemNo: '2', tagNo: 'Control Room / Security Bldg', mrDescription: 'CCTV Workstation & Client Software (per Appendix 2 Drawings)', offeredEquipment: 'Dell OptiPlex Tower Plus 7020 (Core i7, 16GB DDR5, 512GB, Win11 Pro) c/w Keyboard/Mouse, Hikvision Joystick & VMS Client Software', description: 'Dell OptiPlex Tower Plus 7020 (Core i7, 16GB DDR5, 512GB, Win11 Pro) c/w Keyboard/Mouse, Hikvision Joystick & VMS Client Software', brand: 'Dell / Hikvision', model: 'OptiPlex Tower Plus 7020', partNo: 'OPTIPLEX-7020-75', quantity: 2, unit: 'Set', remarks: 'Details shall be included not limit to Bulk Materials etc.', weight: 7200 },
+];
