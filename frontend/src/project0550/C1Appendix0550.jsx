@@ -621,7 +621,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
      const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;
      const heading=g.title.toUpperCase();
      return <tbody key={g.id}>
-     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
+     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?heading:'APPENDIX '+g.id+' · '+heading)}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary?.amount)}</td><td>{summary?.label||''}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=>{
       const apmExcludedAmt=sys.sites.flatMap(s=>s.rows).filter(isNonMrApmRow).reduce((acc,r)=>acc+(Number.isFinite(r.amount)?r.amount:0),0);
       const displayKnownAmount=Number.isFinite(sys.knownAmount)?Math.round((sys.knownAmount-apmExcludedAmt)*100)/100:null;
@@ -728,7 +728,7 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
     </tbody>;})}
     <tfoot><tr><td colSpan={5}>{screenSubtotal===null?'TOTAL — BASE SCOPE OF SUPPLY':'BASE SCOPE OF SUPPLY'}</td><td className="number">{c1Display0550(projection.amount??screenSubtotal)}</td><td>{screenSubtotal!==null?'Priced items subtotal':''}</td></tr></tfoot>
    </table>
-   {view.getRecord('I.C1').content&&<p>{view.getRecord('I.C1').content}</p>}
+   {view.getRecord?.('I.C1')?.content&&<p>{view.getRecord('I.C1').content}</p>}
    <footer>Schedule C1 · {view.proposal.documentNo} / {view.proposal.revision}</footer>
   </article>
   </div>

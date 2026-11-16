@@ -14,6 +14,9 @@
   "nonMrVendorExtras": [
     {"id":"LINE-MGW-CURRENT-RADIO-006","system":"TEL-RADIO-MARINE","status":"NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION","mgwSite":"APM","mgwCostUSD":27478,"customerSellUSD":36270.96,"note":"Unallocated MGW VHF-FM Marine Radio System (2 Lots, APM vendor label not in Customer MR). Excluded from customer-facing C1/11.P and tracked internally in 10.2 SI as NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION."}
   ],
+  "vendorOptions": [
+    {"id":"OFFER-MGW-Q26-063-RADIO-009-OPTION","system":"TEL-RADIO-DTRS","status":"VENDOR_OPTION_UNPRICED / BAFO_FOC_CANDIDATE","brand":"MOTOROLA","items":[{"partNo":"PMPN4296","description":"Six-Port Smart Charger","qty":0},{"partNo":"PMNN4067","description":"ATEX Remote Speaker /Microphone","qty":0}],"note":"Not mandated by Customer MR Appendix 1.1, PHI-0001, DTS-0006..0009, SPE-0007..0010, or LIS. Kept strictly isolated in 10.2 SI as VENDOR_OPTION_UNPRICED / BAFO_FOC_CANDIDATE."}
+  ],
   "layouts": [
     "APF LAY-0001 C1 sheet 3/4 and LAY-0010 C4 overall",
     "ACP LAY-0001 C2 sheet 3/3, LAY-0003 C1 overall and BLD-0001 C3",

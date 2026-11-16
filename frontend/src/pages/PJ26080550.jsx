@@ -2206,7 +2206,7 @@ function Project0550Bidding({ lang = "th" }) {
           <strong>{PROJECT_0550.method}</strong>
         </div>
 
-        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","CUS · Customer Requirements"],["B","SI · Engineering & Bid Preparation"],["C","COM · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>{if(!technicalDirty)setArea(id);}}>{label}</button>)}<button type="button" aria-pressed={area==='B'&&activeTab==='documents'} onClick={()=>{if(!technicalDirty){setArea('B');setActiveTab('documents');}}}>VND · Vendor Offers / Evidence</button></div>
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","CUS · Customer Requirements"],["B","SI · Engineering & Bid Preparation"],["C","COM · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>{if(!technicalDirty){setArea(id);setNavigationTarget(null);setMrNavigationTarget(null);}}}>{label}</button>)}<button type="button" aria-pressed={area==='B'&&activeTab==='documents'} onClick={()=>{if(!technicalDirty){setArea('B');setActiveTab('documents');setNavigationTarget(null);setMrNavigationTarget(null);}}}>VND · Vendor Offers / Evidence</button></div>
         {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
           {TABS.map((tab) => (
             <button
@@ -2214,7 +2214,7 @@ function Project0550Bidding({ lang = "th" }) {
               aria-label={tab.aria}
               type="button"
               className={activeTab === tab.id ? "is-active" : ""}
-              onClick={() => {if(!technicalDirty)setActiveTab(tab.id);}}
+              onClick={() => {if(!technicalDirty){setActiveTab(tab.id);setNavigationTarget(null);setMrNavigationTarget(null);}}}
             >
               <small className="p55-workspace-alias">{workspaceAlias0550('bid.'+tab.id)}</small> {tab.label}
             </button>
