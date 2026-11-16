@@ -7,6 +7,7 @@ export const RADIO_ACCESSORIES_SEPARATOR_0550='\nVHF DMR Radio System Accessarie
 
 export const VHF_DMR_REVIEW_FLAGS_0550 = [
   { id: 'REVIEW_FLAG_DMR_COMBINER', scope: 'APF (1.1.1)', tagNo: 'APF-CAB-0004', summary: 'Verify Tx Combiner & Rx Multicoupler inclusion inside APF-CAB-0004 (3 Repeaters sharing 1 Tx + 1 Rx Dipole antenna).' },
+  { id: 'REVIEW_FLAG_DMR_CABINET_RITTAL', scope: 'APF (1.1.1.1)', tagNo: 'APF-CAB-0004', summary: 'Mixed-vendor substitution: MGW RADIO-001 quoted TUTENG G26642 (non-AVL); substituted with Rittal VX IT 42U (VERSED QT2611035) to maintain AVL compliance across all cabinets.' },
   { id: 'REVIEW_FLAG_DMR_HANDHELD_EX', scope: 'APF (1.1.1.11)', summary: 'Verify ATEX / IECEx / UL (TIA-4950) Ex-certification on all 98 Ea. VHF DMR Handheld Radios.' },
   { id: 'REVIEW_FLAG_DMR_CAPACITY_MAX', scope: 'APF / ACP / ABV01', summary: 'Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios).' },
   { id: 'REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET', scope: '1.1.5 / 1.1.7 / 1.1.12 / 1.1.16', summary: 'Verify RF Link Budget attenuation on 1/2" feeder cable (150 m / 500 m / 700 m / 60 m tower) for potential Phase-2 7/8" upgrade clarification.' },
@@ -18,7 +19,7 @@ export const VHF_DMR_REVIEW_FLAGS_0550 = [
 ];
 
 export const APF_DMR_MR_12_ITEMS_0550 = [
-  { itemNo: '1', tagNo: 'APF-CAB-0004', mrDescription: 'Radio System Cabinet', offeredEquipment: '42U 19" Floor-Mounted Telecom Equipment Cabinet', description: 'Radio System Cabinet', brand: 'TUTENG', model: 'G26642', partNo: 'G26642', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 24000 },
+  { itemNo: '1', tagNo: 'APF-CAB-0004', mrDescription: 'Radio System Cabinet', offeredEquipment: 'Rittal 42U 19" Floor-Mounted Telecom Equipment Cabinet', description: 'Radio System Cabinet', brand: 'Rittal', model: 'VX IT 42U 800x1000x2200', partNo: 'VX25 / VX IT', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 24000 },
   { itemNo: '2', tagNo: 'APF-VHF-ANT-0001', mrDescription: 'VHF Dipole DMR Antenna Tx', offeredEquipment: 'VHF 4-Stack Dipole Array Antenna (Tx)', description: 'VHF Dipole DMR Antenna Tx', brand: 'Amphenol Procom', model: '4-Stack Dipole Array', partNo: 'WL-150-4S', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 5000 },
   { itemNo: '3', tagNo: 'APF-VHF-ANT-0002', mrDescription: 'VHF Dipole DMR Antenna Rx', offeredEquipment: 'VHF 4-Stack Dipole Array Antenna (Rx)', description: 'VHF Dipole DMR Antenna Rx', brand: 'Amphenol Procom', model: '4-Stack Dipole Array', partNo: 'WL-150-4S', quantity: 1, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 5000 },
   { itemNo: '4', tagNo: 'APF-VHF-ANT-0003 / 0004', mrDescription: 'VHF Omni DMR Antenna', offeredEquipment: 'VHF Omnidirectional Collinear Antenna', description: 'VHF Omni DMR Antenna', brand: 'Amphenol Procom', model: 'TQJ-150I', partNo: 'TQJ-150I', quantity: 2, unit: 'Ea.', remarks: 'Included in Base Scope of Supply', weight: 4500 },

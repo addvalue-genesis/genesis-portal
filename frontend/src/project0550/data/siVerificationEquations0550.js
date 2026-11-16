@@ -44,6 +44,12 @@ export const SI_LEARNED_RULES_0550 = [
     rule: 'Ex-Proof CCTV stations include Camera + DS-2XE2705-M04(316L)(O-STD) Ex Junction Box/Fiber Converter + Mounting Kit; APF 1.3.11 matched to MR-B1-13-APF-11 (1 Switch, 1 UTP Patch); 1.3.12/1.3.13 unbundled from 1.3.P3; TP-Link MC210CS logged in Tab 14 Deviation List; LIS-0001 tags mapped from appendix2MasterEvidence0550.json.',
     status: 'ACTIVE_ENFORCED',
   },
+  {
+    id: 'LAMBDA-04',
+    scope: 'CROSS-SYSTEM (Mixed-Vendor AVL Substitution)',
+    rule: 'When a primary vendor package quotes a non-AVL enclosure/component (e.g., TUTENG G26642 in MGW RADIO-001 for 1.1.1.1 APF-CAB-0004), TSI substitutes an AVL-compliant Rittal VX IT / VX25 enclosure from secondary vendor VERSED (QT2611035) while tracking cost reconciliation in 10.2 SI (Cost_Impact = $0.00).',
+    status: 'ACTIVE_ENFORCED',
+  },
 ];
 
 const FORBIDDEN_CUSTOMER_STRINGS = [

@@ -2,6 +2,7 @@
   "basis": "SI DRAFT · MR Rev.B1 Appendix 1.1 · MGW Q26-063 ver1.0 pp.9–12 · scope and site assignments pending review",
   "reviewFlags": [
     {"id":"REVIEW_FLAG_DMR_COMBINER","scope":"APF (1.1.1)","tagNo":"APF-CAB-0004","summary":"Verify Tx Combiner & Rx Multicoupler inclusion inside APF-CAB-0004 (3 Repeaters sharing 1 Tx + 1 Rx Dipole antenna)."},
+    {"id":"REVIEW_FLAG_DMR_CABINET_RITTAL","scope":"APF (1.1.1.1)","tagNo":"APF-CAB-0004","summary":"Mixed-vendor substitution: MGW RADIO-001 quoted TUTENG G26642 (non-AVL); substituted with Rittal VX IT 42U (VERSED QT2611035) to maintain AVL compliance across all cabinets."},
     {"id":"REVIEW_FLAG_DMR_HANDHELD_EX","scope":"APF (1.1.1.11)","summary":"Verify ATEX / IECEx / UL (TIA-4950) Ex-certification on all 98 Ea. VHF DMR Handheld Radios."},
     {"id":"REVIEW_FLAG_DMR_CAPACITY_MAX","scope":"APF / ACP / ABV01","summary":"Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios)."},
     {"id":"REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET","scope":"1.1.5 / 1.1.7 / 1.1.12 / 1.1.16","summary":"Verify RF Link Budget attenuation on 1/2\" feeder cable (150 m / 500 m / 700 m / 60 m tower) for potential Phase-2 7/8\" upgrade clarification."},
