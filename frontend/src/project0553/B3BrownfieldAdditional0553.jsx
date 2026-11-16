@@ -201,20 +201,20 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
 }
 function OfficialCustomerSheet({model,priced,itemized,currency}){
  const schedule=selectB3BrownfieldOfficialSchedule0553(model,{priced,itemized,currency});
- const shown=row=>priced?row.cells:[...row.cells.slice(0,5),row.cells[7]||""];
  const span=schedule.columns.length;
+ const priceCell=index=>priced&&(index===5||index===6);
  return <div className="p553-native-sheet" data-testid="b3bf-official-sheet">
   <div className="p553-native-title">Scope of supply<br/>供货范围</div>
-  <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span><strong>Document</strong><span>{b3BrownfieldDocumentNumber0553()}</span></div>
+  <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span><strong>RFQ No.</strong><span> </span><strong>Package Name</strong><span>{b3BrownfieldDocumentNumber0553()}</span></div>
   <div className="p553-sheet-scroll"><table className="p553-customer-table">
    <thead><tr>{schedule.columns.map(header=><th key={header}>{header.split(" / ").map((part,index)=><React.Fragment key={part+index}>{index>0&&<br/>}{part}</React.Fragment>)}</th>)}</tr></thead>
    <tbody>{schedule.rows.map((row,index)=>{
-    const cells=shown(row);
     if(row.kind==="section")return <tr key={index} className="p553-sheet-section"><td colSpan={span}>{row.cells[0]}<br/>{row.cells[1]}</td></tr>;
+    if(row.kind==="subheading")return <tr key={index} className="p553-sheet-subheading"><td colSpan={span}>{row.cells[0]}</td></tr>;
+    if(row.kind==="highlight")return <tr key={index} className="p553-sheet-highlight"><td colSpan={span}>{row.cells[0]}</td></tr>;
     if(row.kind==="note")return <tr key={index} className="b3bf-note"><td colSpan={span}>{row.cells[0]}</td></tr>;
-    if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-testid={priced?"b3bf-total":undefined}><td colSpan={priced?6:5}>{row.cells[0]}</td>{priced&&<td className="p553-price-cell">{row.cells[6]}</td>}<td>{row.cells[7]}</td></tr>;
-    if(row.kind==="tba")return <tr key={index}><td colSpan={span}>{row.cells[0]} — TBA</td></tr>;
-    return <tr key={index} className={row.kind==="detail"?"b3bf-official-detail":"p553-mr-preview-row"}>{cells.map((value,cell)=><td key={cell} className={(priced&&(cell===5||cell===6)?"p553-price-cell ":"")+"b3bf-pre"}>{value}</td>)}</tr>;
+    if(row.kind==="total")return <tr key={index} className="p553-sheet-total" data-testid={priced?"b3bf-total":undefined}><td colSpan={6}>{row.cells[0]}</td><td className="p553-price-cell">{priced?row.cells[6]:""}</td><td>{row.cells[7]}</td></tr>;
+    return <tr key={index} className="p553-mr-preview-row" data-testid={row.kind==="a1"?"b3bf-a1":undefined}>{row.cells.map((value,cell)=><td key={cell} className={priceCell(cell)?"p553-price-cell":"b3bf-pre"}>{value}</td>)}</tr>;
    })}</tbody>
   </table></div>
  </div>;

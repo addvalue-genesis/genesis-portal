@@ -361,29 +361,30 @@ export function b3BrownfieldOfficialScopeText0553(model){
 export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemized=true,currency="thb"}={}){
  if(!model||model.id!=="PJ2608-0553-B3BF-ADDITIONAL")throw Error("Official schedule requires the additional-proposal model");
  void itemized;
- const preview=model.baseCustomerPreview;
- if(!preview?.partA||!preview.b3)throw Error("Official schedule requires the base customer preview");
  const show=n=>priced?formatB3BrownfieldMoney0553(model,n.thb,n.usd,currency):"";
  const line=(cells,kind="line")=>({kind,cells});
+ const senior=model.bomLines.find(entry=>entry.id==="BF.1.1");
+ const specialist=model.bomLines.find(entry=>entry.id==="BF.1.2");
+ const ticket=model.bomLines.find(entry=>entry.id==="BF.1.4");
+ if(!senior||!specialist||!ticket)throw Error("Official schedule is missing the B3-BF price lines");
+ const scope=b3BrownfieldOfficialScopeText0553(model);
  const rows=[];
  rows.push(line(["Part A: BASIC","A部分：基本"],"section"));
- for(const part of preview.partA){
-  const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
-  rows.push(line([part.code,part.mr,part.description,locations,"1 lot",priced?"Quoted":"",priced?"Quoted":"","Quoted"]));
- }
+ rows.push(line(["A1. Brownfield inspection, testing & certification"],"subheading"));
+ rows.push(line(["A1","B3-BF","Brownfield inspection, testing & certification — additional",scope,"1 lot","","",""],"a1"));
  rows.push(line(["Part B: OTHERS","B部分：其它"],"section"));
- const bfSpec=b3BrownfieldOfficialScopeText0553(model);
- const additional=show({thb:model.grandTotalTHB,usd:model.grandTotalUSD});
- for(const row of model.partB){
-  if(row.code==="B3"){
-   rows.push(line(["B3","",preview.b3.name,"","1 lot","",priced?"Quoted":"","Quoted"]));
-   rows.push(line(["B3-BF","","Brownfield inspection, testing & certification — additional",bfSpec,"1 lot",additional,additional,"Price for 2 persons"]));
-  }else rows.push(line([row.code,"",row.customerDescription,"","1 lot","",priced?"Quoted":"","Quoted"]));
- }
- rows.push(line(["Total Additional (B3-BF) — 2 persons","","","","","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"Labour + MOB/DEMOB"],"total"));
+ rows.push(line(["B3-BF.1","",senior.activity,"9 person-days","9 day",show({thb:senior.unitRateTHB,usd:senior.unitRateUSD}),show({thb:senior.totalTHB,usd:senior.totalUSD}),""],"bf"));
+ rows.push(line(["B3-BF.2","",specialist.activity,"9 person-days","9 day",show({thb:specialist.unitRateTHB,usd:specialist.unitRateUSD}),show({thb:specialist.totalTHB,usd:specialist.totalUSD}),""],"bf"));
+ rows.push(line(["B3-BF.3","","MOB/DEMOB (ticket + POB)","2 persons × 1 trip","2 trip",show({thb:ticket.unitRateTHB,usd:ticket.unitRateUSD}),show({thb:ticket.totalTHB,usd:ticket.totalUSD}),""],"bf"));
+ rows.push(line(["Total Additional (B3-BF) — 2 persons","","","","","",show({thb:model.grandTotalTHB,usd:model.grandTotalUSD}),"Labour + MOB/DEMOB + punch list"],"total"));
+ rows.push(line(["Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items."],"highlight"));
  rows.push(line([model.jutalNote],"note"));
  rows.push(line([model.lastLineNote],"note"));
- const columns=priced?RELEASE_CUSTOMER_COLUMNS_0553.scope:[...RELEASE_CUSTOMER_COLUMNS_0553.scope.slice(0,5),RELEASE_CUSTOMER_COLUMNS_0553.scope[7]];
+ const columns=RELEASE_CUSTOMER_COLUMNS_0553.scope;
+ if(rows.filter(row=>row.kind==="a1").length!==1)throw Error("Official schedule must contain one A1 row");
+ if(rows.some(row=>["A2","A3","A4"].includes(row.cells[0])))throw Error("Official schedule must not contain A2, A3 or A4");
+ const a1=rows.find(row=>row.kind==="a1");
+ if(a1.cells[5]!==""||a1.cells[6]!=="")throw Error("A1 price cells must stay blank");
  return Object.freeze({columns,rows:Object.freeze(rows),project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",title:"Scope of supply"});
 }
 export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized,version="internal",currency="thb"}={}){
@@ -398,7 +399,11 @@ export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized,versio
    ["Document",b3BrownfieldDocumentNumber0553()],
    schedule.columns
   ];
-  for(const row of schedule.rows)lines.push(row.kind==="section"?[row.cells[0]+" / "+row.cells[1]]:drop(row.cells));
+  for(const row of schedule.rows){
+   if(row.kind==="section")lines.push([row.cells[0]+" / "+(row.cells[1]||"")]);
+   else if(row.kind==="subheading"||row.kind==="highlight"||row.kind==="note")lines.push([row.cells[0]]);
+   else lines.push(drop(row.cells));
+  }
   const text=lines.map(row=>row.map(csvCell).join(",")).join("\n");
   if(priced===false&&UNPRICED_LEAK.test(text))throw Error("Unpriced brownfield export contains a money figure");
   return text;
@@ -480,7 +485,7 @@ function replaceBrownfieldCell(xml,address,value){
  const contents=isText?'<is><t xml:space="preserve">'+encodeExcelText(value)+'</t></is>':"<v>"+value+"</v>";
  return xml.replace(match[0],nameAndStyle+(isText?' t="inlineStr"':'')+">"+contents+"</c>");
 }
-const FORBIDDEN_BF_EXPORT=/2,?322,?450|793,?800|63,?000|56,?700|31,?500|25,?200|441,?000|899,?640|28,?560/;
+const FORBIDDEN_BF_EXPORT=/2,?322,?450|856,?800|793,?800|403,?200|340,?200|27,?200|14,?000|11,?200|899,?640|28,?560/;
 function officialExportOptions(options={}){
  return {priced:options.priced!==false,itemized:true,currency:options.currency||"thb"};
 }
@@ -490,7 +495,7 @@ export function buildB3BrownfieldOfficialDocHtml0553(model,options={}){
  const esc=value=>String(value??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
  const width=schedule.columns.length;
  const body=schedule.rows.map(row=>{
-  if(row.kind==="section")return `<tr><td colspan="${width}"><strong>${esc(row.cells[0])}</strong><br>${esc(row.cells[1]||"")}</td></tr>`;
+  if(row.kind==="section"||row.kind==="subheading"||row.kind==="highlight")return `<tr><td colspan="${width}"><strong>${esc(row.cells[0])}</strong>${row.cells[1]?"<br>"+esc(row.cells[1]):""}</td></tr>`;
   if(row.kind==="note")return `<tr><td colspan="${width}">${esc(row.cells[0])}</td></tr>`;
   if(row.kind==="total")return view.priced
    ?`<tr><td colspan="${width-2}"><strong>${esc(row.cells[0])}</strong></td><td><strong>${esc(row.cells[6])}</strong></td><td>${esc(row.cells[7]||"")}</td></tr>`
@@ -518,26 +523,21 @@ export async function buildB3BrownfieldOfficialXlsx0553(file,model,options={}){
  if(!workbook.includes('name="Scope of supply"'))throw Error("Template is not 4-Scope of Supply");
  let xml=new TextDecoder().decode(await readEntry(sheetEntry));
  if(!xml.includes("<f>SUM(E8:E22)</f><v>8</v>"))throw Error("Part A quantity formula is not the original template");
- const partA=schedule.rows.filter(row=>row.kind==="line"&&/^A\d+$/.test(row.cells[0]));
- const partB=schedule.rows.filter(row=>row.kind==="line"&&/^B\d+$/.test(row.cells[0]));
- const additional=schedule.rows.find(row=>row.cells[0]==="B3-BF");
+ const a1=schedule.rows.find(row=>row.kind==="a1");
+ const pricedLines=schedule.rows.filter(row=>row.kind==="bf");
  const total=schedule.rows.find(row=>row.kind==="total");
  const notes=schedule.rows.filter(row=>row.kind==="note").map(row=>row.cells[0]);
- if(partA.length!==4||partB.length!==14||!additional||!total||notes.length!==2)throw Error("Official schedule cannot be written to the template");
+ if(!a1||pricedLines.length!==3||!total||notes.length!==2)throw Error("Official schedule cannot be written to the template");
+ if(a1.cells[5]!==""||a1.cells[6]!=="")throw Error("A1 price cells must stay blank");
  const writes=new Map();
  const put=(cell,value)=>{if(writes.has(cell))throw Error("Duplicate brownfield cell "+cell);writes.set(cell,value);};
- partA.forEach((row,index)=>{
-  const line=8+index;
+ put("A8","A1");put("B8",a1.cells[1]);put("C8",a1.cells[2]);put("D8",a1.cells[3]);
+ put("E8","1 lot");put("F8","");put("G8","");put("H8","");
+ pricedLines.forEach((row,index)=>{
+  const line=9+index;
   put("A"+line,row.cells[0]);put("B"+line,row.cells[1]);put("C"+line,row.cells[2]);put("D"+line,row.cells[3]);
-  put("E"+line,1);put("F"+line,row.cells[5]);put("G"+line,row.cells[6]);put("H"+line,row.cells[7]);
+  put("E"+line,row.cells[4]);put("F"+line,row.cells[5]);put("G"+line,row.cells[6]);put("H"+line,row.cells[7]);
  });
- partB.forEach((row,index)=>put("G"+(24+index),row.cells[6]));
- put("A44","B3-BF");
- put("B44",additional.cells[2]+"\n"+additional.cells[3]);
- put("E44","1 lot");
- put("F44",additional.cells[5]);
- put("G44",additional.cells[6]);
- put("H44",(additional.cells[7]||"Price for 2 persons")+". Labour + MOB/DEMOB (ticket + POB). Not the base B3 quotation.");
  put("A38",total.cells[0]);
  put("G38",total.cells[6]);
  const docNo=b3BrownfieldDocumentNumber0553();
@@ -549,7 +549,7 @@ export async function buildB3BrownfieldOfficialXlsx0553(file,model,options={}){
  if(view.priced&&view.currency==="thb"&&!written.includes("573,300.00"))throw Error("Brownfield Excel export is missing the combined THB total");
  if(view.priced&&view.currency==="usd"&&!written.includes("18,200.00 USD"))throw Error("Brownfield Excel export is missing the combined USD total");
  if(!view.priced&&UNPRICED_LEAK.test(written))throw Error("Unpriced brownfield Excel contains a money figure");
- xml=xml.replace("<f>SUM(E8:E22)</f><v>8</v>","<f>SUM(E8:E22)</f><v>4</v>");
+ xml=xml.replace("<f>SUM(E8:E22)</f><v>8</v>","<f>SUM(E8:E22)</f><v>1</v>");
  for(const [cell,value] of writes)xml=replaceBrownfieldCell(xml,cell,value);
  xml=xml.replace(/<row r="44"([^>]*)>/,(full,attrs)=>"<row r=\"44\""+attrs.replace(/\sht="[^"]*"/,"").replace(/\scustomHeight="[^"]*"/,"")+" ht=\"72\" customHeight=\"1\">");
  xml=xml.replace(/<row r="39"([^>]*)>/,(full,attrs)=>"<row r=\"39\""+attrs.replace(/\sht="[^"]*"/,"").replace(/\scustomHeight="[^"]*"/,"")+" ht=\"68\" customHeight=\"1\">");
