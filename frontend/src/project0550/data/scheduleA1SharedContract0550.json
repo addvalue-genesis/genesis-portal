@@ -1,13 +1,13 @@
 {
   "contract": "PJ2608-0550 Schedule A1 shared line items (10.2 SI / Master Schedule)",
-  "version": "0.2.0-skeleton",
+  "version": "0.3.0-skeleton",
   "status": "DRAFT - NOT WIRED INTO ANY SCREEN OR EXPORT",
   "currency": "USD",
-  "numberingNote": "User confirmed: SN 5 appears twice in the ownership contract — once for the C-3 Option (Two years Operation Spares) and once for Tools (C-5). This differs from the sequential numbering currently in exhibitCNative0550.js / customer form rendering (where Tools was SN 6 and Field Service SN 7). The Shared Contract follows the user's specified numbering. Other teams: do not assume sequential uniqueness of SN 5 when reading this contract.",
+  "numberingNote": "SN 5 appears twice on the customer form itself (once for Two years Operation Spare parts → C-3 Option, once for Special Tools → C-5). The UI already renders this correctly by using internal row numbers, not the SN value. Do not assume SN is unique; use itemKey to distinguish the two SN 5 rows. Previous note that claimed Tools=SN 6 and Field Service=SN 7 was incorrect (it was based on internal row position, not form text).",
   "rules": [
     "WORKSTREAM_A_FORM_C writes only items whose sourceForm starts with C-. It never writes a1DirectItems.",
     "WORKSTREAM_B_A1_DIRECT writes only a1DirectItems (sourceForm A1_DIRECT) and the rollup block. It never changes Form C schemas.",
-    "sn follows the user-specified ownership numbering (see numberingNote). sn is NOT unique: use itemKey as the unique id. templateRow is the row used by a1SummarySlot0550 in exhibitCNative0550.js today.",
+    "sn is the SN text printed on the customer form (Exhibit C Schedule A1): 1, 2, 3, 4, 5, 5, 6, 8, 9, …. sn is NOT unique: use itemKey as the unique id. templateRow is the internal row used by a1SummarySlot0550 in exhibitCNative0550.js.",
     "A null price means OPEN/TBA. A rollup total stays null while any base item is OPEN (same rule as scheduleRollup0550).",
     "isOption items are excluded from the A1 base total; options belong to Schedule A2."
   ],
@@ -83,7 +83,7 @@
       "templateRow": 9,
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-8",
-      "title": "Facilities",
+      "title": "Facilities and Services for COMPANY and PURCHASER",
       "codeSelector": "schedule C8"
     },
     {
@@ -97,11 +97,11 @@
     },
     {
       "itemKey": "A1-OTHERS",
-      "sn": "10",
+      "sn": "…",
       "templateRow": 11,
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
-      "title": "Others",
+      "title": "Others (Please specify)",
       "codeSelector": "summary OTHER",
       "breakdownRef": "11.E / 11.F"
     }
@@ -207,7 +207,7 @@
       "sn": "8",
       "owner": "WORKSTREAM_A_FORM_C",
       "sourceForm": "C-8",
-      "description": "Facilities",
+      "description": "Facilities and Services for COMPANY and PURCHASER",
       "breakdownRef": "Form C-8",
       "unit": "Day",
       "qty": null,
@@ -288,10 +288,10 @@
     },
     {
       "itemKey": "A1-OTHERS",
-      "sn": "10",
+      "sn": "…",
       "owner": "WORKSTREAM_B_A1_DIRECT",
       "sourceForm": "A1_DIRECT",
-      "description": "Others (licences, other costs, insurance)",
+      "description": "Others (Please specify)",
       "breakdownRef": "11.E / 11.F",
       "unit": "Lot",
       "qty": 1,
