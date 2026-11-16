@@ -2,7 +2,7 @@ import React,{useEffect,useMemo,useRef,useState} from 'react';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550,sanitizeCustomerText0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
-import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550} from './data/radioLotComponents0550';
+import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550} from './data/radioLotComponents0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -448,6 +448,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  const isDmrAms=r.key==='OWNER:LINE-MGW-CURRENT-RADIO-016'||(r.appendix==='1.1'&&r.site==='AMS01'&&/dmr/i.test(r.description));
  const isMarineApf=r.sn==='1.1.2'||r.key==='MR-B1-11-APF-02'||(r.appendix==='1.1'&&r.site==='APF'&&/marine/i.test(r.description));
  const isMarineAcp=r.sn==='1.1.10'||r.key==='MR-B1-11-ACP-02'||(r.appendix==='1.1'&&r.site==='ACP'&&/marine/i.test(r.description));
+ const isAeroApf=r.sn==='1.1.4'||r.key==='MR-B1-11-APF-04'||(r.appendix==='1.1'&&r.site==='APF'&&/aeronautical|aero/i.test(r.description));
  let items=[];
 
  if(isDmrApf)return buildStaticBomItems(APF_DMR_BOM_RAW,r,pricingMode);
@@ -456,6 +457,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(isDmrAms)return buildStaticBomItems(AMS_DMR_BOM_RAW,r,pricingMode);
  if(isMarineApf)return buildStaticBomItems(APF_MARINE_MR_6_ITEMS_0550,r,pricingMode);
  if(isMarineAcp)return buildStaticBomItems(ACP_MARINE_MR_4_ITEMS_0550,r,pricingMode);
+ if(isAeroApf)return buildStaticBomItems(APF_AERO_MR_5_ITEMS_0550,r,pricingMode);
 
  if(r.quotedComponents&&r.quotedComponents.length>0){
   for(const c of r.quotedComponents){

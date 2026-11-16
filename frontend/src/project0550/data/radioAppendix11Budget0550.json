@@ -4,7 +4,10 @@
     {"id":"REVIEW_FLAG_DMR_COMBINER","scope":"APF (1.1.1)","tagNo":"APF-CAB-0004","summary":"Verify Tx Combiner & Rx Multicoupler inclusion inside APF-CAB-0004 (3 Repeaters sharing 1 Tx + 1 Rx Dipole antenna)."},
     {"id":"REVIEW_FLAG_DMR_HANDHELD_EX","scope":"APF (1.1.1.11)","summary":"Verify ATEX / IECEx / UL (TIA-4950) Ex-certification on all 98 Ea. VHF DMR Handheld Radios."},
     {"id":"REVIEW_FLAG_DMR_CAPACITY_MAX","scope":"APF / ACP / ABV01","summary":"Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios)."},
-    {"id":"REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET","scope":"1.1.5 / 1.1.7 / 1.1.16","summary":"Verify RF Link Budget attenuation on 1/2\" feeder cable (150 m / 60 m tower) for potential Phase-2 7/8\" upgrade clarification."}
+    {"id":"REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET","scope":"1.1.5 / 1.1.7 / 1.1.16","summary":"Verify RF Link Budget attenuation on 1/2\" feeder cable (150 m / 60 m tower) for potential Phase-2 7/8\" upgrade clarification."},
+    {"id":"REVIEW_FLAG_AERO_FREQUENCY","scope":"APF (1.1.4)","summary":"Verify 118–137 MHz airband operating frequencies and channel plan against Heliport operational requirements."},
+    {"id":"REVIEW_FLAG_AERO_HANDHELD_EX","scope":"APF (1.1.4.4)","summary":"Verify ATEX / IECEx / UL hazardous-area certificates and full airband channel capability for all 4 Ea. VHF-AM Aeronautical Handheld Radios."},
+    {"id":"REVIEW_FLAG_AERO_DCA_APPROVAL","scope":"APF (1.1.4)","summary":"Verify Myanmar Department of Civil Aviation (DCA) Heliport aeronautical station licensing and approval."}
   ],
   "nonMrVendorExtras": [
     {"id":"LINE-MGW-CURRENT-RADIO-006","system":"TEL-RADIO-MARINE","status":"NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION","mgwSite":"APM","mgwCostUSD":27478,"customerSellUSD":36270.96,"note":"Unallocated MGW VHF-FM Marine Radio System (2 Lots, APM vendor label not in Customer MR). Excluded from customer-facing C1/11.P and tracked internally in 10.2 SI as NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION."}
