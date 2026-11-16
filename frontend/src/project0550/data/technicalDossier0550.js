@@ -9,6 +9,7 @@ import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
 import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './satelliteScope0550';
 import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550,APF_CCTV_MON_27_BOM_0550,APF_CCTV_MON_75_BOM_0550,CCTV_CAMERA_BOMS_BY_MR_0550,CCTV_TPLINK_DEVIATION_0550} from './mgwCctvEntBudget0550';
+import {APPENDIX_13_TO_18_BOMS_BY_MR_0550} from './appendix13To18Boms0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 import {sanitizeCustomerText0550} from './c1Appendix0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
@@ -73,6 +74,20 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
  }
  if(systemToken==='TEL-CCTV'&&sectionId==='deviations'){
   tables.push({title:'Technical Deviation & AVL Clarification · 1.3.11.6 (Cross-Link to Tab 14 Deviation List)',heads:['Ref. / C1 Item','Compliance','MR / Project Requirement','Proposed Deviation / Alternative','Cost / Schedule Impact'],rows:[[CCTV_TPLINK_DEVIATION_0550.mrRef,'DEVIATE / CLARIFICATION','Equipment manufacturer to be selected from COMPANY Approved Vendor List (AVL).',CCTV_TPLINK_DEVIATION_0550.vendorDeviation,CCTV_TPLINK_DEVIATION_0550.justification]]});
+ }
+ const EQ_DISP_HEADS=['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'];
+ const pushEqDispBoq=(title,mrKeys)=>{
+  const combined=mrKeys.flatMap(k=>APPENDIX_13_TO_18_BOMS_BY_MR_0550[k]||[]);
+  if(combined.length)tables.push({title,heads:EQ_DISP_HEADS,rows:combined.map((item,i)=>[String(i+1),sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+ };
+ if(['description','parameters','equipment'].includes(sectionId)){
+  if(systemToken==='TEL-LAN')pushEqDispBoq('MR Appendix 1.3 LAN Cabinets & Wireless Access Points BoQ (EQ-DISP)',['MR-B1-13-APF-08','MR-B1-13-APF-09','MR-B1-13-APF-10','MR-B1-13-ACP-06','MR-B1-13-ACP-07','MR-B1-13-ACP-09','MR-B1-13-ABV01-05','MR-B1-13-AMS01-04','MR-B1-13-AMS01-05']);
+  if(systemToken==='TEL-IPP'||systemToken==='TEL-PABX')pushEqDispBoq('MR Appendix 1.3 IP Telephony & Ex-Proof IP Phone BoQ (EQ-DISP)',['MR-B1-13-APF-06','MR-B1-13-APF-07','MR-B1-13-ACP-05','MR-B1-13-ABV01-04','MR-B1-13-AMS01-03']);
+  if(systemToken==='TEL-MET')pushEqDispBoq('MR Appendix 1.3 Meteorological System (APF & ACP) BoQ (EQ-DISP)',['MR-B1-13-APF-14','MR-B1-13-APF-15','MR-B1-13-APF-16','MR-B1-13-APF-17','MR-B1-13-APF-18','MR-B1-13-ACP-10','MR-B1-13-ACP-11','MR-B1-13-ACP-12','MR-B1-13-ACP-13']);
+  if(systemToken==='TEL-PAGA')pushEqDispBoq('MR Appendix 1.4 PAGA Field Devices & Access Panels BoQ (EQ-DISP)',['MR-B1-14-APF-04','MR-B1-14-APF-05','MR-B1-14-APF-06','MR-B1-14-APF-07','MR-B1-14-APF-08','MR-B1-14-ACP-02','MR-B1-14-ACP-03','MR-B1-14-ACP-04','MR-B1-14-ACP-05']);
+  if(systemToken==='TEL-DMR')pushEqDispBoq('MR Appendix 1.5 Microwave System (Ceragon RevA1 + Rittal + Draka) BoQ (EQ-DISP)',['MR-B1-15-APF-01','MR-B1-15-APF-02','MR-B1-15-ACP-01','MR-B1-15-ACP-02']);
+  if(systemToken==='TEL-ES')pushEqDispBoq('MR Appendix 1.6 Entertainment & Conferencing System BoQ (EQ-DISP)',['MR-B1-16-APF-01','MR-B1-16-APF-02','MR-B1-16-APF-03','MR-B1-16-APF-04','MR-B1-16-APF-05','MR-B1-16-APF-06','MR-B1-16-APF-07','MR-B1-16-APF-08','MR-B1-16-APF-09','MR-B1-16-APF-10','MR-B1-16-APF-11']);
+  if(systemToken==='TEL-NDB')pushEqDispBoq('MR Appendix 1.7 Non-Directional Beacon (Nautel VR250) BoQ (EQ-DISP)',['MR-B1-17-APF-01','MR-B1-17-APF-02','MR-B1-17-APF-03','MR-B1-17-APF-04','MR-B1-17-APF-05','MR-B1-17-APF-06','MR-B1-17-APF-07','MR-B1-17-APF-08','MR-B1-17-APF-09','MR-B1-17-APF-10','MR-B1-17-APF-11']);
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
