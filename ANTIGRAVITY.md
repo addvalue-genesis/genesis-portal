@@ -59,3 +59,11 @@ All customer-facing figures must bind strictly to the pre-calculated final custo
 * **Dual Pricing Mode Toggle:**
   * **`Lump Sum Lot Mode` (Default):** Main system row displays the single contract Lot price (`Lot`, `1`, `Total Price`). The BOM sub-table displays equipment specifications with Remarks (`"Included in Base Scope of Supply"`).
   * **`Itemized Pricing Mode`:** The BOM sub-table dynamically adds `Unit Rate` and `Total Price` columns, culminating in an exact `Subtotal` verification row that matches the parent Lot total with zero discrepancy.
+
+---
+
+## 5. Authoritative Native RFQ & Appendix 2 Source Root
+* **Local Google Drive RFQ Source Root:**
+  `H:\.shortcut-targets-by-id\1lG8jqDcz4fIU425V4xqiWPc2HdxrndAt\PJ2608-0550 SAM PTTEPI MY ASK TEL\00_NATIVE_ORIGINAL\SHAREPOINT\RFQ`
+* **Mandatory Cross-Reference Rule (All 19 Systems + COMMON, `APPENDIX 1.1`–`1.9` + `COMMON`):**
+  Every system audit and BOM reconciliation must cross-reference the native `MR`, `PHI`, `DTS`, `SPE`, `LIS`, and **Appendix 2 Drawings** (`MM-ASK-1A-[APF|ACP|ABV01|AMS01]-TEL-[LAY|BLK|SLD|STD]-*` and Client Comment sheets) from this root (indexed offline into `frontend/src/project0550/data/appendix2MasterEvidence0550.json` via `frontend/scripts/ingest-pj0550-rfq-appendix2.cjs`).
