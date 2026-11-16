@@ -25,7 +25,35 @@ assert.equal(model.teamDayTHB,sat.satTeamDaySellTHB);
 assert.equal(model.netCalendarDays,14);
 assert.equal(model.netCalendarDays*model.teamDayTHB,793800);
 assert.equal(model.proposalTHB,793800);
+assert.equal(model.proposalUSD,25200);
+assert.equal(model.teamDayUSD,1800);
+assert.equal(model.proposalUSD*model.fxTHBPerUSD,model.proposalTHB);
+assert.equal(model.teamDayUSD*model.fxTHBPerUSD,model.teamDayTHB);
 assert.equal(model.grandTotalTHB,793800);
+assert.equal(model.grandTotalUSD,25200);
+assert.equal(model.a1Rows[8].sn,"A1.9");
+assert.equal(model.a1Rows[8].sourceRowIndex,49);
+assert.equal(model.a1Rows[8].site,"ZWP11");
+assert.equal(model.a1Rows[8].tagText,"MR-502-005A MR-502-005B\nANT-502-005");
+assert.equal(model.a1Rows[8].qtyText,"1 Set\n1 Set\n1 Set");
+assert.equal(model.a1Rows[8].description,"Subscriber Radio (ODU) Subscriber Radio (IDU) SCADA Antenna");
+assert.equal(model.a1Rows[8].unitText,"");
+assert.equal(model.a1Rows[9].tagText,"SA- 507-005");
+assert.equal(model.a1Rows[9].qtyText,"1 Set");
+assert.equal(model.a1Rows[9].unitText,"Set");
+assert.equal(model.a1Rows[10].tagText,"TCAB-500-003");
+assert.equal(model.a1Rows[11].qtyText,"1 Lot");
+assert.ok(model.a1Rows[11].description.includes("\n"));
+assert.equal(data.B3BF_JUTAL_NOTE_0553,"Note: Installation and cable routing are by the Jutal team. / งานติดตั้งและเดินสายโดยทีม Jutal");
+assert.equal(model.jutalNote,data.B3BF_JUTAL_NOTE_0553);
+assert.equal(model.bomLines.at(-2).text,model.jutalNote);
+assert.ok(!model.bomLines.some(line=>["BF.1.5","BF.1.6","BF.1.7"].includes(line.id)));
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official",extension:"csv"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00.csv");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal",extension:"csv"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00_INTERNAL.csv");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"official"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00");
+assert.equal(data.b3BrownfieldExportFileName0553({audience:"internal"}),"MM-ZTK-1F-GEN-ADV-TEL-QUO-0001 Rev.00_INTERNAL");
+assert.throws(()=>data.b3BrownfieldExportFileName0553({extension:"docx"}));
+assert.throws(()=>data.b3BrownfieldExportFileName0553({extension:"doc"}));
 assert.equal(model.partATHB,0);
 assert.equal(model.partBReferencePriceTHB,null);
 assert.equal(model.baseB3Modified,false);
@@ -53,7 +81,7 @@ assert.ok(pricedCsv.includes(NOTE)&&pricedCsv.includes("793,800.00"));
 assert.ok(!unpricedCsv.includes("793,800")&&!unpricedCsv.includes("Unit Rate (THB)")&&unpricedCsv.includes(NOTE));
 assert.ok(lumpCsv.includes("793,800.00")&&!lumpCsv.includes("441,000.00"));
 const partABeforePartB=(text,label)=>{
- const a=text.indexOf("A1"),b=text.indexOf("B3-BF");
+ const a=text.indexOf("\nA1,"),b=text.indexOf("\nB3-BF,");
  assert.ok(a>=0&&b>a,label+": Part A must precede Part B");
  assert.ok(text.lastIndexOf(NOTE)>b,label+": the Greenfield/base note stays after Part B");
  assert.ok(text.trimEnd().endsWith(NOTE)||text.split("\n").at(-1).includes(NOTE),label+": the note stays the last line");
@@ -77,6 +105,33 @@ const scheduleOrder=(html,label)=>{
 scheduleOrder(pricedHtml,"priced");
 scheduleOrder(unpricedHtml,"unpriced");
 scheduleOrder(lumpHtml,"lump");
+const absentRows=text=>!text.includes("BF.1.5")&&!text.includes("BF.1.6")&&!text.includes("BF.1.7")&&!text.includes("Offshore transfer")&&!text.includes("boat / helicopter");
+for(const [label,text] of [["priced csv",pricedCsv],["unpriced csv",unpricedCsv],["lump csv",lumpCsv],["priced",pricedHtml],["unpriced",unpricedHtml],["lump",lumpHtml]]){
+ assert.ok(absentRows(text),label+": BF.1.5/BF.1.6/BF.1.7 must be absent");
+ assert.ok(text.includes(data.B3BF_JUTAL_NOTE_0553),label+": Jutal note missing");
+ assert.ok(text.lastIndexOf(NOTE)>text.lastIndexOf(data.B3BF_JUTAL_NOTE_0553),label+": Greenfield note must follow the Jutal note");
+}
+const officialHtml=render({initialPriced:true,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
+const officialCsv=data.buildB3BrownfieldAdditionalCsv0553(model,{priced:true,itemized:true,version:"official",currency:"both"});
+assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("A1 · MR-0001"));
+assert.ok(officialHtml.indexOf("A1 · MR-0001")<officialHtml.indexOf("B3-BF · Brownfield inspection"));
+assert.ok(!officialHtml.includes("BF.1.3")&&!officialHtml.includes("Existing SAT role rate")&&!officialHtml.includes("Offshore POB"));
+assert.ok(!officialCsv.includes("BF.1.3")&&!officialCsv.includes("Existing SAT role rate")&&!officialCsv.includes("Offshore POB"));
+assert.ok(officialCsv.includes("25,200.00 USD")&&officialCsv.includes("793,800.00"));
+assert.ok(pricedHtml.includes("BF.1.3")&&pricedHtml.includes("Existing SAT role rate")&&pricedHtml.includes("Offshore POB"));
+const leak=/793,?800|56,?700|25,?200|441,?000|352,?800|14,?000|11,?200|1,?800|1,?000|31\.5/;
+for(const view of [
+ {initialPriced:false,initialCurrency:"both",initialVersion:"internal"},
+ {initialPriced:false,initialCurrency:"usd",initialVersion:"official"},
+ {initialPriced:false,initialItemized:false,initialCurrency:"thb",initialVersion:"internal"}
+]){
+ const html=render(view);
+ const csv=data.buildB3BrownfieldAdditionalCsv0553(model,{priced:false,itemized:view.initialItemized!==false,version:view.initialVersion,currency:view.initialCurrency});
+ assert.ok(!leak.test(html)&&!leak.test(csv),"unpriced view leaked a money figure");
+ assert.ok(absentRows(html)&&absentRows(csv));
+}
+const uiSource=fs.readFileSync(path.join(root,"project0553/B3BrownfieldAdditional0553.jsx"),"utf8");
+assert.ok(!/docx|\.doc\b|Word export|Export Word/i.test(uiSource),"this tab must not offer a Word export");
 const page=fs.readFileSync(path.join(frontend,"src/pages/PJ26080553.jsx"),"utf8");
 const nav=fs.readFileSync(path.join(frontend,"src/project0553/lifecycleNavigation.js"),"utf8");
 assert.ok(page.includes('tab==="b3bf"&&<B3BrownfieldAdditional0553/>'));
