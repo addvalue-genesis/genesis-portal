@@ -4,7 +4,7 @@ import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,ACP_CONSOLE_BOM_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './data/radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_VSAT_CABLE_BOM_0550,YANGON_VSAT_CABLE_BOM_0550,APF_VSAT_OFFSHORE_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './data/satelliteScope0550';
-import {APF_CCTV_PTZ_EX_BOM_0550} from './data/mgwCctvEntBudget0550';
+import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_CABINET_BOM_0550} from './data/mgwCctvEntBudget0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -60,7 +60,7 @@ export function cleanCustomerNote0550(note){
 export function formatCustomerNote0550(r){
  const raw=(r.note||'').trim();
  const isThaiDraft=/ราคาตาม/.test(raw)||/[\u0E00-\u0E7F]/.test(raw)||/ราคาตาม/.test(r.pendingRadioPlacement||'');
- if(isThaiDraft||r.provisionalRadio){
+ if(isThaiDraft||r.provisionalRadio||r.key==='MR-B1-13-APF-11'||/enclosure allowance pending rack reconciliation|MGW draft price/i.test(raw)){
   return 'Details shall be included not limit to Bulk Materials etc.';
  }
  if(!raw)return '';
@@ -358,8 +358,8 @@ function parseModelPartNo(desc='',r={}){
    model='DIN-Rail Power Supply 24VDC';
    partNo='XDR-240-24';
   } else {
-   model='Manufacturer Model per MR';
-   partNo='Catalog Standard';
+   model='Per Appendix 2 Spec';
+   partNo='Per Appendix 2 Ref';
   }
  }
 
@@ -478,6 +478,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(r.key==='MR-B1-12-YANGON-02'||r.sn==='1.2.7')return buildStaticBomItems(YANGON_VSAT_CABLE_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-12-ACP-01'||r.sn==='1.2.8')return buildStaticBomItems(ACP_KU_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-01'||r.sn==='1.3.1')return buildStaticBomItems(APF_CCTV_PTZ_EX_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-13-APF-11'||r.sn==='1.3.11')return buildStaticBomItems(APF_CCTV_CABINET_BOM_0550,r,pricingMode);
  if(isAntennaCable){
   const cableQty=Number(r.quantity)||500;
   return buildStaticBomItems([{itemNo:'1',tagNo:'Per Appendix 2 Drawing',mrDescription:'Antenna Cable',offeredEquipment:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',description:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',brand:'Yongding / Amphenol',model:'1/2" Flexible RF Foam Dielectric Cable',partNo:'HCAAYZ-50-12',quantity:cableQty,unit:r.unit||'m',remarks:'Included in Base Scope of Supply (per Appendix 2 drawings)',weight:1000}],r,pricingMode);
