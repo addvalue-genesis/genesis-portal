@@ -396,7 +396,7 @@ function dedupeBomItems(items,r){
   if(u==='x'||rem.includes('included in lot'))continue;
   const offered=sanitizeCustomerText0550(it.offeredEquipment||it.description||'');
   const mrDesc=resolveMrDescription(it,r);
-  const norm=(it.itemCode||it.partNo||it.model||offered.toLowerCase().replace(/[^a-z0-9]/g,'')).trim();
+  const norm=((it.mrDescription?mrDesc.toLowerCase()+'|':'')+(it.itemCode||it.partNo||it.model||offered.toLowerCase().replace(/[^a-z0-9]/g,''))).trim();
   if(!norm)continue;
   if(seen.has(norm)){
    const ex=seen.get(norm);

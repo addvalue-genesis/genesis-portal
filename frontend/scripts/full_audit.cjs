@@ -92,7 +92,7 @@ for (const group of c1Proj.groups) {
             countUnitX++;
             console.error(`Child row in ${r.sn} has unit "x":`, item);
           }
-          const key = (item.itemCode || item.partNo || item.description.toLowerCase()).trim();
+          const key = ((item.mrDescription ? item.mrDescription.toLowerCase() + '|' : '') + (item.itemCode || item.partNo || item.description.toLowerCase())).trim();
           if (seenInRow.has(key)) {
             duplicateChildCount++;
             console.error(`Duplicate child item in ${r.sn}: ${key}`);
