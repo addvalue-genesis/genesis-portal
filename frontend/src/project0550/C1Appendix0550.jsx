@@ -4,7 +4,7 @@ import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,ACP_CONSOLE_BOM_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './data/radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_VSAT_CABLE_BOM_0550,YANGON_VSAT_CABLE_BOM_0550,APF_VSAT_OFFSHORE_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './data/satelliteScope0550';
-import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550,APF_CCTV_MON_27_BOM_0550,APF_CCTV_MON_75_BOM_0550} from './data/mgwCctvEntBudget0550';
+import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550,APF_CCTV_MON_27_BOM_0550,APF_CCTV_MON_75_BOM_0550,CCTV_CAMERA_BOMS_BY_MR_0550} from './data/mgwCctvEntBudget0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -227,7 +227,7 @@ function parseModelPartNo(desc='',r={}){
   if(mc){model=mc[1];partNo=mc[1];}
  }
 
- const cleanDesc=text.replace(/^(?:-\s*)?/,'').replace(/^(?:PROJECT|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/;\s*quantity in metres per supplier quote.*$/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
+ const cleanDesc=text.replace(/^(?:-\s*)?/,'').replace(/^(?:PROJECT|APF|ACP|ABV01|AMS01|ACO|APM|SI estimate|Working draft offer)\s*·\s*/i,'').replace(/;\s*quantity in metres per supplier quote.*$/i,'').replace(/comprised of\s*:\s*$/i,'').trim();
 
  if(!model||model==='Standard EPC Model'||!partNo||partNo==='Per Specification'){
   const low=cleanDesc.toLowerCase();
@@ -482,6 +482,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(r.key==='MR-B1-13-APF-11'||r.sn==='1.3.11')return buildStaticBomItems(APF_CCTV_CABINET_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-12'||r.sn==='1.3.12')return buildStaticBomItems(APF_CCTV_MON_27_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-13'||r.sn==='1.3.13')return buildStaticBomItems(APF_CCTV_MON_75_BOM_0550,r,pricingMode);
+ if(CCTV_CAMERA_BOMS_BY_MR_0550[r.key])return buildStaticBomItems(CCTV_CAMERA_BOMS_BY_MR_0550[r.key],r,pricingMode);
  if(isAntennaCable){
   const cableQty=Number(r.quantity)||500;
   return buildStaticBomItems([{itemNo:'1',tagNo:'Per Appendix 2 Drawing',mrDescription:'Antenna Cable',offeredEquipment:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',description:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',brand:'Yongding / Amphenol',model:'1/2" Flexible RF Foam Dielectric Cable',partNo:'HCAAYZ-50-12',quantity:cableQty,unit:r.unit||'m',remarks:'Included in Base Scope of Supply (per Appendix 2 drawings)',weight:1000}],r,pricingMode);
