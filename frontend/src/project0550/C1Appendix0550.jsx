@@ -3,6 +3,7 @@ import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,c1Display0550,c1AppendixCss0550,sanitizeCustomerText0550} from './data/c1Appendix0550';
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,ACP_CONSOLE_BOM_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './data/radioLotComponents0550';
+import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_VSAT_CABLE_BOM_0550,YANGON_VSAT_CABLE_BOM_0550,APF_VSAT_OFFSHORE_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './data/satelliteScope0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -467,6 +468,14 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(isConsoleAcp)return buildStaticBomItems(ACP_CONSOLE_BOM_0550,r,pricingMode);
  if(isTowerApf)return buildStaticBomItems(APF_TOWER_60M_BOM_0550,r,pricingMode);
  if(isTowerAcp)return buildStaticBomItems(ACP_TOWER_30M_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-APF-01'||r.sn==='1.2.1')return buildStaticBomItems(APF_VSAT_1_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-APF-02'||r.sn==='1.2.2')return buildStaticBomItems(APF_VSAT_2_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-APF-03'||r.sn==='1.2.3')return buildStaticBomItems(APF_VSAT_CABLE_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-APF-04'||r.sn==='1.2.4')return buildStaticBomItems(APF_VSAT_OFFSHORE_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-APF-05'||r.sn==='1.2.5')return buildStaticBomItems(APF_KU_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-YANGON-01'||r.sn==='1.2.6')return buildStaticBomItems(YANGON_VSAT_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-YANGON-02'||r.sn==='1.2.7')return buildStaticBomItems(YANGON_VSAT_CABLE_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-12-ACP-01'||r.sn==='1.2.8')return buildStaticBomItems(ACP_KU_BOM_0550,r,pricingMode);
  if(isAntennaCable){
   const cableQty=Number(r.quantity)||500;
   return buildStaticBomItems([{itemNo:'1',tagNo:'Per Appendix 2 Drawing',mrDescription:'Antenna Cable',offeredEquipment:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',description:'1/2" RF Coaxial Feeder Cable & Jumpers (per Appendix 2)',brand:'Yongding / Amphenol',model:'1/2" Flexible RF Foam Dielectric Cable',partNo:'HCAAYZ-50-12',quantity:cableQty,unit:r.unit||'m',remarks:'Included in Base Scope of Supply (per Appendix 2 drawings)',weight:1000}],r,pricingMode);

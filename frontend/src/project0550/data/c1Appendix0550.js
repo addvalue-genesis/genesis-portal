@@ -402,6 +402,30 @@ export function deriveC1Appendix0550(view,currency='USD'){
   }
   prices.forEach(b=>groupedQuoteOwners.add(b.lineId));
  }
+ if(!legacy&&view.workingPreview){
+  const round2=n=>Math.round((Number(n)+Number.EPSILON)*100)/100;
+  const allocateSupport=(ownerId,targets)=>{
+   const entry=byOwner.get(ownerId);
+   if(!entry||!entry.usdPriced||!Number.isFinite(entry.binding?.amount))return;
+   const total=entry.binding.amount;
+   const weightSum=targets.reduce((n,[,w])=>n+w,0);
+   let used=0;
+   const mapped=targets.map(([key,w],i)=>{
+    const row=rows.find(r=>r.key===key&&!r.excluded);
+    if(!row)return null;
+    const part=i===targets.length-1?round2(total-used):round2(total*w/weightSum);
+    used=round2(used+part);
+    return {row,part};
+   }).filter(Boolean);
+   if(mapped.length!==targets.length)return;
+   byOwner.delete(ownerId);
+   for(const {row,part} of mapped){
+    row.priceOwners=[...(row.priceOwners||[]),{...entry.binding,amount:part}];
+   }
+  };
+  allocateSupport('LINE-BID-SUPPORT-TEL-VSAT-0550',[['MR-B1-12-APF-01',810],['MR-B1-12-APF-02',405],['MR-B1-12-APF-03',36],['MR-B1-12-YANGON-01',405],['MR-B1-12-YANGON-02',36]]);
+  allocateSupport('LINE-BID-SUPPORT-TEL-VSAT-KU-0550',[['MR-B1-12-APF-05',1],['MR-B1-12-ACP-01',1]]);
+ }
  const dmrApf=r11&&view.workingPreview?rows.find(r=>r.key===APF_DMR_CABINET_MR_0550):undefined;
  const dmrAcp=dmrApf&&rows.find(r=>r.key==='MR-B1-15-ACP-01');
  // A package shared across MR rows remains a single additive price row. No
@@ -609,6 +633,10 @@ export function deriveC1Appendix0550(view,currency='USD'){
   if(bySystem&&group.id==='1.8'&&group.amount===null){
    const subtotal=scheduleRollup0550(group.rows.flatMap(r=>r.priceOwners||[]));
    if(subtotal.priced)group.draftSubtotal=subtotal.knownUSD;
+  }
+  if(group.id==='1.2'&&!legacy&&view.workingPreview&&group.amount===null){
+   const satSum=money(group.rows.filter(r=>Number.isFinite(r.amount)).map(r=>r.amount));
+   if(Number.isFinite(satSum))group.draftSubtotal=satSum;
   }
  }
  const byKey=new Map(displayRows.map(r=>[r.key,r]));
