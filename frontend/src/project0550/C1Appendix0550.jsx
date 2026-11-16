@@ -4,7 +4,7 @@ import {deriveC1Appendix0550,c1AppendixOverview0550,c1AppendixSubtotalLabel0550,
 import {sumMoney0550} from './data/money0550';
 import {APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,ACP_CONSOLE_BOM_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './data/radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_VSAT_CABLE_BOM_0550,YANGON_VSAT_CABLE_BOM_0550,APF_VSAT_OFFSHORE_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './data/satelliteScope0550';
-import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_CABINET_BOM_0550} from './data/mgwCctvEntBudget0550';
+import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550} from './data/mgwCctvEntBudget0550';
 
 const isNonMrApmRow=r=>r.site==='APM'||r.key==='OWNER:LINE-MGW-CURRENT-RADIO-006';
 const screenSites=(sites,nativeOrder)=>{
@@ -60,7 +60,7 @@ export function cleanCustomerNote0550(note){
 export function formatCustomerNote0550(r){
  const raw=(r.note||'').trim();
  const isThaiDraft=/ราคาตาม/.test(raw)||/[\u0E00-\u0E7F]/.test(raw)||/ราคาตาม/.test(r.pendingRadioPlacement||'');
- if(isThaiDraft||r.provisionalRadio||r.key==='MR-B1-13-APF-11'||/enclosure allowance pending rack reconciliation|MGW draft price/i.test(raw)){
+ if(isThaiDraft||r.provisionalRadio||r.key==='MR-B1-13-APF-11'||r.key==='MR-B1-13-APF-02'||/enclosure allowance pending rack reconciliation|MGW draft price|\bOPEN\s*·|\bprice\s*·\s*scope\b|reconciliation pending/i.test(raw)){
   return 'Details shall be included not limit to Bulk Materials etc.';
  }
  if(!raw)return '';
@@ -478,6 +478,7 @@ export function formatBomItems0550(r,pricingMode='LUMP_SUM'){
  if(r.key==='MR-B1-12-YANGON-02'||r.sn==='1.2.7')return buildStaticBomItems(YANGON_VSAT_CABLE_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-12-ACP-01'||r.sn==='1.2.8')return buildStaticBomItems(ACP_KU_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-01'||r.sn==='1.3.1')return buildStaticBomItems(APF_CCTV_PTZ_EX_BOM_0550,r,pricingMode);
+ if(r.key==='MR-B1-13-APF-02'||r.sn==='1.3.2')return buildStaticBomItems(APF_CCTV_PTZ_EX_2_BOM_0550,r,pricingMode);
  if(r.key==='MR-B1-13-APF-11'||r.sn==='1.3.11')return buildStaticBomItems(APF_CCTV_CABINET_BOM_0550,r,pricingMode);
  if(isAntennaCable){
   const cableQty=Number(r.quantity)||500;
@@ -648,14 +649,17 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
         {!documentMode&&Number.isFinite(site.knownAmount)&&<><td className="number">{c1Display0550(site.knownAmount)}</td><td>Priced items subtotal</td></>}
        </tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=>{
-        const bomItems=formatBomItems0550(r,pricingMode);
+        const apf01Unit=r.key==='MR-B1-13-APF-02'&&!Number.isFinite(r.amount)?site.rows.find(x=>x.key==='MR-B1-13-APF-01')?.unitPrice:null;
+        const displayUnitPrice=Number.isFinite(r.unitPrice)?r.unitPrice:Number.isFinite(apf01Unit)?apf01Unit:null;
+        const displayAmount=Number.isFinite(r.amount)?r.amount:Number.isFinite(apf01Unit)?Math.round(apf01Unit*(Number(r.quantity)||2)*100)/100:null;
+        const bomItems=formatBomItems0550(displayAmount!==r.amount?{...r,amount:displayAmount,unitPrice:displayUnitPrice}:r,pricingMode);
         const hasBom=bomItems.length>0;
         const systemTitle=(r.system||cleanItemTitle0550(r)||'SYSTEM').toUpperCase();
         const siteTitle=(r.site||'PROJECT').toUpperCase();
         const subtableTitle=`BILL OF MATERIALS (BOM) — ${systemTitle} (${siteTitle})`;
         return <React.Fragment key={r.key}>
         <tr ref={r.key===location?.key?focusedRow:undefined} tabIndex={r.key===location?.key?-1:undefined}
-         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}>
+         data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')} data-c1-review-note={r.key==='MR-B1-13-APF-02'?r.note:undefined}>
          <td>{r.sn}</td>
          <td>
           {hasBom&&button(r.key,'BOM '+r.description+' / '+r.site,true)}
@@ -666,8 +670,8 @@ export function C1Appendix0550({view,currency='USD',onNavigate,disabled=false,mr
          </td>
          <td>{r.unit&&r.unit!=='—'&&r.unit!=='U'?r.unit:(r.quantity===1||r.kind==='PACKAGE'||r.sn?.includes('.P')||r.sn==='1.1.P1'?'Lot':'—')}</td>
          <td className="number">{r.quantity??'—'}</td>
-         <td className="number">{c1Display0550(r.unitPrice)}</td>
-         <td className="number">{c1Display0550(r.amount)}</td>
+         <td className="number">{c1Display0550(displayUnitPrice)}</td>
+         <td className="number">{c1Display0550(displayAmount)}</td>
          <td>{formatCustomerNote0550(r)}</td>
         </tr>
         {!documentMode&&r.pagaCost&&<PagaPackageCosts0550 cost={r.pagaCost} onNavigate={onNavigate} disabled={disabled}/>}
