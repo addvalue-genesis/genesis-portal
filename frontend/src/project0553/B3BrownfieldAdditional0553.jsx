@@ -44,7 +44,6 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
  const bomCols=priced&&itemized?8:6;
  const docName=b3BrownfieldExportFileName0553({audience:official?"official":"internal"});
  const viewLabel=`${official?"OFFICIAL":"INTERNAL"} · ${priced?"PRICED":"UNPRICED"} · ${itemized?"ITEMIZED":"LUMP SUM"}${priced?" · "+currency.toUpperCase():""}`;
- const gap=official?"TBA":"OPEN";
  return <section className="p55-panel b3bf" data-testid="b3bf-root" data-version={version} data-currency={priced?currency:"unpriced"}>
   <style>{CSS}</style>
   <div className="b3bf-head"><span>PJ2608-0553 / Additional Proposal / B3-BF</span><span>{viewLabel}</span></div>
@@ -128,7 +127,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      {shown("bf")&&<tr>
       <td>BF.1</td>
       <td><button type="button" className="b3bf-tg" aria-expanded={shown("bom")} onClick={()=>toggle("bom")}>BOM</button> <strong>Brownfield site inspection, testing &amp; certification services</strong>
-       <div className="b3bf-desc">Existing 2-person team, {model.netCalendarDays} net calendar days, covering brownfield SCADA WiMAX radio links at ZPQ, ZWP8 and ZWP11.</div></td>
+       <div className="b3bf-desc">Existing 2-person team, {model.netCalendarDays} offshore working days (ZPQ 2, ZWP8 2, ZWP11 2). Travel days are excluded. MOB/DEMOB is ticket + POB cash, not extra working days. Brownfield SCADA WiMAX radio links at ZPQ, ZWP8 and ZWP11.</div></td>
       <td>Lot</td><td className="b3bf-num">1</td>
       {priced&&<td className="b3bf-num">—</td>}
       {priced&&<td className="b3bf-num" data-testid="b3bf-lot">{money(model.grandTotalTHB,model.grandTotalUSD)}</td>}
@@ -160,14 +159,14 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
       </table>
      </div></td></tr>}
      {shown("bf")&&<tr className="b3bf-site">
-      <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("site")} onClick={()=>toggle("site")}>BF.2 · Per-site allocation of the 14 days</button> <Mark kind="open">{official?"SPLIT TBA":"SPLIT OPEN"}</Mark></td>
+      <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("site")} onClick={()=>toggle("site")}>BF.2 · Per-site allocation of the 6 offshore working days</button></td>
      </tr>}
      {shown("bf")&&shown("site")&&model.siteRows.map(site=><tr key={site.sn}>
       <td>{site.sn}</td>
       <td>{site.site} — {site.description}</td>
-      <td>day</td><td className="b3bf-num"><Mark kind="open">{gap}</Mark></td>
+      <td>day</td><td className="b3bf-num">{site.days}</td>
       {priced&&<td className="b3bf-num">—</td>}{priced&&<td className="b3bf-num">—</td>}
-      <td>Total only · {site.jbText} · {site.installer}</td>
+      <td>Included in the 6-day total · travel excluded · {site.jbText} · {site.installer}</td>
      </tr>)}
      <tr className="b3bf-sec b3bf-ref">
       <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("ref")} onClick={()=>toggle("ref")}>PART B — original quotation items (reference base scope, not priced)</button></td>
@@ -183,7 +182,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      </tr>}
     </tbody>
    </table></div>
-   <p className="b3bf-foot">{model.exclusion} The per-site day split stays OPEN.</p>
+   <p className="b3bf-foot">{model.exclusion} Offshore working days are ZPQ 2, ZWP8 2 and ZWP11 2. Travel days are excluded.</p>
    </>}
   </div>
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
