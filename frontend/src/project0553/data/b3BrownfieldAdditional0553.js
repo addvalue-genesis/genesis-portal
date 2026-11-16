@@ -97,14 +97,13 @@ function customerScopeName0553(code){
 function baseCustomerPreview0553(release){
  const partA=(release.a||[]).map(part=>({
   code:part.code,mr:part.mr,description:part.description,
-  locations:[...new Set((part.sourceRows||[]).map(row=>row.site).filter(Boolean))],
-  previewSellTHB:part.previewSellTHB
+  locations:[...new Set((part.sourceRows||[]).map(row=>row.site).filter(Boolean))]
  }));
  const b3=(release.b||[]).find(row=>row.code==="B3");
  const name=customerScopeName0553("B3");
- if(partA.length!==4||!partA.some(part=>Number.isFinite(part.previewSellTHB))||
+ if(partA.length!==4||partA.some(part=>!part.description||!part.locations.length)||
     name==="B3"||!b3?.executionActivities?.releaseText||!b3.serviceCommercialBasis?.compactText)
-  throw Error("Base Scope of Supply preview is missing Part A prices or the B3 description");
+  throw Error("Base Scope of Supply preview is missing Part A locations or the B3 description");
  return {source:"buildReleaseCommercialModel0553",partA,b3:{name,releaseText:b3.executionActivities.releaseText,compactText:b3.serviceCommercialBasis.compactText}};
 }
 function referencePartB(){
@@ -148,10 +147,7 @@ function build(){
     china.fatWorkingSellTHB!==452850||purchased.selectedIncrementalWorkingSellTHB!==0||
     baseB3WorkingSellTHB!==2322450)
   throw Error("B3 brownfield additional price does not match the read-only B3 basis");
- const baseCustomerPreview={...baseCustomerPreview0553(buildReleaseCommercialModel0553({thbPerUsd:fxTHBPerUSD})),thbPerUsd:fxTHBPerUSD};
- const partAPreviewSum=round(baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0));
- if(partAPreviewSum===proposalTHB||partAPreviewSum===0)
-  throw Error("Base Part A prices must stay out of the additional-proposal total");
+ const baseCustomerPreview=baseCustomerPreview0553(buildReleaseCommercialModel0553());
  if(satBefore!==snapshot(selectB3SelectedSatSurveyPrice0553)||
     chinaBefore!==snapshot(selectB9ChinaWorkingBudget0553)||
     purchasedBefore!==snapshot(selectB3MgwPurchasedFatWorkingSell0553))
@@ -271,15 +267,10 @@ export function b3BrownfieldExportFileName0553({audience="official",extension}={
  const named=audience==="internal"?base+"_INTERNAL":base;
  if(!extension)return named;
  const ext=String(extension).replace(/^\./,"").toLowerCase();
- if(ext==="doc"||ext==="docx")throw Error("Word export is not allowed for the brownfield additional proposal");
+ if(ext==="doc"||ext==="docx")throw Error("10.3 customer preview exports Excel only; there is no Word helper to reuse");
  return named+"."+ext;
 }
 const UNPRICED_LEAK=/793,?800|56,?700|31,?500|25,?200|441,?000|352,?800|252,?000|283,?500|2,?322,?450|452,?850|1,?587,?600|14,?000|11,?200|1,?800|1,?000|(?:^|[^\d.,])800(?:[^\d]|$)|31\.5|\bUSD\b|\bTHB\b/;
-function formatBasePreviewThb0553(value,currency){
- if(!Number.isFinite(value))return "—";
- const text=money2(value);
- return currency==="thb"?text:text+" THB";
-}
 export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemized=true,currency="thb"}={}){
  if(!model||model.id!=="PJ2608-0553-B3BF-ADDITIONAL")throw Error("Official schedule requires the additional-proposal model");
  void itemized;
@@ -291,8 +282,7 @@ export function selectB3BrownfieldOfficialSchedule0553(model,{priced=true,itemiz
  rows.push(line(["Part A: BASIC","A部分：基本"],"section"));
  for(const part of preview.partA){
   const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
-  const price=priced?formatBasePreviewThb0553(part.previewSellTHB,currency):"";
-  rows.push(line([part.code,part.mr,part.description,locations,"1 lot",price,price,"Quoted"]));
+  rows.push(line([part.code,part.mr,part.description,locations,"1 lot",priced?"Quoted":"",priced?"Quoted":"","Quoted"]));
  }
  rows.push(line(["Part B: OTHERS","B部分：其它"],"section"));
  const b3Spec=[preview.b3.releaseText,priced?preview.b3.compactText:""].filter(Boolean).join("\n");

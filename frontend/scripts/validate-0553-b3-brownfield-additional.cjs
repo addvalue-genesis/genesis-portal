@@ -111,16 +111,14 @@ for(const [label,text] of [["priced csv",pricedCsv],["unpriced csv",unpricedCsv]
  assert.ok(text.includes(data.B3BF_JUTAL_NOTE_0553),label+": Jutal note missing");
  assert.ok(text.lastIndexOf(NOTE)>text.lastIndexOf(data.B3BF_JUTAL_NOTE_0553),label+": Greenfield note must follow the Jutal note");
 }
+const PART_A_MONEY=["7,643,874.13","4,088,522.84","1,203,800.00","9,213,750.00","7643874.13","4088522.84","1203800","9213750"];
 const officialHtml=render({initialPriced:true,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
 const officialThb=render({initialPriced:true,initialItemized:false,initialVersion:"official",initialCurrency:"thb"});
+const officialUsd=render({initialPriced:true,initialItemized:true,initialVersion:"official",initialCurrency:"usd"});
 const officialCsv=data.buildB3BrownfieldAdditionalCsv0553(model,{priced:true,itemized:true,version:"official",currency:"both"});
-const baseMoney=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
-const partASum=model.baseCustomerPreview.partA.reduce((sum,part)=>sum+(Number.isFinite(part.previewSellTHB)?part.previewSellTHB:0),0);
-const officialSchedule=data.selectB3BrownfieldOfficialSchedule0553(model,{priced:true,itemized:true,currency:"thb"});
+const officialSchedule=data.selectB3BrownfieldOfficialSchedule0553(model,{priced:true,itemized:true,currency:"usd"});
 assert.equal(model.baseCustomerPreview.source,"buildReleaseCommercialModel0553");
-assert.equal(model.baseCustomerPreview.thbPerUsd,31.5);
-assert.deepEqual(model.baseCustomerPreview.partA.map(part=>part.previewSellTHB),[7643874.13,4088522.84,1203800,9213750]);
-assert.notEqual(model.grandTotalTHB,partASum);
+assert.equal(model.baseCustomerPreview.partA.some(part=>Object.prototype.hasOwnProperty.call(part,"previewSellTHB")),false);
 assert.equal(model.grandTotalTHB,793800);
 assert.ok(officialHtml.includes("25,200.00 USD")&&officialHtml.includes("793,800.00")&&officialHtml.includes("Part A: BASIC")&&officialHtml.includes("Part B: OTHERS"));
 assert.ok(officialHtml.indexOf("Part A: BASIC")<officialHtml.indexOf(">B3<")&&officialHtml.indexOf(">B3<")<officialHtml.indexOf(">B3-BF<"));
@@ -128,17 +126,15 @@ assert.ok(officialHtml.indexOf(">B3-BF<")<officialHtml.indexOf("Total Additional
 assert.ok(officialThb.includes("Total Additional (B3-BF)")&&officialThb.includes("793,800.00")&&!officialThb.includes("25,200"));
 for(const part of model.baseCustomerPreview.partA){
  const locations=part.locations.length?"Locations: "+part.locations.join(", "):"TBC";
- const price=Number.isFinite(part.previewSellTHB)?baseMoney(part.previewSellTHB):"—";
  const row=officialSchedule.rows.find(entry=>entry.cells[0]===part.code);
- assert.equal(row.cells[5],price);
- assert.equal(row.cells[6],price);
+ assert.equal(row.cells[5],"Quoted");
+ assert.equal(row.cells[6],"Quoted");
  assert.equal(row.cells[7],"Quoted");
  assert.equal(row.cells[3],locations);
- assert.ok(officialThb.includes(locations)&&officialThb.includes(part.description));
- if(Number.isFinite(part.previewSellTHB)){
-  assert.ok(officialThb.includes(price),"official THB missing base price "+part.code);
-  assert.ok(officialCsv.includes(price));
- }
+ assert.ok(officialUsd.includes(locations)&&officialUsd.includes(part.description));
+}
+for(const money of PART_A_MONEY){
+ for(const text of [officialHtml,officialThb,officialUsd,officialCsv])assert.ok(!text.includes(money),"official output contains Part A money "+money);
 }
 const b3Row=officialSchedule.rows.find(entry=>entry.cells[0]==="B3");
 const bfRow=officialSchedule.rows.find(entry=>entry.cells[0]==="B3-BF");
@@ -147,7 +143,7 @@ assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.releaseText));
 assert.ok(b3Row.cells[3].includes(model.baseCustomerPreview.b3.compactText));
 assert.equal(b3Row.cells[6],"Quoted");
 assert.ok(officialThb.includes("Included SAT: 2 persons")&&officialThb.includes("Proposed standby"));
-assert.ok(bfRow.cells[3].includes("14 team-days")&&bfRow.cells[5]==="793,800.00"&&bfRow.cells[6]==="793,800.00"&&bfRow.cells[7]==="");
+assert.ok(bfRow.cells[3].includes("14 team-days")&&bfRow.cells[5]==="25,200.00 USD"&&bfRow.cells[6]==="25,200.00 USD"&&bfRow.cells[7]==="");
 assert.ok(officialThb.includes("14 team-days")&&officialThb.includes("USD 1,000.00 / 800.00 per person/day @31.5"));
 for(const code of ["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14"]){
  assert.ok(officialHtml.includes(">"+code+"<"),"official view missing "+code);
@@ -164,7 +160,7 @@ assert.ok(officialCsv.lastIndexOf(NOTE)>officialCsv.lastIndexOf(data.B3BF_JUTAL_
 const officialUnpriced=render({initialPriced:false,initialItemized:true,initialVersion:"official",initialCurrency:"both"});
 assert.ok(!officialUnpriced.includes("793,800")&&!officialUnpriced.includes("25,200")&&!officialUnpriced.includes("1,000.00")&&officialUnpriced.includes("Quoted"));
 assert.ok(officialUnpriced.includes("SAMTEL preparation")&&!officialUnpriced.includes("Included SAT")&&!officialUnpriced.includes("TBA"));
-for(const part of model.baseCustomerPreview.partA)if(Number.isFinite(part.previewSellTHB))assert.ok(!officialUnpriced.includes(baseMoney(part.previewSellTHB)));
+for(const money of PART_A_MONEY)assert.ok(!officialUnpriced.includes(money));
 assert.ok(pricedHtml.includes("BF.1.3")&&pricedHtml.includes("Existing SAT role rate")&&pricedHtml.includes("Offshore POB"));
 const leak=/793,?800|56,?700|25,?200|441,?000|352,?800|14,?000|11,?200|1,?800|1,?000|31\.5/;
 for(const view of [
@@ -178,7 +174,10 @@ for(const view of [
  assert.ok(absentRows(html)&&absentRows(csv));
 }
 const uiSource=fs.readFileSync(path.join(root,"project0553/B3BrownfieldAdditional0553.jsx"),"utf8");
-assert.ok(!/docx|\.doc\b|Word export|Export Word/i.test(uiSource),"this tab must not offer a Word export");
+const releaseSource=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
+assert.ok(releaseSource.includes("Export Excel — WORKING DRAFT"));
+assert.ok(!/Export Word|html-docx|\.docx/i.test(releaseSource),"10.3 preview has no Word export");
+assert.ok(!/Export Word|html-docx/i.test(uiSource),"brownfield tab must not invent a Word export");
 const page=fs.readFileSync(path.join(frontend,"src/pages/PJ26080553.jsx"),"utf8");
 const nav=fs.readFileSync(path.join(frontend,"src/project0553/lifecycleNavigation.js"),"utf8");
 assert.ok(page.includes('tab==="b3bf"&&<B3BrownfieldAdditional0553/>'));
