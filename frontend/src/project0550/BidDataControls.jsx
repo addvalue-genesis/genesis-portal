@@ -3,6 +3,7 @@ import {useBidWorkspace,downloadBidFile} from "./BidWorkspaceContext";
 import {Module} from "./BidControls";
 import {MODULE_REGISTRY} from "./data";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {formatPttepFileName0550,PTTEP_DOC_STANDARD_0550} from "./data/pttepDocControl0550";
 import release from "../projectHubRelease.json";
 export function BidSaveStatus(){
  const {data,error,busy,reload,recovery}=useBidWorkspace();const [copied,setCopied]=useState("");
@@ -21,8 +22,39 @@ export function BidSaveStatus(){
   <button type="button" disabled={busy} onClick={reload}>โหลดข้อมูลที่บันทึกใหม่</button>
  </div>;
 }
-export function BidDataControls(){const {data,importFile,busy}=useBidWorkspace();return <div className="p55-stack"><Module id="bid.registry.storage" title="09.1 ฐานข้อมูล Bidding / Backup">
- <p>Vendor, Offer, สมการ, Working, Schematic, Source intake และประวัติ Commercial issue บันทึกใน IndexedDB ของเบราว์เซอร์/URL นี้ เก็บ revision ก่อนหน้าแยกไว้ ไม่มีการเชื่อม ERP หรือส่งข้อมูลออกเซิร์ฟเวอร์</p><p>ควร Export backup หลังจบงานและก่อนเปลี่ยนเครื่อง/port/เบราว์เซอร์ หรือเคลียร์ข้อมูลเว็บไซต์ ไฟล์นำเข้าแทนที่ Working ปัจจุบันใน revision ใหม่ โดยไม่แก้ Rev10 · ประวัติฉบับที่ตรึงและหลักฐานส่งรวมกับข้อมูลเดิม ไม่เขียนทับรายการที่ขัดกัน · Backup รองรับ 64 MiB</p>
- <button type="button" disabled={!data||busy} onClick={()=>downloadBidFile(data,`PJ2608-0550_Bidding_Workspace_R${data.revision}.json`)}>Export workspace backup</button><label>Import workspace backup <input aria-label="Import workspace backup" type="file" accept=".json,application/json" disabled={busy} onChange={e=>{importFile(e.target.files[0]);e.target.value="";}}/></label>
+export function BidDataControls(){
+ const {data,importFile,busy}=useBidWorkspace();
+ const [backupNote,setBackupNote]=useState("");
+ const pttepRev=data?`INT-${String(data.revision??0).padStart(2,"0")}`:"INT-00";
+ const buildPttepBackupName=()=>{
+  const d=new Date();
+  const ymd=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,"0")}${String(d.getDate()).padStart(2,"0")}`;
+  const ver=String(release.version||"0.2.0").replace(/[^\w.-]/g,"");
+  return formatPttepFileName0550({area:"GEN",pkg:"TEQ",discipline:"TEL",docType:"MTO",seq:"0001",rev:pttepRev,ext:"json",internal:true,timestamp:`v${ver}_${ymd}`});
+ };
+ const exportPttepJson=()=>{
+  if(!data)return;
+  const filename=buildPttepBackupName();
+  const payload={
+   schema:"genesis.0550.workspace-backup.v2",
+   pttepDocStandard:PTTEP_DOC_STANDARD_0550,
+   pttepFilename:filename,
+   appVersion:release.version,
+   buildCommit:release.buildCommit||"",
+   exportedAt:new Date().toISOString(),
+   workspace:data,
+  };
+  downloadBidFile(payload,filename);
+  setBackupNote(`บันทึกและส่งออกไฟล์ JSON มาตรฐาน PTTEP แล้ว: ${filename}`);
+ };
+ return <div className="p55-stack"><Module id="bid.registry.storage" title="09.1 ฐานข้อมูล Bidding / Backup">
+ <p>Vendor, Offer, สมการ, Working, Schematic, Source intake และประวัติ Commercial issue บันทึกใน IndexedDB ของเบราว์เซอร์/URL นี้ เก็บ revision ก่อนหน้าแยกไว้ ไม่มีการเชื่อม ERP หรือส่งข้อมูลออกเซิร์ฟเวอร์</p><p>ควร Save / Export JSON หลังจบงานและก่อนเปลี่ยนเครื่อง/port/เบราว์เซอร์ หรือเคลียร์ข้อมูลเว็บไซต์ ไฟล์นำเข้าแทนที่ Working ปัจจุบันใน revision ใหม่ โดยไม่แก้ Rev10 · ประวัติฉบับที่ตรึงและหลักฐานส่งรวมกับข้อมูลเดิม ไม่เขียนทับรายการที่ขัดกัน · Backup รองรับ 64 MiB</p>
+ <div className="p55-review-toolbar">
+  <button type="button" disabled={!data||busy} onClick={exportPttepJson}>Save &amp; Export JSON (PTTEP Std: {pttepRev})</button>
+  <button type="button" disabled={!data||busy} onClick={()=>downloadBidFile(data,`PJ2608-0550_Bidding_Workspace_R${data.revision}.json`)}>Export workspace backup (Raw JSON)</button>
+  <label>Import JSON / Restore backup <input aria-label="Import workspace backup" type="file" accept=".json,application/json" disabled={busy} onChange={e=>{const f=e.target.files[0];if(f){importFile(f);setBackupNote(`นำเข้าไฟล์ ${f.name} เรียบร้อยแล้ว`);}e.target.value="";}}/></label>
+ </div>
+ {backupNote&&<p className="p55-note">{backupNote}</p>}
  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Revision</th><th>Time</th><th>Change</th></tr></thead><tbody>{data?.audit.slice().reverse().map(a=><tr key={a.revision}><td>{a.revision}</td><td>{a.at}</td><td>{a.action}</td></tr>)}</tbody></table></div></Module>
- <Module id="bid.registry.modules" title="09.2 Module Registry / Stable IDs"><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Module</th><th>Purpose / implementation</th><th>Copy</th></tr></thead><tbody>{MODULE_REGISTRY.map(m=><tr key={m.id} data-component-key={m.id}><td>{m.name}<small>{m.lifecycleStatus}</small></td><td>{m.purpose}<small>{m.implementation.join(" · ")}</small></td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={m.id}/></td></tr>)}</tbody></table></div></Module></div>;}
+ <Module id="bid.registry.modules" title="09.2 Module Registry / Stable IDs"><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Module</th><th>Purpose / implementation</th><th>Copy</th></tr></thead><tbody>{MODULE_REGISTRY.map(m=><tr key={m.id} data-component-key={m.id}><td>{m.name}<small>{m.lifecycleStatus}</small></td><td>{m.purpose}<small>{m.implementation.join(" · ")}</small></td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={m.id}/></td></tr>)}</tbody></table></div></Module></div>;
+}

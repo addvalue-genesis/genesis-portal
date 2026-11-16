@@ -19,14 +19,14 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       itemNo: '1',
       tagNo: 'TPH-304-001~008, 151~182, 201~206, 251~290, 301~307, 351~360, 401~416, 451, 501~509, 520, 701',
       mrDescription: 'IP Phone Indoor',
-      offeredEquipment: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
-      description: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
+      offeredEquipment: 'Avaya J179 / J159 Gigabit Color IP Deskphone (SIP/H.323, PoE, Dual 1000Base-T)',
+      description: 'Avaya J179 / J159 Gigabit Color IP Deskphone (SIP/H.323, PoE, Dual 1000Base-T)',
       brand: 'Avaya',
-      model: 'J179 Gigabit IP Phone',
+      model: 'J179 / J159 Gigabit IP Phone',
       partNo: '700513569',
       quantity: 120,
       unit: 'SET',
-      remarks: 'Includes desk stand / wall mount kit & PoE patch cord (per Appendix 2 LIS-0001)',
+      remarks: 'Supplied via Chevalier CITT-QT-392-2026-REV01 (Items 1.1.10–1.1.11; Appendix 2 LIS-0001)',
       weight: 1000
     }
   ],
@@ -35,14 +35,14 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       itemNo: '1',
       tagNo: 'TPH-304-101',
       mrDescription: 'IP Phone (Ex)',
-      offeredEquipment: 'J&R ATEX/IECEx Explosion-Proof VoIP Industrial Telephone (Ex d IIB T6, IP67, SIP)',
-      description: 'J&R ATEX/IECEx Explosion-Proof VoIP Industrial Telephone (Ex d IIB T6, IP67, SIP)',
-      brand: 'J&R Technology',
-      model: 'JR101-FK-Y-SIP (Ex)',
-      partNo: 'JR101-FK-Y-SIP',
+      offeredEquipment: 'Ex-Proof VoIP Industrial Telephone with Ex Sounder & Flashing Beacon (ATEX/IECEx, IP66/67)',
+      description: 'Ex-Proof VoIP Industrial Telephone with Ex Sounder & Flashing Beacon (ATEX/IECEx, IP66/67)',
+      brand: 'J&R / Chevalier',
+      model: 'JR101-FK-Y-SIP + Sounder/Beacon',
+      partNo: 'CHEV-EX-IP-1.1.15',
       quantity: 1,
       unit: 'SET',
-      remarks: 'Hazardous area Zone 1/2 certified Ex-proof IP telephone (per Appendix 2 LIS-0001)',
+      remarks: 'Supplied via Chevalier CITT-QT-392-2026-REV01 (Items 1.1.15–1.1.17; Appendix 2 LIS-0001)',
       weight: 1000
     }
   ],
@@ -149,7 +149,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
   'MR-B1-13-APF-09': [
     { itemNo: '1', tagNo: 'LAN-307-001', mrDescription: 'LAN Cabinet (42U IP54 Enclosure & Accessories)', offeredEquipment: 'Rittal VX25 42U 800x1000x2200mm IP54 Telecom Cabinet with PDU, Fan Tray & Earthing Bar', description: 'Rittal VX25 42U 800x1000x2200mm IP54 Telecom Cabinet with PDU, Fan Tray & Earthing Bar', brand: 'Rittal', model: 'VX25 42U 800x1000x2200mm', partNo: 'VX-8825.000', quantity: 1, unit: 'SET', remarks: 'Instrument Building LAN Cabinet (per Appendix 2 LIS-0001)', weight: 300 },
     { itemNo: '2', tagNo: 'LAN-307-001', mrDescription: 'Core / Distribution Switch L3 & Firewall', offeredEquipment: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', description: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', brand: 'Cisco', model: 'C9300-48P-A / FPR1120', partNo: 'C9300-48P-A', quantity: 1, unit: 'Lot', remarks: 'Redundant core/distribution switching & perimeter firewall', weight: 400 },
-    { itemNo: '3', tagNo: 'LAN-307-001', mrDescription: 'IP PBX Server & Gateway Assembly', offeredEquipment: 'Avaya IP Office 500 V2 Control Unit & Redundant Application Server', description: 'Avaya IP Office 500 V2 Control Unit & Redundant Application Server', brand: 'Avaya', model: 'IP Office 500 V2 / SE', partNo: '700476005', quantity: 1, unit: 'SET', remarks: 'PABX call server installed inside APF LAN Cabinet', weight: 200 },
+    { itemNo: '3', tagNo: 'LAN-307-001', mrDescription: 'IP PBX Server & Gateway Assembly', offeredEquipment: 'Dell PowerEdge R660 IP PBX Call Server & Avaya IP Telephony Core (Chevalier CITT-QT-392-2026-REV01)', description: 'Dell PowerEdge R660 IP PBX Call Server & Avaya IP Telephony Core (Chevalier CITT-QT-392-2026-REV01)', brand: 'Dell / Avaya', model: 'PowerEdge R660 (IP PBX)', partNo: 'R660-PBX-CHEV', quantity: 1, unit: 'SET', remarks: 'Supplied via Chevalier CITT-QT-392-2026-REV01 Item 1.1.1 within APF LAN Cabinet', weight: 200 },
     { itemNo: '4', tagNo: 'LAN-307-001', mrDescription: 'FO & CAT6A Patch Panels & Management', offeredEquipment: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', description: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', brand: 'Putian', model: '1U 24-Port FO / CAT6A Panel', partNo: 'PT-FODP-24SC', quantity: 1, unit: 'Lot', remarks: 'Pre-terminated rack patching & cable management', weight: 100 }
   ],
   'MR-B1-13-APF-10': [
