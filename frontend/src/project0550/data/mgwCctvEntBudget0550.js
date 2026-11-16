@@ -221,3 +221,25 @@ export const APF_CCTV_PTZ_EX_2_BOM_0550 = [
  { itemNo: '2', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Ex-Proof Junction Box with Fiber Optic Media Converter (per MR)', offeredEquipment: 'Ex-Proof Fiber Optic Junction Box c/w Single-Mode SC Fiber Media Converter & 4 Ex Cable Glands (ATEX & IECEx Certified, IP68, SUS316L)', description: 'Ex-Proof Fiber Optic Junction Box c/w Single-Mode SC Fiber Media Converter & 4 Ex Cable Glands (ATEX & IECEx Certified, IP68, SUS316L)', brand: 'Hikvision', model: 'DS-2XE2705-M04(316L)(O-STD)', partNo: 'DS-2XE2705-M04(316L)(O-STD)', quantity: 2, unit: 'Sets', remarks: 'Included in Base Scope of Supply (complete with PTZ camera assembly)', weight: 20000 },
  { itemNo: '3', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Etc. (per Appendix 2 Drawings)', offeredEquipment: 'SUS316L Wall/Pole Mounting Brackets, Ex Cable Glands, Fiber Patch Cords & Bulk Installation Accessories', description: 'SUS316L Wall/Pole Mounting Brackets, Ex Cable Glands, Fiber Patch Cords & Bulk Installation Accessories', brand: 'Hikvision / Panduit', model: 'EX-MNT-316L-KIT', partNo: 'EX-MNT-316L-KIT', quantity: 2, unit: 'Lot', remarks: 'Details shall be included not limit to Bulk Materials etc.', weight: 5000 },
 ];
+
+export const CCTV_TPLINK_DEVIATION_0550 = {
+ id: 'DEV-CCTV-TPLINK-MC-0550',
+ requirementId: 'REQDEF-MR-B1-13-APF-11',
+ avlCheckId: '',
+ systemToken: 'TEL-CCTV',
+ offerIds: [],
+ sn: '2',
+ mrRef: 'APPENDIX 1.3 — Item 1.3.11.6 (APF — CCTV Cabinet, Tag: APF-CCTV-317)',
+ contractorDocument: 'APPENDIX 1.3 — Item 1.3.11.6 (APF — CCTV Cabinet, Tag: APF-CCTV-317) · CCTV System (TEL-CCTV) — Single-Mode SC Fiber Optic Media Converter & 2U Rackmount Chassis (28 Sets) · Equipment manufacturer to be selected from COMPANY Approved Vendor List (AVL).',
+ vendorDeviation: 'Offered Brand: TP-Link (Model: MC210CS / TL-MC1400), which is currently not listed in COMPANY AVL. Offered units meet all functional, optical (1000Base-SX/LX single-mode SC), and 19" rack-mounted chassis requirements per MR. Equivalent AVL-listed industrial media converter (e.g., Moxa / Allied Telesis) can be substituted upon COMPANY technical review.',
+ justification: 'No impact on Base Lump Sum Price (USD 76,439.88) or Project Delivery Schedule (Subject to COMPANY AVL waiver approval).',
+ contractorResponse1: 'DEVIATE / CLARIFICATION — Pending COMPANY AVL waiver or substitution with equivalent AVL-listed industrial media converter (e.g., Moxa / Allied Telesis).',
+ vendorResponse1: 'Offered units meet all functional, optical (1000Base-SX/LX single-mode SC), and 19" rack-mounted chassis requirements per MR.',
+ companyResponse: '',
+ resolution: 'Pending COMPANY Technical Review',
+ templateStatus: 'CLARIFICATION — Subject to COMPANY AVL waiver approval',
+ finalClosure: '',
+ workflowStatus: 'SUBMITTED',
+ approvalDecision: 'PENDING',
+ problems: [],
+};

@@ -8,7 +8,7 @@ import {workingOffers0550} from './workingOffers0550';
 import {mgwQuoteItem0550,MGW_QUOTE_0550} from './mgwVendorBasis0550';
 import {radioLotIncludedLines0550,APF_DMR_MR_12_ITEMS_0550,APF_MARINE_MR_6_ITEMS_0550,ACP_MARINE_MR_4_ITEMS_0550,APF_AERO_MR_5_ITEMS_0550,APF_ROIP_MR_7_ITEMS_0550,APF_TOWER_60M_BOM_0550,ACP_TOWER_30M_BOM_0550} from './radioLotComponents0550';
 import {APF_VSAT_1_BOM_0550,APF_VSAT_2_BOM_0550,YANGON_VSAT_BOM_0550,APF_KU_BOM_0550,ACP_KU_BOM_0550} from './satelliteScope0550';
-import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550} from './mgwCctvEntBudget0550';
+import {APF_CCTV_PTZ_EX_BOM_0550,APF_CCTV_PTZ_EX_2_BOM_0550,APF_CCTV_CABINET_BOM_0550,CCTV_TPLINK_DEVIATION_0550} from './mgwCctvEntBudget0550';
 import {cusQuantityWorkingRows0550} from './bidCompletion0550';
 import {sanitizeCustomerText0550} from './c1Appendix0550';
 // Supplier sourceRef is internal free text and may embed quoted costs. Never copy it into Volume II.
@@ -66,6 +66,9 @@ export function technicalDossier0550(data,model,view,systemToken,sectionId){
   tables.push({title:'MR Appendix 1.3 (APF Item 1) CCTV PTZ Camera Outdoor (PTZ Explosion Proof Camera) BoQ · 3-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_CCTV_PTZ_EX_BOM_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
   tables.push({title:'MR Appendix 1.3 (APF Item 2) CCTV PTZ Camera Outdoor (PTZ Explosion Proof Camera) BoQ · 3-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_CCTV_PTZ_EX_2_BOM_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
   tables.push({title:'MR Appendix 1.3 (APF Item 11) CCTV Cabinet BoQ · 6-Line Specification',heads:['Item','MR Description','Tag No.','Offered Equipment','Brand','Model','Part No.','Qty','Unit','Remarks'],rows:APF_CCTV_CABINET_BOM_0550.map(item=>[item.itemNo,sanitizeCustomerText0550(item.mrDescription||item.description),item.tagNo||'Per Appendix 2 Drawing',sanitizeCustomerText0550(item.offeredEquipment||item.description),sanitizeCustomerText0550(item.brand),sanitizeCustomerText0550(item.model),item.partNo,String(item.quantity),item.unit,sanitizeCustomerText0550(item.remarks)])});
+ }
+ if(systemToken==='TEL-CCTV'&&sectionId==='deviations'){
+  tables.push({title:'Technical Deviation & AVL Clarification · 1.3.11.6 (Cross-Link to Tab 14 Deviation List)',heads:['Ref. / C1 Item','Compliance','MR / Project Requirement','Proposed Deviation / Alternative','Cost / Schedule Impact'],rows:[[CCTV_TPLINK_DEVIATION_0550.mrRef,'DEVIATE / CLARIFICATION','Equipment manufacturer to be selected from COMPANY Approved Vendor List (AVL).',CCTV_TPLINK_DEVIATION_0550.vendorDeviation,CCTV_TPLINK_DEVIATION_0550.justification]]});
  }
  const paga=systemToken==='TEL-PAGA'?pagaRevisionSelected0550(data):null;
  if(paga&&['description','parameters','equipment','delivery','deviations'].includes(sectionId)){
