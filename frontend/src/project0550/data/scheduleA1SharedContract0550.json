@@ -1,0 +1,304 @@
+{
+  "contract": "PJ2608-0550 Schedule A1 shared line items (10.2 SI / Master Schedule)",
+  "version": "0.1.0-skeleton",
+  "status": "DRAFT - NOT WIRED INTO ANY SCREEN OR EXPORT",
+  "currency": "USD",
+  "rules": [
+    "WORKSTREAM_A_FORM_C writes only items whose sourceForm starts with C-. It never writes a1DirectItems.",
+    "WORKSTREAM_B_A1_DIRECT writes only a1DirectItems (sourceForm A1_DIRECT) and the rollup block. It never changes Form C schemas.",
+    "sn follows the customer Exhibit C Schedule A1 form; template row = sn + 1 (see a1SummarySlot0550 in exhibitCNative0550.js).",
+    "A null price means OPEN/TBA. A rollup total stays null while any base item is OPEN (same rule as scheduleRollup0550).",
+    "isOption items are excluded from the A1 base total; options belong to Schedule A2."
+  ],
+  "snMap": [
+    {
+      "sn": "1",
+      "templateRow": 2,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-1",
+      "title": "GOODS",
+      "codeSelector": "summary GOODS"
+    },
+    {
+      "sn": "2",
+      "templateRow": 3,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Inspection and tests",
+      "codeSelector": "summary INSPECTION",
+      "breakdownRef": "11.D"
+    },
+    {
+      "sn": "3",
+      "templateRow": 4,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Preservation and packing",
+      "codeSelector": "summary PACKING"
+    },
+    {
+      "sn": "4",
+      "templateRow": 5,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-2",
+      "title": "Commissioning spares",
+      "codeSelector": "schedule C2"
+    },
+    {
+      "sn": "5",
+      "templateRow": 6,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-3",
+      "title": "Two-year operation spares",
+      "codeSelector": "A2 option (schedule C3)",
+      "isOption": true
+    },
+    {
+      "sn": "6",
+      "templateRow": 7,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-5",
+      "title": "Special tools",
+      "codeSelector": "schedule C5"
+    },
+    {
+      "sn": "7",
+      "templateRow": 8,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-7",
+      "title": "Field service including training",
+      "codeSelector": "schedule C7"
+    },
+    {
+      "sn": "8",
+      "templateRow": 9,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-8",
+      "title": "Facilities",
+      "codeSelector": "schedule C8"
+    },
+    {
+      "sn": "9",
+      "templateRow": 10,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Vendor documents",
+      "codeSelector": "summary VENDOR_DOCUMENTS"
+    },
+    {
+      "sn": "10",
+      "templateRow": 11,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Others",
+      "codeSelector": "summary OTHER",
+      "breakdownRef": "11.E / 11.F"
+    }
+  ],
+  "formCItems": [
+    {
+      "sn": "1",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-1",
+      "description": "GOODS",
+      "breakdownRef": "Form C-1",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-1"
+    },
+    {
+      "sn": "4",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-2",
+      "description": "Commissioning spares",
+      "breakdownRef": "Form C-2",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-2"
+    },
+    {
+      "sn": "5",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-3",
+      "description": "Two-year operation spares (option, excluded from A1 base)",
+      "breakdownRef": "Form C-3",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": true,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-3"
+    },
+    {
+      "sn": "6",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-5",
+      "description": "Special tools",
+      "breakdownRef": "Form C-5",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-5"
+    },
+    {
+      "sn": "7",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-7",
+      "description": "Field service including training",
+      "breakdownRef": "Form C-7",
+      "unit": "Day",
+      "qty": null,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Site Service Time shall be specified."
+    },
+    {
+      "sn": "8",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-8",
+      "description": "Facilities",
+      "breakdownRef": "Form C-8",
+      "unit": "Day",
+      "qty": null,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-8"
+    }
+  ],
+  "a1DirectItems": [
+    {
+      "sn": "2",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Inspection and tests with witness by COMPANY and PURCHASER",
+      "breakdownRef": "11.D",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 20999.96,
+      "totalPriceUsd": 20999.96,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in 11.D",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary INSPECTION"
+    },
+    {
+      "sn": "3",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Preservation and packing",
+      "breakdownRef": "",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 25718.4,
+      "totalPriceUsd": 25718.4,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary PACKING"
+    },
+    {
+      "sn": "9",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Vendor documents",
+      "breakdownRef": "",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 153649.41,
+      "totalPriceUsd": 153649.41,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary VENDOR_DOCUMENTS"
+    },
+    {
+      "sn": "10",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Others (licences, other costs, insurance)",
+      "breakdownRef": "11.E / 11.F",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 348737.07,
+      "totalPriceUsd": 348737.07,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in 11.E / 11.F",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary OTHER"
+    }
+  ],
+  "rollup": {
+    "owner": "WORKSTREAM_B_A1_DIRECT",
+    "a1DirectKnownUsd": 549104.84,
+    "formCKnownUsd": null,
+    "baseTotalUsd": null,
+    "openSns": [
+      "1",
+      "4",
+      "6",
+      "7",
+      "8"
+    ],
+    "note": "KNOWN SUBTOTAL ONLY. Base total stays null until every base sn is priced."
+  }
+}
