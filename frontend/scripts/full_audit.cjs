@@ -154,3 +154,16 @@ console.log(`- Technical Volume II record count: ${techView.records.length} (19 
 console.log(`- Volume II authored items intact: ${techView.authoredCount >= 0 ? 'PASS' : 'FAIL'}`);
 console.log(`- Volume II state: ${techView.records.every(r => r.state) ? 'PASS' : 'FAIL'}`);
 console.log('================================================================\n');
+const SI_EQ = require(root + '/project0550/data/siVerificationEquations0550.js');
+const synthRes = SI_EQ.evaluateSiSynthEquations0550({
+  systems: [...D.SYSTEMS, { token: 'COMMON', name: 'Common / Project-Wide' }],
+  c1Rows: c1Proj.rows,
+  bomFormatter: C1UI.formatBomItems0550,
+  technicalDossiers: systemTokens.map(t => TD.technicalDossier0550(d, model, techView, t, 'equipment'))
+});
+console.log('[CHECK 6: SI-SYNTH-EQ VERIFICATION SCORECARD]');
+for (const c of synthRes.checks) {
+  console.log(`- [${c.id}] (${c.equation}): ${c.detail} -> ${c.passed ? 'PASS' : 'FAIL'}`);
+}
+console.log(`- SI-SYNTH-EQ Overall (${synthRes.passedChecks}/${synthRes.totalChecks} gates, ${synthRes.systemScorecard.length} scopes): ${synthRes.passed ? 'PASS' : 'FAIL'}`);
+if (!synthRes.passed) process.exit(1);

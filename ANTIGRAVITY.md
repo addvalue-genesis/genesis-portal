@@ -67,3 +67,12 @@ All customer-facing figures must bind strictly to the pre-calculated final custo
   `H:\.shortcut-targets-by-id\1lG8jqDcz4fIU425V4xqiWPc2HdxrndAt\PJ2608-0550 SAM PTTEPI MY ASK TEL\00_NATIVE_ORIGINAL\SHAREPOINT\RFQ`
 * **Mandatory Cross-Reference Rule (All 19 Systems + COMMON, `APPENDIX 1.1`–`1.9` + `COMMON`):**
   Every system audit and BOM reconciliation must cross-reference the native `MR`, `PHI`, `DTS`, `SPE`, `LIS`, and **Appendix 2 Drawings** (`MM-ASK-1A-[APF|ACP|ABV01|AMS01]-TEL-[LAY|BLK|SLD|STD]-*` and Client Comment sheets) from this root (indexed offline into `frontend/src/project0550/data/appendix2MasterEvidence0550.json` via `frontend/scripts/ingest-pj0550-rfq-appendix2.cjs`).
+
+---
+
+## 6. 3-Group Holistic Verification & Synthesis Equation Engine (`SI-SYNTH-EQ`)
+* **Engine & Scorecard:** Implemented in `frontend/src/project0550/data/siVerificationEquations0550.js` (`SI_SYNTH_EQUATIONS_0550`, `SI_LEARNED_RULES_0550`, `evaluateSiSynthEquations0550`) and mounted across the existing `SI` tabs:
+  * **`SI-CAL` (`02 First Principles`, `EquationWorkbench.jsx`):** Displays formal mathematical definitions for **`EQ-UI`** (Customer-Facing Sanitization & 10-Col BOM Completeness), **`EQ-CUS`** ($\Psi_{\text{Synth}}$ Holistic Context Synthesis across `MR + PHI + DTS + SPE + LIS + Appendix 2 + RedFont/Comments`), and **`EQ-VND`** (Supplier/Cross-Volume Gate §10 & conditional markup routing $\mu(s)$).
+  * **`SI-REQ` (`04 Systems / Requirements`, `WorkingPreview0550.jsx` step 4):** Mounts the **Particular Context & Learned Rules Registry ($\Psi_{\text{Synth}} + \Lambda_{\text{SI}}$)**.
+  * **`SI-ACT` (`06 Execution / Resources`, `WorkingPreview0550.jsx` step 6):** Mounts the live **`SI-SYNTH-EQ` Verification Scorecard** across all 19 systems + `COMMON`.
+* **Automatic Post-Edit Execution:** `full_audit.cjs` and `npm run validate:pj0550-si-equations` execute `SI-SYNTH-EQ` automatically after every BOM, pricing, technical, or schedule change.

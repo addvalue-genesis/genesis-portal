@@ -7,6 +7,7 @@ import {SERVICE_EQUATIONS,SYSTEMS} from "./data";
 import {Module,Field,Select,Save} from "./BidControls";
 import {BidInheritedBasis} from "./BidInheritedBasis";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {SiSynthesisEquations0550} from "./SiSynthesisEquations0550";
 export function EquationWorkbench(){
  const {data,put,busy}=useBidWorkspace();
  const blank=()=>({id:"",title:"",systemToken:"TEL-PAGA",equationId:"E05",inputs:{},sourceRef:""});
@@ -68,5 +69,6 @@ export function EquationWorkbench(){
  {result.errors.length>0&&<p>{result.errors.join(" · ")}</p>}<Save busy={busy}>บันทึกผลและ Inputs</Save>{form.id&&<button type="button" onClick={()=>setForm(blank())}>รายการใหม่</button>}
  </form>
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Saved calculations"><thead><tr><th>System / calculation</th><th>Equation / result</th><th>Source</th><th>ID / edit</th></tr></thead><tbody>{data.calculations.map(c=>{const r=evaluateServiceEquation(c.equationId,c.inputs);return <tr key={c.id} data-component-key={"bid.engineering.calculation."+c.id}><td>{c.systemToken}<small>{c.title}</small></td><td>{c.equationId} · {r.value===null?"OPEN":r.value+" "+r.unit}{r.MH!==undefined&&<small>{r.MH} MH</small>}</td><td>{c.sourceRef}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.engineering.calculation."+c.id}/><button type="button" onClick={()=>setForm(JSON.parse(JSON.stringify(c)))}>แก้ Inputs</button></td></tr>;})}</tbody></table></div>
+ <SiSynthesisEquations0550 mode="cal"/>
  </Module>;
 }
