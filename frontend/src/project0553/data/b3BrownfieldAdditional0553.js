@@ -229,6 +229,10 @@ export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized}={}){
   rows.push(line);
  };
  const moneyText=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"";
+ push("A1","Brownfield SCADA radio items","Lot",String(model.a1Rows.length),"",money?moneyText(0):"","Supplied under base");
+ for(const row of model.a1Rows)push(row.sn,row.tagText+" — "+row.description,row.qtyText,row.site,"","",row.status+" · "+row.jbText+" · "+row.installer);
+ rows.push(["",model.exclusion,"","","","",""].slice(0,header.length));
+ for(const row of model.otherPartA)push(row.sn,row.title+" — "+row.description,"","", "","",row.status);
  push("B3-BF","Brownfield inspection, testing and certification — additional","Lot","1",
   money?moneyText(model.proposalTHB):"",money?moneyText(model.proposalTHB):"","Net additional. Original quotation unchanged.");
  if(itemized!==false){
@@ -241,10 +245,6 @@ export function buildB3BrownfieldAdditionalCsv0553(model,{priced,itemized}={}){
   }
   for(const site of model.siteRows)push(site.sn,site.description,"day","OPEN","","",site.jbText+" · "+site.installer);
  }
- push("A1","Brownfield SCADA radio items","Lot",String(model.a1Rows.length),"",money?moneyText(0):"","Supplied under base");
- for(const row of model.a1Rows)push(row.sn,row.tagText+" — "+row.description,row.qtyText,row.site,"","",row.status+" · "+row.jbText+" · "+row.installer);
- rows.push(["",model.exclusion,"","","","",""].slice(0,header.length));
- for(const row of model.otherPartA)push(row.sn,row.title+" — "+row.description,"","", "","",row.status);
  for(const row of model.partB)push(row.code,row.note,"","","","",row.note);
  if(money){
   push("","Part A","","","",moneyText(model.partATHB),"Supplied under base");

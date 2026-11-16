@@ -56,6 +56,32 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
      {priced&&<th>Unit Rate (THB)</th>}{priced&&<th>Amount (THB)</th>}<th>Notes</th>
     </tr></thead>
     <tbody>
+     <tr className="b3bf-sec b3bf-ref">
+      <td colSpan={priced?5:4}><button type="button" className="b3bf-tg" aria-expanded={shown("a1")} onClick={()=>toggle("a1")}>A1 · MR-0001 SCADA radio — brownfield items executed with this proposal</button></td>
+      {priced&&<td className="b3bf-num">{thb(model.partATHB)}</td>}<td>Supplied under base</td>
+     </tr>
+     {shown("a1")&&<tr>
+      <td>A1</td>
+      <td><button type="button" className="b3bf-tg" aria-expanded={shown("a1bom")} onClick={()=>toggle("a1bom")}>BOM</button> <strong>Brownfield SCADA radio sets from the MR0001 MTO</strong>
+       <div className="b3bf-desc">{model.exclusion} {model.installer}.</div></td>
+      <td>Lot</td><td className="b3bf-num">{model.a1Rows.length}</td>
+      {priced&&<td className="b3bf-num">—</td>}{priced&&<td className="b3bf-num">{thb(model.partATHB)}</td>}
+      <td>Supplied under base</td>
+     </tr>}
+     {shown("a1")&&shown("a1bom")&&<tr><td colSpan={cols}><div className="b3bf-bom">
+      <div className="b3bf-bomh"><span>BILL OF MATERIALS — A1 BROWNFIELD (ZPQ / ZWP8 / ZWP11)</span><span className="b3bf-badge">NOT PRICED IN THIS PROPOSAL</span></div>
+      <table>
+       <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Site</th><th>Qty</th><th>Status</th><th>JB status</th><th>Install / routing by</th></tr></thead>
+       <tbody>{model.a1Rows.map(row=><tr key={row.sn}>
+        <td>{row.sn}</td><td>{row.tagText}</td><td>{row.description}<div className="b3bf-src">{row.source}</div></td><td>{row.site}</td><td>{row.qtyText}</td>
+        <td>{row.status}</td><td>{row.jbState==="OPEN"?<Mark kind="open">{row.jbText}</Mark>:row.jbText}</td><td>{row.installer}</td>
+       </tr>)}</tbody>
+      </table>
+     </div></td></tr>}
+     {model.otherPartA.map(row=><tr key={row.sn} className="b3bf-ref">
+      <td>{row.sn}</td><td colSpan={priced?4:3}><strong>{row.title}.</strong> {row.description}</td>
+      {priced&&<td className="b3bf-num">—</td>}<td>{row.status}</td>
+     </tr>)}
      <tr className="b3bf-sec">
       <td colSpan={priced?5:4}><button type="button" className="b3bf-tg" aria-expanded={shown("bf")} onClick={()=>toggle("bf")}>B3-BF · Brownfield inspection, testing &amp; certification — additional</button></td>
       {priced&&<td className="b3bf-num" data-testid="b3bf-lot">{thb(model.proposalTHB)}</td>}
@@ -103,32 +129,6 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
       <td>day</td><td className="b3bf-num"><Mark kind="open">OPEN</Mark></td>
       {priced&&<td className="b3bf-num">—</td>}{priced&&<td className="b3bf-num">—</td>}
       <td>Total only · {site.jbText} · {site.installer}</td>
-     </tr>)}
-     <tr className="b3bf-sec b3bf-ref">
-      <td colSpan={priced?5:4}><button type="button" className="b3bf-tg" aria-expanded={shown("a1")} onClick={()=>toggle("a1")}>A1 · MR-0001 SCADA radio — brownfield items executed with this proposal</button></td>
-      {priced&&<td className="b3bf-num">{thb(model.partATHB)}</td>}<td>Supplied under base</td>
-     </tr>
-     {shown("a1")&&<tr>
-      <td>A1</td>
-      <td><button type="button" className="b3bf-tg" aria-expanded={shown("a1bom")} onClick={()=>toggle("a1bom")}>BOM</button> <strong>Brownfield SCADA radio sets from the MR0001 MTO</strong>
-       <div className="b3bf-desc">{model.exclusion} {model.installer}.</div></td>
-      <td>Lot</td><td className="b3bf-num">{model.a1Rows.length}</td>
-      {priced&&<td className="b3bf-num">—</td>}{priced&&<td className="b3bf-num">{thb(model.partATHB)}</td>}
-      <td>Supplied under base</td>
-     </tr>}
-     {shown("a1")&&shown("a1bom")&&<tr><td colSpan={cols}><div className="b3bf-bom">
-      <div className="b3bf-bomh"><span>BILL OF MATERIALS — A1 BROWNFIELD (ZPQ / ZWP8 / ZWP11)</span><span className="b3bf-badge">NOT PRICED IN THIS PROPOSAL</span></div>
-      <table>
-       <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Site</th><th>Qty</th><th>Status</th><th>JB status</th><th>Install / routing by</th></tr></thead>
-       <tbody>{model.a1Rows.map(row=><tr key={row.sn}>
-        <td>{row.sn}</td><td>{row.tagText}</td><td>{row.description}<div className="b3bf-src">{row.source}</div></td><td>{row.site}</td><td>{row.qtyText}</td>
-        <td>{row.status}</td><td>{row.jbState==="OPEN"?<Mark kind="open">{row.jbText}</Mark>:row.jbText}</td><td>{row.installer}</td>
-       </tr>)}</tbody>
-      </table>
-     </div></td></tr>}
-     {model.otherPartA.map(row=><tr key={row.sn} className="b3bf-ref">
-      <td>{row.sn}</td><td colSpan={priced?4:3}><strong>{row.title}.</strong> {row.description}</td>
-      {priced&&<td className="b3bf-num">—</td>}<td>{row.status}</td>
      </tr>)}
      <tr className="b3bf-sec b3bf-ref">
       <td colSpan={cols}><button type="button" className="b3bf-tg" aria-expanded={shown("ref")} onClick={()=>toggle("ref")}>PART B — original quotation items (reference base scope, not priced)</button></td>

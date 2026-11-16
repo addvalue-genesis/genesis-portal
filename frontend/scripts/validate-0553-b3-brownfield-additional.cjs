@@ -4,7 +4,7 @@ const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("n
 const babel=require("@babel/core"),React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const root=path.resolve(__dirname,"../src");
 const frontend=path.resolve(__dirname,"..");
-const compile=(m,file)=>{const x=babel.transformFileSync(file,{babelrc:false,configFile:false,
+const compile=(m,file)=>{const x=babel.transformFileSync(file,{babelrc:false,configFile:false,cwd:frontend,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
  m._compile(x.code,file);};
 const originalJS=require.extensions[".js"],originalJSX=require.extensions[".jsx"];
@@ -52,6 +52,15 @@ const lumpCsv=data.buildB3BrownfieldAdditionalCsv0553(model,{priced:true,itemize
 assert.ok(pricedCsv.includes(NOTE)&&pricedCsv.includes("793,800.00"));
 assert.ok(!unpricedCsv.includes("793,800")&&!unpricedCsv.includes("Unit Rate (THB)")&&unpricedCsv.includes(NOTE));
 assert.ok(lumpCsv.includes("793,800.00")&&!lumpCsv.includes("441,000.00"));
+const partABeforePartB=(text,label)=>{
+ const a=text.indexOf("A1"),b=text.indexOf("B3-BF");
+ assert.ok(a>=0&&b>a,label+": Part A must precede Part B");
+ assert.ok(text.lastIndexOf(NOTE)>b,label+": the Greenfield/base note stays after Part B");
+ assert.ok(text.trimEnd().endsWith(NOTE)||text.split("\n").at(-1).includes(NOTE),label+": the note stays the last line");
+};
+partABeforePartB(pricedCsv,"priced csv");
+partABeforePartB(unpricedCsv,"unpriced csv");
+partABeforePartB(lumpCsv,"lump csv");
 const render=props=>renderToStaticMarkup(React.createElement(ui.B3BrownfieldAdditional0553,props));
 const pricedHtml=render({initialPriced:true,initialItemized:true});
 const unpricedHtml=render({initialPriced:false,initialItemized:true});
@@ -60,6 +69,14 @@ assert.ok(pricedHtml.includes(NOTE)&&pricedHtml.includes("793,800.00")&&pricedHt
 assert.ok(pricedHtml.includes("data-testid=\"b3bf-total\"")&&pricedHtml.includes("Open items"));
 assert.ok(!unpricedHtml.includes("793,800")&&!unpricedHtml.includes("Unit Rate (THB)")&&!unpricedHtml.includes("data-testid=\"b3bf-total\"")&&unpricedHtml.includes(NOTE));
 assert.ok(lumpHtml.includes("793,800.00")&&!lumpHtml.includes("441,000.00")&&lumpHtml.includes("LUMP SUM LOT MODE"));
+const scheduleOrder=(html,label)=>{
+ const a=html.indexOf("A1 · MR-0001"),b=html.indexOf("B3-BF · Brownfield inspection");
+ assert.ok(a>=0&&b>a,label+": Part A must precede Part B");
+ assert.ok(html.indexOf(NOTE)>b,label+": the Greenfield/base note stays after Part B");
+};
+scheduleOrder(pricedHtml,"priced");
+scheduleOrder(unpricedHtml,"unpriced");
+scheduleOrder(lumpHtml,"lump");
 const page=fs.readFileSync(path.join(frontend,"src/pages/PJ26080553.jsx"),"utf8");
 const nav=fs.readFileSync(path.join(frontend,"src/project0553/lifecycleNavigation.js"),"utf8");
 assert.ok(page.includes('tab==="b3bf"&&<B3BrownfieldAdditional0553/>'));
