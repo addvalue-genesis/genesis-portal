@@ -1,16 +1,30 @@
 import React,{useMemo,useState} from "react";
-import {b3BrownfieldDocumentNumber0553,b3BrownfieldExportFileName0553,buildB3BrownfieldAdditionalCsv0553,formatB3BrownfieldMoney0553,selectB3BrownfieldAdditional0553,selectB3BrownfieldOfficialSchedule0553} from "./data/b3BrownfieldAdditional0553";
+import nativeReleaseTemplate0553 from "./data/nativeReleaseTemplate0553.json";
+import {b3BrownfieldDocumentNumber0553,b3BrownfieldExportFileName0553,buildB3BrownfieldAdditionalCsv0553,buildB3BrownfieldOfficialDocHtml0553,buildB3BrownfieldOfficialXlsx0553,formatB3BrownfieldMoney0553,selectB3BrownfieldAdditional0553,selectB3BrownfieldOfficialSchedule0553} from "./data/b3BrownfieldAdditional0553";
 import "./releaseWorkbook0553.css";
 
-function downloadCsv(model,view){
- const csv=buildB3BrownfieldAdditionalCsv0553(model,view);
- const blob=new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"});
+function saveBlob(blob,filename){
  const url=URL.createObjectURL(blob);
  const link=document.createElement("a");
  link.href=url;
- link.download=b3BrownfieldExportFileName0553({audience:view.version==="official"?"official":"internal",extension:"csv"});
+ link.download=filename;
  link.click();
  URL.revokeObjectURL(url);
+}
+function downloadCsv(model,view){
+ const csv=buildB3BrownfieldAdditionalCsv0553(model,view);
+ saveBlob(new Blob(["\uFEFF"+csv],{type:"text/csv;charset=utf-8"}),
+  b3BrownfieldExportFileName0553({audience:view.version==="official"?"official":"internal",extension:"csv"}));
+}
+function downloadDoc(model,view){
+ const html=buildB3BrownfieldOfficialDocHtml0553(model,{priced:view.priced,currency:view.currency});
+ saveBlob(new Blob([html],{type:"application/msword"}),b3BrownfieldExportFileName0553({audience:"official",extension:"doc"}));
+}
+async function downloadXlsx(model,view){
+ const bytes=Uint8Array.from(atob(nativeReleaseTemplate0553.base64),char=>char.charCodeAt(0));
+ const file=new File([bytes],nativeReleaseTemplate0553.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+ const result=await buildB3BrownfieldOfficialXlsx0553(file,model,{priced:view.priced,currency:view.currency});
+ saveBlob(new Blob([result.bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),result.filename);
 }
 
 export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=true,initialVersion="internal",initialCurrency="thb"}={}){
@@ -20,6 +34,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
  const [priced,setPriced]=useState(initialPriced);
  const [version,setVersion]=useState(initialVersion);
  const [currency,setCurrency]=useState(initialCurrency);
+ const [exportNote,setExportNote]=useState("");
  const official=version==="official";
  const money=(thbValue,usdValue)=>priced?formatB3BrownfieldMoney0553(model,thbValue,usdValue,currency):"";
  const [open,setOpen]=useState({bf:true,bom:true,site:true,a1:true,a1bom:true,ref:false});
@@ -53,9 +68,17 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
    <button type="button" data-testid="b3bf-usd" aria-pressed={currency==="usd"} onClick={()=>setCurrency("usd")} disabled={!priced}>USD</button>
    <button type="button" data-testid="b3bf-both" aria-pressed={currency==="both"} onClick={()=>setCurrency("both")} disabled={!priced}>Both</button>
    <span className="b3bf-sep">|</span>
-   <button type="button" onClick={()=>downloadCsv(model,{priced,itemized,version,currency})}>Export CSV</button>
+   <details className="b3bf-export" data-testid="b3bf-export-menu">
+    <summary>Export</summary>
+    <div className="b3bf-export-menu" role="menu">
+     <button type="button" onClick={()=>downloadCsv(model,{priced,itemized,version,currency})}>CSV — current view</button>
+     <button type="button" data-testid="b3bf-export-xlsx" onClick={()=>downloadXlsx(model,{priced,currency}).then(()=>setExportNote("Excel official schedule downloaded.")).catch(error=>setExportNote(error?.message||String(error)))}>Excel — Official schedule</button>
+     <button type="button" data-testid="b3bf-export-doc" onClick={()=>{downloadDoc(model,{priced,currency});setExportNote("Word official schedule downloaded (.doc). No docx library is installed.");}}>Word — Official schedule (.doc)</button>
+    </div>
+   </details>
    <button type="button" onClick={()=>window.print()}>Print</button>
   </div>
+  {exportNote&&<p className="b3bf-export-note" role="status">{exportNote}</p>}
   <div className="b3bf-doc">
    {official&&<OfficialCustomerSheet model={model} priced={priced} itemized={itemized} currency={currency}/>}
    {!official&&<><p className="b3bf-stand">ADDITIONAL PROPOSAL — B3 BROWNFIELD INSPECTION, TESTING &amp; CERTIFICATION<br/><small>Standalone. The original quotation / Scope of Supply is not modified.</small></p>
@@ -162,6 +185,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
    <p className="b3bf-foot">{model.exclusion} The per-site day split stays OPEN.</p>
    </>}
   </div>
+  {!official&&priced&&<p className="b3bf-cost" data-testid="b3bf-cost-basis">{model.costBasis.note}</p>}
   {!official&&<aside className="b3bf-openpanel" data-testid="b3bf-open-items">
    <h3>Open items</h3>
    <ul>{model.openItems.map(item=><li key={item.id}><strong>{item.topic}.</strong> {priced?item.detail:(item.unpricedDetail||item.detail)}</li>)}</ul>
@@ -243,12 +267,20 @@ const CSS=`
 .b3bf-official-detail td{background:#f8fbfd;font-weight:400}
 .b3bf-doctitle{font-family:Consolas,monospace;font-size:12px;margin:0 0 8px}
 .b3bf-controls button:disabled{opacity:.45;cursor:not-allowed}
+.b3bf-export{position:relative}
+.b3bf-export summary{list-style:none;border:1px solid #8ba2b1;background:#fff;padding:4px 9px;border-radius:3px;font-size:12px;cursor:pointer}
+.b3bf-export summary::-webkit-details-marker{display:none}
+.b3bf-export[open] summary{background:#005a9e;color:#fff;border-color:#005a9e}
+.b3bf-export-menu{position:absolute;z-index:5;background:#fff;border:1px solid #8ba2b1;padding:4px;display:flex;flex-direction:column;gap:4px;min-width:240px}
+.b3bf-export-menu button{text-align:left}
+.b3bf-export-note{font-size:12px;color:#2c5d7a;margin:0 0 8px}
 .b3bf-total td{background:#0b2538;color:#fff;font-weight:700}
 .b3bf-totals{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
 .b3bf-totals div{border:1px solid #b1c0cb;padding:8px 10px;background:#f7fbfd}
 .b3bf-totals span,.b3bf-totals small{display:block;color:#4d6474;font-size:11px}
 .b3bf-totals strong{display:block;margin:3px 0;font-size:15px}
 .b3bf-foot{font-size:11.5px;color:#4a5568;line-height:1.45}
+.b3bf-cost{margin-top:12px;border:1px solid #e0a800;background:#fff8e1;padding:8px 10px;line-height:1.45}
 .b3bf-openpanel{margin-top:14px;border:2px dashed #a4161a;background:#fffafa;padding:10px 14px}
 .b3bf-openpanel h3{margin:0 0 8px;color:#a4161a;font-size:14px}
 .b3bf-openpanel li{margin:4px 0}
