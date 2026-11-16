@@ -8,6 +8,7 @@ import {zipStore} from './exportOriginalPriceForm';
 import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 import {isLicensingCostLine0550} from './data/licensingScope0550';
 import {isC1Appendix0550,c1AppendixHtml0550,c1AppendixWord0550,c1AppendixCss0550,deriveC1Appendix0550,cleanCustomerText0550} from './data/c1Appendix0550';
+import {officialC1Word0550} from './data/officialC1Word0550';
 import {buildC1LookupForC20550,c2DeliveryTermFromC10550,c2MasterEntry0550,c2MasterSystemMeta0550,c2PartsDescription0550,c2SystemGroups0550,formatC2PartsDescriptionFromC10550,formatC2VendorSerialParts0550,spareSystemGroups0550,SPARE_DRAFT_NOTE_0550} from './data/c2SystemForms0550';
 import {formatPttepFileName0550,normalizePttepRev0550,revisionHistoryHtml0550,revisionHistoryWordXml0550} from './data/pttepDocControl0550';
 import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
@@ -663,7 +664,7 @@ export function buildNativeExhibitDocx0550(view,only){
  const trailingBreak=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<w:br w:type="page"\/><\/w:r><\/w:p>$/;
  const trailingParagraph=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<\/w:p>$/;
  const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
-  ?c1AppendixWord0550(view):nativePages(view,id).pages.map((page,index)=>{
+  ?(issued(view)?officialC1Word0550(view):c1AppendixWord0550(view)):nativePages(view,id).pages.map((page,index)=>{
    const xml=renderPage(view,page,'xml');
    if(issued(view)&&['A1','A2','C2','C3','C4','C5','C6','C7','C8'].includes(id)){
     const sz=['C2','C3','C4'].includes(id)?'16':'18';
