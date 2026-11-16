@@ -156,6 +156,8 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
   if(note)set(v,r,9,note);
  }
  if(base){
+  if(!groups.has(6)){set(v,6,3,'Lot');set(v,6,4,'—');set(v,6,5,'Excluded');set(v,6,6,'Excluded');set(v,6,7,'Excluded from Base Scope (see Form C-3)');}
+  if(!groups.has(9)){set(v,9,3,'Day');set(v,9,4,'—');set(v,9,5,'Per Form C-8');set(v,9,6,'Per Form C-8');set(v,9,7,'Call-off basis (Form C-8)');}
   const complete=Number.isFinite(view.baseAssigned);
   set(v,12,1,'In figures: '+(complete?currency+' '+number(view.baseAssigned):'TBA')+'\nIn Words: '+(complete?words(view.baseAssigned,currency):'TBA'));
   if(!complete)issues.push('Lump sum total TBA until every base price is complete');
@@ -668,7 +670,17 @@ export function buildNativeExhibitDocx0550(view,only){
    const xml=renderPage(view,page,'xml');
    if(issued(view)&&['A1','A2','B','C5','C6','C7','C8','C2','C3','C4'].includes(id)){
     const sz=['C2','C3','C4'].includes(id)?'16':'18';
-    return xml.replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`).replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`).replace(/<w:rPr>(?!.*?<w:sz\b)/g,`<w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/><w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`).replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>TBA<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell);
+    return xml.replace(/<w:tbl\b[\s\S]*?<\/w:tbl>/g,tbl=>tbl
+     .replace(/<w:jc\s+w:val="both"\s*\/>/g,'<w:jc w:val="left"/>')
+     .replace(/<w:highlight\b[^>]*\/>/g,'')
+     .replace(/<w:color\s+w:val="0000FF"\s*\/>/gi,'')
+     .replace(/<w:i(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
+     .replace(/<w:iCs(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
+     .replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`)
+     .replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`)
+     .replace(/<w:rPr>([\s\S]*?)<\/w:rPr>/g,(_,inner)=>`<w:rPr>${/w:rFonts/.test(inner)?inner:'<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>'+inner}${/w:sz\b/.test(inner)?'':`<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`}</w:rPr>`)
+     .replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>(?:TBA|[\d,]+\.\d{2})<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell)
+    );
    }
    if(!only||!view.workingPreview)return xml;
    const content=xml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>

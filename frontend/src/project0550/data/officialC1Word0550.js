@@ -41,6 +41,14 @@ function resolveStaticBomForWord(r) {
   if (r.sn === '1.1.15' || r.key === 'MR-B1-11-ABV01-01') return APF_DMR_MR_12_ITEMS_0550.slice(0, 4);
   if (r.key === 'OWNER:LINE-MGW-CURRENT-RADIO-016' || (r.appendix === '1.1' && r.site === 'AMS01' && /dmr/i.test(r.description || ''))) return APF_DMR_MR_12_ITEMS_0550.slice(0, 4);
   if (r.sn === '1.1.2' || r.key === 'MR-B1-11-APF-02') return APF_MARINE_MR_6_ITEMS_0550;
+  if (r.sn === '1.1.3' || r.key === 'MR-B1-11-APF-03') return [
+    { tagNo: 'Per Appendix 2 Drawing', offeredEquipment: 'MF/HF SSB 250W DSC Class A Radiotelephone System (Control Unit, Transceiver, ATU, Handset, PSU)', brand: 'SAILOR', model: 'SAILOR 6320 (6301/6368/6384)', partNo: 'SAILOR-6320-250W', quantity: 2, unit: 'SET', remarks: 'GMDSS Class A MF/HF SSB Dual Station' },
+    { tagNo: 'Per Appendix 2 Drawing', offeredEquipment: '8m Self-Supporting MF/HF Whip Antenna with Lightning Protection & 6m Control Cable', brand: 'SAILOR / Amphenol', model: 'HF8000 + Surge Arrester', partNo: 'HF8000', quantity: 2, unit: 'Ea.', remarks: 'Included in Base Scope of Supply' },
+    { tagNo: 'Per Appendix 2 Drawing', offeredEquipment: 'MF/HF SSB RoIP IP Gateway & 230VAC/24VDC Power Supply Unit', brand: 'SAILOR / Mean Well', model: 'RGW-7700 + XDR-960', partNo: 'RGW-7700', quantity: 2, unit: 'SET', remarks: 'Included in Base Scope of Supply' }
+  ];
+  if (r.sn === '1.1.11' || r.key === 'MR-B1-11-ACP-03') return [
+    { tagNo: 'Per Appendix 2 Drawing', offeredEquipment: 'MF/HF SSB 250W DSC Class A Radiotelephone System with ATU, Whip Antenna & IP Gateway', brand: 'SAILOR', model: 'SAILOR 6320 + HF8000 + RGW-7700', partNo: 'SAILOR-6320-ACP', quantity: 1, unit: 'SET', remarks: 'ACP MF/HF SSB Station' }
+  ];
   if (r.sn === '1.1.10' || r.key === 'MR-B1-11-ACP-02') return ACP_MARINE_MR_4_ITEMS_0550;
   if (r.sn === '1.1.4' || r.key === 'MR-B1-11-APF-04') return APF_AERO_MR_5_ITEMS_0550;
   if (r.sn === '1.1.6' || r.key === 'MR-B1-11-APF-06') return APF_ROIP_MR_7_ITEMS_0550;
@@ -97,31 +105,32 @@ export function officialC1Word0550(view) {
   const row = (values, header = false, span = false, bold = false) =>
     `<w:tr><w:trPr>${header ? '<w:tblHeader/>' : '<w:cantSplit/>'}</w:trPr>${values
       .map((v, i) => {
+        const w = span ? 13400 : widths[i];
         const noWrap = !span && (i === 0 || i === 2 || i === 3 || i === 4 || i === 5) ? '<w:noWrap/>' : '';
         const align = header ? 'center' : (i === 0 || i === 2 || i === 3) ? 'center' : (i === 4 || i === 5) ? 'right' : 'left';
-        return `<w:tc><w:tcPr>${span && i === 0 ? '<w:gridSpan w:val="7"/>' : ''}${noWrap}${header ? '<w:shd w:fill="EAF2F6"/>' : ''}<w:vAlign w:val="center"/></w:tcPr>${p(v, header || bold, '18', align)}</w:tc>`;
+        return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${span && i === 0 ? '<w:gridSpan w:val="7"/>' : ''}${noWrap}${header ? '<w:shd w:fill="EAF2F6"/>' : ''}<w:vAlign w:val="center"/></w:tcPr>${p(v, header || bold, '18', align)}</w:tc>`;
       })
       .join('')}</w:tr>`;
-  const headerCell = (text, properties = '') =>
-    `<w:tc><w:tcPr>${properties}<w:shd w:fill="EAF2F6"/><w:vAlign w:val="center"/></w:tcPr>${p(text, true, '18', 'center')}</w:tc>`;
+  const headerCell = (text, w, properties = '') =>
+    `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${properties}<w:shd w:fill="EAF2F6"/><w:vAlign w:val="center"/></w:tcPr>${p(text, true, '18', 'center')}</w:tc>`;
 
+  const widths = [850, 5950, 750, 700, 1350, 1350, 2450];
   const header =
     '<w:tr><w:trPr><w:tblHeader/></w:trPr>' +
-    ['SN', 'Item Description', 'Unit', 'Qty.'].map(t => headerCell(t, '<w:vMerge w:val="restart"/>')).join('') +
-    headerCell('CIF or FOB (USD)', '<w:gridSpan w:val="2"/>') +
-    headerCell('Notes', '<w:vMerge w:val="restart"/>') +
+    [['SN', widths[0]], ['Item Description', widths[1]], ['Unit', widths[2]], ['Qty.', widths[3]]].map(([t, w]) => headerCell(t, w, '<w:vMerge w:val="restart"/>')).join('') +
+    headerCell('CIF or FOB (USD)', widths[4] + widths[5], '<w:gridSpan w:val="2"/>') +
+    headerCell('Notes', widths[6], '<w:vMerge w:val="restart"/>') +
     '</w:tr><w:tr><w:trPr><w:tblHeader/></w:trPr>' +
-    Array.from({ length: 4 }, () => headerCell('', '<w:vMerge/>')).join('') +
-    headerCell('Unit Rate') +
-    headerCell('Total Price') +
-    headerCell('', '<w:vMerge/>') +
+    widths.slice(0, 4).map(w => headerCell('', w, '<w:vMerge/>')).join('') +
+    headerCell('Unit Rate', widths[4]) +
+    headerCell('Total Price', widths[5]) +
+    headerCell('', widths[6], '<w:vMerge/>') +
     '</w:tr>';
 
-  const widths = [900, 5600, 750, 750, 1400, 1400, 2600];
   let xml =
     heading('SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPLY') +
     p('Currency: USD', false, '18') +
-    '<w:tbl><w:tblPr><w:tblW w:w="0" w:type="auto"/><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="70" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="70" w:type="dxa"/></w:tblCellMar><w:tblBorders>' +
+    '<w:tbl><w:tblPr><w:tblW w:w="13400" w:type="dxa"/><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="70" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="70" w:type="dxa"/></w:tblCellMar><w:tblBorders>' +
     ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(n => `<w:${n} w:val="single" w:sz="4" w:color="8097A7"/>`).join('') +
     '</w:tblBorders></w:tblPr><w:tblGrid>' +
     widths.map(w => `<w:gridCol w:w="${w}"/>`).join('') +
