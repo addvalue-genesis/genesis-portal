@@ -72,7 +72,7 @@ const rOpenCust = SI_EQ.evaluatePhiDtsRow0550(
   { isInternal: false }
 );
 assert.equal(rOpenCust.status, 'OPEN / TBE');
-assert.equal(rOpenCust.offered, 'To be confirmed by Manufacturer');
+assert.equal(rOpenCust.offered, 'To be confirmed by Manufacturer post-award');
 assert(rOpenCust.internalFlag.length > 0);
 
 const rDeviate = SI_EQ.evaluatePhiDtsRow0550(

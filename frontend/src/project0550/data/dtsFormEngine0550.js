@@ -20,12 +20,12 @@ import {
 export const DTS_FORM_AREAS_0550 = ['APF', 'ACP', 'ABV01', 'AMS01'];
 
 export const DTS_FORM_REVISIONS_0550 = [
-  { code: 'INT-00', label: 'INT-00 (Internal WIP)' },
+  { code: '00', label: '00 (Issued for Bidding)' },
+  { code: 'A1', label: 'A1 (Issued for Review)' },
   { code: 'R1', label: 'R1 (IDC)' },
-  { code: 'A1', label: 'A1 (IFR/IFI)' },
   { code: 'B1', label: 'B1 (IFA/IFT)' },
   { code: 'C1', label: 'C1 (AFC)' },
-  { code: '00', label: '00 (As-Built)' },
+  { code: 'INT-00', label: 'INT-00 (Internal WIP)' },
 ];
 
 export const DTS_FORM_SECTIONS_0550 = [
@@ -206,14 +206,14 @@ export function buildDtsFormModel0550({
   systems = [],
   systemToken = 'TEL-DMR',
   area = 'APF',
-  revision = 'A1',
+  revision = '00',
   mode = 'customer',
   today = '2026-11-17',
 } = {}) {
   const isInternal = mode === 'internal';
   const safeArea = DTS_FORM_AREAS_0550.includes(area) ? area : 'APF';
-  const normRev = normalizePttepRev0550(revision, 'A1');
-  const displayRev = !isInternal && isInternalPttepRevision0550(normRev) ? 'A1' : normRev;
+  const normRev = normalizePttepRev0550(revision, '00');
+  const displayRev = !isInternal && isInternalPttepRevision0550(normRev) ? '00' : normRev;
   const sysMeta = DTS_SYSTEM_PACKAGE_MAP_0550[systemToken] || {
     pkg: 'TEQ',
     seq: '0001',
@@ -251,18 +251,30 @@ export function buildDtsFormModel0550({
         ? 'A'
         : '—';
 
-  // Revision history (auto-hides INT-XX in Customer Preview)
+  // Revision history (auto-hides INT-XX in Customer Preview; defaults to 00 Issued for Bidding)
+  const bidRevisionRow = {
+    rev: '00',
+    page: 'ALL',
+    date: dateDmy,
+    description: 'Issued for Bidding',
+    by: 'Suriyapong Y.',
+    checked: 'Suriyapong Y.',
+    approved: '',
+  };
   const rawHistory = dts.revisionHistory || [];
   const filteredHistory = isInternal ? rawHistory : customerRevisionHistory0550(rawHistory);
-  const revisionHistory = filteredHistory.map(r => ({
-    rev: r.rev,
-    page: 'ALL',
-    date: formatDateDmy(r.date || today),
-    description: clean(r.description || r.purpose),
-    by: clean(r.prepared || 'TSI Telecom Eng.'),
-    checked: clean(r.checked || 'SI Lead'),
-    approved: clean(r.approved || ''),
-  }));
+  const revisionHistory =
+    displayRev === '00'
+      ? [bidRevisionRow]
+      : filteredHistory.map(r => ({
+          rev: r.rev,
+          page: 'ALL',
+          date: formatDateDmy(r.date || today),
+          description: r.rev === '00' ? 'Issued for Bidding' : clean(r.description || r.purpose),
+          by: r.rev === '00' ? 'Suriyapong Y.' : clean(r.prepared || 'TSI Telecom Eng.'),
+          checked: r.rev === '00' ? 'Suriyapong Y.' : clean(r.checked || 'SI Lead'),
+          approved: r.rev === '00' ? '' : clean(r.approved || ''),
+        }));
 
   // Combine specRows + antennaRows into Datasheet sections evaluated via Φ_DTS(r)
   // For TEL-DMR, use the exact 60-row PTTEP Client DTS (MM-ASK-1A-APF-TEL-DTS-0010) answered from APPENDIX 1.5

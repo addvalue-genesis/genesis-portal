@@ -191,7 +191,7 @@ export function evaluatePhiDtsRow0550(row = {}, { volumeIModel = '', catalogEntr
   const rawCompliance = String(catalogEntry?.compliance ?? row.compliance ?? '').trim().toUpperCase();
   const modelVal = String(catalogEntry?.model ?? row.model ?? volumeIModel ?? '').trim();
   const partVal = String(catalogEntry?.partNo ?? row.partNo ?? '').trim();
-  const isVtaReq = /\bVTA\b|Defined by the bidder/i.test(reqText);
+  const isVtaReq = /\bVTA\b|Defined by the bidder|link\s*budget|path\s*loss/i.test(reqText);
   const hasMissing =
     isMissingCatalogVal(rawOffered) ||
     isMissingCatalogVal(modelVal) ||
@@ -199,28 +199,28 @@ export function evaluatePhiDtsRow0550(row = {}, { volumeIModel = '', catalogEntr
     /^(?:HOLD|OPEN|TBE|PENDING)/i.test(rawCompliance) ||
     /\b(?:OPEN|PENDING|TBE|NOT PROVIDED)\b/i.test(rawOffered);
 
-  // Major deviation -> Gate R3 auto-link to Tab 14 Deviation List
+  // Major deviation -> Gate R3 auto-link to Tab 14 Deviation List & Volume III Commercial Assumptions
   if (/DEVIAT/i.test(rawCompliance) && !/All-Outdoor|port|channel|switch/i.test(rawRemarks)) {
     return {
       offered: rawOffered || 'Proposed Alternative (See Deviation List)',
       status: 'DEVIATE',
       badgeClass: 'sb-d',
-      remarks: rawRemarks || 'Logged in Deviation List MM-ASK-1A-WP01-TEQ-TEL-LIS-0004',
-      internalFlag: `Gate R3 Deviation: ${row.item || ''} ${row.parameter || ''} -> Tab 14 Deviation List`,
+      remarks: rawRemarks || 'Logged in Tab 14 Deviation List (LIS-0004) & Volume III Commercial Assumptions',
+      internalFlag: `Gate R3 Deviation: ${row.item || ''} ${row.parameter || ''} -> Tab 14 Deviation List & Volume III Commercial Assumptions`,
       deviationLink: 'bid.deviations.release',
-      deviationLabel: 'Tab 14 Deviation List',
+      deviationLabel: 'Tab 14 Deviation List & Volume III Commercial Assumptions',
     };
   }
 
-  // Missing in catalog -> Gate R1 forbids COMPLY; Customer Preview shows "To be confirmed by Manufacturer"
+  // Missing in catalog -> Gate R1 forbids COMPLY; Customer Preview shows "To be confirmed by Manufacturer post-award"
   if (hasMissing) {
     return {
-      offered: isInternal ? (rawOffered || 'OPEN — Missing in 7 VND catalog') : 'To be confirmed by Manufacturer',
+      offered: isInternal ? (rawOffered || 'OPEN — Missing in 7 VND catalog') : 'To be confirmed by Manufacturer post-award',
       status: 'OPEN / TBE',
       badgeClass: 'sb-o',
       remarks: isInternal
         ? (rawRemarks || 'Gate R1: Missing in K_Cat(E*) — COMPLY forbidden')
-        : 'To be confirmed by Manufacturer',
+        : 'To be confirmed by Manufacturer post-award',
       internalFlag: `Gate R1 OPEN/TBE: ${row.item || ''} ${row.parameter || ''} (missing K_Cat(E*))`,
       deviationLink: null,
       deviationLabel: '',
@@ -240,13 +240,14 @@ export function evaluatePhiDtsRow0550(row = {}, { volumeIModel = '', catalogEntr
     };
   }
 
-  // C3 specifies VTA / Defined by the bidder and exact value of E* is populated
+  // C3 specifies VTA / Defined by the bidder / Link-Budget and exact value of E* is populated
   if (isVtaReq) {
+    const vtaNote = 'Preliminary per datasheet; final value confirmed per post-award Path Loss / Link Budget report';
     return {
       offered: rawOffered,
       status: 'COMPLY (VTA)',
       badgeClass: 'sb-c',
-      remarks: rawRemarks || 'Exact E* value populated per K_Cat(E*)',
+      remarks: rawRemarks ? `${rawRemarks} — ${vtaNote}` : vtaNote,
       internalFlag: '',
       deviationLink: null,
       deviationLabel: '',

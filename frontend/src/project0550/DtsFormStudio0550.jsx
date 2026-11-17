@@ -41,7 +41,7 @@ export function DtsFormStudio0550({
   const [mode, setMode] = useState('customer');
   const [systemToken, setSystemToken] = useState(defaultSystem && defaultSystem !== 'COMMON' ? defaultSystem : 'TEL-DMR');
   const [area, setArea] = useState('APF');
-  const [revision, setRevision] = useState('A1');
+  const [revision, setRevision] = useState('00');
   const [zoom, setZoom] = useState(1.25);
   const [notice, setNotice] = useState('');
   const rootRef = useRef(null);
@@ -566,7 +566,7 @@ export function DtsFormStudio0550({
             </table>
 
             <div className="basis">
-              VENDOR has answered against {form.clientDtsRef} Rev.A1, which incorporates COMPANY review comments closed at that revision. Deviations and exclusions are listed in MM-ASK-1A-WP01-TEQ-TEL-LIS-0004, submitted with this bid.
+              Submitted WITH BID based on selected equipment in Volume I (Schedule C1) and manufacturer standard datasheets (Volume II VDB). Final VTA / link-budget-dependent parameters shall be confirmed during detail engineering post-award. Deviations and exclusions are listed in MM-ASK-1A-WP01-TEQ-TEL-LIS-0004.
             </div>
 
             {isInternal && form.internalNotes.length > 0 && (

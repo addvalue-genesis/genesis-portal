@@ -61,7 +61,7 @@ for (const tok of [...tokens, 'COMMON']) {
       today,
     });
     totalChecked++;
-    assert.equal(cust.revision, 'A1', 'INT-00 auto-maps to A1 in Customer Preview');
+    assert.equal(cust.revision, '00', 'INT-00 auto-maps to 00 in Customer Preview');
     assert.equal(cust.revisionHistory.some(r => /^INT-/i.test(r.rev)), false, 'INT-XX hidden in Customer Preview');
     assert.equal(cust.internalNotes.length, 0, 'Internal notes stripped in Customer Preview');
     assert(cust.sections.length > 0, `Sections non-empty for ${tok}/${area}`);
@@ -130,7 +130,9 @@ assert(ssr.includes('Refer to Equipment Tag List (Page 4)'), 'Rows 1-3 verbatim 
 assert(ssr.includes('CommScope VHLP4-7W/E'), 'Page 4 Sheet 3 Antenna Datasheet');
 assert(ssr.includes('APF-MR-320-201') && ssr.includes('ACP-MR-320-002') && ssr.includes('MR-320'), 'Page 5 exact client tags');
 assert(ssr.includes('Page 5 of 5'), '5-page footer for TEL-DMR');
-assert(ssr.includes('MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.A1.docx'));
+assert(ssr.includes('Issued for Bidding'), 'Default Rev.00 Issued for Bidding');
+assert(ssr.includes('Submitted WITH BID based on selected equipment in Volume I (Schedule C1)'), 'WITH BID basis note on Page 3');
+assert(ssr.includes('MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.00.docx'));
 assert(!ssr.includes('class="vm-warn intblock"'), 'Customer Preview SSR omits .intblock');
 assert(!ssr.includes('class="devref"'), 'Customer Preview SSR omits [DEV-XXX] tags');
 
