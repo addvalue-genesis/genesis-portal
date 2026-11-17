@@ -1,0 +1,613 @@
+/* Exact 4-Page A4 Datasheet Template CSS (MM-ASK-1A-WP01/WP02-TEQ-TEL-DTS-0001) */
+.dts-form-studio .xb {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: #111827;
+  color: #e5e7eb;
+  padding: 8px 12px;
+  font: 12px Arial, Helvetica, sans-serif;
+  border-radius: 6px 6px 0 0;
+}
+.dts-form-studio .xb b {
+  color: #93c5fd;
+}
+.dts-form-studio .xb label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #d1d5db;
+  font: 600 11.5px Arial, Helvetica, sans-serif;
+}
+.dts-form-studio .xb select {
+  background: #1f2937;
+  color: #f9fafb;
+  border: 1px solid #4b5563;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font: 12px Arial, Helvetica, sans-serif;
+  max-width: 240px;
+}
+.dts-form-studio .xb button {
+  padding: 5px 14px;
+  border-radius: 999px;
+  border: 1px solid #4b5563;
+  background: #1f2937;
+  color: #e5e7eb;
+  font: 600 12px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+}
+.dts-form-studio .xb button.on {
+  background: #6366f1;
+  border-color: #6366f1;
+  color: #fff;
+}
+.dts-form-studio .xb .sp {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.dts-form-studio .xb .sp button {
+  border-radius: 6px;
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+}
+.dts-form-studio .xb .hint {
+  color: #9ca3af;
+}
+
+.dts-root {
+  background: #e8e8e8;
+  padding: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #111;
+}
+.dts-root * {
+  box-sizing: border-box;
+}
+.vm-warn {
+  background: #fdf6ec;
+  border: 1px solid #e0b070;
+  border-left: 5px solid #a8560b;
+  color: #7a3f06;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.vm-warn ul {
+  margin: 4px 0 0 16px;
+  padding: 0;
+}
+.vm-fail {
+  margin-top: 6px;
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 6px 8px;
+  font-weight: 700;
+}
+.intblock {
+  background: #fdf6ec;
+  border: 1px solid #e0b070;
+  border-left: 5px solid #a8560b;
+  color: #7a3f06;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  background: #fff;
+  margin: 0 auto 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 1px solid #888;
+}
+.inner {
+  margin: 18mm 20mm 15mm 20mm;
+  display: flex;
+  flex-direction: column;
+  min-height: 264mm;
+}
+.page.cover .inner {
+  margin: 6mm;
+  padding: 0;
+}
+.cv-frame {
+  border: 0.8px solid #000;
+  padding: 8mm 9mm 7mm;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 272mm;
+}
+.cv-proj {
+  text-align: center;
+  padding: 0 10mm;
+  margin-top: 4mm;
+  font-size: 14pt;
+  font-weight: 700;
+  color: #1f3864;
+  line-height: 1.4;
+}
+.cv-sp {
+  flex: 1;
+  min-height: 38mm;
+}
+.cv-title {
+  text-align: center;
+  font-size: 18pt;
+  font-weight: 700;
+  color: #1f3864;
+  margin-bottom: 2mm;
+}
+.cv-for {
+  text-align: center;
+  font-size: 14pt;
+  font-weight: 700;
+  margin-bottom: 6mm;
+}
+.cv-pkg {
+  text-align: center;
+  font-size: 14pt;
+  font-weight: 700;
+}
+.cv-sp2 {
+  flex: 1;
+  min-height: 34mm;
+}
+.cv-rev {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  table-layout: fixed;
+}
+.cv-rev td {
+  border: 0.5px solid #000;
+  padding: 3px 4px;
+  text-align: center;
+  height: 5mm;
+}
+.cv-rev td.desc {
+  text-align: center;
+}
+.cv-rev td.lbl {
+  font-weight: 700;
+  font-size: 7pt;
+  vertical-align: middle;
+}
+.cv-rev td.lbl-b {
+  font-size: 8pt;
+}
+.cv-rev td.grp {
+  font-weight: 700;
+  font-size: 7pt;
+  line-height: 1.15;
+}
+.cv-status {
+  font-weight: 700;
+  font-size: 8pt;
+  padding: 4px !important;
+}
+.cv-conf {
+  font-weight: 700;
+  font-size: 8pt;
+  line-height: 1.5;
+  padding: 5px 8px !important;
+}
+.cv-tb {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  table-layout: fixed;
+  margin-top: 0;
+}
+.cv-tb td {
+  border: 0.5px solid #000;
+  padding: 4px 6px;
+  text-align: center;
+  vertical-align: middle;
+}
+.tb-logo {
+  width: 17%;
+  font-weight: 700;
+  font-size: 11pt;
+  color: #1f3864;
+}
+.tb-avs {
+  color: #c00;
+  font-size: 8pt;
+}
+.tb-client {
+  font-weight: 700;
+  font-size: 8pt;
+}
+.tb-proj {
+  font-weight: 700;
+  font-size: 8pt;
+  line-height: 1.35;
+}
+.tb-no {
+  width: 40%;
+  font-weight: 700;
+  font-size: 9pt;
+}
+.tb-f {
+  width: 13%;
+  padding: 0 !important;
+}
+.tb-fh {
+  font-weight: 700;
+  font-size: 7pt;
+  border-bottom: 0.5px solid #000;
+  padding: 3px;
+}
+.tb-fv {
+  font-weight: 700;
+  font-size: 10pt;
+  padding: 4px;
+}
+
+/* Page 2 — Approval & Document Revision History Sheet */
+.as-hd {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 9pt;
+  margin-bottom: 4mm;
+}
+.as-hd td {
+  border: 0.5px solid #555;
+  padding: 5px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+.as-logo {
+  width: 20%;
+  font-weight: 700;
+  color: #1f3864;
+}
+.as-avs {
+  color: #c00;
+}
+.as-proj {
+  font-weight: 700;
+  font-size: 9pt;
+}
+.as-f {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-bottom: 3mm;
+}
+.as-f td {
+  border: 0.5px solid #555;
+  padding: 4px 8px;
+}
+.as-k {
+  width: 32%;
+  background: #eef3f9;
+  font-weight: 700;
+}
+.as-k2 {
+  font-weight: 400;
+  font-size: 7pt;
+}
+.as-v {
+  text-align: center;
+  font-weight: 700;
+}
+.as-rev {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-bottom: 3mm;
+}
+.as-rev th {
+  border: 0.5px solid #555;
+  padding: 4px;
+  background: #eef3f9;
+}
+.as-rev td {
+  border: 0.5px solid #555;
+  padding: 4px;
+  height: 5mm;
+}
+.as-rev .c {
+  text-align: center;
+}
+.as-sub {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-bottom: 3mm;
+}
+.as-sub td {
+  border: 0.5px solid #555;
+  padding: 6px 8px;
+  vertical-align: middle;
+}
+.as-subk {
+  width: 22%;
+  font-weight: 700;
+  text-align: center;
+}
+.as-subv {
+  width: 28%;
+}
+.as-subn {
+  line-height: 1.9;
+}
+.as-cod {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+}
+.as-cod td {
+  border: 0.5px solid #555;
+  padding: 7px 9px;
+  width: 50%;
+  vertical-align: top;
+}
+.as-ch {
+  text-align: center;
+  font-weight: 700;
+  font-size: 9pt;
+  text-decoration: underline;
+  margin-bottom: 5px;
+}
+.as-row {
+  line-height: 1.75;
+}
+.as-box {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border: 0.5px solid #555;
+  margin-right: 7px;
+  vertical-align: middle;
+}
+.as-box.checked {
+  background: #1f3864;
+}
+.as-d {
+  margin: 0 0 3px 15px;
+  font-size: 7pt;
+  color: #555;
+}
+.as-sig {
+  line-height: 2.1;
+}
+.as-dis {
+  font-size: 7pt;
+  text-align: center;
+  line-height: 1.6;
+}
+.st2rh {
+  font-weight: 700;
+  font-size: 10pt;
+  color: #1f3864;
+  text-align: center;
+  margin: 6mm 0 3px;
+}
+.as-rh {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+}
+.as-rh th {
+  border: 0.5px solid #555;
+  padding: 4px;
+  background: #eef3f9;
+  font-weight: 700;
+}
+.as-rh td {
+  border: 0.5px solid #555;
+  padding: 4px;
+  height: 5mm;
+}
+.as-rh .c {
+  text-align: center;
+}
+
+/* Page 3 & 4 — Header Banner, Spec Table, Tag List, Notes, Footer */
+.ph {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 8pt;
+  margin-bottom: 7px;
+}
+.ph td {
+  border: 0.5px solid #999;
+  padding: 3px 6px;
+}
+.ph-t {
+  background: #ddeeff;
+  font-weight: 700;
+  font-size: 9pt;
+  text-align: center;
+}
+.ph-i {
+  font-size: 8pt;
+  color: #333;
+}
+.st2 {
+  font-weight: 700;
+  font-size: 10pt;
+  color: #1f3864;
+  margin: 12px 0 3px;
+}
+.tb {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 7pt;
+  table-layout: fixed;
+}
+.tb th {
+  background: #1f3864;
+  color: #fff;
+  padding: 3px;
+  text-align: center;
+  border: 0.3px solid #1f3864;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.tb td {
+  padding: 3px 4px;
+  border: 0.3px solid #bbb;
+  vertical-align: top;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.tb.ds td {
+  border-color: #999;
+}
+.tb .sec td {
+  background: #d6e4f0;
+  font-weight: 700;
+  font-size: 8pt;
+}
+.tb .alt td {
+  background: #f7fafe;
+}
+.tb .c {
+  text-align: center;
+}
+.param {
+  font-weight: 600;
+}
+.mono {
+  font-family: Consolas, monospace;
+}
+.sb {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 6pt;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.sb-c {
+  background: #dff3e7;
+  color: #0f7b4f;
+}
+.sb-p,
+.sb-d,
+.sb-t {
+  background: #fdeddc;
+  color: #a8560b;
+}
+.sb-b,
+.sb-n {
+  background: #eee;
+  color: #555;
+}
+.sb-o {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.devref {
+  font-size: 7pt;
+  color: #a8560b;
+  font-weight: 700;
+}
+.notes {
+  font-size: 8pt;
+  line-height: 1.6;
+  padding-left: 16px;
+  margin: 0;
+}
+.notes li {
+  margin-bottom: 5px;
+}
+.foot {
+  margin-top: auto;
+  font-size: 7pt;
+  color: #555;
+  padding-top: 5px;
+  border-top: 0.4px solid #999;
+  display: flex;
+  justify-content: space-between;
+}
+.basis {
+  font-size: 7pt;
+  color: #333;
+  margin: 4px 0 7px;
+  line-height: 1.55;
+}
+
+img.lg {
+  display: block;
+  margin: 0 auto;
+}
+img.lg-pttep-cv {
+  width: 14mm;
+  height: 14mm;
+}
+img.lg-avs-cv {
+  width: 26mm;
+  height: 8.38mm;
+}
+img.lg-pttep-hd {
+  width: 9mm;
+  height: 9mm;
+}
+img.lg-omega-cv {
+  width: 26mm;
+  height: 6.01mm;
+  margin-bottom: 1.6mm;
+}
+img.lg-omega-hd {
+  width: 18mm;
+  height: 4.16mm;
+  margin-bottom: 1.2mm;
+}
+img.lg-avs-hd {
+  width: 18mm;
+  height: 5.82mm;
+}
+
+@media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .dts-form-studio .xb,
+  .no-print {
+    display: none !important;
+  }
+  .dts-root {
+    background: #fff;
+    padding: 0;
+  }
+  .page {
+    box-shadow: none;
+    margin: 0;
+    border: none;
+    page-break-after: always;
+    width: auto;
+    min-height: 0;
+  }
+  .page.cover .inner {
+    margin: 6mm;
+  }
+  .page:last-child {
+    page-break-after: auto;
+  }
+  .tb tr {
+    page-break-inside: avoid;
+  }
+  @page {
+    size: A4 portrait;
+    margin: 0;
+  }
+}

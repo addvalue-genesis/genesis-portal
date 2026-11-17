@@ -2,7 +2,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{execFileSync}=require('node:child_process'),babel=require('@babel/core');
 const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
 const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
-require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+require.extensions['.js']=compile;require.extensions['.jsx']=compile;require.extensions['.css']=()=>{};
 const D=require(root+'/project0550/data.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),I=require(root+'/project0550/data/integrationWorkspace0550.js'),R=require(root+'/project0550/data/releaseIssue0550.js'),T=require(root+'/project0550/data/technicalProposal0550.js'),X=require(root+'/project0550/exportTechnicalProposal0550.js');
 const today='2026-10-29',tokens=D.SYSTEMS.map(s=>s.token),clone=structuredClone;
 const derive=d=>{const integration=I.deriveIntegration0550(d,D.SYSTEMS,today);return {...W.deriveBidWorkspace(d,tokens,today,integration),integration};};
