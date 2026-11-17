@@ -39,7 +39,7 @@ export function DtsFormStudio0550({
   today = '2026-11-17',
 }) {
   const [mode, setMode] = useState('customer');
-  const [systemToken, setSystemToken] = useState(defaultSystem || 'TEL-DMR');
+  const [systemToken, setSystemToken] = useState(defaultSystem && defaultSystem !== 'COMMON' ? defaultSystem : 'TEL-DMR');
   const [area, setArea] = useState('APF');
   const [revision, setRevision] = useState('A1');
   const [zoom, setZoom] = useState(1.25);
@@ -614,20 +614,27 @@ export function DtsFormStudio0550({
                     <tr className="sec">
                       <td colSpan={colCount}>{sec.title}</td>
                     </tr>
-                    {sec.rows.map((row, idx) => (
-                      <tr key={`${sec.title}-${row.item}-${idx}`} className={idx % 2 === 1 ? 'alt' : ''}>
-                        <td className="c mono">{row.item}</td>
-                        <td className="param">{row.parameter}</td>
-                        <td>{row.requirement}</td>
-                        <td>{row.offered}</td>
-                        {isInternal && <td className="c">{row.src || '—'}</td>}
-                        {isInternal && (
-                          <td className="c">
-                            <span className={`sb ${row.badge.cls}`}>{row.badge.label}</span>
-                          </td>
-                        )}
-                      </tr>
-                    ))}
+                    {sec.rows.map((row, idx) =>
+                      row.isSectionHeader ? (
+                        <tr key={`${sec.title}-hdr-${row.item}-${idx}`} className="sec">
+                          <td className="c mono">{row.item}</td>
+                          <td colSpan={colCount - 1} style={{ textDecoration: 'underline' }}>{row.parameter}</td>
+                        </tr>
+                      ) : (
+                        <tr key={`${sec.title}-${row.item}-${idx}`} className={idx % 2 === 1 ? 'alt' : ''}>
+                          <td className="c mono">{row.item}</td>
+                          <td className="param">{row.parameter}</td>
+                          <td>{row.requirement}</td>
+                          <td>{row.offered}</td>
+                          {isInternal && <td className="c">{row.src || '—'}</td>}
+                          {isInternal && (
+                            <td className="c">
+                              {row.badge && <span className={`sb ${row.badge.cls}`}>{row.badge.label}</span>}
+                            </td>
+                          )}
+                        </tr>
+                      )
+                    )}
                   </React.Fragment>
                 ))}
               </tbody>

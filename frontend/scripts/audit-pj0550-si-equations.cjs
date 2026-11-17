@@ -107,12 +107,13 @@ const model = { ...W.deriveBidWorkspace(d, tokens, today, integration), integrat
 const dtsFormHtml = renderToStaticMarkup(
   React.createElement(DtsFormStudio0550, { data: d, model, systems: D.SYSTEMS, defaultSystem: 'TEL-DMR', today })
 );
-assert(dtsFormHtml.includes('To be confirmed by Manufacturer'), '12.T Customer Preview renders Gate R1 TBE text');
+assert(dtsFormHtml.includes('FibeAir IP-50CX (2+0)'), '12.T TEL-DMR renders APPENDIX 1.5 FibeAir IP-50CX (2+0)');
+assert(dtsFormHtml.includes('Microwave Characteristics'), '12.T TEL-DMR renders exact 60-row Client DTS sections');
 const dmrIntModel = buildDtsFormModel0550({ data: d, model, systems: D.SYSTEMS, systemToken: 'TEL-DMR', area: 'APF', revision: 'A1', mode: 'internal', today });
-const statuses = new Set(dmrIntModel.sections.flatMap(s => s.rows.map(r => r.badge.label)));
+assert.equal(dmrIntModel.sections[0].rows.length, 60, '12.T TEL-DMR renders all 60 Client DTS rows');
+const statuses = new Set(dmrIntModel.sections.flatMap(s => s.rows.filter(r => r.badge).map(r => r.badge.label)));
 assert(statuses.has('COMPLY'), '12.T TEL-DMR includes COMPLY');
 assert(statuses.has('MINOR / CLARIFY'), '12.T TEL-DMR includes MINOR / CLARIFY');
-assert(statuses.has('OPEN / TBE'), '12.T TEL-DMR includes OPEN / TBE');
 assert.equal(dmrIntModel.volumeIAsIsLock.locked, true, '12.T TEL-DMR Volume I AS-IS Lock verified');
 
 console.log('PASS audit-pj0550-si-equations: 6 SDRL equations (B03/B05/B08/B11/CAL/C02), Phi_DTS 5 outcomes + Vol.I AS-IS Lock, SI-CAL 02 / 12.V / 12.T SSR.');
