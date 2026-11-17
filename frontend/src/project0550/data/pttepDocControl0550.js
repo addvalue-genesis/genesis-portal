@@ -2,10 +2,10 @@
 
 export const PTTEP_DOC_STANDARD_0550='10008-STD-6-GEN-002-R01';
 
-export const PTTEP_AREAS_0550=['GEN','APF','ACP','ABV01'];
+export const PTTEP_AREAS_0550=['GEN','APF','ACP','ABV01','AMS01'];
 
 export const PTTEP_PACKAGES_0550=[
- 'TEQ','RADIO','VSAT','LAN','PABX','PAGA','CCTV','FO','TELT','MET','AIS','ES','IPP',
+ 'TEQ','RADIO','VSAT','LAN','PABX','PAGA','CCTV','FO','TELT','MET','AIS','ES','IPP','DMR','NDB','ENT','CAB','COMMON',
 ];
 
 export const PTTEP_DISCIPLINES_0550=['TEL','PJM'];
