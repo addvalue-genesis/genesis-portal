@@ -196,7 +196,7 @@ assert.match(N.nativeSchedule0550(spareView,'C3').html,/class="native-c2-draft-p
 assert(Buffer.from(N.buildNativeExhibitDocx0550(spareView,'A1')).toString().includes('Option reference (A2 / Form C-3): USD 75.00'));
 const officialSpare=N.nativeSchedule0550({...spareView,customerIssue:true},'A1');
 assert.equal(officialSpare.pages[0].values.A1_5_6,'100.00','Complete official row price is unchanged');
-assert.equal(officialSpare.pages[0].values.A1_6_6,'','Two-year spares stay off the base price columns');
+assert.equal(officialSpare.pages[0].values.A1_6_6,'Excluded','Two-year spares stay off base price columns; Official A1 marks the empty C-3 slot Excluded');
 assert.match(officialSpare.pages[0].values.A1_12_1,/In figures: USD 100\.00/);
 assert.doesNotMatch(officialSpare.html,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Site service period to confirm/);
 assert.match(officialSpare.html,/whiteness/);
