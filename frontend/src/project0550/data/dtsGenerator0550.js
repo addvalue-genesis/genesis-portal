@@ -67,7 +67,7 @@ export const DTS_SYSTEM_PACKAGE_MAP_0550 = {
   'TEL-LAN': { pkg: 'LAN', seq: '0014', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0014', title: 'Industrial LAN, Core/Access Switch & Wi-Fi' },
   'TEL-PABX': { pkg: 'PABX', seq: '0015', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0015', title: 'IP-PABX & Telephony System' },
   'TEL-IPP': { pkg: 'IPP', seq: '0016', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0016', title: 'Ex-Proof & Industrial IP Telephone System' },
-  'TEL-PAGA': { pkg: 'PAGA', seq: '0017', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0017', title: 'Public Address & General Alarm (PAGA) System' },
+  'TEL-PAGA': { pkg: 'PAGA', seq: '0003', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0003', title: 'Public Address & General Alarm (PAGA) System' },
   'TEL-CCTV': { pkg: 'CCTV', seq: '0018', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0018', title: 'Ex-Proof & Industrial CCTV Surveillance System' },
   'TEL-FO': { pkg: 'FO', seq: '0019', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0019', title: 'Fiber Optic & Structured Cabling System' },
   'TEL-MET': { pkg: 'MET', seq: '0020', clientDts: 'MM-ASK-1A-APF-TEL-DTS-0020', title: 'Meteorological & Weather Monitoring System' },

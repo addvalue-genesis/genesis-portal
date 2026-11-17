@@ -136,6 +136,26 @@ assert(ssr.includes('MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.00.docx'));
 assert(!ssr.includes('class="vm-warn intblock"'), 'Customer Preview SSR omits .intblock');
 assert(!ssr.includes('class="devref"'), 'Customer Preview SSR omits [DEV-XXX] tags');
 
+// 4. TEL-PAGA (MM-ASK-1A-APF-TEL-DTS-0003 Rev.B1 -> 9-page INDUSTRONIC INTRON-X WITH BID)
+const ssrPaga = renderToStaticMarkup(
+  React.createElement(DtsFormStudio0550, {
+    data: d,
+    model,
+    systems: D.SYSTEMS,
+    defaultSystem: 'TEL-PAGA',
+    today,
+  })
+);
+assert(ssrPaga.includes('MM-ASK-00-APF-PAGA-TEL-DTS-0003 Rev.00.docx'), 'PAGA PTTEP §7.5 file name');
+assert(ssrPaga.includes('INTRON-X Main Rack'), 'PAGA AS-IS Volume I INDUSTRONIC INTRON-X');
+assert(ssrPaga.includes('Override Control Units (OCU)'), 'PAGA Sheet 3 OCU');
+assert(ssrPaga.includes('Operator Access Panel (OAP)'), 'PAGA Sheet 4 OAP');
+assert(ssrPaga.includes('Horn Speaker Explosion Proof'), 'PAGA Sheet 5 Horn Speaker');
+assert(ssrPaga.includes('Loud Speaker Ceiling/Wall Mounted'), 'PAGA Sheet 6 Indoor Speaker');
+assert(ssrPaga.includes('Flashing Beacon (Ex d)'), 'PAGA Sheet 7 Flashing Beacon');
+assert(ssrPaga.includes('Page 9 of 9'), 'PAGA 9-page split');
+assert(ssrPaga.includes('LSN-303-365') && ssrPaga.includes('LSN-303-414'), 'PAGA Rev.B1 ITR & Lab tags');
+
 console.log(
   `PASS 12.T DTS Form Studio: ${totalChecked} system/area combinations, zero placeholders/leaks, PTTEP §7.5 naming, 4-page A4 SSR.`
 );

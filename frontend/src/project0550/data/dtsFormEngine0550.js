@@ -16,6 +16,7 @@ import {
   evaluatePhiDtsRow0550,
   verifyVolumeIAsIsLock0550,
 } from './siVerificationEquations0550';
+import { buildPagaClientDtsSheets0550 } from './pagaClientDts0003_0550';
 
 export const DTS_FORM_AREAS_0550 = ['APF', 'ACP', 'ABV01', 'AMS01'];
 
@@ -277,20 +278,24 @@ export function buildDtsFormModel0550({
         }));
 
   // Combine specRows + antennaRows into Datasheet sections evaluated via Φ_DTS(r)
-  // For TEL-DMR, use the exact 60-row PTTEP Client DTS (MM-ASK-1A-APF-TEL-DTS-0010) answered from APPENDIX 1.5
+  // For TEL-DMR: exact 60-row PTTEP Client DTS (DTS-0010) + 16-row Antenna sheet
+  // For TEL-PAGA: exact PTTEP Client DTS (DTS-0003 Rev.B1) 6 equipment sheets + APF/ACP Tag List
   const isDmr60 = systemToken === 'TEL-DMR';
+  const isPaga0003 = systemToken === 'TEL-PAGA';
+  const pagaSheets = isPaga0003 ? buildPagaClientDtsSheets0550(safeArea) : null;
   const combinedRows = isDmr60
     ? buildDmrClientDts60Rows0550(safeArea)
-    : [...(dts.specRows || []), ...(dts.antennaRows || [])];
+    : isPaga0003
+      ? pagaSheets.mainSection.rows
+      : [...(dts.specRows || []), ...(dts.antennaRows || [])];
   const volumeILines = (data?.lines || []).filter(
     l => l.selected && (systemToken === 'COMMON' || l.systemToken === systemToken)
   );
   const volumeIAsIsLock = verifyVolumeIAsIsLock0550(combinedRows, volumeILines);
   const phiFlags = [];
 
-  let sections = [];
-  if (isDmr60) {
-    const dmrRows = combinedRows.map(r => {
+  const evalRows = (rawRows, defaultSrc) =>
+    rawRows.map((r, idx) => {
       if (r.isSectionHeader) {
         return {
           item: r.item,
@@ -311,11 +316,11 @@ export function buildDtsFormModel0550({
         });
       }
       return {
-        item: r.item,
+        item: r.item || String(idx + 1),
         parameter: clean(r.parameter),
         requirement: clean(r.requirement),
         offered: clean(phi.offered),
-        src: isInternal ? (r.remarks || 'APPENDIX 1.5') : '',
+        src: isInternal ? (r.remarks || defaultSrc) : '',
         badge: { label: phi.status, cls: phi.badgeClass },
         remarks: clean(phi.remarks),
         deviationLink: phi.deviationLink,
@@ -323,7 +328,12 @@ export function buildDtsFormModel0550({
         isSectionHeader: false,
       };
     });
-    sections = [{ title: 'Sheet 2 · Main Equipment Datasheet — Microwave Radio System (Ceragon FibeAir IP-50CX)', rows: dmrRows }];
+
+  let sections = [];
+  if (isDmr60) {
+    sections = [{ title: 'Sheet 2 · Main Equipment Datasheet — Microwave Radio System (Ceragon FibeAir IP-50CX)', rows: evalRows(combinedRows, 'APPENDIX 1.5') }];
+  } else if (isPaga0003) {
+    sections = [{ title: pagaSheets.mainSection.title, rows: evalRows(pagaSheets.mainSection.rows, 'APPENDIX 1.4 / A20261632') }];
   } else {
     const groupedSpecs = new Map(DTS_FORM_SECTIONS_0550.map(sec => [sec, []]));
     combinedRows.forEach((r, idx) => {
@@ -356,23 +366,11 @@ export function buildDtsFormModel0550({
     })).filter(s => s.rows.length > 0);
   }
 
-  // Optional Sheet 3 (Page 4): Antenna / Sub-Equipment Datasheet when present (e.g., TEL-DMR 16-row CommScope VHLP4-7W/E)
+  // Optional Sheet 3+ : Sub-Equipment Datasheets when present
   let subEquipmentSections = [];
   if (isDmr60) {
     const refDts = buildDts0010ReferenceRows0550();
-    const antRows = (refDts.antennaRows || []).map((r, idx) => {
-      const phi = evaluatePhiDtsRow0550(r, { isInternal });
-      return {
-        item: r.item || `A.${idx + 1}`,
-        parameter: clean(r.parameter),
-        requirement: clean(r.requirement),
-        offered: clean(phi.offered),
-        src: isInternal ? (r.remarks || 'Ceragon / CommScope') : '',
-        badge: { label: phi.status, cls: phi.badgeClass },
-        remarks: clean(phi.remarks),
-        isSectionHeader: false,
-      };
-    });
+    const antRows = evalRows(refDts.antennaRows || [], 'Ceragon / CommScope');
     if (antRows.length > 0) {
       subEquipmentSections = [
         {
@@ -381,9 +379,14 @@ export function buildDtsFormModel0550({
         },
       ];
     }
+  } else if (isPaga0003) {
+    subEquipmentSections = pagaSheets.subSections.map(s => ({
+      title: s.title,
+      rows: evalRows(s.rows, 'APPENDIX 1.4 / A20261632'),
+    }));
   }
 
-  // Final Sheet: Equipment Tag list (exact client tags for TEL-DMR)
+  // Final Sheet: Equipment Tag list
   const rawTagRows = isDmr60
     ? [
         { tagNo: 'APF-MR-320-201', service: 'APF Microwave Radio ODU (2+0 High Sub-Band)', location: 'APF / 60m Telecom Tower / Dish Back-Mount', model: 'Ceragon FibeAir IP-50CX', partNo: 'IP50CX-FO-2P0', vdbRef: 'CERAGON-26-30029-R11 / PTD Pending' },
@@ -394,7 +397,9 @@ export function buildDtsFormModel0550({
         { tagNo: 'ACP-MR-320-001', service: 'ACP Microwave Radio ODU (2+0 Low Sub-Band)', location: 'ACP / 30m Telecom Tower / Dish Back-Mount', model: 'Ceragon FibeAir IP-50CX', partNo: 'IP50CX-FO-2P0', vdbRef: 'CERAGON-26-30029-R11 / PTD Pending' },
         { tagNo: 'ACP-MR-320-002', service: 'ACP Microwave IDU Slot (Full Outdoor IP-50CX)', location: 'ACP / Control Room / RAD-308-001', model: 'Ceragon FibeAir IP-50CX (Full Outdoor)', partNo: 'IP50CX-FO-2P0', vdbRef: 'DEV-DMR-CERAGON-R11-BID-DRAFT' },
       ]
-    : dts.tagRows || [];
+    : isPaga0003
+      ? pagaSheets.tagRows.map(t => ({ ...t, vdbRef: 'INDUSTRONIC A20261632-005 / App.2 LIS' }))
+      : dts.tagRows || [];
 
   const tagList = rawTagRows.map(t => ({
     items: clean(t.service || dts.systemTitle),
@@ -407,7 +412,7 @@ export function buildDtsFormModel0550({
     ),
   }));
 
-  const totalPages = subEquipmentSections.length > 0 ? 5 : 4;
+  const totalPages = 3 + subEquipmentSections.length + 1;
 
   const tagSummary = tagList
     .slice(0, 3)
