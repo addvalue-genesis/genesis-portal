@@ -81,10 +81,10 @@
   box-sizing: border-box;
 }
 .vm-warn {
-  background: #fdf6ec;
-  border: 1px solid #e0b070;
-  border-left: 5px solid #a8560b;
-  color: #7a3f06;
+  background: #f3f4f6;
+  border: 1px solid #9ca3af;
+  border-left: 5px solid #374151;
+  color: #111;
   padding: 8px 12px;
   margin-bottom: 10px;
   font-size: 11px;
@@ -96,17 +96,17 @@
 }
 .vm-fail {
   margin-top: 6px;
-  background: #fee2e2;
-  border: 1px solid #fca5a5;
-  color: #991b1b;
+  background: #e5e7eb;
+  border: 1px solid #374151;
+  color: #111;
   padding: 6px 8px;
   font-weight: 700;
 }
 .intblock {
-  background: #fdf6ec;
-  border: 1px solid #e0b070;
-  border-left: 5px solid #a8560b;
-  color: #7a3f06;
+  background: #f3f4f6;
+  border: 1px solid #9ca3af;
+  border-left: 5px solid #374151;
+  color: #111;
   padding: 8px 12px;
   margin-bottom: 10px;
   font-size: 11px;
@@ -145,7 +145,7 @@
   margin-top: 4mm;
   font-size: 14pt;
   font-weight: 700;
-  color: #1f3864;
+  color: #111;
   line-height: 1.4;
 }
 .cv-sp {
@@ -156,7 +156,7 @@
   text-align: center;
   font-size: 18pt;
   font-weight: 700;
-  color: #1f3864;
+  color: #111;
   margin-bottom: 2mm;
 }
 .cv-for {
@@ -230,10 +230,10 @@
   width: 17%;
   font-weight: 700;
   font-size: 11pt;
-  color: #1f3864;
+  color: #111;
 }
 .tb-avs {
-  color: #c00;
+  color: #111;
   font-size: 8pt;
 }
 .tb-client {
@@ -282,10 +282,10 @@
 .as-logo {
   width: 20%;
   font-weight: 700;
-  color: #1f3864;
+  color: #111;
 }
 .as-avs {
-  color: #c00;
+  color: #111;
 }
 .as-proj {
   font-weight: 700;
@@ -303,7 +303,7 @@
 }
 .as-k {
   width: 32%;
-  background: #eef3f9;
+  background: #efefef;
   font-weight: 700;
 }
 .as-k2 {
@@ -323,7 +323,7 @@
 .as-rev th {
   border: 0.5px solid #555;
   padding: 4px;
-  background: #eef3f9;
+  background: #efefef;
 }
 .as-rev td {
   border: 0.5px solid #555;
@@ -385,7 +385,7 @@
   vertical-align: middle;
 }
 .as-box.checked {
-  background: #1f3864;
+  background: #111;
 }
 .as-d {
   margin: 0 0 3px 15px;
@@ -403,7 +403,7 @@
 .st2rh {
   font-weight: 700;
   font-size: 10pt;
-  color: #1f3864;
+  color: #111;
   text-align: center;
   margin: 6mm 0 3px;
 }
@@ -415,7 +415,7 @@
 .as-rh th {
   border: 0.5px solid #555;
   padding: 4px;
-  background: #eef3f9;
+  background: #efefef;
   font-weight: 700;
 }
 .as-rh td {
@@ -439,19 +439,20 @@
   padding: 3px 6px;
 }
 .ph-t {
-  background: #ddeeff;
+  background: #e5e7eb;
+  color: #111;
   font-weight: 700;
   font-size: 9pt;
   text-align: center;
 }
 .ph-i {
   font-size: 8pt;
-  color: #333;
+  color: #222;
 }
 .st2 {
   font-weight: 700;
   font-size: 10pt;
-  color: #1f3864;
+  color: #111;
   margin: 12px 0 3px;
 }
 .tb {
@@ -461,31 +462,32 @@
   table-layout: fixed;
 }
 .tb th {
-  background: #1f3864;
+  background: #111;
   color: #fff;
   padding: 3px;
   text-align: center;
-  border: 0.3px solid #1f3864;
+  border: 0.3px solid #111;
   font-weight: 700;
   line-height: 1.25;
 }
 .tb td {
   padding: 3px 4px;
-  border: 0.3px solid #bbb;
+  border: 0.3px solid #999;
   vertical-align: top;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .tb.ds td {
-  border-color: #999;
+  border-color: #777;
 }
 .tb .sec td {
-  background: #d6e4f0;
+  background: #e5e7eb;
+  color: #111;
   font-weight: 700;
   font-size: 8pt;
 }
 .tb .alt td {
-  background: #f7fafe;
+  background: #f9fafb;
 }
 .tb .c {
   text-align: center;
@@ -505,27 +507,31 @@
   white-space: nowrap;
 }
 .sb-c {
-  background: #dff3e7;
-  color: #0f7b4f;
+  background: #f3f4f6;
+  color: #111;
+  border: 0.5px solid #555;
 }
 .sb-p,
 .sb-d,
 .sb-t {
-  background: #fdeddc;
-  color: #a8560b;
+  background: #e5e7eb;
+  color: #111;
+  border: 0.5px solid #333;
 }
 .sb-b,
 .sb-n {
   background: #eee;
-  color: #555;
+  color: #444;
+  border: 0.5px solid #999;
 }
 .sb-o {
-  background: #fee2e2;
-  color: #991b1b;
+  background: #fff;
+  color: #111;
+  border: 0.5px solid #111;
 }
 .devref {
   font-size: 7pt;
-  color: #a8560b;
+  color: #333;
   font-weight: 700;
 }
 .notes {
@@ -556,6 +562,7 @@
 img.lg {
   display: block;
   margin: 0 auto;
+  filter: grayscale(100%) contrast(1.08);
 }
 img.lg-pttep-cv {
   width: 14mm;

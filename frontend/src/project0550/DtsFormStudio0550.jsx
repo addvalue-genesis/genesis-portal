@@ -9,8 +9,8 @@ import {
 } from './data/dtsFormEngine0550';
 import {
   AVS_LOGO_DATA_URI,
-  OMEGA_LOGO_DATA_URI,
   PTTEP_LOGO_DATA_URI,
+  SAMTEL_LOGO_DATA_URI,
 } from './data/dtsFormLogos0550';
 
 function collectDtsFormCssText() {
@@ -350,7 +350,7 @@ export function DtsFormStudio0550({
                     </td>
                     <td colSpan={3} className="tb-client">{form.clientName}</td>
                     <td rowSpan={3} className="tb-logo tb-avs">
-                      <img className="lg lg-omega-cv" alt="OMEGA Integration" src={OMEGA_LOGO_DATA_URI} />
+                      <img className="lg lg-omega-cv" alt="SAMTEL" src={SAMTEL_LOGO_DATA_URI} />
                       <img className="lg lg-avs-cv" alt="Add Value System" src={AVS_LOGO_DATA_URI} />
                     </td>
                   </tr>
@@ -385,7 +385,7 @@ export function DtsFormStudio0550({
                   </td>
                   <td className="as-proj">{form.projectTitle}</td>
                   <td className="as-logo as-avs">
-                    <img className="lg lg-omega-hd" alt="OMEGA Integration" src={OMEGA_LOGO_DATA_URI} />
+                    <img className="lg lg-omega-hd" alt="SAMTEL" src={SAMTEL_LOGO_DATA_URI} />
                     <img className="lg lg-avs-hd" alt="Add Value System" src={AVS_LOGO_DATA_URI} />
                   </td>
                 </tr>
