@@ -76,8 +76,10 @@ export function DtsFormStudio0550({
   }, [form]);
 
   const isInternal = mode === 'internal';
-  const colCount = isInternal ? 6 : 4;
+  const colCount = isInternal ? 7 : 6;
   const blankCoverRows = Math.max(0, 4 - form.revisionHistory.length);
+  const hasSubSheet = (form.subEquipmentSections || []).length > 0;
+  const tagPageNo = hasSubSheet ? 5 : 4;
 
   const handleExportDocx = () => {
     const cssText = collectDtsFormCssText();
@@ -583,19 +585,22 @@ export function DtsFormStudio0550({
             <table className="tb ds">
               {isInternal ? (
                 <colgroup>
-                  <col style={{ width: '6%' }} />
+                  <col style={{ width: '5%' }} />
+                  <col style={{ width: '17%' }} />
                   <col style={{ width: '21%' }} />
-                  <col style={{ width: '25%' }} />
-                  <col style={{ width: '27%' }} />
+                  <col style={{ width: '23%' }} />
+                  <col style={{ width: '9%' }} />
                   <col style={{ width: '10%' }} />
-                  <col style={{ width: '11%' }} />
+                  <col style={{ width: '15%' }} />
                 </colgroup>
               ) : (
                 <colgroup>
-                  <col style={{ width: '7%' }} />
-                  <col style={{ width: '24%' }} />
-                  <col style={{ width: '32%' }} />
-                  <col style={{ width: '37%' }} />
+                  <col style={{ width: '5%' }} />
+                  <col style={{ width: '19%' }} />
+                  <col style={{ width: '23%' }} />
+                  <col style={{ width: '26%' }} />
+                  <col style={{ width: '10%' }} />
+                  <col style={{ width: '17%' }} />
                 </colgroup>
               )}
               <thead>
@@ -605,7 +610,8 @@ export function DtsFormStudio0550({
                   <th>COMPANY Requirement</th>
                   <th>Vendor Offered Data</th>
                   {isInternal && <th>Src.</th>}
-                  {isInternal && <th>Compliance</th>}
+                  <th>Compliance</th>
+                  <th>Remarks</th>
                 </tr>
               </thead>
               <tbody>
@@ -627,11 +633,10 @@ export function DtsFormStudio0550({
                           <td>{row.requirement}</td>
                           <td>{row.offered}</td>
                           {isInternal && <td className="c">{row.src || '—'}</td>}
-                          {isInternal && (
-                            <td className="c">
-                              {row.badge && <span className={`sb ${row.badge.cls}`}>{row.badge.label}</span>}
-                            </td>
-                          )}
+                          <td className="c">
+                            {row.badge && <span className={`sb ${row.badge.cls}`}>{row.badge.label}</span>}
+                          </td>
+                          <td>{row.remarks || '—'}</td>
                         </tr>
                       )
                     )}
@@ -642,12 +647,104 @@ export function DtsFormStudio0550({
 
             <div className="foot">
               <span className="mono">{form.docId} Rev.{form.revision}</span>
-              <span>Page 3 of 4</span>
+              <span>Page 3 of {form.totalPages}</span>
             </div>
           </div>
         </div>
 
-        {/* PAGE 4: EQUIPMENT TAG LIST & NOTES */}
+        {/* PAGE 4 (OPTIONAL SHEET 3): ANTENNA / SUB-EQUIPMENT DATASHEET */}
+        {hasSubSheet && (
+          <div className="page">
+            <div className="inner">
+              <table className="ph">
+                <tbody>
+                  <tr>
+                    <td className="ph-t">{form.projectTitle}</td>
+                  </tr>
+                  <tr>
+                    <td className="ph-i">
+                      DATA SHEET FOR {form.systemTitleUpper} — {form.area} — Antenna / Sub-Equipment Datasheet
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="ph-i">
+                      DOC: {form.docId} &nbsp;·&nbsp; REV: {form.revision} &nbsp;·&nbsp; {form.dateDmy}
+                      {isInternal && (
+                        <>
+                          {' '}
+                          &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken})</i>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <table className="tb ds">
+                {isInternal ? (
+                  <colgroup>
+                    <col style={{ width: '5%' }} />
+                    <col style={{ width: '17%' }} />
+                    <col style={{ width: '21%' }} />
+                    <col style={{ width: '23%' }} />
+                    <col style={{ width: '9%' }} />
+                    <col style={{ width: '10%' }} />
+                    <col style={{ width: '15%' }} />
+                  </colgroup>
+                ) : (
+                  <colgroup>
+                    <col style={{ width: '5%' }} />
+                    <col style={{ width: '19%' }} />
+                    <col style={{ width: '23%' }} />
+                    <col style={{ width: '26%' }} />
+                    <col style={{ width: '10%' }} />
+                    <col style={{ width: '17%' }} />
+                  </colgroup>
+                )}
+                <thead>
+                  <tr>
+                    <th>Item</th>
+                    <th>Parameter</th>
+                    <th>COMPANY Requirement</th>
+                    <th>Vendor Offered Data</th>
+                    {isInternal && <th>Src.</th>}
+                    <th>Compliance</th>
+                    <th>Remarks</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {form.subEquipmentSections.map(sec => (
+                    <React.Fragment key={sec.title}>
+                      <tr className="sec">
+                        <td colSpan={colCount}>{sec.title}</td>
+                      </tr>
+                      {sec.rows.map((row, idx) => (
+                        <tr key={`${sec.title}-${row.item}-${idx}`} className={idx % 2 === 1 ? 'alt' : ''}>
+                          <td className="c mono">{row.item}</td>
+                          <td className="param">{row.parameter}</td>
+                          <td>{row.requirement}</td>
+                          <td>{row.offered}</td>
+                          {isInternal && <td className="c">{row.src || '—'}</td>}
+                          <td className="c">
+                            {row.badge && <span className={`sb ${row.badge.cls}`}>{row.badge.label}</span>}
+                          </td>
+                          <td>{row.remarks || '—'}</td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+
+              <div className="foot">
+                <span className="mono">{form.docId} Rev.{form.revision}</span>
+                <span>Page 4 of {form.totalPages}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* FINAL PAGE (SHEET 4): EQUIPMENT TAG LIST & NOTES */}
         <div className="page">
           <div className="inner">
             <table className="ph">
@@ -714,7 +811,7 @@ export function DtsFormStudio0550({
 
             <div className="foot">
               <span className="mono">{form.docId} Rev.{form.revision}</span>
-              <span>Page 4 of 4</span>
+              <span>Page {tagPageNo} of {form.totalPages}</span>
             </div>
           </div>
         </div>

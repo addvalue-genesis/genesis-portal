@@ -1,5 +1,6 @@
 import {
   DTS_SYSTEM_PACKAGE_MAP_0550,
+  buildDts0010ReferenceRows0550,
   generateDtsDocument0550,
   sanitizeDtsCustomerText0550,
 } from './dtsGenerator0550';
@@ -124,9 +125,9 @@ function buildDmrClientDts60Rows0550(area = 'APF') {
 
   // Exact 60-row PTTEP Client DTS (MM-ASK-1A-APF-TEL-DTS-0010) answered from APPENDIX 1.5 (Ceragon FibeAir IP-50CX 2+0)
   const raw = [
-    ['1', 'Tag. Number', 'Refer to Tag Number on page 3', tagSummary, 'COMPLY', 'APPENDIX 1.5 (1.5.1.1–1.5.1.3)'],
-    ['2', 'Service', 'Refer to Tag Number on page 3', 'Microwave Radio Unit (Full Outdoor 2+0), 1.2m Dish Antenna & Termination Cabinet', 'COMPLY', 'Ceragon Offer 26-30029 RevA1'],
-    ['3', 'Location', 'Refer to Tag Number on page 3', locSummary, 'COMPLY', 'Appendix 2 LIS-0001'],
+    ['1', 'Tag. Number', 'Refer to Tag Number on page 4', 'Refer to Equipment Tag List (Page 4)', 'COMPLY', 'APPENDIX 1.5 (1.5.1.1–1.5.1.3)'],
+    ['2', 'Service', 'Refer to Tag Number on page 4', 'Refer to Equipment Tag List (Page 4)', 'COMPLY', 'Ceragon Offer 26-30029 RevA1'],
+    ['3', 'Location', 'Refer to Tag Number on page 4', 'Refer to Equipment Tag List (Page 4)', 'COMPLY', 'Appendix 2 LIS-0001'],
     ['4', 'Ambient Temperature, °C (max. / min. / design)', '38.7 / 19.1 / 40', '-33 °C to +55 °C continuous ODU rating (ETSI EN 300 019-1-4 Class 4.1)', 'COMPLY', 'IP-50CX Datasheet'],
     ['5', 'Relative Humidity, % (design)', '91.4', '5% to 95% non-condensing (100% condensing external IP67)', 'COMPLY', 'IP-50CX Datasheet'],
     ['6', 'Room Operating Temperature (°C)', '20 - 25', '20 - 25 °C inside Rittal VX25 42U IP54 Telecom Cabinet (MR-320)', 'COMPLY', 'VERSED VX-8825.000'],
@@ -310,7 +311,7 @@ export function buildDtsFormModel0550({
         isSectionHeader: false,
       };
     });
-    sections = [{ title: 'MM-ASK-1A-APF-TEL-DTS-0010 · Microwave Communication System (APPENDIX 1.5 · FibeAir IP-50CX 2+0)', rows: dmrRows }];
+    sections = [{ title: 'Sheet 2 · Main Equipment Datasheet — Microwave Radio System (Ceragon FibeAir IP-50CX)', rows: dmrRows }];
   } else {
     const groupedSpecs = new Map(DTS_FORM_SECTIONS_0550.map(sec => [sec, []]));
     combinedRows.forEach((r, idx) => {
@@ -343,8 +344,47 @@ export function buildDtsFormModel0550({
     })).filter(s => s.rows.length > 0);
   }
 
-  // Page 4 Equipment Tag list
-  const tagList = (dts.tagRows || []).map(t => ({
+  // Optional Sheet 3 (Page 4): Antenna / Sub-Equipment Datasheet when present (e.g., TEL-DMR 16-row CommScope VHLP4-7W/E)
+  let subEquipmentSections = [];
+  if (isDmr60) {
+    const refDts = buildDts0010ReferenceRows0550();
+    const antRows = (refDts.antennaRows || []).map((r, idx) => {
+      const phi = evaluatePhiDtsRow0550(r, { isInternal });
+      return {
+        item: r.item || `A.${idx + 1}`,
+        parameter: clean(r.parameter),
+        requirement: clean(r.requirement),
+        offered: clean(phi.offered),
+        src: isInternal ? (r.remarks || 'Ceragon / CommScope') : '',
+        badge: { label: phi.status, cls: phi.badgeClass },
+        remarks: clean(phi.remarks),
+        isSectionHeader: false,
+      };
+    });
+    if (antRows.length > 0) {
+      subEquipmentSections = [
+        {
+          title: 'Sheet 3 · Microwave Antenna Datasheet — CommScope VHLP4-7W/E (1.2 m Parabolic Dish)',
+          rows: antRows,
+        },
+      ];
+    }
+  }
+
+  // Final Sheet: Equipment Tag list (exact client tags for TEL-DMR)
+  const rawTagRows = isDmr60
+    ? [
+        { tagNo: 'APF-MR-320-201', service: 'APF Microwave Radio ODU (2+0 High Sub-Band)', location: 'APF / 60m Telecom Tower / Dish Back-Mount', model: 'Ceragon FibeAir IP-50CX', partNo: 'IP50CX-FO-2P0', vdbRef: 'CERAGON-26-30029-R11 / PTD Pending' },
+        { tagNo: 'APF-MR-320-202', service: 'APF Microwave IDU Slot (Full Outdoor IP-50CX)', location: 'APF / Control Building / Equipment Room', model: 'Ceragon FibeAir IP-50CX (Full Outdoor)', partNo: 'IP50CX-FO-2P0', vdbRef: 'DEV-DMR-CERAGON-R11-BID-DRAFT' },
+        { tagNo: 'APF-ANT-320-201', service: 'APF 1.2m Parabolic Microwave Dish Antenna', location: 'APF / 60m Telecom Tower / El. +58m', model: 'CommScope VHLP4-7W/E', partNo: 'ANT-MW-1.2M-320', vdbRef: 'CERAGON-26-30029-R11 / LIS-0001' },
+        { tagNo: 'MR-320', service: 'APF Microwave Indoor Termination Cabinet', location: 'APF / Control Building / Equipment Room', model: 'Rittal VX25 42U 800x1000x2200mm', partNo: 'VX-8825.000', vdbRef: 'VERSED-QT2611035 / App.2 LIS' },
+        { tagNo: 'ACP-ANT-320-001', service: 'ACP 1.2m Parabolic Microwave Dish Antenna', location: 'ACP / 30m Telecom Tower / El. +28m', model: 'CommScope VHLP4-7W/E', partNo: 'ANT-MW-1.2M-320', vdbRef: 'CERAGON-26-30029-R11 / LIS-0001' },
+        { tagNo: 'ACP-MR-320-001', service: 'ACP Microwave Radio ODU (2+0 Low Sub-Band)', location: 'ACP / 30m Telecom Tower / Dish Back-Mount', model: 'Ceragon FibeAir IP-50CX', partNo: 'IP50CX-FO-2P0', vdbRef: 'CERAGON-26-30029-R11 / PTD Pending' },
+        { tagNo: 'ACP-MR-320-002', service: 'ACP Microwave IDU Slot (Full Outdoor IP-50CX)', location: 'ACP / Control Room / RAD-308-001', model: 'Ceragon FibeAir IP-50CX (Full Outdoor)', partNo: 'IP50CX-FO-2P0', vdbRef: 'DEV-DMR-CERAGON-R11-BID-DRAFT' },
+      ]
+    : dts.tagRows || [];
+
+  const tagList = rawTagRows.map(t => ({
     items: clean(t.service || dts.systemTitle),
     tagNumber: clean(t.tagNo || 'Per Appendix 2 Drawing'),
     location: clean(t.location || `${safeArea} / Telecom Equipment Room`),
@@ -354,6 +394,8 @@ export function buildDtsFormModel0550({
         : `${t.model || 'Per Vendor Technical Proposal'}${t.partNo && !/OPEN/i.test(t.partNo) ? ` (${t.partNo})` : ''}`
     ),
   }));
+
+  const totalPages = subEquipmentSections.length > 0 ? 5 : 4;
 
   const tagSummary = tagList
     .slice(0, 3)
@@ -411,12 +453,13 @@ export function buildDtsFormModel0550({
     tagSummary,
     poNo: '—',
     vendorDocNo: '—',
-    totalPages: 4,
+    totalPages,
     c1SyncCount: dts.c1SyncCount || 0,
     volumeIAsIsLock,
     internalNotes: isInternal ? [...(dts.internalNotes || []), ...phiFlags] : [],
     revisionHistory,
     sections,
+    subEquipmentSections,
     tagList,
     notes,
     docFileNameDocx,
