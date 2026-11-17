@@ -11,6 +11,14 @@ export const DOCUMENT_EQUATIONS_REV0 = Object.freeze({
     'Doc_WithBid(code) = Treatment(code) ⊗ Evidence(VND ∪ Memory) ⊗ Completeness(code); ' +
     'SAMPLE ⊂ FULL; STATEMENT asserts intent + open gaps without claiming deliverable bytes.',
   codes: Object.freeze({
+    A04: Object.freeze({
+      code: 'A04',
+      description: 'Bought out items list',
+      withBidTreatment: 'FULL',
+      equation:
+        'A04_FULL = BoughtOutRegister(C1_appendix packages ∪ components) with Manufacturer from Offer∪ReadyVendor∪CommercialSource; ' +
+        'prices omitted (remain on Exhibit C / C1); OPEN/TBE manufacturer stays visible until AVL closes.',
+    }),
     B03: Object.freeze({
       code: 'B03',
       description: 'General arrangement / Building Layout drawings',

@@ -5,6 +5,15 @@
   "generalFormula": "D_k = G_k(M_SI, Rev_0)",
   "sdrlDeliverables": [
     {
+      "code": "A04",
+      "title": "Bought out items list",
+      "formula": "D_A04 = G_MTO(M_C1, K_Vendor)",
+      "latexFormula": "D_{\\text{A04}} = \\mathcal{G}_{\\text{MTO}}(\\mathcal{M}_{\\text{C1}}, \\mathcal{K}_{\\text{Vendor}})",
+      "withBidRule": "WITH BID (FULL): Bought-out procurement register from Working → C1 appendix packages/components; manufacturer from Offer/ready vendor; prices omitted.",
+      "postAwardRule": "POST-AWARD (P+3): Issued MTO with confirmed AVL manufacturers, models and purchase status.",
+      "crossVolumeGate": "§10 R1 — Every A04 package SN must reconcile to 11.C1 display rows; no invented quantities"
+    },
+    {
       "code": "B03",
       "title": "General Arrangement / Layout Drawings",
       "formula": "D_B03 = G_Layout(M_App2, M_PHI)",
