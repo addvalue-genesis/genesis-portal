@@ -6,7 +6,8 @@ import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorkingSell0553";
 import {PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./officialWorkbookTemplate0553";
-import {RELEASE_CUSTOMER_COLUMNS_0553,RELEASE_POLICY_0553,buildReleaseCommercialModel0553} from "./releaseCommercialModel0553";
+import {RELEASE_CUSTOMER_COLUMNS_0553,buildReleaseCommercialModel0553} from "./releaseCommercialModel0553";
+import {SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./samtelEngineeringServiceMarkup0553";
 import {entriesFromZip,readEntry,rebuildZip} from "../nativeWorkingDraft0553";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 import {MR0003_MR0004_SCOPE_C1} from "./mr0003Mr0004ScopeC1";
@@ -131,8 +132,8 @@ function referencePartB(){
  }));
 }
 function item7Vnd(senior,specialist,days,fxTHBPerUSD,seniorLineUSD,specialistLineUSD,seniorLineTHB,specialistLineTHB,labourUSD,mobPersons,mobTrips,mobUsdPerPersonTrip,mobUSD,mobTHB,vndUSD,vndTHB){
- const samtelPct=RELEASE_POLICY_0553.b.samtelDeductionOfCustomerSellPct;
- const sellFactor=round(1+samtelPct/100);
+ const sellFactor=SAMTEL_ENGINEERING_SERVICE_MARKUP_0553;
+ const samtelPct=round((sellFactor-1)*100);
  const marked=(usd,thb)=>({releaseUSD:round(usd*sellFactor),releaseTHB:round(thb*sellFactor)});
  const lines=[
   {id:"VND.7.1",kind:"labour",activity:senior.role,persons:1,days,unit:"person-day",
@@ -197,8 +198,8 @@ function build(){
  const mobTHB=round(mobUSD*fxTHBPerUSD);
  const vndTHB=round(proposalTHB+mobTHB);
  const vndUSD=round(proposalUSD+mobUSD);
- const samtelPct=RELEASE_POLICY_0553.b.samtelDeductionOfCustomerSellPct;
- const sellFactor=round(1+samtelPct/100);
+ const sellFactor=SAMTEL_ENGINEERING_SERVICE_MARKUP_0553;
+ const samtelPct=round((sellFactor-1)*100);
  const grandTotalTHB=round(vndTHB*sellFactor);
  const grandTotalUSD=round(vndUSD*sellFactor);
  const baseB3WorkingSellTHB=round(sat.includedB3SatSurveyToolsWorkingSellTHB+china.fatWorkingSellTHB+purchased.selectedIncrementalWorkingSellTHB);
