@@ -41,6 +41,7 @@ export function DtsFormStudio0550({
   const [systemToken, setSystemToken] = useState(defaultSystem || 'TEL-DMR');
   const [area, setArea] = useState('APF');
   const [revision, setRevision] = useState('A1');
+  const [zoom, setZoom] = useState(1.25);
   const [notice, setNotice] = useState('');
   const rootRef = useRef(null);
 
@@ -95,6 +96,19 @@ export function DtsFormStudio0550({
       document.title = prev;
     }, 1000);
     setNotice(`Print / Save as PDF: ${form.docFileNamePdf}`);
+  };
+
+  const handleOpenFullscreen = () => {
+    if (!rootRef.current || typeof window === 'undefined') return;
+    const win = window.open('', '_blank');
+    if (!win) return;
+    const cssText = collectDtsFormCssText();
+    win.document.write(
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${form.docFileNamePdf.replace(/\.pdf$/i, '')}</title>` +
+        `<style>body{margin:0;background:#e8e8e8;font-family:Arial,Helvetica,sans-serif}${cssText}</style></head>` +
+        `<body><div class="dts-root" style="zoom:1.25">${rootRef.current.innerHTML}</div></body></html>`
+    );
+    win.document.close();
   };
 
   return (
@@ -164,9 +178,42 @@ export function DtsFormStudio0550({
           </select>
         </label>
 
+        <label>
+          Zoom
+          <button
+            type="button"
+            aria-label="Zoom out"
+            onClick={() => setZoom(z => Math.max(0.75, +(z - 0.15).toFixed(2)))}
+          >
+            −
+          </button>
+          <select
+            aria-label="DTS Form Zoom"
+            value={String(zoom)}
+            onChange={e => setZoom(Number(e.target.value))}
+          >
+            <option value="0.75">75%</option>
+            <option value="1">100%</option>
+            <option value="1.25">125%</option>
+            <option value="1.5">150%</option>
+            <option value="1.75">175%</option>
+            <option value="2">200%</option>
+          </select>
+          <button
+            type="button"
+            aria-label="Zoom in"
+            onClick={() => setZoom(z => Math.min(2, +(z + 0.15).toFixed(2)))}
+          >
+            +
+          </button>
+        </label>
+
         <span className="hint">— {form.docFileNameDocx}</span>
 
         <span className="sp">
+          <button type="button" onClick={handleOpenFullscreen}>
+            Open Fullscreen
+          </button>
           <button type="button" onClick={handleExportDocx}>
             Export .docx
           </button>
@@ -183,7 +230,8 @@ export function DtsFormStudio0550({
       )}
 
       {/* 4-Page A4 Datasheet Template (.dts-root) */}
-      <div className="dts-root" ref={rootRef}>
+      <div className="dts-viewport">
+      <div className="dts-root" ref={rootRef} style={{ zoom }}>
         {/* PAGE 1: COVER PAGE */}
         <div className="page cover">
           <div className="inner">
@@ -625,6 +673,7 @@ export function DtsFormStudio0550({
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

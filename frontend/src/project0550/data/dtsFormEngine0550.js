@@ -44,6 +44,7 @@ export function sanitizeDtsFormText0550(text) {
     .replace(/\bManufacturer Model per MR\b/gi, 'Per Vendor Technical Proposal')
     .replace(/\bDraft\b/gi, 'Issued')
     .replace(/\bMGW\b/gi, 'Vendor Package')
+    .replace(/\s*\(placeholder\)/gi, '')
     .replace(/\s*\[DEV-[^\]]+\]/gi, '')
     .replace(/\s{2,}/g, ' ')
     .trim();

@@ -62,12 +62,20 @@
   color: #9ca3af;
 }
 
+.dts-viewport {
+  overflow: auto;
+  max-height: calc(100vh - 140px);
+  background: #d1d5db;
+  border: 1px solid #9ca3af;
+  border-radius: 0 0 6px 6px;
+}
 .dts-root {
   background: #e8e8e8;
   padding: 16px;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 13px;
   color: #111;
+  min-width: max-content;
 }
 .dts-root * {
   box-sizing: border-box;
@@ -585,9 +593,16 @@ img.lg-avs-hd {
   .no-print {
     display: none !important;
   }
+  .dts-viewport {
+    overflow: visible !important;
+    max-height: none !important;
+    border: none !important;
+    background: #fff !important;
+  }
   .dts-root {
     background: #fff;
     padding: 0;
+    zoom: 1 !important;
   }
   .page {
     box-shadow: none;
