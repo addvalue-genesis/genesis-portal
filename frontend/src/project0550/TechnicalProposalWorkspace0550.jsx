@@ -9,6 +9,7 @@ import {technicalDossierHtml0550,downloadTechnicalDossier0550} from "./technical
 import {prepareTechnicalDossierDrafts0550} from "./data/technicalDossier0550";
 
 import {VdrlWorkspace0550,PackageConsistency0550,VolumeRadioMrContext0550} from "./BidVolumesWorkspace0550";
+import {EnhancedVdrlPanel0550} from './EnhancedVdrlPanel0550_Rev0';
 export const TECHNICAL_PANELS_0550=[{id:"overview",title:"Overview & Checklist"},...TECHNICAL_SECTIONS_0550,{id:"vdrl",title:"VDRL / With Bid"},{id:"preview",title:"Preview & Export"}];
 export function TechnicalProposalWorkspace0550({navigationTarget,mrNavigationTarget,onNavigate,onDirtyChange}){
  const {data,model,change,busy,reviewDate}=useBidWorkspace();
@@ -64,7 +65,7 @@ export function TechnicalProposalWorkspace0550({navigationTarget,mrNavigationTar
     {panel==="delivery"&&<><h4>กิจกรรมจากแผน SI เดิม</h4><ul>{model.integration.activities.filter(a=>{const r=model.integration.requirements.find(r=>r.id===a.requirementId);return system==="COMMON"||r?.systemToken===system;}).map(a=><li key={a.id}>{a.title} · {a.dueDate||"DATE OPEN"} · {a.state}<button type="button" onClick={()=>navigate("bid.working-preview.activity."+a.id)}>เปิดกิจกรรม</button></li>)}</ul><p>หากยังไม่มีกิจกรรม ให้บันทึก dependency/lead time ที่มีหลักฐานในคำตอบ และเปิด SI เพื่อจัดทำแผน</p></>}
     {panel==="deviations"&&<><button type="button" onClick={()=>navigate("bid.deviations.release")}>เปิดทะเบียน / Export Deviation เดิม</button><ul>{model.integration.deviations.filter(d=>system==="COMMON"||d.systemToken===system).map(d=><li key={d.id}>{d.vendorDeviation} · {d.state}<button type="button" onClick={()=>navigate("bid.deviations.record."+d.id)}>เปิด {d.id}</button></li>)}</ul></>}
    </>}
-   {panel==="vdrl"&&<VdrlWorkspace0550 onDirtyChange={setVdrlDirty} onNavigate={navigate}/>}
+   {panel==="vdrl"&&<><EnhancedVdrlPanel0550 data={data}/><VdrlWorkspace0550 onDirtyChange={setVdrlDirty} onNavigate={navigate}/></>}
    {panel==="overview"&&<PackageConsistency0550 onNavigate={navigate}/>}
    {panel==="preview"&&<><h3>Preview & Export · DRAFT</h3><p>เอกสารหน้าจอและไฟล์ HTML ใช้ข้อมูลและรูปแบบเดียวกัน ครบทุกระบบและ COMMON · ข้อมูลที่ยังไม่ยืนยันแสดง OPEN</p><button type="button" disabled={dirty||vdrlDirty} onClick={()=>downloadTechnicalDossier0550(dossier)}>Export Volume II draft HTML / Print to PDF</button><iframe title="Full live technical dossier" sandbox="" srcDoc={dossier} style={{width:"100%",height:850,border:"1px solid #bfd0db"}}/></>}
 
