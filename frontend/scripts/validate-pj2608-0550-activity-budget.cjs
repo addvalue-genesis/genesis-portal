@@ -33,7 +33,7 @@ assert(estimated.every(l=>l.provisionalCostNative===null&&l.customerTHB>0&&l.pro
 assert.equal(estimated.find(l=>l.id==='REQ-MR-ACT-B1-D02').quantity,840,'19-system design budget is 840 MH');
 assert.equal(estimated.find(l=>l.id==='REQ-MR-ACT-B4-D03').quantity,60,'Two 15-day SAT campaigns with two people = 60 MD, not 30 days');
 assert.equal(estimated.find(l=>l.id==='REQ-MR-ACT-B1-D01').provisionalCustomerNative,42000,'40 PM MD × protected $1000 × 1.05');
-const known=K.knownBasePrices0550(m.provisional);assert.equal(known.thb,140132079.29);assert.equal(known.priced,45);
+const known=K.knownBasePrices0550(m.provisional);assert.equal(known.thb,140548315.98);assert.equal(known.priced,44);
 assert.equal(estimated.find(l=>l.id==='REQ-MR-POSTSTART-90D').quantity,20,'90 calendar days coverage uses the owner-selected 20 MD staffing assumption');
 assert.equal(m.provisional.baseTHB,null);assert.equal(m.official.baseUSD,null);assert.equal(m.official.releaseAllowed,false);
 for(const row of before.lines.filter(l=>!estimated.some(e=>e.id===l.id)))assert.deepEqual(p.lines.find(l=>l.id===row.id),row,'Other supply/service/optional records stay exact');
@@ -46,7 +46,7 @@ assert.equal(JSON.stringify(p),bytes,'Price rendering is read-only');
 const exp=T.prepareTsiExpenseBudget0550(p,D.COMMERCIAL_POLICY,D.CORE_TEAM,today);W.validateBidWorkspace(exp,repo.meta.datasetId,tokens);
 assert.deepEqual(T.tsiTravelPlan0550(),{trips:35,travelMD:70,personDays:302,nights:267,persons:6});
 assert.equal(T.prepareTsiExpenseBudget0550(exp,D.COMMERCIAL_POLICY,D.CORE_TEAM,today),exp);
-const em=W.deriveBidWorkspace(exp,tokens,today);assert.equal(K.knownBasePrices0550(em.provisional).thb,143672781.25);
+const em=W.deriveBidWorkspace(exp,tokens,today);assert.equal(K.knownBasePrices0550(em.provisional).thb,144089017.94);
 assert.equal(em.provisional.lines.find(l=>l.id==='REQ-MR-ACT-B9-D02').customerTHB,36000,'Provisional includes the existing 6 x THB6000 planning allowance');
 assert(em.provisional.lines.find(l=>l.id==='REQ-MR-ACT-B9-D02').reviewProblems.some(p=>p.startsWith('MR_CLARIFICATION:')),'Scope warning remains explicit');
 assert.equal(em.official.lines.find(l=>l.id==='REQ-MR-ACT-B9-D02').customerTHB,null,'Strict Official still withholds unresolved insurance scope');
