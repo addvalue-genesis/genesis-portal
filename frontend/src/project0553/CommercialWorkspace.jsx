@@ -33,6 +33,7 @@ import {buildSpareLifecycleTrace0553} from "./data/spareLifecycleTrace0553";
 import {SpareLifecycleControl0553} from "./SpareLifecycleControl0553";
 import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
+import {SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./data/samtelEngineeringServiceMarkup0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
 import {PRICING_VIEWS_0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
@@ -138,9 +139,11 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const activePricingView=PRICING_VIEWS_0553.find(view=>view.key===pricingStage)||PRICING_VIEWS_0553.find(view=>view.key==="released");
  const sourceB3=bcWorking.byCode.B3;
  const previewB3=releaseModel.b.find(x=>x.code==="B3");
+ const roundRelease=n=>Math.round((n+Number.EPSILON)*100)/100;
  if(!sourceB3||!previewB3||previewB3.workingSellTHB!==sourceB3.workingSellTHB||
-    previewB3.customerSellTHB!==sourceB3.workingSellTHB)
-  throw Error("10.2 B3 selected Working SELL does not match 10.3 Release Preview");
+    previewB3.commercialCategory!=="service"||
+    previewB3.customerSellTHB!==roundRelease(sourceB3.workingSellTHB*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553))
+  throw Error("10.2 B3 Item 7 does not match 10.3 Release Item 7 × SAMTEL engineering service markup");
  // Navigate directly to the selected canonical 10.1/10.2 Module ID.
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
@@ -406,11 +409,13 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <h3>Customer Release — HOLD</h3>
    <p className="p55-note" data-component-key="bid.budget.pricing.release.source-trace">
     <strong>LIVE SOURCE TRACE:</strong> Part A comes from 10.1 Equipment BOM;
-    B/C from 10.2 selected canonical owners. B3 source
+    B/C from 10.2 selected canonical owners. B3 Item 7
     <strong> THB {sourceB3.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
-    {" → "} Release Preview
+    {" · SAMTEL 5% "}
+    <strong> THB {previewB3.samtelServiceTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
+    {" → Item 10/Release "}
     <strong> THB {previewB3.customerSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
-    {" · "} PASS selected-source reconciliation.
+    {" · "} PASS Item 7 × 1.05. B3-BF is not included.
     Historical Working/Budgetary previews and unapproved SAT scenarios are NONPOSTING.
     Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
    </p>

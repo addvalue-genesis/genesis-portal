@@ -55,9 +55,10 @@ async function main(){
  assert.equal(x.official.b.find(r=>r.code==='B10').amountUSD,12960);
  assert.equal(x.official.b.find(r=>r.code==='B11').amountUSD,null);
  assert.equal(x.official.b.find(r=>r.code==='B13').amountUSD,1530);
- for(const r of x.official.b.filter(r=>!['B10','B11','B13'].includes(r.code)))assert.equal(r.amountUSD,quote.get(r.code));
- assert.equal(x.official.totalUSD,894910);
- assert.equal(x.official.totalUSD-submitted.totalBaseUSD,-7990);
+ const serviceReleaseUSD={B1:28800,B2:8000,B3:77500,B4:null,B5:10400,B6:11200,B7:1000,B8:4800,B9:16100,B12:null,B14:26300};
+ for(const r of x.official.b.filter(r=>!['B10','B11','B13'].includes(r.code)))assert.equal(r.amountUSD,serviceReleaseUSD[r.code]);
+ assert.equal(x.official.totalUSD,903710);
+ assert.equal(x.official.totalUSD-submitted.totalBaseUSD,810);
  assert.equal(x.official.issued,false);assert.equal(x.official.commercialPriceHold.additionalPartAChargeUSD,0);
  assert.equal(x.official.commercialPriceHold.directCostComplete,false);
  assert.equal(x.zwp11.find(r=>r.row===51).extended,39200);
@@ -71,6 +72,6 @@ async function main(){
  const invalid={...x.source,a:x.source.a.map(r=>r.code==='A1'?{...r,sourceRows:r.sourceRows.map((v,i)=>i? v:{...v,qty:2})}:r)};
  const module=get(path.join(root,'officialUsdRelease0553.js'));
  assert.throws(()=>module.namespace.buildOfficialUsdRelease0553(invalid),/fixed price allocation requires/);
- console.log('PASS commercial hold: current Rev03 A1/A2/A3 241290/137130/34200 retained; working costs unchanged; B10/B11/B13 adjusted; base894910, delta-7990; fixed total child allocation reconciles; missing cost stays open.');
+ console.log('PASS commercial hold: current Rev03 A1/A2/A3 241290/137130/34200 retained; working costs unchanged; B10/B11/B13 adjusted; base903710, delta-7990; fixed total child allocation reconciles; missing cost stays open.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

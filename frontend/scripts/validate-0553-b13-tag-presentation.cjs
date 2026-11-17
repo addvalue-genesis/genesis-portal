@@ -8,7 +8,7 @@ const quote=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(sour
 const review=from('data/otherSpareItemizedPresentation0553').selectB13TagPresentation0553();
 const rows=quote.otherSpareItemizedAnnex.rows.B13,raw=from('data/spareCustomerSchedule0553').selectSpareCustomerSchedule0553().currentByCode.B13;
 const installed=from('data/spareCoverageEngineering0553').selectSpareCoverageEngineering0553().installed;
-assert.equal(quote.totalUSD,894910);assert.equal(quote.b.find(x=>x.code==='B13').amountUSD,1530);
+assert.equal(quote.totalUSD,903710);assert.equal(quote.b.find(x=>x.code==='B13').amountUSD,1530);
 assert.deepEqual(rows.map(x=>x.qty),[4,4,1]);assert.deepEqual(rows.map(x=>x.totalUSD),[640,520,370]);
 assert.deepEqual(rows.map(x=>x.unitUSD),[160,130,370]);
 assert.equal(rows.reduce((n,x)=>Math.round((n+x.totalUSD)*100)/100,0),1530);

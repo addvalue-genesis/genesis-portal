@@ -8,7 +8,7 @@ import {PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./officialWorkbookTemplate0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildReleaseCommercialModel0553} from "./releaseCommercialModel0553";
 import {SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./samtelEngineeringServiceMarkup0553";
-import {entriesFromZip,readEntry,rebuildZip} from "../nativeWorkingDraft0553";
+import {entriesFromZip,omitCalcChain0553,readEntry,rebuildZip} from "../nativeWorkingDraft0553";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 import {MR0003_MR0004_SCOPE_C1} from "./mr0003Mr0004ScopeC1";
 import {MR0002_BDA_DEVIATION_REV00_0553} from "./mr0002DeviationBdaRev00_0553";
@@ -647,6 +647,9 @@ export async function buildB3BrownfieldOfficialXlsx0553(file,model,options={}){
  xml=shiftBrownfieldSheetRows(xml,27,3);
  for(const [cell,value] of writes)xml=replaceBrownfieldCell(xml,cell,value);
  const changes=new Map([[sheetEntry.name,new TextEncoder().encode(xml)]]);
- return {bytes:rebuildZip(entries,changes),filename:b3BrownfieldExportFileName0553({audience:"official",extension:"xlsx"}),
+ // E7's SUM formula is cleared above. The template calcChain still names E7,
+ // which makes Excel repair the file. Drop the chain with its package links.
+ const kept=await omitCalcChain0553(entries,changes);
+ return {bytes:rebuildZip(kept,changes),filename:b3BrownfieldExportFileName0553({audience:"official",extension:"xlsx"}),
   warnings:["Official additional schedule written into 4-Scope of Supply sheet 1. Base B3 and the annex sheets are not repriced. No docx library is installed."]};
 }

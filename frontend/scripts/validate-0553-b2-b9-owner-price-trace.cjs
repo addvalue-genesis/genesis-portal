@@ -110,7 +110,8 @@ assert(!b9Scope.unbilledFieldBackupPostingAllowed&&b9Scope.b3Group06SeparateUnpr
 const b3Yard=b3Dossier(bc.byCode.B3).groups[5];
 assert.equal(b3Yard.selectedWorkingSellTHB,0,"Unpriced B3 Yard SAT must not inherit B9 1 LS");
 assert(b3Yard.rows.every(r=>r.workingSellTHB===null&&r.people===null&&r.teamDays===null));
-assert.equal(releaseModel().b.find(r=>r.code==="B9").customerSellTHB,480550);
+assert.equal(releaseModel().b.find(r=>r.code==="B9").workingSellTHB,480550);
+assert.equal(releaseModel().b.find(r=>r.code==="B9").customerSellTHB,504577.5);
 assert.equal(scopeModel().lines.B9.workingSellTHB,480550);
 assert.equal(scopeModel().lines.B9.directCostTHB,null);
 assert(!releaseModel().approval.releaseAllowed);

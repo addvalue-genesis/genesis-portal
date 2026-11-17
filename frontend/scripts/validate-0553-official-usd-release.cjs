@@ -28,7 +28,7 @@ for(const code of ['B4','B12']){
 }
 assert.throws(()=>buildOfficialUsdRelease0553({...source,b:source.b.map(r=>r.code==='B4'?{...r,customerSellTHB:0}:r)}),/excluded offer cannot carry a quoted price/);
 const b14=source.b.find(x=>x.code==='B14'),plan=b14.insurancePlan;
-assert.equal(b14.executionOwner,'ADDVALUE');assert.equal(b14.customerSellTHB,787500);
+assert.equal(b14.executionOwner,'ADDVALUE');assert.equal(b14.workingSellTHB,787500);assert.equal(b14.customerSellTHB,826875);
 assert.equal(plan.owner,'ADDVALUE');assert.equal(plan.additionalB14BudgetTHB,787500);
 assert.equal(plan.verifiedPremiumTHB,null);assert.equal(plan.customerReleaseAllowed,false);
 assert.equal(plan.currentDeployment.satTeamDays,28);assert.equal(plan.currentDeployment.satWorkingPersonDays,56);
@@ -49,10 +49,10 @@ assert.equal(plan.contractSource.finalTermsConfirmed,false);
 assert.equal(plan.contractSource.cclExposure.offshoreDays,45);
 assert.equal(b14.actualCostTHB,null);assert.equal(b14.profitTHB,null);
 assert.equal(b14.samTelDeductionTHB,39375);
-assert.equal(b14.addvalueReceivableTHB,748125);
-assert.equal(model.b.find(x=>x.code==='B14').amountUSD,25000);
-assert.equal(model.totalUSD,894590);
-assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,869910,'Current A+B excluding B14 includes the selected B1 delta only');
+assert.equal(b14.addvalueReceivableTHB,787500);
+assert.equal(model.b.find(x=>x.code==='B14').amountUSD,26300);
+assert.equal(model.totalUSD,903710);
+assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,877410,'Current A+B excluding B14 includes the service markup');
 
 assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
 assert(plan.coverages.every(x=>x.verifiedPremiumTHB===null&&x.additionalPostingTHB===null));
@@ -163,7 +163,7 @@ for(const [code,amount] of [["C1","5,704,650.00"],["C2","852,086.50"]]){
 assert(releaseSummaryHtml.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'));
 assert(releaseSummaryHtml.includes("PRICE OFFERED — CONDITIONAL BUDGETARY"));
 assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain excluded from A+B");
-assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
+assert(html.includes("894,910.00"),"Default Official USD screen keeps the frozen Rev03 total");
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B11, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
 for(const [code,amount] of [["C1",181100],["C2",27220]]){
@@ -209,7 +209,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
    const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
-   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:894590});
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:903710});
    // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
    const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
    for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])
@@ -225,7 +225,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    assert(cell(xml,'B43').includes('subject to buyer approval against original DDP site terms'));
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
    assert(cell(xml,'A38').includes('B4, B11, B12')&&!cell(xml,'A38').includes('B14'));
-   assert(cell(xml,'G37').includes('<v>25000</v>'));
+   assert(cell(xml,'G37').includes('<v>26300</v>'));
    for(const row of [27,35]){assert(cell(xml,'F'+row).includes('N/A'));assert(cell(xml,'G'+row).includes('N/A'));assert(cell(xml,'H'+row).includes('Not quoted; excluded from this offer.'));}
    assert(cell(xml,'H37').includes('Budgetary insurance allowance'));
    for(const r of model.b)assert(cell(xml,'G'+(23+Number(r.code.slice(1)))).includes(r.amountUSD===null?(r.priceText||'To be quoted'):'<v>'+r.amountUSD+'</v>'));

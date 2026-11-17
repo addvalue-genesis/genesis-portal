@@ -1,4 +1,5 @@
 import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
+import {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553,priceSamtelEngineeringServiceRelease0553} from "./samtelEngineeringServiceMarkup0553";
 // PJ2608-0553 · 10.3 Customer Release staging model.
 // NEVER mutate 10.1 / 10.2. Never equate Working SELL with direct COST.
 // A/C: cost × (1 + 20% SAMTEL + 5% ADDVALUE + 5% ADDVALUE omission reserve).
@@ -311,12 +312,18 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    costComplete,releaseAllowed:false};
  });
  const b=bc.rows.filter(r=>r.code.startsWith("B")).map(r=>{
-  const price=priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,
-   r.code==="B3"?r.b3MgwPurchasedFatWorkingSell:null);
+  const commercialCategory=PART_B_COMMERCIAL_CATEGORY_0553[r.code];
+  if(commercialCategory!=="service"&&commercialCategory!=="goods")
+   throw Error("Part B item has no service/goods category "+r.code);
+  const goodsPrice=commercialCategory==="goods"?priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,null):null;
+  const servicePrice=commercialCategory==="service"?priceSamtelEngineeringServiceRelease0553(r.workingSellTHB):null;
+  const price=commercialCategory==="service"?servicePrice:goodsPrice;
   const b3Source=r.code==="B3"?selectB3ResourcePriceDossier0553(r):null;
-  if(b3Source&&(b3Source.rollupTotalTHB!==r.workingSellTHB||
-    b3Source.rollupTotalTHB!==price?.customerSellTHB))
+  if(b3Source&&b3Source.rollupTotalTHB!==r.workingSellTHB)
    throw Error("10.3 B3 GROUP Source→Release parity failed");
+  if(b3Source&&servicePrice?.customerSellTHB!==null&&
+     servicePrice.customerSellTHB!==round(b3Source.rollupTotalTHB*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553))
+   throw Error("10.3 B3 release must be Item 7 × SAMTEL engineering service markup and must not include B3-BF");
   const b3GroupTrace=b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
    id:g.id,sourceModuleId:g.id,workingSellId:"WS-B3",
    scopeId:"SOW-B3",customerProposalId:"CP-B3",
@@ -333,12 +340,16 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
    b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,
+   commercialCategory,
+   item7CostTHB:commercialCategory==="service"?servicePrice.item7CostTHB:(n(r.workingSellTHB)?round(r.workingSellTHB):null),
+   samtelServiceTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:null,
+   releaseTHB:price?.customerSellTHB??null,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
-   samTelDeductionTHB:price?.samTelDeductionTHB??null,
-   samTelOrdinaryB5PctDeductionTHB:price?.samTelOrdinaryB5PctDeductionTHB??null,
-   samTelPurchased20PctCostShareTHB:price?.samTelPurchased20PctCostShareTHB??null,
-   mgwPurchasedServicesSellIncludedTHB:price?.mgwPurchasedServicesSellIncludedTHB??null,
+   samTelDeductionTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:(price?.samTelDeductionTHB??null),
+   samTelOrdinaryB5PctDeductionTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:(price?.samTelOrdinaryB5PctDeductionTHB??null),
+   samTelPurchased20PctCostShareTHB:commercialCategory==="service"?0:(price?.samTelPurchased20PctCostShareTHB??null),
+   mgwPurchasedServicesSellIncludedTHB:commercialCategory==="service"?0:(price?.mgwPurchasedServicesSellIncludedTHB??null),
    addvalueReceivableTHB:price?.addvalueReceivableTHB??null,
    actualCostTHB:price?.directCostTHB??null,
    profitTHB:price?.addvalueProfitTHB??null,

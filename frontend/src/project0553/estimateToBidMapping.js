@@ -1,4 +1,5 @@
 import {COMMERCIAL_TEMPLATE_0553} from "./commercialWorkbookControl";
+import {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./data/samtelEngineeringServiceMarkup0553";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 // PROJECT-SPECIFIC commercial destination registry only.
 // First Principles / Telecom Constraints / CAL / BOM / selected vendor / cost derivation
@@ -74,9 +75,14 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
    const scoped=scope?.lines?.[code];
    // Null must remain null where the contractual owner has no selected price
    // (for example B4/B12/B14). B9 is a selected nonzero 1 LS, while field execution needs call-out.
+   const roundMoney=n=>Math.round((n+Number.EPSILON)*100)/100;
+   const expectedCustomer=owner?.workingSellTHB==null?null:
+    PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"
+     ?roundMoney(owner.workingSellTHB*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553)
+     :owner.workingSellTHB;
    const sameSelected=Boolean(owner&&priced&&(
-    eq(owner.workingSellTHB,priced.customerSellTHB)||
-    (owner.workingSellTHB===null&&priced.customerSellTHB===null)));
+    (expectedCustomer===null&&priced.customerSellTHB===null)||
+    eq(expectedCustomer,priced.customerSellTHB)));
    const sameScope=!scope||Boolean(scoped&&(
     eq(scoped.workingSellTHB,owner?.workingSellTHB)||
     (scoped.workingSellTHB===null&&owner?.workingSellTHB===null)));

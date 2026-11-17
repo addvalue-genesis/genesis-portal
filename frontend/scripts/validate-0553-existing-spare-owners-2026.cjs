@@ -18,6 +18,8 @@ const {selectDocumentSpareObligations0553}=from("data/documentSpareObligations05
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {selectScopePartBcWorking0553}=from("data/scopePartBcReadModel0553.js");
 const {buildReleaseCommercialModel0553,auditAnnexBidirectionalTrace0553}=from("data/releaseCommercialModel0553.js");
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=from("data/samtelEngineeringServiceMarkup0553.js");
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?Math.round((working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553+Number.EPSILON)*100)/100:working;
 const {auditCurrentCustomerProjection0553}=from("estimateToBidMapping.js");
 const costs=selectSpareCustomerSchedule0553(),docs=selectDocumentSpareObligations0553();
 const bc=selectBcTurnkeyWorkingCost0553(),scope=selectScopePartBcWorking0553(),rel=buildReleaseCommercialModel0553({thbPerUsd:31.5});
@@ -112,7 +114,7 @@ const unchangedOwners={B1:862675.74,B2:237121.13,B3:2322450,B4:null,B5:311184,
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");
  assert.equal(scope.lines[code].workingSellTHB,value);
- assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,value);
+ assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,partBReleaseTHB(code,value));
 }
 assert.equal(rel.summary.baseCustomerSellTHB,null,"A+B complete total must not be constructed from partial costs");
 assert.equal(rel.approval.releaseAllowed,false);

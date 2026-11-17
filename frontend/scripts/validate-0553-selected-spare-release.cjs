@@ -16,7 +16,7 @@ for(const [key,actual] of [['sourceRows',[...source.a,...source.b,...source.c]],
 for(const [code,h] of Object.entries(before.annex).filter(([code])=>!['B10','B11'].includes(code)))assert.equal(hash(source.annex[code]),h,code+' original source identity changed');
 assert.equal(working.byCode.B11.workingSellTHB,null);assert.equal(scope.lines.B11.amountTHB,null);
 assert.equal(scope.lines.B11.offerTreatment.priceText,'N/A');assert.equal(working.byCode.B11.b11VendorFollowup.withdrawnAllowanceTHB,157657.5);
-assert.equal(working.knownWorkingSellTHB,5961702.87);assert.equal(quote.totalUSD,894910);assert.equal(before.totalUSD-quote.totalUSD,7990);
+assert.equal(working.knownWorkingSellTHB,5961702.87);assert.equal(quote.totalUSD,903710);assert.equal(before.totalUSD-quote.totalUSD,-810);
 assert.equal(quote.b.find(x=>x.code==='B11').priceText,'N/A');
 assert(source.annex.B11.every(x=>x.customerUnitTHB===null&&x.customerTotalTHB===null&&x.offerExcluded));
 assert.equal(Math.round(source.annex.B11.reduce((s,x)=>s+x.referenceTotalTHB,0)*100),15765750);
@@ -62,7 +62,7 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
    assert(cell(c1,'I'+(6+i)).includes('<v>'+r.totalUSD*factor+'</v>'));
   }
   if(kind!=='THB'){
-   assert(cell(summary,'G38').includes('<v>894910</v>'));
+   assert(cell(summary,'G38').includes('<v>903710</v>'));
    for(const internal of ['CONDITIONAL BUDGETARY OPTION SELL','installed RACON FCA package is a rate comparator','PRE-AWARD WORKING ALLOCATION','PRE-AWARD WORKING PRICE TOTAL'])assert(!c1.includes(internal),kind+' leaked '+internal);
   }
  }
@@ -79,5 +79,5 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
  const repairedParts=native.entriesFromZip(new Uint8Array(await repaired.blob.arrayBuffer()));
  const fixed=new TextDecoder().decode(await native.readEntry(repairedParts.find(x=>x.name==='xl/worksheets/sheet3.xml')));
  assert(cell(fixed,'I19').includes('N/A'));assert(!fixed.includes('<f>'));assert(!fixed.includes('<v>5100</v>'));
- console.log('PASS selected spare release: B11/C1 selection retained; subsequent owner B10/C2 decisions applied; Source/Working/Scope/Release/6-sheet USD and THB/10-sheet Breakdown agree, A+B894910, C1181100, B11N/A; raw source trace and other prices preserved.');
+ console.log('PASS selected spare release: B11/C1 selection retained; subsequent owner B10/C2 decisions applied; Source/Working/Scope/Release/6-sheet USD and THB/10-sheet Breakdown agree, A+B903710, C1181100, B11N/A; raw source trace and other prices preserved.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

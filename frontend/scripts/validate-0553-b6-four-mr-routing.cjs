@@ -65,7 +65,8 @@ assert.equal(
  403263682
 );
 assert.equal(source.byCode.B6.workingSellTHB,335584);
-assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,335584);
+assert.equal(release.b.find(x=>x.code==="B6").workingSellTHB,335584);
+assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,352363.2);
 assert.equal(scope.lines.B6.workingSellTHB,335584);
 assert.equal(source.byCode.B6.directCostTHB,null);
 assert.equal(m.moduleId,"bid.budget.working.bc.b6");

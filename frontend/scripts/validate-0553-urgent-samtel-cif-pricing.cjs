@@ -7,6 +7,8 @@ require.extensions['.js']=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.tra
 const get=n=>require(path.join(src,'project0553/data',n+'.js'));
 const before=require('../audit-fixtures/urgent-pricing-before-20261024.json');
 const {buildReleaseCommercialModel0553:release,auditAnnexBidirectionalTrace0553:audit}=get('releaseCommercialModel0553');
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=get('samtelEngineeringServiceMarkup0553');
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?Math.round((working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553+Number.EPSILON)*100)/100:working;
 const {selectWorkingBomProjection0553:project}=get('workingBomAggregation0553');
 const bc=get('bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553();
 const scope=get('scopePartBcReadModel0553').selectScopePartBcWorking0553();
@@ -51,7 +53,7 @@ for(const row of bc.rows){
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
  if(row.code.startsWith('B')){
   const out=rel.b.find(x=>x.code===row.code);
-  assert.equal(out.customerSellTHB,row.workingSellTHB);
+  assert.equal(out.customerSellTHB,partBReleaseTHB(row.code,row.workingSellTHB));
   assert.equal(out.sourceModuleId,row.moduleId);
  }
 }

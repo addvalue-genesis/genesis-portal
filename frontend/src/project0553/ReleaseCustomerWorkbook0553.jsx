@@ -43,6 +43,53 @@ export function SubmittedWorksheet0553({sheet}){
 }
 const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const csvCell=value=>{
+ const text=value==null?"":String(value);
+ return /[",\n]/.test(text)?'"'+text.replace(/"/g,'""')+'"':text;
+};
+// Same Part B price cells the customer sheet and the native workbook write.
+// Service release is Item 7 × 1.05. Goods stay on the working-sell customer price.
+export function releaseCustomerPriceRows0553(model){
+ return model.b.map(line=>({
+  code:line.code,
+  category:line.commercialCategory,
+  description:line.description,
+  item7:line.item7CostTHB,
+  samtel:line.samtelServiceTHB,
+  release:line.customerSellTHB,
+  unitPrice:Number.isFinite(line.customerSellTHB)?money(line.customerSellTHB):(line.offerTreatment?.priceText||"—"),
+  subTotal:Number.isFinite(line.customerSellTHB)?money(line.customerSellTHB):(line.offerTreatment?.priceText||"—")
+ }));
+}
+export function releaseCustomerCsv0553(model,{internal=false}={}){
+ const rows=releaseCustomerPriceRows0553(model);
+ const header=internal
+  ?["Item","Category","Description","Item 7 cost THB","SAMTEL 5% THB","Item 10/Release THB","Unit Price","Sub-Total"]
+  :["Item","Description","Qty","Unit Price","Sub-Total"];
+ const body=rows.map(row=>internal
+  ?[row.code,row.category,row.description,money(row.item7),row.category==="service"?money(row.samtel):"",money(row.release),row.unitPrice,row.subTotal]
+  :[row.code,row.description,"1 lot",row.unitPrice,row.subTotal]);
+ const total=["Total Part B priced",money(model.summary.bProvisionalCustomerSellTHB)];
+ return [header,...body,total].map(line=>line.map(csvCell).join(",")).join("\n")+"\n";
+}
+function saveReleaseText(text,type,filename){
+ const link=document.createElement("a");
+ link.href=URL.createObjectURL(new Blob([type.startsWith("text/csv")?"\uFEFF"+text:text],{type}));
+ link.download=filename;document.body.appendChild(link);link.click();link.remove();
+ window.setTimeout(()=>URL.revokeObjectURL(link.href),15000);
+}
+export function releaseCustomerWordHtml0553(model,{internal=false}={}){
+ const rows=releaseCustomerPriceRows0553(model);
+ const head=internal
+  ?"<tr><th>Item</th><th>Category</th><th>Item 7</th><th>SAMTEL 5%</th><th>Item 10/Release</th></tr>"
+  :"<tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Sub-Total</th></tr>";
+ const body=rows.map(row=>internal
+  ?`<tr><td>${row.code}</td><td>${row.category}</td><td>${money(row.item7)}</td><td>${row.category==="service"?money(row.samtel):""}</td><td>${money(row.release)}</td></tr>`
+  :`<tr><td>${row.code}</td><td>${row.description}</td><td>1 lot</td><td>${row.unitPrice}</td><td>${row.subTotal}</td></tr>`).join("");
+ return "<html><head><meta charset=\"utf-8\"><title>PJ2608-0553 Part B Release</title></head><body>"+
+  "<h1>PJ2608-0553 Scope of supply — Part B</h1><table>"+head+body+
+  "<tr><td colspan=\"4\">Total Part B priced</td><td>"+money(model.summary.bProvisionalCustomerSellTHB)+"</td></tr></table></body></html>";
+}
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
 const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
 // Customer descriptions must follow the native source workbook, not Rev08 history.
@@ -99,7 +146,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    target.scrollIntoView?.({behavior:"smooth",block:"center"});
   }
  },[focusKey,sheet]);
- const [viewer,setViewer]=useState("CUSTOMER");
+ const [viewer,setViewer]=useState(recipient==="INTERNAL"?"INTERNAL":"CUSTOMER");
  const [source,setSource]=useState(null);
  const [expandedMr,setExpandedMr]=useState({});
  const [showChecks,setShowChecks]=useState(false);
@@ -209,7 +256,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  return <section className="p55-panel p553-release-workbook" data-owner-colours={internal?"true":"false"} data-component-key="bid.budget.pricing.release.preview">
    <div className="p55-eyebrow">{title} · 10.3 Customer Price Preview</div>
    <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
-   <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
+   <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1. Part B service (B1–B9 and B14) Release = Item 7 working sell × 1.05. Goods B10–B13 stay at the working-sell customer price. C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
    <div className="p553-release-controls">
     <label>Preview mode
      <select value={recipient==="INTERNAL"?viewer:"CUSTOMER"} onChange={e=>{setViewer(e.target.value);setSource(null);}} disabled={recipient!=="INTERNAL"}>
@@ -230,8 +277,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        title="Generate Excel from current Release data using the original template. No file selection required.">
        {nativeBusy?"Preparing Excel…":"Export Excel — WORKING DRAFT"}
       </button>
+      <button type="button" className="p553-detail-button" onClick={()=>saveReleaseText(releaseCustomerCsv0553(model,{internal:true}),"text/csv;charset=utf-8","PJ2608-0553_PartB_Release_INTERNAL.csv")}>CSV — Part B Internal</button>
+      <button type="button" className="p553-detail-button" onClick={()=>saveReleaseText(releaseCustomerWordHtml0553(model,{internal:true}),"application/msword","PJ2608-0553_PartB_Release_INTERNAL.doc")}>Word — Part B Internal (.doc)</button>
       <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}>Use another original template…</button>
      </>}
+    <button type="button" className="p553-detail-button" onClick={()=>saveReleaseText(releaseCustomerCsv0553(model),"text/csv;charset=utf-8","PJ2608-0553_PartB_Release.csv")}>CSV — Part B Release</button>
+    <button type="button" className="p553-detail-button" onClick={()=>saveReleaseText(releaseCustomerWordHtml0553(model),"application/msword","PJ2608-0553_PartB_Release.doc")}>Word — Part B Release (.doc)</button>
     <button type="button" disabled={!canQuote} className="p553-detail-button"
       title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
    </div>
@@ -307,6 +358,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}
           {line?.executionActivities&&<small className="p553-release-activity-text">{line.executionActivities.releaseText}</small>}
           {line?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} compact/>}
+          {internal&&line?.commercialCategory==="service"&&<small className="p553-release-activity-text" data-part-b-price-chain={id}>
+           {Number.isFinite(line.item7CostTHB)
+            ?<>Item 7 {money(line.item7CostTHB)} · SAMTEL 5% {money(line.samtelServiceTHB)} · Item 10/Release {money(line.releaseTHB)}</>
+            :<>Service · unpriced · Release = Item 7 × 1.05 once a working sell is selected</>}
+          </small>}
+          {internal&&line?.commercialCategory==="goods"&&<small className="p553-release-activity-text" data-part-b-category="goods">Goods · customer price unchanged</small>}
          </td>
          <td>1 lot</td><td className="p553-price-cell">{line?.offerTreatment?.priceText&&!Number.isFinite(line?.customerSellTHB)?line.offerTreatment.priceText:money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{line?.offerTreatment?.priceText&&!Number.isFinite(line?.customerSellTHB)?line.offerTreatment.priceText:money(line?.customerSellTHB)}</td>
@@ -322,7 +379,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
          <strong>10.3 B3 — Work Type Source-to-Release attribution (internal only, NOT 4 quotation lines)</strong>
          <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-          <thead><tr><th>10.2 Group Source</th><th>Working SELL THB</th><th>10.3 Customer Preview Attribution THB</th>
+          <thead><tr><th>10.2 Group Source</th><th>Item 7 working sell THB</th><th>Item 7 composition THB</th>
            <th>Status</th><th>Go to 10.2 Source</th></tr></thead>
           <tbody>{line.b3GroupTrace.map(g=><tr key={g.id} data-work-family={g.id.split(".").pop()}>
            <td>{g.name}<small>{g.id}</small></td>
@@ -331,8 +388,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
            <td><button type="button" className="p553-detail-button"
              onClick={()=>onOpenSource({code:"B3",sourceModuleId:g.sourceModuleId})}>↗ 10.2 B3 Group</button></td>
           </tr>)}</tbody>
-          <tfoot><tr><th>B3 Working Budget Preview — ONE customer LS</th>
-           <th>{money(line.workingSellTHB)}</th><th>{money(line.customerSellTHB)}</th>
+          <tfoot><tr><th>B3 Item 7 {money(line.workingSellTHB)} · SAMTEL 5% {money(line.samtelServiceTHB)} · Item 10/Release {money(line.customerSellTHB)}. B3-BF is a separate additional and is not in this total.</th>
+           <th>{money(line.item7CostTHB)}</th><th>{money(line.releaseTHB)}</th>
            <th>CP-B3 NOT ISSUED · No additional posting</th><th>Release HOLD</th></tr></tfoot>
          </table></div>
         </td></tr>}

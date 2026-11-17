@@ -22,7 +22,7 @@ release.require=id=>{
  if(id==='react/jsx-runtime')return {jsx:node,jsxs:node,Fragment:'FRAGMENT'};
  if(id==='./data/officialUsdRelease0553')return {
   selectSubmittedRev02Release0553:()=>snapshot,selectCurrentReleaseRev03_0553:()=>current,
-  buildOfficialUsdRelease0553:()=>({otherSpareItemizedAnnex:{},totalUSD:894910,releasePriceReference:{revision:'Rev03',filename:'4-Scope of Supply Rev03.xlsx'}})
+  buildOfficialUsdRelease0553:()=>({otherSpareItemizedAnnex:{},totalUSD:903710,releasePriceReference:{revision:'Rev03',filename:'4-Scope of Supply Rev03.xlsx'}})
  };
  if(id==='./data/customerPriceBreakdown0553')return {
   buildCustomerPriceBreakdown0553:()=>({groups:['A1','A2','A3','A4'].map((code,i)=>({code,mr:'MR-000'+(i+1),rows:[{key:code+'-CURRENT'}],totalUSD:[241290,137130,34200,292500][i],parentUSD:[241290,137130,34200,292500][i],varianceUSD:0}))}),
@@ -107,7 +107,7 @@ for(const name of expected.slice(6)){
  assert(!all(releaseTree).some(n=>n.type===sheetRenderer),'Release Part A must not render frozen Rev02');
  assert(all(releaseTree).some(n=>n.props['data-release-a-source-key']===name.slice(0,2)+'-CURRENT'));
  assert(text(releaseTree).includes('CURRENT_WORKING_DETAIL'));
- assert(text(releaseTree).includes('894,910.00'));
+ assert(text(releaseTree).includes('903,710.00'));
  assert(text(releaseTree).includes('Rev03'));
  assert(!/Submitted\s+Rev02/.test(text(releaseTree)));
  assert.equal(all(releaseTree).filter(n=>n.props.role==='tab'&&n.props['aria-selected']).length,1);

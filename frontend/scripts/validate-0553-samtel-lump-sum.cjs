@@ -10,6 +10,8 @@ const bc=get('bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553();
 const rel=get('releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const scope=get('scopePartBcReadModel0553').selectScopePartBcWorking0553();
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=get('samtelEngineeringServiceMarkup0553');
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?round(working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553):working;
 const budget=bc.byCode.B3.b3ChinaFatBudget;
 const rows=budget.rows.filter(r=>r.costOwner==='B3'),byId=Object.fromEntries(rows.map(r=>[r.id,r]));
 const expected={
@@ -76,12 +78,12 @@ for(const row of bc.rows){
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
  if(row.code.startsWith('B')){
   const out=rel.b.find(r=>r.code===row.code);
-  assert.equal(out.customerSellTHB,row.workingSellTHB);
+  assert.equal(out.customerSellTHB,partBReleaseTHB(row.code,row.workingSellTHB));
   assert.equal(out.sourceModuleId,row.moduleId);
  }
 }
 for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},baseline.a.find(r=>r.code===a.code));
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580+787500+441495.74-157657.5);
+assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580+787500+441495.74-157657.5+275480.75);
 assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+round(r.workingSellTHB*.05),0)));
 assert.equal(rel.summary.baseCustomerSellTHB,null);
 assert.equal(rel.approval.releaseAllowed,false);

@@ -10,6 +10,8 @@ require.extensions[".js"]=(mod,file)=>{
  }else old(mod,file);
 };
 const from=p=>require(path.join(root,"project0553",p));
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=from("data/samtelEngineeringServiceMarkup0553.js");
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?Math.round((working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553+Number.EPSILON)*100)/100:working;
 const budget=from("data/bcTurnkeyWorkingCost0553.js").selectBcTurnkeyWorkingCost0553();
 const abc=from("data/revKAbcOwnershipControl0553.js").selectRevKAbcOwnershipControl0553(budget);
 const fat=from("data/fatWbsFourMr0553.js").selectFourMrFatWbs0553();
@@ -24,10 +26,12 @@ for(const line of release.b){
  const owner=by[line.code];
  assert(owner,"Release B category lacks selected 10.2 owner: "+line.code);
  assert.equal(line.workingSellTHB,owner.workingSellTHB,"Release must read selected 10.2 "+line.code);
- assert.equal(line.customerSellTHB,owner.workingSellTHB,"Release B must not reprice selected "+line.code);
+ assert.equal(line.commercialCategory,PART_B_COMMERCIAL_CATEGORY_0553[line.code]);
+ assert.equal(line.customerSellTHB,partBReleaseTHB(line.code,owner.workingSellTHB),"Release "+line.code);
 }
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2322450,
- "User-selected SAT 28 + BF Survey 3+2 working budget must project once to Release, risk days excluded");
+assert.equal(release.b.find(x=>x.code==="B3").workingSellTHB,2322450);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2438572.5,
+ "B3 Release is Item 7 2322450 × 1.05; B3-BF is not included");
 for(const [code,amount] of Object.entries({B1:862675.74,B2:237121.13,B3:2322450,B8:142550,B9:480550})){
  assert.equal(by[code].workingSellTHB,amount,"Canonical current "+code+" sell mismatch");
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");

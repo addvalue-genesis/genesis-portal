@@ -35,7 +35,7 @@ assert.equal(option.budgetaryQuoteUSD,prior.c2.budgetaryQuoteUSD-1500+8050+optio
 assert.equal(option.rows.reduce((n,x)=>n+x.totalUSD,0),27220);assert.equal(option.ownerCableReplacement.quoteDeltaUSD,6550);
 assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferTHB,852086.5);
 assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferUSD,27220);
-assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);assert.equal(official.totalUSD,894910);
+assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);assert.equal(official.totalUSD,903710);
 const shown=official.otherSpareItemizedAnnex.rows.C2.find(x=>x.id===r.id);
 assert.equal(shown.qty,1);assert.equal(shown.unit,'drum');assert.equal(shown.totalUSD,8050);assert.equal(shown.totalTHB,253500);
 assert(shown.specification.includes('300 metres continuous cable')&&shown.specification.includes('connectors')===false);
@@ -69,7 +69,7 @@ const value=(xml,a,n)=>assert(cell(xml,a).includes('<v>'+n+'</v>'),a+' stale, ex
   assert(cell(annex,'D14').includes('300m drum'));assert(cell(annex,'E14').includes('TECKNIKABEL'));
   assert(cell(annex,'E14').includes('300 metres continuous cable'));
   for(const text of ['OWNER_PLANNING','195000','budgetCostTHBPerM','QT-H670003342'])assert(!annex.includes(text),'Internal cost/reference exported '+text);
-  if(!isThb)value(scope,'G38',894910);
+  if(!isThb)value(scope,'G38',903710);
  }
  // Reusing an old, filled50m file must not resurrect old Qty/unit/amount.
  const parts=native.entriesFromZip(new Uint8Array(await usd.blob.arrayBuffer()));
@@ -81,5 +81,5 @@ const value=(xml,a,n)=>assert(cell(xml,a).includes('<v>'+n+'</v>'),a+' stale, ex
  const fixed=await native.buildNativeOfficialRelease0553(oldFile,official),again=await native.buildNativeOfficialRelease0553({name:usd.filename,arrayBuffer:()=>usd.blob.arrayBuffer()},official);
  assert.deepEqual(new Uint8Array(await fixed.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
  assert.deepEqual(new Uint8Array(await again.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
- console.log('PASS C2 CAT6A: owner300m drum / THB650 planning cost /195000×1.30÷31.5→USD8050; C227220, A+B894910; all unrelated C2 rows and A/B/C1/raw sources unchanged; subsequent RF owner replacement checked separately; Source/Scope/UI/USD/THB/Breakdown/stale/repeated exports agree; CSS quotes nonposting.');
+ console.log('PASS C2 CAT6A: owner300m drum / THB650 planning cost /195000×1.30÷31.5→USD8050; C227220, A+B903710; all unrelated C2 rows and A/B/C1/raw sources unchanged; subsequent RF owner replacement checked separately; Source/Scope/UI/USD/THB/Breakdown/stale/repeated exports agree; CSS quotes nonposting.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

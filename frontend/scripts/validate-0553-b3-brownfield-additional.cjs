@@ -380,6 +380,10 @@ async function checkOfficialExports(){
  assert.equal(xlsx.filename,"MM-ZTK-1F-GEN-ADDV-TEL-QUO-0001 Rev.00.xlsx");
  assert.ok(!xlsx.filename.includes("-ADV-"));
  const zip=native.entriesFromZip(xlsx.bytes);
+ assert.ok(!zip.some(entry=>entry.name==="xl/calcChain.xml"),"brownfield xlsx must not keep a stale calcChain");
+ const packageXml=async name=>new TextDecoder().decode(await native.readEntry(zip.find(entry=>entry.name===name)));
+ assert.ok(!(await packageXml("[Content_Types].xml")).includes("calcChain"));
+ assert.ok(!(await packageXml("xl/_rels/workbook.xml.rels")).includes("calcChain"));
  const sheet=new TextDecoder().decode(await native.readEntry(zip.find(entry=>entry.name==="xl/worksheets/sheet1.xml")));
  assert.ok(sheet.includes("668,115.00")&&!sheet.includes("636,300.00")&&sheet.includes("Quoted")&&sheet.includes("MR-0001 SCADA / AVIAT / Cisco")&&sheet.includes("B3-BF.3")&&!sheet.includes("126,000.00")&&!sheet.includes("283,500.00")&&sheet.includes("Brownfield Additional"));
  assert.ok(!sheet.includes("Offshore working")&&!sheet.includes(">A2<")&&!sheet.includes(">A3<")&&!sheet.includes(">A4<"));

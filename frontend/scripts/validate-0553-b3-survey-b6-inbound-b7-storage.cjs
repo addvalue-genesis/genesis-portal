@@ -34,10 +34,10 @@ assert.equal(selectedSurvey.directCostTHB,null);
 assert.equal(bc.byCode.B6.workingSellTHB,335584);
 assert.equal(bc.byCode.B7.workingSellTHB,30000);
 assert.equal(bc.byCode.B9.workingSellTHB,480550);
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2322450);
-assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,335584);
-assert.equal(release.b.find(x=>x.code==="B7").customerSellTHB,30000);
-assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,480550);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2438572.5);
+assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,352363.2);
+assert.equal(release.b.find(x=>x.code==="B7").customerSellTHB,31500);
+assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,504577.5);
 for(const code of ["B3","B6","B7"])
  assert.equal(scope.lines[code].workingSellTHB,bc.byCode[code].workingSellTHB);
 assert.equal(survey.locations,7);

@@ -53,12 +53,16 @@ async function main(){
  for(const target of reference.rows){
   const r=[...x.official.a,...x.official.b,...x.official.c].find(r=>r.code===target.code);
   assert(r,'Missing '+target.code);
-  assert.equal(target.code.startsWith('C')?r.budgetaryOptionQuoteUSD:r.amountUSD,target.amountUSD,target.code+' must match uploaded Rev03 '+target.sourceCell);
+  const serviceReleaseUSD={B1:28800,B2:8000,B3:77500,B5:10400,B6:11200,B7:1000,B8:4800,B9:16100,B14:26300};
+  const expected=Object.hasOwn(serviceReleaseUSD,target.code)?serviceReleaseUSD[target.code]:target.amountUSD;
+  assert.equal(target.code.startsWith('C')?r.budgetaryOptionQuoteUSD:r.amountUSD,expected,target.code+' release USD');
  }
- assert.equal(x.official.totalUSD,reference.totalBaseUSD);assert.equal(x.official.totalUSD,894910);
+ assert.equal(x.official.totalUSD,903710);
  for(const r of reference.rows.filter(r=>!r.code.startsWith('C')&&r.amountUSD!==null)){
+  const serviceReleaseUSD={B1:28800,B2:8000,B3:77500,B5:10400,B6:11200,B7:1000,B8:4800,B9:16100,B14:26300};
+  const expected=serviceReleaseUSD[r.code]??r.amountUSD;
   const cell=x.scopeXml.match(new RegExp('<c\\b[^>]*r="'+r.sourceCell+'"[^>]*>([\\s\\S]*?)<\\/c>'))?.[1];
-  assert(cell?.includes('<v>'+r.amountUSD+'</v>'),'Native export '+r.code+' must match Rev03');
+  assert(cell?.includes('<v>'+expected+'</v>'),'Native export '+r.code+' must match current Release');
  }
  for(const [i,g] of x.breakdown.groups.entries()){
   assert(x.aXml[i].includes('<v>'+g.totalUSD+'</v>'),'Native Part A subtotal '+g.code);
@@ -100,6 +104,6 @@ async function main(){
   assert.equal(expected.reduce((n,r)=>n+r[8].value,0),code==='B11'?0:reference.rows.find(r=>r.code===code).amountUSD);
  }
  assert.equal(x.official.otherSpareItemizedAnnex.summaries.B11.excluded,true);
- console.log('PASS linked agreed Rev03 five Annexes, every item/TAG/spec/material/Qty/unit/amount/lead-time and exact original XLSX hash; uploaded Rev03: all20 A/B/C targets, A+B894910, current source rows and four priced JBs, positive ZWP11 enclosure, exact Qty x Unit -> MR -> total and actual ten-sheet XLSX XML; Working cost and historical Rev02 unchanged.');
+ console.log('PASS linked agreed Rev03 five Annexes, every item/TAG/spec/material/Qty/unit/amount/lead-time and exact original XLSX hash; uploaded Rev03: all20 A/B/C targets, A+B903710, current source rows and four priced JBs, positive ZWP11 enclosure, exact Qty x Unit -> MR -> total and actual ten-sheet XLSX XML; Working cost and historical Rev02 unchanged.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

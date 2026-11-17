@@ -34,7 +34,7 @@ assert(!rf.materials.includes('connectors included'));assert(rf.materials.includ
 assert(!d.currentSupplierPriceConfirmed&&!d.factoryDrumLengthConfirmed&&!d.technicalCompatibilityConfirmed&&!d.procurementApproved);
 assert.equal(d.separatePackingAndFreightCostTHB,null);assert.equal(rf.evidenceClass,'HISTORICAL_CSS_QUOTE_NOT_CURRENT_VENDOR_QUOTE');
 const a=from('data/mgwP26058R2Selected0553').selectMGWR2Selected0553('UHF-4');assert.equal(a.manufacturer,'FORLLER');assert.equal(a.unitPriceUSD,846);assert.equal(a.quantity,3);
-assert.equal(official.totalUSD,894910);assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);
+assert.equal(official.totalUSD,903710);assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);
 const React=require('react'),render=require('react-dom/server').renderToStaticMarkup;
 const customer=render(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code:'C2',model:official.otherSpareItemizedAnnex}));
 for(const text of ['LDF4RK-50A','305 metres','6,930.00','27,220.00'])assert(customer.includes(text));
@@ -56,7 +56,7 @@ const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*?(?:/>|>([\\s\
   num(c2,'G14',1);num(c2,'I14',isThb?253500:8050);num(c2,'G15',4);num(c2,'I15',isThb?connectors.extendedTHB:160);
   assert(cell(c2,'E13').includes('LDF4RK-50A')&&cell(c2,'E13').includes('305 metres'));
   for(const text of ['167750','budgetCostTHBPerM','CSS QT-H670003342'])assert(!c2.includes(text));
-  if(!isThb)num(scope,'G38',894910);
+  if(!isThb)num(scope,'G38',903710);
  }
  // An old30m/USD600 filled export must update without residual cells or repeated uplift.
  const entries=native.entriesFromZip(new Uint8Array(await usd.blob.arrayBuffer()));
@@ -66,5 +66,5 @@ const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*?(?:/>|>([\\s\
  const repaired=await native.buildNativeOfficialRelease0553({name:'Old30m.xlsx',arrayBuffer:async()=>oldBytes.buffer.slice(oldBytes.byteOffset,oldBytes.byteOffset+oldBytes.length)},official);
  assert.deepEqual(new Uint8Array(await repaired.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
  assert.deepEqual(from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source),official);
- console.log('PASS RF CSS drum305m:550THB/m,167750×1.30÷31.5→USD6930; C227220/A+B894910; other ten C2 rows/CAT6A/Type-N4 and A/B/C1/raw history unchanged; Source/Scope/UI/USD/THB/Breakdown/stale export agree.');
+ console.log('PASS RF CSS drum305m:550THB/m,167750×1.30÷31.5→USD6930; C227220/A+B903710; other ten C2 rows/CAT6A/Type-N4 and A/B/C1/raw history unchanged; Source/Scope/UI/USD/THB/Breakdown/stale export agree.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

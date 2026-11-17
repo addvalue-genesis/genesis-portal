@@ -97,7 +97,7 @@ assert(m.groups[5].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateT
 assert(m.groups[6].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
 const r=release.buildReleaseCommercialModel0553();
 assert.equal(r.b.find(x=>x.code==="B3").workingSellTHB,2322450);
-assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2322450);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2438572.5);
 assert.equal(r.b.find(x=>x.code==="B3").actualCostTHB,null);
 assert.equal(r.b.find(x=>x.code==="B3").releaseAllowed,false);
 assert.deepEqual(r.b.find(x=>x.code==="B3").b3GroupTrace.map(g=>g.workingSellTHB),
