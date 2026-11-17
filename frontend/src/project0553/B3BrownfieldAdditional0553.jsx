@@ -176,7 +176,7 @@ export function B3BrownfieldAdditional0553({initialPriced=true,initialItemized=t
       {priced&&<td className="b3bf-num">—</td>}<td>{row.note}</td>
      </tr>)}
      {priced&&<tr className="b3bf-total" data-testid="b3bf-total">
-      <td colSpan={5}>Grand total of this additional proposal (excl. OPEN items)</td>
+      <td colSpan={5}>Release total of this additional proposal (Item 10 BUDGET, excl. OPEN items)</td>
       <td className="b3bf-num">{money(model.grandTotalTHB,model.grandTotalUSD)}</td>
       <td>{currency==="usd"?"USD":currency==="both"?"THB / USD":"THB"} · excl. OPEN items</td>
      </tr>}
@@ -227,7 +227,7 @@ function Item7Vnd({model,money,itemized}){
  const item=model.item7;
  const lines=itemized?item.lines:[];
  return <section className="b3bf-cost" data-testid="b3bf-cost-basis">
-  <h3>Item 7 (VND)</h3>
+  <h3>Item 7 (VND) → Item 10 (BUDGET) → Release</h3>
   <p data-testid="b3bf-vnd-equation">{item.equation}</p>
   <p data-testid="b3bf-vnd-sell">{item.sellEquation}</p>
   <p>{item.note}</p>
@@ -239,15 +239,18 @@ function Item7Vnd({model,money,itemized}){
    </tbody>
   </table>
   <table>
-   <thead><tr><th>Line</th><th>ADDVALUE selling price</th><th>Qty</th><th>VND cost</th></tr></thead>
+   <thead><tr><th>Line</th><th>ADDVALUE selling price</th><th>Qty</th><th>Item 7 VND</th><th>Item 10 / Release</th></tr></thead>
    <tbody>
     {lines.map(line=><tr key={line.id}>
      <td>{line.id}</td>
      <td>{line.activity}{line.usdPerDay?" · USD "+line.usdPerDay.toLocaleString("en-US")+"/day":" · USD "+line.usdPerPersonTrip.toLocaleString("en-US")+"/person/trip"}</td>
      <td>{line.kind==="mob"?line.persons+" × "+line.trips+" trip":line.persons+" × "+line.days+" days"}</td>
      <td className="b3bf-num">{money(line.totalTHB,line.totalUSD)}</td>
+     <td className="b3bf-num">{money(line.releaseTHB,line.releaseUSD)}</td>
     </tr>)}
-    <tr><td>Sell</td><td colSpan={2}>VND cost × {item.sellFactor.toFixed(2)}. No SAMTEL markup and no profit.</td><td className="b3bf-num">{money(item.sellTHB,item.sellUSD)}</td></tr>
+    <tr><td>Item 7</td><td colSpan={2}>ADDVALUE amount</td><td className="b3bf-num">{money(item.vndCostTHB,item.vndCostUSD)}</td><td></td></tr>
+    <tr><td>SAMTEL</td><td colSpan={2}>{item.samtelPct}% of Item 7</td><td className="b3bf-num">{money(item.samtelTHB,item.samtelUSD)}</td><td></td></tr>
+    <tr><td>Item 10</td><td colSpan={2}>BUDGET = Release = VND × {item.sellFactor.toFixed(2)}</td><td></td><td className="b3bf-num">{money(item.releaseTHB,item.releaseUSD)}</td></tr>
    </tbody>
   </table>
  </section>;
