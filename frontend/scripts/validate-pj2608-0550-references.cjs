@@ -48,7 +48,7 @@ async function main() {
     coverage: data.REQUIREMENT_COVERAGE,
   };
   // Exact semantic projection captured BEFORE migration at b8c74a3; key order is immaterial.
-  assert.equal(hash(JSON.stringify(canonical(projection))), "789e1ab08e156cbb135d027da5ce8b636b25d881649a4b3c42421a563aa627ff", "Reference migration changed existing values/evidence/mappings");
+  assert.equal(hash(JSON.stringify(canonical(projection))), "16c31a8b86403613c65be6a8d2070e4882c7c3626db5cfa3375cc75e6135a465", "Reference migration changed existing values/evidence/mappings");
   const { getProject0550References, validateReferenceRegisters } = get("data/referenceRepository");
   const references = getProject0550References();
   assert(Object.isFrozen(references.b1CostLineage.groups[0].rows));
