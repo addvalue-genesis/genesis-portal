@@ -145,7 +145,7 @@
   margin-top: 4mm;
   font-size: 14pt;
   font-weight: 700;
-  color: #111;
+  color: #1f3864;
   line-height: 1.4;
 }
 .cv-sp {
@@ -156,7 +156,7 @@
   text-align: center;
   font-size: 18pt;
   font-weight: 700;
-  color: #111;
+  color: #1f3864;
   margin-bottom: 2mm;
 }
 .cv-for {
@@ -230,10 +230,10 @@
   width: 17%;
   font-weight: 700;
   font-size: 11pt;
-  color: #111;
+  color: #1f3864;
 }
 .tb-avs {
-  color: #111;
+  color: #c00;
   font-size: 8pt;
 }
 .tb-client {
@@ -282,10 +282,10 @@
 .as-logo {
   width: 20%;
   font-weight: 700;
-  color: #111;
+  color: #1f3864;
 }
 .as-avs {
-  color: #111;
+  color: #c00;
 }
 .as-proj {
   font-weight: 700;
@@ -562,7 +562,6 @@
 img.lg {
   display: block;
   margin: 0 auto;
-  filter: grayscale(100%) contrast(1.08);
 }
 img.lg-pttep-cv {
   width: 14mm;
