@@ -11,6 +11,10 @@ import {
   isInternalPttepRevision0550,
   normalizePttepRev0550,
 } from './pttepDocControl0550';
+import {
+  evaluatePhiDtsRow0550,
+  verifyVolumeIAsIsLock0550,
+} from './siVerificationEquations0550';
 
 export const DTS_FORM_AREAS_0550 = ['APF', 'ACP', 'ABV01', 'AMS01'];
 
@@ -171,22 +175,35 @@ export function buildDtsFormModel0550({
     approved: clean(r.approved || ''),
   }));
 
-  // Combine specRows + antennaRows into 4 canonical Datasheet sections
+  // Combine specRows + antennaRows into 4 canonical Datasheet sections evaluated via Φ_DTS(r)
   const combinedRows = [...(dts.specRows || []), ...(dts.antennaRows || [])];
+  const volumeILines = (data?.lines || []).filter(
+    l => l.selected && (systemToken === 'COMMON' || l.systemToken === systemToken)
+  );
+  const volumeIAsIsLock = verifyVolumeIAsIsLock0550(combinedRows, volumeILines);
   const groupedSpecs = new Map(DTS_FORM_SECTIONS_0550.map(sec => [sec, []]));
+  const phiFlags = [];
 
   combinedRows.forEach((r, idx) => {
     const secName = mapToFourSections(r, idx);
-    const badge = normalizeComplianceBadge(r.compliance);
+    const phi = evaluatePhiDtsRow0550(r, { isInternal });
+    if (isInternal && phi.internalFlag) {
+      phiFlags.push({
+        category: phi.deviationLink ? 'GATE R3 DEVIATION (TAB 14)' : 'PHI-DTS REVIEW FLAG',
+        detail: phi.internalFlag,
+      });
+    }
     const srcTrace = r.remarks ? String(r.remarks).slice(0, 32) : 'C1 / 7 VND';
     groupedSpecs.get(secName).push({
       item: r.item || String(idx + 1),
       parameter: clean(r.parameter),
       requirement: clean(r.requirement),
-      offered: clean(r.offered),
+      offered: clean(phi.offered),
       src: isInternal ? srcTrace : '',
-      badge,
-      remarks: clean(r.remarks),
+      badge: { label: phi.status, cls: phi.badgeClass },
+      remarks: clean(phi.remarks),
+      deviationLink: phi.deviationLink,
+      deviationLabel: phi.deviationLabel,
     });
   });
 
@@ -265,7 +282,8 @@ export function buildDtsFormModel0550({
     vendorDocNo: '—',
     totalPages: 4,
     c1SyncCount: dts.c1SyncCount || 0,
-    internalNotes: isInternal ? dts.internalNotes || [] : [],
+    volumeIAsIsLock,
+    internalNotes: isInternal ? [...(dts.internalNotes || []), ...phiFlags] : [],
     revisionHistory,
     sections,
     tagList,

@@ -469,7 +469,7 @@ export function DtsFormStudio0550({
                     {isInternal && (
                       <>
                         {' '}
-                        &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken} · C1 rows: {form.c1SyncCount})</i>
+                        &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken} · C1 rows: {form.c1SyncCount} · Vol.I AS-IS Lock: {form.volumeIAsIsLock?.locked ? 'LOCKED' : 'CHECK'})</i>
                       </>
                     )}
                   </td>

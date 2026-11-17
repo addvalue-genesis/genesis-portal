@@ -3,6 +3,9 @@ import { SYSTEMS } from './data';
 import {
   SI_SYNTH_EQUATIONS_0550,
   SI_LEARNED_RULES_0550,
+  SDRL_GENERAL_FORMULA_0550,
+  SDRL_DOCUMENT_EQUATIONS_0550,
+  PHI_DTS_EQUATION_0550,
   evaluateSiSynthEquations0550,
 } from './data/siVerificationEquations0550';
 
@@ -35,6 +38,60 @@ export function SiSynthesisEquations0550({ mode = 'cal' }) {
                   <td>{eq.homeTab}</td>
                   <td><code>{eq.formula}</code></td>
                   <td>{eq.control}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h4 style={{ marginTop: 16 }}>SDRL Document Generation Equations ({SDRL_GENERAL_FORMULA_0550})</h4>
+        <div className="p55-table-wrap">
+          <table className="p55-table" aria-label="SDRL Document Generation Equations">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Deliverable Class</th>
+                <th>Formal Formula</th>
+                <th>WITH BID vs POST-AWARD Rule</th>
+                <th>Cross-Volume Gate §10</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SDRL_DOCUMENT_EQUATIONS_0550.map((d) => (
+                <tr key={d.code}>
+                  <td><strong>{d.code}</strong></td>
+                  <td>{d.title}</td>
+                  <td><code>{d.formula}</code></td>
+                  <td>
+                    <div><strong>WITH BID:</strong> {d.withBidRule}</div>
+                    <div><small><strong>POST-AWARD:</strong> {d.postAwardRule}</small></div>
+                  </td>
+                  <td>{d.crossVolumeGate}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <h4 style={{ marginTop: 16 }}>{PHI_DTS_EQUATION_0550.name}</h4>
+        <p><code>{PHI_DTS_EQUATION_0550.formula}</code></p>
+        <div className="p55-table-wrap">
+          <table className="p55-table" aria-label="Phi DTS Specification Mapping Outcomes">
+            <thead>
+              <tr>
+                <th>Compliance Status</th>
+                <th>Condition</th>
+                <th>Customer Preview (12.T)</th>
+                <th>Internal / Gate Control</th>
+              </tr>
+            </thead>
+            <tbody>
+              {PHI_DTS_EQUATION_0550.outcomes.map((o) => (
+                <tr key={o.status}>
+                  <td><strong>{o.status}</strong></td>
+                  <td>{o.condition}</td>
+                  <td>{o.customerBehavior}</td>
+                  <td>{o.internalBehavior}</td>
                 </tr>
               ))}
             </tbody>

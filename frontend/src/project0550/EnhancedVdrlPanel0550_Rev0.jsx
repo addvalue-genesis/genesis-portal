@@ -3,6 +3,7 @@ import {
   DOCUMENT_EQUATIONS_REV0,
   listEquations,
 } from './data/documentEquations_Rev0';
+import sdrlDocumentEquations from './data/sdrlDocumentEquations0550.json';
 
 const TREATMENT_LABEL = {
   SAMPLE: 'SAMPLE — representative With-Bid excerpt from Memory',
@@ -147,6 +148,32 @@ export function EnhancedVdrlPanel0550({ data }) {
                 </td>
                 <td>
                   <pre>{r.equation}</pre>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <h4 style={{ marginTop: 14 }}>Canonical SDRL Deliverable Equations ({sdrlDocumentEquations.generalFormula})</h4>
+      <div className="p55-table-wrap">
+        <table className="p55-table" aria-label="Canonical SDRL Generation Equations">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Deliverable Class</th>
+              <th>Equation</th>
+              <th>WITH BID / POST-AWARD &amp; Gate §10</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(sdrlDocumentEquations.sdrlDeliverables || []).map((d) => (
+              <tr key={d.code}>
+                <td><strong>{d.code}</strong></td>
+                <td>{d.title}</td>
+                <td><code>{d.formula}</code></td>
+                <td>
+                  <div>{d.withBidRule}</div>
+                  <div><small>{d.postAwardRule} · {d.crossVolumeGate}</small></div>
                 </td>
               </tr>
             ))}

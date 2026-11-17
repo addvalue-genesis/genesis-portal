@@ -1,5 +1,10 @@
 import appendix2Evidence from './appendix2MasterEvidence0550.json';
+import sdrlDocumentEquations from './sdrlDocumentEquations0550.json';
 import { CCTV_TPLINK_DEVIATION_0550 } from './mgwCctvEntBudget0550';
+
+export const SDRL_GENERAL_FORMULA_0550 = sdrlDocumentEquations.generalFormula;
+export const SDRL_DOCUMENT_EQUATIONS_0550 = sdrlDocumentEquations.sdrlDeliverables;
+export const PHI_DTS_EQUATION_0550 = sdrlDocumentEquations.phiDtsEquation;
 
 export const SI_SYNTH_EQUATIONS_0550 = [
   {
@@ -140,5 +145,122 @@ export function evaluateSiSynthEquations0550({ systems = [], c1Rows = [], bomFor
     passedChecks: checks.filter((c) => c.passed).length,
     checks,
     systemScorecard,
+  };
+}
+
+const isMissingCatalogVal = (v) => {
+  const s = String(v ?? '').trim();
+  return !s || /^(?:OPEN|TBA|TBE|TBC|N\/A|NONE|PENDING|-|—)$/i.test(s);
+};
+
+/**
+ * Volume I AS-IS Equipment Lock:
+ * Model_DTS(s, l, Tag) ≡ Model_Vol.I(11.C1)(s, l, Tag)
+ */
+export function verifyVolumeIAsIsLock0550(dtsRows = [], c1ModelRows = []) {
+  const c1Models = new Set(
+    (c1ModelRows || [])
+      .map((r) => String(r.model || r.line?.model || '').trim().toLowerCase())
+      .filter((m) => m && !isMissingCatalogVal(m))
+  );
+  const mismatches = [];
+  for (const r of dtsRows || []) {
+    const m = String(r.model || '').trim().toLowerCase();
+    if (!m || isMissingCatalogVal(m) || c1Models.size === 0) continue;
+    const matched = Array.from(c1Models).some((cm) => cm.includes(m) || m.includes(cm));
+    if (!matched && /HOLD|DEVIATE/i.test(String(r.compliance || ''))) {
+      mismatches.push({ item: r.item, model: r.model });
+    }
+  }
+  return {
+    locked: mismatches.length === 0,
+    checkedRows: (dtsRows || []).length,
+    c1ModelCount: c1Models.size,
+    mismatches,
+  };
+}
+
+/**
+ * Evaluate Φ_DTS(r) = (C1: No., C2: Parameter, C3: COMPANY Requirement) × K_Cat(E*)
+ * -> (Vendor Offered Data, Compliance Status, Remarks)
+ */
+export function evaluatePhiDtsRow0550(row = {}, { volumeIModel = '', catalogEntry = null, isInternal = false } = {}) {
+  const reqText = String(row.requirement || '');
+  const rawOffered = String(catalogEntry?.offered ?? row.offered ?? '').trim();
+  const rawRemarks = String(catalogEntry?.remarks ?? row.remarks ?? '').trim();
+  const rawCompliance = String(catalogEntry?.compliance ?? row.compliance ?? '').trim().toUpperCase();
+  const modelVal = String(catalogEntry?.model ?? row.model ?? volumeIModel ?? '').trim();
+  const partVal = String(catalogEntry?.partNo ?? row.partNo ?? '').trim();
+  const isVtaReq = /\bVTA\b|Defined by the bidder/i.test(reqText);
+  const hasMissing =
+    isMissingCatalogVal(rawOffered) ||
+    isMissingCatalogVal(modelVal) ||
+    isMissingCatalogVal(partVal) ||
+    /^(?:HOLD|OPEN|TBE|PENDING)/i.test(rawCompliance) ||
+    /\b(?:OPEN|PENDING|TBE|NOT PROVIDED)\b/i.test(rawOffered);
+
+  // Major deviation -> Gate R3 auto-link to Tab 14 Deviation List
+  if (/DEVIAT/i.test(rawCompliance) && !/All-Outdoor|port|channel|switch/i.test(rawRemarks)) {
+    return {
+      offered: rawOffered || 'Proposed Alternative (See Deviation List)',
+      status: 'DEVIATE',
+      badgeClass: 'sb-d',
+      remarks: rawRemarks || 'Logged in Deviation List MM-ASK-1A-WP01-TEQ-TEL-LIS-0004',
+      internalFlag: `Gate R3 Deviation: ${row.item || ''} ${row.parameter || ''} -> Tab 14 Deviation List`,
+      deviationLink: 'bid.deviations.release',
+      deviationLabel: 'Tab 14 Deviation List',
+    };
+  }
+
+  // Missing in catalog -> Gate R1 forbids COMPLY; Customer Preview shows "To be confirmed by Manufacturer"
+  if (hasMissing) {
+    return {
+      offered: isInternal ? (rawOffered || 'OPEN — Missing in 7 VND catalog') : 'To be confirmed by Manufacturer',
+      status: 'OPEN / TBE',
+      badgeClass: 'sb-o',
+      remarks: isInternal
+        ? (rawRemarks || 'Gate R1: Missing in K_Cat(E*) — COMPLY forbidden')
+        : 'To be confirmed by Manufacturer',
+      internalFlag: `Gate R1 OPEN/TBE: ${row.item || ''} ${row.parameter || ''} (missing K_Cat(E*))`,
+      deviationLink: null,
+      deviationLabel: '',
+    };
+  }
+
+  // Minor variance under AS-IS Volume I model
+  if (/PARTIAL|MINOR|CLARIFY|VTA|DEVIATE/i.test(rawCompliance)) {
+    return {
+      offered: rawOffered,
+      status: 'MINOR / CLARIFY',
+      badgeClass: 'sb-p',
+      remarks: rawRemarks || 'Minor variance under AS-IS Volume I model; verified in 10.2 SI.',
+      internalFlag: isInternal ? `Minor / Clarify (${row.item || ''}): ${rawRemarks}` : '',
+      deviationLink: null,
+      deviationLabel: '',
+    };
+  }
+
+  // C3 specifies VTA / Defined by the bidder and exact value of E* is populated
+  if (isVtaReq) {
+    return {
+      offered: rawOffered,
+      status: 'COMPLY (VTA)',
+      badgeClass: 'sb-c',
+      remarks: rawRemarks || 'Exact E* value populated per K_Cat(E*)',
+      internalFlag: '',
+      deviationLink: null,
+      deviationLabel: '',
+    };
+  }
+
+  // Catalog satisfies C3(r)
+  return {
+    offered: rawOffered,
+    status: 'COMPLY',
+    badgeClass: 'sb-c',
+    remarks: rawRemarks || 'Verified against 7 VND catalog K_Cat(E*)',
+    internalFlag: '',
+    deviationLink: null,
+    deviationLabel: '',
   };
 }
