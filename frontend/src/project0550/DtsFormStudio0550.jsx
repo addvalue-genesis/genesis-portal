@@ -16,10 +16,11 @@ import {
 function collectDtsFormCssText() {
   if (typeof document === 'undefined') return '';
   const chunks = [];
+  const matchRe = /dts-root|dts-viewport|cv-|as-|ph|tb|sb|foot|basis|notes|vm-warn|intblock|lg-|\.page|\.inner|\.param|\.mono|\.st2|@page|@media\s+print/;
   for (const sheet of Array.from(document.styleSheets || [])) {
     try {
       for (const rule of Array.from(sheet.cssRules || [])) {
-        if (/dts-root|cv-|as-|ph|tb|sb|foot|basis|notes|vm-warn|intblock|lg-/.test(rule.cssText)) {
+        if (matchRe.test(rule.cssText)) {
           chunks.push(rule.cssText);
         }
       }
@@ -89,12 +90,49 @@ export function DtsFormStudio0550({
   };
 
   const handleExportPdf = () => {
-    const prev = document.title;
-    document.title = form.docFileNamePdf.replace(/\.pdf$/i, '');
-    window.print();
+    if (!rootRef.current || typeof document === 'undefined') return;
+    const baseName = form.docFileNamePdf.replace(/\.pdf$/i, '');
+    const cssText = collectDtsFormCssText();
+    const prevTitle = document.title;
+    document.title = baseName;
+
+    const frame = document.createElement('iframe');
+    frame.setAttribute('aria-hidden', 'true');
+    frame.style.cssText = 'position:fixed;width:0;height:0;border:0;left:-10000px;top:0;visibility:hidden';
+    document.body.appendChild(frame);
+
+    const fdoc = frame.contentDocument || frame.contentWindow?.document;
+    if (!fdoc) {
+      document.body.removeChild(frame);
+      document.title = prevTitle;
+      return;
+    }
+
+    fdoc.open();
+    fdoc.write(
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>${baseName}</title>` +
+        `<style>html,body{margin:0;padding:0;background:#fff;font-family:Arial,Helvetica,sans-serif}` +
+        `@page{size:A4 portrait;margin:0}` +
+        `${cssText}` +
+        `.dts-root{background:#fff !important;padding:0 !important;zoom:1 !important;min-width:0 !important}` +
+        `.page{box-shadow:none !important;margin:0 !important;border:none !important;page-break-after:always;width:auto !important;min-height:0 !important}` +
+        `.page:last-child{page-break-after:auto}</style></head>` +
+        `<body><div class="dts-root">${rootRef.current.innerHTML}</div></body></html>`
+    );
+    fdoc.close();
+
     setTimeout(() => {
-      document.title = prev;
-    }, 1000);
+      try {
+        frame.contentWindow?.focus();
+        frame.contentWindow?.print();
+      } finally {
+        setTimeout(() => {
+          document.title = prevTitle;
+          if (frame.parentNode) frame.parentNode.removeChild(frame);
+        }, 1200);
+      }
+    }, 150);
+
     setNotice(`Print / Save as PDF: ${form.docFileNamePdf}`);
   };
 
