@@ -234,6 +234,22 @@ export function buildTechnicalProposalDocx0550(view, data, model, today = '2026-
     CCTV_TPLINK_DEVIATION_0550.justification,
     'OPEN — AVL Clarification',
   ]);
+  devs.push([
+    'TQ-ACP-13-D2',
+    'TEL-PABX',
+    'MR Appendix 1.3 (MR-B1-13-ACP-05) / MM-ASK-1A-ACP-TEL-LIS-0001 Rev C1',
+    'TQ: MR Appendix 1.3 qty 10 / LIS-0001 Rev C1 10 tags (TPH-304-001~008, 101, 201) vs Rev00 baseline qty 3',
+    'Preserves Rev00 commercial ceiling; confirm final ACP indoor IP phone count at IFC',
+    'OPEN — Technical Clarification',
+  ]);
+  devs.push([
+    'TQ-ACP-13-D3',
+    'TEL-LAN',
+    'MR Appendix 1.3 (MR-B1-13-ACP-09) / MM-ASK-1A-ACP-TEL-LIS-0001 Rev C1',
+    'TQ: MR Appendix 1.3 qty 3 / LIS-0001 Rev C1 3 tags (AP-307-001, 002, 201) vs Rev00 baseline qty 2',
+    'Preserves Rev00 commercial ceiling; confirm final ACP indoor Wi-Fi AP count at IFC',
+    'OPEN — Technical Clarification',
+  ]);
   body += makeTable(
     ['ID', 'System', 'Contractor Document', 'Proposed Deviation', 'Justification', 'Status'],
     devs,

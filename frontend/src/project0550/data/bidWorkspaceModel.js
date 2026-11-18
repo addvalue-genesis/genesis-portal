@@ -202,10 +202,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     spareBudget={rate,basisTHB:spareBasisTHB};
     const estimateFx=fx(currency);costRate=estimateFx!==null?round((spareBasisTHB*rate)/estimateFx):null;
     problems.push(SPARE_BUDGET_REVIEW_0550);
-   }else if(nonnegative(othersRate)){
+   }else if(nonnegative(othersRate?.amount)){
     a1OthersEstimate=true;
-    // B2-D01 and B2-D02 return line.manualCost already in line.currency; B2-D04 and B9-D01 are derived in THB.
-    const estimateFx=fx(currency);costRate=(l.id==='REQ-MR-ACT-B2-D01'||l.id==='REQ-MR-ACT-B2-D02')?othersRate:(estimateFx!==null?round(othersRate/estimateFx):null);
+    const srcFx=fx(othersRate.currency),targetFx=fx(currency);
+    costRate=srcFx!==null&&targetFx!==null?round((othersRate.amount*srcFx)/targetFx):null;
     problems.push(A1_OTHERS_ESTIMATE_REVIEW_0550);
    }else{
     costRate=null;

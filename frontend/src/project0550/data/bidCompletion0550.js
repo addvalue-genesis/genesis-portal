@@ -54,17 +54,17 @@ export function generatedBidEstimate0550(data,line){
 export function a1OthersEstimateRate0550(data,line,procurementTHB){
  const id=line.id;
  if(line.unit!=='Lot'||line.quantity!==1)return null;
- if(id==='REQ-MR-ACT-B2-D01')return line.manualCost;
+ if(id==='REQ-MR-ACT-B2-D01')return {amount:line.manualCost,currency:line.currency||'THB'};
  if(id==='REQ-MR-ACT-B2-D02'){
   const receipt=data.repositoryBasisImport?.bidCompletion?.rows.find(row=>row.lineId===id);
   // Reuse the origin allowance only while the tower delivery quotations match.
   if(receipt?.offerIds.length!==2||receipt.sourceKey!==sourceKey(data,receipt.offerIds))return null;
   const assignedElsewhere=data.lines.some(owner=>owner.selected&&owner.id!==id&&receipt.offerIds.includes(owner.offerId));
-  return assignedElsewhere?null:line.manualCost;
+  return assignedElsewhere?null:{amount:line.manualCost,currency:line.currency||'THB'};
  }
  if(!(procurementTHB>0))return null;
- if(id==='REQ-MR-ACT-B2-D04')return roundMoney0550(procurementTHB*cargoInsuredValueFactor0550*cargoPremiumRate0550);
- if(id==='REQ-MR-ACT-B9-D01')return roundMoney0550(procurementTHB*projectLiabilityRate0550);
+ if(id==='REQ-MR-ACT-B2-D04')return {amount:roundMoney0550(procurementTHB*cargoInsuredValueFactor0550*cargoPremiumRate0550),currency:'THB'};
+ if(id==='REQ-MR-ACT-B9-D01')return {amount:roundMoney0550(procurementTHB*projectLiabilityRate0550),currency:'THB'};
  return null;
 }
 const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return 'bid1:'+(h>>>0).toString(16)+':'+text.length;};

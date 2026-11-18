@@ -116,4 +116,45 @@ assert(statuses.has('COMPLY'), '12.T TEL-DMR includes COMPLY');
 assert(statuses.has('MINOR / CLARIFY'), '12.T TEL-DMR includes MINOR / CLARIFY');
 assert.equal(dmrIntModel.volumeIAsIsLock.locked, true, '12.T TEL-DMR Volume I AS-IS Lock verified');
 
-console.log('PASS audit-pj0550-si-equations: 6 SDRL equations (B03/B05/B08/B11/CAL/C02), Phi_DTS 5 outcomes + Vol.I AS-IS Lock, SI-CAL 02 / 12.V / 12.T SSR.');
+// H2: FX Hardening regression assertions for a1OthersEstimateRate0550 (B2-D01, B2-D02, B2-D04, B9-D01)
+const BC = require(root + '/project0550/data/bidCompletion0550.js');
+const fxTest = (c) => ({ THB: 1, USD: 31.5 }[c] ?? null);
+const b2d01Line = { id: 'REQ-MR-ACT-B2-D01', unit: 'Lot', quantity: 1, currency: 'USD', manualCost: 36000 };
+const b2d01Est = BC.a1OthersEstimateRate0550({ lines: [b2d01Line] }, b2d01Line, 100000000);
+assert.deepEqual(b2d01Est, { amount: 36000, currency: 'USD' }, 'H2: B2-D01 returns USD 36,000 without THB mis-scaling');
+assert.equal(Math.round(((b2d01Est.amount * fxTest(b2d01Est.currency)) / fxTest('USD')) * 100) / 100, 36000, 'H2: B2-D01 derived USD costRate stays 36,000.00');
+const d2 = BC.prepareBidCompletion0550(d, D.SYSTEMS, today);
+const b2d02Line = d2.lines.find(l => l.id === 'REQ-MR-ACT-B2-D02') || { id: 'REQ-MR-ACT-B2-D02', unit: 'Lot', quantity: 1, currency: 'THB', manualCost: 120000 };
+const b2d02Est = BC.a1OthersEstimateRate0550(d2, b2d02Line, 100000000);
+assert.equal(b2d02Est, null, 'H2: B2-D02 returns null without 2 private tower delivery offers in repo seed');
+const b2d04Line = { id: 'REQ-MR-ACT-B2-D04', unit: 'Lot', quantity: 1, currency: 'THB' };
+const b2d04Est = BC.a1OthersEstimateRate0550({ lines: [b2d04Line] }, b2d04Line, 100000000);
+assert.deepEqual(b2d04Est, { amount: 440000, currency: 'THB' }, 'H2: B2-D04 returns 1.1 * 0.004 * procurementTHB in THB');
+assert.equal(Math.round(((b2d04Est.amount * fxTest(b2d04Est.currency)) / fxTest('USD')) * 100) / 100, 13968.25, 'H2: B2-D04 converts THB 440,000 -> USD 13,968.25');
+const b9d01Line = { id: 'REQ-MR-ACT-B9-D01', unit: 'Lot', quantity: 1, currency: 'THB' };
+const b9d01Est = BC.a1OthersEstimateRate0550({ lines: [b9d01Line] }, b9d01Line, 100000000);
+assert.deepEqual(b9d01Est, { amount: 500000, currency: 'THB' }, 'H2: B9-D01 returns 0.005 * procurementTHB in THB');
+assert.equal(Math.round(((b9d01Est.amount * fxTest(b9d01Est.currency)) / fxTest('USD')) * 100) / 100, 15873.02, 'H2: B9-D01 converts THB 500,000 -> USD 15,873.02');
+
+// Automated Tag-vs-Quantity Audit Gate across APPENDIX_13_TO_18_BOMS_BY_MR_0550
+const { APPENDIX_13_TO_18_BOMS_BY_MR_0550 } = require(root + '/project0550/data/appendix13To18Boms0550.js');
+assert.equal(APPENDIX_13_TO_18_BOMS_BY_MR_0550['MR-B1-13-ACP-11'][0].quantity, 2, 'D1: MR-B1-13-ACP-11 aligned to qty 2');
+let bomChecked = 0, tqFlagged = 0;
+for (const [mrId, rows] of Object.entries(APPENDIX_13_TO_18_BOMS_BY_MR_0550)) {
+  for (const row of rows) {
+    bomChecked++;
+    const tagStr = String(row.tagNo || '').trim();
+    if (!tagStr || /PER APPENDIX 2|TBC|VARIOUS|N\/A|~|\//i.test(tagStr)) {
+      if (/TQ:|MR qty \d+ vs BOM qty/i.test(row.remarks || '')) tqFlagged++;
+      continue;
+    }
+    const tags = tagStr.split(',').map(s => s.trim()).filter(Boolean);
+    const hasTq = /TQ:|MR qty \d+ vs BOM qty/i.test(row.remarks || '');
+    if (tags.length > Number(row.quantity || 0) && !hasTq) {
+      assert.fail(`Tag-vs-Qty mismatch without TQ flag in ${mrId}: ${tags.length} tags (${tagStr}) > qty ${row.quantity}`);
+    }
+    if (hasTq) tqFlagged++;
+  }
+}
+
+console.log(`PASS audit-pj0550-si-equations: 7 SDRL equations (A04/B03/B05/B08/B11/CAL/C02), Phi_DTS 5 outcomes + Vol.I AS-IS Lock, H2 FX regression, Tag-vs-Qty gate (${bomChecked} BOM rows, ${tqFlagged} TQ-flagged), SI-CAL 02 / 12.V / 12.T SSR.`);

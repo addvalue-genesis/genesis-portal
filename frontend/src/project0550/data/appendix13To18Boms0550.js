@@ -65,7 +65,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
   'MR-B1-13-ACP-05': [
     {
       itemNo: '1',
-      tagNo: 'TPH-304-001, TPH-304-002, TPH-304-003',
+      tagNo: 'TPH-304-001~008, TPH-304-101, TPH-304-201',
       mrDescription: 'IP Phone Indoor',
       offeredEquipment: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
       description: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
@@ -74,14 +74,14 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: '700513569',
       quantity: 3,
       unit: 'SET',
-      remarks: 'ACP indoor IP telephone set (per Appendix 2 LIS-0001)',
+      remarks: 'ACP indoor IP telephone set (per Appendix 2 LIS-0001 Rev C1; TQ: MR Appendix 1.3 qty 10 / 10 LIS tags vs locked Rev00 qty 3)',
       weight: 1000
     }
   ],
   'MR-B1-13-ACP-09': [
     {
       itemNo: '1',
-      tagNo: 'AP-307-001, AP-307-002',
+      tagNo: 'AP-307-001, AP-307-002, AP-307-201',
       mrDescription: 'Access Point',
       offeredEquipment: 'Cisco Catalyst 9120AXI Wi-Fi 6 Dual-Band Indoor Access Point (802.11ax, PoE+)',
       description: 'Cisco Catalyst 9120AXI Wi-Fi 6 Dual-Band Indoor Access Point (802.11ax, PoE+)',
@@ -90,7 +90,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: 'C9120AXI-E',
       quantity: 2,
       unit: 'SET',
-      remarks: 'ACP indoor wireless access point with mounting kit (per Appendix 2 LIS-0001)',
+      remarks: 'ACP indoor wireless access point with mounting kit (per Appendix 2 LIS-0001 Rev C1; TQ: MR Appendix 1.3 qty 3 / 3 LIS tags vs locked Rev00 qty 2)',
       weight: 1000
     }
   ],
@@ -106,7 +106,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: '700513569',
       quantity: 2,
       unit: 'SET',
-      remarks: 'ABV01 indoor IP telephone set (per Appendix 2 LIS-0001)',
+      remarks: 'ABV01 indoor IP telephone set (per Appendix 2 LIS-0001 Rev C2 p3: TPH-304-001; MR qty 1 vs BOM qty 2)',
       weight: 1000
     }
   ],
@@ -185,19 +185,19 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
     { itemNo: '1', tagNo: 'MON-315-001, MON-315-002', mrDescription: 'MET Monitor', offeredEquipment: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', description: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', brand: 'Vaisala', model: 'AviMet AWS Display 24"', partNo: 'AVIMET-HMI-24', quantity: 2, unit: 'SET', remarks: 'Control Room & Radio Room MET monitoring displays (per Appendix 2 LIS-0001)', weight: 1000 }
   ],
   'MR-B1-13-APF-16': [
-    { itemNo: '1', tagNo: 'MET-315-001', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor (Marine/Offshore)', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor (Marine/Offshore)', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 1, unit: 'SET', remarks: 'Tower-mounted wind speed & direction sensor with mounting arm', weight: 1000 }
+    { itemNo: '1', tagNo: 'PER APPENDIX 2 / TBC', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor (Marine/Offshore)', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor (Marine/Offshore)', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 1, unit: 'SET', remarks: 'Tower-mounted wind speed & direction sensor with mounting arm (sub-tags unnumbered under APF MET-315 in LIS-0001 Rev C8; confirm individual sensor tags before IFC)', weight: 1000 }
   ],
   'MR-B1-13-APF-17': [
-    { itemNo: '1', tagNo: 'MET-315-002', mrDescription: 'Themperature and Huminity Sensor', offeredEquipment: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Radiation Shield', description: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Radiation Shield', brand: 'Vaisala', model: 'HMP155 + DTR503A', partNo: 'HMP155-DTR503A', quantity: 1, unit: 'SET', remarks: 'Solar-shielded ambient temperature & humidity sensor', weight: 1000 }
+    { itemNo: '1', tagNo: 'PER APPENDIX 2 / TBC', mrDescription: 'Themperature and Huminity Sensor', offeredEquipment: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Radiation Shield', description: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Radiation Shield', brand: 'Vaisala', model: 'HMP155 + DTR503A', partNo: 'HMP155-DTR503A', quantity: 1, unit: 'SET', remarks: 'Solar-shielded ambient temperature & humidity sensor (sub-tags unnumbered under APF MET-315 in LIS-0001 Rev C8; confirm individual sensor tags before IFC)', weight: 1000 }
   ],
   'MR-B1-13-APF-18': [
-    { itemNo: '1', tagNo: 'MET-315-003', mrDescription: 'Static Pressure Head and Barometic Pressure Sensor', offeredEquipment: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', description: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', brand: 'Vaisala', model: 'PTB330 + SPH10', partNo: 'PTB330-SPH10', quantity: 1, unit: 'SET', remarks: 'High-accuracy barometric pressure sensor with static head', weight: 1000 }
+    { itemNo: '1', tagNo: 'PER APPENDIX 2 / TBC', mrDescription: 'Static Pressure Head and Barometic Pressure Sensor', offeredEquipment: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', description: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', brand: 'Vaisala', model: 'PTB330 + SPH10', partNo: 'PTB330-SPH10', quantity: 1, unit: 'SET', remarks: 'High-accuracy barometric pressure sensor with static head (sub-tags unnumbered under APF MET-315 in LIS-0001 Rev C8; confirm individual sensor tags before IFC)', weight: 1000 }
   ],
   'MR-B1-13-ACP-10': [
     { itemNo: '1', tagNo: 'MON-315-001', mrDescription: 'MET Monitor', offeredEquipment: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', description: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', brand: 'Vaisala', model: 'AviMet AWS Display 24"', partNo: 'AVIMET-HMI-24', quantity: 1, unit: 'SET', remarks: 'ACP MET monitoring workstation display (per Appendix 2 LIS-0001)', weight: 1000 }
   ],
   'MR-B1-13-ACP-11': [
-    { itemNo: '1', tagNo: 'MET-315-001, MET-315-002', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 1, unit: 'SET', remarks: 'ACP tower-mounted ultrasonic wind sensor (per Appendix 2 LIS-0001)', weight: 1000 }
+    { itemNo: '1', tagNo: 'MET-315-001, MET-315-002', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 2, unit: 'SET', remarks: 'ACP tower-mounted ultrasonic wind sensors (aligned qty=2 per MR Appendix 1.3 & Appendix 2 LIS-0001 Rev C1 p5: MET-315-001, MET-315-002)', weight: 1000 }
   ],
   'MR-B1-13-ACP-12': [
     { itemNo: '1', tagNo: 'MET-315-003', mrDescription: 'Themperature and Huminity Sensor', offeredEquipment: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', description: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', brand: 'Vaisala', model: 'HMP155 + DTR503A', partNo: 'HMP155-DTR503A', quantity: 1, unit: 'SET', remarks: 'ACP ambient temperature & humidity sensor (per Appendix 2 LIS-0001)', weight: 1000 }
