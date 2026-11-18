@@ -30,12 +30,12 @@ import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
 import { SYSTEMS_0553, SYSTEM_GROUPS_0553 } from "../project0553/systemsBinding";
 import { PROJECT_0553_FACTS } from "../project0553/projectFacts";
-import { PROJECT_0553_EVIDENCE, TECHNICAL_HOLDS } from "../project0553/evidenceRegistry";
+import { PROJECT_0553_EVIDENCE } from "../project0553/evidenceRegistry";
 import { BID_0553_SOURCES, BID_0553_GATES, validateBidReview } from "../project0553/bidReview";
-import { VENDOR_0553_SOURCES } from "../project0553/vendorEvidence";
-import { ARCHITECTURE_0553 } from "../project0553/architectureManifest";
-import { deriveManHours, deriveLaborCost } from "../common/cost/derivationKernel";
-import { STANDARD_PROJECT_TABS, AuditBadge, AuditMetric, AuditTable, AuditSection, ProjectTabs } from "../common/ui/ProjectAuditPrimitives";
+import { AuditBadge, AuditTable, AuditSection } from "../common/ui/ProjectAuditPrimitives";
+import { selectBcWorkCostLines0553 } from "../project0553/data/bcWorkCostLines0553";
+import { BC_EXECUTION_ACTIVITIES_0553 } from "../project0553/data/bcExecutionActivities0553";
+import { selectContingencyRegister0553 } from "../project0553/data/contingencyRegister0553";
 import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
@@ -47,7 +47,6 @@ import "../project0553/moduleHierarchy0553.css";
 const TABS = L3_TABS_0553.map(([id,label])=>[id,`${TAB_IDENTITY_0553.tabs.find(t=>t.route===id)?.semanticCode||"BID-UNKNOWN"} · ${label}`]);
 const TAB_GROUPS = L3_TAB_GROUPS_0553;
 const Badge = AuditBadge;
-const Metric = AuditMetric;
 const Table = AuditTable;
 const Section = AuditSection;
 const sourceLinks = ids => ids.map(id => {
@@ -55,6 +54,26 @@ const sourceLinks = ids => ids.map(id => {
   return s?<a key={id} href={s.url} target="_blank" rel="noreferrer" style={{display:"block"}}>{id}</a>:id;
 });
 
+function ExecutionResourcePlan0553(){
+ const lines=selectBcWorkCostLines0553();
+ const activities=Object.values(BC_EXECUTION_ACTIVITIES_0553);
+ return <div className="p55-stack">
+  <Section title="Execution activities — same source as 10.2">
+   <Table headers={["Code","Activity","What is included","Boundary"]} rows={activities.map(row=>[row.code,row.title,row.activities.join(" "),row.releaseText])}/>
+  </Section>
+  <Section title="Resource lines — selectBcWorkCostLines0553">
+   <p className="p55-note">{lines.policy} Direct cost total stays {lines.totalCostTHB==null?"not established":lines.totalCostTHB}. These lines do not add a second selling price.</p>
+   <Table headers={["Owner","Line","Quantity","Unit"]} rows={lines.rows.map(row=>[row.code,row.name,row.quantity??"Not established",row.unit])}/>
+  </Section>
+ </div>;
+}
+function ContingencyRegister0553(){
+ const register=selectContingencyRegister0553();
+ return <Section title="Contingency register — BID-RSK">
+  <p className="p55-note">This register displays the two existing factors. It does not change either percent and does not add the SCADA envelope to the customer total.</p>
+  <Table headers={["Item","Percent","Source","Basis","In customer total"]} rows={register.lines.map(row=>[row.id,row.pct+"%",row.source,row.basis,row.includedInCustomerTotal?"Yes — "+row.customerTotalEffect:"No — "+row.customerTotalEffect])}/>
+ </Section>;
+}
 export function PJ26080553() {
  const [moduleQuery,setModuleQuery]=useState("");
  const mainModuleIndex=[
@@ -159,10 +178,10 @@ export function PJ26080553() {
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/><B1B2EquationAudit0553/><B3EquationAudit0553/><B5EquationAudit0553/></SharedEngineeringView>}
-   {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
+   {tab==="execution"&&<ExecutionResourcePlan0553/>}
    {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationOwner={navOwner} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
    {tab==="b3bf"&&<B3BrownfieldAdditional0553/>}
-   {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
+   {tab==="risk"&&<div className="p55-stack"><ContingencyRegister0553/><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack">
     <VendorProductCatalog0553/>
     <SmartDataGroup moduleKey="bid.documents" projectId="PJ2608-0553"

@@ -7,6 +7,8 @@ import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorking
 import {PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./officialWorkbookTemplate0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildReleaseCommercialModel0553} from "./releaseCommercialModel0553";
+import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
+import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./samtelEngineeringServiceMarkup0553";
 import {entriesFromZip,omitCalcChain0553,readEntry,rebuildZip} from "../nativeWorkingDraft0553";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
@@ -203,6 +205,7 @@ function build(){
  const grandTotalTHB=round(vndTHB*sellFactor);
  const grandTotalUSD=round(vndUSD*sellFactor);
  const baseB3WorkingSellTHB=round(sat.includedB3SatSurveyToolsWorkingSellTHB+china.fatWorkingSellTHB+purchased.selectedIncrementalWorkingSellTHB);
+ const dossierRollupTHB=selectB3ResourcePriceDossier0553(selectBcTurnkeyWorkingCost0553().byCode.B3).rollupTotalTHB;
  const carveC1THB=sat.siteSurveyWorkingSellTHB;
  const carveC2THB=round(B3BF_CARVEOUT_DAYS_0553*teamDayTHB);
  if(fxTHBPerUSD!==31.5||senior.usdPerPersonDay!==1000||specialist.usdPerPersonDay!==800||
@@ -222,7 +225,7 @@ function build(){
     sat.satTeamDays!==28||sat.satWorkingSellTHB!==1587600||sat.siteSurveyTeamDays!==5||
     carveC1THB!==252000||carveC2THB!==283500||sat.veexWorkingSellTHB!==30000||
     china.fatWorkingSellTHB!==452850||purchased.selectedIncrementalWorkingSellTHB!==0||
-    baseB3WorkingSellTHB!==2322450)
+    baseB3WorkingSellTHB!==dossierRollupTHB)
   throw Error("B3 brownfield additional price does not match the read-only B3 basis");
  const baseCustomerPreview=baseCustomerPreview0553(buildReleaseCommercialModel0553());
  if(satBefore!==snapshot(selectB3SelectedSatSurveyPrice0553)||
@@ -326,8 +329,14 @@ function build(){
  });
 }
 let cache=null;
+let buildingBrownfield=false;
+export function isBuildingB3BrownfieldAdditional0553(){return buildingBrownfield;}
 export function selectB3BrownfieldAdditional0553(){
- if(!cache)cache=build();
+ if(cache)return cache;
+ if(buildingBrownfield)throw Error("B3 brownfield additional re-entered while its base preview was loading");
+ buildingBrownfield=true;
+ try{cache=build();}
+ finally{buildingBrownfield=false;}
  return cache;
 }
 const csvCell=value=>{

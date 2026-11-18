@@ -4,10 +4,12 @@
 // physical Ethernet route 60m +15% as scenario; market comparables; distinct envelope buckets.
 import {selectMR0001TagCostRows0553} from "./mr0001TagCostLedger0553";
 import {deriveScadaBulkVerification0553} from "./scadaBulkQuantityVerification0553";
+import {SCADA_ENVELOPE_CONTINGENCY_PCT_0553} from "./contingencyRegister0553";
 const round=n=>Math.round(n*100)/100;
 const SITES=["ZPQ","ZWP8","ZWP11","ZWP20","ZWP21","ZWP22","ZWP23"];
 // This ratio is an explicitly labelled adjustable SCENARIO, not a client/OEM fact or approved corporate rate.
-export const SCADA_CONTINGENCY_SCENARIO_PCT=10;
+// The percent is owned by the BID-RSK contingency register. The value stays 10.
+export const SCADA_CONTINGENCY_SCENARIO_PCT=SCADA_ENVELOPE_CONTINGENCY_PCT_0553;
 export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCADA_CONTINGENCY_SCENARIO_PCT}={}){
  const validFX=Number.isFinite(thbPerUsd)&&thbPerUsd>0;
  const pct=Number.isFinite(contingencyPct)&&contingencyPct>=0?contingencyPct:null;

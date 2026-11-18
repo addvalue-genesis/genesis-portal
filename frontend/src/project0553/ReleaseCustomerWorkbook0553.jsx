@@ -70,7 +70,11 @@ export function releaseCustomerCsv0553(model,{internal=false}={}){
   ?[row.code,row.category,row.description,money(row.item7),row.category==="service"?money(row.samtel):"",money(row.release),row.unitPrice,row.subTotal]
   :[row.code,row.description,"1 lot",row.unitPrice,row.subTotal]);
  const total=["Total Part B priced",money(model.summary.bProvisionalCustomerSellTHB)];
- return [header,...body,total].map(line=>line.map(csvCell).join(",")).join("\n")+"\n";
+ const extra=model.b3BrownfieldAdditional?[
+  ["B3-BF Brownfield Additional (separate, not in Part B priced total)",money(model.b3BrownfieldAdditional.grandTotalTHB)],
+  ["Combined base B3 release + B3-BF additional",money(model.summary.b3BaseReleasePlusBrownfieldAdditionalTHB)]
+ ]:[];
+ return [header,...body,total,...extra].map(line=>line.map(csvCell).join(",")).join("\n")+"\n";
 }
 function saveReleaseText(text,type,filename){
  const link=document.createElement("a");
@@ -86,9 +90,13 @@ export function releaseCustomerWordHtml0553(model,{internal=false}={}){
  const body=rows.map(row=>internal
   ?`<tr><td>${row.code}</td><td>${row.category}</td><td>${money(row.item7)}</td><td>${row.category==="service"?money(row.samtel):""}</td><td>${money(row.release)}</td></tr>`
   :`<tr><td>${row.code}</td><td>${row.description}</td><td>1 lot</td><td>${row.unitPrice}</td><td>${row.subTotal}</td></tr>`).join("");
+ const extra=model.b3BrownfieldAdditional
+  ?"<tr><td>B3-BF</td><td>Brownfield Additional (separate, not in Part B priced total)</td><td>1 lot</td><td>"+money(model.b3BrownfieldAdditional.grandTotalTHB)+"</td><td>"+money(model.b3BrownfieldAdditional.grandTotalTHB)+"</td></tr>"+
+   "<tr><td colspan=\"4\">Combined base B3 release + B3-BF additional</td><td>"+money(model.summary.b3BaseReleasePlusBrownfieldAdditionalTHB)+"</td></tr>"
+  :"";
  return "<html><head><meta charset=\"utf-8\"><title>PJ2608-0553 Part B Release</title></head><body>"+
   "<h1>PJ2608-0553 Scope of supply — Part B</h1><table>"+head+body+
-  "<tr><td colspan=\"4\">Total Part B priced</td><td>"+money(model.summary.bProvisionalCustomerSellTHB)+"</td></tr></table></body></html>";
+  "<tr><td colspan=\"4\">Total Part B priced</td><td>"+money(model.summary.bProvisionalCustomerSellTHB)+"</td></tr>"+extra+"</table></body></html>";
 }
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
 const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
@@ -399,6 +407,17 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          {!fullBaseReady&&<small>Excludes unpriced items{unpricedB?": "+unpricedB:""}.</small>}</td>
         <td className="p553-price-cell">{money(provisionalBase)}</td>
         <td><strong>WORKING DRAFT</strong></td></tr>
+       {model.b3BrownfieldAdditional&&<>
+        <tr data-cost-owner="B3-BF"><td><strong>B3-BF</strong></td>
+         <td colSpan={3}>Brownfield Additional — separate from base B3. Not included in the priced A+B total above.</td>
+         <td>1 lot</td>
+         <td className="p553-price-cell">{money(model.b3BrownfieldAdditional.grandTotalTHB)}</td>
+         <td className="p553-price-cell">{money(model.b3BrownfieldAdditional.grandTotalTHB)}</td>
+         <td>Additional proposal only</td></tr>
+        <tr className="p553-sheet-total" data-cost-owner="B3-COMBINED"><td colSpan={6}>Combined base B3 release + B3-BF additional (not the A+B total)</td>
+         <td className="p553-price-cell">{money(model.summary.b3BaseReleasePlusBrownfieldAdditionalTHB)}</td>
+         <td>Base B3 {money(bLines.find(row=>row.code==="B3")?.customerSellTHB)} + additional {money(model.b3BrownfieldAdditional.grandTotalTHB)}</td></tr>
+       </>}
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
        {model.c.map(r=>{
