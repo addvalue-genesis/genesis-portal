@@ -6,6 +6,7 @@ import {useBidWorkspace} from "./BidWorkspaceContext";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {TECHNICAL_AUTHORITY_0550,TECHNICAL_SECTIONS_0550,emptyTechnicalProposal0550,blankTechnicalRecord0550,saveTechnicalRecord0550,deriveTechnicalProposal0550} from "./data/technicalProposal0550";
 import {technicalDossierHtml0550,downloadTechnicalDossier0550} from "./technicalDossierHtml0550";
+import {downloadTechnicalProposalWord0550} from "./exportTechnicalProposalWord0550";
 import {prepareTechnicalDossierDrafts0550} from "./data/technicalDossier0550";
 import {DtsDocumentStudio} from "./DtsDocumentStudio";
 import {DtsFormStudio0550} from "./DtsFormStudio0550";
@@ -71,7 +72,7 @@ export function TechnicalProposalWorkspace0550({navigationTarget,mrNavigationTar
    {panel==="dtsForm"&&<><h3>12.T · DTS Form Studio</h3><DtsFormStudio0550 data={data} model={model} systems={SYSTEMS} defaultSystem={system} today={reviewDate}/></>}
    {panel==="vdrl"&&<><EnhancedVdrlPanel0550 data={data}/><VdrlWorkspace0550 onDirtyChange={setVdrlDirty} onNavigate={navigate}/></>}
    {panel==="overview"&&<PackageConsistency0550 onNavigate={navigate}/>}
-   {panel==="preview"&&<><h3>Preview & Export · DRAFT</h3><p>เอกสารหน้าจอและไฟล์ HTML ใช้ข้อมูลและรูปแบบเดียวกัน ครบทุกระบบและ COMMON · ข้อมูลที่ยังไม่ยืนยันแสดง OPEN</p><button type="button" disabled={dirty||vdrlDirty} onClick={()=>downloadTechnicalDossier0550(dossier)}>Export Volume II draft HTML / Print to PDF</button><iframe title="Full live technical dossier" sandbox="" srcDoc={dossier} style={{width:"100%",height:850,border:"1px solid #bfd0db"}}/></>}
+   {panel==="preview"&&<><h3>Preview & Export · DRAFT</h3><p>เอกสารหน้าจอและไฟล์ HTML/Word ใช้ข้อมูลชุดเดียวกัน ครบทุกระบบและ COMMON · ข้อมูลที่ยังไม่ยืนยันแสดง OPEN</p><div className="p55-review-toolbar"><button type="button" disabled={dirty||vdrlDirty} onClick={()=>downloadTechnicalProposalWord0550(view,data,model,reviewDate)}>Export Volume II Word (.docx)</button><button type="button" disabled={dirty||vdrlDirty} onClick={()=>downloadTechnicalDossier0550(dossier)}>Export Volume II draft HTML / Print to PDF</button></div><iframe title="Full live technical dossier" sandbox="" srcDoc={dossier} style={{width:"100%",height:850,border:"1px solid #bfd0db"}}/></>}
 
    {dirty&&<button type="button" onClick={()=>{setDirty(false);setEquipment(null);setForm(p.records.find(r=>r.systemToken===system&&r.sectionId===panel)||blankTechnicalRecord0550(panel,system));setMeta({documentNo:p.documentNo,revision:p.revision});setMessage("ยกเลิกเฉพาะร่างที่ยังไม่บันทึก");}}>ยกเลิกการแก้ไขที่ยังไม่บันทึก</button>}
   </section>

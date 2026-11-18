@@ -120,7 +120,7 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
    set(v,r,3,'Lot');set(v,r,4,1);set(v,r,5,moneyText(view,amount));set(v,r,6,moneyText(view,amount));
    let remark='';
    if(r===2)remark='Breakdown in Form C-1';
-   else if(r===3)remark='Breakdown in 11.D';
+   else if(r===3)remark='Witnessed FAT / Pre-FAT / Integrated FAT (breakdown attached)';
    else if(r===5)remark='Breakdown in Form C-2';
    else if(r===6)remark='Breakdown in Form C-3';
    else if(r===7)remark='Breakdown in Form C-5';
@@ -161,12 +161,19 @@ function fillOfficialSummary0550(view,id,currency,v,set,groups,issues){
   const complete=Number.isFinite(view.baseAssigned);
   set(v,12,1,'In figures: '+(complete?currency+' '+number(view.baseAssigned):'TBA')+'\nIn Words: '+(complete?words(view.baseAssigned,currency):'TBA'));
   if(!complete)issues.push('Lump sum total TBA until every base price is complete');
- }else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
+ }else{
+  const a2Notes={3:'Breakdown in Form C-4. Recommended 10-year capital spares.',4:'Per Form C-7 (Optional site service / DIEM rates).',5:'Breakdown in Form C-6. Filling materials and consumables.',6:'Breakdown in Form C-3. Two-year operating spares.',7:'Optional site installation and interconnecting works (subject to Purchase Order).'};
+  for(const r of [3,4,5,6,7]){
+   if(groups.has(r))continue;
+   set(v,r,3,r===4?'MD':'Lot');set(v,r,4,r===4?'—':1);set(v,r,5,'TBA');set(v,r,7,'TBA');set(v,r,9,a2Notes[r]);
+  }
+  for(const [r,t] of [[8,'CIF'],[9,'FOB']]){
   const bs=eligible.filter(b=>term(b)===t),total=sum(bs);
   const pending=eligible.some(b=>!term(b))||!Number.isFinite(view.optionsAssigned);
   const show=!pending&&bs.length&&Number.isFinite(total);
   set(v,r,2,'In figures: '+(show?currency+' '+number(total):'TBA')+'\nIn Words: '+(show?words(total,currency):'TBA'));
   if(!show)issues.push((t==='CIF'?'Overseas CIF':'China FOB')+' total TBA');
+  }
  }
 }
 function nativePages(view,id,currency='USD',c2References){
@@ -629,7 +636,8 @@ export function nativeSchedule0550(view,id,currency='USD',c2References){
  const agreement=field(view,'A','agreementNo')||(issued(view)?'':'OPEN');
  const html=pages.map(page=>{
   const status=issued(view)?'':`<p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>`;
-  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(agreement)}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${issued(view)?'Exhibit C - Commercial Terms':sourceLabel+(page.detail?' / '+escape(page.detail):'')}</span></footer></article>`;
+  const hdrPkg=view.nativeExhibitVersion==='exhibit-c-native-v1'||view.nativeExhibitVersion==='exhibit-c-native-v2'?'Export XXX':'Telecommunication and Security Systems';
+  return `<article class="p55-native-paper" data-native-schedule="${id}"${page.systemToken?' data-c2-system="'+escape(page.systemToken)+'"':''}><header><img alt="CNEEC" src="${logo}"><span>Supply of ${hdrPkg} for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(agreement)}</span></header>${status}${renderPage(view,page,'html',currency)}<footer><span>Exhibit C - Commercial Terms</span><span>${issued(view)?'Exhibit C - Commercial Terms':sourceLabel+(page.detail?' / '+escape(page.detail):'')}</span></footer></article>`;
  }).join('');
  return {html,issues,pages};
 }
@@ -660,6 +668,40 @@ export function nativeExhibitHtml0550(view,only,includeCover=false){
  const revHist=(issued(view)||includeCover)?revisionHistoryHtml0550(view.revisionHistory):'';
  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}${isC1Appendix0550(view)&&!issued(view)?c1AppendixCss0550:''}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}${revHist}${appendix}</body></html>`;
 }
+function normalizeOfficialTableXml0550(pageXml,id){
+ const sz=['C2','C3','C4'].includes(id)?'16':'18';
+ const hdrCount={A1:2,A2:3,B:1,C2:2,C3:2,C4:2,C5:2,C6:2,C7:1,C8:1}[id]||1;
+ const arial='<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>';
+ return pageXml.replace(/<w:tbl\b[\s\S]*?<\/w:tbl>/g,tbl=>{
+  let rIdx=0;
+  return tbl
+   .replace(/<w:tr\b[\s\S]*?<\/w:tr>/g,tr=>{
+    const flag=rIdx++<hdrCount?'tblHeader':'cantSplit';
+    if(tr.includes('<w:'+flag))return tr;
+    const cleanTr=tr.replace('<w:trPr/>','<w:trPr></w:trPr>');
+    return /<w:trPr(?:\s[^>]*)?>/.test(cleanTr)?cleanTr.replace(/(<w:trPr(?:\s[^>]*)?>)/,'$1<w:'+flag+'/>'):cleanTr.replace(/(<w:tr(?:\s[^>]*)?>)/,'$1<w:trPr><w:'+flag+'/></w:trPr>');
+   })
+   .replace(/<w:p\b[^>]*>[\s\S]*?<\/w:p>/g,p=>{
+    let out=p.replace(/<w:jc\s+w:val="(?:both|distribute)"\s*\/>/g,'<w:jc w:val="left"/>');
+    if(!/<w:jc\b/.test(out)){
+     out=out.replace('<w:pPr/>','<w:pPr></w:pPr>');
+     out=/<w:pPr(?:\s[^>]*)?>/.test(out)?out.replace(/(<w:pPr(?:\s[^>]*)?>)/,'$1<w:jc w:val="left"/>'):out.replace(/(<w:p(?:\s[^>]*)?>)/,'$1<w:pPr><w:jc w:val="left"/></w:pPr>');
+    }
+    return out;
+   })
+   .replace(/<w:highlight\b[^>]*\/>/g,'')
+   .replace(/<w:color\s+w:val="0000FF"\s*\/>/gi,'')
+   .replace(/<w:i(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
+   .replace(/<w:iCs(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
+   .replace(/<w:rFonts\b[^>]*\/>/g,arial)
+   .replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`)
+   .replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`)
+   .replace(/<w:rPr\b[^>]*\/>/g,`<w:rPr>${arial}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr>`)
+   .replace(/<w:rPr>([\s\S]*?)<\/w:rPr>/g,(_,inner)=>`<w:rPr>${/w:rFonts/.test(inner)?inner:arial+inner}${/w:sz\b/.test(inner)?'':`<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`}</w:rPr>`)
+   .replace(/<w:r(?:\s[^>]*)?>(?!\s*<w:rPr\b)/g,m=>`${m}<w:rPr>${arial}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr>`)
+   .replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>(?:TBA|Excluded|Included|[\d,]+\.\d{2})<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell);
+ });
+}
 export function buildNativeExhibitDocx0550(view,only){
  if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
  const ids=only?[only]:Object.keys(template.schedules);
@@ -667,27 +709,44 @@ export function buildNativeExhibitDocx0550(view,only){
  const trailingParagraph=/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*<\/w:p>$/;
  const blocks=Object.fromEntries(ids.map(id=>[id,id==='C1'&&isC1Appendix0550(view)
   ?(issued(view)?officialC1Word0550(view):c1AppendixWord0550(view)):nativePages(view,id).pages.map((page,index)=>{
-   const xml=renderPage(view,page,'xml');
-   if(issued(view)&&['A1','A2','B','C5','C6','C7','C8','C2','C3','C4'].includes(id)){
-    const sz=['C2','C3','C4'].includes(id)?'16':'18';
-    return xml.replace(/<w:tbl\b[\s\S]*?<\/w:tbl>/g,tbl=>tbl
-     .replace(/<w:jc\s+w:val="both"\s*\/>/g,'<w:jc w:val="left"/>')
-     .replace(/<w:highlight\b[^>]*\/>/g,'')
-     .replace(/<w:color\s+w:val="0000FF"\s*\/>/gi,'')
-     .replace(/<w:i(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
-     .replace(/<w:iCs(?:\s+w:val="(?:1|true)")?\s*\/>/g,'')
-     .replace(/<w:sz\s+w:val="\d+"\s*\/>/g,`<w:sz w:val="${sz}"/>`)
-     .replace(/<w:szCs\s+w:val="\d+"\s*\/>/g,`<w:szCs w:val="${sz}"/>`)
-     .replace(/<w:rPr>([\s\S]*?)<\/w:rPr>/g,(_,inner)=>`<w:rPr>${/w:rFonts/.test(inner)?inner:'<w:rFonts w:ascii="Arial" w:hAnsi="Arial" w:cs="Arial"/>'+inner}${/w:sz\b/.test(inner)?'':`<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/>`}</w:rPr>`)
-     .replace(/<w:tc\b[^>]*>[\s\S]*?<\/w:tc>/g,cell=>/(?:USD|THB|RMB)\s+[\d,]+(?:\.\d+)?|^[\s\S]*<w:t[^>]*>(?:TBA|[\d,]+\.\d{2})<\/w:t>/.test(cell)&&!cell.includes('<w:noWrap')?cell.replace('<w:tcPr>','<w:tcPr><w:noWrap/>'):cell)
-    );
+   let pageXml=renderPage(view,page,'xml');
+   const isLegacyV1=view.nativeExhibitVersion==='exhibit-c-native-v1'||view.nativeExhibitVersion==='exhibit-c-native-v2';
+   if(!isLegacyV1&&id==='A1'){
+    let rowIdx=0;
+    pageXml=pageXml.replace(/<w:highlight\b[^>]*\/>/g,'').replace(/with\s*<\/w:t>[\s\S]*?<w:t[^>]*>whiteness/g,'witnessed').replace(/with whiteness/g,'witnessed').replace(/whiteness/g,'witnessed').replace(/<w:tr\b[\s\S]*?<\/w:tr>/g,tr=>{
+     const idx=rowIdx++;
+     if(idx===7)return tr.replace(/(<w:t[^>]*>)5(<\/w:t>)/,'$16$2');
+     if(idx===8)return tr.replace(/(<w:t[^>]*>)6(<\/w:t>)/,'$17$2');
+     return tr;
+    });
+   }else if(!isLegacyV1&&id==='A2'){
+    pageXml=pageXml.replace(/Contract Price for Base Scope/g,'Contract Price for Optional Scope');
+   }else if(!isLegacyV1&&['C2','C3','C4'].includes(id)){
+    let noteNum=0;
+    pageXml=pageXml.replace(/<w:p\b[^>]*>(?:(?!<\/w:p>)[\s\S])*?<w:numPr>[\s\S]*?<\/w:numPr>[\s\S]*?<\/w:p>/g,p=>{
+     noteNum++;
+     return p.replace(/<w:numPr>[\s\S]*?<\/w:numPr>/g,'').replace(/(<w:t\b[^>]*>)/,`$1${noteNum}. `);
+    });
    }
-   if(!only||!view.workingPreview)return xml;
-   const content=xml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>
+   if(issued(view)&&['A1','A2','B','C1','C5','C6','C7','C8','C2','C3','C4'].includes(id)){
+    return normalizeOfficialTableXml0550(pageXml,id);
+   }
+   if(!only||!view.workingPreview)return pageXml;
+   const content=pageXml.replace(trailingBreak,'').replace(trailingParagraph,paragraph=>
     /<w:t\b[^>]*>\s*[^\s<]|<w:(?:drawing|object|br|sectPr)\b/.test(paragraph)?paragraph:'');
    return index?content.replace(/^(<w:p\b[^>]*><w:pPr>(?:<w:keepNext\/>)?)/,'$1<w:pageBreakBefore/>'):content;
   }).join('')]));
- let xml=template.document.replace(/\{\{SCHEDULE_(\w+)_XML\}\}/g,(_,id)=>blocks[id]??'');
+ const isLegacyV1Doc=view.nativeExhibitVersion==='exhibit-c-native-v1'||view.nativeExhibitVersion==='exhibit-c-native-v2';
+ let docTemplate=template.document;
+ if(issued(view)&&!isLegacyV1Doc)docTemplate=normalizeOfficialTableXml0550(docTemplate,'DOC');
+ let xml=docTemplate.replace(/\{\{SCHEDULE_(\w+)_XML\}\}/g,(_,id)=>blocks[id]??'');
+ if(!isLegacyV1Doc){
+  xml=xml
+   .replace(/BASE SCOPE OF SUPPY/g,'BASE SCOPE OF SUPPLY')
+   .replace(/EXIBHIT/g,'EXHIBIT')
+   .replace(/this Exhibit B/g,'this Exhibit C')
+   .replace(/Schedule C-7 Services and Facilities for COMPANY and PURCHASER/g,'Schedule C-8 Services and Facilities for COMPANY and PURCHASER');
+ }
  if(only){
   // Retain the native final landscape section, logo relationships and styles.
   const start=xml.indexOf('<w:body>')+8,end=xml.lastIndexOf('<w:sectPr');
@@ -715,7 +774,23 @@ export function buildNativeExhibitDocx0550(view,only){
  if(lastParagraph!==-1)xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
  if(/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(xml))throw Error('Unsupported XML control character in Exhibit C');
  const parts={...template.parts,'word/document.xml':xml};
- for(const name of Object.keys(parts).filter(n=>/^word\/header\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:t[^>]*>[^<]*No\.:)(<\/w:t>)/g,(_,a,b)=>a+' '+escape(field(view,'A','agreementNo')||'OPEN')+b);
+ for(const name of Object.keys(parts).filter(n=>/^word\/header\d+\.xml$/.test(n))){
+  if(!isLegacyV1Doc){
+   parts[name]=parts[name]
+    .replace(/Export Gas<\/w:t>[\s\S]*?<w:t[^>]*>\s*Compressor\s*<\/w:t>[\s\S]*?<w:t[^>]*>Package/g,'Telecommunication and Security Systems')
+    .replace(/Export\s*<\/w:t>[\s\S]*?<w:t[^>]*>XXX/g,'Telecommunication and Security Systems');
+  }
+  parts[name]=parts[name].replace(/(<w:t[^>]*>[^<]*No\.:)(<\/w:t>)/g,(_,a,b)=>a+' '+escape(field(view,'A','agreementNo')||'OPEN')+b);
+ }
+ if(!isLegacyV1Doc){
+  for(const name of ['word/footer5.xml','word/footer6.xml']){
+   if(parts[name])parts[name]=parts[name]
+    .replace(/PAGEREF PJ0550_EXHIBIT_END/g,'NUMPAGES')
+    .replace(/(<w:instrText[^>]*>\s*PAGE\s*<\/w:instrText>[\s\S]*?<w:t[^>]*>)\d+(<\/w:t>)/g,'$11$2')
+    .replace(/(<w:t[^>]*>)18(<\/w:t>)/g,'$11$2');
+  }
+  if(parts['word/footer2.xml']&&parts['word/footer6.xml'])parts['word/footer2.xml']=parts['word/footer6.xml'];
+ }
  if(Object.values(parts).some(s=>/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(s)))throw Error('Unsupported XML control character in Exhibit C');
  // A visible draft/authorized label in each native footer; original fields remain.
  if(!issued(view))for(const name of Object.keys(parts).filter(n=>/^word\/footer\d+\.xml$/.test(n)))parts[name]=parts[name].replace(/(<w:p(?:\s[^>]*)?>)/,m=>m+`<w:r><w:rPr><w:sz w:val="16"/></w:rPr><w:t xml:space="preserve">${escape(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')} / </w:t></w:r>`);

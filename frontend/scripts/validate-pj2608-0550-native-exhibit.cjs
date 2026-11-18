@@ -202,7 +202,7 @@ assert.doesNotMatch(officialSpare.html,/Working subtotal|KNOWN SUBTOTAL|Option r
 assert.match(officialSpare.html,/whiteness/);
 const officialDoc=Buffer.from(N.buildNativeExhibitDocx0550({...spareView,customerIssue:true},'A1')).toString();
 assert.doesNotMatch(officialDoc,/Working subtotal|KNOWN SUBTOTAL|Option reference|Draft budget|BIDDER response|Working owner|priced items/);
-assert.match(officialDoc,/whiteness/);
+assert.match(officialDoc,/witnessed/);
 const thbView=require(root+'/project0550/data/scheduleRollup0550').scheduleViewTHB0550(spareView);
 assert.deepEqual(priceCells(N.nativeSchedule0550(thbView,'C2','THB').pages[0]),['THB 1,600.00','','THB 3,200.00','']);
 assert.match(N.nativeSchedule0550(thbView,'A1','THB').pages[0].values.A1_6_7,/THB 2,400\.00/);

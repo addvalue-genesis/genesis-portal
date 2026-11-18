@@ -200,11 +200,11 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
    // This calculation uses current cost owners and is a draft price basis only.
    if(selected&&rate&&finite(spareBasisTHB)&&spareBasisTHB>=0){
     spareBudget={rate,basisTHB:spareBasisTHB};
-    costRate=round(spareBasisTHB*rate);
+    const estimateFx=fx(currency);costRate=estimateFx!==null?round((spareBasisTHB*rate)/estimateFx):null;
     problems.push(SPARE_BUDGET_REVIEW_0550);
    }else if(nonnegative(othersRate)){
     a1OthersEstimate=true;
-    costRate=othersRate;
+    const estimateFx=fx(currency);costRate=estimateFx!==null?round(othersRate/estimateFx):null;
     problems.push(A1_OTHERS_ESTIMATE_REVIEW_0550);
    }else{
     costRate=null;

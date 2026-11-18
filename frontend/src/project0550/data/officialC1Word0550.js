@@ -111,6 +111,12 @@ export function officialC1Word0550(view) {
         return `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${span && i === 0 ? '<w:gridSpan w:val="7"/>' : ''}${noWrap}${header ? '<w:shd w:fill="EAF2F6"/>' : ''}<w:vAlign w:val="center"/></w:tcPr>${p(v, header || bold, '18', align)}</w:tc>`;
       })
       .join('')}</w:tr>`;
+  const summaryRow = (label, amount) =>
+    `<w:tr><w:trPr><w:cantSplit/></w:trPr>` +
+    `<w:tc><w:tcPr><w:tcW w:w="${widths[0] + widths[1] + widths[2] + widths[3] + widths[4]}" w:type="dxa"/><w:gridSpan w:val="5"/><w:vAlign w:val="center"/></w:tcPr>${p(label, true, '18', 'left')}</w:tc>` +
+    `<w:tc><w:tcPr><w:tcW w:w="${widths[5]}" w:type="dxa"/><w:noWrap/><w:vAlign w:val="center"/></w:tcPr>${p(amount, true, '18', 'right')}</w:tc>` +
+    `<w:tc><w:tcPr><w:tcW w:w="${widths[6]}" w:type="dxa"/><w:vAlign w:val="center"/></w:tcPr>${p('', true, '18', 'left')}</w:tc>` +
+    `</w:tr>`;
   const headerCell = (text, w, properties = '') =>
     `<w:tc><w:tcPr><w:tcW w:w="${w}" w:type="dxa"/>${properties}<w:shd w:fill="EAF2F6"/><w:vAlign w:val="center"/></w:tcPr>${p(text, true, '18', 'center')}</w:tc>`;
 
@@ -148,7 +154,8 @@ export function officialC1Word0550(view) {
         for (const r of mrRows) {
           const priceUnit = Number.isFinite(r.unitPrice) && r.unitPrice > 0 ? c1Display0550(r.unitPrice) : (r.nonAdditive ? 'Included' : 'TBA');
           const priceTotal = Number.isFinite(r.amount) && r.amount > 0 ? c1Display0550(r.amount) : (r.nonAdditive ? 'Included' : 'TBA');
-          xml += row([r.sn, r.description, r.unit || '—', r.quantity ?? '—', priceUnit, priceTotal, cleanOfficialNote(r.note)], false, false, true);
+          const cleanDesc = String(r.description || '').replace(/Optice Spice closure/gi, 'Optic Splice Closure');
+          xml += row([r.sn, cleanDesc, r.unit || '—', r.quantity ?? '—', priceUnit, priceTotal, cleanOfficialNote(r.note)], false, false, true);
           const bom = resolveStaticBomForWord(r);
           if (bom && bom.length) {
             bom.forEach((b, idx) => {
@@ -166,13 +173,12 @@ export function officialC1Word0550(view) {
       }
     }
     const subAmt = g.amount ?? g.draftSubtotal;
-    xml += row([`Subtotal — ${g.title || g.number || ''}`, '', '', '', '', Number.isFinite(subAmt) ? c1Display0550(subAmt) : 'TBA', ''], false, false, true);
+    xml += summaryRow(`Subtotal — ${g.title || g.number || ''}`, Number.isFinite(subAmt) ? c1Display0550(subAmt) : 'TBA');
   }
 
   return (
     xml +
-    row(['TOTAL — BASE SCOPE OF SUPPLY (USD)', '', '', '', '', Number.isFinite(c1.amount) ? c1Display0550(c1.amount) : 'TBA', ''], false, false, true) +
-    '</w:tbl>' +
-    p('Schedule C1 — Base Scope of Supply', false, '18')
+    summaryRow('TOTAL — BASE SCOPE OF SUPPLY (USD)', Number.isFinite(c1.amount) ? c1Display0550(c1.amount) : 'TBA') +
+    '</w:tbl>'
   );
 }
