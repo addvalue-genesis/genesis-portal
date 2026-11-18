@@ -25,7 +25,8 @@ export const L3_TABS_0553 = Object.freeze([
  ["risk","08 Risk, Assumptions & Change"],
  ["registry","09 Data, Code & Traceability"],
  ["budget","10 Budget & Commercial Analysis"],
- ["b3bf","10B B3 Brownfield Additional"]
+ ["b3bf","10B B3 Brownfield Additional"],
+ ["deviations","14 Deviations & Clarifications"]
 ]);
 for (const [id] of STANDARD_PROJECT_TABS) {
  if (!L3_TABS_0553.some(([route]) => route === id)) throw Error("PJ2608-0553 dropped shared standard tab "+id);
@@ -37,7 +38,7 @@ export const L3_TAB_GROUPS_0553 = [
  {id:"govern",title:"GOVERN · หลักการและโครงสร้าง",tabs:["overview","engineering","architecture"]},
  {id:"analyse",title:"ENGINEER & ANALYSE · วิศวกรรมและการวิเคราะห์",tabs:["systems","schematic","execution","risk"]},
  {id:"commercial",title:"SOURCE & COMMERCIAL · ผู้ขายและงบประมาณ",tabs:["documents","budget"]},
- {id:"additional",title:"ADDITIONAL PROPOSAL · ข้อเสนอเพิ่มเติม",tabs:["b3bf"]},
+ {id:"additional",title:"ADDITIONAL PROPOSAL · ข้อเสนอเพิ่มเติม",tabs:["b3bf","deviations"]},
  {id:"control",title:"CONTROL · ข้อมูลและการติดตาม",tabs:["registry"]}
 ];
 
@@ -53,7 +54,8 @@ export const TAB_SEMANTIC_0553=Object.freeze([
  {route:"risk",code:"BID-RSK",locationCode:"L3-B-08",workflowIds:["WF-08"],sourcePaths:["frontend/src/project0553/bidReview.js"]},
  {route:"registry",code:"BID-DAT",locationCode:"L3-B-09",workflowIds:[],sourcePaths:["frontend/src/project0553/DataCodeRegistry0553.jsx"]},
  {route:"budget",code:"BID-BUD",locationCode:"L3-B-10",workflowIds:["WF-10","WF-11"],sourcePaths:["frontend/src/project0553/CommercialWorkspace.jsx"]},
- {route:"b3bf",code:"BID-BFAD",locationCode:"L3-B-10B",workflowIds:[],sourcePaths:["frontend/src/project0553/B3BrownfieldAdditional0553.jsx","frontend/src/project0553/data/b3BrownfieldAdditional0553.js"]}
+ {route:"b3bf",code:"BID-BFAD",locationCode:"L3-B-10B",workflowIds:[],sourcePaths:["frontend/src/project0553/B3BrownfieldAdditional0553.jsx","frontend/src/project0553/data/b3BrownfieldAdditional0553.js"]},
+ {route:"deviations",code:"BID-DEV",locationCode:"L3-B-14",workflowIds:[],sourcePaths:["frontend/src/project0553/DeviationWorkspace0553.jsx","frontend/src/project0553/data/deviationRegister0553.js"]}
 ]);
 export const TAB_IDENTITY_0553=assignSemanticNames(
  createComponentRegistry({projectId:"PJ2608-0553",stage:"L3",area:"B",tabs:L3_TABS_0553}),
