@@ -52,7 +52,16 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
 
   const renderTable = (rows) => (
     <div className="p55-table-wrap">
-      <table className="p55-table p55-table--budget">
+      <table className="p55-table p55-table--budget" style={{ tableLayout: "fixed", width: "100%", minWidth: 980 }}>
+        <colgroup>
+          <col style={{ width: 108 }} />
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "16%" }} />
+          <col style={{ width: "18%" }} />
+          <col style={{ width: "20%" }} />
+          {isAVS && <col style={{ width: "17%" }} />}
+          <col style={{ width: 145 }} />
+        </colgroup>
         <thead>
           <tr>
             <th>ID / Type</th>
@@ -67,19 +76,19 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
         <tbody>
           {rows.map((r) => (
             <tr key={r.id} data-deviation-id={r.id} data-register-kind={r.kind}>
-              <td>
-                <strong>{r.id}</strong>
+              <td style={{ verticalAlign: "top" }}>
+                <strong style={{ whiteSpace: "nowrap" }}>{r.id}</strong>
                 <small>{r.kind} · {r.mr} · {r.code}</small>
               </td>
-              <td>
+              <td style={{ verticalAlign: "top", overflowWrap: "break-word" }}>
                 <strong>{r.title}</strong>
                 {isAVS && r.customerComment && <small>JUTAL: {r.customerComment}</small>}
               </td>
-              <td>{r.mrRequirement}</td>
-              <td>{r.offeredBasis}</td>
-              <td>{r.justification}</td>
+              <td style={{ verticalAlign: "top", overflowWrap: "break-word" }}>{r.mrRequirement}</td>
+              <td style={{ verticalAlign: "top", overflowWrap: "break-word" }}>{r.offeredBasis}</td>
+              <td style={{ verticalAlign: "top", overflowWrap: "anywhere" }}>{r.justification}</td>
               {isAVS && (
-                <td>
+                <td style={{ verticalAlign: "top", overflowWrap: "break-word" }}>
                   <small>{r.vendorRef}</small>
                   {r.brownfieldRef !== "—" && <small>{r.brownfieldRef}</small>}
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 4 }}>
@@ -96,8 +105,10 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
                   </div>
                 </td>
               )}
-              <td>
-                <AuditBadge>{r.status}</AuditBadge>
+              <td style={{ verticalAlign: "top", overflowWrap: "anywhere", whiteSpace: "normal" }}>
+                <span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block", lineHeight: 1.35, overflowWrap: "anywhere" }}>
+                  {r.status}
+                </span>
               </td>
             </tr>
           ))}

@@ -2,6 +2,7 @@ import React,{useEffect,useMemo,useRef,useState} from "react";
 import {buildOfficialUsdRelease0553,OFFICIAL_SHEETS_0553,selectSubmittedRev02Release0553,selectCurrentReleaseRev03_0553} from "./data/officialUsdRelease0553";
 import {allocateBreakdown0553,breakdownKey0553,buildCustomerPriceBreakdown0553,customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {selectDeviationRegister0553} from "./data/deviationRegister0553";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import {SubmittedWorksheet0553} from "./ReleaseCustomerWorkbook0553";
@@ -202,6 +203,7 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
    <button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="CURRENT_REV03"} onClick={()=>setReleaseVersion("CURRENT_REV03")}>Current Rev03 · Agreed quotation</button>
    <button type="button" className="p553-detail-button" aria-pressed={historical} onClick={()=>setReleaseVersion("SUBMITTED_REV02")}>History Rev02 · 30 Oct 2026</button>
    {isSI&&<button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="WORKING_DRAFT"} onClick={()=>setReleaseVersion("WORKING_DRAFT")}>Working draft · not issued</button>}</div>
+  {isSI&&<p className="p55-note" data-jutal-register-summary="true"><strong>JUTAL {selectDeviationRegister0553().responseRound}:</strong> {selectDeviationRegister0553().counts.deviations} Formal Deviation · {selectDeviationRegister0553().counts.technicalClarifications} TC · {selectDeviationRegister0553().counts.commercialClarifications} CCL (tracked in Tab 14 / 15; Rev03 totals unchanged).</p>}
   {isSI&&<QuotationBaselineControl0553 controllerRef={baselineControl} mode={releaseVersion} reference={submitted} source={source} onSelectRecord={record=>{setError("");setRecordedQuotation(record);setReleaseVersion("RECORDED");}}/>}
   {error&&<p role="alert">{error}</p>}
   {releaseVersion==="RECORDED"&&recordedQuotation?<RecordedQuotation0553 key={recordedQuotation.id} record={recordedQuotation}/>:releaseVersion!=="WORKING_DRAFT"?<div data-release-revision={submitted.revision} data-release-state={historical?"HISTORICAL_SUBMITTED_REV02":"OWNER_SELECTED_REV03"}>

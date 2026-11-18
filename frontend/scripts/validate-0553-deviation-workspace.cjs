@@ -30,9 +30,11 @@ assert.equal(L3_TABS_0553.some(([id]) => id === "deviations"), true, "L3_TABS_05
 assert.equal(L3_TABS_0553.some(([id]) => id === "clarify"), true, "L3_TABS_0553 must include clarify tab");
 
 const reg = selectDeviationRegister0553();
-assert.equal(reg.counts.total, 6);
+assert.equal(reg.counts.total, 14);
 assert.equal(reg.counts.deviations, 1, "Only 1 formal Deviation (MR-0002 Trunk Radio LNA -> BDA)");
-assert.equal(reg.counts.tc, 5, "Remaining 5 items are Technical/Commercial Clarifications (TC/CCL)");
+assert.equal(reg.counts.tc, 13, "Remaining 13 items are Technical/Commercial Clarifications (3 TC + 10 CCL)");
+assert.equal(reg.counts.technicalClarifications, 3);
+assert.equal(reg.counts.commercialClarifications, 10);
 
 const devHtml = renderToStaticMarkup(React.createElement(DeviationWorkspace0553, {}));
 assert.equal(devHtml.includes("bid.deviations"), true);
@@ -42,10 +44,10 @@ assert.equal(devHtml.includes("14.1 Formal Deviations (1)"), true);
 
 const clarifyHtml = renderToStaticMarkup(React.createElement(ClarifyWorkspace0553, {}));
 assert.equal(clarifyHtml.includes("bid.clarify"), true);
-assert.equal(clarifyHtml.includes("15.1 TC · Technical (2)"), true);
-assert.equal(clarifyHtml.includes("15.2 CCL · Commercial (3)"), true);
-assert.equal(clarifyHtml.includes("15.3 Export TC / CCL (5)"), true);
+assert.equal(clarifyHtml.includes("15.1 TC · Technical (3)"), true);
+assert.equal(clarifyHtml.includes("15.2 CCL · Commercial (10)"), true);
+assert.equal(clarifyHtml.includes("15.3 Export TC / CCL (13)"), true);
 assert.equal(clarifyHtml.includes("TC-TECH-01"), true);
 assert.equal(clarifyHtml.includes("DEV-TECH-01"), false, "15 Clarify must NOT contain Formal Deviation rows");
 
-console.log("PASS: 0553 14 Deviations (1: Trunk Radio LNA->BDA) & 15 Clarify (TC 2 + CCL 3)");
+console.log("PASS: 0553 14 Deviations (1: Trunk Radio LNA->BDA) & 15 Clarify (TC 3 + CCL 10)");
