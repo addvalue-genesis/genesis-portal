@@ -149,15 +149,16 @@
       "breakdownRef": "Form C-2",
       "unit": "Lot",
       "qty": 1,
-      "unitPriceUsd": null,
-      "totalPriceUsd": null,
+      "unitPriceUsd": 47492.76,
+      "totalPriceUsd": 47492.76,
       "isOption": false,
       "pricingStats": {
-        "priced": null,
-        "total": null,
-        "open": null
+        "priced": 12,
+        "total": 15,
+        "open": 3
       },
-      "customerNotes": "Breakdown in Form C-2"
+      "customerNotes": "Breakdown in Form C-2",
+      "valueStatus": "RECONCILED_PARTIAL_MASTER_C2"
     },
     {
       "itemKey": "A1-SN5-OPTION-C3",
@@ -177,7 +178,8 @@
         "total": null,
         "open": null
       },
-      "customerNotes": "Breakdown in Form C-3"
+      "customerNotes": "Breakdown in Form C-3",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
     },
     {
       "itemKey": "A1-SN5-TOOLS-C5",
@@ -189,15 +191,16 @@
       "breakdownRef": "Form C-5",
       "unit": "Lot",
       "qty": 1,
-      "unitPriceUsd": null,
-      "totalPriceUsd": null,
+      "unitPriceUsd": 42100,
+      "totalPriceUsd": 42100,
       "isOption": false,
       "pricingStats": {
-        "priced": null,
-        "total": null,
-        "open": null
+        "priced": 15,
+        "total": 15,
+        "open": 0
       },
-      "customerNotes": "Breakdown in Form C-5"
+      "customerNotes": "Breakdown in Form C-5",
+      "valueStatus": "CATALOG_BASELINE_C5"
     },
     {
       "itemKey": "A1-SN6-C7",
@@ -217,7 +220,8 @@
         "total": null,
         "open": null
       },
-      "customerNotes": "Site Service Time shall be specified."
+      "customerNotes": "Site Service Time shall be specified.",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
     },
     {
       "itemKey": "A1-SN8-C8",
@@ -237,7 +241,8 @@
         "total": null,
         "open": null
       },
-      "customerNotes": "Breakdown in Form C-8"
+      "customerNotes": "Breakdown in Form C-8",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
     }
   ],
   "a1DirectItems": [

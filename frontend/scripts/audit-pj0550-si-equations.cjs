@@ -36,14 +36,14 @@ const { EnhancedVdrlPanel0550 } = require(root + '/project0550/EnhancedVdrlPanel
 const { DtsFormStudio0550 } = require(root + '/project0550/DtsFormStudio0550.jsx');
 const { buildDtsFormModel0550 } = require(root + '/project0550/data/dtsFormEngine0550.js');
 
-// 1. SDRL Document Generation Equations (6 classes)
-const expectedCodes = ['B03', 'B05', 'B08', 'B11', 'CAL', 'C02'];
+// 1. SDRL Document Generation Equations (7 classes)
+const expectedCodes = ['A04', 'B03', 'B05', 'B08', 'B11', 'CAL', 'C02'];
 assert.deepEqual(
   SI_EQ.SDRL_DOCUMENT_EQUATIONS_0550.map(d => d.code),
   expectedCodes,
-  'All 6 SDRL deliverable classes registered'
+  'All 7 SDRL deliverable classes registered'
 );
-assert.equal(sdrlJson.sdrlDeliverables.length, 6);
+assert.equal(sdrlJson.sdrlDeliverables.length, 7);
 for (const d of SI_EQ.SDRL_DOCUMENT_EQUATIONS_0550) {
   assert(d.withBidRule && d.postAwardRule && d.crossVolumeGate, `Complete rules for ${d.code}`);
 }
