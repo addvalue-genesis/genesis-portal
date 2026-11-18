@@ -204,7 +204,8 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     problems.push(SPARE_BUDGET_REVIEW_0550);
    }else if(nonnegative(othersRate)){
     a1OthersEstimate=true;
-    const estimateFx=fx(currency);costRate=estimateFx!==null?round(othersRate/estimateFx):null;
+    // B2-D01 and B2-D02 return line.manualCost already in line.currency; B2-D04 and B9-D01 are derived in THB.
+    const estimateFx=fx(currency);costRate=(l.id==='REQ-MR-ACT-B2-D01'||l.id==='REQ-MR-ACT-B2-D02')?othersRate:(estimateFx!==null?round(othersRate/estimateFx):null);
     problems.push(A1_OTHERS_ESTIMATE_REVIEW_0550);
    }else{
     costRate=null;

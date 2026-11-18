@@ -65,7 +65,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
   'MR-B1-13-ACP-05': [
     {
       itemNo: '1',
-      tagNo: 'Per Appendix 2 Drawing',
+      tagNo: 'TPH-304-001, TPH-304-002, TPH-304-003',
       mrDescription: 'IP Phone Indoor',
       offeredEquipment: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
       description: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
@@ -74,14 +74,14 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: '700513569',
       quantity: 3,
       unit: 'SET',
-      remarks: 'ACP indoor IP telephone set (per Appendix 2 drawings)',
+      remarks: 'ACP indoor IP telephone set (per Appendix 2 LIS-0001)',
       weight: 1000
     }
   ],
   'MR-B1-13-ACP-09': [
     {
       itemNo: '1',
-      tagNo: 'Per Appendix 2 Drawing',
+      tagNo: 'AP-307-001, AP-307-002',
       mrDescription: 'Access Point',
       offeredEquipment: 'Cisco Catalyst 9120AXI Wi-Fi 6 Dual-Band Indoor Access Point (802.11ax, PoE+)',
       description: 'Cisco Catalyst 9120AXI Wi-Fi 6 Dual-Band Indoor Access Point (802.11ax, PoE+)',
@@ -90,14 +90,14 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: 'C9120AXI-E',
       quantity: 2,
       unit: 'SET',
-      remarks: 'ACP indoor wireless access point with mounting kit (per Appendix 2 drawings)',
+      remarks: 'ACP indoor wireless access point with mounting kit (per Appendix 2 LIS-0001)',
       weight: 1000
     }
   ],
   'MR-B1-13-ABV01-04': [
     {
       itemNo: '1',
-      tagNo: 'Per Appendix 2 Drawing',
+      tagNo: 'TPH-304-001',
       mrDescription: 'IP Phone Indoor',
       offeredEquipment: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
       description: 'Avaya J179 Gigabit Color IP Deskphone (SIP/H.323, PoE Class 1/2, Dual 1000Base-T)',
@@ -106,7 +106,7 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
       partNo: '700513569',
       quantity: 2,
       unit: 'SET',
-      remarks: 'ABV01 indoor IP telephone set (per Appendix 2 drawings)',
+      remarks: 'ABV01 indoor IP telephone set (per Appendix 2 LIS-0001)',
       weight: 1000
     }
   ],
@@ -157,18 +157,18 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
     { itemNo: '2', tagNo: 'LAN-307-151~501', mrDescription: 'Access Switch L3 PoE+ & Patch Panels', offeredEquipment: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', description: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', brand: 'Cisco / Putian', model: 'C9200L-24P-4X-A', partNo: 'C9200L-24P-4X-A', quantity: 8, unit: 'Lot', remarks: 'Building access switching & structured cabling termination', weight: 500 }
   ],
   'MR-B1-13-ACP-06': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'LAN Cabinet (42U IP54 Enclosure)', offeredEquipment: 'Rittal VX25 42U 800x1000x2200mm IP54 Main Telecom Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x1000x2200mm IP54 Main Telecom Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x1000x2200mm', partNo: 'VX-8825.000', quantity: 1, unit: 'SET', remarks: 'ACP main LAN / MPLS / Wireless Controller cabinet', weight: 300 },
-    { itemNo: '2', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Core / Distribution Switch L3 & Firewall', offeredEquipment: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', description: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', brand: 'Cisco', model: 'C9300-48P-A / FPR1120', partNo: 'C9300-48P-A', quantity: 1, unit: 'Lot', remarks: 'ACP core switching & security', weight: 400 },
-    { itemNo: '3', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Wireless LAN Controller', offeredEquipment: 'Cisco Catalyst 9800-L-F-K9 Wireless LAN Controller', description: 'Cisco Catalyst 9800-L-F-K9 Wireless LAN Controller', brand: 'Cisco', model: 'Catalyst C9800-L-F-K9', partNo: 'C9800-L-F-K9', quantity: 1, unit: 'SET', remarks: 'Centralized Wi-Fi 6 AP controller', weight: 200 },
-    { itemNo: '4', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'FO & CAT6A Patch Panels', offeredEquipment: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', description: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', brand: 'Putian', model: '1U 24-Port FO / CAT6A Panel', partNo: 'PT-FODP-24SC', quantity: 1, unit: 'Lot', remarks: 'Fiber & copper termination inside ACP LAN cabinet', weight: 100 }
+    { itemNo: '1', tagNo: 'LAN-307-001', mrDescription: 'LAN Cabinet (42U IP54 Enclosure)', offeredEquipment: 'Rittal VX25 42U 800x1000x2200mm IP54 Main Telecom Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x1000x2200mm IP54 Main Telecom Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x1000x2200mm', partNo: 'VX-8825.000', quantity: 1, unit: 'SET', remarks: 'ACP main LAN / MPLS / Wireless Controller cabinet (per Appendix 2 LIS-0001)', weight: 300 },
+    { itemNo: '2', tagNo: 'LAN-307-001', mrDescription: 'Core / Distribution Switch L3 & Firewall', offeredEquipment: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', description: 'Cisco Catalyst 9300-48P-A L3 Switch & Firepower 1120 NGFW', brand: 'Cisco', model: 'C9300-48P-A / FPR1120', partNo: 'C9300-48P-A', quantity: 1, unit: 'Lot', remarks: 'ACP core switching & security', weight: 400 },
+    { itemNo: '3', tagNo: 'LAN-307-001', mrDescription: 'Wireless LAN Controller', offeredEquipment: 'Cisco Catalyst 9800-L-F-K9 Wireless LAN Controller', description: 'Cisco Catalyst 9800-L-F-K9 Wireless LAN Controller', brand: 'Cisco', model: 'Catalyst C9800-L-F-K9', partNo: 'C9800-L-F-K9', quantity: 1, unit: 'SET', remarks: 'Centralized Wi-Fi 6 AP controller', weight: 200 },
+    { itemNo: '4', tagNo: 'LAN-307-001', mrDescription: 'FO & CAT6A Patch Panels', offeredEquipment: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', description: 'Putian 1U 24-Port FO Patch Panel & 24-Port CAT6A Patch Panel', brand: 'Putian', model: '1U 24-Port FO / CAT6A Panel', partNo: 'PT-FODP-24SC', quantity: 1, unit: 'Lot', remarks: 'Fiber & copper termination inside ACP LAN cabinet', weight: 100 }
   ],
   'MR-B1-13-ACP-07': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'LAN Cabinet (Sub-Distribution IP54)', offeredEquipment: 'Rittal VX25 42U 800x800x2000mm IP54 Sub-Distribution Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x800x2000mm IP54 Sub-Distribution Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x800x2000mm', partNo: 'VX-8805.000', quantity: 1, unit: 'SET', remarks: 'ACP sub-building LAN cabinet', weight: 500 },
-    { itemNo: '2', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Access Switch L3 PoE+ & Patch Panels', offeredEquipment: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', description: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', brand: 'Cisco / Putian', model: 'C9200L-24P-4X-A', partNo: 'C9200L-24P-4X-A', quantity: 1, unit: 'Lot', remarks: 'Access switch & structured cabling termination', weight: 500 }
+    { itemNo: '1', tagNo: 'LAN-307-002', mrDescription: 'LAN Cabinet (Sub-Distribution IP54)', offeredEquipment: 'Rittal VX25 42U 800x800x2000mm IP54 Sub-Distribution Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x800x2000mm IP54 Sub-Distribution Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x800x2000mm', partNo: 'VX-8805.000', quantity: 1, unit: 'SET', remarks: 'ACP sub-building LAN cabinet (per Appendix 2 LIS-0001)', weight: 500 },
+    { itemNo: '2', tagNo: 'LAN-307-002', mrDescription: 'Access Switch L3 PoE+ & Patch Panels', offeredEquipment: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', description: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', brand: 'Cisco / Putian', model: 'C9200L-24P-4X-A', partNo: 'C9200L-24P-4X-A', quantity: 1, unit: 'Lot', remarks: 'Access switch & structured cabling termination', weight: 500 }
   ],
   'MR-B1-13-ABV01-05': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'LAN Cabinet (IP54 Enclosure)', offeredEquipment: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x800x2000mm', partNo: 'VX-8805.000', quantity: 1, unit: 'SET', remarks: 'ABV01 block valve station LAN cabinet', weight: 500 },
-    { itemNo: '2', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Access Switch L3 & Patch Panels', offeredEquipment: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', description: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', brand: 'Cisco / Putian', model: 'C9200L-24P-4X-A', partNo: 'C9200L-24P-4X-A', quantity: 1, unit: 'Lot', remarks: 'ABV01 station network switching & fiber termination', weight: 500 }
+    { itemNo: '1', tagNo: 'MPLS-0001', mrDescription: 'LAN Cabinet (IP54 Enclosure)', offeredEquipment: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x800x2000mm', partNo: 'VX-8805.000', quantity: 1, unit: 'SET', remarks: 'ABV01 block valve station LAN/MPLS cabinet (per Appendix 2 LIS-0001)', weight: 500 },
+    { itemNo: '2', tagNo: 'MPLS-0001', mrDescription: 'Access Switch L3 & Patch Panels', offeredEquipment: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', description: 'Cisco Catalyst 9200L-24P-4X-A 24-Port PoE+ Switch & Putian FO/CAT6A Patch Panels', brand: 'Cisco / Putian', model: 'C9200L-24P-4X-A', partNo: 'C9200L-24P-4X-A', quantity: 1, unit: 'Lot', remarks: 'ABV01 station network switching & fiber termination', weight: 500 }
   ],
   'MR-B1-13-AMS01-04': [
     { itemNo: '1', tagNo: 'AMS-LAN-0001, AMS-LAN-0002', mrDescription: 'LAN Cabinet (IP54 Enclosure)', offeredEquipment: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', description: 'Rittal VX25 42U 800x800x2000mm IP54 Telecom Cabinet with PDU & Fan', brand: 'Rittal', model: 'VX25 42U 800x800x2000mm', partNo: 'VX-8805.000', quantity: 2, unit: 'SET', remarks: 'AMS01 metering station LAN cabinets (per Appendix 2 LIS-0001)', weight: 500 },
@@ -194,13 +194,13 @@ export const APPENDIX_13_TO_18_BOMS_BY_MR_0550 = {
     { itemNo: '1', tagNo: 'MET-315-003', mrDescription: 'Static Pressure Head and Barometic Pressure Sensor', offeredEquipment: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', description: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', brand: 'Vaisala', model: 'PTB330 + SPH10', partNo: 'PTB330-SPH10', quantity: 1, unit: 'SET', remarks: 'High-accuracy barometric pressure sensor with static head', weight: 1000 }
   ],
   'MR-B1-13-ACP-10': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'MET Monitor', offeredEquipment: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', description: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', brand: 'Vaisala', model: 'AviMet AWS Display 24"', partNo: 'AVIMET-HMI-24', quantity: 1, unit: 'SET', remarks: 'ACP MET monitoring workstation display', weight: 1000 }
+    { itemNo: '1', tagNo: 'MON-315-001', mrDescription: 'MET Monitor', offeredEquipment: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', description: 'Vaisala AviMet / AWS Meteorological Operator Display & 24" Industrial Monitor', brand: 'Vaisala', model: 'AviMet AWS Display 24"', partNo: 'AVIMET-HMI-24', quantity: 1, unit: 'SET', remarks: 'ACP MET monitoring workstation display (per Appendix 2 LIS-0001)', weight: 1000 }
   ],
   'MR-B1-13-ACP-11': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 1, unit: 'SET', remarks: 'ACP tower-mounted ultrasonic wind sensor', weight: 1000 }
+    { itemNo: '1', tagNo: 'MET-315-001, MET-315-002', mrDescription: 'Wind Speed and Direction Sensor', offeredEquipment: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', description: 'Vaisala WMT703 Heated Ultrasonic Wind Speed & Direction Sensor', brand: 'Vaisala', model: 'WMT703 Ultrasonic Anemometer', partNo: 'WMT703', quantity: 1, unit: 'SET', remarks: 'ACP tower-mounted ultrasonic wind sensor (per Appendix 2 LIS-0001)', weight: 1000 }
   ],
   'MR-B1-13-ACP-12': [
-    { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Themperature and Huminity Sensor', offeredEquipment: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', description: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', brand: 'Vaisala', model: 'HMP155 + DTR503A', partNo: 'HMP155-DTR503A', quantity: 1, unit: 'SET', remarks: 'ACP ambient temperature & humidity sensor', weight: 1000 }
+    { itemNo: '1', tagNo: 'MET-315-003', mrDescription: 'Themperature and Huminity Sensor', offeredEquipment: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', description: 'Vaisala HMP155 Temperature & Relative Humidity Probe with DTR503A Shield', brand: 'Vaisala', model: 'HMP155 + DTR503A', partNo: 'HMP155-DTR503A', quantity: 1, unit: 'SET', remarks: 'ACP ambient temperature & humidity sensor (per Appendix 2 LIS-0001)', weight: 1000 }
   ],
   'MR-B1-13-ACP-13': [
     { itemNo: '1', tagNo: 'Per Appendix 2 Drawing', mrDescription: 'Static Pressure Head and Barometic Pressure Sensor', offeredEquipment: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', description: 'Vaisala PTB330 Class A Digital Barometer with SPH10 Static Pressure Head', brand: 'Vaisala', model: 'PTB330 + SPH10', partNo: 'PTB330-SPH10', quantity: 1, unit: 'SET', remarks: 'ACP barometric pressure sensor with static head', weight: 1000 }

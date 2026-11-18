@@ -128,15 +128,16 @@
       "breakdownRef": "Form C-1",
       "unit": "Lot",
       "qty": 1,
-      "unitPriceUsd": null,
-      "totalPriceUsd": null,
+      "unitPriceUsd": 4649195.28,
+      "totalPriceUsd": 4649195.28,
       "isOption": false,
       "pricingStats": {
         "priced": null,
         "total": null,
         "open": null
       },
-      "customerNotes": "Breakdown in Form C-1"
+      "customerNotes": "Breakdown in Form C-1",
+      "valueStatus": "LOCKED_REV00_CEILING"
     },
     {
       "itemKey": "A1-SN4-C2",
