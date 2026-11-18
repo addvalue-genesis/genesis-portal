@@ -1,4 +1,5 @@
 import { createComponentRegistry, assignSemanticNames } from "../common/governance/componentRegistry";
+import { STANDARD_PROJECT_TABS } from "../common/ui/ProjectAuditPrimitives";
 // O&G lifecycle master navigation for PJ2608-0553.
 // Stage mappings are additive: legacy route IDs and dataset locations remain untouched.
 export const O_G_LIFECYCLE_0553 = Object.freeze([
@@ -26,6 +27,9 @@ export const L3_TABS_0553 = Object.freeze([
  ["budget","10 Budget & Commercial Analysis"],
  ["b3bf","10B B3 Brownfield Additional"]
 ]);
+for (const [id] of STANDARD_PROJECT_TABS) {
+ if (!L3_TABS_0553.some(([route]) => route === id)) throw Error("PJ2608-0553 dropped shared standard tab "+id);
+}
 // Legacy workbench IDs intentionally preserved. The schematic workbench remains
 // accessible under 05.3 until Engineering subnavigation is fully migrated.
 // No recalculation, pricing, import, or engineering assumptions are changed.

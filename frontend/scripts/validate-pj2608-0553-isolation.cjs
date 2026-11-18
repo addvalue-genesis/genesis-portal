@@ -14,8 +14,21 @@ assert(!/PJ2608-0550|project0550|19 systems|19 ASK/.test(commonUi),"0550 facts i
 assert(p0553.includes('projectId:"PJ2608-0553"'),"0553 snapshot project ID missing");
 assert(p0553.includes('issuePermission:false'),"0553 release must default closed");
 assert(page.includes('getProject0553Dataset()'),"0553 UI must consume project repository");
-assert(page.includes('ProjectTabs')&&page.includes('STANDARD_PROJECT_TABS'),"0553 UI must reuse standard tabs");
-assert(page.includes('common/cost/derivationKernel'),"0553 UI must use shared cost kernel");
+const navigation=read("project0553/lifecycleNavigation.js");
+const shell=read("common/ui/ProjectWorkspaceShell.jsx");
+const primitives=read("common/ui/ProjectAuditPrimitives.jsx");
+assert(navigation.includes("STANDARD_PROJECT_TABS")&&navigation.includes("dropped shared standard tab"),"0553 tab list must be built from the shared standard tabs");
+assert(shell.includes("<ProjectTabs")&&shell.includes("tabGroups={tabGroups}"),"0553 workspace must render shared ProjectTabs");
+assert(primitives.includes("tabGroups ? tabGroups.map")&&primitives.includes("group.tabs.includes(t.id)"),"ProjectTabs must own the shared tab navigation");
+assert(page.includes("ProjectWorkspaceShell")&&page.includes("L3_TABS_0553"),"0553 page must supply its lifecycle tabs to the shared shell");
+for (const id of ["overview","architecture","systems","engineering","execution","budget","risk","documents"]) {
+ assert(navigation.includes('["'+id+'"'),"standard tab missing from 0553 list: "+id);
+}
+const kernelBridge=read("project0553/derivationKernel.js");
+const equationOwners=["project0553/data/bcB1B2EquationExecution0553.js","project0553/data/bcB3EquationExecution0553.js","project0553/data/bcB5EquationExecution0553.js"];
+assert(kernelBridge.includes('from "../common/cost/derivationKernel"')&&!/function deriveManHours|function deriveLaborCost/.test(kernelBridge),"0553 must re-export the shared cost kernel, not fork it");
+for (const file of equationOwners) assert(read(file).includes("common/cost/derivationKernel"),"0553 equation owner must use the shared cost kernel: "+file);
+assert(page.includes("<B3EquationAudit0553/>")&&page.includes("<B5EquationAudit0553/>")&&page.includes("<B1B2EquationAudit0553/>"),"0553 engineering tab must render the shared-kernel equation audits");
 assert(!page.includes('from "../project0550/data"'),"0553 UI imports particular 0550 data");
 assert(app.includes('path="/projects/pj2608-0550"')&&app.includes('path="/projects/pj2608-0553"'),"Project routes not isolated");
 assert(p0550.includes('from "../project0550/data"'),"0550 regression guard: original facade not found");
