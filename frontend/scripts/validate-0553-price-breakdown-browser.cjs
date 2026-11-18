@@ -1,5 +1,10 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+let chromium;
+try{({chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'));}
+catch(error){
+ console.log('SKIP validate-0553-price-breakdown-browser: Playwright is not installed ('+error.message+'). This browser check is optional and is not part of npm run build:0553.');
+ process.exit(0);
+}
 (async()=>{
  const port=process.env.QA_PORT||'3094';
  const server=process.env.QA_URL?null:require('node:child_process').spawn(process.execPath,['node_modules/webpack-cli/bin/cli.js','serve','--mode','development','--host','127.0.0.1','--port',port],{cwd:path.resolve(__dirname,'..'),stdio:'ignore'});

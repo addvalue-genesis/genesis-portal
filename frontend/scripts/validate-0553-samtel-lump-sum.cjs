@@ -72,7 +72,7 @@ for(const code of ['B5','B6']){
 }
 assert.equal(logistics.statutoryThaiDutyVATTHB,null);
 assert.equal(logistics.adequacyVerified,false);
-const deltas={B1:651075.74,B6:28000,B3:189150,B8:-9000};
+const deltas={B1:651075.74,B6:28000,B3:189150,B8:-9000,B10:-104422.5}; // 93c5146a RACON exclusion; B10 working sell stays 405405
 for(const row of bc.rows){
  assert.equal(row.workingSellTHB,row.code==='B11'?null:row.code==='C1'?5704650:row.code==='B14'?787500:baseline.b[row.code]===null?null:round(baseline.b[row.code]+(deltas[row.code]||0)),row.code);
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
@@ -82,12 +82,19 @@ for(const row of bc.rows){
   assert.equal(out.sourceModuleId,row.moduleId);
  }
 }
-for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},baseline.a.find(r=>r.code===a.code));
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580+787500+441495.74-157657.5+275480.75);
-assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+round(r.workingSellTHB*.05),0)));
+const partADelta={A1:[39200,50960],A2:[-173819.43,-225965.26],A3:[98000,127400]}; // eb67cb2f, 31da5805, 634f5414
+for(const a of rel.a){
+ const prior=baseline.a.find(r=>r.code===a.code),delta=partADelta[a.code]||[0,0];
+ assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},{
+  code:a.code,previewCostTHB:round(prior.previewCostTHB+delta[0]),previewSellTHB:round(prior.previewSellTHB+delta[1])});
+}
+assert.equal(rel.summary.bProvisionalCustomerSellTHB,6237183.62); // 659af09c Part B service release
+assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,298085.15);
+assert.equal(rel.summary.bProvisionalNetReceivableTHB,5939098.47);
+assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(rel.b.reduce((n,r)=>n+(r.samTelDeductionTHB||0),0)));
 assert.equal(rel.summary.baseCustomerSellTHB,null);
 assert.equal(rel.approval.releaseAllowed,false);
-assert.equal(rel.annexTraceAudit.rowTrace.length,16);
+assert.equal(rel.annexTraceAudit.rowTrace.length,15); // 93c5146a drops the excluded RACON B10 row from the annex trace
 assert(rel.annexTraceAudit.rowTrace.every(r=>r.sourceToReleaseMatched&&r.releaseToSourceMatched));
 const dossier=get('b3ResourcePriceDossier0553').selectB3ResourcePriceDossier0553(bc.byCode.B3);
 assert.equal(dossier.groups[1].selectedWorkingSellTHB,452850);

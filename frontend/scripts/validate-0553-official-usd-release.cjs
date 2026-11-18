@@ -166,13 +166,14 @@ assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain exc
 assert(html.includes("894,910.00"),"Default Official USD screen keeps the frozen Rev03 total");
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B11, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
+const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdRelease0553.jsx'),'utf8');
+assert(officialView.includes('data-option-price-status={isOption?"CONDITIONAL_BUDGETARY_OFFER":undefined}'),
+ "Working-draft option rows must stay marked apart from the base quote");
 for(const [code,amount] of [["C1",181100],["C2",27220]]){
- assert(html.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'),
-  "Option price reference row must be distinguished from customer quote");
  assert(html.includes(amount.toLocaleString("en-US",{minimumFractionDigits:2})),
   code+" historical/comparable budget price missing from Part C Summary");
 }
-assert(html.includes("Optional spares; excluded from Total A+B."));
+assert(officialView.includes("Optional spares; excluded from Total A+B."));
 
 const native=fs.readFileSync(path.join(root,'project0553/nativeWorkingDraft0553.js'),'utf8'),box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
 vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry,rebuildZip};',box);

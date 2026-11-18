@@ -71,11 +71,11 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 27400,
+      "amountUSD": 28800,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 862675.74,
+      "sourceTHB": 905809.53,
       "sourceModuleId": "bid.budget.working.bc.b1",
       "locations": "",
       "mr": ""
@@ -86,11 +86,11 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 7600,
+      "amountUSD": 8000,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 237121.13,
+      "sourceTHB": 248977.19,
       "sourceModuleId": "bid.budget.working.bc.b2",
       "locations": "",
       "mr": ""
@@ -101,11 +101,11 @@
       "serviceText": "Included: 2 persons; 28 working days; 12 hours/day.\nAdditional labour (Senior / Field): USD 1,000 / 800/person/day.\nProposed OT after 12 hours/day: USD 125 / 100/person/hour.\nProposed standby: USD 1,000 / 800/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 73800,
+      "amountUSD": 77500,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 2322450,
+      "sourceTHB": 2438572.5,
       "sourceModuleId": "bid.budget.working.bc.b3",
       "locations": "",
       "mr": ""
@@ -137,11 +137,11 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 9900,
+      "amountUSD": 10400,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 311184,
+      "sourceTHB": 326743.2,
       "sourceModuleId": "bid.budget.working.bc.b5",
       "locations": "",
       "mr": ""
@@ -152,11 +152,11 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 10700,
+      "amountUSD": 11200,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 335584,
+      "sourceTHB": 352363.2,
       "sourceModuleId": "bid.budget.working.bc.b6",
       "locations": "",
       "mr": ""
@@ -171,7 +171,7 @@
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 30000,
+      "sourceTHB": 31500,
       "sourceModuleId": "bid.budget.working.bc.b7",
       "locations": "",
       "mr": ""
@@ -182,11 +182,11 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 4600,
+      "amountUSD": 4800,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 142550,
+      "sourceTHB": 149677.5,
       "sourceModuleId": "bid.budget.working.bc.b8",
       "locations": "",
       "mr": ""
@@ -197,11 +197,11 @@
       "serviceText": "Included: 2 persons; 7 working days + 2 travel days/person.\nAdditional labour (Senior / Field): USD 700 / 600/person/day.\nOnshore working hours and OT rates: to be agreed.\nProposed standby: USD 700 / 600/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 15300,
+      "amountUSD": 16100,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 480550,
+      "sourceTHB": 504577.5,
       "sourceModuleId": "bid.budget.working.bc.b9",
       "locations": "",
       "mr": ""
@@ -292,7 +292,7 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 25000,
+      "amountUSD": 26300,
       "offerTreatment": {
         "status": "OWNER_SELECTED_BUDGETARY_INSURANCE_ALLOWANCE",
         "priceText": null,
@@ -304,7 +304,7 @@
       },
       "priceText": null,
       "commercialRemark": "Budgetary insurance allowance for ADDVALUE services; coverage and policy terms subject to confirmation. Cargo insurance in B6; SAMTEL bonds excluded.",
-      "sourceTHB": 787500,
+      "sourceTHB": 826875,
       "sourceModuleId": "bid.budget.working.bc.b14",
       "locations": "",
       "mr": ""
@@ -363,26 +363,26 @@
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"4-0\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"5-0\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"6-0\"]",
       "qty": 1,
-      "unitUSD": 6130,
-      "amountUSD": 6130
+      "unitUSD": 6090,
+      "amountUSD": 6090
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"7-0\"]",
       "qty": 1,
-      "unitUSD": 15340,
-      "amountUSD": 15340
+      "unitUSD": 15250,
+      "amountUSD": 15250
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"8-0\"]",
@@ -393,44 +393,44 @@
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"9-0\"]",
       "qty": 1,
-      "unitUSD": 1620,
-      "amountUSD": 1620
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"10-0\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP20\",\"11-0\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1530,
+      "amountUSD": 1530
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"MR-502-001\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"MR-502-001A\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"ANT-502-001\"]",
       "qty": 1,
-      "unitUSD": 4180,
-      "amountUSD": 4180
+      "unitUSD": 4150,
+      "amountUSD": 4150
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"LAN-502-001\"]",
       "qty": 1,
-      "unitUSD": 15340,
-      "amountUSD": 15340
+      "unitUSD": 15250,
+      "amountUSD": 15250
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"DATO-507-001\"]",
@@ -441,44 +441,44 @@
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"TCAB-500-001\"]",
       "qty": 1,
-      "unitUSD": 1620,
-      "amountUSD": 1620
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"SA-502-001\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP21\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1530,
+      "amountUSD": 1530
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"MR-502-001\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"MR-502-001A\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"ANT-502-001\"]",
       "qty": 1,
-      "unitUSD": 6130,
-      "amountUSD": 6130
+      "unitUSD": 6090,
+      "amountUSD": 6090
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"LAN-502-001\"]",
       "qty": 1,
-      "unitUSD": 15340,
-      "amountUSD": 15340
+      "unitUSD": 15250,
+      "amountUSD": 15250
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"DATO-507-001\"]",
@@ -489,50 +489,50 @@
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"TCAB-500-001\"]",
       "qty": 1,
-      "unitUSD": 1620,
-      "amountUSD": 1620
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"SA-502-001\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP22\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1520,
+      "amountUSD": 1520
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"MR-502-001\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"MR-502-001A\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"ANT-502-001\"]",
       "qty": 1,
-      "unitUSD": 2060,
-      "amountUSD": 2060
+      "unitUSD": 2040,
+      "amountUSD": 2040
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"ANT-502-002\"]",
       "qty": 1,
-      "unitUSD": 2060,
-      "amountUSD": 2060
+      "unitUSD": 2040,
+      "amountUSD": 2040
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"LAN-502-001\"]",
       "qty": 1,
-      "unitUSD": 15340,
-      "amountUSD": 15340
+      "unitUSD": 15250,
+      "amountUSD": 15250
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"DATO-507-001\"]",
@@ -543,158 +543,158 @@
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"TCAB-500-001\"]",
       "qty": 1,
-      "unitUSD": 1620,
-      "amountUSD": 1620
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"SA-502-001\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP23\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1520,
+      "amountUSD": 1520
     },
     {
       "key": "[\"MR-0001\",\"ZPQ\",\"MR-LQM-202-025A\"]",
       "qty": 1,
-      "unitUSD": 16910,
-      "amountUSD": 16910
+      "unitUSD": 16810,
+      "amountUSD": 16810
     },
     {
       "key": "[\"MR-0001\",\"ZPQ\",\"MR-LQM-202-025B\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZPQ\",\"ANT-LQM-202-025\"]",
       "qty": 1,
-      "unitUSD": 790,
-      "amountUSD": 790
+      "unitUSD": 780,
+      "amountUSD": 780
     },
     {
       "key": "[\"MR-0001\",\"ZPQ\",\"SA-LQM-202-025\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZPQ\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1530,
+      "amountUSD": 1530
     },
     {
       "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-003\"]",
       "qty": 1,
-      "unitUSD": 16910,
-      "amountUSD": 16910
+      "unitUSD": 16810,
+      "amountUSD": 16810
     },
     {
       "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-003A\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP8\",\"ANT-502-002\"]",
+      "qty": 1,
+      "unitUSD": 780,
+      "amountUSD": 780
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004\"]",
+      "qty": 1,
+      "unitUSD": 9420,
+      "amountUSD": 9420
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004A\"]",
+      "qty": 1,
+      "unitUSD": 870,
+      "amountUSD": 870
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"ANT-502-003\"]",
+      "qty": 1,
+      "unitUSD": 6090,
+      "amountUSD": 6090
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"LAN-502-002\"]",
+      "qty": 1,
+      "unitUSD": 15250,
+      "amountUSD": 15250
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"SA-502-002\"]",
       "qty": 1,
       "unitUSD": 790,
       "amountUSD": 790
     },
     {
-      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004\"]",
-      "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
-    },
-    {
-      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004A\"]",
-      "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
-    },
-    {
-      "key": "[\"MR-0001\",\"ZWP8\",\"ANT-502-003\"]",
-      "qty": 1,
-      "unitUSD": 6130,
-      "amountUSD": 6130
-    },
-    {
-      "key": "[\"MR-0001\",\"ZWP8\",\"LAN-502-002\"]",
-      "qty": 1,
-      "unitUSD": 15340,
-      "amountUSD": 15340
-    },
-    {
-      "key": "[\"MR-0001\",\"ZWP8\",\"SA-502-002\"]",
-      "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
-    },
-    {
       "key": "[\"MR-0001\",\"ZWP8\",\"SA-502-003\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP8\",\"TCAB-500-003\"]",
       "qty": 1,
-      "unitUSD": 1620,
-      "amountUSD": 1620
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP8\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1520,
+      "amountUSD": 1520
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"MR-502-005A\"]",
       "qty": 1,
-      "unitUSD": 9480,
-      "amountUSD": 9480
+      "unitUSD": 9420,
+      "amountUSD": 9420
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"MR-502-005B\"]",
       "qty": 1,
-      "unitUSD": 880,
-      "amountUSD": 880
+      "unitUSD": 870,
+      "amountUSD": 870
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"ANT-502-005\"]",
       "qty": 1,
-      "unitUSD": 4180,
-      "amountUSD": 4180
+      "unitUSD": 4150,
+      "amountUSD": 4150
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"SA-507-005\"]",
       "qty": 1,
-      "unitUSD": 800,
-      "amountUSD": 800
+      "unitUSD": 790,
+      "amountUSD": 790
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"TCAB-500-003\"]",
       "qty": 1,
-      "unitUSD": 0,
-      "amountUSD": 0
+      "unitUSD": 1610,
+      "amountUSD": 1610
     },
     {
       "key": "[\"MR-0001\",\"ZWP11\",\"Bulk Material\"]",
       "qty": 1,
-      "unitUSD": 1540,
-      "amountUSD": 1540
+      "unitUSD": 1530,
+      "amountUSD": 1530
     },
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-RFI-BDA\"]",
       "qty": 1,
-      "unitUSD": 40930,
-      "amountUSD": 40930
+      "unitUSD": 43230,
+      "amountUSD": 43230
     },
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-RFI-BDA-EXD-ENCLOSURE\"]",
@@ -735,14 +735,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BULK-LNA-BOX\"]",
       "qty": 1,
-      "unitUSD": 2400,
-      "amountUSD": 2400
+      "unitUSD": null,
+      "amountUSD": null
     },
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-2\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-3\"]",
@@ -753,14 +753,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-4\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-RFI-BDA\"]",
       "qty": 1,
-      "unitUSD": 40930,
-      "amountUSD": 40930
+      "unitUSD": 43230,
+      "amountUSD": 43230
     },
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-RFI-BDA-EXD-ENCLOSURE\"]",
@@ -801,14 +801,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BULK-LNA-BOX\"]",
       "qty": 1,
-      "unitUSD": 2400,
-      "amountUSD": 2400
+      "unitUSD": null,
+      "amountUSD": null
     },
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-2\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-3\"]",
@@ -819,14 +819,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-4\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-RFI-BDA\"]",
       "qty": 1,
-      "unitUSD": 40930,
-      "amountUSD": 40930
+      "unitUSD": 43230,
+      "amountUSD": 43230
     },
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-RFI-BDA-EXD-ENCLOSURE\"]",
@@ -867,14 +867,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BULK-LNA-BOX\"]",
       "qty": 1,
-      "unitUSD": 2400,
-      "amountUSD": 2400
+      "unitUSD": null,
+      "amountUSD": null
     },
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-2\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-3\"]",
@@ -885,14 +885,14 @@
     {
       "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-4\"]",
       "qty": 1,
-      "unitUSD": 1110,
-      "amountUSD": 1110
+      "unitUSD": 1160,
+      "amountUSD": 1160
     },
     {
       "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE-1\"]",
       "qty": 1,
-      "unitUSD": 8550,
-      "amountUSD": 8550
+      "unitUSD": 7650,
+      "amountUSD": 7650
     },
     {
       "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE1-PHONE\"]",
@@ -909,8 +909,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE1-JB\"]",
       "qty": null,
-      "unitUSD": null,
-      "amountUSD": null
+      "unitUSD": 900,
+      "amountUSD": 900
     },
     {
       "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
@@ -939,8 +939,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE-1\"]",
       "qty": 1,
-      "unitUSD": 8550,
-      "amountUSD": 8550
+      "unitUSD": 7650,
+      "amountUSD": 7650
     },
     {
       "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE1-PHONE\"]",
@@ -957,8 +957,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE1-JB\"]",
       "qty": null,
-      "unitUSD": null,
-      "amountUSD": null
+      "unitUSD": 900,
+      "amountUSD": 900
     },
     {
       "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
@@ -987,8 +987,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE-1\"]",
       "qty": 1,
-      "unitUSD": 8550,
-      "amountUSD": 8550
+      "unitUSD": 7650,
+      "amountUSD": 7650
     },
     {
       "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE1-PHONE\"]",
@@ -1005,8 +1005,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE1-JB\"]",
       "qty": null,
-      "unitUSD": null,
-      "amountUSD": null
+      "unitUSD": 900,
+      "amountUSD": 900
     },
     {
       "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
@@ -1035,8 +1035,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE-1\"]",
       "qty": 1,
-      "unitUSD": 8550,
-      "amountUSD": 8550
+      "unitUSD": 7650,
+      "amountUSD": 7650
     },
     {
       "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE1-PHONE\"]",
@@ -1053,8 +1053,8 @@
     {
       "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE1-JB\"]",
       "qty": null,
-      "unitUSD": null,
-      "amountUSD": null
+      "unitUSD": 900,
+      "amountUSD": 900
     },
     {
       "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",

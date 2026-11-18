@@ -76,10 +76,11 @@ assert.equal(cisco.removedUnitTHB,51950);
 assert.equal(cisco.removedTotalTHB,259750);
 assert.equal(cisco.sourceTotalTHB,2117650,"Preserve original VST quotation");
 assert.equal(cisco.indicativeExtendedTHB,1857900,"Five-site 8-port Cisco working estimate");
-assert.equal(allLocationsTHB,5840703.15,
+const zwp11NewCabinetTHB=39200; // eb67cb2f: one ZWP11 TCAB-500-003 at the existing PROSPER rate
+assert.equal(allLocationsTHB,5840703.15+zwp11NewCabinetTHB,
  "TC-0001 revised seven-location working cost diverges from expected source change");
-assert.equal(money(allLocationsTHB+cisco.removedTotalTHB),originalRev02THB,
- "Rev02 reconciliation bridge failed: only TC-0001 removed module and module SmartNet");
+assert.equal(money(allLocationsTHB+cisco.removedTotalTHB-zwp11NewCabinetTHB),originalRev02THB,
+ "Rev02 reconciliation bridge failed: TC-0001 removed module and module SmartNet, plus the later ZWP11 cabinet");
 const projectedAll=selectWorkingBomProjection0553({mr:"MR-0001"});
 assert.equal(cent(projectedAll.currencies.USD),cent(totalUSD));
 assert.equal(cent(projectedAll.currencies.THB),cent(totalTHB));
@@ -97,10 +98,10 @@ assert.equal(zwp8.allocated,11);
 const zwp11=summarizeMR0001TagCost0553("ZWP11").rows.find(r=>r.row===51&&r.tag==="TCAB-500-003");
 assert(zwp11,"ZWP11 source enclosure TAG must exist");
 assert.equal(zwp11.sourceQty,1);
-assert.equal(zwp11.procurementQty,0);
-assert.equal(zwp11.extended,0);
+assert.equal(zwp11.procurementQty,1); // eb67cb2f overlay; the protected raw ledger remains procurement zero
+assert.equal(zwp11.extended,39200);
 assert.equal(zwp11.referenceExtended,39200);
-assert(zwp11.status.includes("MODIFICATION_NOT_ESTABLISHED"));
+assert(zwp11.status.includes("OWNER_CONFIRMED_MTO_C1_NEW_ENCLOSURE"));
 const bulk=deriveA5BulkAttribution0553();
 assert.equal(bulk.state,"PARTIAL_WORKING_PRICED_BULK__RECLASS_FROM_A1");
 assert.equal(bulk.a5PriceTHB,260232);

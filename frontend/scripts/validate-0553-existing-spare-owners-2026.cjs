@@ -163,9 +163,9 @@ const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook05
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
 for(const amount of ["405,405.00","46,683.00"])assert(html.includes(amount));
 assert(html.includes("CONDITIONAL BUDGETARY")&&html.includes("Not quoted; excluded from this offer."));
-for(const amount of ["5,704,650.00","436,595.65"])assert(html.includes(amount));
+for(const amount of ["5,704,650.00","852,086.50"])assert(html.includes(amount)); // C2 budgetary offer after the CSS 305 m drum, not the prior THB 436,595.65
 assert.equal((html.match(/data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"/g)||[]).length,2);
-assert(html.includes("28,159,255.10")&&html.includes("WORKING DRAFT"));
+assert(html.includes("28,387,130.59")&&html.includes("WORKING DRAFT")); // priced A+B after the approved Part B service release
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
 for(const amount of ["405,405.00","46,683.00"])assert(scopeHtml.includes(amount));

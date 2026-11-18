@@ -7,6 +7,7 @@ const from=p=>require(path.join(root,'project0553',p));
 const before=require('./fixtures/0553-before-b1-selection-20261030.json');
 const hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 // R72 owner disposition changes only the three A4 source-row status labels.
+// Fingerprints follow eb67cb2f, 31da5805, 634f5414 and 659af09c. A4 status is still normalized before the hash.
 // Normalize that exact metadata exception; every financial value, row identity,
 // other status and annex must still match the original protected fingerprint.
 const fingerprintRow=row=>{

@@ -2,7 +2,12 @@
 // CHROMIUM_EXECUTABLE may select a provisioned Chromium. No financial writes.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+let chromium;
+try{({chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'));}
+catch(error){
+ console.log('SKIP validate-0553-spare-browser: Playwright is not installed ('+error.message+'). This browser check is optional and is not part of npm run build:0553.');
+ process.exit(0);
+}
 const cwd=path.resolve(__dirname,'..'),out=process.env.QA_OUTPUT_DIR||path.join(require('node:os').tmpdir(),'genesis-spare-qa');
 const port=process.env.QA_PORT||'3090';
 const exportsOnly=process.argv.includes('--exports-only');

@@ -5,7 +5,7 @@ const src=path.join(__dirname,"../src/project0553");
 const file=p=>fs.readFileSync(path.join(src,p),"utf8");
 const model=file("data/bomReadModel0553.js");
 assert(model.includes('SITE_SYSTEM_COST_RECONCILIATION_0553'));
-assert(model.includes("rows:source.rows"));
+assert(model.includes("source.rows.map")&&model.includes("rows:unifiedRows"));
 assert(model.includes("bomCurrencySubtotals0553"));
 for(const p of ["SourceCoverage0553.jsx","SiteSystemCostReconciliation0553.jsx","CustomerProposalPreview0553.jsx"]){
  const s=file(p);

@@ -1,3 +1,4 @@
+// Fingerprints follow eb67cb2f, 31da5805, 634f5414 and 659af09c. B10 and C2 stay outside this guard.
 const tensAudit=require('./fixtures/0553-pre-tens-audit.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const babel=require('@babel/core'),root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];

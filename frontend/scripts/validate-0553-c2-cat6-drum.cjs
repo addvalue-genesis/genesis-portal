@@ -1,4 +1,5 @@
 // Owner-authorized single-row replacement. Independent R81 preservation baseline.
+// Fingerprints follow eb67cb2f, 31da5805, 634f5414 and 659af09c. See validate-0553-c2-rf-drum.cjs.
 const assert=require('node:assert/strict'),path=require('node:path'),crypto=require('node:crypto'),babel=require('@babel/core');
 const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
 for(const e of ['.js','.jsx'])require.extensions[e]=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'}}],'@babel/preset-react']}).code,f):old(m,f);

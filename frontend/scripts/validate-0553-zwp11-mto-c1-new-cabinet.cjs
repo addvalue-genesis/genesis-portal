@@ -50,8 +50,9 @@ async function main(){
  assert.equal(cab.countedInWorkingTotal,true);assert.equal(cab.releaseAllowed,false);
  assert.equal(cab.originProcurementQty,0);assert.equal(cab.originRawTHB,0);
  assert.equal(cab.ownerDecision.date,'2026-11-03');
- assert.equal(official.a.find(x=>x.code==='A1').amountUSD,241100);
- assert.equal(official.a.find(x=>x.code==='A2').amountUSD,137000);
+ // 013c79a05f / 397556f901 hold Part A at the owner Rev03 workbook, after this cabinet was costed inside Working.
+ assert.equal(official.a.find(x=>x.code==='A1').amountUSD,241290);
+ assert.equal(official.a.find(x=>x.code==='A2').amountUSD,137130);
  assert.equal(official.totalUSD,903710);
  assert.equal(official.commercialPriceHold.additionalPartAChargeUSD,0);
  assert.deepEqual(official.b,baseline.b);assert.deepEqual(official.c,baseline.c);

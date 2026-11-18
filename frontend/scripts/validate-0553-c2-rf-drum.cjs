@@ -1,4 +1,6 @@
 // Independent R84 baseline: only the owner-selected RF spare row may change.
+// Row fingerprints refreshed after eb67cb2f (ZWP11 cabinet at the existing rate),
+// 31da5805 (superseded LNA removed), 634f5414 (telephone JB restored) and 659af09c (Part B service ×1.05).
 const assert=require('node:assert/strict'),path=require('node:path'),crypto=require('node:crypto'),babel=require('@babel/core');
 const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
 for(const e of ['.js','.jsx'])require.extensions[e]=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'}}],'@babel/preset-react']}).code,f):old(m,f);
