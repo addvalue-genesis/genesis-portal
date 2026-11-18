@@ -121,9 +121,8 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
   </tr>;
  };
  const renderPartABreakdown=()=>{
-  if(!activeBreakdown)return null;
+  if(!isSI||!activeBreakdown)return null;
   if(!activeBreakdown.reconciled){
-   if(!isSI)return null;
    return <div className="p553-native-warning" role="alert" data-official-breakdown-mismatch="true">
     <strong>MISMATCH — Part A BOM breakdown does not reconcile to {releaseVersion==="CURRENT_REV03"?"Rev03":"Working"} A1–A4 totals (tolerance 0.01 USD).</strong>
     <ul>{activeBreakdown.groups.filter(g=>!g.matched).map(g=><li key={g.code}>{g.code} ({g.mr}): Parent USD {money(g.parentUSD)} vs Sum USD {money(g.totalUSD)} (diff {money(g.varianceUSD)})</li>)}</ul>

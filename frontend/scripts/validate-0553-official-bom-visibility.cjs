@@ -83,8 +83,8 @@ for (const term of forbiddenInCus) {
   assert.equal(cusHtml.includes(term), false, `CUS output must not contain "${term}"`);
 }
 assert.equal(cusHtml.includes('data-viewer-tier="CUS"'), true);
-assert.equal(cusHtml.includes("data-official-bom-detail"), false, "CUS breakdown must default collapsed");
-assert.equal(cusHtml.includes('aria-expanded="false"'), true);
+assert.equal(cusHtml.includes("bid.budget.pricing.official.part-a-breakdown"), false, "CUS must not render Part A 141-row breakdown (0550 doctrine)");
+assert.equal(cusHtml.includes("data-official-bom-group"), false, "CUS must not render BOM groups");
 
 const vndHtml = renderToStaticMarkup(
   React.createElement(OfficialUsdRelease0553, { source, recipient: "SAMTEL" })
@@ -105,7 +105,8 @@ for (const term of forbiddenInVnd) {
   assert.equal(vndHtml.includes(term), false, `VND output must not contain "${term}"`);
 }
 assert.equal(vndHtml.includes('data-viewer-tier="VND"'), true);
-assert.equal(vndHtml.includes("data-official-bom-detail"), false, "VND breakdown must default collapsed");
+assert.equal(vndHtml.includes("bid.budget.pricing.official.part-a-breakdown"), false, "VND must not render Part A 141-row breakdown (0550 doctrine)");
+assert.equal(vndHtml.includes("data-official-bom-group"), false, "VND must not render BOM groups");
 
 // 4. Negative control (S4): SI mode MUST contain internal strings so leak grep is proven active
 const siHtml = renderToStaticMarkup(
