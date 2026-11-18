@@ -282,8 +282,11 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  );
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
-  <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
+  <div className="p55-filterbar p55-filterbar--simple">
+   {pricingNavigation}
+   <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
+  </div>
+  <OfficialUsdRelease0553 source={releaseModel} recipient={recipient} onOpenSource={openReleaseSource}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -323,7 +326,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. Official Release defaults to the owner-selected Rev03 quotation. Submitted Rev02 is available only as history; Working changes do not overwrite either source workbook. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     {pricingNavigation}
-    <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
   </div>
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·

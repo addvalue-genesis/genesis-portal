@@ -89,7 +89,7 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*?(?:/>|>
   for(let row=10;row<=16;row++)assert(!xml.includes('ref="C'+row+':D'+row+'"')&&!xml.includes('ref="F'+row+':I'+row+'"'));
   assert(xml.includes('ref="B19:H19"'),'Original total merge preserved');
   assert(!(out.warnings||[]).some(x=>x.includes('sheet4.xml')&&x.includes('maximum row height')));
-  if(currency==='USD')fs.writeFileSync('/tmp/PJ2608-0553-B13-TAG-QA.xlsx',Buffer.from(await out.blob.arrayBuffer()));
+  if(currency==='USD')fs.writeFileSync(path.join(require('node:os').tmpdir(),'PJ2608-0553-B13-TAG-QA.xlsx'),Buffer.from(await out.blob.arrayBuffer()));
  }
  // Simulate a previously exported reference table and its added merges.
  const oldParts=native.entriesFromZip(new Uint8Array(await usd.blob.arrayBuffer()));
