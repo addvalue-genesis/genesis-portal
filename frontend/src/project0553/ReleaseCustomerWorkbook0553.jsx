@@ -268,8 +268,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    <div className="p553-release-controls">
     <label>Preview mode
      <select value={recipient==="INTERNAL"?viewer:"CUSTOMER"} onChange={e=>{setViewer(e.target.value);setSource(null);}} disabled={recipient!=="INTERNAL"}>
-      <option value="CUSTOMER">Customer Excel Preview</option>
-      <option value="INTERNAL">Internal · Expand TAG / Source</option>
+      <option value="CUSTOMER">Customer Preview (0550 clean)</option>
+      <option value="INTERNAL">AVS Internal · Expand TAG / Source</option>
      </select>
     </label>
     {recipient==="INTERNAL"&&<button type="button" className="p553-detail-button"
