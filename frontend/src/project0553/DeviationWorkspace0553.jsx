@@ -18,23 +18,23 @@ function buildDeviationCsv(records) {
     const s = v == null ? "" : String(v);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
   };
-  const head = ["ID", "Category", "MR", "Code", "Title", "MR Requirement", "Offered Basis", "Justification", "Status"];
-  const body = records.map((r) => [r.id, r.category, r.mr, r.code, r.title, r.mrRequirement, r.offeredBasis, r.justification, r.status]);
+  const head = ["ID", "Kind", "Category", "MR", "Code", "Title", "MR Requirement", "Offered Basis", "Justification", "Status"];
+  const body = records.map((r) => [r.id, r.kind, r.category, r.mr, r.code, r.title, r.mrRequirement, r.offeredBasis, r.justification, r.status]);
   return [head, ...body].map((row) => row.map(esc).join(",")).join("\n") + "\n";
 }
 
-function buildDeviationWordHtml(records) {
+function buildDeviationWordHtml(records, title) {
   const rows = records
     .map(
       (r) =>
-        `<tr><td>${r.id}</td><td>${r.category}</td><td>${r.mr} / ${r.code}</td><td>${r.title}</td><td>${r.mrRequirement}</td><td>${r.offeredBasis}</td><td>${r.justification}</td><td>${r.status}</td></tr>`
+        `<tr><td>${r.id}</td><td>${r.kind}</td><td>${r.mr} / ${r.code}</td><td>${r.title}</td><td>${r.mrRequirement}</td><td>${r.offeredBasis}</td><td>${r.justification}</td><td>${r.status}</td></tr>`
     )
     .join("");
   return (
-    "<html><head><meta charset=\"utf-8\"><title>PJ2608-0553 Technical & Commercial Deviations</title></head><body>" +
-    "<h1>PJ2608-0553 · Technical &amp; Commercial Deviation Register</h1>" +
+    `<html><head><meta charset="utf-8"><title>${title}</title></head><body>` +
+    `<h1>${title}</h1>` +
     "<table border=\"1\" cellspacing=\"0\" cellpadding=\"6\"><thead><tr>" +
-    "<th>ID</th><th>Category</th><th>MR / Code</th><th>Title</th><th>MR Requirement</th><th>Offered Basis</th><th>Justification</th><th>Status</th>" +
+    "<th>ID</th><th>Type</th><th>MR / Code</th><th>Title</th><th>MR Requirement</th><th>Offered Basis</th><th>Justification</th><th>Status</th>" +
     "</tr></thead><tbody>" +
     rows +
     "</tbody></table></body></html>"
@@ -42,25 +42,21 @@ function buildDeviationWordHtml(records) {
 }
 
 export function DeviationWorkspace0553({ onNavigate = null }) {
-  const [subTab, setSubTab] = useState("technical");
+  const [subTab, setSubTab] = useState("deviations");
   const [viewer, setViewer] = useState("AVS");
   const register = useMemo(() => selectDeviationRegister0553(), []);
   const isAVS = viewer === "AVS";
 
-  const visibleRecords =
-    subTab === "technical"
-      ? register.records.filter((r) => r.category === "TECHNICAL")
-      : subTab === "commercial"
-      ? register.records.filter((r) => r.category === "COMMERCIAL")
-      : register.records;
+  const deviationRows = register.records.filter((r) => r.kind === "DEVIATION");
+  const visibleRecords = deviationRows;
 
   const renderTable = (rows) => (
     <div className="p55-table-wrap">
       <table className="p55-table p55-table--budget">
         <thead>
           <tr>
-            <th>ID / Code</th>
-            <th>Deviation Title</th>
+            <th>ID / Type</th>
+            <th>Title</th>
             <th>MR / RFQ Requirement</th>
             <th>Offered Basis (Rev03)</th>
             <th>Justification / Disposition</th>
@@ -70,10 +66,10 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} data-deviation-id={r.id}>
+            <tr key={r.id} data-deviation-id={r.id} data-register-kind={r.kind}>
               <td>
                 <strong>{r.id}</strong>
-                <small>{r.mr} · {r.code}</small>
+                <small>{r.kind} · {r.mr} · {r.code}</small>
               </td>
               <td>
                 <strong>{r.title}</strong>
@@ -113,21 +109,23 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
   return (
     <div className="p55-stack" data-component-key="bid.deviations">
       <section className="p55-panel" style={{ padding: "12px 16px" }}>
-        <div className="p55-eyebrow">14 DEVIATIONS &amp; CLARIFICATIONS · 0550 PATTERN / 0553 SOURCES</div>
+        <div className="p55-eyebrow">14 FORMAL DEVIATIONS · 0550 PATTERN / 0553 SOURCES</div>
         <h3>
-          Technical &amp; Commercial Deviation Register{" "}
+          Formal Deviation Register{" "}
           <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.deviations" />
         </h3>
         <p className="p55-note">
-          รวบรวม Technical &amp; Commercial Deviations จาก 04 MR, 07 Vendor (VND), 08 Risk, 10 Budget (10.1–10.3.4 / B3) และ 10B Brownfield (B3-BF)
-          โดยไม่แก้ไขยอดราคา Rev03 และไม่ import ข้อมูลจาก 0550
+          แสดงเฉพาะ <strong>Formal Deviation (1 รายการ: MR-0002 Trunk Radio LNA → BDA)</strong> ส่วนรายการชี้แจง{" "}
+          <strong>TC / CCL (5 รายการ)</strong> แยกไปอยู่ที่แท็บ{" "}
+          <button type="button" className="p553-detail-button" onClick={() => onNavigate?.({ id: "bid.clarify", tab: "clarify", name: "15 Clarify (TC / CCL)" })}>
+            ↗ 15 Clarify (TC / CCL)
+          </button>
         </p>
         <div className="p55-filterbar p55-filterbar--simple">
           <div role="tablist" aria-label="Deviation work areas" style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {[
-              ["technical", `14.1 Technical / AVL (${register.counts.technical})`],
-              ["commercial", `14.2 Commercial / JUTAL (${register.counts.commercial})`],
-              ["release", `14.3 Deviation Release / Export (${register.counts.total})`],
+              ["deviations", `14.1 Formal Deviations (${register.counts.deviations})`],
+              ["release", `14.2 Deviation Release / Export (${register.counts.deviations})`],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -153,28 +151,32 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
       </section>
 
       {subTab === "release" && (
-        <AuditSection title="14.3 — Customer Deviation List Export (Read-only)">
+        <AuditSection title="14.3 — Customer Deviation & TC Export (Read-only)">
           <p className="p55-note">
-            Export เอกสาร Technical &amp; Commercial Deviations List จากทะเบียนกลางนี้โดยตรง (ไม่แสดงข้อมูลภายใน 07 VND / 10B ในไฟล์ลูกค้า)
+            แยกไฟล์ Export ระหว่าง <strong>Formal Deviation List (1 รายการ)</strong> กับ <strong>TC · Clarifications (5 รายการ)</strong> (ซ่อนข้อมูลภายใน 07 VND / 10B)
           </p>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
             <button
               type="button"
               className="p553-detail-button"
               onClick={() =>
-                downloadText(buildDeviationWordHtml(register.records), "application/msword", "PJ2608-0553_Deviations_List.doc")
+                downloadText(
+                  buildDeviationWordHtml(deviationRows, "PJ2608-0553 · Formal Deviation List"),
+                  "application/msword",
+                  "PJ2608-0553_Formal_Deviation_List.doc"
+                )
               }
             >
-              Word — Deviation List (.doc)
+              Word — Formal Deviation List ({deviationRows.length}) (.doc)
             </button>
             <button
               type="button"
               className="p553-detail-button"
               onClick={() =>
-                downloadText(buildDeviationCsv(register.records), "text/csv;charset=utf-8", "PJ2608-0553_Deviations_List.csv")
+                downloadText(buildDeviationCsv(deviationRows), "text/csv;charset=utf-8", "PJ2608-0553_Formal_Deviation_List.csv")
               }
             >
-              CSV — Deviation List (.csv)
+              CSV — Formal Deviation List ({deviationRows.length}) (.csv)
             </button>
           </div>
           {renderTable(visibleRecords)}
@@ -182,7 +184,13 @@ export function DeviationWorkspace0553({ onNavigate = null }) {
       )}
 
       {subTab !== "release" && (
-        <AuditSection title={subTab === "technical" ? "14.1 — Technical & AVL Deviations" : "14.2 — Commercial & JUTAL Deviations"}>
+        <AuditSection
+          title={
+            subTab === "deviations"
+              ? "14.1 — Formal Technical Deviations (1 item: MR-0002 LNA → BDA)"
+              : "14.2 — Technical & Commercial Clarifications (TC)"
+          }
+        >
           {renderTable(visibleRecords)}
         </AuditSection>
       )}
