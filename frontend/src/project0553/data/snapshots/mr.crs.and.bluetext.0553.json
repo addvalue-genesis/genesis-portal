@@ -100,6 +100,13 @@
       "page": "DTS4 p.5–6",
       "topic": "DTS-0004: RACON GRP Zone 1, Ex de IIC T4 / Ex d IIB+H2 T5, M25 × 2",
       "note": "GRP Zone 1 IIA T3 IP66 Ex de IIC T4 Gb; II 2G Ex d IIB+H2 T5 Gb; M25 2 Nos. bottom with certified cable glands and certified plugs for spare entries."
+    },
+    {
+      "id": "CLOUD-LAY-01",
+      "mr": "MR-0002 (LAY C1 Cloud)",
+      "page": "LAY p.3–10",
+      "topic": "LAY Rev.C1 Cloud: ANT-508-001/002 & TCAB-508-001/002 on E&I Room Rooftop (Mezzanine Deck)",
+      "note": "Rev.C1 revision cloud on Mezzanine Deck (representing E&I Room Rooftop): 1) ANT-508-001 Outdoor Yagi, 2) ANT-508-002 Outdoor Omni, 3) TCAB-508-002 Enclosure for RF Surge (Exd), 4) TCAB-508-001 Enclosure for RF LNA. CRS (WichaiS): Antennas/Enclosures shown on E&I Rooftop/Mezzanine, not lower deck; layout omission never overrides MR quantities (e.g. MR-0003 on ZWP23)."
     }
   ],
   "commonReviewComments": [
