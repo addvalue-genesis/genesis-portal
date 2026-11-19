@@ -5,6 +5,10 @@ import { selectDeviationRegister0553 } from "./data/deviationRegister0553";
 import TC_HISTORY_0553 from "./data/snapshots/tc.communication.history.0553.json";
 import PARTICULAR_REQS_0553 from "./data/documentParticularRequirements0553.json";
 import MR_CRS_BLUE_0553 from "./data/snapshots/mr.crs.and.bluetext.0553.json";
+import {
+  PARTICULAR_DIRECTIVE_EQUATION_0553,
+  evaluateParticularDirective0553,
+} from "./data/particularDirectiveRule0553";
 
 function inferMrGroup0553(rec) {
   const tags = (rec.tags || []).join(" ").toUpperCase();
@@ -61,6 +65,7 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
   const [historyImpact, setHistoryImpact] = useState("ALL");
   const [partDoc, setPartDoc] = useState("ALL");
   const [partMr, setPartMr] = useState("ALL");
+  const [partDir, setPartDir] = useState("ALL");
   const register = useMemo(() => selectDeviationRegister0553(), []);
   const isAVS = viewer === "AVS";
 
@@ -71,13 +76,22 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
   const particularRows = useMemo(
     () =>
       (PARTICULAR_REQS_0553.records || [])
-        .map((r) => ({ ...r, mrGroup: inferMrGroup0553(r) }))
+        .map((r) => {
+          const evalRes = evaluateParticularDirective0553({
+            text: r.requirement,
+            topic: r.topic,
+            signals: { red: r.decisionStatus === "REQUIRES_ENGINEERING_EVALUATION" },
+            decisionStatus: r.decisionStatus,
+          });
+          return { ...r, mrGroup: inferMrGroup0553(r), directive: evalRes.directive, phi: evalRes.phi };
+        })
         .filter((r) => {
           if (partDoc !== "ALL" && r.document !== partDoc) return false;
           if (partMr !== "ALL" && r.mrGroup !== partMr) return false;
+          if (partDir !== "ALL" && r.directive !== partDir) return false;
           return true;
         }),
-    [partDoc, partMr]
+    [partDoc, partMr, partDir]
   );
   const historyRows = useMemo(
     () =>
@@ -206,27 +220,39 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
             <p className="p55-note">
               ข้อกำหนดเฉพาะโครงการ (<strong>Particular</strong>) แยกตามระบบ MR และหมวดเอกสาร — ข้อความ{" "}
               <strong style={{ color: "#b91c1c" }}>ตัวอักษรสีแดง</strong> คือจุดที่ต้องระวัง และ{" "}
-              <strong style={{ color: "#1d4ed8" }}>ตัวอักษรสีน้ำเงิน</strong> คือข้อความปรับแก้ Rev.C1 ใน MR PDF{" "}
+              <strong style={{ color: "#1d4ed8" }}>ตัวอักษรสีน้ำเงิน</strong> คือข้อความปรับแก้ใน MR / BOD / SPE / DTS{" "}
+              {isAVS && <code>{PARTICULAR_DIRECTIVE_EQUATION_0553.id}</code>}{" "}
               <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.clarify.particulars" />
             </p>
             <details className="p553-budget-phase" open style={{ marginBottom: 12 }}>
               <summary>
-                <strong>Rev.C1 Blue-Text Particular Notes ({MR_CRS_BLUE_0553.blueTextParticulars.length}) &amp; Common MR Client Comments — WichaiS ({MR_CRS_BLUE_0553.commonReviewComments.length})</strong>
+                <strong>Blue-Text Revisions (MR / BOD / SPE / DTS: {MR_CRS_BLUE_0553.blueTextParticulars.length}) &amp; Common MR Client Comments — WichaiS ({MR_CRS_BLUE_0553.commonReviewComments.length})</strong>
               </summary>
               <div className="p55-table-wrap" style={{ marginBottom: 10 }}>
                 <table className="p55-table p55-table--compact">
                   <thead>
-                    <tr><th>ID</th><th>MR / Page</th><th>Blue-Text Revision (Rev.C1)</th><th>ความหมาย / ผลกระทบ (Interpretation)</th></tr>
+                    <tr><th>ID</th><th>MR / Page</th><th>Blue-Text Revision</th><th>Directive ({PARTICULAR_DIRECTIVE_EQUATION_0553.id})</th><th>ความหมาย / ผลกระทบ</th></tr>
                   </thead>
                   <tbody>
-                    {MR_CRS_BLUE_0553.blueTextParticulars.map((b) => (
-                      <tr key={b.id}>
-                        <td><strong>{b.id}</strong></td>
-                        <td><strong>{b.mr}</strong><small>{b.page}</small></td>
-                        <td style={{ color: "#1d4ed8", fontWeight: 600 }}>{b.note}</td>
-                        <td>{b.topic}</td>
-                      </tr>
-                    ))}
+                    {MR_CRS_BLUE_0553.blueTextParticulars.map((b) => {
+                      const ev = evaluateParticularDirective0553({ text: b.note, topic: b.topic, signals: { blue: true } });
+                      return (
+                        <tr key={b.id}>
+                          <td><strong>{b.id}</strong></td>
+                          <td><strong>{b.mr}</strong><small>{b.page}</small></td>
+                          <td style={{ color: "#1d4ed8", fontWeight: 600 }}>{b.note}</td>
+                          <td>
+                            <span className="p55-badge">{ev.directive}</span>
+                            {isAVS && (
+                              <small>
+                                {ev.phi.cus ? "CUS " : ""}{ev.phi.vnd ? "07 VND " : ""}{ev.phi.si ? "SI" : ""}
+                              </small>
+                            )}
+                          </td>
+                          <td>{b.topic}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -271,6 +297,17 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
                   <option value="SPE">SPE</option>
                   <option value="RPT">RPT</option>
                   <option value="BLD">BLD</option>
+                </select>
+              </label>
+              <label>
+                Directive{" "}
+                <select value={partDir} onChange={(e) => setPartDir(e.target.value)}>
+                  <option value="ALL">All Directives</option>
+                  <option value="MUST_DO">MUST_DO (ต้องทำ)</option>
+                  <option value="DO_NOT">DO_NOT (ห้าม/ตัดออก)</option>
+                  <option value="OPTIONAL_SCOPE">OPTIONAL_SCOPE (แยก Option)</option>
+                  <option value="DEVIATION_SI">DEVIATION_SI (เบี่ยงเบน)</option>
+                  <option value="CLARIFY_CUS">CLARIFY_CUS (ชี้แจง)</option>
                 </select>
               </label>
             </div>
@@ -319,7 +356,10 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
                             {r.costDriver && <small>Driver: {r.costDriver}</small>}
                           </td>
                         )}
-                        <td><span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block" }}>{r.type}</span></td>
+                        <td>
+                          <span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block" }}>{r.directive}</span>
+                          {isAVS && <small>{r.phi.cus ? "CUS " : ""}{r.phi.vnd ? "07 VND " : ""}{r.phi.si ? "SI" : ""}</small>}
+                        </td>
                       </tr>
                     );
                   })}
