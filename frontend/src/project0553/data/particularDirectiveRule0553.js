@@ -86,3 +86,31 @@ export function evaluateParticularDirective0553({
     phi: { cus, vnd, si },
   };
 }
+
+/**
+ * Drawing Line-Style & Boundary Equation for BLD / DWG / LAY (EQ-0553-DRAWING-01):
+ *   DASHED (- - -)      => EXISTING_NO_SUPPLY (Existing installation; reuse/interface only)
+ *   DASH_DOT (-.-.-)    => BY_OTHERS_EXCLUDED (Provided by Other, e.g. PCS / Wireless Gateway)
+ *   SOLID (----)        => IN_SCOPE_SUPPLY    (New Telecom Package supply)
+ *   CLOUD_C1            => REV_C1_DELTA       (Revision C1 change; verify against MR/TC)
+ */
+export const DRAWING_LINE_LEGEND_0553 = Object.freeze({
+  DASHED: { code: "EXISTING_NO_SUPPLY", scope: "OUT_OF_SUPPLY_EXISTING", label: "Dashed (- - -): Existing equipment installation" },
+  DASH_DOT: { code: "BY_OTHERS_EXCLUDED", scope: "OUT_OF_SUPPLY_OTHER", label: "Dash-Dot (- · -): Equipment provided by other (PCS/Instrument)" },
+  SOLID: { code: "IN_SCOPE_SUPPLY", scope: "IN_TELECOM_SCOPE", label: "Solid (———): New Telecom package supply" },
+  CLOUD_C1: { code: "REV_C1_DELTA", scope: "REQUIRES_MR_TC_CHECK", label: "Revision Cloud C1: Rev.C1 delta / modification" },
+});
+
+export function evaluateDrawingBoundary0553({ lineStyle = "SOLID", hasCloudC1 = false } = {}) {
+  const base = DRAWING_LINE_LEGEND_0553[lineStyle] || DRAWING_LINE_LEGEND_0553.SOLID;
+  return {
+    ...base,
+    hasCloudC1: !!hasCloudC1,
+    directive:
+      lineStyle === "DASHED" || lineStyle === "DASH_DOT"
+        ? "DO_NOT"
+        : hasCloudC1
+          ? "MUST_DO"
+          : "MUST_DO",
+  };
+}

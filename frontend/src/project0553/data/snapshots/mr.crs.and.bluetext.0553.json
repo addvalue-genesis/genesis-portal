@@ -107,6 +107,13 @@
       "page": "LAY p.3–10",
       "topic": "LAY Rev.C1 Cloud: ANT-508-001/002 & TCAB-508-001/002 on E&I Room Rooftop (Mezzanine Deck)",
       "note": "Rev.C1 revision cloud on Mezzanine Deck (representing E&I Room Rooftop): 1) ANT-508-001 Outdoor Yagi, 2) ANT-508-002 Outdoor Omni, 3) TCAB-508-002 Enclosure for RF Surge (Exd), 4) TCAB-508-001 Enclosure for RF LNA. CRS (WichaiS): Antennas/Enclosures shown on E&I Rooftop/Mezzanine, not lower deck; layout omission never overrides MR quantities (e.g. MR-0003 on ZWP23)."
+    },
+    {
+      "id": "CLOUD-BLD-01",
+      "mr": "ALL (BLD-0001 C1 Legend & Cloud)",
+      "page": "BLD p.1–6",
+      "topic": "BLD / DWG / LAY Line-Style & Cloud Boundary Rules (Solid vs Dashed vs Dash-Dot)",
+      "note": "Drawing Legend Rule: Solid line = New Telecom Scope (supply); Dashed (- - -) = Existing equipment installation (no supply); Dash-Dot (- · - ·) = Equipment provided by other (PCS, TCP/IP Card, Wireless Gateway — excluded from supply). Cloud C1: DMR + LNA Ex d, PTMP 6ft @ 21.5m EL, E&I Room Rooftop / Mezzanine Deck."
     }
   ],
   "commonReviewComments": [
