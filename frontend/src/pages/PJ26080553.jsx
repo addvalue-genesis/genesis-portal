@@ -102,6 +102,7 @@ export function PJ26080553() {
   {id:"bid.b3bf",name:"10B B3 Brownfield Additional",tab:"b3bf",keywords:"brownfield additional proposal ZPQ ZWP8 ZWP11"},
   {id:"bid.deviations",name:"14 Deviations",tab:"deviations",keywords:"deviation bda lna"},
   {id:"bid.clarify",name:"15 Clarify (TC / CCL)",tab:"clarify",keywords:"clarify tc ccl bartec cif fat painting training jutal"},
+  {id:"bid.clarify.history",name:"15.4 Clarify — TC / CCL History & Source Chain (CUS / 07 VND / SI)",tab:"clarify",keywords:"tc-0001 tc-0002 tc-0003 samtel jutal gcme 20261014 20261019 history"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
   {id:"bid.budget.working.bc.cost-lines",name:"10.2 — Part B/C WBS Cost Lines / Evidence-Backed Resource Ledger",tab:"budget",keywords:"B1 B2 B3 B6 B9 B10 B11 964 man-hour 39 offshore days 78 man-days special tools cost rate source annex first principles"},
   {id:"bid.budget.working.bc.execution-audit",name:"10.2 B/C — Execution, Permits, MOB/DEMOB & Tools Audit",tab:"budget",keywords:"annex 4 annex 6 pack shipment special tools logistics license transport 01 08 10.2"},

@@ -37,9 +37,10 @@ for (const [id] of STANDARD_PROJECT_TABS) {
 // No recalculation, pricing, import, or engineering assumptions are changed.
 export const L3_TAB_GROUPS_0553 = [
  {id:"govern",title:"GOVERN · หลักการและโครงสร้าง",tabs:["overview","engineering","architecture"]},
- {id:"analyse",title:"ENGINEER & ANALYSE · วิศวกรรมและการวิเคราะห์",tabs:["systems","schematic","execution","risk"]},
- {id:"commercial",title:"SOURCE & COMMERCIAL · ผู้ขายและงบประมาณ",tabs:["documents","budget"]},
- {id:"additional",title:"ADDITIONAL PROPOSAL · ข้อเสนอเพิ่มเติม",tabs:["b3bf","deviations","clarify"]},
+ {id:"analyse",title:"ENGINEER & ANALYSE (SI) · วิศวกรรม, ความเสี่ยง & Deviations",tabs:["systems","schematic","execution","risk","deviations"]},
+ {id:"commercial",title:"SOURCE & COMMERCIAL (7 VND / SI) · ผู้ขายและงบประมาณ",tabs:["documents","budget"]},
+ {id:"customer",title:"CUSTOMER (CUS · MR+++) · คำชี้แจงลูกค้า (TC / CCL)",tabs:["clarify"]},
+ {id:"additional",title:"ADDITIONAL PROPOSAL (BF) · งานเพิ่ม Brownfield",tabs:["b3bf"]},
  {id:"control",title:"CONTROL · ข้อมูลและการติดตาม",tabs:["registry"]}
 ];
 
