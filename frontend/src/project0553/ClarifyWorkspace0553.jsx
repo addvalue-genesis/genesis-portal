@@ -358,6 +358,7 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
                         )}
                         <td>
                           <span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block" }}>{r.directive}</span>
+                          <small style={{ color: "#0f766e", fontWeight: 600 }}>Provided in {r.document} §{r.section || "-"}</small>
                           {isAVS && <small>{r.phi.cus ? "CUS " : ""}{r.phi.vnd ? "07 VND " : ""}{r.phi.si ? "SI" : ""}</small>}
                         </td>
                       </tr>

@@ -174,12 +174,22 @@ export function resolveDocumentPrecedence0553(
     return { ...c, docType, score: baseAuth * (1 + 0.5 * w) };
   });
   scored.sort((a, b) => b.score - a.score);
+  const winner = scored[0] || null;
+  const conflict = scored.length > 1 && scored[0]?.value !== scored[1]?.value;
+  const providedByCustomer = !!(winner && winner.value != null && String(winner.value).trim() !== "");
+  const resolutionNote = !providedByCustomer
+    ? "Not specified in customer documents — open TC or vendor confirmation."
+    : conflict
+      ? `Provided in ${winner.docType} (conflict detected — stricter rule applies; confirm via TC if needed).`
+      : `Provided in ${winner.docType} — use directly and append as customer basis.`;
   return {
     attribute: attr,
     phase,
-    winner: scored[0] || null,
-    conflict: scored.length > 1 && scored[0]?.value !== scored[1]?.value,
-    stricterRuleApplies: scored.length > 1 && scored[0]?.value !== scored[1]?.value,
+    winner,
+    providedByCustomer,
+    conflict,
+    stricterRuleApplies: conflict,
+    resolutionNote,
     ranked: scored,
   };
 }
