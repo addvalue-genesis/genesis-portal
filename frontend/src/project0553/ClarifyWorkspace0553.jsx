@@ -3,6 +3,17 @@ import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 import { AuditBadge, AuditSection } from "../common/ui/ProjectAuditPrimitives";
 import { selectDeviationRegister0553 } from "./data/deviationRegister0553";
 import TC_HISTORY_0553 from "./data/snapshots/tc.communication.history.0553.json";
+import PARTICULAR_REQS_0553 from "./data/documentParticularRequirements0553.json";
+
+function inferMrGroup0553(rec) {
+  const tags = (rec.tags || []).join(" ").toUpperCase();
+  const text = `${rec.topic || ""} ${rec.requirement || ""}`.toUpperCase();
+  if (/MR-502|ANT-502|LAN-502|DATO-507|TCAB-500|SA-502|SA-507|ZPQ|ZWP8|ZWP11|SCADA|NMS|PTMP/.test(tags + " " + text)) return "MR-0001";
+  if (/LNA|BDA|DMR|TRUNK|RAD-508|YAGI|OMNI/.test(tags + " " + text)) return "MR-0002";
+  if (/PHONE|SOUNDER|PABX|TPH-504|LSE-504|TCAB-504/.test(tags + " " + text)) return "MR-0003";
+  if (/RACON|MAR-514|MORSE|S\/X|9\.3/.test(tags + " " + text)) return "MR-0004";
+  return "SYSTEM";
+}
 
 function downloadText(text, type, filename) {
   const link = document.createElement("a");
@@ -47,6 +58,8 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
   const [viewer, setViewer] = useState("AVS");
   const [historyDoc, setHistoryDoc] = useState("ALL");
   const [historyImpact, setHistoryImpact] = useState("ALL");
+  const [partDoc, setPartDoc] = useState("ALL");
+  const [partMr, setPartMr] = useState("ALL");
   const register = useMemo(() => selectDeviationRegister0553(), []);
   const isAVS = viewer === "AVS";
 
@@ -54,6 +67,17 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
   const cclRows = register.records.filter((r) => r.category === "COMMERCIAL_CLARIFICATION");
   const allClarify = [...tcRows, ...cclRows];
   const visibleRows = subTab === "tc" ? tcRows : subTab === "ccl" ? cclRows : allClarify;
+  const particularRows = useMemo(
+    () =>
+      (PARTICULAR_REQS_0553.records || [])
+        .map((r) => ({ ...r, mrGroup: inferMrGroup0553(r) }))
+        .filter((r) => {
+          if (partDoc !== "ALL" && r.document !== partDoc) return false;
+          if (partMr !== "ALL" && r.mrGroup !== partMr) return false;
+          return true;
+        }),
+    [partDoc, partMr]
+  );
   const historyRows = useMemo(
     () =>
       (TC_HISTORY_0553.items || []).filter((item) => {
@@ -150,6 +174,7 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
               ["ccl", `15.2 CCL · Commercial (${cclRows.length})`],
               ["export", `15.3 Export TC / CCL (${allClarify.length})`],
               ["history", `15.4 History & Source Chain (${(TC_HISTORY_0553.items || []).length})`],
+              ["particulars", `15.5 Particulars (MR/BOD/DTS/SPE) (${(PARTICULAR_REQS_0553.records || []).length})`],
             ].map(([id, label]) => (
               <button
                 key={id}
@@ -174,7 +199,94 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
         </div>
       </section>
 
-      {subTab === "history" ? (
+      {subTab === "particulars" ? (
+        <AuditSection title="15.5 — CUS Particular Requirements (MR / PHI / BOD / DTS / SPE / LIS)">
+          <div data-component-key="bid.clarify.particulars">
+            <p className="p55-note">
+              ข้อกำหนดเฉพาะโครงการ (<strong>Particular</strong>) แยกตามระบบ MR และหมวดเอกสาร — ข้อความ{" "}
+              <strong style={{ color: "#b91c1c" }}>ตัวอักษรสีแดง</strong> คือจุดที่ต้องระวัง/ตรวจเทียบเป็นพิเศษ{" "}
+              <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.clarify.particulars" />
+            </p>
+            <div className="p55-filterbar p55-filterbar--simple" style={{ marginBottom: 10 }}>
+              <label>
+                MR Group{" "}
+                <select value={partMr} onChange={(e) => setPartMr(e.target.value)}>
+                  <option value="ALL">All MR / Systems ({(PARTICULAR_REQS_0553.records || []).length})</option>
+                  <option value="MR-0001">MR-0001 (SCADA Radio)</option>
+                  <option value="MR-0002">MR-0002 (DMR Trunk Radio)</option>
+                  <option value="MR-0003">MR-0003 (Ex Telephone &amp; Sounder)</option>
+                  <option value="MR-0004">MR-0004 (Marine RACON)</option>
+                  <option value="SYSTEM">SYSTEM (General / Cross-MR)</option>
+                </select>
+              </label>
+              <label>
+                Document{" "}
+                <select value={partDoc} onChange={(e) => setPartDoc(e.target.value)}>
+                  <option value="ALL">All Docs (MR / BOD / DTS / SPE / RPT / BLD)</option>
+                  <option value="MR">MR</option>
+                  <option value="BOD">BOD</option>
+                  <option value="DTS">DTS</option>
+                  <option value="SPE">SPE</option>
+                  <option value="RPT">RPT</option>
+                  <option value="BLD">BLD</option>
+                </select>
+              </label>
+            </div>
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget" style={{ tableLayout: "fixed", width: "100%", minWidth: 960 }}>
+                <colgroup>
+                  <col style={{ width: 108 }} />
+                  <col style={{ width: 110 }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "36%" }} />
+                  {isAVS && <col style={{ width: "22%" }} />}
+                  <col style={{ width: 130 }} />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>ID / MR</th>
+                    <th>Doc / Sec</th>
+                    <th>Topic / TAGs</th>
+                    <th>Particular Requirement (Red = Critical Note)</th>
+                    {isAVS && <th>SI Action / Cost Driver</th>}
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {particularRows.map((r) => {
+                    const isCritical =
+                      r.decisionStatus === "REQUIRES_ENGINEERING_EVALUATION" ||
+                      /conflict|deviation|not |no |min |retain|stricter|only/i.test(r.requirement || "");
+                    return (
+                      <tr key={r.id}>
+                        <td><strong>{r.id}</strong><small>{r.mrGroup}</small></td>
+                        <td><strong>{r.document}</strong><small>§{r.section || "-"} · p.{r.page || "-"}</small></td>
+                        <td style={{ overflowWrap: "break-word" }}>
+                          <strong>{r.topic}</strong>
+                          <small>{(r.tags || []).join(", ")}</small>
+                        </td>
+                        <td style={{ overflowWrap: "anywhere" }}>
+                          <span style={isCritical ? { color: "#b91c1c", fontWeight: 700 } : undefined}>
+                            {isCritical ? "PARTICULAR NOTE: " : ""}
+                            {r.requirement}
+                          </span>
+                        </td>
+                        {isAVS && (
+                          <td style={{ overflowWrap: "anywhere" }}>
+                            {r.siAction || "—"}
+                            {r.costDriver && <small>Driver: {r.costDriver}</small>}
+                          </td>
+                        )}
+                        <td><span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block" }}>{r.type}</span></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </AuditSection>
+      ) : subTab === "history" ? (
         <AuditSection title="15.4 — TC / CCL History & Source Chain (MR Addendum Baseline)">
           <div data-component-key="bid.clarify.history">
             <p className="p55-note">
