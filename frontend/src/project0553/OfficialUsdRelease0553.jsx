@@ -5,6 +5,7 @@ import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {selectDeviationRegister0553} from "./data/deviationRegister0553";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
+import {ScheduleC1Breakdown0553} from "./ScheduleC1Breakdown0553";
 import {SubmittedWorksheet0553} from "./ReleaseCustomerWorkbook0553";
 import "./releaseWorkbook0553.css";
 import {QuotationBaselineControl0553} from "./QuotationBaselineControl0553";
@@ -157,32 +158,17 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
        <td>{isSI?<>RECONCILED (SI)<small>{driftLabel}</small></>:"Scope schedule"}</td>
       </tr>
       {open&&<tr className="p553-drilldown-only" data-official-bom-detail={g.code}><td colSpan={6}>
-       <div className="p553-drilldown-table-wrap"><table className="p553-drilldown-table">
-        <thead><tr>
-         <th>Item</th><th>Location</th><th>TAG</th><th>Description</th><th>Qty / Unit</th>
-         {isSI&&showSubPrices&&<><th>Unit USD</th><th>Amount USD</th><th>Working Sell THB</th></>}
-         {isSI&&<th>Source / Trace</th>}
-        </tr></thead>
-        <tbody>{displayRows.map((r,idx)=>{
-         const raw=g.rows[idx];
-         return <tr key={raw?.key||idx}>
-          <td>{isSI?g.code+"."+(idx+1):r.item}</td>
-          <td>{r.site||"—"}</td>
-          <td>{r.tag||"TBC"}</td>
-          <td>{r.description}</td>
-          <td>{r.qty??"TBC"} {r.unit||""}</td>
-          {isSI&&showSubPrices&&<>
-           <td className="p553-price-cell">{raw?.unitUSD==null?"—":raw.unitUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:6})}</td>
-           <td className="p553-price-cell">{money(raw?.amountUSD)}</td>
-           <td className="p553-price-cell">{money(raw?.customerSellTHB)}</td>
-          </>}
-          {isSI&&<td>
-           <button type="button" className="p553-origin-trace" onClick={()=>setTraceItem(raw)}>Trace</button>
-           {onOpenSource&&<button type="button" className="p553-detail-button" onClick={()=>onOpenSource({...raw,breakdownKey:raw.key,breakdownOrigin:"official"})}>↗ Source</button>}
-          </td>}
-         </tr>;
-        })}</tbody>
-       </table></div>
+       <ScheduleC1Breakdown0553
+        group={g}
+        sourceGroup={source?.a?.find(x=>x.code===g.code)||null}
+        internal={isSI}
+        showSubPrices={showSubPrices}
+        onPricingModeChange={setShowSubPrices}
+        onTraceItem={setTraceItem}
+        onOpenSource={onOpenSource}
+        moduleId="bid.budget.pricing.official.schedule-c1"
+        titlePrefix="10.3.4 Official Part A (Schedule C1)"
+       />
       </td></tr>}
      </React.Fragment>;
     })}</tbody>

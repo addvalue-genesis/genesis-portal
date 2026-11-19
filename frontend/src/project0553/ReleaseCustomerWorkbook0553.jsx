@@ -17,14 +17,14 @@ import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0
 import {buildOfficialUsdRelease0553,selectCurrentReleaseRev03_0553} from "./data/officialUsdRelease0553";
 import {buildCustomerPriceBreakdown0553,customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
+import {ScheduleC1Breakdown0553} from "./ScheduleC1Breakdown0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
 // and MUST NOT be included in the six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
- ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"],
- ["A1 MR0001","A1"],["A2 MR0002","A2"],["A3 MR0003","A3"],["A4 MR0004","A4"]
+ ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
 ]);
 // Same preserved worksheet cells/merges; changing the display location never
 // rewrites the submitted workbook or substitutes current Working prices.
@@ -451,20 +451,15 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
     </>:releasePartA?<div data-release-part-a={code} data-release-revision={quotedRelease.releasePriceReference.revision}>
-     <p className="p55-note"><strong>{sheet} · {quotedRelease.releasePriceReference.revision} · USD</strong><br/>
-      รายละเอียดจาก Source / Working ปัจจุบัน → Release ตามราคา {quotedRelease.releasePriceReference.filename} · A+B USD {money(quotedRelease.totalUSD)}</p>
-     <div className="p553-sheet-scroll"><table className="p553-customer-table">
-      <thead><tr>{["Item","Location","TAG","Description","Qty","Unit","Unit price USD","Amount USD","Remarks"].map(h=><th key={h}>{h}</th>)}</tr></thead>
-      <tbody>{releasePartARows.map((r,i)=><tr key={releasePartA.rows[i].key} data-release-a-source-key={releasePartA.rows[i].key}>
-       <td>{r.item}</td><td>{r.site}</td><td>{r.tag}</td><td>{r.description}</td><td>{r.qty??"TBC"}</td><td>{r.unit}</td>
-       <td className="p553-price-cell">{formatUnit(r.unitUSD)}</td><td className="p553-price-cell">{money(r.amountUSD)}</td>
-       <td>{r.remark}{internal&&<button type="button" onClick={()=>onOpenSource({...releasePartA.rows[i],breakdownKey:releasePartA.rows[i].key,breakdownOrigin:"released"})}>↗ Source</button>}</td>
-      </tr>)}
-       <tr className="p553-sheet-total"><td colSpan={7}>Priced subtotal</td><td className="p553-price-cell">{money(releasePartA.totalUSD)}</td><td/></tr>
-       <tr className="p553-sheet-total"><td colSpan={7}>Release summary amount</td><td className="p553-price-cell">{money(releasePartA.parentUSD)}</td><td/></tr>
-       <tr className="p553-sheet-total"><td colSpan={7}>Difference</td><td className="p553-price-cell">{money(releasePartA.varianceUSD)}</td><td/></tr>
-      </tbody>
-     </table></div>
+     <ScheduleC1Breakdown0553
+      group={releasePartA}
+      sourceGroup={model.a.find(x=>x.code===code)||null}
+      internal={internal}
+      defaultPricingMode="itemized"
+      onOpenSource={internal?onOpenSource:undefined}
+      titlePrefix={`${sheet} · ${quotedRelease.releasePriceReference.revision} · USD`}
+      subtitle={`รายละเอียดจาก Source / Working ปัจจุบัน → Release ตามราคา ${quotedRelease.releasePriceReference.filename} · A+B USD ${money(quotedRelease.totalUSD)}`}
+     />
     </div>:agreedAnnex&&!internal&&!focusAnnexTarget?.code?<div data-release-agreed-annex={code} data-release-revision="Rev03">
      <p className="p55-note"><strong>{code} · Rev03 · Agreed quotation / USD</strong><br/>
       <a href={agreed.sourceUrl} target="_blank" rel="noopener noreferrer">Open agreed source workbook</a></p>

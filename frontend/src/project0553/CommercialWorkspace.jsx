@@ -424,7 +424,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
-   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
+   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} defaultView="customer" onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
    {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>

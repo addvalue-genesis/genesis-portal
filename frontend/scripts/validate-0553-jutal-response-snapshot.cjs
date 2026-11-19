@@ -17,9 +17,9 @@ assert.equal(jutalSnap.replacesRev03, false);
 assert.equal(jutalSnap.priced, false);
 assert.equal(jutalSnap.responseRound, "R1");
 assert.equal(jutalSnap.jutalEmailDate, "2026-11-17");
-assert.equal(jutalSnap.items.length, 14);
+assert.equal(jutalSnap.items.length, 15);
 assert.equal(jutalSnap.items.filter((x) => x.kind === "DEVIATION").length, 1);
-assert.equal(jutalSnap.items.filter((x) => x.kind === "TC").length, 13);
+assert.equal(jutalSnap.items.filter((x) => x.kind === "TC").length, 14);
 
 const forbiddenInResponse = [/\bUSD\b/i, /\bTHB\b/i, /\d[\d,.]*\s*(?:USD|THB|\$)/i, /\bItem\s*7\b/i, /SAMTEL\s*5%/i, /\bmarkup\b/i, /\bdirectCost\b/i, /\bsourceRef\b/i, /\bINTERNAL\b/i];
 

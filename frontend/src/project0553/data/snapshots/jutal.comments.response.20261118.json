@@ -81,6 +81,23 @@
       "status": "OPEN"
     },
     {
+      "id": "TC-TECH-04",
+      "kind": "TC",
+      "category": "TECHNICAL_CLARIFICATION",
+      "mr": "MR-0001",
+      "code": "A1",
+      "title": "Layer 3 Switch Ports (TC-0001 Item 13: 4 Copper + 1 SFP Standard Chassis)",
+      "sourceCell": "MM-ZTK-1F-GEN-TEL-TC-0001 Item 13 / LAN-502-001",
+      "jutalComment": "Customer requires standard module with 4 copper ports + 1 SFP uplink (no expansion module).",
+      "mrRequirement": "LAN-502-001 / LAN-502-002 Industrial Layer 3 Switch per MR-0001 (4 copper + 1 SFP minimum).",
+      "offeredBasis": "Cisco Catalyst IE-3400-8P2S-E standard chassis (8 GE PoE RJ45 + 2 GE SFP built-in; IEM-3300-8T= expansion module excluded).",
+      "response": "Confirmed that Cisco IE-3400-8P2S-E standard chassis natively includes 8 GE PoE copper ports and 2 GE SFP uplinks, satisfying the 4 copper + 1 SFP requirement without an expansion module. Optical/copper SFP transceiver and L3 routing licence level remain subject to site link confirmation.",
+      "treatment": "Technical Clarification (Standard Chassis; No Expansion Module)",
+      "rev03PriceRef": { "code": "A1", "amountUSD": 241290, "sourceCell": "G8" },
+      "jackDecision": "OWNER_CONFIRMED_STANDARD_CHASSIS_NO_EXPANSION",
+      "status": "OPEN"
+    },
+    {
       "id": "CCL-COMM-01",
       "kind": "TC",
       "category": "COMMERCIAL_CLARIFICATION",
