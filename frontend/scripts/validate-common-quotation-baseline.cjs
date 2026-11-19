@@ -54,7 +54,27 @@ async function main(){
  assert.equal(JSON.stringify(source),sourceBefore);assert.equal(capture.snapshot.quotation.reference.totalBaseUSD,894910);
  assert.equal(capture.snapshot.issued,false);assert.deepEqual(capture.snapshot.policyBindings.fixedParentCodes,['A1','A2','A3']);
  assert.equal(capture.artifacts[0].sha256,ref.sourceWorkbookSha256);assert.deepEqual(Buffer.from(k.base64ToBytes(capture.artifacts[0].base64)),bytes);
- assert.equal(capture.artifacts.length,4);assert.equal(capture.snapshot.derivedContext.model.totalUSD,894910);
+ assert.equal(capture.artifacts.length,4);
+ const samtelMarkup=from('project0553/data/samtelEngineeringServiceMarkup0553');
+ const offMod=from('project0553/data/officialUsdRelease0553');
+ const off=offMod.buildOfficialUsdRelease0553(source);
+ const roundUp=(v,inc)=>inc*Math.ceil(v/inc-1e-12);
+ const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
+ let layer1TotalUSD=0,layer2TotalUSD=0;
+ for(const x of off.a){layer1TotalUSD+=x.amountUSD||0;layer2TotalUSD+=x.amountUSD||0;}
+ for(const x of off.b){
+  const rb=source.b.find(r=>r.code===x.code);
+  const recvUSD=rb&&rb.commercialCategory==='service'&&rb.addvalueReceivableTHB!=null
+   ?roundUp(rb.addvalueReceivableTHB/off.policy.thbPerUsd,off.policy.seedIncrementUSD):(x.amountUSD||0);
+  if(rb&&rb.commercialCategory==='service'&&rb.addvalueReceivableTHB!=null){
+   assert.equal(rb.releaseTHB,round2(rb.addvalueReceivableTHB*samtelMarkup.SAMTEL_ENGINEERING_SERVICE_MARKUP_0553));
+  }
+  layer1TotalUSD+=recvUSD;
+  layer2TotalUSD+=x.amountUSD||0;
+ }
+ assert.equal(layer1TotalUSD,capture.snapshot.quotation.reference.totalBaseUSD);
+ assert.equal(layer2TotalUSD,capture.snapshot.derivedContext.model.totalUSD);
+ assert.equal(capture.snapshot.derivedContext.model.totalUSD,903710);
  assert(capture.snapshot.derivedContext.status.includes('NOT_PROVEN_PREVIOUSLY_ISSUED'));
  const historical=from('project0553/data/officialUsdRelease0553').selectSubmittedRev02Release0553();
  const historyBytes=fs.readFileSync(path.resolve(__dirname,'../public'+historical.originalWorkbookPath));
@@ -64,9 +84,9 @@ async function main(){
  await assert.rejects(adapter.captureQuotation0553({mode:'CURRENT_REV03',reference:ref,source,label:'bad file',actor:'test',createdAt,
   fetchFile:async()=>({ok:true,arrayBuffer:async()=>new Uint8Array(bytes.length).buffer})}),/hash mismatch/);
  const draft=await adapter.captureQuotation0553({mode:'WORKING_DRAFT',source,label:'Frozen Working',actor:'test',createdAt});
- assert.equal(draft.snapshot.quotation.model.totalUSD,894910);assert.equal(draft.artifacts.length,3);assert(draft.artifacts.every(a=>a.audience==='INTERNAL'));
+ assert.equal(draft.snapshot.quotation.model.totalUSD,903710);assert.equal(draft.artifacts.length,3);assert(draft.artifacts.every(a=>a.audience==='INTERNAL'));
  const React=require('react'),SSR=require('react-dom/server'),View=from('project0553/RecordedQuotation0553.jsx').RecordedQuotation0553;
- for(const r of [capture,draft]){const html=SSR.renderToStaticMarkup(React.createElement(View,{record:r,source:{totalUSD:1}}));assert(html.includes('894,910.00'));assert(!html.includes('USD 1.00'));}
+ for(const r of [capture,draft]){const expected=r===capture?'894,910.00':'903,710.00';const html=SSR.renderToStaticMarkup(React.createElement(View,{record:r,source:{totalUSD:1}}));assert(html.includes(expected));assert(!html.includes('USD 1.00'));}
  const persisted=await k.addBaseline(k.emptyBaselineRegister(adapter.QUOTATION_SCOPE_0553),capture);
  assert.equal((await k.parseBaselineRegister(await k.serializeBaselineRegister(persisted),adapter.QUOTATION_SCOPE_0553)).records[0].id,capture.id);
  // Real control handlers with injected persistence. Browser IndexedDB remains a

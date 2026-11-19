@@ -5,6 +5,10 @@
 // the separate approved-source 964 MH / THB510k or B2 THB580k baseline.
 import VDRL from "./bcVdrlSourceLedger0553.json";
 import {deriveManHours,deriveDocumentHours} from "../../common/cost/derivationKernel";
+import {BC_EXECUTION_ACTIVITIES_0553} from "./bcExecutionActivities0553";
+import {PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
+import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
+import {extractVdrlDocType0553} from "./particularDirectiveRule0553";
 
 const freeze = x => Object.freeze(x);
 const MR_CODES=freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
@@ -12,32 +16,90 @@ const GEQ=freeze(["GEQ-001","GEQ-004","GEQ-005","GEQ-006","GEQ-007","GEQ-009","G
 const PEQ_B1=freeze(["PEQ-B1-001","PEQ-B1-002","PEQ-B1-003","PEQ-B1-004","PEQ-B1-005","PEQ-B1-006","PEQ-B1-007"]);
 const PEQ_B2=freeze(Array.from({length:14},(_,i)=>"PEQ-B2-"+String(i+1).padStart(3,"0")));
 const normalize=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
-const VDRL_OWNER_DECISION_0553=freeze({
- decisionBasis:"REPO_APPROVED_BASIS + STANDARD_PRACTICE__ADOPTED_BY_PM_20261119",
- revisable:true,
- references:freeze(["fatExecutionBasis0553.costRouting","bcB3EquationExecution0553 L117","bcExecutionActivities0553 B4/B5/B9/B10","NORSOK Z-018","IEC 62381","NORSOK Z-008 §11"]),
- byTitle:freeze({
-  "inspection and test plan":                         freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_INTEGRATION_QA",                  flags:freeze({I_B3_author:0})}),
-  "fat procedure":                                    freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_TEST_PROCEDURE_AUTHOR",           flags:freeze({I_B3_author:0})}),
-  "sat procedure":                                    freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_TEST_PROCEDURE_AUTHOR",           flags:freeze({I_B3_author:0,existingRevC:true})}),
-  "erection, & installation procedure":               freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"OEM_IOM_PLUS_B1_PACKAGE_INTEGRATION",flags:freeze({I_install:0,supervisionPackage:"B9"})}),
-  "surface preparation and painting procedure":       freeze({workKind:"OEM_FABRICATION_QA",                 technicalWorkOwner:"OEM",                                flags:freeze({I_B1:0,I_B3:0,touchUpPackage:"B4"})}),
-  "painting/insulation inspection report":            freeze({workKind:"OEM_FABRICATION_QA",                 technicalWorkOwner:"OEM",                                flags:freeze({I_B3:0,touchUpPackage:"B4"})}),
-  "recommended start-up and commissioning spares list":freeze({workKind:"TECHNICAL_B1_OR_OEM",               technicalWorkOwner:"OEM_SPIR",                           flags:freeze({createsQty:false,qtyPackage:"B10/SPQ"})}),
-  "recommended spares list for two year's operation": freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"OEM_SPIR",                           flags:freeze({createsQty:false,pricedQuoteOnly:true})}),
-  "bought out items list":                            freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"DERIVED_FROM_PART_A_BOM",            flags:freeze({newB1MH:false})}),
-  "list of loosed items shipped to zpq":              freeze({workKind:"DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD", technicalWorkOwner:"B5_PACKING_OUTPUT",                  flags:freeze({})})
- })
-});
-const kind=title=>{
- const s=normalize(title);
- const decided=VDRL_OWNER_DECISION_0553.byTitle[s];
- if(decided)return decided.workKind;
- if(/\b(fat|sat) report\b|inspection report|commissioning test report/.test(s))return "TEST_EVIDENCE_B3";
- if(/calculation|schematic|wiring|termination|general arrangement|installation detail|data sheet|drawing|radio coverage/.test(s))return "TECHNICAL_B1_OR_OEM";
- if(/vdr|register|progress report|meeting|dossier|index|table of contents|shipping|packing|certificate|catalog|brochure|schedule|contact directory/.test(s))return "DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD";
- return "OWNER_TECHNICAL_REVIEW_PENDING";
-};
+
+const WBS_BY_CODE=Object.freeze(Object.fromEntries((PART_BC_WBS_SOURCE_0553.rows||[]).map(r=>[r.code,r])));
+
+// EQ-VDRL-ROUTE-01: Derive package, owner, applicability, and flags from existing registries
+// (bcExecutionActivities0553, partBCWorkingWbs0553, fatExecutionBasis0553.costRouting, extractVdrlDocType0553).
+function routeVdrlRowByEquation0553(row){
+ const s=normalize(row.title);
+ const docCode=extractVdrlDocType0553({doc:row.projectDocumentNo,title:row.title});
+ const subjectOf=()=>{
+  if(/painting/.test(s))return "B4";
+  if(/loosed items|shipping|packing/.test(s)&&!/procedure/.test(s))return "B5";
+  if(/spares list/.test(s))return "B10";
+  if(docCode==="MTO")return "PART_A";
+  if(docCode==="ITP"||/inspection and test plan/.test(s))return "B1_ITP";
+  if(/\b(fat|sat) report\b|commissioning test report/.test(s))return "B3";
+  if(docCode==="PRO"&&/fat|sat/.test(s))return "B1_TEST_PROC";
+  if(docCode==="PRO"&&/installation/.test(s))return "B1_INSTALL_PROC";
+  return null;
+ };
+ const pkgKey=subjectOf();
+ const wbsCode=pkgKey==="B1_ITP"||pkgKey==="B1_TEST_PROC"||pkgKey==="B1_INSTALL_PROC"?"B1":pkgKey;
+ const wbs=wbsCode&&WBS_BY_CODE[wbsCode]?WBS_BY_CODE[wbsCode]:null;
+ const act=wbsCode&&BC_EXECUTION_ACTIVITIES_0553[wbsCode]?BC_EXECUTION_ACTIVITIES_0553[wbsCode]:null;
+
+ let workKind;
+ if(pkgKey==="B4"){
+  workKind="OEM_FABRICATION_QA";
+ }else if(pkgKey==="B3"||/\b(fat|sat) report\b|inspection report|commissioning test report/.test(s)){
+  workKind="TEST_EVIDENCE_B3";
+ }else if(pkgKey==="B10"||pkgKey==="PART_A"||pkgKey==="B1_ITP"||pkgKey==="B1_TEST_PROC"||pkgKey==="B1_INSTALL_PROC"||
+  /calculation|schematic|wiring|termination|general arrangement|installation detail|data sheet|drawing|radio coverage/.test(s)){
+  workKind="TECHNICAL_B1_OR_OEM";
+ }else if(pkgKey==="B5"||/vdr|register|progress report|meeting|dossier|index|table of contents|shipping|packing|certificate|catalog|brochure|schedule|contact directory/.test(s)){
+  workKind="DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD";
+ }else{
+  workKind="OWNER_TECHNICAL_REVIEW_PENDING";
+ }
+
+ let technicalWorkOwner=workKind==="TEST_EVIDENCE_B3"?"B3_OR_OEM_FOR_TEST_CONTENT":
+  workKind==="TECHNICAL_B1_OR_OEM"?"B1_OR_OEM_SCOPE_TO_VERIFY":
+  workKind==="OEM_FABRICATION_QA"?"OEM":"OEM_OR_ADDVALUE_CONTENT_TO_VERIFY";
+ if(pkgKey==="B1_ITP")technicalWorkOwner="B1_INTEGRATION_QA";
+ else if(pkgKey==="B1_TEST_PROC")technicalWorkOwner="B1_TEST_PROCEDURE_AUTHOR";
+ else if(pkgKey==="B1_INSTALL_PROC")technicalWorkOwner="OEM_IOM_PLUS_B1_PACKAGE_INTEGRATION";
+ else if(pkgKey==="B4")technicalWorkOwner="OEM";
+ else if(pkgKey==="B10")technicalWorkOwner="OEM_SPIR";
+ else if(pkgKey==="PART_A")technicalWorkOwner="DERIVED_FROM_PART_A_BOM";
+ else if(pkgKey==="B5")technicalWorkOwner="B5_PACKING_OUTPUT";
+
+ const iAddvalue=wbs?(/^OUTSIDE_ADDVALUE_SCOPE/.test(wbs.state)?0:/^WORKING/.test(wbs.state)?1:null):null;
+ const iB3=pkgKey==="B3"&&workKind==="TEST_EVIDENCE_B3"?1:0;
+ const flags={};
+ if(pkgKey==="B1_ITP"||pkgKey==="B1_TEST_PROC")flags.I_B3_author=0;
+ if(pkgKey==="B1_TEST_PROC"&&/sat/.test(s))flags.existingRevC=true;
+ if(pkgKey==="B1_INSTALL_PROC"){flags.I_install=0;flags.supervisionPackage="B9";}
+ if(pkgKey==="B4"){
+  flags.I_B3=0;
+  flags.incrementalB3=0; // GT-4: Paint shade visual check already inside FAT Final Inspection
+  flags.touchUpPackage="B4";
+  if(/procedure/.test(s))flags.I_B1=0;
+ }
+ if(pkgKey==="B10"){
+  flags.createsQty=false;
+  if(/start-up/.test(s))flags.qtyPackage="B10/SPQ";
+  if(/two year/.test(s))flags.pricedQuoteOnly=true;
+ }
+ if(pkgKey==="PART_A")flags.newB1MH=false;
+
+ return freeze({
+  workKind,
+  technicalWorkOwner,
+  packageCode:wbsCode||pkgKey||null,
+  packageTitle:act?act.title:null,
+  I_ADDVALUE:iAddvalue,
+  I_B3:iB3,
+  createsQty:false,
+  flags:freeze(flags),
+  ownerDecisionBasis:pkgKey?"EQ-VDRL-ROUTE-01":null,
+  routingReferences:freeze([
+   "EQ-VDRL-ROUTE-01",
+   FAT_EXECUTION_BASIS_0553.costRouting?"fatExecutionBasis0553.costRouting":null
+  ].filter(Boolean))
+ });
+}
 const recurrence=record=>{
  const trigger=normalize(record.submissionTrigger);
  const title=normalize(record.title);
@@ -50,8 +112,7 @@ const recurrence=record=>{
 const requirements=freeze(VDRL.records.map(row=>{
  const documentKey=row.mr+"|"+row.projectDocumentNo;
  const normalizedTitle=normalize(row.title);
- const decided=VDRL_OWNER_DECISION_0553.byTitle[normalizedTitle]||null;
- const workKind=decided?decided.workKind:kind(row.title);
+ const routed=routeVdrlRowByEquation0553(row);
  const occurrenceRule=recurrence(row);
  // Quantity of source VDRL obligations = 1. Actual documents, submissions,
  // repeat events, approved revisions and as-built splits remain independently OPEN.
@@ -66,14 +127,15 @@ const requirements=freeze(VDRL.records.map(row=>{
  return freeze({
   ...row,documentKey,moduleId:"bid.engineering.equations.b1-b2."+row.id.toLowerCase(),
   sourceRequirementQuantity:1,documentInstances:null,documentIssues:null,revisionCycles:null,
-  projectTitleType:normalizedTitle,workKind,occurrenceRule,
+  projectTitleType:normalizedTitle,workKind:routed.workKind,occurrenceRule,
   documentControlOwner:"B2", // Control/transmittal only; technical content stays separate.
-  technicalWorkOwner:decided?decided.technicalWorkOwner:
-   workKind==="TEST_EVIDENCE_B3"?"B3_OR_OEM_FOR_TEST_CONTENT":
-   workKind==="TECHNICAL_B1_OR_OEM"?"B1_OR_OEM_SCOPE_TO_VERIFY":
-   workKind==="OEM_FABRICATION_QA"?"OEM":"OEM_OR_ADDVALUE_CONTENT_TO_VERIFY",
-  flags:decided?decided.flags:freeze({}),
-  ownerDecisionBasis:decided?VDRL_OWNER_DECISION_0553.decisionBasis:null,
+  technicalWorkOwner:routed.technicalWorkOwner,
+  packageCode:routed.packageCode,
+  I_ADDVALUE:routed.I_ADDVALUE,
+  I_B3:routed.I_B3,
+  createsQty:routed.createsQty,
+  flags:routed.flags,
+  ownerDecisionBasis:routed.ownerDecisionBasis,
   technicalWorkState:"CONTRACTUAL_VENDOR_DELIVERABLE_ADDVALUE_INCREMENT_TO_VERIFY",
   documentControlEquationIds:freeze(["GEQ-009","GEQ-024","PEQ-B2-001","PEQ-B2-003","PEQ-B2-004"]),
   technicalEquationIds:freeze(["GEQ-005","PEQ-B1-003"]),

@@ -2,8 +2,28 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R89";
+export const CHANGE_LOG_VERSION_0553="2026-11-19-R92";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261119-02",date:"2026-11-19",kind:"VALIDATION",tone:"neutral",
+  title:"EQ-VDRL-ROUTE-01, Step 1b/Step 2 precedence & cost-impact notice guard",
+  detail:"Replaced hand-written VDRL title flags with EQ-VDRL-ROUTE-01 derived from bcExecutionActivities0553, partBCWorkingWbs0553, and fatExecutionBasis0553; repaired two-layer baseline guard (Layer 1 USD 894,910 / Layer 2 USD 903,710) and added validate-0553-cost-impact-notice.cjs.",
+  moduleIds:Object.freeze(["bid.clarify.particulars","bid.engineering.equations.b1-b2","bid.budget.changes"]),
+  priceImpact:"NO_PRICE_CHANGE",layer1DeltaUSD:0,layer2DeltaUSD:0,direction:"NONE",affectedLines:Object.freeze([]),commit:"8047e49d",
+  source:"Rev05 EQ-VDRL-ROUTE-01 & Step 1b/Step 2 governance"}),
+ Object.freeze({id:"P553-CHANGE-20261119-01",date:"2026-11-19",kind:"VALIDATION",tone:"neutral",
+  title:"F-01..F-06 directive/precedence & F-09 Rev02 VDRL routing",
+  detail:"Hardened particularDirectiveRule0553.js (negation, null filter, PTTEP doc codes, fail-closed drawing boundary) and added VDRL routing validator. No changes to GEQ/PEQ, rates, quantities, or release totals.",
+  moduleIds:Object.freeze(["bid.clarify.particulars","bid.engineering.equations.b1-b2"]),
+  priceImpact:"NO_PRICE_CHANGE",layer1DeltaUSD:0,layer2DeltaUSD:0,direction:"NONE",affectedLines:Object.freeze([]),commit:"9106466e",
+  source:"Rev00/Rev02/Rev03 directive & VDRL governance"}),
+ Object.freeze({id:"P553-CHANGE-20261117-01",date:"2026-11-17",kind:"RELEASE",tone:"caution",
+  title:"SAMTEL 5% engineering service markup (Layer 2 +USD 8,800 vs Layer 1 Rev03)",
+  detail:"Applied SAMTEL_ENGINEERING_SERVICE_MARKUP_0553 (1.05x) on ADDVALUE engineering service lines (B1-B9, B14). Layer 1 ADDVALUE receivable remains USD 894,910 (Rev03); Layer 2 SAMTEL customer release moves to USD 903,710 (+USD 8,800: B1 +1,400, B2 +400, B3 +3,700, B5 +500, B6 +500, B7 0, B8 +200, B9 +800, B14 +1,300).",
+  moduleIds:Object.freeze(["bid.budget.pricing.official","bid.budget.changes"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",layer1DeltaUSD:0,layer2DeltaUSD:8800,direction:"UP",
+  recordedLayer1TotalUSD:894910,recordedLayer2TotalUSD:903710,
+  affectedLines:Object.freeze(["B1","B2","B3","B4","B5","B6","B7","B8","B9","B14"]),commit:"659af09c",
+  source:"samtelEngineeringServiceMarkup0553.js & officialUsdRelease0553.js"}),
  Object.freeze({id:"P553-CHANGE-20261103-13",date:"2026-11-03",kind:"UI",tone:"caution",
   title:"Official defaults to exact agreed Rev03; old Rev02 is history only",
   detail:"Owner identifies Drive1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA as the agreed quotation. Its original146675-byte XLSX matches the uploaded Rev03 SHA256d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e. Prior bug left10.3.4 defaulting to old submitted Rev02 despite current Working changes. Official now defaults to the exact six-sheet owner-selected Rev03, with its correct source link and original file download. B10 has11 priced rows/USD12960; B11 is not separately quoted, zero offered rows; B13 has3 rows/USD1530; optionalC1 six rows/USD181100 andC2 eleven rows/USD27220. Verified every offered item/TAG/description/specification/material/Qty/unit/amount/lead time against the linked workbook, not just summary totals.10.3.3 customer Annex tabs use the same agreed sheets; internal source trace remains separate. A1–A4 stay live in10.3.3. Rev02 requires explicit History selection; neither source file nor Working costs/FX/markup/quantities/module IDs are changed. A+BUSD894910 unchanged; no new submission or customer acceptance asserted.",

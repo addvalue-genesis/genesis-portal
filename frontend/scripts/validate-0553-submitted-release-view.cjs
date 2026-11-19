@@ -51,6 +51,9 @@ own.require=id=>{
   MTO_C1_RELEASE_CONFIRMATION_0553:{mto:'MM-ZTK-1F-GEN-TEL-MTO-0001 Rev.C1'},
   buildOfficialUsdRelease0553:()=>{liveCalls++;throw Error('LIVE_MODEL_SELECTED');},OFFICIAL_SHEETS_0553:[]
  };
+ if(id==='./data/deviationRegister0553')return {
+  selectDeviationRegister0553:()=>({responseRound:'R1',counts:{deviations:1,technicalClarifications:4,commercialClarifications:10}})
+ };
  if(id.endsWith('.css'))return {};
  if(id.endsWith('.json'))return {};
  return new Proxy({}, {get:()=>()=>null});
@@ -92,27 +95,15 @@ const latest=all(tree).find(n=>n.type==='button'&&text(n).includes('Current Rev0
 assert(text(tree).includes('Not separately quoted. Tools expressly included in the equipment supply remain included.'));
 const working=all(tree).find(n=>n.type==='button'&&text(n).includes('Working draft'));working.props.onClick();
 assert.throws(render,/LIVE_MODEL_SELECTED/);assert.equal(liveCalls,1,'Live calculation is selected only explicitly');
-// Part A tabs must render current calculated rows matching Rev03, not archived Rev02 cells.
-states.length=0;states[0]='A1 MR0001';
+// 10.3.3 ReleaseCustomerWorkbook0553 renders the 6 Rev03 customer workbook tabs (A1-A4 moved to 10.3 Schedule C1).
+states.length=0;states[0]='Scope of supply';
 const releaseModel={a:[],b:[],c:[],annex:{},annexModels:{},summary:{},
  sourceCoverage:{annexOverflow:[]}};
 const renderRelease=()=>{cursor=0;return release.exports.ReleaseCustomerWorkbook0553({model:releaseModel,recipient:'CUSTOMER'});};
-const expected=['Scope of supply','B10 CommSpares','B11 SpecialTool','B13 Consumerables','C1 CapitalSpares','C2 2Y-Spares','A1 MR0001','A2 MR0002','A3 MR0003','A4 MR0004'];
+const expected=['Scope of supply','B10 CommSpares','B11 SpecialTool','B13 Consumerables','C1 CapitalSpares','C2 2Y-Spares'];
 let releaseTree=renderRelease();
 assert.deepEqual(all(releaseTree).filter(n=>n.props.role==='tab').map(n=>text(n).trim()),expected);
-for(const name of expected.slice(6)){
- const tab=all(releaseTree).find(n=>n.props.role==='tab'&&text(n).trim()===name);tab.props.onClick();
- releaseTree=renderRelease();
- assert(all(releaseTree).some(n=>n.props['data-release-part-a']===name.slice(0,2)));
- assert(!all(releaseTree).some(n=>n.type===sheetRenderer),'Release Part A must not render frozen Rev02');
- assert(all(releaseTree).some(n=>n.props['data-release-a-source-key']===name.slice(0,2)+'-CURRENT'));
- assert(text(releaseTree).includes('CURRENT_WORKING_DETAIL'));
- assert(text(releaseTree).includes('903,710.00'));
- assert(text(releaseTree).includes('Rev03'));
- assert(!/Submitted\s+Rev02/.test(text(releaseTree)));
- assert.equal(all(releaseTree).filter(n=>n.props.role==='tab'&&n.props['aria-selected']).length,1);
-}
-for(const name of expected.slice(1,6)){
+for(const name of expected.slice(1)){
  const tab=all(releaseTree).find(n=>n.props.role==='tab'&&text(n).trim()===name);tab.props.onClick();releaseTree=renderRelease();
  assert(all(releaseTree).some(n=>n.props['data-release-agreed-annex']===name.split(' ')[0]));
  assert(all(releaseTree).some(n=>n.type===sheetRenderer&&n.props.sheet===current.worksheets.find(s=>s.name===name)));
