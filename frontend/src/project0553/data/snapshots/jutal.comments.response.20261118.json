@@ -30,7 +30,7 @@
       "status": "APPROVED"
     },
     {
-      "id": "TC-TECH-01",
+      "id": "R1-TC-01",
       "kind": "TC",
       "category": "TECHNICAL_CLARIFICATION",
       "mr": "MR-0001",
@@ -47,7 +47,7 @@
       "status": "OPEN"
     },
     {
-      "id": "TC-TECH-02",
+      "id": "R1-TC-02",
       "kind": "TC",
       "category": "TECHNICAL_CLARIFICATION",
       "mr": "MR-0001–MR-0004",
@@ -64,7 +64,7 @@
       "status": "OPEN"
     },
     {
-      "id": "TC-TECH-03",
+      "id": "R1-TC-03",
       "kind": "TC",
       "category": "TECHNICAL_CLARIFICATION",
       "mr": "MR-0001 / MR-0004",
@@ -81,7 +81,7 @@
       "status": "OPEN"
     },
     {
-      "id": "TC-TECH-04",
+      "id": "R1-TC-04",
       "kind": "TC",
       "category": "TECHNICAL_CLARIFICATION",
       "mr": "MR-0001",

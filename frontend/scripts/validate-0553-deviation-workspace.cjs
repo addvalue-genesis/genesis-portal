@@ -39,7 +39,7 @@ assert.equal(reg.counts.commercialClarifications, 10);
 const devHtml = renderToStaticMarkup(React.createElement(DeviationWorkspace0553, {}));
 assert.equal(devHtml.includes("bid.deviations"), true);
 assert.equal(devHtml.includes("DEV-TECH-01"), true);
-assert.equal(devHtml.includes("TC-TECH-01"), false, "14 Deviations must NOT contain TC rows");
+assert.equal(devHtml.includes("R1-TC-01"), false, "14 Deviations must NOT contain TC rows");
 assert.equal(devHtml.includes("14.1 Formal Deviations (1)"), true);
 
 const clarifyHtml = renderToStaticMarkup(React.createElement(ClarifyWorkspace0553, {}));
@@ -47,8 +47,8 @@ assert.equal(clarifyHtml.includes("bid.clarify"), true);
 assert.equal(clarifyHtml.includes("15.1 TC · Technical (4)"), true);
 assert.equal(clarifyHtml.includes("15.2 CCL · Commercial (10)"), true);
 assert.equal(clarifyHtml.includes("15.3 Export TC / CCL (14)"), true);
-assert.equal(clarifyHtml.includes("TC-TECH-01"), true);
-assert.equal(clarifyHtml.includes("TC-TECH-04"), true);
+assert.equal(clarifyHtml.includes("R1-TC-01"), true);
+assert.equal(clarifyHtml.includes("R1-TC-04"), true);
 assert.equal(clarifyHtml.includes("DEV-TECH-01"), false, "15 Clarify must NOT contain Formal Deviation rows");
 
 console.log("PASS: 0553 14 Deviations (1: Trunk Radio LNA->BDA) & 15 Clarify (TC 4 + CCL 10)");

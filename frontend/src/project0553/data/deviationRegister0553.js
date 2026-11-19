@@ -16,7 +16,7 @@ const LINKS_BY_ID = Object.freeze({
       { label: "10B B3-BF", tab: "b3bf", moduleId: "bid.b3bf" },
     ],
   },
-  "TC-TECH-01": {
+  "R1-TC-01": {
     vendorRef: "07 Vendor / BARTEC EJB-6 reference",
     brownfieldRef: "ZWP20 Row 11 / 10.1 Required BOM",
     links: [
@@ -24,7 +24,7 @@ const LINKS_BY_ID = Object.freeze({
       { label: "04 MR Systems", tab: "systems", moduleId: "bid.systems" },
     ],
   },
-  "TC-TECH-02": {
+  "R1-TC-02": {
     vendorRef: "10.1 Part A (141 rows) / 10.3.4",
     brownfieldRef: "—",
     links: [
@@ -32,11 +32,19 @@ const LINKS_BY_ID = Object.freeze({
       { label: "04 MR Systems", tab: "systems", moduleId: "bid.systems" },
     ],
   },
-  "TC-TECH-03": {
+  "R1-TC-03": {
     vendorRef: "07 Vendor / Next G & ORGA OEM package",
     brownfieldRef: "—",
     links: [
       { label: "10.2 B11", tab: "budget", moduleId: "bid.budget.working.bc" },
+      { label: "07 VND", tab: "documents", moduleId: "bid.documents" },
+    ],
+  },
+  "R1-TC-04": {
+    vendorRef: "07 Vendor / Cisco VST-0048-RE1 (IE-3400-8P2S-E)",
+    brownfieldRef: "TC-0001 Item 13 (IEM-3300-8T= excluded)",
+    links: [
+      { label: "10.1 Working BOM", tab: "budget", moduleId: "bid.budget.bom" },
       { label: "07 VND", tab: "documents", moduleId: "bid.documents" },
     ],
   },
