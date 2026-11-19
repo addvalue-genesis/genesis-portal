@@ -80,10 +80,19 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
           const evalRes = evaluateParticularDirective0553({
             text: r.requirement,
             topic: r.topic,
-            signals: { red: r.decisionStatus === "REQUIRES_ENGINEERING_EVALUATION" },
+            signals: r.markup || {},
             decisionStatus: r.decisionStatus,
+            recordType: r.type,
+            tags: r.tags,
           });
-          return { ...r, mrGroup: inferMrGroup0553(r), directive: evalRes.directive, phi: evalRes.phi };
+          return {
+            ...r,
+            mrGroup: inferMrGroup0553(r),
+            directive: evalRes.directive,
+            directiveSource: evalRes.directiveSource,
+            signalSource: evalRes.signalSource,
+            phi: evalRes.phi,
+          };
         })
         .filter((r) => {
           if (partDoc !== "ALL" && r.document !== partDoc) return false;
@@ -235,7 +244,7 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
                   </thead>
                   <tbody>
                     {MR_CRS_BLUE_0553.blueTextParticulars.map((b) => {
-                      const ev = evaluateParticularDirective0553({ text: b.note, topic: b.topic, signals: { blue: true } });
+                      const ev = evaluateParticularDirective0553({ text: b.note, topic: b.topic, signals: b.markup || {} });
                       return (
                         <tr key={b.id}>
                           <td><strong>{b.id}</strong></td>
@@ -358,6 +367,7 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
                         )}
                         <td>
                           <span className="p55-badge" style={{ whiteSpace: "normal", display: "inline-block" }}>{r.directive}</span>
+                          <small style={{ color: "#475569", display: "block" }}>{r.directiveSource} · {r.signalSource}</small>
                           <small style={{ color: "#0f766e", fontWeight: 600 }}>Provided in {r.document} §{r.section || "-"}</small>
                           {isAVS && <small>{r.phi.cus ? "CUS " : ""}{r.phi.vnd ? "07 VND " : ""}{r.phi.si ? "SI" : ""}</small>}
                         </td>

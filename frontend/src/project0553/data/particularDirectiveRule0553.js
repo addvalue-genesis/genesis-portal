@@ -8,17 +8,17 @@
  *      w(x) = max(c_red, c_blue, c_strike, c_yellow, c_revbar) in {0, 1}
  *      w(x) = 1 => Particular / Actionable Clause
  *
- * 3. Directive Polarity D(x):
- *      - DO_NOT         if c_strike == 1 or matches exclude/remove/not require/not accept/withdrawn
- *      - OPTIONAL_SCOPE if matches optional / if required / conditional
- *      - DEVIATION_SI   if offered(x) != MR(x) (e.g. BDA in lieu of LNA, 8-port vs 16+2)
- *      - MUST_DO        if matches shall / must / minimum / provide / include / required / >=
- *      - CLARIFY_CUS    otherwise
+ * 3. Directive Polarity Resolution Order D(x):
+ *      (1) Strike (`c_strike == 1`)                        -> DO_NOT
+ *      (2) Deviation (`in lieu of / offered != MR`)       -> DEVIATION_SI (even with NEG)
+ *      (3) Conflicting multi-match ({NEG+OPT/MUST}, etc.) -> CLARIFY_CUS (ambiguity: true)
+ *      (4) Negation (`not required / shall not / excl.`)  -> DO_NOT
+ *      (5) Optional (`optional / if required`)            -> OPTIONAL_SCOPE
+ *      (6) Bare `remove` (without `do not remove`)        -> CLARIFY_CUS
+ *      (7) Obligation (`shall / must / mandatory`)        -> MUST_DO (or structural TAG fallback)
+ *      (8) Fallback                                       -> CLARIFY_CUS
  *
- * 4. 3-Tier Routing Phi(x) = (CUS, VND, SI) in {0, 1}^3:
- *      - CUS = 1 for all customer-facing scope/clarify/deviation/option obligations
- *      - VND = 1 when equipment brand/model/part/Ex/cert/spares/tools are affected
- *      - SI  = 1 when cost/MH/link budget/deviation/logistics/engineering are affected
+ * 4. 3-Tier Routing Phi(x) = (CUS, VND, SI) in {0, 1}^3
  */
 export const PARTICULAR_DIRECTIVE_EQUATION_0553 = Object.freeze({
   id: "EQ-0553-PARTICULAR-01",
@@ -31,7 +31,9 @@ const NEG_RE =
 const DO_NOT_REMOVE_RE = /\b(do\s+not|shall\s+not|must\s+not)\s+remove\b/i;
 const BARE_REMOVE_RE = /\bremove\b/i;
 const OPT_RE = /\b(optional|if\s+required|if\s+used|conditional|where\s+applicable)\b/i;
-const DEV_RE = /\b(in\s+lieu\s+of|deviation|versus|vs\.?|conflict|changed\s+from\s+dtrs|8-port)\b/i;
+const DEV_RE = /\b(in\s+lieu\s+of|deviation|versus|vs\.?|changed\s+from\s+dtrs)\b/i;
+const DEVIATION_KEYWORDS_0553 = /\b(8-port)\b/i;
+const DEVIATION_CONTEXT_0553 = /\b(in\s+lieu\s+of|offered|instead\s+of|vs\.?)\b/i;
 const MUST_RE =
   /\b(shall|must|mandatory|minimum|min\s|provide|include|required|comply|obtain|install|at\s+least)\b/i;
 
@@ -40,6 +42,8 @@ export function evaluateParticularDirective0553({
   topic = "",
   signals = {},
   decisionStatus = "",
+  recordType = "",
+  tags = [],
 } = {}) {
   const s = {
     red: signals.red ? 1 : 0,
@@ -49,28 +53,37 @@ export function evaluateParticularDirective0553({
     revbar: signals.revbar ? 1 : 0,
   };
   const w = Math.max(s.red, s.blue, s.strike, s.yellow, s.revbar);
+  const signalSource = w === 1 ? "EXTRACTED" : "NOT_EXTRACTED";
   const full = `${topic} ${text}`.toLowerCase();
 
   const hasPreserveNoRemove = DO_NOT_REMOVE_RE.test(full);
   const strippedForMust = full.replace(new RegExp(NEG_RE.source, "gi"), " ");
-  const hasNeg = s.strike === 1 || (!hasPreserveNoRemove && NEG_RE.test(full));
+  const hasStrike = s.strike === 1;
+  const hasNeg = !hasStrike && !hasPreserveNoRemove && NEG_RE.test(full);
   const hasOpt = OPT_RE.test(full);
-  const hasDev = DEV_RE.test(full) || decisionStatus === "DEVIATION";
+  const hasContextualDevKeyword =
+    DEVIATION_KEYWORDS_0553.test(full) && DEVIATION_CONTEXT_0553.test(full);
+  const hasDev =
+    DEV_RE.test(full) || hasContextualDevKeyword || decisionStatus === "DEVIATION";
   const hasMust = hasPreserveNoRemove || MUST_RE.test(strippedForMust);
   const hasBareRemoveOnly = !hasPreserveNoRemove && BARE_REMOVE_RE.test(full) && !hasNeg;
 
   const matchedClasses = [];
-  if (hasNeg) matchedClasses.push("NEG");
+  if (hasStrike || hasNeg) matchedClasses.push("NEG");
   if (hasOpt) matchedClasses.push("OPT");
   if (hasDev) matchedClasses.push("DEV");
   if (hasMust) matchedClasses.push("MUST");
 
   let directive = "CLARIFY_CUS";
   let ambiguity = false;
+  let directiveSource = "FALLBACK_CLARIFY";
 
-  if (hasDev) {
-    // Deviation + Negation (e.g. "BDA in lieu of LNA; LNA not required") is DEVIATION_SI
+  if (hasStrike) {
+    directive = "DO_NOT";
+    directiveSource = "MARKUP_STRIKE";
+  } else if (hasDev) {
     directive = "DEVIATION_SI";
+    directiveSource = "MODAL_TEXT";
   } else if (
     (hasNeg && hasOpt) ||
     (hasNeg && hasMust) ||
@@ -78,17 +91,36 @@ export function evaluateParticularDirective0553({
   ) {
     directive = "CLARIFY_CUS";
     ambiguity = true;
+    directiveSource = "AMBIGUOUS_CONFLICT";
   } else if (hasNeg) {
     directive = "DO_NOT";
+    directiveSource = "MODAL_TEXT";
   } else if (hasOpt) {
     directive = "OPTIONAL_SCOPE";
+    directiveSource = "MODAL_TEXT";
   } else if (hasBareRemoveOnly) {
     directive = "CLARIFY_CUS";
+    directiveSource = "BARE_REMOVE";
   } else if (hasMust) {
     directive = "MUST_DO";
+    directiveSource = "MODAL_TEXT";
+  } else if (
+    recordType === "TAG_SUPPLY" ||
+    (recordType === "CLAUSE" && Array.isArray(tags) && tags.length > 0)
+  ) {
+    directive = "MUST_DO";
+    directiveSource = "STRUCTURAL_TYPE";
   }
 
-  const cus = 1;
+  const cus =
+    directive === "CLARIFY_CUS" ||
+    directive === "OPTIONAL_SCOPE" ||
+    directive === "DEVIATION_SI" ||
+    /\b(scope|client|company|jutal|pttep|clarify|confirm|approval|submit|vdrl|fat|sat|warranty|exclude|not required)\b/i.test(
+      full
+    )
+      ? 1
+      : 0;
   const vnd = /\b(brand|model|part|antenna|lna|bda|switch|enclosure|gland|cable|sounder|telephone|racon|spare|tool|spir|ex d|ex de|atex|iecex|ip66|m20|m25|datasheet|oem)\b/i.test(
     full
   )
@@ -105,7 +137,9 @@ export function evaluateParticularDirective0553({
   return {
     w,
     signals: s,
+    signalSource,
     directive,
+    directiveSource,
     ambiguity,
     matchedClasses,
     phi: { cus, vnd, si },
@@ -169,15 +203,15 @@ export function evaluateDrawingBoundary0553({
 }
 
 /**
- * Unified VDRL-Extensible Document Sub-Equations (EQ-0553-DOC-ENGINE-01):
- *   R*(x, phase) = argmax_{d in D} (Authority(d, attr, phase) + 0.25 * w_d(x))
- *   (Bounded +0.25*w tie-breaker preserves strict contractual rank order.)
+ * Unified VDRL-Extensible Document Precedence Engine (EQ-0553-DOC-ENGINE-01):
+ *   Lexicographic sort: (authority DESC, w DESC, revisionDate DESC, revisionCode DESC)
+ *   - Evidence docs (CAL, RPT_STUDY, RPT_TEST) never win contractual precedence or set providedByCustomer.
+ *   - Agreed/closed TC overrides baseline peers in R1_PLUS_CLARIFY; open TC stays in openTcRefs.
+ *   - Baseline peer conflicts apply MOST_STRINGENT comparator (e.g., IP66/IP67 composite, range hull).
  *
  * Phases:
  *   - "R0_INITIAL"      : Initial bid before TC/CCL -> MR is #1
  *   - "R1_PLUS_CLARIFY" : Post-R0 clarification     -> Agreed TC/CCL overlays MR (MR + Delta)
- *
- * Extensible via VDRL document codes (PHI, BOD, MR, DTS, SPE, LIS, MTO, BLD, LAY, DWG, RPT, CAL, PRO, ITP, SPIR).
  */
 export const DOCUMENT_SUB_EQUATIONS_0553 = Object.freeze({
   TC:   { id: "EQ-DOC-TC",   vdrlGroup: "CLARIFY",   output: "Agreed Technical/Commercial Delta", formula: "f_TC(x) = MR + Delta(TC/CCL)" },
@@ -198,68 +232,144 @@ export const DOCUMENT_SUB_EQUATIONS_0553 = Object.freeze({
   SPIR: { id: "EQ-DOC-SPIR", vdrlGroup: "SPARES",    output: "Spare Parts Interchangeability Record", formula: "f_SPIR(x) = (OEM_PartNo, Qty_platform, LeadTime)" },
 });
 
+const PTTEP_DOCTYPE_MAP_0553 = Object.freeze({
+  TC: "TC", CCL: "TC", PHI: "PHI", BOD: "BOD", MR: "MR", DTS: "DTS",
+  SPE: "SPE", LIS: "LIS", MTO: "MTO", RPT: "RPT", CAL: "CAL", BLD: "BLD",
+  LAY: "LAY", DWG: "DWG", PRO: "PRO", ITP: "ITP", SPIR: "SPIR",
+  PRC: "PRO", PDR: "PRO", REP: "RPT_TEST", FAT: "RPT_TEST", SAT: "RPT_TEST",
+  WIR: "DWG", GA: "DWG",
+  DSS: "OTHER", CER: "OTHER", SCD: "OTHER", DOC: "OTHER", CAT: "OTHER", MOM: "OTHER", VDR: "OTHER",
+});
 const VALID_DOC_TYPES_0553 = new Set([
   "TC", "CCL", "PHI", "BOD", "MR", "DTS", "SPE", "LIS", "MTO",
-  "RPT", "CAL", "BLD", "LAY", "DWG", "PRO", "ITP", "SPIR",
+  "RPT", "RPT_STUDY", "RPT_TEST", "CAL", "BLD", "LAY", "DWG", "PRO", "ITP", "SPIR",
 ]);
-const EQUIP_TAG_RE_0553 = /^[A-Z]{2,4}-\d{3}-\d{3}[A-Z]?$/i;
+const EQUIP_TAG_RE_0553 = /^[A-Z]{2,4}-(?:[A-Z]{2,4}-)?\d{3}-\d{3}[A-Z]?\b/i;
 const NUMBERED_DOC_RE_0553 =
   /(?:^|[-_ ])(TC|CCL|PHI|BOD|MR|DTS|SPE|LIS|MTO|RPT|CAL|BLD|LAY|DWG|PRO|ITP|SPIR)[-_ ]?\d{2,4}(?:[-_ ]?[A-Z]\d?)?(?=$|[\s_(§,])/i;
 const WORD_DOC_RE_0553 =
   /\b(TC|CCL|PHI|BOD|MR|DTS|SPE|LIS|MTO|RPT|CAL|BLD|LAY|DWG|PRO|ITP|SPIR)\b/i;
+const RPT_TEST_HINT_RE = /\b(fat|sat|test|inspection)\b/i;
 
-export function extractVdrlDocType0553(docCodeOrCandidate = "") {
+function classifyRpt0553(context = "") {
+  return RPT_TEST_HINT_RE.test(String(context || "")) ? "RPT_TEST" : "RPT_STUDY";
+}
+
+export function extractVdrlDocType0553(docCodeOrCandidate = "", titleHint = "") {
   if (docCodeOrCandidate && typeof docCodeOrCandidate === "object") {
     const explicit = String(docCodeOrCandidate.docType || "").trim().toUpperCase();
-    if (VALID_DOC_TYPES_0553.has(explicit)) return explicit === "CCL" ? "TC" : explicit;
-    return extractVdrlDocType0553(docCodeOrCandidate.doc || docCodeOrCandidate.title || "");
+    if (VALID_DOC_TYPES_0553.has(explicit)) {
+      if (explicit === "CCL") return "TC";
+      if (explicit === "RPT") return classifyRpt0553(docCodeOrCandidate.title || docCodeOrCandidate.doc);
+      return explicit;
+    }
+    return extractVdrlDocType0553(
+      docCodeOrCandidate.doc || docCodeOrCandidate.projectDocumentNo || docCodeOrCandidate.title || "",
+      docCodeOrCandidate.title || ""
+    );
   }
   const s = String(docCodeOrCandidate || "").trim().toUpperCase();
   if (!s || EQUIP_TAG_RE_0553.test(s)) return "OTHER";
+
+  const coreToken = s.split(/[\s_(§,]/)[0];
+  const segs = coreToken.split("-");
+  if (segs.length >= 5 && /^\d{2,4}$/.test(segs[segs.length - 1])) {
+    const rawCode = segs[segs.length - 2];
+    const mapped = PTTEP_DOCTYPE_MAP_0553[rawCode];
+    if (mapped === "RPT") return classifyRpt0553(`${s} ${titleHint}`);
+    return mapped || "OTHER";
+  }
+
   const numMatch = s.match(NUMBERED_DOC_RE_0553);
-  if (numMatch) return numMatch[1] === "CCL" ? "TC" : numMatch[1];
+  if (numMatch) {
+    const code = numMatch[1] === "CCL" ? "TC" : numMatch[1];
+    return code === "RPT" ? classifyRpt0553(`${s} ${titleHint}`) : code;
+  }
   const wordMatch = s.match(WORD_DOC_RE_0553);
-  if (wordMatch) return wordMatch[1] === "CCL" ? "TC" : wordMatch[1];
+  if (wordMatch) {
+    const code = wordMatch[1] === "CCL" ? "TC" : wordMatch[1];
+    return code === "RPT" ? classifyRpt0553(`${s} ${titleHint}`) : code;
+  }
   return "OTHER";
 }
 
 const ATTRIBUTE_AUTHORITY_RANK_0553 = Object.freeze({
   QTY:       ["TC", "MR", "MTO", "LIS", "SPIR", "BLD", "LAY", "DWG"],
-  SPEC:      ["TC", "DTS", "SPE", "CAL", "RPT", "BOD", "MR", "BLD", "PHI"],
-  LOCATION:  ["TC", "LAY", "DWG", "RPT", "BLD", "MTO", "MR"],
+  SPEC:      ["TC", "DTS", "SPE", "RPT_STUDY", "BOD", "MR", "BLD", "PHI"],
+  LOCATION:  ["TC", "LAY", "DWG", "RPT_STUDY", "BLD", "MTO", "MR"],
   INTERFACE: ["TC", "BLD", "DWG", "PHI", "SPE", "DTS"],
   TESTING:   ["TC", "MR", "ITP", "PRO", "SPE", "BOD", "DTS", "LIS"],
 });
 
+const EVIDENCE_DOC_TYPES_0553 = new Set(["CAL", "RPT_STUDY", "RPT_TEST"]);
+const AGREED_TC_STATUSES_0553 = new Set([
+  "AGREED", "CLOSED", "CLOSED_NOTED", "APPROVED", "ACCEPTED",
+]);
 const normValue0553 = (v) => String(v).toUpperCase().replace(/\s+/g, "");
+
+function comparePeerValues0553(v1, v2) {
+  const s1 = String(v1).trim();
+  const s2 = String(v2).trim();
+  const ip1 = s1.match(/^IP(\d)(\d)$/i);
+  const ip2 = s2.match(/^IP(\d)(\d)$/i);
+  if (ip1 && ip2) {
+    const d1Max = Math.max(Number(ip1[1]), Number(ip2[1]));
+    const b1 = Number(ip1[2]);
+    const b2 = Number(ip2[2]);
+    if ((b1 >= 7 && (b2 === 5 || b2 === 6)) || (b2 >= 7 && (b1 === 5 || b1 === 6))) {
+      const lo = Math.min(b1, b2);
+      const hi = Math.max(b1, b2);
+      return { stricterValue: `IP${d1Max}${lo}/IP${d1Max}${hi}`, compositeRequirement: true };
+    }
+    return { stricterValue: `IP${d1Max}${Math.max(b1, b2)}`, compositeRequirement: false };
+  }
+  const r1 = s1.match(/^([+-]?\d+(?:\.\d+)?)\s*\.\.\s*([+-]?\d+(?:\.\d+)?)$/);
+  const r2 = s2.match(/^([+-]?\d+(?:\.\d+)?)\s*\.\.\s*([+-]?\d+(?:\.\d+)?)$/);
+  if (r1 && r2) {
+    const lo = Math.min(Number(r1[1]), Number(r2[1]));
+    const hi = Math.max(Number(r1[2]), Number(r2[2]));
+    const fmt = (n) => (n > 0 ? `+${n}` : `${n}`);
+    return { stricterValue: `${fmt(lo)}..${fmt(hi)}`, compositeRequirement: false };
+  }
+  return { stricterValue: null, compositeRequirement: false };
+}
 
 export function resolveDocumentPrecedence0553(
   attr = "SPEC",
   candidates = [],
-  { phase = "R1_PLUS_CLARIFY" } = {}
+  { phase = "R1_PLUS_CLARIFY", conflictPolicy = "MOST_STRINGENT" } = {}
 ) {
   const baseRank = ATTRIBUTE_AUTHORITY_RANK_0553[attr] || ATTRIBUTE_AUTHORITY_RANK_0553.SPEC;
   const rank = phase === "R0_INITIAL" ? baseRank.filter((d) => d !== "TC") : baseRank;
-  const valued = (candidates || []).filter((c) => {
-    if (!c || c.value == null || String(c.value).trim() === "") return false;
+
+  const valued = [];
+  const evidence = [];
+  const openTcRefs = [];
+
+  for (const c of candidates || []) {
+    if (!c || c.value == null || String(c.value).trim() === "") continue;
     const docType = extractVdrlDocType0553(c);
-    if (phase === "R0_INITIAL" && docType === "TC") return false;
-    if (docType === "TC" && Array.isArray(c.deltaAttrs) && !c.deltaAttrs.includes(attr)) return false;
-    return true;
-  });
+    if (EVIDENCE_DOC_TYPES_0553.has(docType)) {
+      evidence.push({ ...c, docType });
+      continue;
+    }
+    if (docType === "TC") {
+      if (phase === "R0_INITIAL") continue;
+      if (Array.isArray(c.deltaAttrs) && !c.deltaAttrs.includes(attr)) continue;
+      const st = String(c.status || "").trim().toUpperCase();
+      if (!AGREED_TC_STATUSES_0553.has(st)) {
+        openTcRefs.push({ ...c, docType });
+        continue;
+      }
+    }
+    valued.push({ ...c, docType });
+  }
 
   const scored = valued.map((c) => {
-    const docType = extractVdrlDocType0553(c);
-    const idx = rank.indexOf(docType);
+    const idx = rank.indexOf(c.docType);
     const baseAuth = idx === -1 ? 1 : rank.length - idx + 1;
     const w = c.hasMarkup ? 1 : 0;
-    return {
-      ...c,
-      docType,
-      authority: baseAuth,
-      w,
-      score: baseAuth + 0.25 * w,
-    };
+    return { ...c, authority: baseAuth, w };
   });
 
   scored.sort((a, b) => {
@@ -272,16 +382,35 @@ export function resolveDocumentPrecedence0553(
 
   const winner = scored[0] || null;
   const winnerNorm = winner ? normValue0553(winner.value) : null;
-  const conflictsWith = winner
-    ? [...new Set(scored.slice(1).filter((c) => normValue0553(c.value) !== winnerNorm).map((c) => c.docType))]
+  const differing = winner
+    ? scored.slice(1).filter((c) => normValue0553(c.value) !== winnerNorm)
     : [];
+  const conflictsWith = [...new Set(differing.map((c) => c.docType))];
   const conflict = conflictsWith.length > 0;
   const providedByCustomer = !!winner;
+
+  let policyApplied = winner?.docType === "TC" ? "AGREED_TC_DELTA" : "PRECEDENCE_WINNER";
+  let stricterValue = winner ? winner.value : null;
+  let compositeRequirement = false;
+
+  if (conflict && winner && winner.docType !== "TC" && conflictPolicy === "MOST_STRINGENT") {
+    for (const peer of differing) {
+      const cmp = comparePeerValues0553(stricterValue, peer.value);
+      if (cmp.stricterValue) {
+        stricterValue = cmp.stricterValue;
+        compositeRequirement = compositeRequirement || cmp.compositeRequirement;
+        policyApplied = "MOST_STRINGENT_BASELINE";
+      }
+    }
+  }
+
   const resolutionNote = !providedByCustomer
     ? "Not specified in customer documents — open TC or vendor confirmation."
-    : conflict
-      ? `Precedence winner: ${winner.docType} (conflict with ${conflictsWith.join(", ")} — confirm stricter rule / TC if needed).`
-      : `Precedence winner: ${winner.docType} — use directly and append as customer basis.`;
+    : policyApplied === "AGREED_TC_DELTA"
+      ? `Agreed TC delta: ${winner.docType} (${stricterValue}).`
+      : conflict
+        ? `Conflict (${winner.docType} vs ${conflictsWith.join(", ")}) — ${policyApplied}: ${stricterValue}.`
+        : `Precedence winner: ${winner.docType} — use directly and append as customer basis.`;
 
   return {
     attribute: attr,
@@ -290,7 +419,12 @@ export function resolveDocumentPrecedence0553(
     providedByCustomer,
     conflict,
     conflictsWith,
-    stricterRuleApplies: conflict,
+    evidence,
+    openTcRefs,
+    policyApplied,
+    stricterValue,
+    compositeRequirement,
+    stricterRuleApplies: conflict && winner?.docType !== "TC",
     resolutionNote,
     ranked: scored,
   };
