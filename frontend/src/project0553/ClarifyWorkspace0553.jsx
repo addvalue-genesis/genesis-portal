@@ -4,6 +4,7 @@ import { AuditBadge, AuditSection } from "../common/ui/ProjectAuditPrimitives";
 import { selectDeviationRegister0553 } from "./data/deviationRegister0553";
 import TC_HISTORY_0553 from "./data/snapshots/tc.communication.history.0553.json";
 import PARTICULAR_REQS_0553 from "./data/documentParticularRequirements0553.json";
+import MR_CRS_BLUE_0553 from "./data/snapshots/mr.crs.and.bluetext.0553.json";
 
 function inferMrGroup0553(rec) {
   const tags = (rec.tags || []).join(" ").toUpperCase();
@@ -204,9 +205,50 @@ export function ClarifyWorkspace0553({ onNavigate = null }) {
           <div data-component-key="bid.clarify.particulars">
             <p className="p55-note">
               ข้อกำหนดเฉพาะโครงการ (<strong>Particular</strong>) แยกตามระบบ MR และหมวดเอกสาร — ข้อความ{" "}
-              <strong style={{ color: "#b91c1c" }}>ตัวอักษรสีแดง</strong> คือจุดที่ต้องระวัง/ตรวจเทียบเป็นพิเศษ{" "}
+              <strong style={{ color: "#b91c1c" }}>ตัวอักษรสีแดง</strong> คือจุดที่ต้องระวัง และ{" "}
+              <strong style={{ color: "#1d4ed8" }}>ตัวอักษรสีน้ำเงิน</strong> คือข้อความปรับแก้ Rev.C1 ใน MR PDF{" "}
               <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.clarify.particulars" />
             </p>
+            <details className="p553-budget-phase" open style={{ marginBottom: 12 }}>
+              <summary>
+                <strong>Rev.C1 Blue-Text Particular Notes ({MR_CRS_BLUE_0553.blueTextParticulars.length}) &amp; Common MR Client Comments — WichaiS ({MR_CRS_BLUE_0553.commonReviewComments.length})</strong>
+              </summary>
+              <div className="p55-table-wrap" style={{ marginBottom: 10 }}>
+                <table className="p55-table p55-table--compact">
+                  <thead>
+                    <tr><th>ID</th><th>MR / Page</th><th>Blue-Text Revision (Rev.C1)</th><th>ความหมาย / ผลกระทบ (Interpretation)</th></tr>
+                  </thead>
+                  <tbody>
+                    {MR_CRS_BLUE_0553.blueTextParticulars.map((b) => (
+                      <tr key={b.id}>
+                        <td><strong>{b.id}</strong></td>
+                        <td><strong>{b.mr}</strong><small>{b.page}</small></td>
+                        <td style={{ color: "#1d4ed8", fontWeight: 600 }}>{b.note}</td>
+                        <td>{b.topic}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="p55-table-wrap">
+                <table className="p55-table p55-table--compact">
+                  <thead>
+                    <tr><th>No.</th><th>MR / Ref</th><th>Client Comments (Reviewer)</th><th>Contractor Response</th><th>Status / By</th></tr>
+                  </thead>
+                  <tbody>
+                    {MR_CRS_BLUE_0553.commonReviewComments.map((c) => (
+                      <tr key={c.no}>
+                        <td>{c.no}</td>
+                        <td><strong>{c.mr}</strong><small>{c.pageRef}</small></td>
+                        <td>{c.clientComment}</td>
+                        <td>{c.contractorResponse}</td>
+                        <td><span className="p55-badge">{c.status}</span><small>{c.commentBy}</small></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </details>
             <div className="p55-filterbar p55-filterbar--simple" style={{ marginBottom: 10 }}>
               <label>
                 MR Group{" "}

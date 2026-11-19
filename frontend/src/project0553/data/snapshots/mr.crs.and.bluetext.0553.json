@@ -1,0 +1,127 @@
+{
+  "schemaVersion": "0553-mr-crs-bluetext-v1",
+  "sourceDocuments": [
+    "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1",
+    "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1",
+    "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1",
+    "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1"
+  ],
+  "blueTextParticulars": [
+    {
+      "id": "BLUE-MR1-01",
+      "mr": "MR-0001",
+      "page": "p.12–14",
+      "topic": "Brownfield & New Platform Quantities",
+      "note": "Updated Rev.C1 quantities and tags across ZWP20–23, ZPQ (MR-LQM-202-025A/B, ANT-LQM-202-025, SA-LQM-202-025), ZWP8 (2 radio pairs, LAN-502-002, SA-502-002/003), and ZWP11."
+    },
+    {
+      "id": "BLUE-MR1-02",
+      "mr": "MR-0001",
+      "page": "p.15",
+      "topic": "Myanmar Telecom Authority & Optional China Yard Approvals",
+      "note": "All import/operating licenses shall be approved by Myanmar Telecommunication Authority. Optional Scope: VENDOR responsible for any necessary Approvals to import to China Fabrication Yard and export from China to Myanmar."
+    },
+    {
+      "id": "BLUE-MR2-01",
+      "mr": "MR-0002",
+      "page": "p.9, 12–13",
+      "topic": "DMR + LNA & Ex d Surge Enclosure (TCAB-508-002)",
+      "note": "Changed from DTRS to DMR: Install Low Noise Amplifier (LNA) to extend DMR signal coverage on ZPQ main + Yagi Antenna + TCAB-508-002 (DMR Ex d Enclosure for RF Surge)."
+    },
+    {
+      "id": "BLUE-MR2-02",
+      "mr": "MR-0002",
+      "page": "p.14",
+      "topic": "Myanmar Type Approval, Import & Operating License",
+      "note": "VENDOR responsible for application and requisition of any type approval (if required), import license and operating license of radio equipment (including antenna, peripherals and accessories)."
+    },
+    {
+      "id": "BLUE-MR4-01",
+      "mr": "MR-0004",
+      "page": "p.12",
+      "topic": "Offshore Commissioning & Startup Spares",
+      "note": "Offshore commissioning and startup spare parts (1 set per platform) explicitly added in Rev.C1."
+    },
+    {
+      "id": "BLUE-MR4-02",
+      "mr": "MR-0004",
+      "page": "p.13–14",
+      "topic": "Optional Scope: China Yard Import & Export Approvals to Myanmar",
+      "note": "Optional Scope: a) VENDOR shall be responsible for any necessary Approvals that may require to import to China Fabrication Yard and export from China to Myanmar where the platforms are located."
+    },
+    {
+      "id": "BLUE-ALL-01",
+      "mr": "ALL (MR-0001–MR-0004)",
+      "page": "p.17–19, 28–32",
+      "topic": "Exhibit A Annex-8 Minimum List & Project SPIR Format",
+      "note": "VENDOR shall provide minimum spare parts / special tools per wellhead platform per Exhibit A Annex-8, and prepare Commissioning/Start-up + 2-Year Operating Spare Parts Lists using the Project's prescribed SPIR format."
+    }
+  ],
+  "commonReviewComments": [
+    {
+      "no": 1,
+      "mr": "ALL (MR-0001–MR-0004)",
+      "pageRef": "p.10–11",
+      "clientComment": "CTR to clarify the requirement of dimension to be specified in summary of supply.",
+      "contractorResponse": "Dimensions will be specified in the Summary of Supply after vendor/model selection is finalized and shown on Datasheet.",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    },
+    {
+      "no": 2,
+      "mr": "MR-0001 / MR-0002",
+      "pageRef": "p.10–12",
+      "clientComment": "This part shall be updated as the result of Brownfield survey.",
+      "contractorResponse": "Updated; based on site survey, agreed to change Trunk Radio from DTRS to DMR LNA with Yagi Antenna (MR-0002).",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    },
+    {
+      "no": 3,
+      "mr": "MR-0004",
+      "pageRef": "p.10",
+      "clientComment": "Offshore commissioning shall be included.",
+      "contractorResponse": "Incorporate comment.",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    },
+    {
+      "no": 4,
+      "mr": "ALL (MR-0001–MR-0004)",
+      "pageRef": "p.15–17, 26–28",
+      "clientComment": "Vendor shall provide the commissioning spare and special tools, not only the list.",
+      "contractorResponse": "Incorporate comment.",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    },
+    {
+      "no": 5,
+      "mr": "ALL (MR-0001–MR-0004)",
+      "pageRef": "p.15–17, 26–30",
+      "clientComment": "CTR to provide the project template for spare part list preparation by vendor.",
+      "contractorResponse": "SPIR format is one of MR attachment which has been provided to vendor during bidding stage.",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    },
+    {
+      "no": 6,
+      "mr": "ALL (MR-0001–MR-0004)",
+      "pageRef": "p.19–21",
+      "clientComment": "CTR to check the VDRL whether it shall be aligned to VDRL check list.",
+      "contractorResponse": "VDRL is based on 10008-STD-6-GEN-003.",
+      "status": "CLOSED",
+      "commentBy": "WichaiS"
+    }
+  ],
+  "attachments": [
+    { "no": "ATTACHMENT 1", "title": "ENGINEERING DOCUMENTS AND DRAWINGS", "pages": "MR1 p.26 / MR2 p.25 / MR3-4 p.24", "purpose": "VDRL / Technical Drawings & Calculations required with bid & post-PO" },
+    { "no": "ATTACHMENT 2", "title": "BILL OF MATERIAL", "pages": "MR1 p.27 / MR2 p.26 / MR3-4 p.25", "purpose": "Complete physical BOM per platform / TAG" },
+    { "no": "ATTACHMENT 3", "title": "MANUFACTURED COMPONENT DATA", "pages": "MR1 p.28 / MR2 p.27 / MR3-4 p.26", "purpose": "OEM Datasheets, Ex Certificates (ATEX/IECEx)" },
+    { "no": "ATTACHMENT 4", "title": "PRE-COMMISSIONING, COMMISSIONING, START-UP, AND OPERATING PROCEDURES", "pages": "MR1 p.29 / MR2 p.28 / MR3-4 p.27", "purpose": "FAT / SAT / Commissioning test & operating procedures" },
+    { "no": "ATTACHMENT 5", "title": "PRE-COMMISSIONING, COMMISSIONING, AND START-UP SPARE PARTS LIST", "pages": "MR1 p.30 / MR2 p.29 / MR3-4 p.28", "purpose": "B10 Commissioning Spares (SPIR format; physical supply required)" },
+    { "no": "ATTACHMENT 6", "title": "MAINTENANCE MANUAL", "pages": "MR1 p.31 / MR2 p.30 / MR3-4 p.29", "purpose": "Vendor O&M & maintenance instructions" },
+    { "no": "ATTACHMENT 7", "title": "TWO YEARS OPERATING SPARE PARTS LIST", "pages": "MR1 p.32 / MR2 p.31 / MR3-4 p.30", "purpose": "C2 2-Year Operating Spares (SPIR format)" },
+    { "no": "ATTACHMENT 8", "title": "SPECIAL TOOLS", "pages": "MR1 p.33 / MR2 p.32 / MR3-4 p.31", "purpose": "B11 Special Tools list & supply per Exhibit A Annex-8" },
+    { "no": "ATTACHMENT 9", "title": "SHIPPING AND LONGTERM STORAGE RECOMMENDATIONS", "pages": "MR1 p.34 / MR2 p.33 / MR3-4 p.32", "purpose": "B5/B6/B7 Packing, shipping & preservation/storage requirements" }
+  ]
+}
