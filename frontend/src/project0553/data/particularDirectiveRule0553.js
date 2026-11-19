@@ -26,6 +26,15 @@ export const PARTICULAR_DIRECTIVE_EQUATION_0553 = Object.freeze({
     "w(x)=max(s(x)); D(x) in {DO_NOT, OPTIONAL_SCOPE, DEVIATION_SI, MUST_DO, CLARIFY_CUS}; Phi(x)=(CUS, VND, SI)",
 });
 
+const NEG_RE =
+  /\b(do\s+not|does\s+not|shall\s+not|must\s+not|will\s+not|not\s+(?:be\s+)?(?:required|accepted|included|supplied|provided|in\s+scope)|not\s+accept\w*|withdrawn|struck\s+through|exclud\w*|by\s+others|no\s+lna|not\s+share|no\s+fabrication)\b/i;
+const DO_NOT_REMOVE_RE = /\b(do\s+not|shall\s+not|must\s+not)\s+remove\b/i;
+const BARE_REMOVE_RE = /\bremove\b/i;
+const OPT_RE = /\b(optional|if\s+required|if\s+used|conditional|where\s+applicable)\b/i;
+const DEV_RE = /\b(in\s+lieu\s+of|deviation|versus|vs\.?|conflict|changed\s+from\s+dtrs|8-port)\b/i;
+const MUST_RE =
+  /\b(shall|must|mandatory|minimum|min\s|provide|include|required|comply|obtain|install|at\s+least)\b/i;
+
 export function evaluateParticularDirective0553({
   text = "",
   topic = "",
@@ -42,26 +51,40 @@ export function evaluateParticularDirective0553({
   const w = Math.max(s.red, s.blue, s.strike, s.yellow, s.revbar);
   const full = `${topic} ${text}`.toLowerCase();
 
+  const hasPreserveNoRemove = DO_NOT_REMOVE_RE.test(full);
+  const strippedForMust = full.replace(new RegExp(NEG_RE.source, "gi"), " ");
+  const hasNeg = s.strike === 1 || (!hasPreserveNoRemove && NEG_RE.test(full));
+  const hasOpt = OPT_RE.test(full);
+  const hasDev = DEV_RE.test(full) || decisionStatus === "DEVIATION";
+  const hasMust = hasPreserveNoRemove || MUST_RE.test(strippedForMust);
+  const hasBareRemoveOnly = !hasPreserveNoRemove && BARE_REMOVE_RE.test(full) && !hasNeg;
+
+  const matchedClasses = [];
+  if (hasNeg) matchedClasses.push("NEG");
+  if (hasOpt) matchedClasses.push("OPT");
+  if (hasDev) matchedClasses.push("DEV");
+  if (hasMust) matchedClasses.push("MUST");
+
   let directive = "CLARIFY_CUS";
-  if (
-    s.strike === 1 ||
-    /\b(do not|not accept|not require|remove|withdrawn|struck through|exclude|no lna|not share|no fabrication)\b/i.test(
-      full
-    )
-  ) {
-    directive = "DO_NOT";
-  } else if (/\b(optional|if required|if used|conditional)\b/i.test(full)) {
-    directive = "OPTIONAL_SCOPE";
-  } else if (
-    /\b(in lieu of|deviation|versus|vs\.?|conflict|changed from dtrs|8-port)\b/i.test(full) ||
-    decisionStatus === "DEVIATION"
-  ) {
+  let ambiguity = false;
+
+  if (hasDev) {
+    // Deviation + Negation (e.g. "BDA in lieu of LNA; LNA not required") is DEVIATION_SI
     directive = "DEVIATION_SI";
   } else if (
-    /\b(shall|must|minimum|min |provide|include|required|comply|obtain|install|at least)\b/i.test(
-      full
-    )
+    (hasNeg && hasOpt) ||
+    (hasNeg && hasMust) ||
+    (hasOpt && hasMust)
   ) {
+    directive = "CLARIFY_CUS";
+    ambiguity = true;
+  } else if (hasNeg) {
+    directive = "DO_NOT";
+  } else if (hasOpt) {
+    directive = "OPTIONAL_SCOPE";
+  } else if (hasBareRemoveOnly) {
+    directive = "CLARIFY_CUS";
+  } else if (hasMust) {
     directive = "MUST_DO";
   }
 
@@ -83,6 +106,8 @@ export function evaluateParticularDirective0553({
     w,
     signals: s,
     directive,
+    ambiguity,
+    matchedClasses,
     phi: { cus, vnd, si },
   };
 }
@@ -101,15 +126,42 @@ export const DRAWING_LINE_LEGEND_0553 = Object.freeze({
   CLOUD_C1: { code: "REV_C1_DELTA", scope: "REQUIRES_MR_TC_CHECK", label: "Revision Cloud C1: Rev.C1 delta / modification" },
 });
 
-export function evaluateDrawingBoundary0553({ lineStyle = "SOLID", hasCloudC1 = false } = {}) {
-  const base = DRAWING_LINE_LEGEND_0553[lineStyle] || DRAWING_LINE_LEGEND_0553.SOLID;
+export function evaluateDrawingBoundary0553({
+  lineStyle = "",
+  hasCloudC1 = false,
+  legendVerified = false,
+} = {}) {
+  const key = String(lineStyle || "").trim().toUpperCase();
+  const base =
+    key === "SOLID" || key === "DASHED" || key === "DASH_DOT"
+      ? DRAWING_LINE_LEGEND_0553[key]
+      : null;
+  const revDelta = hasCloudC1 ? "REV_C1_DELTA" : null;
+  const legendStatus = legendVerified ? "LEGEND_VERIFIED" : "LEGEND_NOT_VERIFIED";
+  if (!base) {
+    return {
+      code: "UNRESOLVED_LINESTYLE",
+      scope: "CLARIFY_REQUIRED",
+      label: "Unresolved / missing drawing line style",
+      hasCloudC1: !!hasCloudC1,
+      revDelta,
+      requiresMrTcCheck: !!hasCloudC1,
+      legendStatus,
+      directive: "CLARIFY_CUS",
+      supplyDirective: "CLARIFY_CUS",
+      interfaceDirective: "CLARIFY_CUS",
+    };
+  }
   const supplyDirective =
-    lineStyle === "DASHED" || lineStyle === "DASH_DOT" ? "DO_NOT" : "MUST_DO";
+    key === "DASHED" || key === "DASH_DOT" ? "DO_NOT" : "MUST_DO";
   const interfaceDirective =
-    lineStyle === "DASH_DOT" ? "CLARIFY_CUS" : "MUST_DO";
+    key === "DASH_DOT" ? "CLARIFY_CUS" : "MUST_DO";
   return {
     ...base,
     hasCloudC1: !!hasCloudC1,
+    revDelta,
+    requiresMrTcCheck: !!hasCloudC1,
+    legendStatus,
     directive: supplyDirective,
     supplyDirective,
     interfaceDirective,
@@ -146,10 +198,28 @@ export const DOCUMENT_SUB_EQUATIONS_0553 = Object.freeze({
   SPIR: { id: "EQ-DOC-SPIR", vdrlGroup: "SPARES",    output: "Spare Parts Interchangeability Record", formula: "f_SPIR(x) = (OEM_PartNo, Qty_platform, LeadTime)" },
 });
 
-export function extractVdrlDocType0553(docCodeOrName = "") {
-  const s = String(docCodeOrName || "").toUpperCase();
-  const match = s.match(/\b(TC|CCL|PHI|BOD|MR|DTS|SPE|LIS|MTO|RPT|CAL|BLD|LAY|DWG|PRO|ITP|SPIR)\b/);
-  if (match) return match[1] === "CCL" ? "TC" : match[1];
+const VALID_DOC_TYPES_0553 = new Set([
+  "TC", "CCL", "PHI", "BOD", "MR", "DTS", "SPE", "LIS", "MTO",
+  "RPT", "CAL", "BLD", "LAY", "DWG", "PRO", "ITP", "SPIR",
+]);
+const EQUIP_TAG_RE_0553 = /^[A-Z]{2,4}-\d{3}-\d{3}[A-Z]?$/i;
+const NUMBERED_DOC_RE_0553 =
+  /(?:^|[-_ ])(TC|CCL|PHI|BOD|MR|DTS|SPE|LIS|MTO|RPT|CAL|BLD|LAY|DWG|PRO|ITP|SPIR)[-_ ]?\d{2,4}(?:[-_ ]?[A-Z]\d?)?(?=$|[\s_(§,])/i;
+const WORD_DOC_RE_0553 =
+  /\b(TC|CCL|PHI|BOD|MR|DTS|SPE|LIS|MTO|RPT|CAL|BLD|LAY|DWG|PRO|ITP|SPIR)\b/i;
+
+export function extractVdrlDocType0553(docCodeOrCandidate = "") {
+  if (docCodeOrCandidate && typeof docCodeOrCandidate === "object") {
+    const explicit = String(docCodeOrCandidate.docType || "").trim().toUpperCase();
+    if (VALID_DOC_TYPES_0553.has(explicit)) return explicit === "CCL" ? "TC" : explicit;
+    return extractVdrlDocType0553(docCodeOrCandidate.doc || docCodeOrCandidate.title || "");
+  }
+  const s = String(docCodeOrCandidate || "").trim().toUpperCase();
+  if (!s || EQUIP_TAG_RE_0553.test(s)) return "OTHER";
+  const numMatch = s.match(NUMBERED_DOC_RE_0553);
+  if (numMatch) return numMatch[1] === "CCL" ? "TC" : numMatch[1];
+  const wordMatch = s.match(WORD_DOC_RE_0553);
+  if (wordMatch) return wordMatch[1] === "CCL" ? "TC" : wordMatch[1];
   return "OTHER";
 }
 
@@ -161,6 +231,8 @@ const ATTRIBUTE_AUTHORITY_RANK_0553 = Object.freeze({
   TESTING:   ["TC", "MR", "ITP", "PRO", "SPE", "BOD", "DTS", "LIS"],
 });
 
+const normValue0553 = (v) => String(v).toUpperCase().replace(/\s+/g, "");
+
 export function resolveDocumentPrecedence0553(
   attr = "SPEC",
   candidates = [],
@@ -168,28 +240,56 @@ export function resolveDocumentPrecedence0553(
 ) {
   const baseRank = ATTRIBUTE_AUTHORITY_RANK_0553[attr] || ATTRIBUTE_AUTHORITY_RANK_0553.SPEC;
   const rank = phase === "R0_INITIAL" ? baseRank.filter((d) => d !== "TC") : baseRank;
-  const scored = candidates.map((c) => {
-    const docType = extractVdrlDocType0553(c.doc || "");
+  const valued = (candidates || []).filter((c) => {
+    if (!c || c.value == null || String(c.value).trim() === "") return false;
+    const docType = extractVdrlDocType0553(c);
+    if (phase === "R0_INITIAL" && docType === "TC") return false;
+    if (docType === "TC" && Array.isArray(c.deltaAttrs) && !c.deltaAttrs.includes(attr)) return false;
+    return true;
+  });
+
+  const scored = valued.map((c) => {
+    const docType = extractVdrlDocType0553(c);
     const idx = rank.indexOf(docType);
     const baseAuth = idx === -1 ? 1 : rank.length - idx + 1;
     const w = c.hasMarkup ? 1 : 0;
-    return { ...c, docType, score: baseAuth + 0.25 * w };
+    return {
+      ...c,
+      docType,
+      authority: baseAuth,
+      w,
+      score: baseAuth + 0.25 * w,
+    };
   });
-  scored.sort((a, b) => b.score - a.score);
+
+  scored.sort((a, b) => {
+    if (b.authority !== a.authority) return b.authority - a.authority;
+    if (b.w !== a.w) return b.w - a.w;
+    const dateCmp = String(b.revisionDate || "").localeCompare(String(a.revisionDate || ""));
+    if (dateCmp !== 0) return dateCmp;
+    return String(b.revisionCode || "").localeCompare(String(a.revisionCode || ""));
+  });
+
   const winner = scored[0] || null;
-  const conflict = scored.length > 1 && scored[0]?.value !== scored[1]?.value;
-  const providedByCustomer = !!(winner && winner.value != null && String(winner.value).trim() !== "");
+  const winnerNorm = winner ? normValue0553(winner.value) : null;
+  const conflictsWith = winner
+    ? [...new Set(scored.slice(1).filter((c) => normValue0553(c.value) !== winnerNorm).map((c) => c.docType))]
+    : [];
+  const conflict = conflictsWith.length > 0;
+  const providedByCustomer = !!winner;
   const resolutionNote = !providedByCustomer
     ? "Not specified in customer documents — open TC or vendor confirmation."
     : conflict
-      ? `Provided in ${winner.docType} (conflict detected — stricter rule applies; confirm via TC if needed).`
-      : `Provided in ${winner.docType} — use directly and append as customer basis.`;
+      ? `Precedence winner: ${winner.docType} (conflict with ${conflictsWith.join(", ")} — confirm stricter rule / TC if needed).`
+      : `Precedence winner: ${winner.docType} — use directly and append as customer basis.`;
+
   return {
     attribute: attr,
     phase,
     winner,
     providedByCustomer,
     conflict,
+    conflictsWith,
     stricterRuleApplies: conflict,
     resolutionNote,
     ranked: scored,

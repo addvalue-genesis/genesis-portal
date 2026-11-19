@@ -12,11 +12,30 @@ const GEQ=freeze(["GEQ-001","GEQ-004","GEQ-005","GEQ-006","GEQ-007","GEQ-009","G
 const PEQ_B1=freeze(["PEQ-B1-001","PEQ-B1-002","PEQ-B1-003","PEQ-B1-004","PEQ-B1-005","PEQ-B1-006","PEQ-B1-007"]);
 const PEQ_B2=freeze(Array.from({length:14},(_,i)=>"PEQ-B2-"+String(i+1).padStart(3,"0")));
 const normalize=x=>String(x||"").trim().toLowerCase().replace(/\s+/g," ");
+const VDRL_OWNER_DECISION_0553=freeze({
+ decisionBasis:"REPO_APPROVED_BASIS + STANDARD_PRACTICE__ADOPTED_BY_PM_20261119",
+ revisable:true,
+ references:freeze(["fatExecutionBasis0553.costRouting","bcB3EquationExecution0553 L117","bcExecutionActivities0553 B4/B5/B9/B10","NORSOK Z-018","IEC 62381","NORSOK Z-008 §11"]),
+ byTitle:freeze({
+  "inspection and test plan":                         freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_INTEGRATION_QA",                  flags:freeze({I_B3_author:0})}),
+  "fat procedure":                                    freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_TEST_PROCEDURE_AUTHOR",           flags:freeze({I_B3_author:0})}),
+  "sat procedure":                                    freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"B1_TEST_PROCEDURE_AUTHOR",           flags:freeze({I_B3_author:0,existingRevC:true})}),
+  "erection, & installation procedure":               freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"OEM_IOM_PLUS_B1_PACKAGE_INTEGRATION",flags:freeze({I_install:0,supervisionPackage:"B9"})}),
+  "surface preparation and painting procedure":       freeze({workKind:"OEM_FABRICATION_QA",                 technicalWorkOwner:"OEM",                                flags:freeze({I_B1:0,I_B3:0,touchUpPackage:"B4"})}),
+  "painting/insulation inspection report":            freeze({workKind:"OEM_FABRICATION_QA",                 technicalWorkOwner:"OEM",                                flags:freeze({I_B3:0,touchUpPackage:"B4"})}),
+  "recommended start-up and commissioning spares list":freeze({workKind:"TECHNICAL_B1_OR_OEM",               technicalWorkOwner:"OEM_SPIR",                           flags:freeze({createsQty:false,qtyPackage:"B10/SPQ"})}),
+  "recommended spares list for two year's operation": freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"OEM_SPIR",                           flags:freeze({createsQty:false,pricedQuoteOnly:true})}),
+  "bought out items list":                            freeze({workKind:"TECHNICAL_B1_OR_OEM",                technicalWorkOwner:"DERIVED_FROM_PART_A_BOM",            flags:freeze({newB1MH:false})}),
+  "list of loosed items shipped to zpq":              freeze({workKind:"DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD", technicalWorkOwner:"B5_PACKING_OUTPUT",                  flags:freeze({})})
+ })
+});
 const kind=title=>{
  const s=normalize(title);
+ const decided=VDRL_OWNER_DECISION_0553.byTitle[s];
+ if(decided)return decided.workKind;
  if(/\b(fat|sat) report\b|inspection report|commissioning test report/.test(s))return "TEST_EVIDENCE_B3";
  if(/calculation|schematic|wiring|termination|general arrangement|installation detail|data sheet|drawing|radio coverage/.test(s))return "TECHNICAL_B1_OR_OEM";
- if(/vdr|register|report|meeting|dossier|index|table of contents|shipping|packing|certificate|catalog|brochure|schedule|contact directory/.test(s))return "DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD";
+ if(/vdr|register|progress report|meeting|dossier|index|table of contents|shipping|packing|certificate|catalog|brochure|schedule|contact directory/.test(s))return "DOCUMENT_CONTROL_B2_VENDOR_PAYLOAD";
  return "OWNER_TECHNICAL_REVIEW_PENDING";
 };
 const recurrence=record=>{
@@ -30,7 +49,9 @@ const recurrence=record=>{
 };
 const requirements=freeze(VDRL.records.map(row=>{
  const documentKey=row.mr+"|"+row.projectDocumentNo;
- const workKind=kind(row.title);
+ const normalizedTitle=normalize(row.title);
+ const decided=VDRL_OWNER_DECISION_0553.byTitle[normalizedTitle]||null;
+ const workKind=decided?decided.workKind:kind(row.title);
  const occurrenceRule=recurrence(row);
  // Quantity of source VDRL obligations = 1. Actual documents, submissions,
  // repeat events, approved revisions and as-built splits remain independently OPEN.
@@ -45,10 +66,14 @@ const requirements=freeze(VDRL.records.map(row=>{
  return freeze({
   ...row,documentKey,moduleId:"bid.engineering.equations.b1-b2."+row.id.toLowerCase(),
   sourceRequirementQuantity:1,documentInstances:null,documentIssues:null,revisionCycles:null,
-  projectTitleType:normalize(row.title),workKind,occurrenceRule,
+  projectTitleType:normalizedTitle,workKind,occurrenceRule,
   documentControlOwner:"B2", // Control/transmittal only; technical content stays separate.
-  technicalWorkOwner:workKind==="TEST_EVIDENCE_B3"?"B3_OR_OEM_FOR_TEST_CONTENT":
-   workKind==="TECHNICAL_B1_OR_OEM"?"B1_OR_OEM_SCOPE_TO_VERIFY":"OEM_OR_ADDVALUE_CONTENT_TO_VERIFY",
+  technicalWorkOwner:decided?decided.technicalWorkOwner:
+   workKind==="TEST_EVIDENCE_B3"?"B3_OR_OEM_FOR_TEST_CONTENT":
+   workKind==="TECHNICAL_B1_OR_OEM"?"B1_OR_OEM_SCOPE_TO_VERIFY":
+   workKind==="OEM_FABRICATION_QA"?"OEM":"OEM_OR_ADDVALUE_CONTENT_TO_VERIFY",
+  flags:decided?decided.flags:freeze({}),
+  ownerDecisionBasis:decided?VDRL_OWNER_DECISION_0553.decisionBasis:null,
   technicalWorkState:"CONTRACTUAL_VENDOR_DELIVERABLE_ADDVALUE_INCREMENT_TO_VERIFY",
   documentControlEquationIds:freeze(["GEQ-009","GEQ-024","PEQ-B2-001","PEQ-B2-003","PEQ-B2-004"]),
   technicalEquationIds:freeze(["GEQ-005","PEQ-B1-003"]),
