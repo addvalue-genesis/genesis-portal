@@ -114,3 +114,48 @@ export function evaluateDrawingBoundary0553({ lineStyle = "SOLID", hasCloudC1 = 
           : "MUST_DO",
   };
 }
+
+/**
+ * Unified 9-Document Mathematical Engine (EQ-0553-DOC-ENGINE-01):
+ *   R*(x) = argmax_{d in D} Authority(d, attr) * (1 + 0.5 * w_d(x))
+ *
+ * Each document family carries its own sub-equation and domain authority:
+ *   PHI, BOD, MR, DTS, SPE, LIS, MTO, BLD, DWG/LAY
+ */
+export const DOCUMENT_SUB_EQUATIONS_0553 = Object.freeze({
+  PHI: { id: "EQ-DOC-PHI", output: "Topology & Redundancy Constraint", formula: "f_PHI(x) = (availability, redundancy, failSafe)" },
+  BOD: { id: "EQ-DOC-BOD", output: "System & RF Design Envelope", formula: "f_BOD(x) = (band, linkBudget, throughput)" },
+  MR:  { id: "EQ-DOC-MR",  output: "Contractual Scope & Attachments 1-9", formula: "f_MR(x) = (Qty_platform, Mandatory/Optional, Annex-8)" },
+  DTS: { id: "EQ-DOC-DTS", output: "OEM Compliance Vector", formula: "f_DTS(x) = (ExRating, IP, Power, Entries, Latency)" },
+  SPE: { id: "EQ-DOC-SPE", output: "Material, Fire & Test Gate", formula: "f_SPE(x) = (IEC/ATEX, FirePerformance, FAT/SAT)" },
+  LIS: { id: "EQ-DOC-LIS", output: "Unique Tag Registry", formula: "f_LIS(x) = Tag x Platform x Service" },
+  MTO: { id: "EQ-DOC-MTO", output: "Physical Material Takeoff", formula: "f_MTO(x) = sum_site(Qty(tag)) + BulkLot" },
+  BLD: { id: "EQ-DOC-BLD", output: "Supply Scope Boundary", formula: "f_BLD(x) = LineStyle(Solid | Dashed | Dash-Dot)" },
+  LAY: { id: "EQ-DOC-LAY", output: "Physical Placement & Route", formula: "f_LAY(x) = (Deck, Elevation, Cloud_C1, FeederLen)" },
+  DWG: { id: "EQ-DOC-DWG", output: "Detail Interface & Mounting", formula: "f_DWG(x) = (Entries, Mounting, Earthing, Dimensions)" },
+});
+
+const ATTRIBUTE_AUTHORITY_RANK_0553 = Object.freeze({
+  QTY:       ["MR", "MTO", "LIS", "BLD", "LAY", "DWG"],
+  SPEC:      ["DTS", "SPE", "BOD", "MR", "BLD", "PHI"],
+  LOCATION:  ["LAY", "DWG", "BLD", "MTO", "MR"],
+  INTERFACE: ["BLD", "DWG", "PHI", "SPE", "DTS"],
+  TESTING:   ["MR", "SPE", "BOD", "DTS", "LIS"],
+});
+
+export function resolveDocumentPrecedence0553(attr = "SPEC", candidates = []) {
+  const rank = ATTRIBUTE_AUTHORITY_RANK_0553[attr] || ATTRIBUTE_AUTHORITY_RANK_0553.SPEC;
+  const scored = candidates.map((c) => {
+    const idx = rank.indexOf(String(c.doc || "").toUpperCase());
+    const baseAuth = idx === -1 ? 1 : rank.length - idx + 1;
+    const w = c.hasMarkup ? 1 : 0;
+    return { ...c, score: baseAuth * (1 + 0.5 * w) };
+  });
+  scored.sort((a, b) => b.score - a.score);
+  return {
+    attribute: attr,
+    winner: scored[0] || null,
+    conflict: scored.length > 1 && scored[0]?.value !== scored[1]?.value,
+    ranked: scored,
+  };
+}
