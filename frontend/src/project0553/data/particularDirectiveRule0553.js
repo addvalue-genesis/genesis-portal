@@ -103,21 +103,23 @@ export const DRAWING_LINE_LEGEND_0553 = Object.freeze({
 
 export function evaluateDrawingBoundary0553({ lineStyle = "SOLID", hasCloudC1 = false } = {}) {
   const base = DRAWING_LINE_LEGEND_0553[lineStyle] || DRAWING_LINE_LEGEND_0553.SOLID;
+  const supplyDirective =
+    lineStyle === "DASHED" || lineStyle === "DASH_DOT" ? "DO_NOT" : "MUST_DO";
+  const interfaceDirective =
+    lineStyle === "DASH_DOT" ? "CLARIFY_CUS" : "MUST_DO";
   return {
     ...base,
     hasCloudC1: !!hasCloudC1,
-    directive:
-      lineStyle === "DASHED" || lineStyle === "DASH_DOT"
-        ? "DO_NOT"
-        : hasCloudC1
-          ? "MUST_DO"
-          : "MUST_DO",
+    directive: supplyDirective,
+    supplyDirective,
+    interfaceDirective,
   };
 }
 
 /**
  * Unified VDRL-Extensible Document Sub-Equations (EQ-0553-DOC-ENGINE-01):
- *   R*(x, phase) = argmax_{d in D} Authority(d, attr, phase) * (1 + 0.5 * w_d(x))
+ *   R*(x, phase) = argmax_{d in D} (Authority(d, attr, phase) + 0.25 * w_d(x))
+ *   (Bounded +0.25*w tie-breaker preserves strict contractual rank order.)
  *
  * Phases:
  *   - "R0_INITIAL"      : Initial bid before TC/CCL -> MR is #1
@@ -171,7 +173,7 @@ export function resolveDocumentPrecedence0553(
     const idx = rank.indexOf(docType);
     const baseAuth = idx === -1 ? 1 : rank.length - idx + 1;
     const w = c.hasMarkup ? 1 : 0;
-    return { ...c, docType, score: baseAuth * (1 + 0.5 * w) };
+    return { ...c, docType, score: baseAuth + 0.25 * w };
   });
   scored.sort((a, b) => b.score - a.score);
   const winner = scored[0] || null;
