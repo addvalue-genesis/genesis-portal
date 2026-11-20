@@ -1,0 +1,19 @@
+{
+  "schema": "genesis.0550.tools-scope.v1",
+  "projectId": "PJ2608-0550",
+  "status": "DRAFT_UNVERIFIED",
+  "note": "Tool TYPES by system token for Schedule C5. Starting list only, not extracted from MR/SPE; engineering must confirm against the customer C5 scope. No brand, quantity or price.",
+  "bidFlow": "BID-FLOW: CUS ↔ VND → SI A/B/C → Release → Volume I (A1 A2 C1–C8 D E F M) / II / III",
+  "bySystem": {
+    "TEL-LAN": ["Network cable tester", "UTP crimping tool", "Punch down tool"],
+    "TEL-LAN-VCS": ["IP phone tester", "Network cable tester"],
+    "TEL-PABX": ["IP phone tester", "Network cable tester"],
+    "TEL-FO": ["OTDR", "FO continuity tester", "Optical power meter", "Fiber splicing machine", "FO cleaning kit"],
+    "TEL-PAGA": ["SPL meter"],
+    "TEL-DMR": ["Radio communication analyzer", "Site Master / spectrum analyzer", "RF cable repair kit"],
+    "TEL-RADIO-DTRS": ["Radio communication analyzer", "Site Master / spectrum analyzer"],
+    "TEL-VSAT": ["Satellite finder", "Antenna alignment tool"],
+    "TEL-CCTV": ["IP CCTV tester"]
+  },
+  "common": ["Multimeter", "AC/DC clamp meter", "Earth clamp meter", "Basic hand tools", "Tool bag", "Label printer", "Antistatic kit"]
+}

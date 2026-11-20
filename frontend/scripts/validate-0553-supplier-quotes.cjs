@@ -1,0 +1,17 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"../src/project0553");
+const raw=fs.readFileSync(path.join(root,"data/supplierQuoteLines.js"),"utf8");
+const quote=JSON.parse(fs.readFileSync(path.join(root,"data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
+const view=fs.readFileSync(path.join(root,"CommercialSystemBreakdown.jsx"),"utf8");
+const repository=fs.readFileSync(path.join(root,"data/repository.js"),"utf8");
+assert.equal(quote.lines.length,53);
+assert.equal(quote.currency,"USD");
+assert.equal(quote.quotedGrandTotal,191610.15);
+assert.equal(Math.round(quote.lines.reduce((n,x)=>n+(x.quotedTotal??0),0)*100)/100,191610.15);
+assert(raw.includes('from "./quotes/NG-260916-ADV-DAP1.full.json"'));
+assert(raw.includes('id:"VST-0048-RE1"')&&raw.includes('currency:"THB"'));
+assert(raw.includes('id:"PROSPER-24051"')&&raw.includes("2024_REFERENCE_ONLY_REQUOTE"));
+assert(raw.includes('id:"ST-2407073"')&&raw.includes("currentPriceAllowed:false"));
+assert(view.includes("getProject0553SupplierQuotes().filter")&&view.includes("q.lines.map"));
+assert(repository.includes("getProject0553SupplierQuotes"));
+console.log("PASS supplier quote source JSON 53 lines, original currency, 2024 references and repository UI binding");

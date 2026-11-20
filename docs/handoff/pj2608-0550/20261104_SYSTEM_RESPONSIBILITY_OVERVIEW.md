@@ -1,0 +1,409 @@
+# Existing WP.1 responsibility / Vendor / Working overview
+
+Starting branch HEAD: `650bce165e3b79d987679d629bdd5d6450730689`.
+UI: `2026-11-04.10`. Same branch / draft PR53 / port3050.
+
+## Behavior and canonical ownership
+
+The existing WP.1 all-system scope table now separates TSI supply, COMPANY
+responsibility, TSI services, unresolved responsibility/type and reviewed N/A.
+Counts are requirement records, not equipment quantities or completeness scores.
+All canonical systems, COMMON and additional authored scope remain visible.
+Selected-system mode shows the same summary above the original constraint worklist.
+
+Classification uses the current canonical requirement responsibility and linked
+Working WBS (MR catalogue WBS only for its exact seed when no linked line is found).
+Mixed or untyped work stays unresolved; title keywords do not decide scope.
+Requirement groups open the existing record editor and materialize their record
+lists only when expanded. Scope review/problems and its existing editor remain.
+
+Offer presence uses the existing Vendor register projection, including exact
+quotation system tokens and current requirement/Working bindings. Valid linked IDs,
+missing references and canonical REVIEWED_MAPPING are separate counts. No link is
+not evidence of no Vendor or an instruction to procure COMPANY equipment.
+
+Working references use the existing MR owner-validation rule before accepting an
+included owner, then deduplicate selected owners per system. Missing, deselected or
+invalid owner references remain visible. Known-price counts use the existing finite
+provisionalCustomerTHB (including zero), not Official/Release approval. COMMON or
+shared owners are not allocated, added or summed across systems. COMPANY and
+reviewed N/A records do not create TSI procurement-price gaps. Unlinked requirements
+are shown separately. All navigation reuses original record/module IDs.
+
+## Domain limits
+
+VSAT retains COMPANY main equipment, TSI accessories/services and clarification;
+AIS retains COMPANY supply and TSI engineering/testing. The two MGW Ku dishes
+remain TEL-ES, not inferred TEL-VSAT-KU Internet. VCS catalogue requirements are
+not treated as accepted MGW endpoints. MR is one source of requirements, not an
+override of applicable PHI/DTS/SPE/drawings/standards/contracts.
+
+ADR0550-001 principles1–6,8–14 guide the change: preserve source/requirement lineage,
+separate supplier evidence from adequacy, preserve SI work and single cost ownership,
+and distinguish received CAL/RPT from derived proof and frozen issues. This view is
+read-only. It does not implement semantic document extraction, accept applicability,
+resolve conflicts, prove capacities/quantity allocation, change AVL or pass Release.
+Actual all-system engineering and owner Windows deployment remain unverified.
+
+## Validation
+
+- Extended system-constraints logic/SSR checks: VSAT/AIS split, VCS and Ku scope,
+  exact MGW dish tokens, all/additional systems, exclusive record classification,
+  valid/missing Offer IDs, zero/missing prices, valid/invalid/deselected/missing
+  owners, mixed scope, reviewed N/A, no mutations and unchanged architectural IDs.
+- Existing Working Preview and commercial Release-issue validators passed,
+  including source staleness, unchanged financial inputs and immutable history.
+- Existing context `--check` passed. `git diff --check` passed.
+- Production webpack passed; one existing asset-size warning (105.bundle.js).
+- Actual Source Rev11 / A Rev07 isolated browser:678 sources,20 scope options;
+  VCS/VSAT/Ku/AIS/LAN/CCTV/COMMON, scope editor, requirement editor, source reverse
+  navigation, search,1440/390 containment, reload, exact saved-workspace preservation
+  and no page errors passed. Opening a lazily rendered responsibility group also
+  navigated to the existing requirement editor without saving.
+
+Private DATA is not bundled or changed. Git pull updates this view, not a browser
+workspace backup. No financial adoption, customer issue, merge or deployment claim.
+
+## Antigravity comment reviewed during this continuation
+
+Owner supplied a report explicitly based on d641c9f0. Compared with branch650bce16
+and the bounded WP.1 changes above; the report is evidence to evaluate, not an
+instruction to replace the architecture or alter native customer forms.
+
+- bidVolumes0550 derives active rows from model.official.lines (line81), and binding
+  amount from line.customerUSD (line98). Bindings allocate scope/terms, not another
+  editable price store. Missing allocations do produce HOLD. The existing synthetic
+  validator reaches ready=true and equal baseAssigned/official.baseUSD; HOLD is not
+  structurally permanent or proof of disconnection.
+- Different WBS / Schedule code names do not change treatment or amounts. Existing
+  scheduleAllocationPlan0550 is deterministic draft guidance and has an explicit
+  saveScheduleAllocationDrafts0550 path preserving saved allocations. It remains
+  deliberately unreviewed; this is not automatic semantic acceptance.
+- B7/B8/B9 are absent from the reference customerForm rows. Real seed gap:4+5+4
+  catalogue lines import with unmapped customerRowCode. Runtime mappingValid accepts
+  any of these WBS under an existing Part B row (tested B1); that test is not a
+  project allocation decision. Resolve default/allocation basis with the actual
+  customer form, preserve saved decisions and shared owners; do not add native
+  customer rows or reprice to silence the gate.
+- nativePages uses chunks/continuation pages, including35 C1 rows across2 pages;
+  native Word uses the same page projection, and the C1 versioned Word builder.
+  Existing native/bid-volume/Working-schedule validators passed, including overflow,
+  current-price propagation, canonical financial preservation and frozen exports.
+- Current RFQ catalogue is85 expected inputs:78 DOCUMENT,2 EMBEDDED (both have
+  excerpts),5 ATTACHMENT. Actual text is in private Source Intake (678 sources in
+  the tested Rev11 pair); sourceReadiness checks bound sources, authority/revision,
+  read state, embedded excerpts and document reviews. Expected-input metadata is
+  not a claim of completed reading/engineering.
+- PAGA/Master/IDIE/CERAGON private quotation/default/loader work is documented in
+  prior checkpoints; MGW is not the only supported Vendor JSON. Detailed coverage
+  for remaining legacy radio offers must still be checked individually.
+- Discovery accepts GENESIS_0550_PROJECT_DIR and established Drive project/DATA
+  paths. The report's Downloads/0550 listing cannot establish failure on the
+  owner's Windows mount or prove private DATA absent. Do not claim Windows
+  deployment from repository inspection or isolated browser tests.
+
+Keep separate CUS sources, supplier evidence and authored SI mappings; do not use
+Vendor quotations to rewrite the MR requirement catalogue. Follow canonical Working
+pricing into both presenters, with explicit reviewed Schedule allocation and exact
+reconciliation; do not delete HOLD controls or frozen-history protections.
+
+## 7-Nov-2026. Working results by system
+
+WP.1 `10.2.2.1.3` shows the existing Volume II draft and selected Working
+owners for each system while CUS review is open. It displays THB subtotals for
+Base A/B and Option C separately, retaining open owner rows and non-additive
+references to other systems and COMMON. Existing CUS findings link back to
+their source records. ADR §§4–6, 8–13 govern the projection.
+
+The Rev.36 Drive pair combined with the reconstructed Working fixture produces
+19 system drafts and COMMON. Selected Working owners appear once across those
+rows. Hazardous Area Telephone references the existing PABX package and AIS
+references COMMON activities. The two tower equipment prices remain open in
+the tested fixture. The canonical reviews, quantities, prices and issue state
+are unchanged. Context, system constraints and Working Preview validation and
+the development webpack build passed. The owner's saved Windows workspace has
+yet to be verified.
+
+## 7-Nov-2026. Customer quantity and separate supply prices
+
+The MR Rev.B1 Appendix 1.5 quantity is two installed dishes at each endpoint.
+PHI §7.3.11 and SPE §7.2 establish 7 GHz, 99.99% and diversity assessment.
+DTS-0010 sets the 1.2 m antenna basis and LIS-0004 item 12 assigns complete
+system supply to TSI. The earlier ACP LIS cable-schedule comment refers to one
+antenna. CERAGON Rev.A1 BoQ F93/G93 includes one shared dish per site. Add one
+per site in the bid draft and retain the Full Outdoor versus separate IDU/ODU
+architecture, link design and cable reconciliation as technical review.
+
+The native APF DWG-0001 C4 and ACP DWG-0001 C1, sheet 2/2 Item 02, show
+one microwave dish at 50 m and 29 m respectively. APF LAY-0010 C4 sheet 8
+and ACP LAY-0003 C1 sheet 3 identify one microwave tag each in Detail A and
+call for EPC to revisit quantities. DTS-0010 B1 sheet 4 likewise has one
+microwave antenna tag per site. The layouts, drawings, older LIS and
+RPT-0001 C4 are useful for interfaces and layout verification. The MR retains
+two dishes per site as the bid baseline and calls for detailed BOQ adjustment
+after the approved path and availability study. PHI text says about 40 km
+and its Figure 7-15 labels 12 km. Verify the actual path and available
+mounting separation before claiming space diversity or 99.99% availability.
+Both MTO-0001s are bulk takeoffs. APF C5 item 4 gives 400 m of 50-ohm coax
+before allowance and ACP C1 item 5 gives 360 m. These bulk values repeat in
+MR Appendix 1.8 and cannot establish the microwave circuit quantity. Keep
+the 200 m per site in Appendix 1.5 until the cable and route reconciliation.
+
+The existing Working preparation installs four source-bound cost adjustments
+after the controlled sources and original quote basis are present. It prices
+each native tower row from that site's Master Tower items 2–5. Erection Item
+10 stays in Base B4 and physical foundation construction Item 9 is excluded.
+The CERAGON dish and MGW handheld differences are separate estimates. The dish
+reserve uses the R11 non-protected link price less R12 two spare radios, and
+the handheld reserve uses the Q26-063 mixed-lot rate divided by the quoted 122
+radios. Neither calculation establishes an OEM unit rate. The Volume II
+draft lists the bid scope and quantities without these costs. Reconcile the
+previous budget-derived reserves before use.
+
+ADR §§3–6 and 8–13 apply. Context, bid completion, live dossier and Working
+Preview passed. The Rev.36 reconstruction verified the four prices,
+preservation of existing owner totals, staleness after quote or owner change,
+deletion/edit preservation and Release HOLD. The user's Windows workspace
+remains unverified.
+
+## 7-Nov-2026. Licensing cost visibility and single-dish design evidence
+
+Part B8 displays the five existing regulatory cost owners. They cover
+frequency and operating licence coordination, equipment type approval,
+import permits, application support and the separate authority/agent fee
+allowance. Volume I shows the same IDs and sales amounts in the 11.A1 Others
+allocation. The native draft remark identifies the included licensing scope.
+Amounts, original allocations, approved outputs and historical issues retain
+their canonical owners. MR Appendix 1.0 §2.0(l), SPE-0011 §7.1 and LIS-0004
+Item 12 distinguish TSI dossier preparation and representation from COMPANY
+licence ownership. Confirm actual application counts and payer before issue.
+
+SPE-0011 §§7.2–7.4 require a 7 GHz link, 99.99% availability and assessment
+of diversity. The SPE does not prescribe two dishes per site. DTS equipment
+tags, BLD-0011, DWG, LAY and RPT-0001 C4 §8.1 equipment schedules support
+one dish per site as the design candidate. RPT §11.1 separately describes
+space diversity. The MR Appendix 1.5 schedule remains two dishes per site
+and permits detailed BOQ adjustment after approval of the link study.
+Confirm this difference before removing the two-dish bid allowance.
+
+## 7-Nov-2026. Licensing budget evidence and logistics checks
+
+The internal B8 panel now shows the basis of the existing THB 300,000
+authority/agent reserve: two import/export work packages at THB 25,000 and
+five radio approval work packages at THB 50,000. These are planning drivers,
+not an application count or statutory fee. The Rev.36 reconstruction adds
+THB 80,000 of existing TSI labour for THB 380,000 total. Volume I continues to
+read the existing price owners through A1 Others.
+
+R03 Table 6.1 and §§6.1.2 and 6.1.5 identify the FaFE and prior-approval
+requirements. The cost detail distinguishes approval preparation, agency and
+authority fees, and physical logistics/customs costs. Confirm the intended
+Satellite Systems route and the respective applicant and payer with COMPANY.
+The planning schedule allows 5–6 months for sequential prior approval and
+MOC licence processing while noting Table 6.1 lists 4–5 months.
+
+The 0553 requirements JSON and costing JS are separate references.
+0553's THB 200,000 was a project-specific external budget including agency,
+fee allowance and reserves. The THB 100,000 Instrument figure was a separate
+provisional SELL allowance with unknown direct cost. Neither is a 0550 charge
+or an authority tariff.
+
+## 7-Nov-2026. Official fee payer and payment milestones
+
+B8 distinguishes the licensee/applicant, TSI application work, statutory
+payment, and any authorized advance/recovery. MR Appendix 1.0 §2.0(l),
+SPE-0011 §7.1 and LIS-0004 Item 12 establish different application roles.
+The documents reviewed do not establish an ADDVALUE advance with recovery
+via CNEEC. The working proposal is for the licensee to pay or for CNEEC to
+arrange an agreed route. An ADDVALUE advance requires written terms.
+
+The internal comparison shows MOC's CIF-based import reference and the
+PTD Link by Link example at 7 GHz and 28 MHz. The PTD page was posted in
+2018. Neither estimate is booked as a project fee. Before issue confirm
+whether a fresh licence is needed, the PTD charging unit, first-year and
+renewal payer, and FX. The Purchase Agreement ties customs to Incoterms;
+the upstream EPC §31.5.2 net-cost reimbursement is conditional and is
+separate from licence fees and from any ADDVALUE entitlement.
+Annex 6 §5.3.1 sets a FaFE filing milestone at least six months ahead of
+shipment. Payment timing follows the applicable authority's notice.
+
+## 7-Nov-2026. Import and operating licence review by system
+
+Working Part B8 lists all 19 canonical systems. The review covers goods
+imported by TSI, COMPANY, its service provider, or Offshore under the relevant
+package. Applications and their charges are tracked by the importer and
+application, which can cover multiple systems. The system links open the
+existing Part A groups. Operating licence notes reference LIS-0004 Rev.B1
+items, with the Microwave SPE and Logistics Instruction cited where relevant.
+The review distinguishes seven systems with a stated licence check, three
+conditional checks and nine with no system-specific RF licence found in the
+reviewed basis. Actual BOM, applicant, applicable approvals, payer and
+renewals still need reconciliation for payment.
+
+Internal B8 presents the published TradeNet CIF bands and the PTD 2018
+Microwave example and selected Private Network/VSAT unit rates in MMK and
+equivalent THB. The 6-Nov-2026 CBM snapshot
+uses 109.11 MMK/THB as the indicative Market Trading basis, alongside the
+62.60 MMK/THB Reference basis. Actual settlement terms remain open. The
+comparison has no cost allocation. B8-D05 remains the shared provisional
+fee owner and Volume I reads the same existing A1 Others bindings.
+
+## 7-Nov-2026. Supplemental licensing budget Rev.01
+
+Reviewed the user-supplied PJ2608-0550 Import and Operation License Budget
+Myanmar Rev.01, sections 1–4, against R03 §§6.1.1 and 6.1.5, the MOC TradeNet
+CIF fee table, the PTD historical Link by Link schedule and the existing CBM
+snapshot. B8 adds a single COMMON review row for shared goods and temporary
+test tools linked to the existing Part A COMMON group. R03 distinguishes
+permanent from temporary import routes and restricts hand-carry and specified
+radio installations in Yangon. Applicability and eligibility are checked per
+shipment and RF use. The VSAT and Ku/C-Band import route remains open pending
+written confirmation from COMPANY.
+
+The Rev.01 MOC scenario of 8–15 applications uses the top illustrative
+CIF-band fee of 90,000 MMK and totals 720,000–1,350,000 MMK. B8 converts the
+scenario at both existing CBM rates. The number of applications remains an
+assumption. The WTO entry and Myanmar import form establish the telecom
+approval route but do not confirm a zero PTD Recommendation fee for ASK.
+The aggregate Rev.01 range overlaps radio, satellite and agent cost
+assumptions. The published PTD Microwave reference remains visible and its
+applicability, including Main/Standby charging, remains open. Keep official
+fees and agency handling separate pending actual charging units, quotes and
+payer confirmation.
+
+This read-only update follows ADR-0550-001 principles 2, 4–6, 8 and 10.
+The existing five B8 owners, Working allowance and Volume I binding are
+preserved. The native Exhibit regression verifies the single COMMON row,
+the converted comparison and separation from customer forms.
+
+## 7-Nov-2026. DMR price trace in 10.7
+
+Reconciled CERAGON Rev.A1 against the Rev.36 source and A preparation pair. The
+existing quote owner supplies the link package. The existing two-dish allowance
+is a separate estimate. Startup links the four exact prepared Appendix 1.5
+requirements to the quote owner and links the allowance only to the two equipment
+requirements. It uses current source identities and price receipts. Edited or
+deleted requirements, stale quote bases, quantities and review decisions retain
+their original handling.
+
+The existing A1-11 Working view shows a DMR-only known subtotal and opens the
+allowance's source offers. Official still requires engineering, scope, AVL,
+deviation and commercial review. The CUS cable length/interface and the Full
+Outdoor versus IDU/ODU scope are open. ADR principles 2, 3, 5, 6, 8–12 apply.
+The Rev.36 audit uses a reconstructed workspace. The owner's Windows workspace
+has yet to be verified.
+The current Rev.36 model and browser checks reconcile the two DMR owners to the
+10.7 subtotal and draft C1. The DMR-specific checks preserve authored changes,
+deletions, stale-quote handling, the Official HOLD and existing export cells.
+The older optional 4-Nov completion fixture reports the same stale-basis check
+failure on the parent. Standard completion, release and native Exhibit tests pass.
+
+## 7-Nov-2026. B8 licence fee research results Rev.01
+
+Reviewed the submitted research against the publication for each rate. Myanmar's
+WTO notification G/LIC/N/3/MMR/3 (2025), section 19, paragraph 12, states no
+fee for PTD Recommendation Approval and MMK 90,000 for the telecom import
+licence. The 2026 notification was located in the index but its clause was
+unavailable to this review. The project still needs the actual HS/CIF and
+invoice. Recommendation, equipment type approval and testing are separate.
+
+The TradeNet reference shows the fee changes reported by DFDL under Newsletter
+6/2025, effective 15 October 2025. Apply membership once per applicable
+account and application/amendment fees by actual event. The source is a
+secondary summary. PTD's displayed Ship Station and Aircraft Station rates
+are comparison categories. They do not establish the rate for the project's
+coast, ground or NDB stations. The WLAN SRD technical reference requires a
+model and deployment check before treating an RF device as exempt. Confirm
+the applicability and rates of DCA and local construction approvals.
+
+Each of the 19 system rows now states its fee position. For the nine original
+gap rows, N/A is restricted to the specified wired or structural case.
+TVRO, optional RF and other approvals are shown separately. The COMMON
+coverage and B8-D01 through B8-D05 ownership are retained. These additions
+are informational in Working only. The existing budget and Volume I
+allocations do not incorporate the published rates as new charges. ADR-0550-001
+principles 2, 4–6, 8 and 10 apply. Verified with the Native Exhibit and Bid
+Completion checks and a production webpack compile.
+
+## 7-Nov-2026. DMR source and link-budget review
+
+The four untouched Appendix 1.5 equipment and cable drafts now cite the
+current MR Rev.B1, printed p21 / PDF p23, with separate APF and ACP item
+locators. The exact earlier draft and previously linked versions both upgrade
+when the replacement source and unchanged price receipts match. The MR bid
+basis remains two dishes and 200 m per site. WP.2 links the CERAGON Pathloss
+report as open evidence on both equipment requirements.
+
+The 12.06 km supplier case models one antenna position per site at ACP 30 m
+and APF 60 m. Total annual availability is 99.9603% at 4KQAM (262–320 Mbps)
+and 99.9924% at 2KQAM (242–295 Mbps). The report does not demonstrate 99.99%
+at the highest mode or prove the two-dish bid layout. The bid review still
+needs the required net throughput/availability combination, the final link
+case and cable/interface reconciliation. Keep the owner's Full Outdoor bid
+basis and two-dish allowance, with the estimate and AVL/commercial review
+still open. Official A1-11 also includes the two Master Tower scope rows.
+
+Rev.36 model QA confirmed the current source and both open proofs, the same
+two DMR price owners, 10.7/C1 draft prices and Official HOLD. Idempotence,
+legacy migration, authored edits, deletions and stale-quote guards passed.
+An isolated browser opened the WP.2 report detail and verified the 10.7
+Working subtotal and Official hold without workspace writes. Completion,
+Punch, price summary, native Exhibit, Working Preview and issue regressions
+passed. The saved Windows workspace remains unverified.
+
+## 7-Nov-2026. Telecom Tower BOM in Vendor, Mapping and Working
+
+The existing Supplier detail component presents Master Tower's two original
+quotations as APF/ACP columns. Its default equipment view uses Items 2–5.
+Services, interfaces and all quoted items are selectable in the same disclosure.
+Each cell shows the original quantity/unit, the quoted rate/amount when used
+in a cost view, native package detail and the existing SI/Working links.
+WP.7 uses the same BOM with its live Mapping state and technical display.
+
+The BOM uses the canonical Vendor quotation projection and exact Requirement
+Offer/TAG links. One LS for tower/accessories stays one LS, with the supplier's
+included components available in the source dialog. Additional source items,
+missing source cells, deleted mappings and stale cost allocations stay visible.
+The current Base erection and excluded foundation construction follow existing
+Working/source scope. ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply.
+
+The Rev.36 reconstruction applies the existing startup retirement/scope
+normalisation before bid preparation. Model and isolated browser checks passed
+for both original quotes, all 30 native items, exact paint units and package
+text, scope links, Vendor/WP.7/10.2 navigation, 390/1440 containment and byte
+preservation of the saved workspace after viewing. Existing source-trace,
+Working Preview, Vendor, price-summary and bid-completion regressions passed.
+Production webpack compiled with its existing application-size advisory.
+Structural adequacy and commercial acceptance require their existing reviews.
+The owner's Windows workspace has yet to be verified.
+
+## 7-Nov-2026. INDUSTRONIC PAGA native BOM and cabinet components
+
+Vendor07.2, WP.7 and Working10.2 share the existing Supplier component for the
+PAGA BOM. The two originals have 37 and 39 non-NET items. The disclosure opens
+the -002 source first and lets the reader switch original identities. Equipment,
+included entitlements, services and Options use their recorded classifications.
+The same item code can have different meanings between quotes, including 5010.
+
+Native item text resolves by source identity, document number, physical page,
+item code and recorded quantity/unit, with a declared source hash check where
+present. Both original form-feed and numbered-page extractions are supported.
+The source dialog shows P/N and cabinet components with counts per quoted unit.
+Multiplication is displayed only for explicit component counts under the source's
+one-unit note. Unprinted cabinet counts stay unprinted. Existing Source dialogs
+beside MR, Vendor and WP.7 Offer entries use the same reader.
+
+ADR-0550-001 principles 2, 3, 5, 6 and 8–13 govern the shared projection and
+canonical identities. Source quantities, price owners and issue decisions retain
+their existing handling. In the Rev.36 reconstruction, -002 has zero selected
+Working owners. The BOM shows this separately from its source NET. Adopting a
+Working basis and engineering/commercial acceptance follow the existing controls.
+
+All 76 source item sections matched their recorded page/quantity/unit. Native
+reader regressions covered revision, duplicate/missing/changed source, unprinted
+counts, item boundaries and legacy extraction. Supplier revision, Vendor,
+Working Preview, Tower trace, bid completion and price-summary checks passed.
+The isolated browser verified both full item sets, Options, component counts,
+canonical navigation, 390/1440 containment and unchanged saved workspace.
+Production webpack compiled with its existing size advisory. The owner's saved
+Windows workspace and engineering acceptance remain unverified.

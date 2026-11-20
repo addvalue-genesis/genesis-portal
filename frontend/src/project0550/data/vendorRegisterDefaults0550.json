@@ -1,0 +1,137 @@
+{
+  "schema": "genesis.0550.vendor-register.v1",
+  "projectId": "PJ2608-0550",
+  "batchId": "VND-IDIE-QO26163-DEFAULTS-20261104-1",
+  "preparedOn": "2026-11-04",
+  "coverageNote": "Default supplier identity and quotation row metadata only. Original source rates/terms load privately; missing rates remain OPEN. No Working selection, crew/duration or final project budget.",
+  "vendors": [
+    {
+      "id": "VENDOR-IDIE-0550",
+      "name": "ID Industrial Engineering Co., Ltd.",
+      "kind": "SERVICE_PROVIDER",
+      "reference": "QO26163 / 03-Nov-2026 / original supplier source"
+    }
+  ],
+  "offers": [
+    {
+      "id": "OFFER-IDIE-QO26163-85D9A816-P1R1",
+      "vendorId": "VENDOR-IDIE-0550",
+      "description": "Service commissioning Engineer PAGA system (ASK)",
+      "brand": "IDIE service",
+      "quoteRef": "QO26163",
+      "date": "2026-11-03",
+      "validUntil": "",
+      "currency": "EUR",
+      "unit": "day",
+      "sourceRef": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view / physical PDF p1 / SERVICE row1",
+      "unitCost": null,
+      "quoteEvidence": {
+        "revision": "",
+        "systemTokens": [
+          "TEL-PAGA"
+        ],
+        "sourceId": "DRV-11o7juF5hOFXxWL40GHh7Wle9BHxprKvP",
+        "sourceSha256": "85d9a816e405c93f8d7a9c170e37a56521a38bccc682c6bc87a135229b777c18",
+        "sourceUrl": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view",
+        "locator": "physical PDF p1 / SERVICE row1",
+        "quotedQuantity": 1,
+        "quotedUnit": "Day",
+        "quotedCurrency": "EUR",
+        "classification": "RATE",
+        "quotedUnitCost": null,
+        "rateBasis": "Quoted reference quantity/unit only. Original rate awaits private source; no commissioning duration or trip quantity adopted.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-IDIE-QO26163-85D9A816-P1R2",
+      "vendorId": "VENDOR-IDIE-0550",
+      "description": "Service technician daily rate8hr/day",
+      "brand": "IDIE service",
+      "quoteRef": "QO26163",
+      "date": "2026-11-03",
+      "validUntil": "",
+      "currency": "EUR",
+      "unit": "U",
+      "sourceRef": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view / physical PDF p1 / SERVICE row2",
+      "unitCost": null,
+      "quoteEvidence": {
+        "revision": "",
+        "systemTokens": [
+          "TEL-PAGA"
+        ],
+        "sourceId": "DRV-11o7juF5hOFXxWL40GHh7Wle9BHxprKvP",
+        "sourceSha256": "85d9a816e405c93f8d7a9c170e37a56521a38bccc682c6bc87a135229b777c18",
+        "sourceUrl": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view",
+        "locator": "physical PDF p1 / SERVICE row2",
+        "quotedQuantity": 1,
+        "quotedUnit": "Unit",
+        "quotedCurrency": "EUR",
+        "classification": "RATE",
+        "quotedUnitCost": null,
+        "rateBasis": "Quoted reference quantity/unit only. Original rate awaits private source; no commissioning duration or trip quantity adopted.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-IDIE-QO26163-85D9A816-P1R3",
+      "vendorId": "VENDOR-IDIE-0550",
+      "description": "Mobilization and transportation in Thailand (per trip)",
+      "brand": "IDIE service",
+      "quoteRef": "QO26163",
+      "date": "2026-11-03",
+      "validUntil": "",
+      "currency": "EUR",
+      "unit": "U",
+      "sourceRef": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view / physical PDF p1 / SERVICE row3",
+      "unitCost": null,
+      "quoteEvidence": {
+        "revision": "",
+        "systemTokens": [
+          "TEL-PAGA"
+        ],
+        "sourceId": "DRV-11o7juF5hOFXxWL40GHh7Wle9BHxprKvP",
+        "sourceSha256": "85d9a816e405c93f8d7a9c170e37a56521a38bccc682c6bc87a135229b777c18",
+        "sourceUrl": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view",
+        "locator": "physical PDF p1 / SERVICE row3",
+        "quotedQuantity": 1,
+        "quotedUnit": "Unit",
+        "quotedCurrency": "EUR",
+        "classification": "RATE",
+        "quotedUnitCost": null,
+        "rateBasis": "Quoted reference quantity/unit only. Original rate awaits private source; no commissioning duration or trip quantity adopted.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-IDIE-QO26163-85D9A816-P2R1",
+      "vendorId": "VENDOR-IDIE-0550",
+      "description": "Service vendor print procedure as per customer/EPC requirement",
+      "brand": "IDIE service",
+      "quoteRef": "QO26163",
+      "date": "2026-11-03",
+      "validUntil": "",
+      "currency": "EUR",
+      "unit": "U",
+      "sourceRef": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view / physical PDF p2 / SERVICE row1",
+      "unitCost": null,
+      "quoteEvidence": {
+        "revision": "",
+        "systemTokens": [
+          "TEL-PAGA"
+        ],
+        "sourceId": "DRV-11o7juF5hOFXxWL40GHh7Wle9BHxprKvP",
+        "sourceSha256": "85d9a816e405c93f8d7a9c170e37a56521a38bccc682c6bc87a135229b777c18",
+        "sourceUrl": "https://drive.google.com/file/d/11o7juF5hOFXxWL40GHh7Wle9BHxprKvP/view",
+        "locator": "physical PDF p2 / SERVICE row1",
+        "quotedQuantity": 1,
+        "quotedUnit": "Unit",
+        "quotedCurrency": "EUR",
+        "classification": "OPTION",
+        "quotedUnitCost": null,
+        "rateBasis": "Quoted reference quantity/unit only. Original rate awaits private source; no commissioning duration or trip quantity adopted.",
+        "terms": []
+      }
+    }
+  ]
+}

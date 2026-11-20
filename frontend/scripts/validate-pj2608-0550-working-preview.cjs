@@ -1,0 +1,338 @@
+// Behavior checks: workflow dependency changes must not approve engineering or post costs.
+const assert=require('node:assert/strict'),path=require('node:path'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+const M=require(root+'/project0550/data/integrationWorkspace0550.js');
+const {WORKING_PREVIEW_STAGES_0550:stages}=require(root+'/project0550/workingPreviewStages0550.js');
+const {evaluateServiceEquation:eq}=require(root+'/project0550/serviceEquationRuntime.js');
+const {emptyBidWorkspace,validateBidWorkspace,deriveBidWorkspace,newId}=require(root+'/project0550/data/bidWorkspaceModel.js');
+const {DATA_LAYER_META,SYSTEMS,COMMERCIAL_POLICY,BUDGETARY_ESTIMATE,COMMERCIAL_SOURCES}=require(root+'/project0550/data.js');
+const {importMrWorkingBasis0550}=require(root+'/project0550/data/mrWorkingBasis0550.js');
+const {importLegacyVendorBasis0550}=require(root+'/project0550/data/legacyVendorBasis0550.js');
+const {officialLineBasisKey}=require(root+'/project0550/data/officialPricing0550.js');
+const cryptoDescriptor=Object.getOwnPropertyDescriptor(globalThis,'crypto'),nativeCrypto=globalThis.crypto;
+try{Object.defineProperty(globalThis,'crypto',{configurable:true,value:{getRandomValues:nativeCrypto.getRandomValues.bind(nativeCrypto)}});assert.match(newId('DEV'),/^DEV-[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);}finally{Object.defineProperty(globalThis,'crypto',cryptoDescriptor);}
+const today='2026-10-29',tokens=SYSTEMS.map(s=>s.token),clone=x=>JSON.parse(JSON.stringify(x));
+assert.deepEqual(stages.map(s=>s.step),[1,2,3,4,5,6,7,8]);assert(stages.every(s=>s.target&&s.purpose&&s.inputs&&s.method&&s.outputs&&s.limits));
+assert.equal(eq('CCTV-STORAGE',{cameras:16,Mbps:4,days:30,overhead:1,usable:1}).value,20.736);
+assert.equal(eq('NETWORK-HEADROOM',{capacityMbps:1000,usable:.8,demandMbps:900}).value,-100);
+assert.equal(eq('POWER-HEADROOM',{capacityW:500,usable:.8,demandW:350}).value,50);
+assert.equal(eq('FO-LOSS',{lengthKm:10,dBperKm:.35,splices:4,spliceLoss:.1,connectors:2,connectorLoss:.5,margin:3}).value,7.9);
+assert.equal(eq('PORT-HEADROOM',{available:24,connected:20,reserved:5}).value,-1);
+assert.equal(eq('LICENSE-HEADROOM',{licensed:16,required:20}).value,-4);
+assert.equal(eq('RF-MARGIN',{txDBm:20,txGain:20,rxGain:20,lossDB:120,sensitivityDBm:-80}).value,20);
+assert.equal(eq('PORT-HEADROOM',{available:2.5,connected:1,reserved:0}).state,'INVALID');
+assert.equal(eq('CCTV-STORAGE',{}).value,null);
+let d=emptyBidWorkspace(DATA_LAYER_META.datasetId);
+d=importLegacyVendorBasis0550(d,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},today);
+d=importMrWorkingBasis0550(d,COMMERCIAL_POLICY,today);
+const before=clone(d),rawModel={...deriveBidWorkspace(d,tokens,today),integration:M.deriveIntegration0550(d,SYSTEMS,today)};
+assert(rawModel.official.requirementGaps.some(g=>g.id==='INTEGRATION-PROJECT-SCOPE')===false,'Legacy pure projection remains compatible');
+const liveProjection=deriveBidWorkspace(d,tokens,today,rawModel.integration);
+assert(liveProjection.official.requirementGaps.some(g=>g.id==='INTEGRATION-PROJECT-SCOPE'),'Live app enforces integration before first save');
+assert.equal(rawModel.integration.requirements.length,264);assert.equal(rawModel.integration.scopes.length,20);assert.equal(rawModel.integration.ready,false);
+assert(rawModel.integration.requirements.every(r=>r.state==='OPEN'));assert.deepEqual(d,before,'Deriving preview is read-only');
+const source=(id,content)=>({id,provider:'GDRIVE',title:id+'.pdf',documentNo:id,revision:'B1',issuedDate:'2026-10-01',receivedDate:'',url:'https://drive.google.com/file/d/'+id+'/view',readState:'TEXT_READ',authority:'CURRENT_TENDER',content,note:'Synthetic only',replaces:[]});
+d.sourceIntake={schema:'genesis.0550.source-intake.v1',projectId:'PJ2608-0550',batchId:'SYNTHETIC',reviewedOn:today,coverageNote:'Synthetic only',sources:[source('CUSTOMER','Available power 230 VAC only. Training Engineers (5 persons).'),source('SUPPLIER','Offered compliant conversion. Manufacturer X model Y.'),source('AVL','Approved X Y.'),source('APPROVAL','Customer accepts alternate X Y under deviation DEV.')],findings:[],milestones:[]};
+d.integrationWorkspace=M.emptyIntegration0550();
+const w=d.integrationWorkspace;
+const line=d.lines.find(l=>l.systemToken==='TEL-PAGA'),offer=d.offers.find(o=>o.id===line.offerId);
+let r={...M.blankRequirement0550('REQ-X','TEL-PAGA'),title:'Synthetic power',statement:'Available power 230 VAC only.',sourceIds:['CUSTOMER'],sourceLocator:'p1 clause 9.6',sourceExcerpt:'Available power 230 VAC only.',need:'Power conversion',criteria:'Headroom >= 0 W',interfaceBasis:'230VAC input; verify output interface',offerIds:[offer.id],supplierSourceIds:['SUPPLIER'],supplierLocator:'p1 item 1',supplierExcerpt:'Offered compliant conversion.',supplierBasis:'Exact offered scope reviewed',responsibility:'TSI',reason:'Design check required',workLineIds:[line.id],proofMode:'CAL',reviewer:'test',reviewedOn:today,status:'REVIEWED'};
+w.requirements.push(r);
+d.calculations.push({id:'CAL-X',title:'Synthetic power margin',systemToken:'TEL-PAGA',equationId:'POWER-HEADROOM',inputs:{capacityW:500,usable:.8,demandW:350},sourceRef:'SYNTHETIC / CUSTOMER p1 / SUPPLIER p1'});
+let p={id:'PROOF-X',requirementId:r.id,title:'Power',kind:'CAL',calculationId:'CAL-X',operator:'GTE',limit:0,unit:'W',method:'Capacity minus demand',inputsBasis:'Source inputs',criteria:r.criteria,limitations:'No site test represented',report:'',outcome:'OPEN',reviewer:'test',reviewedOn:today,status:'REVIEWED',basisKey:''};
+p=M.stampIntegration0550(d,'proofs',p);w.proofs.push(p);
+let a={...M.blankAvlCheck0550('AVL-X'),requirementId:r.id,offerId:offer.id,manufacturer:'X',model:'Y',sourceIds:['AVL'],sourceLocator:'p1',sourceExcerpt:'Approved X Y.',result:'LISTED',basis:'Exact applicable product',reviewer:'test',reviewedOn:today,status:'REVIEWED'};
+a=M.stampIntegration0550(d,'avlChecks',a);w.avlChecks.push(a);
+r=M.stampIntegration0550(d,'requirements',r);w.requirements[0]=r;
+validateBidWorkspace(d,DATA_LAYER_META.datasetId,tokens);
+let model=M.deriveIntegration0550(d,SYSTEMS,today);
+assert.equal(model.proofs[0].state,'REVIEWED_PROOF');assert.equal(model.proofs[0].fieldTestAccepted,false);
+assert.equal(model.requirements.find(q=>q.id===r.id).state,'REVIEWED_MAPPING');assert.equal(model.ready,false,'One reviewed system never closes whole project');
+const change=clone(d);change.calculations[0].inputs.demandW=450;
+assert.equal(M.deriveIntegration0550(change,SYSTEMS,today).proofs[0].passes,false);
+assert(M.deriveIntegration0550(change,SYSTEMS,today).requirements.find(q=>q.id===r.id).problems.includes('STALE_DEPENDENCIES'));
+const unread=clone(d);unread.sourceIntake.sources[0].readState='METADATA_ONLY';unread.sourceIntake.sources[0].content='';
+assert(M.deriveIntegration0550(unread,SYSTEMS,today).proofs[0].problems.some(p=>p.includes('CONTENT_UNREAD')));
+const mismatch=clone(d);mismatch.integrationWorkspace.proofs[0].unit='kW';mismatch.integrationWorkspace.proofs[0]=M.stampIntegration0550(mismatch,'proofs',mismatch.integrationWorkspace.proofs[0]);
+assert(M.deriveIntegration0550(mismatch,SYSTEMS,today).proofs[0].problems.includes('CRITERION_VALUE_OR_UNIT_OPEN'));
+const avlMissing=clone(d);avlMissing.integrationWorkspace.avlChecks[0].result='NOT_LISTED';avlMissing.integrationWorkspace.avlChecks[0]=M.stampIntegration0550(avlMissing,'avlChecks',avlMissing.integrationWorkspace.avlChecks[0]);
+assert(M.deriveIntegration0550(avlMissing,SYSTEMS,today).avlChecks[0].problems.includes('AVL_DEVIATION_REQUIRED'));
+let dev={...M.blankDeviation0550('DEV-X'),requirementId:r.id,avlCheckId:'AVL-X',systemToken:'TEL-PAGA',offerIds:[offer.id],mrRef:'MR synthetic',vendorQuoteRef:'Quote synthetic',contractorDocument:'AVL p1',vendorDeviation:'Alternate X/Y',justification:'Engineering basis',companyResponse:'Accepted',resolution:'Use X/Y',finalClosure:'Accepted with recorded evidence',workflowStatus:'APPROVED',approvalDecision:'ACCEPTED',reviewer:'test',reviewedOn:today,status:'REVIEWED'};
+dev=M.stampIntegration0550(avlMissing,'deviations',dev);avlMissing.integrationWorkspace.deviations.push(dev);
+assert.equal(M.deriveIntegration0550(avlMissing,SYSTEMS,today).deviations[0].state,'OPEN','APPROVED text alone cannot approve deviation');
+assert(M.deriveIntegration0550(avlMissing,SYSTEMS,today).requirements.find(q=>q.id===r.id).problems.includes('TECHNICAL_DEVIATION_OPEN / DEV-X'));
+const technicalOnly=clone(avlMissing);technicalOnly.integrationWorkspace.avlChecks[0].result='LISTED';
+assert(M.deriveIntegration0550(technicalOnly,SYSTEMS,today).requirements.find(q=>q.id===r.id).problems.includes('TECHNICAL_DEVIATION_OPEN / DEV-X'),'Non-AVL technical deviations also block requirement review');
+Object.assign(dev,{approvalSourceIds:['APPROVAL'],approvalLocator:'p1 decision',approvalExcerpt:'Customer accepts alternate X Y under deviation DEV.'});
+dev=M.stampIntegration0550(avlMissing,'deviations',dev);avlMissing.integrationWorkspace.deviations[0]=dev;
+assert.equal(M.deriveIntegration0550(avlMissing,SYSTEMS,today).deviations[0].state,'ACCEPTED_DEVIATION');
+assert.equal(M.deriveIntegration0550(avlMissing,SYSTEMS,today).avlChecks[0].state,'REVIEWED_AVL');
+const particular={...M.blankParticular0550('PART-X'),systemToken:'TEL-PAGA',kind:'COLOURED_TEXT',title:'230VAC only',text:r.statement,interpretation:'Conversion owned by supplier',impact:'Recalculate power',obligationKinds:['TRAINING'],references:[{sourceId:'CUSTOMER',locator:'p1 clause 9.6',excerpt:r.sourceExcerpt,appearance:'red text',visualEvidenceRef:''}],reviewer:'test',reviewedOn:today,status:'REVIEWED'};
+w.particulars.push(M.stampIntegration0550(d,'particulars',particular));model=M.deriveIntegration0550(d,SYSTEMS,today);
+assert(model.particulars[0].problems.includes('COLOUR_VISUAL_REVIEW_OPEN'));
+assert(model.requirements.find(q=>q.id===r.id).problems.some(p=>p.startsWith('PARTICULAR_ACTIVITY_OPEN')));
+assert(model.requirements.find(q=>q.id===r.id).problems.includes('STALE_DEPENDENCIES'));
+const newDoc=clone(d);newDoc.sourceIntake.sources.push(source('NEW-REQUIRED-DOC','New requirement training.'));
+assert(M.deriveIntegration0550(newDoc,SYSTEMS,today).documentGaps.some(g=>g.id==='NEW-REQUIRED-DOC'));
+let dr={...M.blankDocumentReview0550('CUSTOMER'),systemTokens:['TEL-PAGA'],expectedPages:2,reviewedPages:'1',notesReviewed:true,colourReviewed:true,appendicesReviewed:true,basis:'All contexts reviewed',reviewer:'test',reviewedOn:today,status:'REVIEWED'};
+dr=M.stampIntegration0550(d,'documentReviews',dr);w.documentReviews.push(dr);
+assert(M.deriveIntegration0550(d,SYSTEMS,today).documentReviews[0].problems.includes('DOCUMENT_PAGES_UNREVIEWED'));
+dr.reviewedPages='1-2';w.documentReviews[0]=M.stampIntegration0550(d,'documentReviews',dr);
+assert.equal(M.deriveIntegration0550(d,SYSTEMS,today).documentReviews[0].state,'REVIEWED_DOCUMENT');
+assert.equal(M.reviewedPageSet0550('1-3,5').size,4);assert.equal(M.reviewedPageSet0550('3-1'),null);
+assert(M.obligationCandidates0550(d.sourceIntake.sources[0]).some(c=>c.categories.includes('TRAINING')));
+const financial=clone({lines:d.lines,offers:d.offers,fx:d.fx,calculations:d.calculations});
+const key=officialLineBasisKey(d,line);d.integrationWorkspace.particulars[0].impact='Changed engineering constraints';
+assert.notEqual(officialLineBasisKey(d,line),key,'Particular change stales linked Official basis');
+const derived={...deriveBidWorkspace(d,tokens,today),integration:M.deriveIntegration0550(d,SYSTEMS,today)};
+assert.equal(derived.official.releaseAllowed,false);assert.equal(derived.official.scopeReviewed,false);
+assert.deepEqual({lines:d.lines,offers:d.offers,fx:d.fx,calculations:d.calculations},financial,'Integration controls never rewrite costs/quantities/FX');
+assert.deepEqual(JSON.parse(JSON.stringify(d)).integrationWorkspace,d.integrationWorkspace,'Backup roundtrip');
+assert.throws(()=>validateBidWorkspace({...d,integrationWorkspace:{...w,foreign:true}},DATA_LAYER_META.datasetId,tokens),/Integration/);
+// A vendor-prepared list is evidence of a declaration, never customer approval.
+const V=require(root+'/project0550/data/subvendorReference0550.js');
+const catalog=V.SUBVENDOR_REFERENCE_0550,groups=V.groupedSubvendors0550();
+assert.equal(catalog.rows.length,10);assert.equal(groups.length,5);
+assert.deepEqual(groups.map(g=>g.sourceRows),[[1,6],[2,7],[3,8],[4,9],[5,10]]);
+assert.deepEqual(groups.map(g=>g.vendor),['TIDELAND','Redline','RADWIN','GAI-Tronics','MOTOROLA']);
+assert.equal(groups[2].countryOfOrigin,'ISARAEL','Preserve the source spelling');
+assert(catalog.rows.every(row=>row.makeModel===''));assert.equal(catalog.source.authority,'VENDOR_DECLARATION');
+const declared=clone(d),declaredId='DRV-'+catalog.source.driveFileId;
+declared.sourceIntake.sources.push(source(declaredId,'Redline'));
+const draft=V.subvendorDraftFields0550(groups[1].id);
+assert.equal(draft.model,'');assert.equal(draft.result,'OPEN');assert.deepEqual(draft.sourceIds,[]);
+let candidate={...declared.integrationWorkspace.avlChecks[0],...draft,model:'Synthetic model',result:'LISTED',sourceIds:[declaredId],sourceLocator:'p1 table 1 row 2',sourceExcerpt:'Redline',status:'REVIEWED',reviewer:'test',reviewedOn:today};
+candidate=M.stampIntegration0550(declared,'avlChecks',candidate);declared.integrationWorkspace.avlChecks[0]=candidate;
+validateBidWorkspace(declared,DATA_LAYER_META.datasetId,tokens);
+let declarationModel=M.deriveIntegration0550(declared,SYSTEMS,today);
+assert.equal(declarationModel.avlChecks[0].state,'OPEN');
+assert(declarationModel.avlChecks[0].problems.includes('VENDOR_DECLARATION_IS_NOT_CUSTOMER_AVL'));
+assert.deepEqual({...declared,sourceIntake:d.sourceIntake,integrationWorkspace:d.integrationWorkspace},d,'Preparing a declaration never changes financial/project records');
+assert.equal(JSON.parse(JSON.stringify(candidate)).vendorListRowId,groups[1].id);
+assert(V.subvendorReferenceProblems0550({...candidate,vendorListSourceHash:'0'.repeat(64)}).includes('VENDOR_LIST_SOURCE_CHANGED'));
+assert(V.subvendorReferenceProblems0550({...candidate,manufacturer:'Different manufacturer'}).includes('DECLARED_VENDOR_RECONCILIATION_OPEN'));
+const oldBackup=clone(d);delete oldBackup.integrationWorkspace.avlChecks[0].vendorListRowId;delete oldBackup.integrationWorkspace.avlChecks[0].vendorListSourceHash;
+validateBidWorkspace(oldBackup,DATA_LAYER_META.datasetId,tokens);
+assert.throws(()=>V.subvendorDraftFields0550('UNKNOWN'),/Unknown/);
+
+// SSR covers real modules and escaping; browser interactions are checked separately.
+const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const context=require(root+'/project0550/BidWorkspaceContext.jsx');
+context.useBidWorkspace=()=>({data:d,model:derived,busy:false,reviewDate:today,change:async()=>true});
+const {WorkingPreview0550}=require(root+'/project0550/WorkingPreview0550.jsx');
+const {ParticularWorkspace0550,DeviationWorkspace0550}=require(root+'/project0550/ParticularDeviationWorkspace0550.jsx');
+const props={onNavigate:()=>{},onOpenSource:()=>{}};
+const html=renderToStaticMarkup(React.createElement(WorkingPreview0550,props));
+for(const stage of stages){assert(html.includes(`data-component-key="${stage.id}"`));assert(html.includes(stage.title.replace(/&/g,'&amp;')));}
+assert(!html.includes('Customer integrator supplier mapping'),'Unopened WP tables are deferred, not eagerly rendered');
+const openedStages=stages.map(stage=>renderToStaticMarkup(React.createElement(WorkingPreview0550,{...props,navigationTarget:stage.id})));
+assert(openedStages.some(markup=>markup.includes('System Particular ที่ใช้ในขั้นนี้')));
+assert(openedStages[6].includes('Customer integrator supplier mapping'),'Direct WP.7 navigation renders its unchanged mapping table');
+assert(!openedStages[4].includes('aria-label="Working requirement"')&&openedStages[4].includes('data-wp-quantity-system='),
+ 'WP.5 opens directly to system quantity groups');
+for(const index of [1,5])assert(openedStages[index].includes('aria-label="Working requirement"'),'Draft creation retains its requirement picker');
+assert(openedStages[6].includes('AVL mapping summary')&&openedStages[6].includes('เปิด 14.1 · ตรวจ AVL / Technical Deviation'));
+assert(!openedStages[6].includes('All system deviation coverage'),'WP.7 shows only the compact AVL view');
+const {Module}=require(root+'/project0550/BidControls.jsx');
+let bodyCalls=0;const deferredBody=()=>{bodyCalls++;return React.createElement('input',{'aria-label':'Deferred draft input',defaultValue:'unsaved synthetic draft'});};
+const closedModule=renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Synthetic deferred test',open:false,defer:true},deferredBody));
+assert.equal(bodyCalls,0,'Closed opt-in body must not be evaluated');assert(closedModule.includes('Copy component ID bid.budget.working.lines'));assert(!closedModule.includes('Deferred draft input'));
+const openModule=renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Synthetic deferred test',open:true,defer:true},deferredBody));
+assert.equal(bodyCalls,1);assert(openModule.includes('Deferred draft input'));assert(openModule.includes('data-bid-module-color="official"'));
+renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Default eager test',open:false},deferredBody));assert.equal(bodyCalls,2,'Non-opt-in module compatibility');
+
+assert(renderToStaticMarkup(React.createElement(ParticularWorkspace0550,props)).includes('Document reading ledger'));
+const devHtml=renderToStaticMarkup(React.createElement(DeviationWorkspace0550,props));
+assert(devHtml.includes('All system deviation coverage'),'14.1 retains the full audit table');
+for(const col of M.DEVIATION_COLUMNS_0550)assert(devHtml.includes(col));
+assert(devHtml.includes('Subcontractors and sub-vendors declared list'));
+for(const group of groups)assert(devHtml.includes(group.vendor));
+const {SubvendorReference0550}=require(root+'/project0550/SubvendorReference0550.jsx');
+assert.equal((renderToStaticMarkup(React.createElement(SubvendorReference0550,{onPrepare:()=>{}})).match(/data-subvendor-row=/g)||[]).length,5);
+const {BidCommercialWorkspace}=require(root+'/project0550/BidCommercialWorkspace.jsx');
+const workingHtml=renderToStaticMarkup(React.createElement(BidCommercialWorkspace,props));
+assert(workingHtml.includes('ข้อกำหนด / CAL–RPT / Supplier'),'Working price rows retain reverse engineering trace');
+const apfDtrs=rawModel.lines.find(line=>line.id==='REQ-MR-B1-11-APF-01');
+const apfMr=apfDtrs.mrScopeState.requirement;
+assert.deepEqual([apfDtrs.quantity,apfDtrs.unit,apfMr.components.length],[1,'Lot',11]);
+assert(apfMr.components.includes('VHF Omni DMR Antenna 2 Ea.'));
+assert(apfMr.components.includes('VHF DMR Mobile Radio 21 Ea.'));
+assert(apfMr.components.includes('VHF DMR Handheld Radio (ATEX or 13:19UL) 98 Ea. (For APF, AMS01, ABV01, ACP and MOGE)'));
+assert.equal(apfMr.componentReview.appendixReference,'Refer to Documents / Drawings in Appendix 2');
+assert(apfMr.componentReview.notes.some(note=>note.includes('3 Ea. in Rev.A1 and 2 Ea. in Rev.B1')));
+assert(apfMr.componentReview.notes.some(note=>note.includes('27 Ea. in Rev.A1 and 21 Ea. in Rev.B1')));
+assert(workingHtml.includes(apfMr.componentReview.status),'The APF MR review status is visible with details collapsed');
+console.log('PASS 0550 Working 1–8: all systems; executable engineering checks; source/particular/CAL/offer staleness; visual and full-page review; AVL/deviation evidence; lifecycle activity gaps; unchanged financial inputs; backup validation; real SSR modules.');
+
+// Confirmed selected-OEM AVL draft: additive, idempotent and never an approval.
+const A=require(root+'/project0550/data/avlDeviationBasis0550.js');
+let base=importLegacyVendorBasis0550(emptyBidWorkspace(DATA_LAYER_META.datasetId),{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},today);
+base=importMrWorkingBasis0550(base,COMMERCIAL_POLICY,today);
+const baseline=clone(base),prepared=A.preparePagaAvlDeviation0550(base);
+assert.notEqual(prepared,base);assert.deepEqual(base,baseline);
+assert.deepEqual({...prepared,integrationWorkspace:undefined},{...base,integrationWorkspace:undefined},'No financial/selection/source mutation');
+assert.equal(prepared.integrationWorkspace.deviations.length,1);
+const ind=prepared.integrationWorkspace.deviations[0];
+assert.equal(ind.id,A.PAGA_AVL_BASIS_0550.deviationId);assert.equal(ind.workflowStatus,'DRAFT');assert.equal(ind.approvalDecision,'PENDING');
+assert.equal(ind.companyResponse,'');assert.equal(ind.finalClosure,'');assert.deepEqual(ind.approvalSourceIds,[]);
+assert.equal(prepared.integrationWorkspace.avlChecks[0].result,'NOT_LISTED');
+assert.equal(A.preparePagaAvlDeviation0550(prepared),prepared,'Repeated load does not duplicate drafts');
+validateBidWorkspace(prepared,DATA_LAYER_META.datasetId,tokens);
+let projected=M.deriveIntegration0550(prepared,SYSTEMS,today);
+assert.equal(projected.deviations[0].state,'OPEN');
+assert.equal(A.deviationProgress0550(projected.deviations[0]),'ร่าง · ยังไม่ส่งลูกค้า');
+assert(projected.deviations[0].problems.includes('CUSTOMER_DEVIATION_APPROVAL_OPEN'));
+assert.equal(projected.releaseAllowed,false);
+const edited=clone(prepared);edited.integrationWorkspace.deviations[0].justification='User edited';
+assert.equal(A.preparePagaAvlDeviation0550(edited),edited,'Never replace user edits');
+const prior=clone(prepared);prior.integrationWorkspace.deviations[0].id='USER-EXISTING-IND';
+assert.equal(A.preparePagaAvlDeviation0550(prior),prior,'Reuse existing equivalent record with another ID');
+const customCheck=clone(base);customCheck.integrationWorkspace=M.emptyIntegration0550();customCheck.integrationWorkspace.avlChecks.push({...prepared.integrationWorkspace.avlChecks[0],id:'USER-AVL',result:'LISTED'});
+assert.equal(A.preparePagaAvlDeviation0550(customCheck),customCheck,'Never override a previous AVL decision');
+const alternate=clone(base),selected=A.selectedPagaOffer0550(alternate);
+alternate.offers.find(o=>o.id===selected.offer.id).brand='BOSCH';
+assert.equal(A.preparePagaAvlDeviation0550(alternate),alternate,'No INDUSTRONIC draft for changed selected brand');
+const unselected=clone(base);unselected.lines.filter(l=>l.systemToken==='TEL-PAGA').forEach(l=>l.selected=false);
+assert.equal(A.preparePagaAvlDeviation0550(unselected),unselected);
+assert.deepEqual(ind.offerIds,A.selectedPagaOffer0550(base).offers.map(o=>o.id),'One OEM request covers selected package and quote components');
+const multiple=clone(base);multiple.offers.push({...selected.offer,id:'ANOTHER-PAGA',quoteRef:'DIFFERENT-QUOTE'});multiple.lines.push({...selected.lines[0],id:'ANOTHER-PAGA-LINE',offerId:'ANOTHER-PAGA'});
+assert.equal(A.preparePagaAvlDeviation0550(multiple),multiple,'Ambiguous selection is not resolved automatically');
+assert.notEqual(A.deviationProgress0550({...projected.deviations[0],workflowStatus:'APPROVED',approvalDecision:'ACCEPTED'}),'ลูกค้ายอมรับ · มีหลักฐานปิดครบ');
+context.useBidWorkspace=()=>({data:prepared,model:{integration:projected},busy:false,reviewDate:today,change:async()=>true});
+const selectedHtml=renderToStaticMarkup(React.createElement(DeviationWorkspace0550,props));
+assert(selectedHtml.includes('Request COMPANY approval to use INDUSTRONIC INTRON-X'));
+assert(selectedHtml.includes('ร่าง · ยังไม่ส่งลูกค้า'));assert(selectedHtml.includes('MASTER TOWER'));
+assert(selectedHtml.includes('data-component-key="bid.deviations.register"'));
+assert(!prepared.integrationWorkspace.deviations.some(x=>/BOSCH|MASTER TOWER/.test(x.vendorDeviation)));
+console.log('PASS selected INDUSTRONIC AVL draft: existing/new workspace, no duplicate/user overwrite, selected-brand and ambiguity gates, unchanged financials, pending approval, source lineage, persisted schema and real register render.');
+
+const R=require(root+'/project0550/data/deviationRelease0550.js');
+const releaseBefore=clone(prepared),release=R.deriveDeviationRelease0550(prepared,projected,[ind.id]);
+assert.deepEqual(release.issues,[]);assert.equal(release.count,1);assert.equal(release.groups[0].rows[0].cells.length,11);
+assert.equal(release.groups[0].rows[0].cells[9],'Open','Pending request exports as Open, not missing-analysis status');
+assert.deepEqual(prepared,releaseBefore,'Release projection does not change Working, finance or approvals');
+assert.equal(release.metadata.projectNo,'PJ2608-0550');
+assert(!JSON.stringify(release).includes('ZM169'));assert(!JSON.stringify(release).includes('ZAWTIKA'));
+function unzipStored(bytes){const b=Buffer.from(bytes),out={};let i=0;while(i+30<b.length&&b.readUInt32LE(i)===0x04034b50){const n=b.readUInt16LE(i+26),e=b.readUInt16LE(i+28),size=b.readUInt32LE(i+18),name=b.subarray(i+30,i+30+n).toString();out[name]=b.subarray(i+30+n+e,i+30+n+e+size).toString();i+=30+n+e+size;}return out;}
+const bytes=R.buildDeviationReleaseXlsx0550(release),files=unzipStored(bytes),sheet=files['xl/worksheets/sheet1.xml'];
+assert(sheet.includes('INDUSTRONIC'));assert(sheet.includes('GAI-Tronics'));assert(sheet.includes('DRAFT - NOT ISSUED'));
+assert(sheet.includes('paperSize="9"'));assert(sheet.includes('orientation="landscape"'));
+assert.equal((sheet.match(/<x:pageMargins\b/g)||[]).length,1);assert(sheet.includes('ref="B11:K11"'));
+assert(files['xl/workbook.xml'].includes('_xlnm.Print_Area'));assert(files['xl/workbook.xml'].includes('$1:$10'));
+assert(!sheet.includes('Preparation basis:'));assert(!sheet.includes('docs.google.com'),'Internal vendorResponse1 is not a purchaser reply');
+assert(!sheet.includes('{{'));assert(!sheet.includes('<x:f>'));
+const privateNotes=clone(projected);privateNotes.deviations[0].contractorResponse1='Internal contractor note';privateNotes.deviations[0].purchaserReply='Received purchaser response';
+const replyCells=R.deriveDeviationRelease0550(prepared,privateNotes,[ind.id]).groups[0].rows[0].cells;assert.equal(replyCells[7],'Received purchaser response');assert(!replyCells.includes('Internal contractor note'));
+const empty=R.deriveDeviationRelease0550(prepared,projected,[]);assert(empty.issues.length);assert.throws(()=>R.buildDeviationReleaseXlsx0550(empty));
+const overlong=clone(projected);overlong.deviations[0].purchaserRequirement='x'.repeat(12000);assert(R.deriveDeviationRelease0550(prepared,overlong,[ind.id]).issues.some(x=>x.includes('Excel')));
+const selectedChanged=clone(prepared);selectedChanged.lines.filter(l=>l.systemToken==='TEL-PAGA').forEach(l=>l.selected=false);
+assert(R.deriveDeviationRelease0550(selectedChanged,projected,[ind.id]).issues.some(x=>x.includes('Working')));
+const unsigned=clone(projected);Object.assign(unsigned.deviations[0],{workflowStatus:'APPROVED',approvalDecision:'ACCEPTED'});
+assert.equal(R.deriveDeviationRelease0550(prepared,unsigned,[ind.id]).groups[0].rows[0].cells[9],'Open');
+const extra=clone(projected);extra.deviations.push({...extra.deviations[0],id:'SECOND',releaseDocument:'Another customer document',bidderClarification:'< & " =1+1',purchaserRequirement:'Second requirement'});
+const multi=R.deriveDeviationRelease0550(prepared,extra,[ind.id,'SECOND']);assert.equal(multi.groups.length,2);assert.equal(multi.groups[1].rows[0].cells[0],'2.1');
+const multiXml=unzipStored(R.buildDeviationReleaseXlsx0550(multi))['xl/worksheets/sheet1.xml'];assert(multiXml.includes('&lt; &amp; &quot; =1+1'));assert(!multiXml.includes('<x:f>'));
+const meta=clone(prepared);meta.deviationRelease={...R.deviationReleaseMetadata0550(meta),vendor:'Reviewer edited vendor'};
+Object.assign(meta.integrationWorkspace.deviations[0],{releaseDocument:'Customer document',releasePageRef:'p11',purchaserRequirement:'Listed manufacturer',bidderClarification:'',bidderProposal:'Alternate OEM',releaseRemarks:'Supporting documents attached'});
+validateBidWorkspace(meta,DATA_LAYER_META.datasetId,tokens);assert.deepEqual(JSON.parse(JSON.stringify(meta)).deviationRelease,meta.deviationRelease);
+const {DeviationRelease0550}=require(root+'/project0550/DeviationRelease0550.jsx');
+const releaseHtml=renderToStaticMarkup(React.createElement(DeviationRelease0550,{onEdit:()=>{}}));
+assert(releaseHtml.includes('เปิด 14.1 · ตรวจหลักฐาน / แก้รายการ'));
+assert(!releaseHtml.includes('All system deviation coverage'),'14.3 is an export workspace');
+assert(releaseHtml.includes('Export Excel'));assert(releaseHtml.includes('bid.deviations.release'));
+for(const column of R.DEVIATION_RELEASE_LAYOUT_0550.columns)assert(releaseHtml.includes(column.replace(/&/g,'&amp;').replace(/'/g,'&#x27;')));
+if(process.env.PJ0550_DEVIATION_QA_OUTPUT)require('node:fs').writeFileSync(process.env.PJ0550_DEVIATION_QA_OUTPUT,bytes);
+console.log('PASS deviation Release: native eleven-column layout, same saved preview/export projection, explicit selection, unchanged approvals/financials, backward-compatible editable fields, missing/stale selection gates, XML escaping, multi-document rows and real Release render.');
+
+const {sourceMatrixIndex0550,sourceReadingMatrix0550}=require(root+'/project0550/data/sourceReadingMatrix0550');
+const {apfPhiMatrix0550}=require(root+'/project0550/data/apfPhiMatrix0550');
+const {SourceReadingMatrix0550}=require(root+'/project0550/SourceReadingMatrix0550.jsx');
+const microwaveLay='MM-ASK-1A-APF-TEL-LAY-0010', microwaveTyp='MM-ASK-1A-ACP-TEL-TYP-0001';
+const matrixData={sourceIntake:{...d.sourceIntake,sources:[
+ source('MM-ASK-1A-APF-TEL-MR-0001',microwaveLay+' C4  Layout'),
+ source(microwaveLay,'Earlier layout'),
+ {...source(microwaveTyp,'Typical detail'),authority:'HISTORICAL',revision:'C2'},
+ source('MM-ASK-1A-APF-TEL-SPE-0011','10008-STD-6-TEL-004'),
+ source('10008-STD-6-TEL-004','MM-ASK-1A-APF-TEL-SPE-0011'),
+]}};
+const emptyIntegration={scopes:[],requirements:[],documentReviews:[],particulars:[]};
+const matrixBefore=clone(matrixData),matrixIndex=sourceMatrixIndex0550(matrixData.sourceIntake);
+const matrix=sourceReadingMatrix0550(matrixIndex,emptyIntegration,SYSTEMS);
+assert.deepEqual(matrix.map(row=>row.token),[...tokens,'COMMON']);
+const matrixCell=(token,family)=>matrix.find(row=>row.token===token).cells.find(cell=>cell.family===family);
+const layout=matrixCell('TEL-DMR','LAY');
+assert.equal(layout.state,'open');
+assert.equal(layout.readingStage,'receipt','Wrong revision must not count as read');
+assert.deepEqual(layout.references[0].revisions,['C4']);
+assert.match(layout.references[0].reason,/Rev\./);
+assert.equal(layout.sources[0].source.revision,'B1','Keep the mismatching copy visible');
+assert.equal(matrixCell('TEL-PAGA','LAY').state,'pending','Do not copy Microwave applicability to PAGA');
+assert.equal(matrixCell('TEL-DMR','TYP').state,'open');
+assert(matrixCell('TEL-DMR','STD').references.some(ref=>ref.number==='10008-STD-6-TEL-004'));
+assert.deepEqual(matrixData,matrixBefore);
+const sharedReading=clone(matrixData);
+const actualMR=sharedReading.sourceIntake.sources[0];
+sharedReading.sourceIntake.sources.push({...actualMR,id:'MR-HISTORY',revision:'A1',authority:'HISTORICAL'});
+const readingModel={...emptyIntegration,
+ scopes:[{id:'TEL-DMR',requirements:[],review:{sourceIds:[actualMR.id,'MR-HISTORY'],families:['MR']}}],
+ documentReviews:[{id:actualMR.id,state:'REVIEWED_DOCUMENT',systemTokens:['COMMON']}]};
+const sharedCells=sourceReadingMatrix0550(sourceMatrixIndex0550(sharedReading.sourceIntake),readingModel,SYSTEMS);
+const microwaveMR=sharedCells.find(row=>row.token==='TEL-DMR').cells.find(cell=>cell.family==='MR');
+assert.equal(microwaveMR.state,'open','Keep engineering evidence and former-copy checks separate');
+assert.equal(microwaveMR.readingStage,'complete','An exact current document reviewed once is read for all referencing systems');
+assert.equal(microwaveMR.readingSources.length,1);
+actualMR.readState='TEXT_PARTIAL';
+const partialMR=sourceReadingMatrix0550(sourceMatrixIndex0550(sharedReading.sourceIntake),readingModel,SYSTEMS).find(row=>row.token==='TEL-DMR').cells.find(cell=>cell.family==='MR');
+assert.equal(partialMR.readingStage,'partial','A partial source cannot display as fully read');
+const flattenedPhi=source('MM-ASK-1A-APF-TEL-PHI-0001','Table 7-3 Telecommunication System for APF\nIP Telephony ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nVHF-FM Marine ■\nFiber Optic Cable ■ ■ ■ ■ ■ ■ ■ ■ ■ ■\nTable 7-4');
+assert.equal(apfPhiMatrix0550([{...flattenedPhi,effectiveAuthority:'CURRENT_TENDER'}]).source,null,'Never infer positions from flattened table text');
+const matrixHtml=renderToStaticMarkup(React.createElement(SourceReadingMatrix0550,{data:matrixData,integration:emptyIntegration,systems:SYSTEMS,onOpenSource:()=>{}}));
+assert.equal((matrixHtml.match(/data-system-token=/g)||[]).length,20);
+assert(matrixHtml.includes('ระบบ × ตำแหน่ง APF'));
+for(const family of ['STD','LAY','DWG','TYP','MTO','SOFTWARE']) assert(matrixHtml.includes('aria-label="'+family+'"'));
+console.log('PASS WP.1 CUS matrix: canonical system rows, revision mismatch, distinct TYP, reference cycles, shared applicability, flattened PHI safety and real SSR.');
+
+const {moduleDirectory0550,moduleDirectoryText0550}=require(root+'/project0550/moduleDirectory0550');
+const {WP_NAVIGATION_0550,wpStageForTarget0550}=require(root+'/project0550/workingPreviewStages0550');
+const {bidPresentationIndex}=require(root+'/project0550/bidPresentation0550');
+const navigationEntries=[
+ {id:'bid.budget',title:'Budget',number:'10',tab:'budget'},
+ {id:'l3.original',title:'CUS',number:'A',area:'A',tab:'documents'},
+ {id:'bid.documents.controlled-source-inventory.mr',title:'MR',number:'A.1',area:'A',tab:'documents'},
+ {id:'bid.documents.controlled-source-inventory.mr.page.5',title:'MR page 5',number:'A.1',area:'A',tab:'documents'},
+ {id:'bid.working-preview.requirement.REQ-1',title:'Requirement',tab:'budget'},
+ ...bidPresentationIndex(d.lines),
+];
+const navigation=moduleDirectory0550(navigationEntries);
+assert.equal(navigation.entries.length,new Set(navigationEntries.map(item=>item.id)).size);
+assert.equal(new Set(navigation.numbers.values()).size,navigation.entries.length);
+assert.equal(navigation.numbers.get('bid.budget.working.lines'),'10.2');
+assert.equal(navigation.numbers.get('bid.working-preview.particulars'),'10.2.1');
+assert.equal(navigation.numbers.get('bid.budget.working.editor'),'10.2.3');
+assert.equal(navigation.numbers.get('bid.budget.working.editor.review'),'10.2.3.1');
+assert.deepEqual(navigation.children.get('bid.budget.working.lines').map(item=>item.id),[
+ 'bid.budget.working.lines.principles',
+ 'bid.working-preview.particulars',
+ 'bid.working-preview',
+ 'bid.budget.working.part.A',
+ 'bid.budget.working.part.B',
+ 'bid.budget.working.part.C',
+ 'bid.budget.working.editor'
+]);
+assert.equal(navigation.numbers.get('bid.working-preview.step.1'),'10.2.2.1');
+assert.equal(navigation.entries.find(item=>item.id==='bid.working-preview.step.1').legacyNumber,'WP.1');
+assert.equal(navigation.numbers.get(WP_NAVIGATION_0550.locations.id),'10.2.2.1.1.2');
+assert.equal(navigation.children.get(WP_NAVIGATION_0550.matrix.id).length,2);
+assert(navigation.children.get('bid.working-preview.step.4').some(item=>item.id.endsWith('REQ-1')));
+assert.match(navigation.numbers.get('bid.documents.controlled-source-inventory.mr.page.5'),/^A\.1\./);
+assert.equal(wpStageForTarget0550(WP_NAVIGATION_0550.locations.id),'1');
+assert.equal(wpStageForTarget0550('bid.working-preview.step.10'),undefined);
+const tsv=moduleDirectoryText0550(navigation.entries);
+assert.equal(tsv.split('\n').length,navigation.entries.length+1);
+assert(tsv.includes('10.2.2.1.1.2\tระบบ × ตำแหน่ง APF\tPJ2608-0550 / '+WP_NAVIGATION_0550.locations.id));
+const locationHtml=renderToStaticMarkup(React.createElement(SourceReadingMatrix0550,{data:matrixData,integration:emptyIntegration,systems:SYSTEMS,onOpenSource:()=>{},navigationTarget:WP_NAVIGATION_0550.locations.id}));
+assert(locationHtml.includes('aria-label="ระบบ × ตำแหน่ง APF" aria-pressed="true"'));
+assert(locationHtml.includes('data-module-number="10.2.2.1.1.2"'));
+console.log('PASS module directory: all registered IDs, hierarchical display numbers, exact matrix targets, legacy aliases and complete clipboard TSV.');

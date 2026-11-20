@@ -1,0 +1,10 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const source=fs.readFileSync(path.join(root,"src/project0553/data/mr0001PreliminaryLinkBudget.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/SimpleBom0553.jsx"),"utf8");
+const projection=fs.readFileSync(path.join(root,"src/project0553/data/workingBomByLocation.js"),"utf8");
+for(const token of ["links,standard:target,bidCalculationBaseline","txPowerDbm:null","availabilityPercent:null","stdPass:null","costRule:","assessLinkWithVerifiedInputs"])assert(source.includes(token),token);
+assert(source.includes("CAL-0001")&&source.includes("EMBEDDED_GRAPHICAL_RESULTS_NOT_YET_VERIFIED"));
+assert(projection.includes("MR0001_PRELIMINARY_LINK_BUDGET.links.filter"));
+assert(ui.includes("g.rfProof.map")&&ui.includes("p.fsplDb.toFixed")&&ui.includes("CAL/OEM proof required"));
+console.log("PASS 0553 5-link RF first-principles FSPL view, CAL A1 baseline and guarded STD/BOM decisions");

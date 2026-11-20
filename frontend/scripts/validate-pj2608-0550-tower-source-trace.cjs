@@ -1,0 +1,91 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),babel=require('@babel/core');
+const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+const {retireLegacyTowerPricing0550}=require(src+'/project0550/data/towerLegacyPricing0550.js');
+const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const S=require(src+'/project0550/data/supplierCostProjection0550.js'),R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
+const {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
+const empty={lines:[],offers:[],vendors:[],fx:{}},render=d=>renderToStaticMarkup(React.createElement(WorkingSupplierTrace0550,{data:d,systemToken:'TEL-TELT',onNavigate:()=>{}}));
+const {SupplierItemSourceText0550,SupplierTowerBom0550}=require(src+'/project0550/SupplierItemSourceText0550.jsx');
+const sample={id:'SOURCE-TEXT-QA',description:'Short item title',sourceRef:'Recorded location only',quoteEvidence:{terms:['Line one\n  Exact detail <unsafe> & punctuation','Line one\n  Exact detail <unsafe> & punctuation']}};
+const sampleBefore=JSON.stringify(sample),sampleHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:sample}));
+assert.equal((sampleHtml.match(/Line one/g)||[]).length,1,'Duplicate exact source text appears once');assert(sampleHtml.includes('\n  Exact detail &lt;unsafe&gt; &amp; punctuation'),'Exact wording and line breaks remain escaped text');assert(!sampleHtml.includes('<unsafe>'));
+const missingHtml=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:{id:'NO-SOURCE-DETAIL',sourceRef:'Reference, not a verified excerpt'}}));assert(missingHtml.includes('ยังไม่มีข้อความรายละเอียดต้นฉบับ'));assert(missingHtml.includes('Reference, not a verified excerpt'));assert.equal(JSON.stringify(sample),sampleBefore);
+assert.deepEqual(C.bidCompletionSourceUsages0550(empty),[]);assert(render(empty).includes('ยังไม่มีรายการต้นฉบับ'));
+const legacyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:{...empty,integrationWorkspace:{}},line:{id:'MR-LEGACY',mrRequirementId:'NATIVE-LEGACY',description:'Legacy MR'},projection:{quotes:new Map()},onNavigate:()=>{}}));assert(legacyMr.includes('Mapping ของ MR · 0 ใบ'),'Old/empty Integration workspace remains readable');
+
+// Tower BOM reads native units and exact SI links, including deleted mappings.
+const bomData={...empty,offers:[1,2].map(site=>({
+ id:'OFFER-MASTER-TOWER-2609.95.'+site+'-03',vendorId:'BOM-QA-VENDOR',
+ quoteRef:'BOM-QA-'+site,description:'Paint <source> '+site,unit:'Gl',unitCost:3,
+ supplierQuoteRow:{itemCode:'3',classification:'BASE_PRICE'},
+ quoteEvidence:{systemTokens:['TEL-TELT'],revision:'QA',sourceSha256:String(site).repeat(64),
+  quotedQuantity:site===1?7:0,quotedUnit:'Gl',quotedUnitCost:3,quotedTotal:site===1?21:null,
+  quotedTotalText:'As actual',quotedCurrency:'THB',locator:'PDF p1 / Item 3',
+  sourceUrl:'https://drive.google.com/file/d/qa-bom-'+site+'/view'}
+})),integrationWorkspace:{requirements:[]}};
+bomData.integrationWorkspace.requirements=[{id:'BOM-QA-MR',site:'APF',title:'QA Tower',offerIds:[bomData.offers[0].id],status:'DRAFT'}];
+const bomBefore=JSON.stringify(bomData);
+const renderBom=data=>renderToStaticMarkup(React.createElement(SupplierTowerBom0550,{data,initiallyOpen:true}));
+const bomHtml=renderBom(bomData);
+assert(bomHtml.includes('7 Gl')&&bomHtml.includes('0 Gl'),'Keep native unit and printed zero');
+assert(bomHtml.includes('As actual'),'Unknown supplier amount retains its text');
+assert(bomHtml.includes('&lt;source&gt;'),'Escape source text in the BOM');
+assert(bomHtml.includes('SI Mapping · APF'),'Read the existing requirement link');
+const withoutMapping={...bomData,integrationWorkspace:{requirements:[]}};
+assert(!renderBom(withoutMapping).includes('SI Mapping · APF'),'Do not reconstruct a deleted mapping');
+const withoutItem={...bomData,offers:[bomData.offers[1]],integrationWorkspace:{requirements:[]}};
+assert(!renderBom(withoutItem).includes('data-tower-bom-offer="'+bomData.offers[0].id+'"'),'Do not reconstruct a deleted source item');
+assert.equal(JSON.stringify(bomData),bomBefore,'BOM rendering leaves canonical records unchanged');
+console.log('PASS Tower BOM: native unit/zero/unknown amounts, escaped source text, canonical/deleted Mapping and read-only records.');
+
+if(process.argv[2]){
+ const d=C.reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(JSON.parse(fs.readFileSync(process.argv[2])))),before=JSON.stringify(d),html=render(d),entries=R.vendorOfferEntries0550(d);
+ const tower=entries.filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')&&e.offer.supplierQuoteRow?.classification==='BASE_PRICE');
+ assert.equal(tower.length,30);assert.equal((html.match(/data-working-source-quote=/g)||[]).length,2);assert.equal((html.match(/data-working-source-item=/g)||[]).length,0,'Quote item bodies mount on demand');const originals=S.supplierCostProjection0550(d).bySystem.get('TEL-TELT');assert.equal(originals.reduce((n,q)=>n+q.items.length,0),30);
+ assert.equal(tower.filter(e=>e.referenceWorking.some(W.activeSupply0550)).length,0);
+ assert.equal(tower.filter(e=>e.allocatedWorking.some(u=>u.current&&W.activeSupply0550(u.line))).length,10);
+ const uses=C.bidCompletionSourceUsages0550(d),towerIds=new Set(tower.map(e=>e.offer.id)),used=uses.flatMap(u=>u.offerIds.filter(id=>towerIds.has(id)));
+ assert.equal(used.length,10);assert.equal(new Set(used).size,10,'No duplicated source item allocation');
+ const vendorHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:d,onEdit:()=>{}}));
+ for(const e of tower){
+  const row=vendorHtml.match(new RegExp('data-vnd-offer="'+e.offer.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'"[\\s\\S]*?</tr>'))?.[0];
+  assert(row);assert.equal(row.includes('จัดสรรต้นทุนใน Working แล้ว'),['1','6','8','14','15'].includes(e.offer.supplierQuoteRow.itemCode),'Show source use only where it remains allocated / '+e.offer.id);
+ }
+ assert(originals.flatMap(q=>q.items).some(e=>e.uses.some(u=>u.label.includes('ต้นทุนผสม'))));assert.deepEqual(originals.flatMap(q=>q.items).filter(e=>e.offer.supplierQuoteRow.itemCode==='3').map(e=>[e.native.quantity,e.native.unit]).sort((a,b)=>a[0]-b[0]),[[35,'Gl'],[70,'Gl']],'Original paint units, never normalized U');
+ assert(html.includes('APF')&&html.includes('ACP')&&html.includes('2609.95.1')&&html.includes('2609.95.2'));
+ const projection=S.supplierCostProjection0550(d);
+ for(const e of tower){
+  assert.deepEqual(S.supplierItemSourceText0550(e.offer),e.offer.quoteEvidence.terms,'Source item detail remains verbatim');
+  const body=renderToStaticMarkup(React.createElement(SupplierItemSourceText0550,{offer:e.offer}));
+  assert(body.includes('data-supplier-source-text="'+e.offer.id+'"'));
+  const vendorRow=vendorHtml.match(new RegExp('data-vnd-offer="'+e.offer.id+'"[\\s\\S]*?</tr>'))?.[0];assert(vendorRow&&vendorRow.includes('data-supplier-source-text="'+e.offer.id+'"'),'Vendor and Working use the same source text');
+ }
+ for(const ref of ['2609.95.1','2609.95.2']){const item=tower.find(e=>e.offer.quoteRef===ref&&e.offer.supplierQuoteRow.itemCode==='2').offer,text=S.supplierItemSourceText0550(item).join('\n');assert(text.includes('square self-supporting tower'));assert(text.includes(ref.endsWith('.1')?'9.90 x 9.90':'2.0 x 2.0'));}
+ const mgwItem=[...projection.quotes.values()].flatMap(q=>q.items).find(e=>e.offer.mgwQuoteLineId);assert(mgwItem);assert(S.supplierItemSourceText0550(mgwItem.offer).length,'MGW uses the same native catalogue detail');
+ for(const id of ['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06']){
+  const line=d.lines.find(l=>l.id===id),row=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:d,line,projection,onNavigate:()=>{}}));
+  assert(row.includes('Mapping ของ MR · 1 ใบ'));assert(!row.includes('data-working-source-item='),'Original items beside each MR remain lazy');
+ }
+ const unmapped=structuredClone(d);unmapped.integrationWorkspace.requirements.find(r=>r.id==='REQDEF-MR-B1-11-APF-08').offerIds=[];
+ const emptyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:unmapped,line:unmapped.lines.find(l=>l.id==='REQ-MR-B1-11-APF-08'),projection:S.supplierCostProjection0550(unmapped),onNavigate:()=>{}}));
+ assert(emptyMr.includes('Mapping ของ MR · 0 ใบ'),'Never infer a new MR mapping from its shared price owner');
+ const authored=structuredClone(unmapped),original=d.integrationWorkspace.requirements.find(r=>r.id==='REQDEF-MR-B1-11-APF-08');authored.integrationWorkspace.requirements.push({...original,id:'AUTHORED-MR-LINK-QA',workLineIds:['REQ-MR-B1-11-APF-08']});
+ const authoredMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:authored,line:authored.lines.find(l=>l.id==='REQ-MR-B1-11-APF-08'),projection:S.supplierCostProjection0550(authored),onNavigate:()=>{}}));assert(authoredMr.includes('Mapping ของ MR · 1 ใบ'),'Reuse explicit authored requirement-to-line links, not only seeded requirement IDs');
+
+ const own=uses.find(u=>u.kind==='QUOTED'&&u.offerIds.some(id=>towerIds.has(id))),changed=structuredClone(d);
+ changed.lines.find(l=>l.id===own.line.id).manualCost+=1;
+ assert.equal(C.bidCompletionSourceUsages0550(changed).find(u=>u.line.id===own.line.id).current,false,'Edited owner invalidates displayed allocation');
+ assert(S.supplierCostProjection0550(changed).bySystem.get('TEL-TELT').some(q=>q.items.some(e=>e.stale.length)));
+ const revised=structuredClone(d);revised.offers.find(o=>o.id===own.offerIds[0]).unitCost+=1;
+ assert.equal(C.bidCompletionSourceUsages0550(revised).find(u=>u.line.id===own.line.id).current,false,'Changed supplier rate invalidates displayed allocation');
+ const missing=structuredClone(d);missing.offers=missing.offers.filter(o=>o.id!==own.offerIds[0]);
+ assert.equal(C.bidCompletionSourceUsages0550(missing).find(u=>u.line.id===own.line.id).current,false,'Deleted source item cannot retain a current allocation');
+ const deleted=structuredClone(d);deleted.lines=deleted.lines.filter(l=>l.id!==own.line.id);assert(!C.bidCompletionSourceUsages0550(deleted).some(u=>u.line.id===own.line.id));
+ const deselected=structuredClone(d);deselected.lines.find(l=>l.id===own.line.id).selected=false;
+ assert(!R.vendorOfferEntries0550(deselected).find(e=>e.offer.id===own.offerIds[0]).allocatedWorking.some(u=>u.current&&W.activeSupply0550(u.line)));
+ assert.equal(JSON.stringify(d),before,'Every source, price/qty/FX, receipt, review and frozen history byte preserved by both views');
+ console.log('PASS actual two-quote/30-item trace,8 source-only supply rows,10 active receipt allocations, mixed costs/native units, stale/edit/deletion/deselection guards and read-only canonical data.');
+}
+console.log('PASS empty source fallback.');

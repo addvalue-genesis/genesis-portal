@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const src=path.join(__dirname,"../src/project0553");
+const read=p=>fs.readFileSync(path.join(src,p),"utf8");
+const audit=read("data/mr0001CostCloseout0553.js"),ui=read("MR0001CostCloseout0553.jsx"),entry=read("SimpleBom0553.jsx");
+for(const site of ["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"])assert(audit.includes('"'+site+'"'));
+assert(audit.includes("selectMR0001TagCostRows0553(site)"));
+assert(audit.includes('ref?"PRICED_REFERENCE_NOT_POSTED":"UNPRICED_OR_NOT_ALLOCATED"'));
+assert(audit.includes("costClosed:locations.every"));
+assert(ui.includes("report.outstanding.map"));
+assert(entry.includes("<MR0001CostCloseout0553/>"));
+console.log("PASS MR0001 closeout is ledger-backed; outstanding refs are not booked or hidden");

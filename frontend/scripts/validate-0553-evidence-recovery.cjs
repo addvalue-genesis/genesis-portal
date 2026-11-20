@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const recovery=read("data/mr0001EvidenceRecovery0553.js");
+const detail=read("LocationBomDetail0553.jsx");
+for(const dep of ["mr0001PackageComposition","mr0001ScopeOwnershipAudit","mr0001RadioRoleMatrix","mr0001InnovaCostBridge"])assert(recovery.includes(dep));
+assert(recovery.includes('p.platform+"|"+p.sourceRowIndex'));
+assert(recovery.includes('priceApproval:"NEVER_PROMOTE_CANDIDATE_TO_BOOKED_COST"'));
+assert(detail.includes("recoverMR0001Evidence0553(site,v.row,v.tag)"));
+assert(detail.includes("Recovered Engineering Source / First Principles / Scope Owner"));
+const ledger=read("data/mr0001TagCostLedger0553.js");
+assert(ledger.includes("countedInWorkingTotal"));
+console.log("PASS source recovery is read-only; historic package functions, quote candidates and ownership visible by site+MTO row");

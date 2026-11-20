@@ -1,0 +1,86 @@
+{
+  "projectId": "PJ2608-0553",
+  "records": [
+    {
+      "id": "OEM-PHALCON-EX-SS-RACON",
+      "sourceType": "MANUFACTURER_BROCHURE",
+      "manufacturer": "Pharos Marine Automatic Power",
+      "product": "Phalcon-EX Zone 1 Stainless Steel RACON",
+      "model": "Phalcon-EX",
+      "category": "MARINE_RACON",
+      "sourceDocument": "PMAPI-Phalcon-EX-Stainless-Steel-RACON-051018.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1qUVdSqZ-MDeZ2WmMXMZaa0PJGjAeaaDt/view",
+      "sourceFolder": "https://drive.google.com/drive/folders/1wkIEceKKB6wnQJm5gGpd-XPDKhijht2E",
+      "sourceDocumentCode": "051018",
+      "specifications": {
+        "hazardousArea": "Zone 1",
+        "material": "316L stainless steel base",
+        "certifications": [
+          "ATEX ITS16ATEX101048X",
+          "IECEx ITS16.0046X"
+        ],
+        "exMarking": "Ex II 2 G Ex db eb mb [ibGb] IIB T5 Tamb -40°C to +55°C Gb",
+        "ingressProtection": "IP66",
+        "dcInputVoltageV": {
+          "min": 9,
+          "max": 36
+        },
+        "averagePowerW": 3,
+        "frequencyMHz": {
+          "xBand": [
+            9300,
+            9500
+          ],
+          "sBand": [
+            2900,
+            3100
+          ]
+        },
+        "responseDelayMicroseconds": 0.5,
+        "receiverSensitivityDbm": -40,
+        "antennaGainDbi": {
+          "xBand": 5,
+          "sBand": 3
+        },
+        "azimuthDegrees": 360,
+        "verticalResponseDegrees": 10,
+        "dimensionsMm": {
+          "height": 730,
+          "diameter": 270
+        },
+        "weightKg": 20,
+        "mounting": "4 x M13 bosses on 240mm PCD",
+        "standardAccessory": "2m power and communications cable",
+        "communication": "RS-485-USB programming, diagnostics and alarm outputs",
+        "morseCodeCharacters": 26,
+        "features": [
+          "frequency agile",
+          "side-lobe suppression",
+          "automatic self-test",
+          "no pressurisation",
+          "blanking"
+        ]
+      },
+      "standards": [
+        "Directive 2014/34/EU Annex II",
+        "ITU-R M824-4",
+        "EMC Directive 2014/30/EU",
+        "EN6100-6-4:2007+A1:2011 as printed",
+        "EN61000-6-2:2005"
+      ],
+      "sourcePrice": null,
+      "currency": null,
+      "sourceState": "DATASHEET_READ_PRODUCT_INDEXED",
+      "technicalAssessment": "NOT_COMPARED_TO_Z1F_MR0004",
+      "projectCandidate": "MR-0004 RACON",
+      "supplierQuotationAvailable": false,
+      "approvedForBudget": false,
+      "selectedForProject": false,
+      "notes": [
+        "Brochure is a technical reference, not a vendor quotation",
+        "No claimed equivalence to Tideland or ORGA equipment before full MR/DTS/BLD review",
+        "Source states specifications may change without notice"
+      ]
+    }
+  ]
+}

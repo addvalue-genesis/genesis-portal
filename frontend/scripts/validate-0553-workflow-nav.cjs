@@ -1,0 +1,13 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const page=read("src/pages/PJ26080553.jsx"),nav=read("src/project0553/lifecycleNavigation.js");
+const shell=read("src/common/ui/ProjectWorkspaceShell.jsx"),css=read("src/project0553/project0553.css");
+for(const id of ['id:"govern"','id:"analyse"','id:"commercial"','id:"control"'])assert(nav.includes(id),"missing group "+id);
+assert(nav.includes('tabs:["documents","budget"]'),"Vendor and Budget must share Source & Commercial group");
+assert(nav.includes('tabs:["registry"]'),"Data & Code must stay in Control");
+for(const area of ['["A","A — Original / Received Documents"]','["B","B — Internal Engineering & Bid Preparation"]','["C","C — Communications & Submissions"]'])assert(page.includes(area),"missing L3 workspace "+area);
+assert(page.includes('tabGroups={l3Area==="B"?TAB_GROUPS:[]}'),"L3 internal tab groups missing");
+assert(nav.includes('["budget","10 Budget & Commercial Analysis"]')&&page.includes('setWorkspaceTab("budget")'),"Budget navigation broken");
+assert(shell.includes("tabGroups ? tabGroups.map")&&shell.includes("group.tabs.includes(t.id)"),"shared shell group navigation broken");
+console.log("PASS 0553 L3 A/B/C workspaces, updated tab grouping and Budget navigation");

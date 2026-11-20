@@ -1,0 +1,304 @@
+import {activeSupplyLine0550} from "./supplyProposalDraft0550";
+import {SPARE_EQUATION_SCHEDULES_0550} from '../serviceEquationRuntime';
+// ADR-0550-001 principles 1–6,8–14. New document views reuse canonical
+// engineering, offers and prices. No allowance, supplier choice or approval is inferred.
+import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequirements0550} from './integrationWorkspace0550';
+import {deriveTechnicalProposal0550,TECHNICAL_SECTIONS_0550,technicalRecordBasis0550} from './technicalProposal0550';
+import {mgwDetailGroup0550} from './mgwDetailPricing0550';
+import {mgwQuoteItem0550,mgwWorkingLineExcluded0550} from './mgwVendorBasis0550';
+import {sumMoney0550,displayPriceCheck0550} from './money0550';
+import {C8_TOTAL_NATIVE_0550,c8CalloffDraftRows0550,c8Country0550,c8SingleForm0550,legacyGeneratedC8Calloff0550} from './c8Calloff0550';
+
+export const SCHEDULES_0550=[
+ {id:'A',title:'Initial Contract Price'},
+ {id:'A1',title:'Base Scope of Supply'},
+ {id:'A2',title:'Optional Scope of Supply'},
+ {id:'B',title:'Payment Terms and Schedule'},
+ {id:'C',title:'Breakdown and Unit Rates'},
+ {id:'C1',title:'Base Supply Breakdown'},
+ {id:'C2',title:'Pre-commissioning / Commissioning Spares'},
+ {id:'C3',title:'Two-year Operation Spares'},
+ {id:'C4',title:'Capital Spares'},
+ {id:'C5',title:'Special Tools'},
+ {id:'C6',title:'Filling Materials and Consumables'},
+ {id:'C7',title:'Field Services and Training'},
+ {id:'C8',title:'Services and Facilities to COMPANY / PURCHASER'}
+];
+export const QUALIFICATIONS_0550=[
+ ['1','Valid business license'],['2','Financial statements — latest three years'],
+ ['3','Domestic similar supply performance / user certificates'],
+ ['4','Overseas similar supply performance / user certificates'],
+ ['5','Production license — where applicable'],['6','Agency certificate — where applicable'],
+ ['7','ISO9001 certification'],['8','Facilities and technical support in Thailand / Myanmar'],
+ ['9','Other relevant qualifications'],['10','Approved vendor list undertaking'],
+ ['11','Commercial Deviation List / explicit reviewed disposition']
+].map(([id,title])=>({id,title}));
+export const VOLUME_SCHEMA_0550='genesis.0550.bid-volumes.v1';
+export const emptyBidVolumes0550=()=>({schema:VOLUME_SCHEMA_0550,documentNo:'',revision:'Rev00',records:[],bindings:[],vdrl:[],commercialDeviations:[]});
+const reviewFields={reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''};
+export const blankVolumeRecord0550=key=>({id:key,content:'',owner:'',sourceIds:[],locator:'',disposition:'REQUIRED',reason:'',nativeFields:{},...reviewFields});
+export const blankScheduleBinding0550=lineId=>({id:lineId,lineId,schedule:'C1',summary:'GOODS',treatment:'BASE',sourceIds:[],locator:'',basis:'',mainEquipment:'',partNo:'',interchangeA:'',interchangeB:'',specification:'',deliveryTerm:'',delivery:'',origin:'',shippingFrom:'',hoursPerDay:null,vendorEquipmentNo:'',referenceDrawings:'',...reviewFields});
+export const blankVdrl0550=id=>({id,documentNo:'',title:'',systemToken:'COMMON',phase:'BID',sectionIds:[],technicalRecordIds:[],sourceIds:[],locator:'',owner:'',dueOn:'',deliverableRef:'',reason:'',...reviewFields});
+export const blankCommercialDeviation0550=id=>({id,title:'',sourceIds:[],locator:'',requirement:'',proposal:'',reason:'',approvalSourceIds:[],approvalLocator:'',approvalExcerpt:'',decision:'PENDING',...reviewFields});
+const trim=v=>typeof v==='string'&&v.trim();
+// Empty optional native-form metadata must not stale legacy reviews on opening
+// or first save. Nonempty changes remain part of the existing basis fingerprint.
+const clean=r=>Object.fromEntries(Object.entries(r).filter(([k,v])=>!['reviewer','reviewedOn','status','basisKey'].includes(k)&&!(k==='nativeFields'&&!Object.keys(v||{}).length)&&!(['vendorEquipmentNo','referenceDrawings'].includes(k)&&!v)));
+const sources=(data,ids)=>(ids||[]).map(id=>data.sourceIntake?.sources.find(s=>s.id===id)||{id,missing:true});
+export const CURRENT_PAYMENT_NATIVE_0550='exhibit-c-schedule-b-rev1.v4';
+export const paymentSchedule0550=view=>view.nativeExhibitVersion===CURRENT_PAYMENT_NATIVE_0550
+ ?view.tenderScheduleBasis?.payment||{rows:[]}
+ :c8SingleForm0550(view)||view.nativeExhibitVersion===C8_TOTAL_NATIVE_0550?view.tenderScheduleBasis?.payment:null;
+export function tenderScheduleBasis0550(data){
+ const all=data.sourceIntake?.sources||[],replaced=new Set(all.flatMap(s=>s.replaces||[]));
+ const current=all.filter(s=>s.authority==='CURRENT_TENDER'&&!replaced.has(s.id));
+ const commercial=current.filter(s=>/Exhibit C[- –]+Commercial Terms/i.test(s.title||'')&&Number(s.title.match(/\brev[. -]*(\d+)/i)?.[1])>0);
+ const c=commercial.length===1&&commercial[0].readState==='TEXT_READ'?commercial[0]:null;
+ let payment=null;
+ if(commercial.length){
+  const lines=(c?.content||'').split(/\r?\n/).map(l=>l.match(/^\d+:\s*(.*?)\s*$/)?.[1]).filter(Boolean);
+  const schedule=lines.indexOf('SCHEDULE B - PAYMENT TERMS AND SCHEDULE');
+  const start=schedule<0?-1:lines.indexOf('Down Payment',schedule),end=lines.findIndex((l,i)=>i>start&&l==='TOTAL');
+  const headings=['Down Payment',...Array.from({length:6},(_,i)=>'Milestone No.'+(i+1))];
+  const rows=[];let i=start,valid=start>=0&&end>start&&lines[end+1]==='100.00%';
+  while(valid&&i<end){
+   const name=lines[i++],terms=[];
+   while(i<end&&!/^\d+(?:\.\d+)?%$/.test(lines[i])&&!headings.includes(lines[i])){
+    const term=lines[i++];if(!term.startsWith('[DELETED]'))terms.push(term.replace(/^\[RED\]\s*/,''));
+   }
+   valid=terms.length>0&&/^\d+(?:\.\d+)?%$/.test(lines[i]||'')&&name===headings[rows.length];
+   if(valid)rows.push([name,terms.join('\n'),lines[i++]]);
+  }
+  const complete=valid&&rows.length===headings.length&&sumMoney0550(rows.map(r=>Number.parseFloat(r[2])))===100;
+  payment={sourceId:c?.id||'',sourceTitle:c?.title?.split(' / ').at(-1)||'',rows:complete?rows:[]};
+ }
+ const annex=current.filter(s=>s.readState==='TEXT_READ'&&/Training of Operator Personnel/i.test(s.title||''));
+ const course=annex.length===1&&(annex[0].content||'').match(/Telecommunication System and Fiber Optic\s+- Operation and Maintenance Course\s+([1-9]\d*)\s+As per CONTRACT\s+([1-9]\d*)\b/i);
+ const training=course?{days:Number(course[2]),trainees:Number(course[1]),sourceId:annex[0].id}:null;
+ const delivery=c?.content?.match(/Overseas Manufacturers shall apply CIF Yangon, Myanmar, Incoterms® 2020; Manufacturers within China shall apply FOB any major port in China, Incoterms® 2020\./)?.[0];
+ const siteHours=c?.content?.match(/Normal Working Time is ten \(10\) hours per day\./i)?10:null;
+ const contents=c?.content?.match(/Table of Contents\s+([\s\S]*?)\n\s*GENERAL PROVISIONS/i)?.[1];
+ const facilitiesConflict=contents&&/^SCHEDULE C7[^\n]*FIELD SERVICES AND TRAINING/im.test(contents)&&
+  !/^SCHEDULE C8\b/im.test(contents)&&/on call-off basis\. The prices, rates and sums provided in Schedule C-7 Services and Facilities for COMPANY and PURCHASER/.test(c.content)
+  ?{sourceId:c.id}:null;
+ const packing=current.filter(s=>s.readState==='TEXT_READ'&&/Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(s.title||''));
+ const importLicence=packing.length===1&&/IMPORT LICENSE APPLICATION \(PL SUBMISSION\) PROVIDED BY VENDOR/.test(packing[0].content||'')?{sourceId:packing[0].id}:null;
+ const agreements=current.filter(s=>s.readState==='TEXT_READ'&&/Purchase Agreement.*\.docx$/i.test(s.title||''));
+ const cargo=agreements.length===1&&/All-Risk Cargo Insurance[^.]{0,450}one hundred ten percent \(110%\) value of supplies under the AGREEMENT or each Purchase Order/.test(agreements[0].content||'')?{sourceId:agreements[0].id}:null;
+ return {payment,training,delivery:delivery?{sourceId:c.id,text:delivery}:null,siteHours,facilitiesConflict,importLicence,cargo};
+}
+const currentSourceProblems=(data,ids,locator)=>{
+ const problems=[];if(!ids.length||!trim(locator))problems.push('SOURCE_LOCATOR_OPEN');
+ for(const s of sources(data,ids))if(s.missing||s.readState==='METADATA_ONLY'||['HISTORICAL','REPLACED_COPY','UNCONFIRMED'].includes(s.authority)||(data.sourceIntake?.sources||[]).some(n=>n.replaces?.includes(s.id)))problems.push('SOURCE_UNREAD_MISSING_OR_REPLACED / '+s.id);
+ return problems;
+};
+export function volumeRecordBasis0550(data,collection,r){
+ const p=data.bidVolumes||emptyBidVolumes0550(),w=data.integrationWorkspace||{},base={policy:VOLUME_SCHEMA_0550,documentNo:p.documentNo,revision:p.revision,record:clean(r),sources:sources(data,r.sourceIds),approvalSources:sources(data,r.approvalSourceIds)};
+ if(collection==='bindings'){
+  const l=activeSupplyLine0550(data.lines.find(l=>l.id===r.lineId)),reqs=integrationRequirements0550(data).filter(q=>q.workLineIds.includes(r.lineId));
+  Object.assign(base,{line:l,offer:data.offers.find(o=>o.id===l?.offerId),calculation:data.calculations.find(c=>c.id===l?.calculationId),fx:data.fx,requirements:reqs.map(q=>({record:q,key:integrationRecordBasis0550(data,'requirements',q)})),physical:data.technicalProposal?.equipmentDetails.find(e=>e.lineId===r.lineId)});
+  // Quoted packages have multiple canonical offer rows, rather than line.offerId.
+  if(l?.mgwDetailGroupId)base.packageOffers=data.offers.filter(o=>mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.includes(o.mgwQuoteLineId));
+ }
+ if(collection==='vdrl')base.technical=r.technicalRecordIds.map(id=>{const t=data.technicalProposal?.records.find(t=>t.id===id);return t?{record:t,key:technicalRecordBasis0550(data,t)}:{id,missing:true};});
+ return integrationFingerprint0550(base);
+}
+export function saveBidVolumeRecord0550(data,collection,row,today,review=false){
+ // Screen projections include derived state/problems. Persist only the defined
+ // authoring fields, never a calculated state or a copied price/engineering row.
+ const defaults={records:blankVolumeRecord0550(row.id),bindings:blankScheduleBinding0550(row.id),vdrl:blankVdrl0550(row.id),commercialDeviations:blankCommercialDeviation0550(row.id)}[collection];
+ if(!defaults)throw Error('Unknown bid volume collection');
+ const authored=Object.fromEntries(Object.keys(defaults).map(k=>[k,row[k]===undefined?defaults[k]:row[k]]));
+ const p=data.bidVolumes||emptyBidVolumes0550(),record={...authored,status:review?'REVIEWED':'DRAFT',reviewedOn:review?today:'',basisKey:''};
+ const next={...data,bidVolumes:{...p,[collection]:[...p[collection].filter(r=>r.id!==row.id),record]}};
+ if(review)record.basisKey=volumeRecordBasis0550(next,collection,record);
+ return next;
+}
+
+export const PRESERVATION_PACKING_OWNER_0550='LINE-B2-PRESERVATION-PACKING-0550';
+const myanmarStorageOwner='LINE-TSI-BUDGET-MYANMAR-STORAGE-0550';
+export function preservationPackingOverlap0550(data){
+ const bindings=data.bidVolumes?.bindings||[];
+ const packingOwners=new Set(bindings.filter(b=>b.schedule==='A1'&&b.summary==='PACKING').map(b=>b.lineId));
+ const offers=new Map(data.offers.map(offer=>[offer.id,offer]));
+ return data.lines.some(line=>{
+  if([PRESERVATION_PACKING_OWNER_0550,myanmarStorageOwner].includes(line.id)||!line.selected||line.coveredByLineId||line.responsibility==='COMPANY')return false;
+  const offer=offers.get(line.offerId);
+  if(mgwWorkingLineExcluded0550(data,line,offer))return false;
+  return packingOwners.has(line.id)||line.mgwDetailGroupId==='SERVICES-004'||
+   mgwQuoteItem0550(offer)?.id==='MGW-Q26-063-SERVICES-004';
+ });
+}
+
+export function preparePreservationPacking0550(data,today){
+ const receipt=data.repositoryBasisImport;
+ if(data.projectId!=='PJ2608-0550'||!receipt||today<'2026-11-13')return data;
+ const bindings=data.bidVolumes?.bindings||[],recorded=receipt.pricedVolumeDraftIds||[];
+ const locator='PJ2608-0550_A1_Preservation_Packing_Storage_Rev00.xlsx / A1 Plan and Cost Build / https://chatgpt.com/library?file_id=libfile_3df5bc2f7dd88191b6cb32724a9b48a3&account_id=personal';
+ const candidates=[
+  {id:PRESERVATION_PACKING_OWNER_0550,wbs:'B2',scopeKey:PRESERVATION_PACKING_OWNER_0550,
+   description:'Preservation and packing for shipment',tagRef:'Thailand consolidation / Yangon Port',cost:329000+190000,
+   basis:'THB 329,000 for Thailand staging, preservation and packing plus THB 190,000 for Yangon Port preservation and inspection. Yangon scope, packing quantities and supplier inclusions remain open.'},
+  {id:myanmarStorageOwner,wbs:'B4',scopeKey:'TSI.MYANMAR.STORAGE.CONTAINERS',
+   description:'Myanmar site preservation — two 20 ft storage containers, delivery, placement and collection',tagRef:'APF / ACP',cost:2*(6*18000+65000),
+   basis:'APF and ACP: two 20 ft containers. Rental THB 216,000 and empty-container delivery, placement and collection THB 130,000. C7 Rev.05 references these rates under A1 Item 3. Confirm CNEEC/COMPANY provision.'},
+ ];
+ const occupied=new Set([...recorded,...data.lines.map(line=>line.id),...bindings.map(binding=>binding.lineId)]);
+ const pending=candidates.filter(candidate=>!occupied.has(candidate.id)&&
+  (candidate.id===PRESERVATION_PACKING_OWNER_0550?!preservationPackingOverlap0550(data):
+   !data.lines.some(line=>line.selected&&!line.coveredByLineId&&line.scopeKey.trim().toLowerCase()===candidate.scopeKey.toLowerCase())));
+ if(!pending.length||Math.max(data.lines.length,bindings.length,recorded.length)+pending.length>2000)return data;
+ const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(source=>source.replaces||[]));
+ const sourceIds=sources.filter(source=>source.authority==='CURRENT_TENDER'&&source.readState==='TEXT_READ'&&source.content&&!replaced.has(source.id)&&
+  /Exhibit A[_ -]+Annex 6.+PACKING SHIPPING/i.test(source.title||'')).map(source=>source.id);
+ const lines=pending.map(({id,wbs,scopeKey,description,tagRef,cost,basis})=>({
+  id,systemToken:'COMMON',wbs,scopeKey,description,tagRef,requirementRef:'Exhibit C Schedule A1 S/N 3',sourceRef:locator+' / '+basis,
+  vendorId:'',offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:cost,
+  sellMode:'DIRECT',sellRate:cost,markupPct:null,marginPct:null,primePct:0,selected:true,customerRowCode:wbs,
+  customerRemark:'Draft preservation and packing allowance at cost. Confirm the scope and supplier inclusions before issue.',brand:'',
+ }));
+ let next={...data,lines:[...data.lines,...lines],
+  repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded,...pending.map(row=>row.id)]}};
+ for(const {id,basis} of pending)next=saveBidVolumeRecord0550(next,'bindings',{
+   ...blankScheduleBinding0550(id),schedule:'A1',summary:'PACKING',deliveryTerm:'CIF',sourceIds,locator,basis,
+  },today);
+ return next;
+}
+
+export function prepareC8Calloff0550(data,pack,today){
+ const receipt=data.repositoryBasisImport;
+ if(!receipt||!pack)return data;
+ const drafts=c8CalloffDraftRows0550(pack);
+ const bindings=data.bidVolumes?.bindings||[],lineById=new Map(data.lines.map(line=>[line.id,line]));
+ const recorded=new Set(receipt.pricedVolumeDraftIds||[]);
+ const occupied=new Set([...lineById.keys(),...bindings.map(b=>b.lineId),...recorded]);
+ const pending=drafts.filter(({line})=>!occupied.has(line.id));
+ if(!pending.length)return data;
+ const draftRoles=new Set(pending.map(({binding})=>binding.summary));
+ const retired=new Set(bindings.filter(b=>draftRoles.has(b.summary)&&recorded.has(b.lineId)&&
+  !data.lines.some(line=>line.coveredByLineId===b.lineId)&&
+  !data.technicalProposal?.equipmentDetails.some(detail=>detail.lineId===b.lineId)&&
+  !integrationRequirements0550(data).some(requirement=>requirement.workLineIds.includes(b.lineId))&&
+  legacyGeneratedC8Calloff0550({...b,line:lineById.get(b.lineId)})).map(b=>b.lineId));
+ if(data.lines.length-retired.size+pending.length>2000||bindings.length-retired.size+pending.length>2000||
+  recorded.size+pending.length>2000)return data;
+ let next={...data,lines:[...data.lines.filter(line=>!retired.has(line.id)),...pending.map(draft=>draft.line)],
+  bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:bindings.filter(b=>!retired.has(b.lineId))}};
+ for(const {line,binding} of pending){
+  next=saveBidVolumeRecord0550(next,'bindings',{...blankScheduleBinding0550(line.id),...binding},today);
+  recorded.add(line.id);
+ }
+ return {...next,repositoryBasisImport:{...receipt,pricedVolumeDraftIds:[...recorded]}};
+}
+
+const recordState=(data,collection,r,today,problems)=>{
+ if(r.status!=='REVIEWED'||!trim(r.reviewer)||!r.reviewedOn||r.reviewedOn>today||!r.basisKey)problems.push('REVIEW_OPEN');
+ const stale=Boolean(r.basisKey&&r.basisKey!==volumeRecordBasis0550(data,collection,r));if(stale)problems.push('STALE_DEPENDENCIES');
+ return {...r,problems,state:stale?'STALE':problems.length?'OPEN':'REVIEWED'};
+};
+export function deriveBidVolumes0550(data,model,systems,today){
+ const p=data.bidVolumes||emptyBidVolumes0550(),technical=deriveTechnicalProposal0550(data,model,systems,today);
+ const records=p.records.map(r=>{const problems=currentSourceProblems(data,r.sourceIds,r.locator);if(!trim(r.content)||!trim(r.owner))problems.push('CONTENT_OWNER_OPEN');if(r.disposition==='NOT_APPLICABLE'&&!trim(r.reason))problems.push('APPLICABILITY_REASON_OPEN');return recordState(data,'records',r,today,problems);});
+ const getRecord=id=>records.find(r=>r.id===id)||{...blankVolumeRecord0550(id),state:'OPEN',problems:['DOCUMENT_RESPONSE_OPEN']};
+ const active=(model.official?.lines||[]).filter(l=>l.selected&&!l.mrScopeState?.covered&&!l.mrScopeState?.excluded&&!l.satelliteScopeState?.excluded);
+ const available=(model.official?.lines||[]).filter(l=>!l.mrScopeState?.covered&&!l.mrScopeState?.excluded&&!l.satelliteScopeState?.excluded);
+ const bindings=p.bindings.map(b=>{
+  const line=(b.treatment==='CALLOFF'?available:active).find(l=>l.id===b.lineId),problems=currentSourceProblems(data,b.sourceIds,b.locator);
+  if(!line)problems.push('WORKING_NOT_SELECTED_OR_MISSING');
+  if(!trim(b.basis)||!trim(b.summary)||!trim(b.deliveryTerm))problems.push('ALLOCATION_BASIS_OR_DELIVERY_TERM_OPEN');
+  const physical=data.technicalProposal?.equipmentDetails.find(e=>e.lineId===b.lineId);
+  if(b.schedule==='C8'){
+   const expected=c8Country0550(b)&&['AIRPORT','OFFICE_CONSUMABLES'].includes(b.summary)?'SET':'MD';
+   if(line?.unit!==expected)problems.push(expected==='SET'?'C8_NATIVE_QUANTITY_BASIS_OPEN':'C8_MAN_DAY_BASIS_OPEN');
+  }
+  if(b.schedule==='C6'&&!trim(b.specification))problems.push('CONSUMABLE_SPECIFICATION_OPEN');
+  const part=line?.wbs.startsWith('C')?'OPTION':'BASE';
+  if(b.schedule==='A1'&&(b.treatment!=='BASE'||!['INSPECTION','PACKING','VENDOR_DOCUMENTS','OTHER'].includes(b.summary)))problems.push('DIRECT_A1_SUMMARY_ALLOCATION_OPEN');
+  if(b.schedule==='A2'&&(b.treatment!=='OPTION'||b.summary!=='OTHER'))problems.push('DIRECT_A2_OPTION_ALLOCATION_OPEN');
+  if(b.treatment==='CALLOFF'){if(b.schedule!=='C8'||line?.selected)problems.push('CALLOFF_MUST_BE_UNSELECTED_C8_RATE');}
+  else if(line&&b.treatment!==part)problems.push('WORKING_BASE_OPTION_TREATMENT_MISMATCH');
+  if(['C1','C2','C5'].includes(b.schedule)&&b.treatment!=='BASE')problems.push('BASE_SCHEDULE_TREATMENT_MISMATCH');
+  if(['C3','C4','C6'].includes(b.schedule)&&b.treatment!=='OPTION')problems.push('OPTIONAL_TREATMENT_REVIEW_REQUIRED');
+  if(b.schedule==='C8'&&getRecord('I.C8').state!=='REVIEWED')problems.push('C8_BASE_VS_CALLOFF_CONFIRMATION_OPEN');
+  if(['C2','C3','C4'].includes(b.schedule)&&(!trim(b.mainEquipment)||!trim(b.partNo)||!trim(b.interchangeA)||!trim(b.interchangeB)||!trim(b.delivery)||!trim(b.origin)||!trim(b.shippingFrom)||!(physical?.estimatedWeightKg>0)))problems.push('SPARE_PART_EQUIPMENT_LOGISTICS_DETAILS_OPEN');
+  let quantity=line?.quantity??null,unit=line?.unit||'',amount=line?.customerUSD??null;
+  if(b.schedule==='C7'){
+   if(unit==='MD'&&b.hoursPerDay>0){quantity*=b.hoursPerDay;unit='MH';}
+   else if(unit!=='MH')problems.push('C7_MAN_HOUR_BASIS_OPEN');
+  }
+  const display=displayPriceCheck0550(amount,quantity);if(!Number.isFinite(amount))problems.push('REVIEWED_PRICE_OPEN');
+  if(Number.isFinite(amount)&&!display.matches)problems.push('DISPLAY_UNIT_AMOUNT_MISMATCH');
+  return {...recordState(data,'bindings',b,today,problems),line,physical,quantity,unit,amount,unitPrice:display.unitPrice};
+ });
+ const unallocated=active.filter(l=>!bindings.some(b=>b.lineId===l.id));
+ const requiredSystems=new Set((model.integration?.requirements||[]).filter(r=>r.disposition!=='NOT_APPLICABLE').map(r=>r.systemToken));
+ const vdrl=p.vdrl.map(r=>{
+  const problems=currentSourceProblems(data,r.sourceIds,r.locator);
+  if(!trim(r.documentNo)||!trim(r.title)||!trim(r.owner))problems.push('VDRL_DOCUMENT_OWNER_OPEN');
+  if(r.phase==='NOT_APPLICABLE'&&!trim(r.reason))problems.push('VDRL_APPLICABILITY_OPEN');
+  if(r.phase==='BID'){
+   if(!r.sectionIds.length||!trim(r.deliverableRef))problems.push('WITH_BID_DELIVERABLE_OPEN');
+   for(const id of r.technicalRecordIds){const t=technical.records.find(t=>t.id===id);if(!t||t.state!=='REVIEWED_DRAFT'||!r.sectionIds.includes(t.sectionId)||(r.systemToken!=='COMMON'&&r.systemToken!==t.systemToken))problems.push('TECHNICAL_RECORD_OPEN_OR_MISMATCH / '+id);}
+   if(!r.technicalRecordIds.length)problems.push('WITH_BID_TECHNICAL_LINK_OPEN');
+  }
+  return recordState(data,'vdrl',r,today,problems);
+ });
+ const technicalRequired=technical.records.filter(r=>requiredSystems.has(r.systemToken));
+ const vdrlGaps=technicalRequired.filter(t=>!vdrl.some(r=>r.phase==='BID'&&r.state==='REVIEWED'&&r.technicalRecordIds.includes(t.id)));
+ const commercialDeviations=p.commercialDeviations.map(r=>{
+  const problems=currentSourceProblems(data,r.sourceIds,r.locator);
+  if(![r.title,r.requirement,r.proposal,r.reason].every(trim))problems.push('COMMERCIAL_DEVIATION_FIELDS_OPEN');
+  if(r.decision!=='ACCEPTED')problems.push('CUSTOMER_ACCEPTANCE_OPEN');
+  else {problems.push(...currentSourceProblems(data,r.approvalSourceIds,r.approvalLocator));if(!trim(r.approvalExcerpt)||!sources(data,r.approvalSourceIds).some(s=>s.content?.includes(r.approvalExcerpt)))problems.push('APPROVAL_EVIDENCE_OPEN');}
+  return recordState(data,'commercialDeviations',r,today,problems);
+ });
+ const consistency=[];
+ const lineOfferIds=l=>l.offerId?[l.offerId]:l.mgwDetailGroupId?data.offers.filter(o=>mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.includes(o.mgwQuoteLineId)).map(o=>o.id):[];
+ for(const l of active)for(const id of lineOfferIds(l))if(!(model.integration?.requirements||[]).some(r=>r.disposition!=='NOT_APPLICABLE'&&r.workLineIds.includes(l.id)&&r.offerIds.includes(id)))consistency.push({id:l.id+'/'+id,target:'bid.working-preview.step.7',system:l.systemToken,reason:'SELECTED_WORKING_OFFER_REQUIREMENT_MISMATCH'});
+ for(const t of technicalRequired){
+  if(t.state!=='REVIEWED_DRAFT')consistency.push({id:t.id,target:'bid.technical.'+t.sectionId,system:t.systemToken,reason:'VOLUME_II_'+t.state});
+  for(const offerId of t.offerIds){const reqs=(model.integration?.requirements||[]).filter(r=>t.requirementIds.includes(r.id));if(!reqs.some(r=>r.offerIds.includes(offerId)&&r.workLineIds.some(id=>active.some(l=>l.id===id&&lineOfferIds(l).includes(offerId)))))consistency.push({id:t.id+'/'+offerId,target:'bid.working-preview.step.7',system:t.systemToken,reason:'TECHNICAL_OFFER_NOT_IN_SELECTED_WORKING_SCOPE'});}
+ }
+ for(const d of model.integration?.deviations||[])if(d.state!=='ACCEPTED_DEVIATION')consistency.push({id:d.id,target:'bid.deviations.record.'+d.id,system:d.systemToken,reason:'TECHNICAL_DEVIATION_REVIEW_OPEN'});
+ const scheduleRows=id=>bindings.filter(b=>b.schedule===id&&b.line);
+ const priceProblems=[];
+ if(unallocated.length)priceProblems.push('SCHEDULE_ALLOCATION_OPEN');
+ if(bindings.some(b=>b.problems.length))priceProblems.push('SCHEDULE_BINDING_REVIEW_OPEN');
+ for(const s of SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)))if(!scheduleRows(s.id).length&&getRecord('I.'+s.id).state!=='REVIEWED')priceProblems.push('SCHEDULE_DISPOSITION_OPEN / '+s.id);
+ if(['I.cover','I.A','I.A1','I.A2','I.B','I.C','I.C3','I.C8'].some(id=>getRecord(id).state!=='REVIEWED'))priceProblems.push('VOLUME_I_RESPONSE_OPEN');
+ // SI spare candidates remain visible in 11.M but have no Volume I amount
+ // until bound there. Missing allocation/reconciliation still keeps HOLD.
+ const pendingOwners=unallocated.filter(l=>!SPARE_EQUATION_SCHEDULES_0550[data.calculations.find(c=>c.id===l.calculationId)?.equationId]);
+ const baseAssigned=pendingOwners.some(l=>!l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='BASE').map(b=>b.amount)),optionsAssigned=pendingOwners.some(l=>l.wbs.startsWith('C'))?null:sumMoney0550(bindings.filter(b=>b.line&&b.treatment==='OPTION').map(b=>b.amount));
+ if(baseAssigned!==model.official?.baseUSD||optionsAssigned!==model.official?.optionsUSD)priceProblems.push('SCHEDULE_TOTAL_RECONCILIATION_OPEN');
+ const problems=[...priceProblems];
+ if(!p.documentNo.trim()||!p.revision.trim())problems.push('BID_DOCUMENT_CONTROL_OPEN');
+ if(consistency.length)problems.push('VOLUME_I_II_OR_TECHNICAL_DEVIATION_OPEN');
+ if(getRecord('II.vdrl-scope').state!=='REVIEWED'||!vdrl.length||vdrl.some(r=>r.problems.length)||vdrlGaps.length)problems.push('VDRL_WITH_BID_COVERAGE_OPEN');
+ if(QUALIFICATIONS_0550.some(q=>getRecord('III.'+q.id).state!=='REVIEWED')||commercialDeviations.some(r=>r.problems.length))problems.push('VOLUME_III_OPEN');
+ return {proposal:p,records,getRecord,bindings,active,available,unallocated,technical,technicalRequired,vdrl,vdrlGaps,commercialDeviations,consistency,scheduleRows,baseAssigned,optionsAssigned,priceProblems,problems:[...new Set(problems)],ready:problems.length===0,state:problems.length?'HOLD':'REVIEWED_PACKAGE_NOT_ISSUED',c1Context:{lines:data.lines,requirements:model.integration?.requirements||[]},tenderScheduleBasis:tenderScheduleBasis0550(data)};
+}
+
+export function validateBidVolumes0550(data){
+ const p=data.bidVolumes;if(p===undefined)return;
+ const fail=m=>{throw Error('Bid Volumes: '+m);},obj=(r,keys)=>{if(!r||typeof r!=='object'||Array.isArray(r)||Object.keys(r).some(k=>!keys.includes(k))||keys.some(k=>r[k]===undefined))fail('unsupported/missing fields');};
+ obj(p,Object.keys(emptyBidVolumes0550()));if(p.schema!==VOLUME_SCHEMA_0550)fail('schema');
+ for(const k of ['documentNo','revision'])if(typeof p[k]!=='string'||p[k].length>200)fail('document control');
+ const keys={records:Object.keys(blankVolumeRecord0550('')),bindings:Object.keys(blankScheduleBinding0550('')),vdrl:Object.keys(blankVdrl0550('')),commercialDeviations:Object.keys(blankCommercialDeviation0550(''))};
+ for(const [collection,fields] of Object.entries(keys)){
+  const rows=p[collection];if(!Array.isArray(rows)||rows.length>2000||new Set(rows.map(r=>r?.id)).size!==rows.length)fail('invalid collection '+collection);
+  for(const r of rows){const optional=['nativeFields','vendorEquipmentNo','referenceDrawings'];obj({...Object.fromEntries(optional.filter(k=>fields.includes(k)).map(k=>[k,k==='nativeFields'?{}:''])),...r},fields);for(const [k,v] of Object.entries(r)){
+   if(k==='nativeFields'){if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).some(k=>!['agreementNo','vendorNameAddress','sitePeriodDays','trainingPeriodDays'].includes(k))||Object.values(v).some(x=>typeof x!=='string'||x.length>2000))fail('native form metadata');}
+   else if(k==='hoursPerDay'){if(v!==null&&(!Number.isFinite(v)||v<=0||v>24))fail('hours/day');}
+   else if(k.endsWith('Ids')){if(!Array.isArray(v)||v.length>500||new Set(v).size!==v.length||v.some(id=>typeof id!=='string'||id.length>100))fail('reference list');}
+   else if(typeof v!=='string'||v.length>12000)fail('text');
+  }
+  if(!/^[\w.-]{1,100}$/.test(r.id)||!['DRAFT','REVIEWED'].includes(r.status))fail('ID/review');
+  for(const k of ['reviewedOn','dueOn'])if(r[k]&&(!/^\d{4}-\d{2}-\d{2}$/.test(r[k])||!Number.isFinite(Date.parse(r[k]))||new Date(r[k]).toISOString().slice(0,10)!==r[k]))fail('date');
+  if(collection==='records'&&(!['I.cover','II.vdrl-scope',...SCHEDULES_0550.map(s=>'I.'+s.id),...QUALIFICATIONS_0550.map(q=>'III.'+q.id)].includes(r.id)||!['REQUIRED','NOT_APPLICABLE'].includes(r.disposition)))fail('record section/disposition');
+  if(collection==='bindings'&&(r.id!==r.lineId||!/^C[1-8]$|^A[12]$/.test(r.schedule)||!['BASE','OPTION','CALLOFF'].includes(r.treatment)))fail('schedule binding');
+  if(collection==='vdrl'&&(!['BID','POST_AWARD','NOT_APPLICABLE'].includes(r.phase)||r.sectionIds.some(id=>!TECHNICAL_SECTIONS_0550.some(s=>s.id===id))))fail('VDRL phase/section');
+  if(collection==='commercialDeviations'&&!['PENDING','ACCEPTED','REJECTED'].includes(r.decision))fail('commercial decision');
+  }
+ }
+}

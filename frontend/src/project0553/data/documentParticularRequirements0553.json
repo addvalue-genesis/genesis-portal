@@ -1,0 +1,1719 @@
+{
+  "projectId": "PJ2608-0553",
+  "scope": "SCADA MR0001 plus shared telecom constraints",
+  "version": "ParticularEngineeringKnowledge_Rev01",
+  "sourceDocuments": {
+    "MR": {
+      "documentNo": "MM-ZTK-1F-GEN-TEL-MR-0001",
+      "revision": "C1",
+      "title": "Material Requisition for SCADA Radio",
+      "filename": "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1.pdf"
+    },
+    "BOD": {
+      "documentNo": "MM-ZTK-1F-GEN-TEL-BOD-0001",
+      "revision": "C2",
+      "title": "Telecommunication Basic of Design",
+      "filename": "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2.pdf"
+    },
+    "DTS": {
+      "documentNo": "MM-ZTK-1F-GEN-TEL-DTS-0001",
+      "revision": "C1",
+      "title": "Datasheet for SCADA Radio System",
+      "filename": "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1.pdf"
+    },
+    "SPE": {
+      "documentNo": "MM-ZTK-1F-GEN-TEL-SPE-0001",
+      "revision": "C2",
+      "title": "Project Specification for Telecommunication Package",
+      "filename": "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2.pdf"
+    },
+    "RPT": {
+      "documentNo": "MM-ZTK-1F-GEN-TEL-RPT-0001",
+      "revision": "C1",
+      "title": "Design Report for Communication Link",
+      "sourceUrl": "https://drive.google.com/file/d/1HkhxoFcWI3MaYP9WgGF1h-1qWgnE82on/view"
+    },
+    "BLD": {
+      "documentNo": "MM-ZTK-1F-ZWPX-TEL-BLD-0001",
+      "revision": "C1",
+      "title": "Overall Telecommunication System Block Diagram",
+      "sourceUrl": "https://drive.google.com/file/d/1FZUqKAXBybGkaxeR4CUOH3OaIb2edmt3/view"
+    }
+  },
+  "records": [
+    {
+      "id": "REQ0553-001",
+      "document": "MR",
+      "section": "2",
+      "page": "8",
+      "type": "CLAUSE",
+      "topic": "Precedence and deviations",
+      "requirement": "Document conflicts reported to CONTRACTOR/COMPANY; written approval for changes; stricter requirement generally applies.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Keep clause-level conflict register with written decision and revision lineage",
+      "costDriver": "B1/B4/B8",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-002",
+      "document": "MR",
+      "section": "5",
+      "page": "10",
+      "type": "CLAUSE",
+      "topic": "MR one set is not final BOM",
+      "requirement": "SCADA radio one set/platform; summary list not exhaustive, referenced docs and attachments apply.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Decompose functions, interfaces, package components and services",
+      "costDriver": "A + BULK + B + C",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-003",
+      "document": "MR",
+      "section": "5",
+      "page": "10",
+      "type": "CLAUSE",
+      "topic": "Greenfield ZWP20 TAG supply",
+      "requirement": "ZWP20 ODU MR-502-001; IDU MR-502-001A; antenna ANT-502-001; LAN-502-001; DATO-507-001; TCAB-500-001; SA-502-001; bulk 1 lot.",
+      "tags": [
+        "ZWP20",
+        "MR-502-001",
+        "MR-502-001A",
+        "ANT-502-001",
+        "LAN-502-001",
+        "DATO-507-001",
+        "TCAB-500-001",
+        "SA-502-001"
+      ],
+      "siAction": "Trace each TAG to functional BOM and a single cost owner",
+      "costDriver": "Equipment + bulk",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-004",
+      "document": "MR",
+      "section": "5",
+      "page": "11",
+      "type": "CLAUSE",
+      "topic": "Greenfield ZWP23 second antenna",
+      "requirement": "ZWP23 has ANT-502-001 and ANT-502-002 separately, along with subscriber set, switch, enclosure, DATO, surge and bulk.",
+      "tags": [
+        "ZWP23",
+        "ANT-502-001",
+        "ANT-502-002"
+      ],
+      "siAction": "Keep two independent antenna tags, verify diversity configuration",
+      "costDriver": "Antenna units + supports + feeders",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-005",
+      "document": "MR",
+      "section": "5",
+      "page": "11",
+      "type": "CLAUSE",
+      "topic": "Mandatory package services",
+      "requirement": "Startup/commissioning spares per platform; special tools per phase; 2-year spares quotation; FAT/SAT; VDRL; transport; import and type approval; warranty.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Separate included supply vs optional price and work responsibility",
+      "costDriver": "B2/B4/B5/B6/B8/C2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-006",
+      "document": "MR",
+      "section": "5",
+      "page": "11",
+      "type": "CLAUSE",
+      "topic": "ZPQ brownfield explicit tags",
+      "requirement": "ZPQ ODU MR-LQM-202-025A, IDU MR-LQM-202-025B, ANT-LQM-202-025, SA-LQM-202-025 and bulk.",
+      "tags": [
+        "ZPQ",
+        "MR-LQM-202-025A",
+        "MR-LQM-202-025B"
+      ],
+      "siAction": "Capture existing system work and separate owner from new platform tags",
+      "costDriver": "Brownfield A/B/C",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-007",
+      "document": "MR",
+      "section": "5",
+      "page": "12",
+      "type": "CLAUSE",
+      "topic": "ZWP8 brownfield explicit tags",
+      "requirement": "ZWP8 two radio pairs, antennas, switch LAN-502-002, SA-502-002/003, TCAB-500-003 and bulk.",
+      "tags": [
+        "ZWP8",
+        "MR-502-003",
+        "MR-502-004",
+        "LAN-502-002"
+      ],
+      "siAction": "Reconcile links/ZPQ backhaul and cabinet work with site interfaces",
+      "costDriver": "Brownfield radio + enclosure",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-008",
+      "document": "MR",
+      "section": "5",
+      "page": "12",
+      "type": "CLAUSE",
+      "topic": "ZWP11 brownfield explicit tags",
+      "requirement": "ZWP11 ODU MR-502-005A, IDU MR-502-005B, ANT-502-005, SA-507-005, TCAB-500-003 and bulk.",
+      "tags": [
+        "ZWP11",
+        "MR-502-005A",
+        "MR-502-005B"
+      ],
+      "siAction": "Check DCDB, breaker and cable tray tie-in",
+      "costDriver": "Brownfield power/tray/interfaces",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-009",
+      "document": "MR",
+      "section": "5",
+      "page": "13",
+      "type": "CLAUSE",
+      "topic": "Myanmar radio permits",
+      "requirement": "Vendor to secure type/operating/import approvals, authority approvals, relevant China/Thailand transit approvals; China-yard approval is described separately as optional.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Build country-specific permit and duty responsibility matrix",
+      "costDriver": "B8 + milestone contingency",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-010",
+      "document": "MR",
+      "section": "5",
+      "page": "13",
+      "type": "CLAUSE",
+      "topic": "Vendor design completeness",
+      "requirement": "Vendor link budget against selected RF models, marine paint, named documents, spares, inspection, supervision per-day rate, FAT/SAT/offshore commissioning.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Demand OEM calculations, priced site service and full package list",
+      "costDriver": "B1/B4/B5/B7",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-011",
+      "document": "MR",
+      "section": "6.1",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "Brownfield design/upgrade obligation",
+      "requirement": "Vendor responsible for necessary modification/upgrades at ZPQ and existing platforms and certified completed assemblies.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "siAction": "Survey existing equipment, interface and battery before scope final",
+      "costDriver": "B1/B4/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-012",
+      "document": "MR",
+      "section": "7.2",
+      "page": "15",
+      "type": "CLAUSE",
+      "topic": "Testing witness notice",
+      "requirement": "Purchaser inspection permitted; at least 30 days notice of tests for witnessing.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Compare with SPE 14-day notice and set conservative planning gate pending decision",
+      "costDriver": "FAT schedule/inspection",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-013",
+      "document": "MR",
+      "section": "7.3",
+      "page": "15",
+      "type": "CLAUSE",
+      "topic": "FAT software evergreen",
+      "requirement": "Hardware and software FAT, licensed to COMPANY and non-renewing; latest drawings; punch items clear before shipping.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Verify perpetual entitlements and include realistic FAT workload",
+      "costDriver": "A licence+B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-014",
+      "document": "MR",
+      "section": "7.4–7.5",
+      "page": "16",
+      "type": "CLAUSE",
+      "topic": "SAT/offshore proof",
+      "requirement": "Vendor SAT and offshore radio TX/RX and throughput measurements; special analyzer and signed test records.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Include two-site testing and commissioning manpower/equipment",
+      "costDriver": "B4/B6/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-015",
+      "document": "MR",
+      "section": "8",
+      "page": "16",
+      "type": "CLAUSE",
+      "topic": "Proposal deliverable sections",
+      "requirement": "Proposal must detail equipment, performance, drawings, utilities, maintenance, testing, spares/tools, deviations, execution plan, warranty, QA/HSE and qualified sub-vendors.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Build submission matrix by section and evidence document",
+      "costDriver": "B1/B3/B4/B6",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-016",
+      "document": "MR",
+      "section": "9",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "ITP category IC1",
+      "requirement": "Inspection and Test Plan includes 100% function, cyber security, 24-hour endurance, Explosion-proof certs, FAT, inspection records and release notes.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Cost test facilities, witnesses, certificates, rework allowance based on documented events",
+      "costDriver": "B1/B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-017",
+      "document": "MR",
+      "section": "10–11",
+      "page": "21",
+      "type": "CLAUSE",
+      "topic": "VDS/VDRL schedule",
+      "requirement": "Vendor Document Schedule must track reference, revision, planned/actual submissions, approvals; startup spares in main offer and 2yr spares quoted.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Create requirement-linked documents and workload per submission",
+      "costDriver": "B1/B5/C2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-018",
+      "document": "MR",
+      "section": "ATTACHMENT 1",
+      "page": "24",
+      "type": "ATTACHMENT",
+      "topic": "Engineering Documents",
+      "requirement": "Drawings must show facility, TAG, vendor drawings, revisions, approved-for-construction/as-built status; no fabrication before approval",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-019",
+      "document": "MR",
+      "section": "ATTACHMENT 2",
+      "page": "25",
+      "type": "ATTACHMENT",
+      "topic": "Bill of Material",
+      "requirement": "BOM rows must show drawing/figure, item number, quantity, full description and Vendor Part Number, with project/site/TAG references",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "A + BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-020",
+      "document": "MR",
+      "section": "ATTACHMENT 3",
+      "page": "26",
+      "type": "ATTACHMENT",
+      "topic": "Manufactured Component Data",
+      "requirement": "Subvendor items and accurate catalogues, datasheets, certifications, as-built data and maintenance information",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B1 + A",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-021",
+      "document": "MR",
+      "section": "ATTACHMENT 4",
+      "page": "27",
+      "type": "ATTACHMENT",
+      "topic": "Commissioning/Operation Manuals",
+      "requirement": "Equipment-specific commissioning, operations and shutdown procedures, TAG identification and troubleshooting",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B1/B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-022",
+      "document": "MR",
+      "section": "ATTACHMENT 5",
+      "page": "28",
+      "type": "ATTACHMENT",
+      "topic": "Commissioning Spares",
+      "requirement": "Mandatory actual spares with part numbers, prices, availability, shelf life, start-up technician contact",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B5",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-023",
+      "document": "MR",
+      "section": "ATTACHMENT 6",
+      "page": "29",
+      "type": "ATTACHMENT",
+      "topic": "Maintenance Manual",
+      "requirement": "Preventive/corrective schedules with subvendor equipment and TAG trace",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-024",
+      "document": "MR",
+      "section": "ATTACHMENT 7",
+      "page": "30",
+      "type": "ATTACHMENT",
+      "topic": "Two-year Operating Spares",
+      "requirement": "Itemized priced 2-year operating spares, excluding startup spares",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "C2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-025",
+      "document": "MR",
+      "section": "ATTACHMENT 8",
+      "page": "31",
+      "type": "ATTACHMENT",
+      "topic": "Special Tools",
+      "requirement": "Nonstandard tools, descriptions, quantity, price and use instructions",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B6",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-026",
+      "document": "MR",
+      "section": "ATTACHMENT 9",
+      "page": "32",
+      "type": "ATTACHMENT",
+      "topic": "Shipping/Long-term Preservation",
+      "requirement": "Shipping loose parts; 1-year storage procedure; replenishment and environment conditions",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve attachment requirement as separate response/work item",
+      "costDriver": "B2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-027",
+      "document": "MR",
+      "section": "REVIEW COMMENT 2",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "Brownfield survey update",
+      "requirement": "Client commented Brownfield details require update from survey; response marked CLOSED.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "siAction": "Closed reviewer comment is document history, not proof that SI survey scope is priced",
+      "costDriver": "B7/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-028",
+      "document": "MR",
+      "section": "REVIEW COMMENTS 3/6",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "Actual spares/tools supply",
+      "requirement": "Client states Vendor shall provide commissioning spares and special tools, not just lists; marked CLOSED.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Separate physical goods from lists when building BOM",
+      "costDriver": "B5/B6",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-029",
+      "document": "BOD",
+      "section": "REVIEW COMMENTS 1–8",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "DMR design and added SCADA link",
+      "requirement": "Comments record DTRS→DMR LNA Yagi+Omni, VHF Marine Radio removal and added ZPQ→ZWP8 link; marked CLOSED.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "siAction": "Preserve comment supersession and verify drawing older notes before quoting",
+      "costDriver": "MR0002 + SCADA Brownfield",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-030",
+      "document": "BOD",
+      "section": "5–6.1",
+      "page": "12",
+      "type": "CLAUSE",
+      "topic": "Marine site design",
+      "requirement": "Design 40°C/100% humidity, max wind 59.2m/s, corrosion, 10+ years, safe access and maintenance.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Choose corrosion/wind-qualified hardware and supports",
+      "costDriver": "A/B1/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-031",
+      "document": "BOD",
+      "section": "6.2",
+      "page": "12",
+      "type": "CLAUSE",
+      "topic": "IT DC 24 V supply",
+      "requirement": "24 VDC with positive and negative isolated from earth; feed SCADA, phone/sounder.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Confirm supply, DC conversion, protective trips, earthing, interface",
+      "costDriver": "POWER + B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-032",
+      "document": "BOD",
+      "section": "6.2",
+      "page": "13",
+      "type": "CLAUSE",
+      "topic": "Battery autonomy & radio silence",
+      "requirement": "Brownfield platform electrical load/batteries must maintain autonomy/recovery; radio must safely shutdown and auto reconnect.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "siAction": "Survey battery/DCDB, calculate load and startup current",
+      "costDriver": "B1/C1/B7",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-033",
+      "document": "BOD",
+      "section": "6.3–6.4",
+      "page": "13",
+      "type": "CLAUSE",
+      "topic": "Ex and siting",
+      "requirement": "Zone2 IIA T3 minimum, safe passage, access, radiation, non-hazardous antenna installation and plug/socket radio silence.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Enclosure, cable disconnect, physical safety and certifications",
+      "costDriver": "A + Bulk + B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-034",
+      "document": "BOD",
+      "section": "6.4",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "Sea reflection and interfaces",
+      "requirement": "Tidal reflection, structures, RF interference, existing-system compatibility and complete termination; surge both ends.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Run height/tide reflection; validate route and lightning topology",
+      "costDriver": "B1 + Bulk",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-035",
+      "document": "BOD",
+      "section": "6.5",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "Reliability",
+      "requirement": "Annual link availability >=99.99% and equipment MTBF >=20,000 h unless otherwise specified.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Verify manufacturer reliability and link calculation",
+      "costDriver": "CAL / B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-036",
+      "document": "BOD",
+      "section": "6.6",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "Software package",
+      "requirement": "Programming tools, operating software non-expiring, NMS licences, backups/restore, modification/shutdown procedures, training.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Map every entitlement, licence count, source and validity",
+      "costDriver": "A licences+B1/B3",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-037",
+      "document": "BOD",
+      "section": "7.1",
+      "page": "15",
+      "type": "CLAUSE",
+      "topic": "Shared SCADA data/voice",
+      "requirement": "SCADA, telephone and sand monitoring (two per platform) use WiMAX; 5.75 Mbps per remote node, AES128 process data.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Check VLAN/ports/end-to-end capacity and AES256 DTS stricter value",
+      "costDriver": "A/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-038",
+      "document": "BOD",
+      "section": "7.2",
+      "page": "16",
+      "type": "CLAUSE",
+      "topic": "New SCADA links",
+      "requirement": "ZPQ–ZWP8 new PTP needed due existing insufficient throughput; ZWP8–ZWP20/22 PTMP; ZWP11–ZWP21 PTP; ZPQ–ZWP23 PTMP.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Design RF and full link-by-link equipment and integration",
+      "costDriver": "Equipment + Brownfield B/C",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-039",
+      "document": "BOD",
+      "section": "7.2",
+      "page": "16",
+      "type": "CLAUSE",
+      "topic": "Antenna size by location",
+      "requirement": "ZWP8 90° sector, ZWP20 6ft, ZWP22 4ft, ZWP11/ZWP21 3ft, ZPQ/ZWP8 4ft, ZWP23 two 2ft antennas.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23",
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "siAction": "Use as design reference, verify CAL, azimuth and wind support",
+      "costDriver": "Antenna + mount + RF cable",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-040",
+      "document": "BOD",
+      "section": "7.2",
+      "page": "17",
+      "type": "CLAUSE",
+      "topic": "Latency and sync",
+      "requirement": "Time synchronization all nodes; per-hop latency max20ms, VoIP 150ms; tidal effect +/-3m; existing NMS alarms centralized.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Verify QoS/GPS/NMS integration and RF reflection margin",
+      "costDriver": "A/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-041",
+      "document": "BOD",
+      "section": "7.2",
+      "page": "17",
+      "type": "CLAUSE",
+      "topic": "L3 switch & reboot",
+      "requirement": "Industrial zone2 L3 24V switch; existing Cisco IE3200 or Stratix option mentioned; reboot may exceed SCADA communication timeout.",
+      "tags": [
+        "LAN-502-001",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "PLC timeouts, cybersecurity, compatibility and model proof",
+      "costDriver": "Switch/licence+B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-042",
+      "document": "BOD",
+      "section": "7.3",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "IP telephone integration",
+      "requirement": "VoIP extension from existing ZPQ PABX; FXS/gateway interface; telephone/sounder CAT6A, inrush management.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Confirm existing gateway, SIP compatibility and 24V sounder interface",
+      "costDriver": "Phone + sounder + relay + B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-043",
+      "document": "BOD",
+      "section": "7.4",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "DMR/LNA topology",
+      "requirement": "ZWP20/21/22 need LNA+DAS with Yagi/Omni; ZWP23 uses existing direct DMR from ZPQ.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Keep LNA separate from trunk radio; run coverage calculation and power",
+      "costDriver": "MR0002 equipment/service",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-044",
+      "document": "BOD",
+      "section": "7.5",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "RACON Zone1 scope",
+      "requirement": "RACON at ZWP20/21/22, Zone1, S/X bands, IP66 and optional charging if pressurised.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "siAction": "Compare phalcon/alternate models against full SPE and Ex cert",
+      "costDriver": "MR0004",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-045",
+      "document": "BOD",
+      "section": "7.5",
+      "page": "19",
+      "type": "CLAUSE",
+      "topic": "RACON installation specifics",
+      "requirement": "Morse D, 20NM, duty cycle 20s on/40s off, integrated JB/cable tail, IT earthing or DC/DC, RS232, 2m pole.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "siAction": "Split mounting, JB, earthing and alarm interface from base RACON",
+      "costDriver": "BOM accessories + B1/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-046",
+      "document": "BOD",
+      "section": "7.6–7.7",
+      "page": "19",
+      "type": "CLAUSE",
+      "topic": "Enclosures and cables",
+      "requirement": "Third-party certified Ex assembly; outdoor IP66; SWB outdoor cable, separated coax tray and MCT for penetrations.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Develop cable takeoff and enclosure layout with QA proof",
+      "costDriver": "BULK + B1/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-047",
+      "document": "BOD",
+      "section": "8",
+      "page": "20",
+      "type": "CLAUSE",
+      "topic": "Brownfield installation detail",
+      "requirement": "ZPQ direction ZWP8 302.46°, ZWP8 toward ZPQ 122.41°, ZWP8 sector toward ZWP20/22 290°, ZWP11 toward ZWP21 233.07°; ZWP11 breaker 4A F17/DCDB-350.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "siAction": "Measure brackets, orientation, access, existing ports and power tie-in",
+      "costDriver": "B1/B7/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-048",
+      "document": "BOD",
+      "section": "10",
+      "page": "21",
+      "type": "CLAUSE",
+      "topic": "Training/FAT",
+      "requirement": "Tier1/Tier2 before FAT, FAT with company and 30 calendar-day notice, calibrated test instruments.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Price sessions, location/travel and FAT manpower",
+      "costDriver": "B3/B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-049",
+      "document": "BOD",
+      "section": "11",
+      "page": "22",
+      "type": "CLAUSE",
+      "topic": "Spares and documentation",
+      "requirement": "Start-up spares, 2yr priced spare parts/capital spares, special tools, complete manuals and vendor data.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Distinguish included vs optional commercial supply",
+      "costDriver": "B1/B5/B6/C2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-050",
+      "document": "DTS",
+      "section": "INDEX",
+      "page": "3",
+      "type": "CLAUSE",
+      "topic": "SCADA tag index",
+      "requirement": "50 source index entries cover ZWP20/21/22/23, ZPQ, ZWP08, ZWP11 including antenna, ODU, IDU, surge, L3 switch and enclosures.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Maintain site-qualified TAG keys; never assume same tag text means same site",
+      "costDriver": "BOM per site",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-051",
+      "document": "DTS",
+      "section": "SHEET 4 items 4–35",
+      "page": "4",
+      "type": "CLAUSE",
+      "topic": "Radio technical gates",
+      "requirement": "5.5–5.8GHz, 10MHz design channel, up to186.6 Mbps max UBR, AES256, SNMP2/3, 24V 25W, ODU Ex db, IDU Ex e, IP66 and GPS sync.",
+      "tags": [
+        "MR-502-001",
+        "MR-502-001A"
+      ],
+      "siAction": "Check named offered radio model/licences; do not treat aspirational max as required throughput",
+      "costDriver": "A+B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-052",
+      "document": "DTS",
+      "section": "SHEET 4 items 36–45",
+      "page": "4",
+      "type": "CLAUSE",
+      "topic": "Antenna and injector",
+      "requirement": "Parabolic MIMO gain reference 40.9dBi, max VSWR1.5; power injector and surge must be supplied.",
+      "tags": [
+        "ANT-502-001",
+        "MR-502-001"
+      ],
+      "siAction": "Run actual gain/path/cal and package composition",
+      "costDriver": "A + bulk",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-053",
+      "document": "DTS",
+      "section": "SHEET 4 items 46–51",
+      "page": "4",
+      "type": "CLAUSE",
+      "topic": "SCADA enclosure details",
+      "requirement": "Ex e SS316L IP66, stand mounted, >=18 cable entries with certified spare plugs.",
+      "tags": [
+        "TCAB-500-001"
+      ],
+      "siAction": "Heat, ingress, entries, glanding, assembly certification",
+      "costDriver": "A + B1/BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-054",
+      "document": "DTS",
+      "section": "SHEET 4 items 52–57",
+      "page": "4",
+      "type": "CLAUSE",
+      "topic": "RF filter specifications",
+      "requirement": "4940–5875MHz; insertion loss 0.5dB typical, return loss16dB typical, power 3W average/30W peak and 50 ohm.",
+      "tags": [
+        "MR-502-001"
+      ],
+      "siAction": "Match OEM RF filter and budget its insertion loss",
+      "costDriver": "A+B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-055",
+      "document": "DTS",
+      "section": "SHEET 5 items 61–74",
+      "page": "5",
+      "type": "CLAUSE",
+      "topic": "Layer 3 switch detail",
+      "requirement": ">=16 ports plus 2 uplinks, 24VDC 47W, VLAN/STP, SFP and PoE, ATEX zone2.",
+      "tags": [
+        "LAN-502-001"
+      ],
+      "siAction": "Verify switch SKU, uplink/PoE licence and DC load",
+      "costDriver": "A+B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-056",
+      "document": "DTS",
+      "section": "SHEET 5 items 75–103",
+      "page": "5",
+      "type": "CLAUSE",
+      "topic": "Quick coupling and surge",
+      "requirement": "Quick disconnect Ex e Zone2 M20 >=60V and specifically listed model; Ethernet surge IP66, 3-stage/10kA/8 protected wires.",
+      "tags": [
+        "DATO-507-001",
+        "SA-502-001"
+      ],
+      "siAction": "Check actual Hawke connection and surge certification",
+      "costDriver": "A+BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-057",
+      "document": "DTS",
+      "section": "SHEET 6 items 120–153",
+      "page": "6",
+      "type": "CLAUSE",
+      "topic": "Coax and RF connectors",
+      "requirement": "1/2in fire-rated low-loss corrugated feeder; 1/2 or 7/8 compatible N-type IP68 connector, precise loss and weatherproofing.",
+      "tags": [
+        "ANT-502-001",
+        "MR-502-001"
+      ],
+      "siAction": "Take cable length after routing and connector-end count",
+      "costDriver": "BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-058",
+      "document": "DTS",
+      "section": "SHEET 6 items 154–178",
+      "page": "6",
+      "type": "CLAUSE",
+      "topic": "CAT6A/Ethernet cable",
+      "requirement": "Indoor S/FTP CAT6A; outdoor armored LSZH fire-resistant cable; AWG23 and RJ45 connector constraints.",
+      "tags": [
+        "LAN-502-001",
+        "DATO-507-001"
+      ],
+      "siAction": "Distinguish F/UTP web reference from S/FTP requirement",
+      "costDriver": "BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-059",
+      "document": "DTS",
+      "section": "SHEET 7 items 179–191",
+      "page": "7",
+      "type": "CLAUSE",
+      "topic": "Ex cable glands",
+      "requirement": "Dual Ex e/de gland, deluge IP66, nickel plated brass, correct armor clamp, IP washer, earth tag where relevant.",
+      "tags": [
+        "TCAB-500-001"
+      ],
+      "siAction": "Count glands, entries, spares, stopping plugs from actual interface",
+      "costDriver": "BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-060",
+      "document": "DTS",
+      "section": "NOTES 1–3",
+      "page": "8",
+      "type": "CLAUSE",
+      "topic": "Certified assemblies / surge",
+      "requirement": "Zone2 third-party independent certifications, full enclosure assembled certification; injector inside enclosure, RF and Ethernet surge protection.",
+      "tags": [
+        "MR-502-001",
+        "TCAB-500-001",
+        "SA-502-001"
+      ],
+      "siAction": "Apply Ex proof to assembled package not component alone",
+      "costDriver": "B1 + A",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-061",
+      "document": "DTS",
+      "section": "NOTES 4–10",
+      "page": "8",
+      "type": "CLAUSE",
+      "topic": "Marine protection and antenna",
+      "requirement": "Conformal coating, sun/rain guard, antenna selection per RPT, antenna located in safe area, switch enclosed.",
+      "tags": [
+        "MR-502-001",
+        "ANT-502-001",
+        "LAN-502-001"
+      ],
+      "siAction": "Model thermal/rain guard, and RF loss after mounting",
+      "costDriver": "BULK + B1/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-062",
+      "document": "DTS",
+      "section": "NOTE 11",
+      "page": "8",
+      "type": "CLAUSE",
+      "topic": "PTM vs PTP modes",
+      "requirement": "PTM ZWP8→ZWP20/22 and ZPQ→ZWP23; PTP ZWP11→ZWP21 and ZPQ→ZWP8.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Verify licence/role per radio endpoint",
+      "costDriver": "A licences + B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-063",
+      "document": "DTS",
+      "section": "REVIEW COMMENT 1",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "VTA resolved",
+      "requirement": "Client VTA requirement to finalize in next revision; contractor response finalized and closed.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Preserve reviewer resolution as document evidence",
+      "costDriver": "No standalone cost unless implementation",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-064",
+      "document": "SPE",
+      "section": "5.1–5.3",
+      "page": "13",
+      "type": "CLAUSE",
+      "topic": "Site/Ex/EMC",
+      "requirement": "Design 40C/100% RH; outdoor marine conditions; Zone2 min with Zone1 where located; compute RF hazardous-area power limits; IEC61000.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Environmental, hazardous and RF safety proof",
+      "costDriver": "B1 + A",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-065",
+      "document": "SPE",
+      "section": "5.4–5.6",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "24V/IT and weather protection",
+      "requirement": "24VDC WHP source, suitable converter if different; IT earth, coax grounding/surge and IP66/rain guard.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Power interface, surge and grounding design",
+      "costDriver": "A+BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-066",
+      "document": "SPE",
+      "section": "6.1.1",
+      "page": "14",
+      "type": "CLAUSE",
+      "topic": "Import and radio licence",
+      "requirement": "Vendor obtains Myanmar radio type/import/operating licensing and frequency allocation; permits before sail-out.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Verify Myanmar country entitlement and licensing deliverables",
+      "costDriver": "B8",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-067",
+      "document": "SPE",
+      "section": "6.1.2",
+      "page": "15",
+      "type": "CLAUSE",
+      "topic": "Path calculations with tide",
+      "requirement": "Vendor to calculate RF path, reflection over antenna heights and tide; Pathloss source report is not sufficient proof.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Use OEM radio parameters with height/tide reflection & availability",
+      "costDriver": "B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-068",
+      "document": "SPE",
+      "section": "6.1.3",
+      "page": "15",
+      "type": "CLAUSE",
+      "topic": "Link architecture and L3",
+      "requirement": "Specified PTMP/PTP four link groups, 6/4/3/2ft antenna baseline, SCADA/voice/DMR over L3.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Source completeness for all endpoints and routes",
+      "costDriver": "A/BULK/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-069",
+      "document": "SPE",
+      "section": "6.1.4–6.1.5",
+      "page": "16",
+      "type": "CLAUSE",
+      "topic": "Base & subscriber complete system",
+      "requirement": "802.16e or better unless COMPANY approval; complete ODU/IDU/PoE, surge, GPS, Ex assembly and evergreen software.",
+      "tags": [
+        "MR-502-001",
+        "MR-502-001A"
+      ],
+      "siAction": "Functional role checks for base/subscriber, project licence and certification",
+      "costDriver": "A+B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-070",
+      "document": "SPE",
+      "section": "6.1.6",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "RF antenna safety and support",
+      "requirement": "Antenna size based on link cal; gain/VSWR<1.5; SS316 support and wind/anti-vibration verification.",
+      "tags": [
+        "ANT-502-001"
+      ],
+      "siAction": "Antenna mount mechanical calculation and swing clearance",
+      "costDriver": "A+BULK/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-071",
+      "document": "SPE",
+      "section": "6.1.7",
+      "page": "18",
+      "type": "CLAUSE",
+      "topic": "Existing ZPQ NMS extension",
+      "requirement": "NMS monitor all new & brownfield nodes; extension existing ZPQ NMS, lifetime perpetual licence and sensor count at EPCI stage.",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP11",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "NMS inventory, licence extension and alarm integration",
+      "costDriver": "A licences+B1/B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-072",
+      "document": "SPE",
+      "section": "6.1.8–6.1.9",
+      "page": "19",
+      "type": "CLAUSE",
+      "topic": "Switch/DATO",
+      "requirement": "L3 zone2 16+2 uplink compact switch interoperable PLC; Hawke-style Ex data outlet with 1m RJ45 and cap.",
+      "tags": [
+        "LAN-502-001",
+        "DATO-507-001"
+      ],
+      "siAction": "Verify interfaces, licence and protocol",
+      "costDriver": "A+BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-073",
+      "document": "SPE",
+      "section": "6.2",
+      "page": "19",
+      "type": "CLAUSE",
+      "topic": "Ex telephone & sounder",
+      "requirement": "Phone and sounder per new platform, 24VDC, IP66, dry-contact relay via DCDB-440, SIP/ZPQ PABX interoperability and CAT6A.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Validate current EXION model/sounder distinct, existing PBX gateway and relay supply",
+      "costDriver": "MR0003 + B1/BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-074",
+      "document": "SPE",
+      "section": "6.3",
+      "page": "20",
+      "type": "CLAUSE",
+      "topic": "DMR LNA / DAS",
+      "requirement": "LNA + Yagi/Omni ZWP20/21/22, no LNA ZWP23; LNA frequency 80–520MHz and 11–28VDC.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Coverage and antenna compatibility, link-power budget",
+      "costDriver": "MR0002",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-075",
+      "document": "SPE",
+      "section": "6.4",
+      "page": "20",
+      "type": "CLAUSE",
+      "topic": "RACON requirements",
+      "requirement": "RACON S/X 9.3–9.5/2.9–3.1GHz, hazardous Zone1; following sheets specify 1W, -50dBm sensitivity, RS232 and 24V nominal.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "siAction": "Verify candidate Phalcon specs vs full particular requirements",
+      "costDriver": "MR0004 + B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-076",
+      "document": "SPE",
+      "section": "6.4",
+      "page": "22",
+      "type": "CLAUSE",
+      "topic": "RACON integration package",
+      "requirement": "20s/40s Morse D, JB and control/distribution boxes, common fault to PLC, copper-free aluminium, IT earthing and pressurization kit if used.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "siAction": "Do not select datasheet-only RACON without material/sensitivity/alarm/protocol comparison",
+      "costDriver": "MR0004 + BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-077",
+      "document": "SPE",
+      "section": "6.5",
+      "page": "23",
+      "type": "CLAUSE",
+      "topic": "Completed enclosure certification",
+      "requirement": "Completed Ex assembly, heat dissipation calc max power, suitable spacing, 20% spare cable entries or at least 2, glands and plugs.",
+      "tags": [
+        "TCAB-500-001"
+      ],
+      "siAction": "Check BARTEC enclosure as certified assembly with dimensions and thermal proof",
+      "costDriver": "A+BULK/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-078",
+      "document": "SPE",
+      "section": "6.6",
+      "page": "23",
+      "type": "CLAUSE",
+      "topic": "RF feeder >5m rule",
+      "requirement": "If ODU-to-antenna separation >5m, 7/8in feeder and 1/2in jumpers to radio; feeder/connector supplied by vendor.",
+      "tags": [
+        "ANT-502-001",
+        "MR-502-001"
+      ],
+      "siAction": "Use measured route and check 7/8 cable, jumpers and connector interface",
+      "costDriver": "BULK",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-079",
+      "document": "SPE",
+      "section": "6.6.2–6.6.5",
+      "page": "24",
+      "type": "CLAUSE",
+      "topic": "Cable fire and routing",
+      "requirement": "CAT6A S/FTP shielded, outdoor armor, max80m ethernet, MCT, telecom trays not shared, coax dedicated and 30cm separation.",
+      "tags": [
+        "TCAB-500-001",
+        "DATO-507-001",
+        "LAN-502-001"
+      ],
+      "siAction": "Route-based cable quantities, trays, penetrations and Ex glands",
+      "costDriver": "BULK + C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-080",
+      "document": "SPE",
+      "section": "7.3",
+      "page": "25",
+      "type": "CLAUSE",
+      "topic": "Testing notice and FAT",
+      "requirement": "14-day test witness notice, test tools calibrated within six months, FAT including actual IP/VLAN/frequency/worst case and evergreen software.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Compare notice to MR/BOD 30 days; include FAT planning",
+      "costDriver": "B4",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-081",
+      "document": "SPE",
+      "section": "7.3.2–7.3.4",
+      "page": "26",
+      "type": "CLAUSE",
+      "topic": "SAT/Offshore/site support",
+      "requirement": "Fabrication SAT then remove units to ZPQ for final integration and reinstall; offshore vendor commission; quoted onshore/offshore man-day rates.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Account for repeat mobilization, packing, reinstallation and OEM service days",
+      "costDriver": "B2/B4/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-082",
+      "document": "SPE",
+      "section": "8",
+      "page": "27",
+      "type": "CLAUSE",
+      "topic": "Spares and tools",
+      "requirement": "Startup spares must be supplied; two-year spares quoted, special tools provided, documented SPIR.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Separate operational quoted spares from startup supplied",
+      "costDriver": "B5/B6/C2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-083",
+      "document": "SPE",
+      "section": "9",
+      "page": "28",
+      "type": "CLAUSE",
+      "topic": "Training",
+      "requirement": "Two batches Tier1/Tier2 for SCADA/DMR, location Yangon.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Trainer/duration/person-days, travel and materials",
+      "costDriver": "B3/B2",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-084",
+      "document": "SPE",
+      "section": "10–11",
+      "page": "28",
+      "type": "CLAUSE",
+      "topic": "Vendor docs and interfaces",
+      "requirement": "VDRL, as-built, GA, load, alarm/earthing/wiring, design revisions; no fabrication until approval.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Document-hours and cycles; ensure VDRL linked to TAG",
+      "costDriver": "B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-085",
+      "document": "SPE",
+      "section": "12",
+      "page": "30",
+      "type": "CLAUSE",
+      "topic": "Project-approved supplier",
+      "requirement": "Follow COMPANY approved vendor list; if no approved vendor, submit subvendor for approval.",
+      "tags": [
+        "SYSTEM"
+      ],
+      "siAction": "Do not equate ADDVALUE relationship history with COMPANY AVL",
+      "costDriver": "AVL compliance",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-086",
+      "document": "RPT",
+      "section": "4.4",
+      "page": "11",
+      "type": "CALCULATION",
+      "topic": "Independent RF proof",
+      "requirement": "Original Pathloss6 model includes reflection with height/tide variation; availability better than99.99%; link budget equations given.",
+      "tags": [
+        "ZWP20",
+        "ZWP8"
+      ],
+      "siAction": "Independently recalculate from OEM datasheet and check mathematical expressions",
+      "costDriver": "B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-087",
+      "document": "RPT",
+      "section": "6.1.1",
+      "page": "16",
+      "type": "CALCULATION",
+      "topic": "ZWP8–ZWP20 RF baseline",
+      "requirement": "RPT models ZWP20 6ft 40.9dBi at 21.5m, azimuth94.32°; ZWP8 sector 16dBi at21m azimuth274.36°, distance19.852km.",
+      "tags": [
+        "ZWP20",
+        "ZWP8",
+        "ANT-502-001"
+      ],
+      "siAction": "Use height/azimuth as source baseline then check available azimuth swing and sea reflection",
+      "costDriver": "Antenna/structural mount",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-088",
+      "document": "RPT",
+      "section": "REVIEW COMMENTS",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "Site-survey antenna updates",
+      "requirement": "Review comments include antenna location/elevation to be updated from survey, marked closed.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Use site survey revision not an outdated conceptual layout",
+      "costDriver": "B7/B1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-089",
+      "document": "BLD",
+      "section": "SHEET 3",
+      "page": "3",
+      "type": "DRAWING",
+      "topic": "ZWP20 functional interfaces",
+      "requirement": "ZWP20 block shows PLC/SCADA, radio PTMP to ZWP8, LAN, surge, telecom enclosure, phone, sounder, DMR and RACON functional blocks.",
+      "tags": [
+        "ZWP20"
+      ],
+      "siAction": "Build all physical and logical interface edges and scope boundary notes",
+      "costDriver": "A/B/C",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-090",
+      "document": "BLD",
+      "section": "REVIEW COMMENTS",
+      "page": "1",
+      "type": "REVIEW_COMMENT",
+      "topic": "BLD location feedback",
+      "requirement": "Comments revise SCADA antenna location to mezzanine/E&I rooftop and DMR antenna location, delete DTRS; marked closed.",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "siAction": "Use as delta to configuration and bill of bulk materials",
+      "costDriver": "B1/C1",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    },
+    {
+      "id": "REQ0553-091",
+      "document": "BLD",
+      "section": "SHEET NOTES",
+      "page": "3",
+      "type": "DRAWING",
+      "topic": "BLD note may retain outdated assumptions",
+      "requirement": "BLD note retains VHF marine radio and existing ZPQ–ZWP8 link wording despite BOD comments changing both.",
+      "tags": [
+        "ZWP20",
+        "ZWP8",
+        "ZPQ"
+      ],
+      "siAction": "Open conflicting text for document clarification; do not remove current-scope work based on stale note",
+      "costDriver": "Risk/Scope",
+      "sourceStatus": "TRANSCRIBED_FROM_SOURCE",
+      "decisionStatus": "REQUIRES_ENGINEERING_EVALUATION",
+      "costPostingAllowed": false
+    }
+  ],
+  "rules": [
+    "Every TAG must resolve to all applicable clause/note/comment/attachment requirements",
+    "Original client document remains authoritative; summaries and SI actions do not modify it",
+    "A closed reviewer comment stays source evidence but does not establish any unrecorded physical quantity",
+    "Site+TAG is unique identity, not TAG alone",
+    "Price changes prohibited until independent engineering/AVLs/quantity proof and revision approval",
+    "Source extracts and SI-derived decisions stored as separate fields",
+    "Future MR revisions must create impact review; never silently overwrite previous code/version"
+  ],
+  "releaseAllowed": false,
+  "pricingMutationAllowed": false
+}

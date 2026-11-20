@@ -1,0 +1,39 @@
+{
+  "quoteRef": "CITT-QT-392-2026",
+  "revision": "01",
+  "sourceSha256": "fc9c87fbb2ca0ac0e53df2bc0651b52c74051a719286e52472564dff23587e36",
+  "groups": [
+    {
+      "classification": "BASE_PRICE",
+      "itemCodes": ["1.1.1"],
+      "mrIds": ["MR-B1-13-APF-09-PBX"],
+      "note": "MR ระบุ IP PBX Server ใน LAN Cabinet ที่ APF · รอยืนยันจำนวนและบทบาทของ R660 แต่ละเครื่อง"
+    },
+    {
+      "classification": "BASE_PRICE",
+      "itemCodes": ["1.1.10", "1.1.11"],
+      "mrIds": ["MR-B1-13-APF-06", "MR-B1-13-ACP-05", "MR-B1-13-ABV01-04", "MR-B1-13-AMS01-03"],
+      "note": "J179 และ J159 เทียบกับยอด MR รวมทั้งสี่ไซต์ · รอยืนยันจำนวนของแต่ละรุ่นรายไซต์"
+    },
+    {
+      "classification": "BASE_PRICE",
+      "itemCodes": ["1.1.15"],
+      "mrIds": ["MR-B1-13-APF-07"],
+      "note": "เทียบ Ex IP Phone ตาม MR ที่ APF · TAG ใน LIS Rev.C8 มีสถานะ Historical"
+    },
+    {
+      "classification": "BASE_PRICE",
+      "itemCodes": ["1.1.16", "1.1.17"],
+      "mrIds": ["MR-B1-13-APF-07"],
+      "note": "อ้างไซต์ของ Ex IP Phone ที่เกี่ยวข้อง · รอยืนยัน TAG และขอบเขต Sounder/Beacon แยก"
+    },
+    {
+      "classification": "OPTION",
+      "materialCode": "212-02-6008-510",
+      "mrIds": ["MR-B1-13-APF-07"],
+      "referenceOnly": true,
+      "note": "APF เป็นไซต์ของอุปกรณ์หลักที่อ้างอิง · ยังไม่จัดสรร Option ให้ไซต์"
+    }
+  ],
+  "sharedBaseItemCodes": ["2.1", "2.2"]
+}

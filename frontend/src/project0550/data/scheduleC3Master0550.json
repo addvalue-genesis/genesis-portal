@@ -1,0 +1,483 @@
+{
+  "schema": "genesis.0550.schedule-c3-master.v1",
+  "projectId": "PJ2608-0550",
+  "documentNo": "MM-ASK-00-GEN-TEQ-TEL-SPIR-0002",
+  "title": "Schedule C3 — Two Years Operation Spare Parts (Option)",
+  "treatment": "OPTION",
+  "excludedFromA1Base": true,
+  "referenceBaselineUSD": 135877.91,
+  "currency": "USD",
+  "appendices": [
+    {
+      "id": "1.1",
+      "title": "APPENDIX 1.1 · SCOPE OF SUPPLY FOR VHF AND MF/HF",
+      "systems": [
+        {
+          "systemToken": "TEL-RADIO-DTRS",
+          "systemName": "VHF DMR Radio System",
+          "mainEquipmentNo": "TEL-RADIO-DTRS · APF-DTRS-01 / ACP-DTRS-01 / ABV01-DTRS-01",
+          "vendorEquipmentNo": "MOTOROLA-DTRS-R2",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.1",
+          "entries": [
+            {
+              "id": "C3-11-DTRS-01",
+              "mrId": "MR-B1-11-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — VHF DMR Base Repeater PSU, Fan & Intrinsically Safe Handset Batteries/Antennas",
+              "brand": "Motorola Solutions",
+              "model": "SLR 5500 / DP4801Ex",
+              "partNo": "MOT-DTRS-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-RADIO-MARINE",
+          "systemName": "VHF-FM Marine Radio System",
+          "mainEquipmentNo": "TEL-RADIO-MARINE · APF-VHF-MAR-01 / ACP-VHF-MAR-01",
+          "vendorEquipmentNo": "JOTRON-MARINE-VHF",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.1",
+          "entries": [
+            {
+              "id": "C3-11-MAR-01",
+              "mrId": "MR-B1-11-APF-02",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — VHF-FM Marine Transceiver Handset, Fuses & Surge Arrester Kit",
+              "brand": "SAILOR / Jotron",
+              "model": "SAILOR 6222 / TR-8000",
+              "partNo": "MAR-VHF-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-RADIO-SSB",
+          "systemName": "MF/HF SSB Radio System",
+          "mainEquipmentNo": "TEL-RADIO-SSB · APF-MFHF-01 / ACP-MFHF-01",
+          "vendorEquipmentNo": "SAILOR-6320",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.1",
+          "entries": [
+            {
+              "id": "C3-11-SSB-01",
+              "mrId": "MR-B1-11-APF-03",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — MF/HF SSB 250W Transceiver Handset, ATU Fuse & Surge Kit",
+              "brand": "SAILOR",
+              "model": "SAILOR 6320",
+              "partNo": "SAILOR-6320-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.2",
+      "title": "APPENDIX 1.2 · SATELLITE & MICROWAVE COMMUNICATION",
+      "systems": [
+        {
+          "systemToken": "TEL-VSAT",
+          "systemName": "Satellite Communication (VSAT / Ku-Band)",
+          "mainEquipmentNo": "TEL-VSAT · APF-VSAT-01 / ACP-KU-01 / YANGON-VSAT-01",
+          "vendorEquipmentNo": "INTELLIAN-V100NX",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.2",
+          "entries": [
+            {
+              "id": "C3-12-VSAT-01",
+              "mrId": "MR-B1-12-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — VSAT BUC/LNB, Modem PSU & RF Connector Kit",
+              "brand": "Intellian / iDirect",
+              "model": "v100NX / X7",
+              "partNo": "VSAT-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            },
+            {
+              "id": "C3-12-VSAT-YGN",
+              "mrId": "MR-B1-12-YANGON-01",
+              "site": "YANGON",
+              "partsDescription": "Two-Year Operation Spares — Yangon Base VSAT Modem PSU & RF Patch Kit",
+              "brand": "Intellian / iDirect",
+              "model": "v100NX / X7",
+              "partNo": "VSAT-YGN-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-DMR",
+          "systemName": "Microwave Communication System (ACP–APF)",
+          "mainEquipmentNo": "TEL-DMR · APF-MW-01 / ACP-MW-01",
+          "vendorEquipmentNo": "CERAGON-IP50CX",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.5",
+          "entries": [
+            {
+              "id": "C3-12-MW-01",
+              "mrId": "MR-B1-15-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — Ceragon FibeAir IP-50CX 7.5 GHz RFU/ODU & SFP+ Module",
+              "brand": "Ceragon",
+              "model": "FibeAir IP-50CX",
+              "partNo": "CER-IP50CX-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.3",
+      "title": "APPENDIX 1.3 · NETWORK / LAN, PABX, CCTV & MET",
+      "systems": [
+        {
+          "systemToken": "TEL-LAN",
+          "systemName": "Network / LAN & Wireless System",
+          "mainEquipmentNo": "TEL-LAN · LAN-307-001 / AP-307-001~201",
+          "vendorEquipmentNo": "CISCO-CATALYST-9300-9200L",
+          "referenceDrawings": "MM-ASK-1A-APF-TEL-LIS-0001 / MM-ASK-1A-ACP-TEL-LIS-0001",
+          "entries": [
+            {
+              "id": "C3-13-LAN-01",
+              "mrId": "MR-B1-13-APF-09",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — Cisco Catalyst 9300/9200L PSU, SFP+ Transceiver & Wi-Fi 6 AP",
+              "brand": "Cisco",
+              "model": "C9300-48P-A / C9200L-24P-4X-A / C9120AXI-E",
+              "partNo": "CISCO-LAN-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-PABX",
+          "systemName": "IP Telephony / PABX System",
+          "mainEquipmentNo": "TEL-PABX · TPH-304-001~201",
+          "vendorEquipmentNo": "AVAYA-J179-DELL-R660",
+          "referenceDrawings": "MM-ASK-1A-ACP-TEL-LIS-0001 / MM-ASK-1A-ABV01-TEL-LIS-0001",
+          "entries": [
+            {
+              "id": "C3-13-PABX-01",
+              "mrId": "MR-B1-13-ACP-05",
+              "site": "ACP",
+              "partsDescription": "Two-Year Operation Spares — Avaya J179 IP Deskphone, Ex-Proof IP Phone & Server PSU/SSD",
+              "brand": "Avaya / Dell",
+              "model": "J179 / PowerEdge R660",
+              "partNo": "PABX-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-CCTV",
+          "systemName": "Closed-Circuit Television (CCTV) System",
+          "mainEquipmentNo": "TEL-CCTV · CAM-317-001~",
+          "vendorEquipmentNo": "PELCO-EX-CCTV",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.3",
+          "entries": [
+            {
+              "id": "C3-13-CCTV-01",
+              "mrId": "MR-B1-13-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — Ex-Proof PTZ/Fixed Camera Wiper Blade, Gland & NVR PSU/HDD",
+              "brand": "Pelco / Rittal",
+              "model": "ExSite / VX25",
+              "partNo": "CCTV-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-MET",
+          "systemName": "Meteorological (MET) System",
+          "mainEquipmentNo": "TEL-MET · MET-315-001~003",
+          "vendorEquipmentNo": "VAISALA-AWS-WMT703",
+          "referenceDrawings": "MM-ASK-1A-ACP-TEL-LIS-0001 / MR Appendix 1.3",
+          "entries": [
+            {
+              "id": "C3-13-MET-01",
+              "mrId": "MR-B1-13-ACP-11",
+              "site": "ACP",
+              "partsDescription": "Two-Year Operation Spares — Vaisala HMP155 Filter Cap, Radiation Shield & Surge Protection",
+              "brand": "Vaisala",
+              "model": "WMT703 / HMP155 / PTB330",
+              "partNo": "MET-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.4",
+      "title": "APPENDIX 1.4 · PUBLIC ADDRESS AND GENERAL ALARM (PAGA)",
+      "systems": [
+        {
+          "systemToken": "TEL-PAGA",
+          "systemName": "Public Address and General Alarm (PAGA) System",
+          "mainEquipmentNo": "TEL-PAGA · PAGA-303-001 / OAP-303-001",
+          "vendorEquipmentNo": "INDUSTRONIC-INTRON-X",
+          "referenceDrawings": "MM-ASK-1A-APF-TEL-DTS-0003 Rev.B1 / MR Appendix 1.4",
+          "entries": [
+            {
+              "id": "C3-14-PAGA-01",
+              "mrId": "MR-B1-14-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — INTRON-X Amplifier Module, Speaker Driver, Beacon Xenon/LED & Fuses",
+              "brand": "INDUSTRONIC",
+              "model": "INTRON-X",
+              "partNo": "IND-INTRONX-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.5",
+      "title": "APPENDIX 1.5 · TELECOM TOWERS & ANTENNA STRUCTURES",
+      "systems": [
+        {
+          "systemToken": "TEL-TELT",
+          "systemName": "Self-Supporting Telecom Towers (60m APF / 30m ACP)",
+          "mainEquipmentNo": "TEL-TELT · APF-60M / ACP-30M",
+          "vendorEquipmentNo": "MASTER-TOWER-2609.95",
+          "referenceDrawings": "2609.95.1 (60m) / 2609.95.2 (30m) / MR Appendix 1.1",
+          "entries": [
+            {
+              "id": "C3-15-TELT-01",
+              "mrId": "MR-B1-11-APF-08",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — Aviation Obstruction Light LED Module, Photocell & Lightning Rod Kit",
+              "brand": "Master Tower / Obelux",
+              "model": "60m / 30m Aviation Obstruction Kit",
+              "partNo": "TELT-AOL-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "FOB / CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "FOB",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.6",
+      "title": "APPENDIX 1.6 · ENTERTAINMENT SYSTEM",
+      "systems": [
+        {
+          "systemToken": "TEL-ENT",
+          "systemName": "TVRO / IPTV Entertainment System",
+          "mainEquipmentNo": "TEL-ENT · APF-ENT-01 / ACP-ENT-01",
+          "vendorEquipmentNo": "TRIAX-IPTV",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.6",
+          "entries": [
+            {
+              "id": "C3-16-ENT-01",
+              "mrId": "MR-B1-16-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — IPTV Headend PSU, LNB & Coaxial Connectors",
+              "brand": "Triax",
+              "model": "TDX / IPTV",
+              "partNo": "ENT-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.7",
+      "title": "APPENDIX 1.7 · NON-DIRECTIONAL BEACON (NDB)",
+      "systems": [
+        {
+          "systemToken": "TEL-NDB",
+          "systemName": "Non-Directional Beacon (NDB)",
+          "mainEquipmentNo": "TEL-NDB · APF-NDB-01",
+          "vendorEquipmentNo": "NAUTEL-VR250",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.7",
+          "entries": [
+            {
+              "id": "C3-17-NDB-01",
+              "mrId": "MR-B1-17-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — NDB Transmitter RF Module, ATU Capacitor & Fuses",
+              "brand": "Nautel / Southern Avionics",
+              "model": "VR250 / SA100",
+              "partNo": "NDB-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.8",
+      "title": "APPENDIX 1.8 & COMMON · FIBER OPTIC, CABLES & COMMON",
+      "systems": [
+        {
+          "systemToken": "TEL-FO",
+          "systemName": "Fiber Optic & Structured Cabling",
+          "mainEquipmentNo": "TEL-FO · APF / ACP / ABV01",
+          "vendorEquipmentNo": "PUTIAN-FOC-ODF",
+          "referenceDrawings": "MM-ASK-1A-TEL-DWG-0001-01 / MR Appendix 1.8",
+          "entries": [
+            {
+              "id": "C3-18-FO-01",
+              "mrId": "MR-B1-18-APF-01",
+              "site": "APF",
+              "partsDescription": "Two-Year Operation Spares — Armored FO Patch Cords, Pigtails, Splice Sleeves & CAT6A Patch Cords",
+              "brand": "Putian / Corning",
+              "model": "LC-UPC / SC-UPC OS2 & CAT6A",
+              "partNo": "FO-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        },
+        {
+          "systemToken": "COMMON",
+          "systemName": "Common Telecom Consumables & Spares",
+          "mainEquipmentNo": "COMMON · APF / ACP / ABV01 / YANGON",
+          "vendorEquipmentNo": "COMMON-TEL-SP",
+          "referenceDrawings": "MM-ASK-1A-TEL-BLD-0001",
+          "entries": [
+            {
+              "id": "C3-18-COM-01",
+              "mrId": "MR-ACT-C3-D02",
+              "site": "ABV01",
+              "partsDescription": "Two-Year Operation Spares — Common Cabinet Air Filters, MCBs, Surge Arresters & Terminal Blocks",
+              "brand": "Rittal / Phoenix Contact",
+              "model": "VX25 Filter / Trabtech SPD",
+              "partNo": "COM-2YR-SP",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "unit": "Lot",
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPTION_OPEN_PRIVATE_RATE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

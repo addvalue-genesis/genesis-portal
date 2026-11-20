@@ -1,0 +1,16 @@
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+(async()=>{const src=fs.readFileSync(path.join(__dirname,"../src/common/engineering/lnaCascade.js"),"utf8");
+const {calculateLnaReceiveChain,deriveLnaSetting}=await import("data:text/javascript;base64,"+Buffer.from(src).toString("base64"));
+const e={sourceId:"SYNTHETIC_TEST"};
+const c={frequencyMHz:388,bandMinMHz:380,bandMaxMHz:520,preLnaLossDb:2,lnaGainDb:20,lnaNoiseFigureDb:2,postLnaLossDb:3,receiverNoiseFigureDb:7,evidence:e};
+assert.equal(calculateLnaReceiveChain({...c,receiverNoiseFigureDb:undefined}).status,"OPEN_INPUT");
+assert.equal(calculateLnaReceiveChain({...c,frequencyMHz:600}).status,"BAND_MISMATCH");
+const out=calculateLnaReceiveChain(c);assert.equal(out.status,"PRELIMINARY_CALCULATED");
+const pre=Math.pow(10,2/10),lna=Math.pow(10,2/10),post=Math.pow(10,3/10),receiver=Math.pow(10,7/10),g=Math.pow(10,20/10);
+const expected=10*Math.log10(pre+(lna-1)*pre+(post-1)*pre/g+(receiver-1)*pre*post/g);
+assert.ok(Math.abs(out.systemNoiseFigureDb-expected)<1e-9);
+assert.ok(out.systemNoiseFigureDb<out.withoutLnaNoiseFigureDb);
+assert.equal(deriveLnaSetting({maxGainDb:40,attenuationDb:31,evidence:e}).value,9);
+assert.equal(deriveLnaSetting({maxGainDb:40,attenuationDb:1.5,evidence:e}).status,"OPEN_INPUT");
+console.log("PASS LNA Friis cascade, band guard, gain setting and missing-input tests (synthetic only)");
+})().catch(e=>{console.error(e);process.exitCode=1});

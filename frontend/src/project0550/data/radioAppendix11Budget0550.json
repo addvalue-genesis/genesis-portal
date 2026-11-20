@@ -1,0 +1,59 @@
+{
+  "basis": "SI DRAFT · MR Rev.B1 Appendix 1.1 · MGW Q26-063 ver1.0 pp.9–12 · scope and site assignments pending review",
+  "reviewFlags": [
+    {"id":"REVIEW_FLAG_DMR_COMBINER","scope":"APF (1.1.1)","tagNo":"APF-CAB-0004","summary":"Verify Tx Combiner & Rx Multicoupler inclusion inside APF-CAB-0004 (3 Repeaters sharing 1 Tx + 1 Rx Dipole antenna)."},
+    {"id":"REVIEW_FLAG_DMR_CABINET_RITTAL","scope":"APF (1.1.1.1)","tagNo":"APF-CAB-0004","summary":"Mixed-vendor substitution: MGW RADIO-001 quoted TUTENG G26642 (non-AVL); substituted with Rittal VX IT 42U (VERSED QT2611035) to maintain AVL compliance across all cabinets."},
+    {"id":"REVIEW_FLAG_DMR_HANDHELD_EX","scope":"APF (1.1.1.11)","summary":"Verify ATEX / IECEx / UL (TIA-4950) Ex-certification on all 98 Ea. VHF DMR Handheld Radios."},
+    {"id":"REVIEW_FLAG_DMR_CAPACITY_MAX","scope":"APF / ACP / ABV01","summary":"Verify Motorola Capacity Max system & subscriber licenses (3 Repeaters + 128 Radios)."},
+    {"id":"REVIEW_FLAG_DMR_FEEDER_LINK_BUDGET","scope":"1.1.5 / 1.1.7 / 1.1.12 / 1.1.16","summary":"Verify RF Link Budget attenuation on 1/2\" feeder cable (150 m / 500 m / 700 m / 60 m tower) for potential Phase-2 7/8\" upgrade clarification."},
+    {"id":"REVIEW_FLAG_ROIP_LICENCES","scope":"APF / ACP (1.1.6 / 1.1.13)","summary":"Verify RoIP Dispatcher Server, Voice Log Server, SmartPTT Core & Additional Dispatcher licences, and 6-port IP Gateway interfaces."},
+    {"id":"REVIEW_FLAG_TOWER_DCA","scope":"APF / ACP (1.1.8 / 1.1.14)","summary":"Verify Myanmar DCA 60 m (APF) and 30 m (ACP) telecom tower height & aviation obstruction lighting approvals."},
+    {"id":"REVIEW_FLAG_AERO_FREQUENCY","scope":"APF (1.1.4)","summary":"Verify 118–137 MHz airband operating frequencies and channel plan against Heliport operational requirements."},
+    {"id":"REVIEW_FLAG_AERO_HANDHELD_EX","scope":"APF (1.1.4.4)","summary":"Verify ATEX / IECEx / UL hazardous-area certificates and full airband channel capability for all 4 Ea. VHF-AM Aeronautical Handheld Radios."},
+    {"id":"REVIEW_FLAG_AERO_DCA_APPROVAL","scope":"APF (1.1.4)","summary":"Verify Myanmar Department of Civil Aviation (DCA) Heliport aeronautical station licensing and approval."}
+  ],
+  "nonMrVendorExtras": [
+    {"id":"LINE-MGW-CURRENT-RADIO-006","system":"TEL-RADIO-MARINE","status":"NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION","mgwSite":"APM","mgwCostUSD":27478,"customerSellUSD":36270.96,"note":"Unallocated MGW VHF-FM Marine Radio System (2 Lots, APM vendor label not in Customer MR). Excluded from customer-facing C1/11.P and tracked internally in 10.2 SI as NON_MR_VENDOR_EXTRA / AVAILABLE_FOR_REALLOCATION."}
+  ],
+  "vendorOptions": [
+    {"id":"OFFER-MGW-Q26-063-RADIO-009-OPTION","system":"TEL-RADIO-DTRS","status":"VENDOR_OPTION_UNPRICED / BAFO_FOC_CANDIDATE","brand":"MOTOROLA","items":[{"partNo":"PMPN4296","description":"Six-Port Smart Charger","qty":0},{"partNo":"PMNN4067","description":"ATEX Remote Speaker /Microphone","qty":0}],"note":"Not mandated by Customer MR Appendix 1.1, PHI-0001, DTS-0006..0009, SPE-0007..0010, or LIS. Kept strictly isolated in 10.2 SI as VENDOR_OPTION_UNPRICED / BAFO_FOC_CANDIDATE."}
+  ],
+  "layouts": [
+    "APF LAY-0001 C1 sheet 3/4 and LAY-0010 C4 overall",
+    "ACP LAY-0001 C2 sheet 3/3, LAY-0003 C1 overall and BLD-0001 C3",
+    "ABV01 LAY-0001 C1 and BLD-0001 C2"
+  ],
+  "notices": {
+    "ACP Radio Console": "ACP Control Room · CON-308-001 คือ Workstation สำหรับควบคุม VHF DMR, VHF-FM Marine และ MF/HF SSB ผ่าน LAN/RoIP. ใช้ MGW RADIO-004 เป็นงบ Workstation พร้อมจอและชุดควบคุมเสียง/PTT 1 จุด. กัน SmartPTT PLUS Additional Dispatcher Client GMVN6054A เพิ่ม 1 สิทธิ์ เพราะสิทธิ์ที่มากับ Core ใน RADIO-001 จัดไว้ให้ Workstation ใน Lot เดิม. ใช้ Server และ Voice Recording ร่วม. ทดสอบรับส่งเสียง, PTT และบันทึกเสียงผ่าน Gateway ของทั้งสามระบบที่ iFAT.",
+    "TEL-RADIO-DTRS": "MR Rev.B1 Appendix 1.1 ข้อ 1.0 กำหนด APF Fixed 6, Mobile 21 และ Handheld รวมโครงการ 98 เครื่อง. RADIO-009 เสนอ Mobile 26 / Handheld 96. กัน Mobile 21 สำหรับ APF และ 1 เครื่องติดตั้งประจำที่ ABV01 E&I Cabin ตาม MR; อีก 4 เครื่องยังไม่จัดไซต์. กันงบ APF Fixed ครบ 6 เครื่องตาม MR. งานย้าย GTPL เป็นหมายเหตุจาก MGW และยังไม่มีหลักฐาน CUS ให้หักจำนวน Fixed. ACP E&I กัน Fixed 2, Gateway 4, เสา 2, ตู้และ Switch. คง APM RADIO-016 ตามใบเดิม.",
+    "RoIP Dispatch Console": "APF LAY-0001 C1 แสดง CON-308-001/002. DTS-0008 B1 ระบุ Console ที่ CCR และ Radio Room, Gateway 6 จุดที่ VTA/CCR/Radio Room และ RoIP/Voice Log Server. RADIO-001 มี Dell Dispatcher และ Voice Recording Licence แล้ว ส่วน Console ใช้ RADIO-015 และกัน RADIO-007 ที่ยังไม่จัดไซต์ไว้ชั่วคราว. กันงบ RoIP/Voice Log Server, Gateway 6 และตู้ 1. SmartPTT ใน RADIO-001 คงไว้กับ DTRS จนยืนยันการแชร์. ปรับลดงบเมื่อ MGW ยืนยันของที่รวมแล้ว.",
+    "TEL-RADIO-AERO": "MR APF ระบุ Fixed และเสาอย่างละ 3, Gateway 1 และ Handheld ATEX หรือ UL 4 เครื่อง. RADIO-012 มี Fixed พร้อมเสา 1 ชุด จึงกันเพิ่ม 2 ชุดและ Gateway 1. RADIO-013 มี Portable 4 เครื่องแล้ว จึงกันเฉพาะส่วนต่างราคาเครื่องที่ตรงข้อกำหนด. รอยืนยันรุ่น ช่วงความถี่ และใบรับรอง.",
+    "TEL-RADIO-MARINE": "APF อ้าง RADIO-002 และ 010 ตาม Working. RADIO-010 มี SP3530 ATEX 12 เครื่อง เทียบ MR 10 เครื่องรวม APF/ACP. กัน RADIO-017 ที่ใบพิมพ์ APM ให้ ACP ชั่วคราว เพราะมี SAILOR 6210, เสา และ Gateway อย่างละ 2. RADIO-006 คงราคาเดิมและยังไม่จัดไซต์. รอ MGW ยืนยันชื่อ ACO/APM และจำนวนต่อ Lot. ไม่มีงบ Marine เพิ่ม.",
+    "TEL-RADIO-SSB": "RADIO-003 และ 011 มี SAILOR 6320 สองชุดแล้ว. ใช้เป็นฐานปริมาณ APF 1 และ ACP 1 โดยคงการผูกไซต์เดิมจน MGW ยืนยันว่าชุดใดเป็นของ ACP. ไม่มีงบ SSB เพิ่ม.",
+    "Antenna Cables": "คงปริมาณ MR คือ APF 500 + 500 ม., ACP 700 ม. และ ABV01 150 ม. LAY/BLD ใช้ตรวจตำแหน่งปลายทางและยังไม่มีระยะ feeder ครบเส้น. กันราคา RADIO-014, 008, 005 และ 018 ให้สี่รายการตามลำดับ โดย 008 และ 018 เป็นการจัดไซต์ชั่วคราวจากแถว APM. รอยืนยันเส้นทาง ชนิดสาย หัวต่อ และระยะเดินจริงก่อนสั่งซื้อ."
+  },
+  "placements": {
+    "RADIO-007": "MR-B1-11-APF-06",
+    "RADIO-008": "MR-B1-11-APF-07",
+    "RADIO-014": "MR-B1-11-APF-05",
+    "RADIO-015": "MR-B1-11-APF-06",
+    "RADIO-017": "MR-B1-11-ACP-02",
+    "RADIO-018": "MR-B1-11-ABV01-02"
+  },
+  "estimates": [
+    {"id":"LINE-BID-DTRS-HANDHELD-GAP-0550","mr":"MR-B1-11-APF-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"Project DTRS · additional ATEX handhelds","quantity":2,"unit":"Pc","reference":"RADIO-009","divisor":122,"rateBasis":"Mixed subscriber lot divided by 122 quoted devices, including licence exposure. MR 98 less 96 quoted."},
+    {"id":"LINE-BID-RADIO-APF-DTRS-FIXED","mr":"MR-B1-11-APF-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"APF · additional DTRS fixed radio stations","quantity":6,"unit":"SET","reference":"RADIO-016","rateBasis":"CUS MR Rev.B1 Appendix 1.1 APF item 1.0 requires six fixed stations. Carry all six pending CUS confirmation of any reuse credit. Use the MGW M8668i equipment lot as a fixed-station hardware proxy; final TAG and RF fit pending."},
+    {"id":"LINE-BID-RADIO-APF-DTRS-SERVER","mr":"MR-B1-11-APF-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"APF · CCMS and RM server hardware allowance","quantity":2,"unit":"SET","reference":"RADIO-001","rate":5000,"rateBasis":"SI planning rate per industrial server hardware set. Reserve CCMS and RM hardware pending OEM entitlement/hosting confirmation. Existing software, dispatch and GTPL controller kept separate."},
+    {"id":"LINE-BID-RADIO-ACP-DTRS-FIXED","mr":"MR-B1-11-ACP-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"ACP E&I Cabin · DTRS fixed radio stations","quantity":2,"unit":"SET","reference":"RADIO-016","rateBasis":"DTS ACP-RAD-308-002/003; use the MGW M8668i equipment lot as a hardware proxy. Feeder and console already carry separate owners."},
+    {"id":"LINE-BID-RADIO-ACP-DTRS-GATEWAY","mr":"MR-B1-11-ACP-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"ACP E&I Cabin · DTRS IP gateways","quantity":4,"unit":"SET","reference":"RADIO-001","rate":3500,"rateBasis":"SI planning rate per compatible gateway with interface/accessories; ACP-ROIP-IGW-001 through 004 counted here once."},
+    {"id":"LINE-BID-RADIO-ACP-DTRS-INFRA","mr":"MR-B1-11-ACP-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"ACP · DTRS rack, switch and tower antenna pair","quantity":1,"unit":"Lot","reference":"RADIO-001","rate":9500,"rateBasis":"SI planning rates: rack 4500 + access switch 1500 + one 4-stack and one omni antenna together 3500. Supply only; ACP feeder is in RADIO-005."},
+    {"id":"LINE-BID-RADIO-ACP-DISPATCH-LICENCE","mr":"MR-B1-11-ACP-05","system":"TEL-RADIO-DTRS","code":"A1-07","description":"ACP CON-308-001 · Additional dispatcher client licence","quantity":1,"unit":"Pc","reference":"RADIO-001","rate":1000,"rateBasis":"SI allowance USD 1,000 for one SmartPTT PLUS Additional Dispatcher licence (GMVN6054A). Allocate the single dispatcher entitlement in Core GMVN6044B to the workstation in RADIO-001. The GMVN6050A licences are for radios. MGW RADIO-004 carries the ACP hardware allowance only in this design. Benchmark: Airsys additional dispatcher licence SPTTC0003 GBP 589.51 ex VAT, used as a comparable only. Verify licence and shared-radio gateway interfaces at procurement and iFAT."},
+    {"id":"LINE-BID-RADIO-ABV-DTRS-MOUNT","mr":"MR-B1-11-ABV01-01","system":"TEL-RADIO-DTRS","code":"A1-07","description":"ABV01 E&I Cabin · fixed-use mounting and power kit","quantity":1,"unit":"SET","reference":"RADIO-009","rate":750,"rateBasis":"SI planning rate for power supply, fixed mount and interfaces. Assign one already-priced M8668i from the 26; feeder is budgeted separately."},
+    {"id":"LINE-BID-RADIO-APF-ROIP-SERVER","mr":"MR-B1-11-APF-06","system":"TEL-RADIO-DTRS","code":"A1-07","description":"APF · RoIP and Voice Log server hardware","quantity":2,"unit":"SET","reference":"RADIO-001","rate":5000,"rateBasis":"SI planning rate per server hardware set. Dispatcher and Voice Recording Licence already in RADIO-001. No second recording licence priced."},
+    {"id":"LINE-BID-RADIO-APF-ROIP-GATEWAY","mr":"MR-B1-11-APF-06","system":"TEL-RADIO-DTRS","code":"A1-07","description":"APF · RoIP IP gateways","quantity":6,"unit":"SET","reference":"RADIO-001","rate":3500,"rateBasis":"SI planning rate. Four VTA, one CCR and one Radio Room per DTS. SmartPTT gateway in RADIO-001 retained for DTRS pending OEM interface design."},
+    {"id":"LINE-BID-RADIO-APF-ROIP-CAB","mr":"MR-B1-11-APF-06","system":"TEL-RADIO-DTRS","code":"A1-07","description":"APF · RoIP equipment cabinet","quantity":1,"unit":"SET","reference":"RADIO-001","rate":4500,"rateBasis":"SI planning rate with PDU and mounting hardware. Hold one cabinet for RoIP per MR pending OEM confirmation of shared rack use."},
+    {"id":"LINE-BID-RADIO-APF-AERO-FIXED","mr":"MR-B1-11-APF-04","system":"TEL-RADIO-AERO","code":"A1-09","description":"APF · additional Aero fixed radios with antennas","quantity":2,"unit":"SET","reference":"RADIO-012","rateBasis":"Three MR fixed sets including antennas less one quoted. Use RADIO-012 complete equipment rate as proxy."},
+    {"id":"LINE-BID-RADIO-APF-AERO-GATEWAY","mr":"MR-B1-11-APF-04","system":"TEL-RADIO-AERO","code":"A1-09","description":"APF · Aero IP gateway","quantity":1,"unit":"SET","reference":"RADIO-012","rate":3500,"rateBasis":"DTS-0007 B1 TAG RAD-311-352. SI planning rate for one airband-to-dispatch interface, pending interoperability and OEM offer."},
+    {"id":"LINE-BID-RADIO-APF-AERO-PORTABLE","mr":"MR-B1-11-APF-04","system":"TEL-RADIO-AERO","code":"A1-09","description":"APF · compliant Aero portable price difference","quantity":4,"unit":"SET","reference":"RADIO-013","replacementRate":4500,"rateBasis":"SI budget USD 4500 per compliant set less current MGW rate per set. MGW TR30 AIR covers two channels; required certificate and final operating channels remain subject to technical selection."}
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "schema": "pj2608-0550-sdrl-equations/1.0",
+  "project": "PJ2608-0550",
+  "standard": "10008-STD-6-GEN-002-R01",
+  "generalFormula": "D_k = G_k(M_SI, Rev_0)",
+  "sdrlDeliverables": [
+    {
+      "code": "A04",
+      "title": "Bought out items list",
+      "formula": "D_A04 = G_MTO(M_C1, K_Vendor)",
+      "latexFormula": "D_{\\text{A04}} = \\mathcal{G}_{\\text{MTO}}(\\mathcal{M}_{\\text{C1}}, \\mathcal{K}_{\\text{Vendor}})",
+      "withBidRule": "WITH BID (FULL): Bought-out procurement register from Working → C1 appendix packages/components; manufacturer from Offer/ready vendor; prices omitted.",
+      "postAwardRule": "POST-AWARD (P+3): Issued MTO with confirmed AVL manufacturers, models and purchase status.",
+      "crossVolumeGate": "§10 R1 — Every A04 package SN must reconcile to 11.C1 display rows; no invented quantities"
+    },
+    {
+      "code": "B03",
+      "title": "General Arrangement / Layout Drawings",
+      "formula": "D_B03 = G_Layout(M_App2, M_PHI)",
+      "latexFormula": "D_{\\text{B03}} = \\mathcal{G}_{\\text{Layout}}(\\mathcal{M}_{\\text{App2}}, \\mathcal{M}_{\\text{PHI}})",
+      "withBidRule": "WITH BID (SAMPLE): Representative APF/ACP Equipment Room & Tower layout excerpts from Appendix 2 + PHI.",
+      "postAwardRule": "POST-AWARD (FULL): Complete IFC General Arrangement & Mounting Detail drawings per platform.",
+      "crossVolumeGate": "§10 R1/R2 — Physical footprint & tower elevation locked to 11.C1 Rittal/Tower BOM"
+    },
+    {
+      "code": "B05",
+      "title": "Schematic Diagrams",
+      "formula": "D_B05 = G_Schem(M_SLD, M_Tag, M_BOM)",
+      "latexFormula": "D_{\\text{B05}} = \\mathcal{G}_{\\text{Schem}}(\\mathcal{M}_{\\text{SLD}}, \\mathcal{M}_{\\text{Tag}}, \\mathcal{M}_{\\text{BOM}})",
+      "withBidRule": "WITH BID (SAMPLE): Block/Single-Line Diagram per Telecom system bound to Appendix 2 LIS-0001 tags.",
+      "postAwardRule": "POST-AWARD (FULL): Full interconnection wiring, patch-panel, and termination schematics.",
+      "crossVolumeGate": "§10 R1/R2 — Schematic tag count & port topology reconciled with 11.C1 & 10.2 SI"
+    },
+    {
+      "code": "B08",
+      "title": "Equipment Data Sheets (DTS)",
+      "formula": "D_B08 = G_DTS(M_CUS_DTS, Φ_DTS(M_Vol.I, K_Cat))",
+      "latexFormula": "D_{\\text{B08}} = \\mathcal{G}_{\\text{DTS}}\\big(\\mathcal{M}_{\\text{CUS\\_DTS}},\\, \\Phi_{\\text{DTS}}(\\mathcal{M}_{\\text{Vol.I}}, \\mathcal{K}_{\\text{Cat}})\\big)",
+      "withBidRule": "WITH BID (FULL): 4-page A4 Datasheet (12.T) per system/area locked to Volume I 11.C1 AS-IS models & 7 VND catalogs.",
+      "postAwardRule": "POST-AWARD (AFC/AS-BUILT): Final vendor-certified DTS incorporating PTTEP review comments.",
+      "crossVolumeGate": "§10 R1/R3 — Gate R1 forbids COMPLY on OPEN/TBE; Gate R3 routes DEVIATE to Tab 14 Deviation List"
+    },
+    {
+      "code": "B11",
+      "title": "Catalogues & Brochures (VDB)",
+      "formula": "D_B11 = G_VDB({ K_Cat(E*) | E* ∈ 11.C1 })",
+      "latexFormula": "D_{\\text{B11}} = \\mathcal{G}_{\\text{VDB}}\\big(\\{ \\mathcal{K}_{\\text{Cat}}(E^*) \\mid E^* \\in \\text{11.C1} \\}\\big)",
+      "withBidRule": "WITH BID (FULL): Manufacturer datasheets & cut-sheets for every offered equipment item E* in 11.C1.",
+      "postAwardRule": "POST-AWARD (FINAL VDB): Complete indexed Vendor Data Book with ATEX/IECEx & PTD certificates.",
+      "crossVolumeGate": "§10 R1 — Every K_Cat(E*) entry must match 7 VND offer evidence and 11.C1 Part No."
+    },
+    {
+      "code": "CAL",
+      "title": "Link Budget Calculations",
+      "formula": "D_CAL = G_Calc(M_STU, K_RF(E*))",
+      "latexFormula": "D_{\\text{CAL}} = \\mathcal{G}_{\\text{Calc}}(\\mathcal{M}_{\\text{STU}}, \\mathcal{K}_{\\text{RF}}(E^*))",
+      "withBidRule": "WITH BID (MEMORY BASELINE): Preliminary RF pathloss / availability & power/heat calculation from STU-0002 + K_RF(E*).",
+      "postAwardRule": "POST-AWARD (FULL): Full site-surveyed path calculation, antenna height optimization & PTD frequency filing.",
+      "crossVolumeGate": "§10 R2 — RF parameters (Tx power, Rx threshold, dish gain) locked to 12.T Datasheet"
+    },
+    {
+      "code": "C02",
+      "title": "Inspection & Test Plan (ITP)",
+      "formula": "D_C02 = G_ITP(M_IC, Scope_FAT/SAT)",
+      "latexFormula": "D_{\\text{C02}} = \\mathcal{G}_{\\text{ITP}}(\\mathcal{M}_{\\text{IC}}, \\text{Scope}_{\\text{FAT/SAT}})",
+      "withBidRule": "WITH BID (STATEMENT): Inspection & Test Plan statement covering OEM FAT, Thailand Pre-FAT/iFAT, and offshore SAT.",
+      "postAwardRule": "POST-AWARD (FULL): Detailed witnessed FAT/iFAT/SAT test procedures & hold/witness point matrix.",
+      "crossVolumeGate": "§10 R2 — FAT/iFAT/SAT scope aligned with Working B4/C7 & A1 S/N 2"
+    }
+  ],
+  "phiDtsEquation": {
+    "id": "PHI-DTS",
+    "name": "DTS AS-IS Specification Mapping Equation (Φ_DTS(r))",
+    "formula": "Φ_DTS(r) = (C1: No., C2: Parameter, C3: COMPANY Requirement) × K_Cat(E*) → (Vendor Offered Data, Compliance Status, Remarks); Model_DTS(s, l, Tag) ≡ Model_Vol.I(11.C1)(s, l, Tag)",
+    "latexFormula": "\\Phi_{\\text{DTS}}(r) : (C_1, C_2, C_3) \\times \\mathcal{K}_{\\text{Cat}}(E^*) \\mapsto (\\text{Vendor Offered Data},\\, \\text{Compliance Status},\\, \\text{Remarks})",
+    "outcomes": [
+      {
+        "status": "COMPLY",
+        "condition": "Catalog K_Cat(E*) directly satisfies C3(r)",
+        "customerBehavior": "Display exact catalog value & COMPLY badge",
+        "internalBehavior": "Log verified 7 VND catalog source"
+      },
+      {
+        "status": "COMPLY (VTA)",
+        "condition": "C3(r) specifies VTA / Defined by the bidder and exact value of E* is populated",
+        "customerBehavior": "Display exact populated E* value & COMPLY (VTA) badge",
+        "internalBehavior": "Log VTA basis from K_Cat(E*)"
+      },
+      {
+        "status": "MINOR / CLARIFY",
+        "condition": "Minor variance under AS-IS Volume I model (e.g., IP-50CX channel spacing or All-Outdoor port layout via cabinet switch)",
+        "customerBehavior": "Display offered data + explicit technical explanation in Remarks",
+        "internalBehavior": "Flag minor clarification in .vm-warn.intblock"
+      },
+      {
+        "status": "OPEN / TBE",
+        "condition": "Missing in catalog K_Cat(E*) — Gate R1 forbids COMPLY",
+        "customerBehavior": "Display \"To be confirmed by Manufacturer\" (forbids COMPLY)",
+        "internalBehavior": "Log internal review flag in .vm-warn.intblock"
+      },
+      {
+        "status": "DEVIATE",
+        "condition": "Major deviation from C3(r) / AVL",
+        "customerBehavior": "Reference Deviation List LIS-0004 (sanitized)",
+        "internalBehavior": "Auto-link to Tab 14 Deviation List (Gate R3)"
+      }
+    ]
+  }
+}

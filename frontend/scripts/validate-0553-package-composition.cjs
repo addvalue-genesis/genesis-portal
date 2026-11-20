@@ -1,0 +1,18 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const mto=JSON.parse(fs.readFileSync(path.join(root,"src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001PackageComposition.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+assert.equal(mto.itemRows.length,42);
+assert.equal(new Set(mto.itemRows.map(x=>x.platform)).size,7);
+assert(model.includes("MR0001_ENGINEERING_REQUIRED_BOM.rows.map"));
+assert(model.includes("functionsByFamily")&&model.includes("compatibleFunctions"));
+assert(model.includes("candidateQuotes")&&model.includes("selectedOffer:null"));
+assert(model.includes("requiredQty:null")&&model.includes("acceptedUnitCost:null"));
+assert(model.includes("allocatedOfferQty:null")&&model.includes("packageTotalCost:null"));
+assert(model.includes("mh:null,cost:null")&&model.includes("releaseAllowed:false"));
+assert(model.includes('x.offeredRole==="BASE_CANDIDATE_NOT_ACCEPTED"'));
+assert(ui.includes("MR0001_PACKAGE_COMPOSITION.packages.map"));
+assert(ui.includes("p.components.map")&&ui.includes("MR0001_PACKAGE_COMPOSITION.services.map"));
+console.log("PASS 0553 source-first 42 MR package decomposition, 1:N functional candidates, service drivers and fail-closed quantity/cost gates (static regression only)");

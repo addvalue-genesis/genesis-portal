@@ -1,0 +1,9 @@
+# TEL-TELT legacy Part A pricing cancelled
+
+The owner rejected the combined TEL-TELT Part A pricing basis. Opening an existing 0550 workspace deselects `LINE-LEGACY-TEL-TELT-1` in an audited revision and clears its coverage links. New workspaces skip the retired `OFFER-LEGACY-TEL-TELT-1` seed. The save and pricing paths apply the cancellation to restored data. Active Vendor selection, Working and module search exclude the retired record. The archived records retain their IDs and original input values.
+
+The APF 60 m and ACP 30 m MR rows require separate Working pricing at A1-11. Their quantities and source mappings remain available. The two Master Tower quotations remain available at 07.2 and through MR source trace. The equipment rows are supplier evidence awaiting a new pricing decision. Existing B/C allocations continue to trace to their original items, and draft B/C preparation uses those source items independently. Earlier percentage allowances based on the combined procurement basis are flagged for review through the existing budget-basis check.
+
+ADR-0550-001 principles 2, 3, 5, 6 and 8–13 apply. The cancellation changes the active financial basis and leaves unresolved prices OPEN. The existing module structure and frozen issues retain their identities and history. Local migration, pricing and export checks use a reconstructed saved workspace. Pull and restart the 3050 app to apply the change to the owner's browser.
+
+Validation covered the affected bidding and MR import, actual saved-workspace migration and Vendor trace, actual draft preparation with two Part A price gaps and all 22 separate tower B/C source allocations, summary, TAG Mapping, and controlled issue/frozen export checks. Webpack compiled with its existing large-chunk advisory. The local checks do not establish deployment to the owner's Windows browser.

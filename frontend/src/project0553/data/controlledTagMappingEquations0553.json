@@ -1,0 +1,92 @@
+{
+  "projectId": "PJ2608-0553",
+  "revision": "TAG_MAPPING_CONTROL_REV01",
+  "currentPilot": {
+    "site": "ZWP20",
+    "mr": "MR-0001",
+    "tag": "MR-502-001",
+    "mtoRow": 4
+  },
+  "fundamentalRule": "Customer Requirement is demand; OEM vendor quotation is evidence. Only engineering validation can connect these, with retained conditions, explicit quantity and ONE cost owner.",
+  "equations": [
+    {
+      "id": "MAP-01",
+      "name": "Source identity",
+      "expression": "K=(ProjectID, MR, Site, TAG, sourceRow, sourceRevision)",
+      "purpose": "Find exactly one RFQ/MTO origin; no fallback to similar site or tag",
+      "failState": "ERROR_SOURCE_IDENTITY"
+    },
+    {
+      "id": "MAP-02",
+      "name": "Requirement thread",
+      "expression": "R(K)=Applicable(MR,TAG,LIS,BOD,DTS,SPE,BLD,LAY,CAL,RPT,STD,Note,Comment,Appendix)",
+      "purpose": "Merge traceable particular requirements and identify applicable function/technical proof; retain revisions",
+      "failState": "ERROR_MISSING_REQUIREMENT_THREAD"
+    },
+    {
+      "id": "MAP-03",
+      "name": "Required function decomposition",
+      "expression": "F_required(K)=Decompose(R(K), topology, interface, system architecture, existing system)",
+      "purpose": "A TAG Set is not one vendor SKU; mandatory functions may map to adjacent TAG cost owners",
+      "failState": "ERROR_FUNCTION_NOT_DEFINED"
+    },
+    {
+      "id": "MAP-04",
+      "name": "Candidate join",
+      "expression": "Candidate(f,o)=1 only if SourceLineID, quote ID, SKU and function are cross-referenced by evidence; quote rate/unit/currency match source",
+      "purpose": "Find vendor candidates from 07 Vendor (not raw keyword-only or vendor price-only)",
+      "failState": "ERROR_VENDOR_EVIDENCE_MISMATCH"
+    },
+    {
+      "id": "MAP-05",
+      "name": "Technical hard-constraint gate",
+      "expression": "Eligible(f,o)=AND(Verified(c_i,f,o) for every mandatory hard constraint c_i), or approved deviation with documented disposition",
+      "purpose": "Missing Ex/country/licence/throughput proof is UNKNOWN or CONFLICT, never silently compliant",
+      "failState": "TECHNICAL_QUALIFICATION_REQUIRED"
+    },
+    {
+      "id": "MAP-06",
+      "name": "Engineering quantity driver",
+      "expression": "Q_required(f,K)=N_verified_endpoints(K) × q_per_endpoint(f) + documented spare/other explicit drivers",
+      "purpose": "One Set does not mean every physical SKU quantity 1 without an explicit driver; offered quoted quantity is evidence only",
+      "failState": "ERROR_QUANTITY_PROVENANCE"
+    },
+    {
+      "id": "MAP-07",
+      "name": "Unique cost ownership",
+      "expression": "For a scope/function instance i: SUM_{owner} allocationShare(i,owner)=1 and owner is stable site+TAG+row; counted once",
+      "purpose": "B-6/B-7 at IDU row5, B-8 at surge row10, B-12 at antenna row6, no duplication in ODU row4",
+      "failState": "ERROR_DUPLICATE_COST_OWNER"
+    },
+    {
+      "id": "MAP-08",
+      "name": "Sourced monetary calculation",
+      "expression": "Extended(f,c)=Q_required(f) × SourceUnitRate(f,c); SUM by currency and owner only; rate NULL -> UNKNOWN, not zero",
+      "purpose": "Allow a separate explicitly labelled managerial incremental assumption but retain source NULL unchanged",
+      "failState": "ERROR_CURRENCY_OR_PRICE_SOURCE"
+    },
+    {
+      "id": "MAP-09",
+      "name": "Ledger reconciliation",
+      "expression": "Delta(owner,c)=MappedTotal(owner,c) − FrozenWorkingLedger(owner,c); PASS if currency identical and |Delta|<=0.01",
+      "purpose": "Never mutate the existing Cost Ledger from an audit. Any mismatch blocks mapping promotion until corrected.",
+      "failState": "ERROR_LEDGER_RECONCILIATION"
+    },
+    {
+      "id": "MAP-10",
+      "name": "Commercial continuation and release",
+      "expression": "BudgetaryProceed=SourceMatch && QuantityTrace && CostReconciled; TechnicalRelease=AllHardConstraintsProvenOrApproved; these are independent",
+      "purpose": "Work on qualified budgetary basis while retaining deviation and evidence requirements; no automatic technical approval",
+      "failState": "RELEASE_NOT_APPROVED"
+    }
+  ],
+  "classifications": {
+    "ERROR": "Document/quote/quantity/owner/currency/reconciliation invariant failed. Stop this mapping and do not book cost.",
+    "QUALIFIED": "Budgetary scenario can proceed on controlled assumption; missing technical/approval/price proof remains visible; not a technical PASS.",
+    "PASS": "A documented mapping/invariant has matched exactly, not an OEM/Company approval.",
+    "NOT_APPLICABLE": "Verified inapplicable function, never inferred from lack of data."
+  },
+  "noAutomaticCostMutation": true,
+  "noAutomaticCustomerRelease": true,
+  "scopeExpansion": "Pilot ZWP20 MR-502-001 row4. Rollout to other TAGs requires their own source identity/topology/quantity evidence and same equation tests."
+}

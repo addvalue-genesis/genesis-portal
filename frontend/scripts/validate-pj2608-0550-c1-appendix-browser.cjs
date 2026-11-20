@@ -1,0 +1,85 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http'),{chromium}=require('playwright');
+const root=path.resolve(__dirname,'..');
+const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/^\/(?:bundle|\d+(?:\.bundle)?)\.(?:js|css)$/.test(u),f=asset?path.join(root,'dist',u):path.join(root,'public/index.html');res.setHeader('Content-Type',f.endsWith('.js')?'text/javascript':f.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(f));});
+(async()=>{let browser;await new Promise(r=>server.listen(0,'127.0.0.1',r));try{
+ browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,headless:true,args:['--no-sandbox','--disable-dev-shm-usage','--disable-webgl','--no-zygote','--single-process']});
+ const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});page.setDefaultTimeout(45000);const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ const read=()=>page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,r=db.transaction('workspace').objectStore('workspace').get('active');r.onsuccess=()=>{resolve(r.result);db.close();};};}));
+ const write=d=>page.evaluate(d=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,tx=db.transaction('workspace','readwrite');tx.objectStore('workspace').put(d,'active');tx.oncomplete=()=>{db.close();resolve();};};}),d);
+ const ready=()=>page.locator('.p55-bid-save').filter({hasText:/Revision \d/}).waitFor();
+ await page.goto('http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550');await ready();
+ const seed=await read(),lan=seed.lines.find(l=>l.id==='REQ-MR-B1-13-APF-09');assert(lan);
+ Object.assign(seed.fx,{thbPerUSD:32.5,source:'SYNTHETIC UI TEST FX',date:'2026-11-05'});
+ Object.assign(lan,{quantity:1,unit:'Lot',currency:'USD',manualCost:987654.32,sellMode:'DIRECT',sellRate:1000,primePct:0,selected:true,responsibility:'TSI',offerId:'',calculationId:'',coveredByLineId:'',coverageBasis:'SYNTHETIC independent cabinet; distinct from existing package candidates in this isolated test',scopeBasis:'SYNTHETIC LAN CABINET / UI TEST ONLY',sourceRef:'PRIVATE COST 987654.32 / must not enter customer paper'});
+ seed.lines.push(...Array.from({length:3},(_,i)=>({...lan,id:'SYNTHETIC-CABLE-'+i,mrRequirementId:'',systemToken:'TEL-FO',description:'Synthetic cable detail '+i,scopeKey:'SYNTHETIC.CABLE.'+i,manualCost:null,sellRate:null})));
+ await write(seed);await page.reload();await ready();const before=await read();
+ const search=page.getByRole('textbox',{name:'Project Module Search'});
+ const jump=async id=>{await search.fill(id);await search.press('Enter');};
+ await jump('bid.quotation.C1');const workspace=page.getByRole('region',{name:'C1 Appendix workspace'}),form=workspace.getByRole('table',{name:'Schedule C1 preview',exact:true});await form.waitFor();
+ const footerAmount=form.locator('tfoot .number');
+ const assertDraftTotal=async()=>{
+  const subtotals=await form.locator('[data-c1-summary-amount]').allTextContents();
+  const cents=subtotals.filter(text=>text!=='—').reduce((total,text)=>total+Number(text.replace(/[,.]/g,'')),0);
+  assert(cents>0);
+  assert.equal(await footerAmount.innerText(),(cents/100).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+  assert.equal(await form.locator('tfoot td').last().innerText(),'Priced items subtotal');
+ };
+ await assertDraftTotal();
+ assert.equal(await form.locator('.c1-app').count(),8);assert.equal(await form.locator('[data-c1-mr-id]').count(),179);for(let i=0;i<3;i++)assert.equal(await form.locator('[data-c1-owner-ids="SYNTHETIC-CABLE-'+i+'"]').count(),0);
+ const paga=form.locator('tr[id="p55-c1-app-1.4"]').locator('xpath=..'),pagaOwners=paga.locator('[data-c1-owner-ids]');
+ const pagaSnapshot=await pagaOwners.evaluateAll(rs=>rs.map(r=>({mr:r.dataset.c1MrId||'',sn:r.cells[0].textContent,amount:r.cells[5].textContent})));
+ assert(pagaSnapshot[0].sn.startsWith('1.4.P'),'Expanded PAGA shows its package prices before the location rows');
+ assert.equal(pagaSnapshot.filter(r=>r.mr).length,13);assert.deepEqual(pagaSnapshot.filter(r=>r.mr).map(r=>r.sn),Array.from({length:13},(_,i)=>'1.4.'+(i+1)));
+ const pagaKnown=pagaSnapshot.map(r=>Number(r.amount.replace(/,/g,''))).filter(Number.isFinite).reduce((a,b)=>a+b,0),pagaTotal=form.locator('[data-c1-summary-amount="1.4"]');assert(pagaKnown>0);assert.equal(await pagaTotal.innerText(),pagaKnown.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));assert((await pagaTotal.locator('xpath=..').innerText()).includes('Priced items subtotal'));assert((await paga.locator('.c1-subtotal').innerText()).includes('—'),'Known package prices do not accept unallocated MR coverage');
+ const entertainment=await form.locator('[data-c1-mr-id^="MR-B1-16-"]').evaluateAll(rs=>rs.map(r=>({number:r.cells[0].textContent,name:r.cells[1].textContent,note:r.cells[6].textContent})));assert.equal(entertainment.length,11);assert.deepEqual(entertainment.map(r=>r.number),Array.from({length:11},(_,i)=>'1.6.'+(i+1)));assert(entertainment[7].name.includes('Audio Conferencing Phone'));assert(entertainment[8].name.includes('Video Conferencing'));assert(entertainment[0].note.includes('Accommodation Building'));assert(entertainment[1].note.includes('Catering Building'));assert((await form.innerText()).includes('SCOPE OF SUPPLY FOR ENTERTAINMENT SYSTEM'));
+ const lanRow=form.locator('[data-c1-mr-id="MR-B1-13-APF-09"]');assert((await lanRow.innerText()).includes('1,000.00'),await lanRow.innerText());assert.equal(await lanRow.getByRole('button').getAttribute('aria-expanded'),'false');await lanRow.getByRole('button').click();assert((await lanRow.locator('xpath=following-sibling::tr[2]').innerText()).includes('Fire Wall'));
+ const currency=page.getByRole('combobox',{name:'Currency',exact:true});
+ await currency.selectOption('THB');
+ assert((await workspace.locator('.p55-c1-document-meta').innerText()).includes('Currency: THB'));
+ assert.equal(await form.getByRole('columnheader',{name:'CIF or FOB (THB)',exact:true}).count(),1);
+ for(const i of [4,5])assert.equal(await lanRow.locator('td').nth(i).innerText(),'32,500.00');
+ await assertDraftTotal();
+ const pagaTHB=await pagaOwners.evaluateAll(rs=>rs.map(r=>Number(r.cells[5].textContent.replace(/,/g,''))).filter(Number.isFinite).reduce((a,b)=>a+b,0));
+ assert(pagaTHB>pagaKnown);
+ assert.equal(await pagaTotal.innerText(),pagaTHB.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));
+ const sections=page.getByRole('navigation',{name:'Volume I sections',exact:true});
+ for(const id of ['A1','B','C','C7']){
+  await sections.getByRole('button',{name:'11.'+id,exact:true}).click();
+  const schedule=page.getByRole('region',{name:'Native Exhibit C Schedule '+id,exact:true});
+  assert((await schedule.locator('.p55-native-help').innerText()).includes('Currency: THB'));
+ }
+ await sections.getByRole('button',{name:'11.C1',exact:true}).click();
+ assert.equal(await lanRow.locator('td').nth(5).innerText(),'32,500.00');
+ await currency.selectOption('USD');
+ assert.equal(await lanRow.locator('td').nth(5).innerText(),'1,000.00');
+ const appToggle=form.locator('.c1-app').first().getByRole('button');await appToggle.click();assert.equal(await appToggle.getAttribute('aria-expanded'),'false');await appToggle.click();
+ const systemToggle=form.locator('.c1-system').first().getByRole('button');await systemToggle.click();assert.equal(await systemToggle.getAttribute('aria-expanded'),'false');await systemToggle.click();
+ const siteToggle=form.locator('.c1-site').first().getByRole('button');await siteToggle.click();assert.equal(await siteToggle.getAttribute('aria-expanded'),'false');await siteToggle.click();
+ assert(await form.locator('.c1-app').first().evaluate(e=>e.style.getPropertyValue('--bid-tint')),'Existing owner colour');
+ const entKnown=await form.locator('tr[id="p55-c1-app-1.6"]').locator('xpath=..').locator('[data-c1-owner-ids]').evaluateAll(rs=>rs.map(r=>Number(r.cells[5].textContent.replace(/,/g,''))).filter(Number.isFinite).reduce((a,b)=>a+b,0));assert(entKnown>0);
+ await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();assert.equal(await form.locator('tbody tr:visible').count(),8+await form.locator('.c1-other').count());assert.equal(await form.locator('[data-c1-summary-amount]').count(),8+await form.locator('.c1-other').count());const entTotal=form.locator('[data-c1-summary-amount="1.6"]');assert.equal(await entTotal.innerText(),entKnown.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}));assert((await entTotal.locator('xpath=..').innerText()).includes('Priced items subtotal'));const totalHead=await form.getByRole('columnheader',{name:'Total Price',exact:true}).boundingBox(),totalCell=await entTotal.boundingBox();assert(Math.abs(totalHead.x-totalCell.x)<2,'Summary aligns with Total Price column');
+ await assertDraftTotal();
+ await workspace.getByRole('button',{name:'แสดงรายการหลักทั้งหมด',exact:true}).click();assert.equal(await form.locator('[data-c1-mr-id]').count(),179);assert.equal(await form.locator('.c1-component').count(),0);
+ await workspace.getByRole('button',{name:'ขยายส่วนประกอบทั้งหมด',exact:true}).click();assert(await form.locator('.c1-component').count()>100);
+ await workspace.getByRole('button',{name:'ดูเอกสารขยายครบ',exact:true}).click();assert.equal(await form.getByRole('button').filter({visible:true}).count(),0);
+ assert.equal(await footerAmount.innerText(),'—','Paper view retains the strict total while C1 is open');
+ assert.equal(await form.locator('tfoot td').last().innerText(),'');
+ assert.equal(await form.locator('[data-c1-summary-amount]').count(),0,'Paper view retains strict native totals');assert((await pagaOwners.first().innerText()).startsWith('1.4.1'),'Native MR-first order is unchanged in paper view');
+ const text=await workspace.locator('.p55-c1-document').innerText();assert(text.includes('Currency: USD'));for(const banned of ['987654.32','PRIVATE COST','REQ-MR','SI-COST','OPEN','mapping pending','Draft price for listed quoted scope'])assert(!text.includes(banned),banned);
+ await workspace.getByRole('button',{name:'ดูแบบ +/−',exact:true}).click();
+ const trace=workspace.getByLabel('C1 internal trace');await trace.locator(':scope > summary').click();const summaries=trace.getByLabel('C1 Appendix summary diagnostics');await summaries.locator('summary').click();assert((await summaries.innerText()).includes('1.6'));const pending=trace.getByLabel('C1 pending Working owners');await pending.locator('summary').click();for(let i=0;i<3;i++)assert((await pending.innerText()).includes('SYNTHETIC-CABLE-'+i));const nameAudit=trace.getByLabel('C1 MR repeated names');await nameAudit.locator('summary').click();assert((await nameAudit.innerText()).includes('1.6.1'));assert((await nameAudit.innerText()).includes('1.6.2'));assert((await trace.innerText()).includes('bid.budget.working.line.REQ-MR-B1-13-APF-09'));
+ await trace.getByRole('button',{name:'SI-COST · เปิดเจ้าของงาน/ราคา',exact:true}).first().click();await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-B1-13-APF-09"]').waitFor();
+ await jump('si-wp-07');await page.getByRole('table',{name:'Customer integrator supplier mapping'}).waitFor();
+ await page.getByRole('button',{name:'VND · Vendor Offers / Evidence',exact:true}).click();await page.locator('[data-component-key="bid.vendor.offers"]').waitFor();
+ await jump('cus');await page.locator('[data-component-key="l3.original"]').waitFor();await jump('bid.quotation.C1');await form.waitFor();
+ await currency.selectOption('THB');
+ const downloadEvent=page.waitForEvent('download');await page.getByRole('button',{name:'Export Schedule C1 Word (.docx)',exact:true}).click();const download=await downloadEvent,bytes=fs.readFileSync(await download.path()).toString();assert(bytes.includes('APPENDIX 1.8'));assert(bytes.includes('1,000.00'));assert(!bytes.includes('987654.32'));assert(!bytes.includes('PRIVATE COST'));assert(bytes.includes('DRAFT'));assert(bytes.includes('1.6.8'));assert(bytes.includes('Audio Conferencing Phone'));assert(bytes.includes('Scope of Supply for Entertainment System'));assert(bytes.includes('Instrument &amp; Telecom Room'));assert(bytes.includes('ABV01, ACP and MOGE'));
+ assert(bytes.includes('Currency: USD'));assert(!bytes.includes('Currency: THB'));
+ await currency.selectOption('USD');
+ if(process.env.PJ0550_C1_SCREENSHOT){if(process.env.PJ0550_QA_THAI_FONT){const font=fs.readFileSync(process.env.PJ0550_QA_THAI_FONT).toString('base64');await page.addStyleTag({content:'@font-face{font-family:Tahoma;src:url(data:font/woff2;base64,'+font+') format("woff2");font-weight:100 900;}'});await page.evaluate(()=>document.fonts.ready);}await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.screenshot({path:process.env.PJ0550_C1_SCREENSHOT});}
+ if(process.env.PJ0550_C1_ENT_SCREENSHOT){await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.getByRole('navigation',{name:'C1 Appendices'}).getByRole('button',{name:'1.6',exact:true}).click();await workspace.screenshot({path:process.env.PJ0550_C1_ENT_SCREENSHOT});}
+ if(process.env.PJ0550_C1_PAGA_SCREENSHOT){await workspace.getByRole('button',{name:'ยุบเหลือ 8 หมวด',exact:true}).click();await workspace.getByRole('navigation',{name:'C1 Appendices'}).getByRole('button',{name:'1.4',exact:true}).click();await form.locator('tr[id="p55-c1-app-1.4"]').scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_C1_PAGA_SCREENSHOT});}
+ await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Mobile containment');await page.setViewportSize({width:1440,height:1000});
+ assert.deepEqual(await read(),before,'All UI navigation/expansion/export is readonly');await page.reload();await ready();assert.deepEqual(await read(),before);assert.deepEqual(errors,[]);
+ console.log('PASS C1 browser: actual production app, 8 Appendices/179 MR rows, all +/− levels, customer-only paper, canonical LAN price, CUS/SI/VND/Working navigation and aliases, cost-safe grouped Word, mobile containment, unchanged IndexedDB/reload and zero page errors.');
+}finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});

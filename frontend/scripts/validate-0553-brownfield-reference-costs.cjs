@@ -1,0 +1,10 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const ledger=read("data/mr0001TagCostLedger0553.js"),detail=read("LocationBomDetail0553.jsx");
+assert(ledger.includes('referenceExtended,countedInWorkingTotal:false'));
+assert(ledger.includes('extended:null'));
+assert(ledger.includes('REPLACEMENT_REFERENCE_ONLY__OWNERSHIP_REVIEW'));
+assert(detail.includes('REFERENCE ONLY — NOT SELECTED'));
+assert(detail.includes('Excluded from booked site cost until owner/quantity decision'));
+assert(detail.includes('Number.isFinite(v.referenceExtended)'));
+console.log("PASS source-priced brownfield reference rates visibly separated from booked site totals");

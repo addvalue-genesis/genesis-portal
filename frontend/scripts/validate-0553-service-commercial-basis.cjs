@@ -1,0 +1,47 @@
+const assert=require('node:assert/strict'),path=require('node:path');
+const babel=require('@babel/core'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f);
+require.extensions['.js']=(m,f)=>f.startsWith(src+path.sep)?compile(m,f):old(m,f);
+require.extensions['.jsx']=compile;require.extensions['.css']=()=>{};
+const get=n=>require(path.join(src,'project0553',n));
+const bc=get('data/bcTurnkeyWorkingCost0553.js').selectBcTurnkeyWorkingCost0553();
+const before=JSON.stringify(bc);
+const basis=get('data/serviceCommercialBasis0553.js').selectServiceCommercialBasis0553;
+const release=get('data/releaseCommercialModel0553.js').buildReleaseCommercialModel0553({thbPerUsd:31.5});
+const scope=get('data/scopePartBcReadModel0553.js').selectScopePartBcWorking0553();
+const UI=get('ServiceCommercialBasis0553.jsx').ServiceCommercialBasis0553;
+const sat=basis(bc.byCode.B3),yard=basis(bc.byCode.B9);
+assert.deepEqual([sat.workDays,sat.crew,sat.personDays,sat.normalHoursPerDay],[28,2,56,12]);
+assert.deepEqual([sat.includedWorkingSellTHB,sat.ownerTotalWorkingSellTHB,sat.teamDayUSD,sat.teamDayTHB],[1587600,2322450,1800,56700]);
+assert.deepEqual(sat.roles.map(r=>r.proposedOtUSDPerHour),[125,100]);
+assert.deepEqual([yard.workDays,yard.travelDays,yard.crew,yard.normalHoursPerDay],[7,2,2,null]);
+assert.deepEqual([yard.includedWorkingSellTHB,yard.teamDayUSD,yard.teamDayTHB],[480550,1300,40950]);
+assert(yard.roles.every(r=>r.proposedOtUSDPerHour===null));
+assert.equal(basis(bc.byCode.B8),null);
+for(const m of [sat,yard]){
+ assert.equal(m.independentPostingAllowed,false);assert.equal(m.customerTermsAgreed,false);
+ assert.equal(m.proposalOnly.approved,false);
+ assert(m.roles.every(r=>r.agreedOtUSDPerHour===null&&r.agreedStandbyUSDPerDay===null));
+ assert.deepEqual(release.b.find(x=>x.code===m.code).serviceCommercialBasis,m);
+ assert.deepEqual(scope.lines[m.code].serviceCommercialBasis,m);
+ const html=renderToStaticMarkup(React.createElement(UI,{basis:m,customer:true}));
+ assert(!html.includes('<table'), 'Service terms must be prose, not a nested rate table');
+ assert(html.includes('Additional working day:')&&html.includes('Proposed Standby:'));
+ assert(html.includes('DRAFT / PROPOSED'));assert(html.includes('ยังไม่อนุมัติ'));assert(html.includes('open=""'));
+ if(m.code==='B3')assert(html.includes('125.00')&&html.includes('100.00'));
+ else assert(html.includes('TBC')&&html.includes('700.00')&&html.includes('600.00'));
+ assert(m.qualificationText.includes('No duplicate base-day'));
+ const compact=renderToStaticMarkup(React.createElement(UI,{basis:m,compact:true}));
+ assert(!/<(?:table|details|summary|tr)\b/.test(compact));
+ assert(compact.includes(m.code==='B3'?'Included SAT: 2 persons':'Included Yard support: 2 persons')&&compact.includes('Senior / Field'));
+ assert(compact.includes('subject to written agreement')&&compact.includes('no duplicate time charges'));
+ assert(compact.includes(m.code==='B3'?'28 working days; 12 h/day':'7 working + 2 travel days/person'));
+ assert(compact.includes(m.code==='B3'?'125.00 / 100.00':'Normal onshore hours / OT: TBC'));
+
+}
+assert.equal(release.b.find(x=>x.code==='B3').customerSellTHB,2322450);
+assert.equal(release.b.find(x=>x.code==='B9').customerSellTHB,480550);
+assert.equal(bc.knownWorkingSellTHB,4994787.13);
+assert.equal(JSON.stringify(bc),before);
+console.log('PASS service basis: source days/rates, B3 28x2/12h and B9 7+2x2, OT/standby proposal unselected, Scope/Release parity, no new amount or customer-agreed rate.');

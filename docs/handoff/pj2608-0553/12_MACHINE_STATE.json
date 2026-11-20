@@ -1,0 +1,642 @@
+{
+  "projectId": "PJ2608-0553",
+  "asOf": "2026-10-10",
+  "branch": "feat/pj2608-0553-tpp-bid-handoff",
+  "codeBaselineVerified": "73ffda7579e806d73e92ed1e21ecf8e703253912",
+  "checkpointUpdateCommit": "5aa426762a932a86d0ec66f0fa7d69f6ef708122",
+  "headCheck": "git rev-parse HEAD after pull",
+  "build": {
+    "userVerified": true,
+    "testsPass": 14,
+    "webpackWarnings": 3,
+    "engineeringValidatedForCustomer": false,
+    "lastUserBuildCommit": "4e731c3787288e93945259dd299d2d3c2037af66",
+    "lastUserBuildResult": "FAILED_JSX_LINE_85_PERSISTED_AFTER_FIRST_HOTFIX",
+    "validationScriptsPassedBeforeWebpack": 14,
+    "hotfixCommit": "57db7b0e910d568a157bd1dce1f1cedbb31ea745",
+    "hotfixVerification": "PENDING_USER_LOCAL_BUILD",
+    "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1",
+    "requiredBomGuard": "ADDED_PENDING_USER_BUILD",
+    "aviatReviewValidation": "HOTFIX_PENDING_USER_BUILD",
+    "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING",
+    "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD",
+    "topologyValidation": "PENDING_LOCAL_BUILD",
+    "radioRoleMatrix": "PENDING_LOCAL_BUILD",
+    "scopeOwnershipValidation": "PENDING_USER_LOCAL_BUILD",
+    "offerAllocationValidation": "PENDING_USER_LOCAL_BUILD",
+    "gapAssessment": "PENDING_USER_LOCAL_BUILD",
+    "requirementEvidence": "PENDING_USER_BUILD",
+    "innovaBudgetValidation": "PENDING_USER_BUILD",
+    "innovaCostBridge": "PENDING_LOCAL_BUILD",
+    "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD",
+    "workingFxDefault": "PENDING_LOCAL_BUILD",
+    "closureProgress": "PENDING_LOCAL_BUILD",
+    "workingPricedBom": "PENDING_LOCAL_BUILD",
+    "simpleBom": "PENDING_USER_LOCAL_BUILD",
+    "costSpine": "PENDING_LOCAL_BUILD",
+    "locationWorkingBom": "PENDING_LOCAL_BUILD",
+    "firstPrinciplesDemand": "PENDING_LOCAL_BUILD"
+  },
+  "data": {
+    "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
+    "mariadb": "NOT_CONNECTED",
+    "agerp": "NOT_CONNECTED",
+    "sources": [
+      "frontend/src/project0553/data/snapshots/pj2608-0553.working.json",
+      "frontend/src/project0553/data/snapshots/mto.rev04.summary.json",
+      "frontend/src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json",
+      "frontend/src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"
+    ]
+  },
+  "commercial": {
+    "customerBaselineRevision": "Rev08",
+    "baseAandBUSD": 1684901.16,
+    "optionalCUSD": 151465.27,
+    "customerWorkbookSheets": [
+      "Scope of supply",
+      "B10 CommSpares",
+      "B11 SpecialTool",
+      "B13 Consumerables",
+      "C1 CapitalSpares",
+      "C2 2Y-Spares"
+    ],
+    "sixSheetExportReady": false,
+    "jutalReleased": false,
+    "samtelHistoricalIssueNeedsRevisionVerification": true,
+    "ngQuote": {
+      "lines": 53,
+      "totalUSD": 191610.15,
+      "expiry": "2026-10-01"
+    },
+    "ciscoQuote": {
+      "currency": "THB",
+      "totalBeforeVAT": 2117650,
+      "ingestion": "PARTIAL"
+    },
+    "fx": "REQUIRES_RATE_DATE_SOURCE",
+    "viewSeparation": {
+      "working": "DERIVATION_AND_HISTORICAL_REV08",
+      "budgetary": "NO_VERIFIED_FROZEN_ISSUE_REGISTERED",
+      "released": "GATES_HOLD_NO_SELL_VALUES",
+      "modeSelectionIssuesDocument": false,
+      "buildAfterChange": "PENDING_HOTFIX_BUILD"
+    }
+  },
+  "engineering": {
+    "requiredMTO": "MR0001_42_SOURCE_ROWS_INGESTED_ENGINEERING_REVIEW_OPEN",
+    "requiredVsOffered": "REQUIRED_SCOPE_UI_BEFORE_VENDOR_QUOTE_ENGINEERING_APPROVAL_OPEN",
+    "mr0001": "SOURCE_DRIVEN_42_MTO_ROWS_7_SITES_5_LINKS_PRELIMINARY_REQUIRED_BOM_CANDIDATES_SKU_OPEN",
+    "mr0002": "LNA_PRELIMINARY_ONLY",
+    "mr0003": "REVIEW_OPEN",
+    "mr0004": "REVIEW_OPEN",
+    "aviatBidEvaluation": {
+      "source": "NG-260916-ADV-DAP1.full.json",
+      "quoteLines": 53,
+      "state": "FUNCTION_CANDIDATES_OEM_APPROVAL_OPEN",
+      "requiredSkuQty": "OPEN",
+      "acceptedCost": "OPEN",
+      "review": [
+        "sector-angle",
+        "Myanmar-region",
+        "radio-topology",
+        "power",
+        "warranty",
+        "bulk-duplication",
+        "quote-validity"
+      ],
+      "build": "PENDING_USER_RUN_AFTER_HOTFIX",
+      "spareFunctionMatching": "D_E_BY_EXACT_SKU_16_OF_16_SOURCE_CHECK"
+    },
+    "mr0001Composition": {
+      "state": "FUNCTIONAL_CANDIDATE_ONE_TO_MANY_42_MTO_ROWS",
+      "model": "frontend/src/project0553/data/mr0001PackageComposition.js",
+      "acceptedQuantities": "OPEN",
+      "offerAllocation": "OPEN",
+      "servicesMH": "OPEN",
+      "costAndSell": "HOLD",
+      "staticValidator": "ADDED_PENDING_LOCAL_BUILD"
+    },
+    "mr0001Topology": {
+      "links": 5,
+      "logicalEndpoints": 10,
+      "sites": 7,
+      "radioQuantities": "OPEN",
+      "model": "frontend/src/project0553/data/mr0001TopologyQuantityAudit.js",
+      "state": "GRAPH_REFERENCE_NOT_EQUIPMENT_APPROVAL"
+    },
+    "mr0001RadioRoles": {
+      "rptLinks": 5,
+      "endpointRoleCandidates": 10,
+      "sites": 7,
+      "approvedRadioQty": null,
+      "allocatedOfferQty": null,
+      "source": "RPT-0001-C1",
+      "status": "ROLE_CANDIDATES_ENG_REVIEW"
+    },
+    "mr0001Ownership": {
+      "source": [
+        "BLD-0001-C1",
+        "MR-0001-C1"
+      ],
+      "gates": 5,
+      "newSupplyQty": null,
+      "reuseQty": null,
+      "serviceMH": null,
+      "releaseAllowed": false
+    },
+    "mr0001OfferAllocation": {
+      "quoteLines": 53,
+      "base": 37,
+      "spares": 16,
+      "status": "CANDIDATE_COVERAGE_WITHOUT_SITE_ALLOCATIONS",
+      "acceptedQty": null,
+      "acceptedCost": null,
+      "model": "frontend/src/project0553/data/mr0001OfferAllocationAudit.js"
+    },
+    "mr0001GapAssessment": {
+      "state": "CANDIDATE_FUNCTIONAL_GAP_NOT_NUMERIC_APPROVED",
+      "requiredQty": null,
+      "allocatedOfferedQty": null,
+      "exposure": null,
+      "source": "MR0001 MTO Rev04 / Next G 53-line quote",
+      "releaseAllowed": false
+    },
+    "mr0001RequirementEvidence": {
+      "sourceEvidence": 5,
+      "status": "SOURCE_LOCATORS_MAPPED_FUNCTIONAL_PROOF_OPEN",
+      "acceptedQty": null,
+      "acceptedCost": null,
+      "releaseAllowed": false
+    },
+    "innovaProvisionalPricing": {
+      "sourceYear": 2024,
+      "currency": "THB",
+      "quoteRefs": [
+        "QA24-0604",
+        "QA24-0605",
+        "QA24-0606"
+      ],
+      "status": "AUTHORIZED_PROVISIONAL_BUDGET_REQUOTE_PENDING",
+      "approvedVendorCost": null,
+      "releaseAllowed": false
+    },
+    "innovaCostBridge": {
+      "status": "SOURCE_UNIT_RATES_LINKED_TO_FUNCTIONAL_BOM",
+      "sourceYear": 2024,
+      "currency": "THB",
+      "rateCount": 3,
+      "quantity": null,
+      "acceptedCost": null,
+      "customerReleaseAllowed": false
+    },
+    "sourceQuoteCompleteness": {
+      "ciscoLines": 11,
+      "ciscoTotalTHB": 2117650,
+      "innovaLines": [
+        4,
+        1,
+        2
+      ],
+      "innovaTotalsTHB": [
+        189220,
+        46000,
+        2705
+      ],
+      "status": "SOURCE_LINES_RECONCILED_LOCAL_BUILD_PENDING",
+      "acceptedCost": null
+    },
+    "workingFxDefault": {
+      "displayCurrency": "THB",
+      "thbPerUsd": 31.5,
+      "date": "2026-10-10",
+      "source": "INTERNAL PLANNING ASSUMPTION — UNVERIFIED",
+      "persistent": "BROWSER_LOCAL_STORAGE",
+      "customerReleaseAllowed": false
+    },
+    "mr0001ClosureProgress": {
+      "sourceQty": "MTO_SOURCE_SET_LOT_RECORDED",
+      "quotedUnitPrices": "VENDOR_CANDIDATES_VISIBLE",
+      "requiredSkuQty": null,
+      "approvedExtendedCost": null,
+      "priority": [
+        "MR-502-001/ZWP20",
+        "LAN-502-001/ZWP20"
+      ],
+      "releaseAllowed": false
+    },
+    "workingPricedBom": {
+      "source": "MR0001 MTO Rev04",
+      "sourceRows": 42,
+      "ciscoLanMtoSets": 5,
+      "ciscoBudgetTHB": 2117650,
+      "ciscoUnitPackageTHB": 423530,
+      "vatExcluded": true,
+      "status": "PRELIMINARY_WORKING_BOM_NOT_OEM_APPROVED",
+      "otherSystemItems": "UNPRICED_PENDING_DERIVATION",
+      "customerReleaseAllowed": false
+    },
+    "simpleBom": {
+      "defaultUI": true,
+      "siteFilter": true,
+      "advancedAuditCollapsed": true,
+      "source": "MR0001 MTO Rev04",
+      "knownCiscoPreliminaryTHB": 2117650,
+      "completeTotal": false,
+      "customerReleaseAllowed": false
+    },
+    "bidCostSpine": {
+      "id": "P553-COST-SPINE",
+      "source": "MR0001 MTO Rev04 / VST A-0048-2026 Re1",
+      "knownPreliminaryCostTHB": 2117650,
+      "fullCost": null,
+      "customerSell": null,
+      "template": "4-Scope of Supply.xlsx",
+      "state": "INTEGRATED_ACROSS_EXECUTIVE_ARCHITECTURE_ENGINEERING_COMMERCIAL"
+    },
+    "locationWorkingBom": {
+      "source": "MR0001 MTO Rev04 / Engineering Required BOM / Source Supplier Registry",
+      "surface": "Budget > Working Preview",
+      "grouping": "LOCATION > MTO TAG",
+      "filters": [
+        "System",
+        "Location",
+        "Vendor"
+      ],
+      "pricing": "SOURCE_ORIGINAL_CURRENCY_WITH_ONLY_CISCO_PRELIMINARY_EXTENDED",
+      "mr2to4": "AWAITING_FULL_ITEM_BINDING",
+      "releaseAllowed": false
+    },
+    "firstPrinciplesDemand": {
+      "source": "RPT-0001 Rev.C1",
+      "links": 5,
+      "radioLinkEndpoints": 10,
+      "antennaDemand": "DERIVED_REFERENCE_COUNTS_WITH_DIVERSITY_NOT_PURCHASE",
+      "vendorSkuQty": null,
+      "model": "frontend/src/project0553/data/mr0001FirstPrinciplesDerivation.js",
+      "releaseAllowed": false
+    }
+  },
+  "sourceConflicts": [
+    "Original ITB 08-Sep deadline vs later reported 14-Oct deadline, amendment not authenticated",
+    "Rev08 historical vs actual SAMTEL sent file may differ",
+    "Next G and Cisco expired quotes; 2024 quotes other project only",
+    "Original ITB directly reverified at 08-Sep-2026; reported 14-Oct instruction still requires original amendment/email authentication",
+    "MTO Rev04 source contains item rows not yet represented in controlled Required BOM JSON"
+  ],
+  "tasks": [
+    {
+      "priority": 0,
+      "id": "P0-ITB",
+      "action": "Verify current JUTAL amendment and submission requirements"
+    },
+    {
+      "priority": 0,
+      "id": "P0-MTO",
+      "action": "Extract complete 0553 MTO Rev04 line quantities and MR1 engineering link/site mapping"
+    },
+    {
+      "priority": 0,
+      "id": "P0-QUOTES",
+      "action": "Reconcile all NG 53 quotation lines with required BOM and complete Cisco quote"
+    },
+    {
+      "priority": 1,
+      "id": "P1-MR2-4",
+      "action": "Complete vendor data, constraints and BOM on remaining MRs"
+    },
+    {
+      "priority": 1,
+      "id": "P1-COST",
+      "action": "Derive evidence-backed cost, FX and selling prices"
+    },
+    {
+      "priority": 1,
+      "id": "P1-EXPORT",
+      "action": "Validate and produce six-sheet customer workbook without releasing"
+    }
+  ],
+  "guardrails": [
+    "0550 branch untouched",
+    "OPEN is not zero",
+    "no invented cost/reconciliation",
+    "no release/merge/deploy without approval"
+  ],
+  "resumeAudit": {
+    "verifiedAt": "2026-10-10",
+    "github": {
+      "comparedFromCheckpoint": "5aa426762a932a86d0ec66f0fa7d69f6ef708122",
+      "aheadBeforeDocUpdate": 1,
+      "behindBeforeDocUpdate": 0,
+      "note": "Exact local HEAD must be recorded with git rev-parse HEAD after pull; connector compare verified branch state but local worktree was not executed here."
+    },
+    "drive": {
+      "originalItbReverified": true,
+      "originalItbDueDate": "2026-09-08 17:00",
+      "originalItbSubmission": "TECHNICAL_PLUS_UNPRICED_FIRST_PRICED_HOLD",
+      "laterReportedClosing": "2026-10-14 17:00 Beijing",
+      "laterAmendmentAuthenticated": false,
+      "mtoRev04Reverified": true,
+      "mtoRev04ContainsLineLevelRowsBeyondCodeSummary": true
+    },
+    "controlDecision": "INGEST_EXISTING_MTO_ROWS_BEFORE_REQUIRED_BOM_QUANTITY_OR_COST_ACCEPTANCE",
+    "mtoRev04Ingestion": {
+      "mr": "MR-0001",
+      "sourceRows": 42,
+      "platforms": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23",
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "groupedRowsRequiringSplit": [
+        31,
+        39,
+        43,
+        45,
+        49
+      ],
+      "source": "1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h",
+      "buildAfterChange": "NOT_YET_RUN",
+      "customerReleaseAllowed": false
+    }
+  },
+  "postSnapshotUpdates": [
+    {
+      "id": "MAP04_B1_TECH_FUNCTION_MISMATCH_20261013",
+      "date": "2026-10-13",
+      "scope": "ZWP20 MR-502-001 row4 source mapping audit only",
+      "rootCause": "B-1 expected RADIO_EQUIPMENT but original quote technical role classified RADIO_REMOTE",
+      "fixedFiles": [
+        "frontend/src/project0553/data/controlledTagMappingPilot0553.js",
+        "frontend/scripts/validate-0553-controlled-tag-mapping.cjs"
+      ],
+      "sourceJoinFunctionAfterFix": "RADIO_REMOTE",
+      "sourceQuoteAndLockedLedgerChanged": false,
+      "staticJoinCheck": "ALL_9_QUOTE_FUNCTIONS_MATCH",
+      "localBuild": "PENDING_USER_EXECUTION",
+      "customerReleaseAllowed": false,
+      "handoffRef": "docs/handoff/pj2608-0553/00_HANDOFF_CURRENT.md#2026-10-13--zwp20-mr-502-001-row4-map-04-source-join-incident--correction"
+    },
+    {
+      "id": "NESTED_MODULE_ID_OVERFLOW_20261013",
+      "date": "2026-10-13",
+      "projectId": "PJ2608-0553",
+      "affectedArea": "10 Budgetary Working Preview: TAG drilldown, mapping audit, RFQ particular evidence, source-bulk-lifecycle tables",
+      "issue": "Some nested modules had no visible ID on their collapsed summary and nested tables overflowed desktop width; RFQ Common and Conflict counts lacked full visible rows.",
+      "implementation": [
+        "ControlledModuleSection0553.jsx",
+        "LocationBomDetail0553.jsx",
+        "TagMappingAudit0553.jsx",
+        "SimpleBom0553.jsx",
+        "project0553.css"
+      ],
+      "contract": "docs/handoff/pj2608-0553/24_MODULE_DISCLOSURE_ID_CONTRACT_REV01.md",
+      "regression": "frontend/scripts/validate-0553-nested-module-contract.cjs",
+      "status": "CODE_COMMITTED_STATIC_REVIEW_ONLY",
+      "localBuild": "PENDING_USER_EXECUTION",
+      "browserVerification": "PENDING",
+      "sourceOrLedgerChanged": false,
+      "customerReleaseAllowed": false,
+      "otherModules01To10Inventory": "NOT_FULLY_AUDITED"
+    },
+    {
+      "id": "ZWP20_ODU_9_VENDOR_LINES_4_COST_OWNERS_20261013",
+      "date": "2026-10-13",
+      "affectedComponent": "bid.budget.bom.zwp20.mr-502-001.4.mapping-audit.vendor-quote-lines",
+      "sourceQuote": "NG/260916-ADV-DAP1",
+      "quotedFunctionCount": 9,
+      "ownerCount": 4,
+      "oduSubset": [
+        "B-1",
+        "B-2",
+        "B-3",
+        "B-4",
+        "B-5"
+      ],
+      "oduWorkingUSD": 7288.65,
+      "iduPoEUSD": 671.27,
+      "surgeUSD": 614.2,
+      "antennaUSD": 4709.77,
+      "nonOduSubtotalUSD": 5995.24,
+      "allNineWorkingUSD": 13283.89,
+      "originalQuoteWidePricedLinesUSD": 30432.13,
+      "sourceUnpriced": [
+        "B-4"
+      ],
+      "underlyingLedgerChanged": false,
+      "uiFix": "Controlled owner-grouped reconciliation/read-only source evidence",
+      "testGuard": "validate:0553-controlled-tag-mapping + validate:0553-nested-module-contract",
+      "localRuntime": "PENDING",
+      "engineeringApproval": false,
+      "releaseAllowed": false
+    },
+    {
+      "id": "FOUR_STAGE_TAG_BOM_20261013",
+      "date": "2026-10-13",
+      "project": "PJ2608-0553",
+      "scope": "Budget Working Preview MR0001 location TAGs",
+      "fourStages": [
+        "required-bom",
+        "working-priced-bom",
+        "vendor-comparison",
+        "engineering-verification"
+      ],
+      "modelFile": "frontend/src/project0553/data/tagBomFourStageReadModel0553.js",
+      "uiFile": "frontend/src/project0553/TagFourStageWorkbench0553.jsx",
+      "parentFile": "frontend/src/project0553/LocationBomDetail0553.jsx",
+      "acceptanceScript": "frontend/scripts/validate-0553-tag-four-stage-bom.cjs",
+      "guide": "docs/handoff/pj2608-0553/25_TAG_BOM_FOUR_STAGE_USER_GUIDE_REV01.md",
+      "sourceDataMutation": false,
+      "lockedCostFilesChanged": false,
+      "engineeringPhysicalSkuApproved": false,
+      "baselineODUCostUSD": 7288.65,
+      "vendorQuotedQtyNotEngineeringQty": true,
+      "quoteRegionB4Rate": null,
+      "independentV8ModelSmoke": "PASS__ALL_4_OWNERS_CONTROLLED_MTO_NEXTG_QUOTE_AND_MAP09_RECONCILIATION_FIXTURE",
+      "nodeBuild": "PENDING_USER_RUN",
+      "browserAcceptance": "PENDING",
+      "approvedCustomerRelease": false,
+      "ownerScopedAdditionalProof": {
+        "source": "CONTROLLED_TAG_MAP09_AUDIT_READ_ONLY",
+        "ownerTotalsUSD": {
+          "MR-502-001.4": 7288.65,
+          "MR-502-001A.5": 671.27,
+          "ANT-502-001.6": 4709.77,
+          "SA-502-001.10": 614.2
+        },
+        "assertFailClosedOnMismatch": true,
+        "foreignCurrencySumRejected": true
+      },
+      "realNodeBabelWebpackBrowser": "PENDING_LOCAL_USER_CHECK"
+    },
+    {
+      "id": "MASTER_SYSTEM_LOCATION_MTO_DISCLOSURE_20261013",
+      "date": "2026-10-13",
+      "correctModuleId": "bid.budget.bom.system-location-mto",
+      "previousIncorrectInterpretation": "ZWP8 Engineering Detail was wrongly considered the missing master module",
+      "fixed": "Real ControlledModuleSection with visible Copy ID and +/- wrapping the entire conditional system/location MTO table after filters",
+      "zwp8RowIdUnchanged": true,
+      "misplacedDetailWrapperReverted": true,
+      "costOrDataChanged": false,
+      "sourceChecks": "COMPLETED",
+      "localBuild": "PENDING",
+      "browserAcceptance": "PENDING"
+    },
+    {
+      "id": "ABC_READINESS_37_OF_55_PRICE_EVIDENCE_20261013",
+      "date": "2026-10-13",
+      "moduleId": "bid.budget.bom.system-location-mto.abc-readiness",
+      "scope": "MR0001 7 locations A working cost; Part B Rev05 project-wide Working SELL reference; C1/C2 spare option source",
+      "priceEvidenceCoverageExample": "37/55 means rate evidence candidate only, not 37 approved items",
+      "ABCAudit": "A cost current-source MR0001 only; B cost NULL; C cost NULL; A+B+C complete NULL; do not add B working sell THB 3804160 to A cost",
+      "BWorkingSellTHB": 3804160,
+      "detailModules": [
+        "price-evidence-gaps",
+        "part-a-gaps",
+        "part-b-wbs",
+        "part-c-spares"
+      ],
+      "model": "frontend/src/project0553/data/abcWorkingReadiness0553.js",
+      "renderer": "frontend/src/project0553/AbcCostReadiness0553.jsx",
+      "regression": "frontend/scripts/validate-0553-abc-readiness.cjs",
+      "sourceOrCostLedgerMutated": false,
+      "localBuild": "PENDING_USER_EXECUTION",
+      "browserAcceptance": "PENDING",
+      "customerRelease": false,
+      "userGuide": "docs/handoff/pj2608-0553/26_ABC_COST_READINESS_USER_GUIDE_REV01.md",
+      "sourceCBSConflict": "Rev05 B4/B5/C1/C2 definitions differ from lifecycle working crosswalk; require RFQ Template CBS mapping before line-level posting",
+      "sourceStaticChecks": "PASS; local runtime PENDING"
+    },
+    {
+      "id": "ALL_LOCATION_SINGLE_WORKING_TOTAL_20261013",
+      "date": "2026-10-13",
+      "module": "bid.budget.bom.system-location-mto",
+      "uiDecision": "Only original 4th source-facts summary card shows one summed allocated working total for ALL locations; extra ABC readiness dashboard unmounted",
+      "source": "getMR0001LocationCost0553 for each of all 7 locations; same as per-WP rendered ledger",
+      "currency": "Separate original USD/THB; THB converted only with configured positive FX",
+      "semanticScope": "MR0001 allocated working equipment and attributable bulk only; full all-MR A+B+C remains not established",
+      "doesNotInclude": [
+        "Part B Working Sell",
+        "Part C Spares",
+        "Other MR totals",
+        "Standalone Bulk Scenarios",
+        "Unselected Vendor Quotes"
+      ],
+      "costLedgerMutation": false,
+      "verification": "Static source code checked; local Node/Webpack/browser PENDING",
+      "userAcceptance": "PENDING_BROWSER_QA"
+    },
+    {
+      "id": "ZWP8_COST_OWNERSHIP_AUDIT_20261013",
+      "date": "2026-10-13",
+      "moduleId": "bid.budget.bom.zwp8.cost-ownership-audit",
+      "issue": "ZWP8 Brownfield internally budgeted as two new radios/antennas with double-charged B-8 surge, and B-6/B-7 PoE misallocated to ODU while two IDU TAGs unpriced",
+      "sourceMto": "MR0001 Rev04 grouped row43, SA grouped row45, LAN44, TCAB46, bulk47",
+      "sourceLinks": [
+        "ZWP8-ZWP20 PTMP",
+        "ZWP8-ZWP22 PTMP",
+        "ZPQ-ZWP8 PTP"
+      ],
+      "currentWorking": {
+        "USD": 27796.18,
+        "THB": 499906,
+        "totalAtFX31_5THB": 1375485.67,
+        "pricedTags": 9,
+        "totalTags": 11
+      },
+      "identifiedDuplicate": {
+        "nextGLine": "B-8",
+        "count": 2,
+        "amountUSD": 1228.4,
+        "amountTHBAt31_5": 38694.6
+      },
+      "misplacedButNotExtra": {
+        "nextGLines": [
+          "B-6",
+          "B-7"
+        ],
+        "twoIDUTags": [
+          "MR-502-003A",
+          "MR-502-004A"
+        ],
+        "amountUSD": 1342.54
+      },
+      "illustrativeUniqueOwner": {
+        "USD": 26567.78,
+        "THB": 499906,
+        "totalAtFX31_5THB": 1336791.07
+      },
+      "workingScenarioStatus": "2 radio + 2 4ft antenna NEW/REUSE & OEM review pending",
+      "auditFile": "frontend/src/project0553/data/zwp8CostOwnershipAudit0553.js",
+      "rendererFile": "frontend/src/project0553/ZWP8CostOwnershipAudit0553.jsx",
+      "regression": "frontend/scripts/validate-0553-zwp8-cost-ownership.cjs",
+      "memo": "docs/handoff/pj2608-0553/27_ZWP8_COST_OWNERSHIP_FIRST_PRINCIPLES_AUDIT_REV01.md",
+      "lockedLedgerChanged": false,
+      "sourceQuoteChanged": false,
+      "managementAntennaDecisionChanged": false,
+      "correctiveChangeRequiresApproval": true,
+      "localRuntime": "PENDING",
+      "customerReleaseAllowed": false
+    },
+    {
+      "id": "ZPQ_ZWP8_PTP_EXISTING_CORRECTION_20261013",
+      "date": "2026-10-13",
+      "existingLink": "SCADA-ZPQ-ZWP8 PTP",
+      "installedState": "EXISTING_BASELINE",
+      "source": "BLD-0001 Rev.C1 Sheet7 Notes9",
+      "otherSource": "BOD-0001 Rev.C2 §7.2 and SPE-0001 Rev.C2 §6.1.3 propose ADDITIONAL NEW LINK after capacity review",
+      "scopeInterpretation": "Existing link != unapproved additional new equipment; confirm separate physical new scopes and endpoints",
+      "auditStatus": "LINK_LIFECYCLE_CORRECTED__NEW_CAPACITY_REQUIREMENT_REQUIRES_PHYSICAL_PROOF",
+      "sourceDataFilesModified": [
+        "frontend/src/project0553/data/scadaLinkEvidence.js",
+        "frontend/src/project0553/data/zwp8CostOwnershipAudit0553.js",
+        "frontend/src/project0553/ZWP8CostOwnershipAudit0553.jsx",
+        "frontend/scripts/validate-0553-zwp8-cost-ownership.cjs"
+      ],
+      "vendorPriceChanged": false,
+      "originalWorkingLedgerChanged": false,
+      "localBuild": "PENDING",
+      "browserAcceptance": "PENDING",
+      "customerReleaseAllowed": false
+    },
+    {
+      "id": "ZWP8_AFC_ROLE_COST_REALLOCATION_20261013",
+      "date": "2026-10-13",
+      "scope": "ZWP8 only; MR0001 Row43 and dependent audit/status; excluded cable glands",
+      "status": "COMMITTED_SOURCE__LOCAL_RUNTIME_QA_PENDING",
+      "roleCounts": {
+        "PTMPBase": 1,
+        "PTMPSector90": 1,
+        "PTPAdditionalEndpointCandidate": 1,
+        "PTPParabolicCandidate": 1,
+        "IDUPowerInterfaces": 2,
+        "SurgeOwners": 2
+      },
+      "tagRateUSD": {
+        "MR-502-003": 13002,
+        "MR-502-003A": 671.27,
+        "ANT-502-002": 602.69,
+        "MR-502-004": 7288.65,
+        "MR-502-004A": 671.27,
+        "ANT-502-003": 4709.77,
+        "SA-502-002": 614.2,
+        "SA-502-003": 614.2
+      },
+      "totalUSD": 28174.05,
+      "unchangedTHBCost": 499906,
+      "planningFx31_5TotalTHB": 1387388.58,
+      "noCurrentDuplicatedSurge": true,
+      "BSLicence": "A-4 PMP MAX QUOTED; OEM CAPACITY OPEN",
+      "NMS": "Existing ZPQ NMS incremental node/port licence unknown",
+      "countryRegionLicence": "A-3/B-4 source rates NULL",
+      "enclosure": "New TCAB-500-003 retained, existing TCAB-WP8-500 procurement zero outside row list",
+      "LAN": "Existing switch tie-in; working Cisco LAN TAG not zeroed because new enclosure has L3 switch and scope needs reconciliation",
+      "cableGland": "NOT TOUCHED; other chat",
+      "customerReleaseAllowed": false,
+      "verification": "Source equations manually checked; user local npm/webpack/browser not yet run"
+    }
+  ]
+}

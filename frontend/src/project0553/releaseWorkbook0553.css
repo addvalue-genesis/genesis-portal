@@ -1,0 +1,177 @@
+/* PJ2608-0553: 10.3 pricing CFO and native-like RELEASE preview.
+   Isolated stylesheet; no changes to actual customer Excel template. */
+.p553-release-dash,.p553-release-workbook{min-width:0}
+/* 10.3 CFO: compact Excel-style summary, no separate KPI cards. */
+.p553-cfo-table-wrap{width:100%;overflow-x:auto;margin:12px 0}
+.p553-cfo-table{width:100%;min-width:1060px;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.p553-cfo-table th,.p553-cfo-table td{padding:9px 10px;vertical-align:middle;line-height:1.45;border:1px solid #cfdae2}
+.p553-cfo-table thead th{font-size:12px;line-height:1.45;background:#e8eff5;text-align:center;color:#18364a}
+.p553-cfo-table tbody th{text-align:left;font-weight:600;width:19%}
+.p553-cfo-table tbody th small{display:block;color:#697c8c;font-weight:400;font-size:10px;margin-top:4px;overflow-wrap:anywhere}
+.p553-cfo-table tbody td:not(:last-child){text-align:right}
+.p553-cfo-number{white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums}
+.p553-cfo-table tbody td.p553-cfo-state{font-size:11px;text-align:left;white-space:normal;min-width:175px}
+.p553-cfo-subtotal th,.p553-cfo-subtotal td{font-weight:700;background:#f1f4f6}
+.p553-cfo-detail{margin-top:12px}
+.p553-cfo-detail summary{font-size:12px;cursor:pointer;font-weight:600}
+/* One native-like sheet per tab; MR price rows + UI-only TAG drilldown. */
+.p553-preview-totals{display:flex;flex-wrap:wrap;gap:12px;border:1px solid #d0dce5;background:#f4f7f9;padding:9px 11px;margin:6px 0 12px;font-size:12px}
+.p553-preview-totals span{padding-right:12px;border-right:1px solid #d2dce4}
+.p553-preview-totals span:last-child{border-right:0}
+.p553-mr-preview-row td{background:#f6f9fc;font-weight:600}
+.p553-mr-preview-row td small{font-size:10px;color:#627b89;font-weight:400}
+.p553-mr-expand{border:1px solid #aabfcc;background:#f2f7fa;color:#145873;font-size:10px;padding:4px;cursor:pointer;border-radius:3px;white-space:nowrap}
+.p553-mr-expand:hover{background:#e1f1f7}
+.p553-drilldown-only td{background:#f8fbfd!important;padding:12px!important}
+.p553-drilldown-table-wrap{overflow-x:auto;max-width:100%;margin:7px 0}
+.p553-drilldown-table{min-width:950px;border-collapse:collapse;width:100%;table-layout:fixed;font-size:11px}
+.p553-drilldown-table th,.p553-drilldown-table td{border:1px solid #c9d9e5;padding:6px 8px;text-align:left;background:white;font-weight:400}
+.p553-drilldown-table thead th,.p553-drilldown-table tfoot th,.p553-drilldown-table tfoot td{background:#eaf1f5;font-weight:600}
+.p553-drilldown-table .p553-price-cell{text-align:right;white-space:nowrap}
+.p553-native-warning{border:1px solid #e0bb7e;background:#fff9eb;padding:8px 10px;font-size:11px;margin:10px 0;line-height:1.6}
+.p553-release-checks{margin:10px 0}
+.p553-release-checks table td{font-size:11px}
+.p553-release-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}
+.p553-release-controls label{font-size:12px;display:flex;flex-direction:column;gap:4px}
+.p553-release-controls select{padding:8px 12px;border:1px solid #bfd0dc;border-radius:5px;background:white}
+.p553-release-controls button:disabled{opacity:.65;cursor:not-allowed}
+.p553-release-tabs{display:flex;gap:4px;overflow-x:auto;white-space:nowrap;border-bottom:1px solid #bdc8d0;margin-top:12px;padding:0 0 5px}
+.p553-release-tabs button{border:1px solid #c7d0d9;background:#f2f6fa;border-radius:5px 5px 0 0;padding:8px 11px;font-size:12px;color:#334155}
+.p553-release-tabs button.is-active{background:#fff;color:#075b85;border-bottom:3px solid #075b85;font-weight:700}
+.p553-native-sheet{background:white;color:#111;border:1px solid #c4c7cb;padding:12px 12px 16px;margin-top:8px;font-family:Arial,"Microsoft YaHei",sans-serif;font-size:12px}
+.p553-native-title{text-align:center;font-weight:700;line-height:1.45;padding:13px 6px;background:#fff;font-size:12px}
+.p553-sheet-meta{display:grid;grid-template-columns:120px 1fr;gap:3px 12px;margin-bottom:12px}
+.p553-sheet-meta strong{font-weight:700}
+.p553-sheet-scroll{width:100%;overflow-x:auto}
+.p553-customer-table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:1080px;color:#000;background:#fff;font-family:Arial,"Microsoft YaHei",sans-serif;font-size:12px}
+.p553-customer-table th,.p553-customer-table td{border:1px solid #222;padding:5px 6px;vertical-align:middle;overflow-wrap:anywhere;line-height:1.25;background:white}
+.p553-customer-table th{background:#d9d9d9;font-weight:700;text-align:center;white-space:normal}
+.p553-customer-table th:nth-child(1){width:6%}
+.p553-customer-table th:nth-child(2){width:15%}
+.p553-customer-table th:nth-child(3){width:19%}
+.p553-customer-table th:nth-child(4){width:24%}
+.p553-customer-table th:nth-child(5){width:6%}
+.p553-customer-table th:nth-child(6){width:9%}
+.p553-customer-table th:nth-child(7){width:10%}
+.p553-customer-table th:nth-child(8){width:11%}
+.p553-customer-table small{display:block;margin-top:2px;color:#697481;font-size:10px}
+.p553-customer-table td.p553-price-cell{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
+.p553-customer-table .p553-sheet-section td{font-weight:700;padding:9px 6px}
+.p553-customer-table .p553-sheet-subheading td{font-weight:700;background:#f9fafb}
+.p553-customer-table .p553-sheet-total td{background:#ffff6a;font-weight:700;text-align:right}
+.p553-customer-table .p553-sheet-highlight td{background:#ffff65;font-weight:700}
+.p553-customer-table .p553-empty-row td{height:19px}
+.p553-annex-table th{background:white}
+.p553-annex-table th:nth-child(1){width:6%}
+.p553-annex-table th:nth-child(2){width:8%}
+.p553-annex-table th:nth-child(3){width:21%}
+.p553-annex-table th:nth-child(4){width:20%}
+.p553-annex-table th:nth-child(5){width:12%}
+.p553-annex-table th:nth-child(6){width:7%}
+.p553-annex-table th:nth-child(7){width:12%}
+.p553-annex-table th:nth-child(8){width:12%}
+.p553-annex-table th:nth-child(9){width:10%}
+.p553-annex-table td{min-height:25px}
+/* 10.3 Annex B10/B11/B13/C1/C2: native-like detail cells plus source-to-total audit. */
+.p553-annex-reconciliation{margin:12px 0;overflow-x:auto}
+.p553-annex-reconciliation .p55-table{min-width:800px}
+.p553-annex-reconciliation .p55-table th,.p553-annex-reconciliation .p55-table td{padding:7px 9px;font-size:11px}
+.p553-annex-reconciliation .p553-price-cell{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p553-annex-reconciliation small{display:block;color:#5d7180;font-size:10px;margin-top:3px}
+.p553-annex-table .p553-price-cell small{font-weight:400;line-height:1.35;white-space:normal}
+.p553-annex-remark{color:#e11d29;padding:10px 6px;line-height:1.4}
+.p553-origin-link{display:inline-flex;margin:2px 2px 2px 4px;color:#09668e;background:#eef8fc;border:1px solid #add5e3;border-radius:3px;font-size:10px;padding:2px 5px;cursor:pointer}
+.p553-origin-link:hover{background:#d9effb}
+.p553-release-overflow{border:1px solid #de9b26;background:#fff9eb;padding:10px;margin-top:10px;line-height:1.5}
+.p553-release-overflow button{margin-left:12px}
+.p553-source-drawer{border:1px solid #6dacc4;background:#f1f8fc;color:#18374a;margin:14px 0;padding:12px;border-radius:5px}
+.p553-source-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.p553-source-head button{border:0;background:transparent;color:#246386;cursor:pointer}
+.p553-source-drawer p{margin:7px 0;font-size:12px;overflow-wrap:anywhere}
+@media(max-width:620px){.p553-native-sheet{padding:6px}.p553-cfo-table{min-width:1020px}}
+
+/* 10.3 spare annex: give TAG summary, purpose, technical spec and material room.
+   Browser-only read view. Native XLSX column widths and merges are untouched. */
+.p553-customer-table.p553-annex-table{min-width:1440px}
+.p553-annex-table th:nth-child(1){width:4%}
+.p553-annex-table th:nth-child(2){width:16%}
+.p553-annex-table th:nth-child(3){width:20%}
+.p553-annex-table th:nth-child(4){width:24%}
+.p553-annex-table th:nth-child(5){width:14%}
+.p553-annex-table th:nth-child(6){width:5%}
+.p553-annex-table th:nth-child(7){width:17%}
+.p553-annex-table .p553-annex-tags{line-height:1.5;overflow-wrap:anywhere}
+.p553-annex-table .p553-annex-description small{line-height:1.45}
+.p553-annex-table .p553-annex-specification,
+.p553-annex-table .p553-annex-materials{line-height:1.45}
+
+.p553-official-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.p553-official-service{white-space:pre-line;margin-top:6px;line-height:1.45}
+.p553-official-usd .p553-customer-table{min-width:960px}
+.p553-official-usd .p553-official-annex th:nth-child(5){width:13%}
+.p553-official-usd .p553-official-annex th:nth-child(6){width:5%}
+.p553-official-usd .p553-official-annex th:nth-child(7),
+.p553-official-usd .p553-official-annex th:nth-child(8){width:11%}
+
+/* B10 10.3.3 primary SKU/source preview: quote evidence, never an additive ledger.
+   The old 29+ installed TAG references must NOT expand one kit row vertically. */
+.p553-b10-sku-preview{margin:12px 0;border:1px solid #b8cbd7;border-radius:6px;padding:12px;min-width:0;background:#fbfdfe}
+.p553-b10-sku-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.p553-b10-sku-heading strong{display:block;font-size:14px;color:#203e50}
+.p553-b10-sku-heading small{display:block;font-size:11px;margin-top:5px;color:#536b7b}
+.p553-b10-sku-state{font-size:10px;font-weight:700;letter-spacing:.02em;color:#6a4a0d;white-space:nowrap}
+.p553-b10-sku-scroll{overflow-x:auto;max-width:100%;border:1px solid #d1dce3;border-radius:4px}
+.p553-b10-sku-table{min-width:1240px;width:100%;table-layout:fixed}
+.p553-b10-sku-table th,.p553-b10-sku-table td{padding:8px 9px!important;vertical-align:top;line-height:1.5;overflow-wrap:anywhere;font-size:11px}
+.p553-b10-sku-table thead th{background:#edf2f5}
+.p553-b10-sku-table th:nth-child(1){width:23%}
+.p553-b10-sku-table th:nth-child(2){width:16%}
+.p553-b10-sku-table th:nth-child(3){width:19%}
+.p553-b10-sku-table th:nth-child(4){width:7%}
+.p553-b10-sku-table th:nth-child(5){width:9%}
+.p553-b10-sku-table td small{display:block;font-size:10px;color:#536b7b;margin-top:3px}
+.p553-b10-sku-table code{font-size:10px;overflow-wrap:anywhere;white-space:normal}
+.p553-b10-sku-table .p553-b10-sku-group th{background:#e5edf2;border-top:1px solid #c3d4df;text-align:left}
+.p553-b10-sku-table .p553-b10-sku-number{text-align:right;font-variant-numeric:tabular-nums}
+.p553-b10-sku-tags summary{font-size:10px;color:#155e85;cursor:pointer}
+.p553-b10-sku-tags>div{max-height:128px;overflow-y:auto;padding:4px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;background:#f2f7fa}
+.p553-b10-sku-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:11px;color:#425869}
+.p553-annex-table .p553-annex-tag-list>div{max-height:148px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
+.p553-annex-table .p553-annex-tag-list .p553-annex-tag-chip{display:block;font-size:10px;overflow-wrap:anywhere}
+
+/* B10 source-owned commercial presentation shared by Budget/10.3.3/10.3.4.
+   All wider engineering/SKU evidence stays in 10.2 Working, not in issued pages. */
+.p553-release-workbook,.p553-native-sheet,.p553-sheet-scroll,.p553-b10-scope-compact{
+ min-width:0;max-width:100%;box-sizing:border-box;
+}
+.p553-native-sheet{overflow:hidden}
+.p553-sheet-scroll{overflow-x:auto;overscroll-behavior-x:contain}
+.p553-b10-commercial-summary{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.p553-b10-commercial-heading{display:flex;flex-direction:column;gap:4px;margin:10px 0 12px}
+.p553-b10-commercial-heading strong{font-size:13px;color:#223b4c}
+.p553-b10-commercial-heading small{font-size:11px;line-height:1.5;color:#596b76}
+.p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.p553-b10-commercial-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;color:#1c2731;background:#fff;font-size:12px}
+.p553-b10-commercial-table th,.p553-b10-commercial-table td{border:1px solid #c6d1d7;padding:8px 9px;vertical-align:middle;line-height:1.4;overflow-wrap:anywhere}
+.p553-b10-commercial-table thead th{background:#e8eef2;text-align:left;font-weight:600}
+.p553-b10-commercial-table th:nth-child(1){width:13%}
+.p553-b10-commercial-table th:nth-child(2){width:39%}
+.p553-b10-commercial-table th:nth-child(3){width:10%}
+.p553-b10-commercial-table th:nth-child(4){width:18%}
+.p553-b10-commercial-table th:nth-child(5){width:20%}
+.p553-b10-commercial-table--internal th:nth-child(1){width:11%}
+.p553-b10-commercial-table--internal th:nth-child(2){width:34%}
+.p553-b10-commercial-table--internal th:nth-child(3){width:9%}
+.p553-b10-commercial-table--internal th:nth-child(4){width:15%}
+.p553-b10-commercial-table--internal th:nth-child(5){width:17%}
+.p553-b10-commercial-table--internal th:nth-child(6){width:14%}
+.p553-b10-commercial-table td small{display:block;color:#667987;font-size:10px;margin-top:3px}
+.p553-b10-commercial-number{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.p553-b10-commercial-table tfoot th{background:#f1f5f8;text-align:right}
+.p553-b10-commercial-note{font-size:11px;color:#526473;margin:10px 0 0;line-height:1.5}
+@media (max-width:720px){
+ .p553-b10-commercial-scroll{overflow-x:auto}
+ .p553-b10-commercial-table{min-width:650px}
+ .p553-b10-commercial-table th,.p553-b10-commercial-table td{padding:7px 6px}
+ .p553-release-workbook .p553-native-sheet{padding:7px}
+}

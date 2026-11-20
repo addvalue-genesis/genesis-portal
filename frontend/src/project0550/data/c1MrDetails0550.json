@@ -1,0 +1,1085 @@
+{
+  "schema": "pj2608-0550.c1-mr-details/1",
+  "documentNo": "MM-ASK-1A-APF-TEL-MR-0001",
+  "revision": "B1",
+  "sourceSha256": "5199bb61c01db86f7c971117ad5e54b7d04e70061d6ad999b72f858122a0de5a",
+  "sourceUrl": "https://drive.google.com/file/d/1KFCSSo3D50fAS6LUBz0IYKPG4NjGVcDS/view",
+  "purpose": "Read-only native MR description text for existing C1 rows. No financial values, quantity adoption, engineering acceptance or saved-record migration. Appendix1.8 follows the index; original cable-page heading discrepancy remains documented in mrReaderProfile0550.",
+  "rows": {
+    "MR-B1-11-APF-01": {
+      "text": "VHF DMR Radio System comprised of :\n- Radio System Cabinet 1 Ea.\n- VHF Dipole DMR Antenna Tx 1 Ea.\n- VHF Dipole DMR Antenna Rx 1 Ea.\n- VHF Omni DMR Antenna 2 Ea\n- VHF DMR Repeater 3 Ea.\n- VHF CCMS server 1 Ea.\n- VHF RM server 1 Ea.\n- VHF DMR Fixed Radio 6 Ea.\n- VHF DMR Mobile Radio 21 Ea.\n- VHF Dispatch Panel 1 Ea\n- VHF DMR Handheld Radio (ATEX or 13:19UL) 98 Ea. (For APF, AMS01,\nABV01, ACP and MOGE)\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-02": {
+      "text": "VHF-FM Marine Radio System comprised of :\n- Radio System Cabinet 1 Ea.\n- VHF-FM Marine Fixed Radio 4 Ea.\n- VHF-FM Marine IP Gateway 2 Ea.\n- VHF-FM Marine Antenna 4 Ea.\n- VHF-FM Marine Handheld Radio 10 Ea. (For APF and ACP,\n- II2G Ex ib IIA T3 Gb as minimum)\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-03": {
+      "text": "MF/HF SSB Radio System comprised of :\n- MF/HF SSB Fixed Radio 1 Ea.\n- MF/HF SSB Radio IP Gateway 1 Ea.\n- MF/HF SSB Antenna 1 Ea.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-04": {
+      "text": "VHF-AM Aeronautical Radio System comprised of :\n- VHF-AM Aeronautical Fixed Radio 3 Ea.\n- VHF Aeronautical IP Gateway 1 Ea.\n- VHF-AM Aeronautical Antenna 3 Ea.\n- VHF-AM Aeronautical Handheld Radio (ATEX or UL) 4 Ea.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-06": {
+      "text": "RoIP Dispatch Console system comprised of :\n- Radio System Cabinet 1 Ea.\n- Dispatcher Server 1 Ea.\n- Radio RoIP server 1 Ea.\n- Voice Log server 1 Ea.\n- IP Gateway 6 Ea.\n- Radio console 2 Ea.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-07": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11
+      ]
+    },
+    "MR-B1-11-APF-08": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        11,
+        12
+      ]
+    },
+    "MR-B1-11-ACP-01": {
+      "text": "VHF DMR Radio System comprised of :\n- Radio System Cabinet 1 Ea.\n- Access Switch 1 Ea.\n- VHF DMR Omni Antenna 1 Ea.\n- VHF DMR Antenna 4 Stack 1Ea.\n- VHF DMR IP Gateway 4 Ea.\n- VHF DMR Fixed Radio 2 Ea.\n- Radio console 1 Ea\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ACP-02": {
+      "text": "VHF-FM Marine Radio System comprised of :\n- VHF-FM Marine Radio Fixed 2 Ea.\n- VHF-FM Marine Antenna 2 Ea.\n- VHF-FM Marine IP Gateway 2 Ea.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ACP-03": {
+      "text": "MF/HF SSB Radio System comprised of :\n- MF/HF SSB Antenna 1 Ea.\n- MF/HF SSB Radio Fixed 1 Ea.\n- MF/HF SSB IP Gateway 1 Ea.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ACP-04": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ACP-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ACP-06": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ABV01-01": {
+      "text": "VHF Radio System comprised of :\n- VHF DMR Mobile 1 Ea.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-11-ABV01-02": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        12
+      ]
+    },
+    "MR-B1-12-APF-01": {
+      "text": "VSAT System Cabinet comprised of :\n- VSAT System Cabinet : 1 Set (by TSI)\n- VSAT Anenna with LNB, BUC and RCU : 1 Set (by CPY)\n- VSAT Modem : 1 Ea. (by CPY)\n- Router : Cisco 8300 1 Set. (by TSI)\n- Installation kid and Accessory: 1 Set (by TSI)\n- Etc. (by TSI)\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-APF-02": {
+      "text": "VSAT System Cabinet comprised of :\n- VSAT System Cabinet : 1 Set (by TSI)\n- VSAT Anenna with LNB, BUC and RCU : 1 Set (by CPY)\n- VSAT Modem : 2 Ea. (by CPY)\n- Splitter Combination : 1 Sets. (by CPY)\n- Router : Cisco 8300 1 Set. (by TSI)\n- Installation kid and Accessory: 1 Set (by TSI)\n- Etc. (by TSI)\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-APF-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-APF-04": {
+      "text": "VSAT antenna (with LNB, BUC and RCU), Splitter combiner and Modem for\ncommunication to offshore shall be supplied by CPY and installed by offshore team",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-APF-05": {
+      "text": "KU/C Band Internet System comprised of :\n- KU/C Band Internet Antenna with LNB, BUC : 1 Set\n- Satellite Modem 1 Ea: (To be installed in VSAT Cabinet)\nMIR:Contention 1:4 to 1:10\nBandwidth 2-10 Mbps\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-YANGON-01": {
+      "text": "VSAT System Cabinet comprised of :\n- VSAT System Cabinet : 1 Set (by TSI)\n- VSAT Anenna with LNB, BUC and RCU : 1 Set (by CPY)\n- VSAT Modem : 2 Ea. MIR (Contention 1:4 to 1:10) (by CPY)\n- Splitter Combination : 1 Sets. (by CPY)\n- Router : Cisco 8300 1 Set. (by TSI)\n- Installation kid and Accessory: 1 Set (by TSI)\n- Etc. (by TSI)\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-YANGON-02": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-12-ACP-01": {
+      "text": "KU/C Band Internet System comprised of :\n- KU/C Band Internet Antenna with LNB, BUC : 1 Set\n- Satellite Modem 1 Ea: (To be installed in VSAT Cabinet)\nMIR:Contention 1:4 to 1:10\nBandwidth 2-10 Mbps\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        14
+      ]
+    },
+    "MR-B1-13-APF-01": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-02": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-04": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-06": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-07": {
+      "text": "IP Phone (Ex) comprised of :\n- IP Phone (Ex) complete with Telephone Hood, junction box with fiber optic\nmedia converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-08": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-09": {
+      "text": "LAN Cabinet comprised of :\n- Fire Wall 2 Ea\n- Core Switch 2 Ea.\n- Distribution 2 Ea.\n- Access Switch 1 Ea. With PoE or PoE++ ports\n- UTP Patch Panel 3 Ea.\n- IP PBX Server 1 Ea.\n- Wireless Controller 1 Ea.\n- Media Converter 3 Ea.\nThis LAN Cabinet shall be installed in Instrument & Telecom Room.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-10": {
+      "text": "LAN Cabinet comprised of :\n- FOC Patch Panel 1 Ea.\n- Access Switch 2 Ea. With PoE or PoE++ ports\n- UTP Patch Panel 2 Ea.\nThis LAN Cabinet shall be installed in Catering Building, Warehouse &\nWorkshop Building, Accommaodation Building, Office Building, Store\nBuilding, Sub Station Building, Security Building and Fire/Safety Building\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-11": {
+      "text": "CCTV Cabinet comprised of :\n- Access Switch 1 Ea. With PoE or PoE++ ports\n- UTP Patch Panel 1 Ea.\n- CCTV NVR Sever 1 Ea.\n- Media Converter 28 Ea.\nThis CCTV Cabinet shall be installed in Instrument & Telecom Room.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        16
+      ]
+    },
+    "MR-B1-13-APF-12": {
+      "text": "CCTV monitor will be installed in Control room and Security Building\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-13": {
+      "text": "CCTV monitor will be installed in Control room and Security Building\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-14": {
+      "text": "MET Cabinet comprised of :\n- Meteorological Sever\nThis MET Cabinet shall be installed in Instrument & Telecom Room.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-15": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-16": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-17": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-APF-18": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-01": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-02": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-04": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-06": {
+      "text": "LAN Cabinet C/W\n- Core Switch 2 Ea\n- Access Switch 2 Ea. With PoE or PoE++ ports\n- Access Switch 1 Ea. With PoE or PoE++ ports\n- Fiber Optic patch Panel 5 Ea\n- UTP Patch Panel 2 Ea\n- Firewall (IT) 1 Ea\n- Firewall (OT) 1 Ea\n- CCTV NVR 1 Ea\n- MET Server 1 Ea\n- Terminal Box 1 Ea\n- Media Converter 1 Ea\nThis LAN Cabinet shall be installed in E/I CABIN\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-07": {
+      "text": "LAN Cabinet comprised of :\n- ODF Panel 2 Ea.\n- Access Switch 2 Ea.\n- UTP Patch Panel 2 Ea.\nThis LAN Cabinet shall be installed in Office Building.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        17
+      ]
+    },
+    "MR-B1-13-ACP-08": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ACP-09": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ACP-10": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ACP-11": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ACP-12": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ACP-13": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ABV01-01": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ABV01-02": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ABV01-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ABV01-04": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-ABV01-05": {
+      "text": "LAN Cabinet comprised of :\n- ODF Panel 2 Ea.\n- Access Switch 2 Ea. With PoE or PoE++ ports\n- UTP Patch Panel 2 Ea.\nThis LAN Cabinet shall be installed in Office Building.",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-01": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-02": {
+      "text": "CCTV System comprised of :\n- CCTV Camera complete with junction box with fiber optic media converter\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-04": {
+      "text": "LAN Cabinet comprised of :\n- ODF Panel 2 Ea.\n- Access Switch 2 Ea. With PoE or PoE++ ports\n- UTP Patch Panel 2 Ea.\nThis LAN Cabinet shall be installed in Office Building.",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-13-AMS01-06": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        18
+      ]
+    },
+    "MR-B1-14-APF-01": {
+      "text": "PAGA System Cabinet comprised of :\n- PAGA Control Unit\n- ETP Panel 1 Ea.\n- PAGA Amplifier 11 Ea.\n- Amplifier Interface\n- Beacon Interface\n- F&G Interface\n- IP Phone Interface\n- Entertainment Interface\n- Etc.\nThis PAGA cabinet system shall be installed in Control Building.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-02": {
+      "text": "PAGA System Cabinet comprised of :\n- PAGA Amplifier 2 Ea.\n- Amplifier Interface\n- Beacon Interface\n- F&G Interface\n- IP Phone Interface\n- Entertainment Interface\n- Etc.\nThese PAGA cabinet systems shall be installed in building as follows:\n- Catering Building\n- Warehouse & Workshop Building\n- Office Building\n- Store Building\n- Security Building\n- Fire/Safety Building\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-03": {
+      "text": "PAGA System Cabinet comprised of :\n- PAGA Amplifier 3 Ea.\n- Amplifier Interface\n- Beacon Interface\n- F&G Interface\n- IP Phone Interface\n- Entertainment Interface\nThis PAGA cabinet system shall be installed in Accommodation Building.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-04": {
+      "text": "OCU shall be completed with special cable to PAGA system cabinet",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-06": {
+      "text": "ZONE 1/2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-07": {
+      "text": "'ZONE 2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-APF-08": {
+      "text": "ZONE 1/2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        20
+      ]
+    },
+    "MR-B1-14-ACP-01": {
+      "text": "PAGA System Cabinet comprised of :\n- PAGA Control Unit 1 Ea.\n- ETP Panel 1 Ea.\n- PAGA Amplifier 2 Ea.\n- Amplifier Interface\n- Beacon Interface\n- F&G Interface\n- IP Phone Interface\n- Entertainment Interface\nThis PAGA cabinet system shall be installed in Office/Gurad House building.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        21
+      ]
+    },
+    "MR-B1-14-ACP-02": {
+      "text": "ZONE 1/2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        21
+      ]
+    },
+    "MR-B1-14-ACP-03": {
+      "text": "'ZONE 2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        21
+      ]
+    },
+    "MR-B1-14-ACP-04": {
+      "text": "ZONE 1/2, depend on hazardous area or not.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        21
+      ]
+    },
+    "MR-B1-14-ACP-05": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        21
+      ]
+    },
+    "MR-B1-15-APF-01": {
+      "text": "Microwave System comprised of :\n-Microwave Cabinet 1 Ea.\n-Microwave Outdoor Unit 2 Ea.\n-Microwave Indoor Unit 2 Ea.\n-Microwave Antena 2 Ea.\n-Access Switch 1 Ea.\n-Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)\nNote: Microwave Indoor Unit and Wireless Broadband Indoor Unit shall be\ninstalled in same cabinet.",
+      "physicalPages": [
+        23
+      ]
+    },
+    "MR-B1-15-APF-02": {
+      "text": "- Cable from Microwave IDU to Microwave ODU\n- Cable from Microwave ODU to Antenna\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        23
+      ]
+    },
+    "MR-B1-15-ACP-01": {
+      "text": "Microwave System comprised of :\n-Microwave Outdoor Unit 2 Ea.\n-Microwave Indoor Unit 2 Ea.\n-Microwave Antena 2 Ea.\n-Etc.\nNote: Microwave Indoor Unit shall be installed in Radio cabinet",
+      "physicalPages": [
+        23
+      ]
+    },
+    "MR-B1-15-ACP-02": {
+      "text": "- Cable from Microwave IDU to Microwave ODU\n- Cable from Microwave ODU to Antenna\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        23
+      ]
+    },
+    "MR-B1-16-APF-01": {
+      "text": "Entertainment System comprised of :\n- Satellite Dish C-Band 1 Ea.\n- LNB 1 Ea. for two output\n- Etc.\nThis Satellite dish shall be installed for Accommodation Building.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-02": {
+      "text": "Entertainment System comprised of :\n- Satellite Dish C-Band 1 Ea.\n- LNB 1 Ea. for four output\n- Etc.\nThis Satellite dish shall be installed for Catering Building.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-03": {
+      "text": "Home Theatre & Karaoke comprised of :\n- Radio Receiver and Mixer Power Amplifier Player\n- Speaker and Wireless Microphone\n- Karaoke Server\n- Blu-ray & DVDs Player.\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-04": {
+      "text": "SMART TV comprised of :\n- Screen Display 50\"\n- Type: 4K UHD\n- Resolution: 4K (3840 x 2160p)\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-05": {
+      "text": "SMART TV comprised of :\n- Screen Display 70\"\n- Type: 4K UHD\n-Resolution: 4K (3840 x 2160p)\n- Etc.\nThis Smart TV for Home Theater & Karaoke",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-06": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-07": {
+      "text": "For Entertainment\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-08": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-09": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-10": {
+      "text": "Entertainment System Cabinet comprised of :\n- Entertainment System Cabinet : 1 Set\n- Digital Head End : 2 Ea\n- Access Switch 1 Ea.\n- UTP Patch Panel 1 Ea.\n- ODF Panel 1 Ea.\n- PAGA Interface\n- Etc.\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-16-APF-11": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        25
+      ]
+    },
+    "MR-B1-17-APF-01": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-02": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-03": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-04": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-05": {
+      "text": "- Dual type Transmitter A and B\n(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-06": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-07": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-08": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-09": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-10": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-17-APF-11": {
+      "text": "(Refer to Documents / Drawings in Appendix 2 for reference)",
+      "physicalPages": [
+        27
+      ]
+    },
+    "MR-B1-18-APF-01": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-02": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-03": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-04": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-05": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-06": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-07": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-08": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-09": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-10": {
+      "text": "For ANTENNA",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-11": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-12": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-13": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-14": {
+      "text": "PAGA CABLES",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-15": {
+      "text": "PAGA CABLES",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-16": {
+      "text": "PAGA CABLES",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-17": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-18": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-19": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-20": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-APF-21": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-01": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-02": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-03": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-04": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-05": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-06": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-07": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-08": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-09": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-10": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-11": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-12": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-13": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-14": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-15": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-16": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-17": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-18": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-19": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ACP-20": {
+      "text": "",
+      "physicalPages": [
+        29
+      ]
+    },
+    "MR-B1-18-ABV01-01": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-02": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-03": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-04": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-05": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-06": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-07": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-08": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-09": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-10": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-11": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-ABV01-12": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-01": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-02": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-03": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-04": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-05": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-06": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-07": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-08": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-09": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-10": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-11": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-AMS01-12": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-01": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-02": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-03": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-04": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-05": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-06": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-07": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-08": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    },
+    "MR-B1-18-FOC-WITH-PIPELINE-09": {
+      "text": "",
+      "physicalPages": [
+        30
+      ]
+    }
+  }
+}

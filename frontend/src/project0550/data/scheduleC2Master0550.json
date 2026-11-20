@@ -1,0 +1,309 @@
+{
+  "schema": "genesis.0550.schedule-c2-master.v1",
+  "projectId": "PJ2608-0550",
+  "documentNo": "MM-ASK-00-GEN-TEQ-TEL-SPIR-0001",
+  "reconciledA1Item4USD": 47492.76,
+  "pricedCount": 12,
+  "openCount": 3,
+  "appendices": [
+    {
+      "id": "1.1",
+      "title": "APPENDIX 1.1 · SCOPE OF SUPPLY FOR VHF AND MF/HF",
+      "systems": [
+        {
+          "systemToken": "TEL-RADIO-DTRS",
+          "systemName": "VHF DMR Radio System",
+          "mainEquipmentNo": "TEL-RADIO-DTRS · APF-DTRS-01 / ACP-DTRS-01 / ABV01-DTRS-01",
+          "vendorEquipmentNo": "MOTOROLA-DTRS-R2",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1101 / MR Appendix 1.1 (1.1.1–1.1.16)",
+          "entries": [
+            {
+              "id": "C2-11-DTRS-01",
+              "mrId": "MR-B1-11-APF-01",
+              "site": "APF",
+              "partsDescription": "VHF DMR Radio System — Pre-Commissioning & Commissioning Spare (Tag No.: APF-DTRS-01)",
+              "vendorSerialPartsNo": "Motorola Solutions / Model: SLR 5500 & DP4801Ex / P/N: MOT-DTRS-COMM-KIT (Serial No.: To be advised upon delivery)",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "1",
+              "recommendedQty": 1,
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "totalWeightKg": "TBC (Per Vendor Packing List)",
+              "pointOfManufacture": "Malaysia / USA",
+              "shippingFrom": "Singapore",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": 4250.00,
+              "totalCostUSD": 4250.00,
+              "status": "PRICED",
+              "internalAudit": {
+                "workingLineId": "LINE-B5-DTRS-COMM-01",
+                "siEquationId": "B5-C2-OEM-QTY",
+                "markupRule": "Standard 5%+5%+20%",
+                "notes": "APF 1.1.1 VHF DMR Radio System commissioning spare; excludes non-MR AMS01"
+              }
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-RADIO-MARINE",
+          "systemName": "VHF-FM Marine Radio System",
+          "mainEquipmentNo": "TEL-RADIO-MARINE · APF-VHF-MAR-01 / ACP-VHF-MAR-01",
+          "vendorEquipmentNo": "JOTRON-MARINE-VHF",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1102 / MR Appendix 1.1",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-RADIO-SSB",
+          "systemName": "MF/HF SSB Radio System",
+          "mainEquipmentNo": "TEL-RADIO-SSB · APF-MFHF-01",
+          "vendorEquipmentNo": "FURUNO-FS-2575C",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1103 / MR Appendix 1.1",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-RADIO-AERO",
+          "systemName": "VHF-AM Aeronautical Radio",
+          "mainEquipmentNo": "TEL-RADIO-AERO · APF-VHF-AM-01",
+          "vendorEquipmentNo": "JOTRON-TR910",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1104 / MR Appendix 1.1",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-TELT",
+          "systemName": "Telecom Towers",
+          "mainEquipmentNo": "TEL-TELT · APF-TWR-60M / ACP-TWR-30M",
+          "vendorEquipmentNo": "MASTER-TOWER-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1108 / MR Appendix 1.1",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "1.2",
+      "title": "APPENDIX 1.2 · SATELLITE / MICROWAVE COMMUNICATION",
+      "systems": [
+        {
+          "systemToken": "TEL-DMR",
+          "systemName": "Microwave Communication System",
+          "mainEquipmentNo": "TEL-DMR · APF-DMR-01 / ACP-DMR-01",
+          "vendorEquipmentNo": "CERAGON-IP50CX-R11",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1501 / MR Appendix 1.5",
+          "entries": [
+            {
+              "id": "C2-12-DMR-01",
+              "mrId": "MR-B1-15-APF-01",
+              "site": "APF",
+              "partsDescription": "Microwave Communication System — Pre-Commissioning & Commissioning Spare (Tag No.: APF-DMR-01 / ACP-DMR-01)",
+              "vendorSerialPartsNo": "Ceragon Networks / Model: FibeAir IP-50CX / P/N: CER-IP50CX-COMM-01 (Serial No.: To be advised upon delivery)",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "2",
+              "recommendedQty": 1,
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "totalWeightKg": "TBC (Per Vendor Packing List)",
+              "pointOfManufacture": "Israel / Europe",
+              "shippingFrom": "Israel / Singapore",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPEN",
+              "internalAudit": {
+                "workingLineId": "LINE-B5-DMR-COMM-01",
+                "siEquationId": "B5-C2-OEM-QTY",
+                "markupRule": "DMR Ceragon Custom Rule",
+                "notes": "Ceragon R12 ODU spare in C4 Capital Spares; commissioning spare OEM breakdown OPEN"
+              }
+            }
+          ]
+        },
+        {
+          "systemToken": "TEL-VSAT",
+          "systemName": "VSAT System",
+          "mainEquipmentNo": "TEL-VSAT · APF-VSAT-01 / ACP-VSAT-01",
+          "vendorEquipmentNo": "COMPANY-VSAT-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1201 / MR Appendix 1.2",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-VSAT-KU",
+          "systemName": "KU/C Band Internet",
+          "mainEquipmentNo": "TEL-VSAT-KU · APF-KU-01",
+          "vendorEquipmentNo": "KU-BAND-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1202 / MR Appendix 1.2",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "1.3",
+      "title": "APPENDIX 1.3 · NETWORK & LAN",
+      "systems": [
+        {
+          "systemToken": "TEL-LAN",
+          "systemName": "Network System",
+          "mainEquipmentNo": "TEL-LAN · APF-SW-CORE-01 / APF-SW-DIST-01 / ACP-SW-01",
+          "vendorEquipmentNo": "CISCO-C9300L-LAN",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1301 / MR Appendix 1.3",
+          "entries": [
+            {
+              "id": "C2-13-LAN-01",
+              "mrId": "MR-B1-13-APF-01",
+              "site": "APF",
+              "partsDescription": "Network System (Core / Distribution Switches & SFP Transceivers) — Pre-Commissioning & Commissioning Spare (Tag No.: APF-SW-CORE-01)",
+              "vendorSerialPartsNo": "Cisco / Model: Catalyst C9300L-24P-4X / P/N: PWR-C1-715WAC-P (Serial No.: To be advised upon delivery)",
+              "interchangeabilityA": "2",
+              "interchangeabilityB": "12",
+              "recommendedQty": 2,
+              "delivery": "FOB Major Port in China — Per Project Schedule 11.M",
+              "totalWeightKg": "4.80",
+              "pointOfManufacture": "China",
+              "shippingFrom": "Shanghai, China",
+              "deliveryTerm": "FOB",
+              "unitCostUSD": 1850.00,
+              "totalCostUSD": 3700.00,
+              "status": "PRICED",
+              "internalAudit": {
+                "workingLineId": "LINE-B5-LAN-STARTUP-01",
+                "siEquationId": "B5-C2-OEM-QTY",
+                "markupRule": "Standard 5%+5%+20%"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.4",
+      "title": "APPENDIX 1.4 · IP TELEPHONY / PABX / VIDEO CONF / EX-TEL",
+      "systems": [
+        {
+          "systemToken": "TEL-IPP",
+          "systemName": "IP Telephone System",
+          "mainEquipmentNo": "TEL-IPP · APF-IPP-01 / ACP-IPP-01",
+          "vendorEquipmentNo": "CISCO-CUCM-IPP",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1302 / MR Appendix 1.3",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-PABX",
+          "systemName": "PABX System",
+          "mainEquipmentNo": "TEL-PABX · APF-PABX-01",
+          "vendorEquipmentNo": "AVAYA-PABX-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1303 / MR Appendix 1.3",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-LAN-VCS",
+          "systemName": "Conferencing System",
+          "mainEquipmentNo": "TEL-LAN-VCS · APF-VCS-01",
+          "vendorEquipmentNo": "POLY-VCS-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1304 / MR Appendix 1.3",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "1.5",
+      "title": "APPENDIX 1.5 · PUBLIC ADDRESS AND GENERAL ALARM (PAGA)",
+      "systems": [
+        {
+          "systemToken": "TEL-PAGA",
+          "systemName": "PAGA System",
+          "mainEquipmentNo": "TEL-PAGA · APF-PAGA-01 / ACP-PAGA-01",
+          "vendorEquipmentNo": "INDUSTRONIC-A20261632-005",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1401 / MR Appendix 1.4",
+          "entries": [
+            {
+              "id": "C2-15-PAGA-01",
+              "mrId": "MR-B1-14-APF-01",
+              "site": "APF",
+              "partsDescription": "Public Address and General Alarm (PAGA) System — Pre-Commissioning & Commissioning Spare (Tag No.: APF-PAGA-01 / ACP-PAGA-01)",
+              "vendorSerialPartsNo": "INDUSTRONIC / Model: INTRON-D plus / P/N: A20261632-005-KIT (Serial No.: To be advised upon delivery)",
+              "interchangeabilityA": "1",
+              "interchangeabilityB": "2",
+              "recommendedQty": 1,
+              "delivery": "CIF Yangon, Myanmar — Per Project Schedule 11.M",
+              "totalWeightKg": "TBC (Per Vendor Packing List)",
+              "pointOfManufacture": "Germany",
+              "shippingFrom": "Frankfurt, Germany",
+              "deliveryTerm": "CIF",
+              "unitCostUSD": null,
+              "totalCostUSD": null,
+              "status": "OPEN",
+              "internalAudit": {
+                "workingLineId": "LINE-B5-PAGA-COMM-01",
+                "siEquationId": "B5-C2-OEM-QTY",
+                "markupRule": "PAGA Industronic Rule",
+                "notes": "Commissioning kit item in A1-05; additional spares per equipment OPEN"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "1.6",
+      "title": "APPENDIX 1.6 · CCTV SYSTEM",
+      "systems": [
+        {
+          "systemToken": "TEL-CCTV",
+          "systemName": "CCTV System",
+          "mainEquipmentNo": "TEL-CCTV · APF-CCTV-01 / ACP-CCTV-01",
+          "vendorEquipmentNo": "HIKVISION-CCTV-SYS",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1305 / MR Appendix 1.3",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "1.7",
+      "title": "APPENDIX 1.7 · FIBER OPTIC / ENTERTAINMENT",
+      "systems": [
+        {
+          "systemToken": "TEL-FO",
+          "systemName": "FOC and Cables",
+          "mainEquipmentNo": "TEL-FO · APF-FODP-01 / ACP-FODP-01",
+          "vendorEquipmentNo": "CORNING-FODP-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1801 / MR Appendix 1.8",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-ES",
+          "systemName": "Entertainment System",
+          "mainEquipmentNo": "TEL-ES · APF-ENT-01 / ACP-ENT-01",
+          "vendorEquipmentNo": "TRIAX-ENT-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1601 / MR Appendix 1.6",
+          "entries": []
+        }
+      ]
+    },
+    {
+      "id": "1.8",
+      "title": "APPENDIX 1.8 & COMMON · MET / NDB / AIS / COMMON",
+      "systems": [
+        {
+          "systemToken": "TEL-MET",
+          "systemName": "Meteorological System",
+          "mainEquipmentNo": "TEL-MET · APF-MET-01",
+          "vendorEquipmentNo": "VAISALA-MAWS-01",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1306 / MR Appendix 1.3",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-NDB",
+          "systemName": "Non-Directional Beacon",
+          "mainEquipmentNo": "TEL-NDB · APF-NDB-01",
+          "vendorEquipmentNo": "NAUTEL-VR250",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1701 / MR Appendix 1.7",
+          "entries": []
+        },
+        {
+          "systemToken": "TEL-AIS",
+          "systemName": "AIS System",
+          "mainEquipmentNo": "TEL-AIS · APF-AIS-01",
+          "vendorEquipmentNo": "SAAB-R5-AIS",
+          "referenceDrawings": "10008-ASK-TEL-DWG-1001 / MR Appendix 1.0",
+          "entries": []
+        }
+      ]
+    }
+  ]
+}

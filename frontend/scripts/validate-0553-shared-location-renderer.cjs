@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const parent=read("SimpleBom0553.jsx"),child=read("LocationBomDetail0553.jsx"),ledger=read("data/mr0001TagCostLedger0553.js");
+assert(parent.includes('<LocationBomDetail0553 site={g.site} fx={fx}/>'));
+assert(!parent.includes('g.site==="ZWP20"&&<div className="p55-panel"><div'));
+assert(!parent.includes('g.site!=="ZWP20"&&<LocationBomDetail0553'));
+assert(ledger.includes('if(site==="ZWP20")return deriveZWP20SiteCost0553().rows'));
+assert(child.includes('v.detail||v.components||[]'));
+assert(child.includes("Engineering Derivation / Vendor Breakdown"));
+assert(child.includes(".derivation"));
+assert(child.includes("Original Unit Rate")||child.includes("Original Rate"));
+console.log("PASS all MR0001 sites use the single LocationBomDetail0553 renderer; ZWP20 retains its cost derivation");

@@ -1,0 +1,20 @@
+// PJ2608-0553 L3.B / Engineering bulk take-off register, source-first.
+// Candidate items are NOT quantities, selected product SKUs or approved prices.
+// Never infer cable length from the 53 km RF path.
+export const BULK_TAKEOFF_0553=[
+ {mr:"MR-0001",category:"SCADA enclosure",item:"SCADA equipment enclosure / TCAB",driver:"Number of cabinet assemblies by location and certified equipment arrangement",source:"MR0001 Rev04 + BLD/LAY + Ex/environment requirements",qty:null,unit:"set",rate:null,currency:null,priceBasis:"UNPRICED_ENGINEERING_TAKEOFF",note:"Not ATEX telephone JB. Dimension, heat, certification, cable entries and power required"},
+ {mr:"MR-0001",category:"SCADA RF/data bulk",item:"RF & Ethernet surge protection, feeder/connectors, CAT6A, glands and earthing",driver:"Radio/port count and actual routed cable lengths",source:"MR0001 MTO Rev04 + BLD/LAY; Next G, INNOVA quote evidence",qty:null,unit:"lot",rate:null,currency:null,priceBasis:"SOURCE_PRICE_CANDIDATES_NOT_ALLOCATED",note:"Track OEM licence enabling throughput and NMS separately; do not merge optional/spares"},
+ {mr:"MR-0002",category:"DMR LNA",item:"RFI RX3852-2002-11 LNA module",driver:"Approved receive-chain topology and number of sites",source:"MOT RFI Datasheet + DMR CAL/RPT",qty:null,unit:"each",rate:null,currency:null,priceBasis:"NO_VENDOR_QUOTATION",note:"BDA is not proven equivalent. LNA requires SMA(F), 11–28 VDC; DC/alarm mating plugs separately if needed"},
+ {mr:"MR-0002",category:"DMR RF bulk",item:"½-inch RF feeder, SMA adapters/pigtails, N-type connectors, grounding and cable supports",driver:"Sum of field-measured Yagi-to-LNA and LNA-to-radio/omni routes plus approved wastage factor",source:"MOT Solution LNA image + BLD/LAY/DWG to verify",qty:null,unit:"m/set",rate:null,currency:null,priceBasis:"ROUTE_LENGTH_NOT_VERIFIED",note:"53 km is radio path distance, not feeder length"},
+ {mr:"MR-0002",category:"DMR LNA enclosure",item:"LNA weather/hazard-area enclosure, glands, PSU, alarm wiring and mounting",driver:"LNA arrangement, dimensions, thermal, hazardous-area classification and cable entries",source:"RFI RX3852 datasheet + site hazardous-area / layout drawings",qty:null,unit:"set",rate:null,currency:null,priceBasis:"ENGINEERING_CONFIGURATION_REQUIRED",note:"Separate from SCADA enclosure and telephone JB"},
+ {mr:"MR-0003",category:"ATEX telephone JB",item:"Explosion-proof telephone junction box and certified glands/terminals",driver:"Phone/sounder locations, circuit count, terminations and cable entries",source:"MR0003 MTO/DTS + BLD/LAY; BARTEC historical quote candidate",qty:null,unit:"each",rate:null,currency:null,priceBasis:"HISTORICAL_CANDIDATE_NOT_ALLOCATED",note:"Dedicated ATEX phone JB, not SCADA cabinet; verify Ex concept and material"},
+ {mr:"MR-0003",category:"Telephone bulk",item:"Power/data/signal cable, glands, supports, labels and terminations",driver:"Actual route length and number of device terminations",source:"MR0003 layout / wiring and Ex site requirements",qty:null,unit:"m/set",rate:null,currency:null,priceBasis:"ENGINEERING_TAKEOFF_REQUIRED",note:"Account for sounder and phone independently"},
+ {mr:"MR-0004",category:"RACON installation bulk",item:"RF/power/interface cables, weatherproof glands, mounting and earthing",driver:"Approved RACON location, equipment layout and termination schedule",source:"MR0004 BLD/LAY/DWG + Orga/MGW offers",qty:null,unit:"lot",rate:null,currency:null,priceBasis:"ENGINEERING_TAKEOFF_REQUIRED",note:"Check Ex certification, marine environment and OEM package exclusions"}
+];
+export const BULK_TAKEOFF_POLICY_0553={
+ price:null,quantitiesVerified:false,released:false,
+ quantityFormula:"Route length = sum approved physical cable segments; procurement length = route length x (1+approved wastage) + approved service loops",
+ amountFormula:"Cost = verified quantity x quote-backed unit cost + applicable delivery/conditions",
+ duplicateControl:"Classify per MR; do not add bulk A5 twice to system costs",
+ sourceRule:"Notes/images suggest components, but not confirmed route length, enclosure certification or price"
+};

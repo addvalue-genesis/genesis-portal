@@ -1,0 +1,92 @@
+{
+  "evidenceInteractions": "PASS",
+  "coverageInteractions": "PASS",
+  "browser": "131.0.6778.0",
+  "viewport": "1440x1000",
+  "method": "production; click-to-two-animation-frames; warm 7 cycles plus optional evidence interactions; import is wall-clock automation time; headless environment, not user Windows; memory coarse; not React Profiler",
+  "metrics": {
+    "19 Systems": {
+      "n": 8,
+      "medianMs": 25.4,
+      "maxMs": 30.4
+    },
+    "PAGA toggle": {
+      "n": 14,
+      "medianMs": 31.5,
+      "maxMs": 32.2
+    },
+    "First Principles": {
+      "n": 10,
+      "medianMs": 46.1,
+      "maxMs": 67.3
+    },
+    "Budget": {
+      "n": 10,
+      "medianMs": 23.3,
+      "maxMs": 33.6
+    },
+    "Working Preview": {
+      "n": 8,
+      "medianMs": 25.6,
+      "maxMs": 32.8
+    },
+    "Released Customer Output": {
+      "n": 8,
+      "medianMs": 31.5,
+      "maxMs": 32.1
+    },
+    "Budgetary Submission": {
+      "n": 8,
+      "medianMs": 31.8,
+      "maxMs": 38.4
+    },
+    "Evidence import": {
+      "n": 1,
+      "medianMs": 77,
+      "maxMs": 77
+    },
+    "XLSX download": {
+      "n": 1,
+      "medianMs": 34,
+      "maxMs": 34
+    }
+  },
+  "hashes": {
+    "systems": "e7fa9360122cb57387a2de1ee8f4b373e9d4bb4b480845f6b63615b5c4bf20cf",
+    "engineering": "d8d5f759594332b42e785e76981b429a9b8984decd90438787e0cb79911da16f",
+    "budgetary": "2a09eaff6a53bbabebd4275fb249e02fb2d3f32c9005fc8b4e8f199efe91c07c",
+    "working": "8426905ced0ca4c111cec85c62de18f174bb9492176074e0f52792e3c38bf064",
+    "released": "ec70ce29870db0ddf6214481504c7cd706680abcec4722dde7b66cd9cfe85134",
+    "xlsx": "2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6"
+  },
+  "errors": [],
+  "longtasks": [
+    {
+      "start": 46.20000000298023,
+      "duration": 63
+    },
+    {
+      "start": 268.1000000014901,
+      "duration": 53
+    }
+  ],
+  "domNodes": 538,
+  "memory": {
+    "usedJSHeapSize": 23100000
+  },
+  "navigation": [
+    {
+      "domContentLoaded": 110,
+      "load": 110
+    }
+  ],
+  "protectedOutputParity": "PASS",
+  "parentCommit": "adcdf57fb7f1fa9b42162c7093981bae7ef532fe",
+  "measuredApplicationFiles": {
+    "frontend/src/project0550/pagaEvidenceModel.js": "59ed77629ef63a9e50e4888c84bc7909b282e44986101293b7c4c3dd189c7967",
+    "frontend/src/project0550/PagaEvidenceReview.jsx": "7c1eaf0c70e102dcc9a4f8136eee13fd6ab1fe267ad67f793dfe79ec9d1f4460",
+    "frontend/src/project0550/moduleRegistry.js": "075edc5120e057493af684c8f36db7389e98bcb5bf1bc8075ae14566a9c65519",
+    "frontend/src/project0550/project0550.css": "3cf84a3f2aef9d63985759b018bdf0c4d417b066d75e21dac2403190f75dbc85",
+    "frontend/src/pages/PJ26080550.jsx": "81c0d24b0d0fd96a019a6bb4f3e20545f90f0fc1159dba302b795c24c9acd7ea"
+  }
+}

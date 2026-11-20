@@ -1,0 +1,292 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
+import React from "react";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
+import {B3ResourcePriceDossier0553} from "./B3ResourcePriceDossier0553";
+import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
+import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
+import {B3SurveySatExecutionPlan0553} from "./B3SurveySatExecutionPlan0553";
+import {selectB3SurveySatExecutionPlan0553} from "./data/b3SurveySatExecutionPlan0553";
+import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
+import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
+import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
+import {selectB3HierarchicalPriceTable0553,B3_PRICE_ROW_CLASSES_0553 as PRICE_CLASS} from "./data/b3HierarchicalPriceTable0553";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
+import {selectB3B8SevenDayCommercialAllocation0553} from "./data/b3B8SevenDayCommercialAllocation0553";
+import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
+
+// 10.2 B3 — real TABLE for groups and nested MODULES, one read-only source model.
+// Table shows all prices even when details are collapsed. Native details preserves
+// Project Module Navigator ancestor opening. Do NOT post supplier/historical/audit.
+const ROOT="bid.budget.working.bc.b3";
+const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const fmtPrice=n=>Number.isFinite(n)?money(n):"—";
+const copyInSummary=id=><span className="p553-b3-table-copy"
+ onClick={e=>{e.preventDefault();e.stopPropagation();}}
+ onKeyDown={e=>e.stopPropagation()}>
+ <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
+ </span>;
+const qtyUnit=row=>row.qty===null?"—":row.qty.toLocaleString("en-US")+" "+(row.unit||"");
+const rateSource=row=>row.unitRateTHB===null?"":money(row.unitRateTHB)+" / "+(row.unit||"unit");
+const gridColumns=Object.freeze(["No.","Work Type / Module ID","Qty / Rate","Supplier Quote USD",
+ "Supplier Source THB","Historical / Scenario / Audit THB","B3 Working SELL THB","Treatment / Owner"]);
+function TablePriceCells0553({row,number,title,isGroup=false,fx}){
+ const quote=Number.isFinite(row.vendorQuoteUSD)?row.vendorQuoteUSD:null;
+ const sourceThb=quote===null?null:Math.round((quote*fx+Number.EPSILON)*100)/100;
+ const reference=Number.isFinite(row.historicalTHB)?row.historicalTHB:row.referenceTHB;
+ return <>
+  <span className="p553-b3-table-cell p553-b3-table-num">{number}</span>
+  <span className="p553-b3-table-cell p553-b3-table-name">
+   <strong>{title}</strong>
+   <small>{row.driver}</small>
+   <code>{row.moduleId}</code>
+  </span>
+  <span className="p553-b3-table-cell p553-b3-table-qty">
+   {qtyUnit(row)}
+   {row.unitRateTHB!==null&&<small>{rateSource(row)}</small>}
+  </span>
+  <span className="p553-b3-table-cell p553-b3-table-amount">{usd(quote)}</span>
+  <span className="p553-b3-table-cell p553-b3-table-amount">{fmtPrice(sourceThb)}</span>
+  <span className="p553-b3-table-cell p553-b3-table-amount">{fmtPrice(reference)}</span>
+  <span className="p553-b3-table-cell p553-b3-table-amount">
+   <strong>{fmtPrice((isGroup&&row.kind!=="audit")?row.workingSellTHB:[PRICE_CLASS.INCLUDED_WORKING_SELL,PRICE_CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(row.priceClass)?
+    row.workingSellTHB:null)}</strong>
+  </span>
+  <span className="p553-b3-table-cell p553-b3-table-treatment">
+   <small>{isGroup?"GROUP ROLL-UP · B3 ONLY":row.status}</small>
+   <small>{row.owner||"B3"}</small>
+   <small>{row.priceClass===PRICE_CLASS.PURCHASED_SERVICE_WORKING_SELL?
+    "VQ-MGW QUOTED COST + 20%/5%/5% WS-B3 / CP HOLD":row.priceClass===PRICE_CLASS.SUPPLIER_QUOTE_REFERENCE?
+    "VQ-MGW / SOURCE ONLY":row.priceClass===PRICE_CLASS.INCLUDED_WORKING_SELL?
+    "SOW-B3 | WS-B3 | CP-B3 NOT ISSUED":"IC / AU / SC — NON-POSTING"}</small>
+  </span>
+ </>;
+}
+
+function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditContent}){
+ const suffix=item.moduleId.slice(ROOT.length+1);
+ const sat=workingRow.b3FortyDayBudget,fat=workingRow.b3ChinaFatBudget,veex=sat.veex;
+ const selected=workingRow.b3SelectedSatSurveyBudget;
+ switch(suffix){
+  case "mgw-r2-cover-20261020":
+   return <p>บริการ FAT ภายนอกถูกยกเลิกจาก B3; ผู้ขายอุปกรณ์ไม่มีบทบาทดำเนินการ FAT</p>;
+  case "revk-china-budget":
+   return <B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>;
+  case "fat-owner-transfer":
+   return <>
+    <MgwPaulVendorClarifications0553 code="B3"/>
+    {workingRow.b3FatOwnerTransfer&&<section className="p55-panel"
+     data-component-key={ROOT+".fat-owner-transfer"} style={{padding:12,marginTop:12}}>
+     <p className="p55-note">SAMTEL Warehouse FAT: ADDVALUE labour, local transfers and work insurance only. No purchased supplier FAT or facility reserve.</p>
+  <h4>B3 — FAT Cost Owner Reconciliation / Rev05</h4>
+     <p className="p55-note">Rev05 Bangkok FAT
+      <strong> {money(workingRow.b3FatOwnerTransfer.amountTHB)}</strong> is
+      SUPERSEDED, not another source of selected Working SELL. China witness/travel
+      <strong> {money(fat.fatWorkingSellTHB)}</strong> appears in B3.1.2 ONLY.</p>
+    </section>}
+   </>;
+  case "40-day-abc":
+   return <section className="p55-panel" data-component-key={ROOT+".40-day-abc"}
+    style={{padding:12,marginTop:12}}>
+    <B3SurveySatExecutionPlan0553 workingRow={workingRow} compact/>
+     <h4>Selected SAT/SIT 28 productive two-person Team-days = 56 MD</h4>
+     <p className="p55-note"><strong>Current Working SELL SAT Labour: {money(selected.satWorkingSellTHB)}</strong>
+      {" "}28 Senior Engineer MD × USD {selected.satRoleRates[0].usdPerPersonDay} + 28 RF Specialist MD × USD {selected.satRoleRates[1].usdPerPersonDay}, × FX {selected.fxTHBPerUSD}.
+      +2 Risk and +2 management reserve days are NOT priced. Historical 40-day estimate remains audit only.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Site / WBS</th><th>Function</th><th>People</th><th>Team-days</th><th>Man-days</th><th>Working SELL</th></tr></thead>
+      <tbody>{selected.satRows.map(r=><tr key={r.id}>
+       <td>{r.site} · {r.wbs}</td><td>{r.work}</td>
+       <td>{r.crew}</td><td>{r.days}</td><td>{r.plannedPersonDays}</td>
+       <td>{money(r.workingSellTHB)}</td></tr>)}</tbody>
+      <tfoot><tr><th colSpan={3}>Selected SAT Team total</th><th>28</th><th>56</th>
+       <th>{money(selected.satWorkingSellTHB)}</th></tr></tfoot>
+     </table></div>
+    <details className="p55-panel" style={{padding:10,marginTop:12}}>
+     <summary><strong>ดูตารางราคา SAT เดิม 40 วัน / 80 MD (Price Baseline — ไม่ใช่แผนปฏิบัติงาน)</strong></summary>
+    <h4>Historical 40-day / 80MD commercial audit only — NOT added to current B3</h4>
+    <p className="p55-note">{sat.persons} engineers × {sat.workdays} team-days =
+     {" "}{sat.personDays} paid person-days × USD {sat.rateUSDPerPersonDay}/person-day
+     × FX {sat.fxTHBPerUSD} = <strong>{money(sat.laborWorkingSellTHB)}</strong>.
+     VeEX {money(veex.workingSellTHB)} is NOT in this labour subtotal;
+     it belongs to B3.3.1.</p>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>Timebox / ID</th><th>Location / Activity</th><th>Team days</th>
+      <th>Person-days</th><th>Working SELL THB</th><th>Scope / Owner</th></tr></thead>
+     <tbody>{sat.rows.map(x=><tr key={x.id}>
+      <td>{x.id} · {x.wbs}</td><td>{x.site} · {x.reason}</td>
+      <td>{x.days}</td><td>{x.plannedPersonDays}</td>
+      <td>{money(x.workingSellTHB)}</td><td>B3 once, shared MR workload</td></tr>)}</tbody>
+    </table></div>
+    </details>
+   </section>;
+  case "site-survey-price":
+    return <section className="p55-panel" data-component-key={ROOT+".site-survey-price"}
+     style={{padding:12,marginTop:12}}>
+     <h4>B3.2.3 — Selected BF Site Survey 3 Site + 2 Travel Team-days / 10 MD</h4>
+     <p className="p55-note"><strong>Current budget allowance {money(selected.siteSurveyWorkingSellTHB)}</strong>;
+      physical BF revisit only on written JUTAL call-out and documented reason.
+      Rate is PRE-AWARD Working SELL, not payroll Direct Cost.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Site / Travel</th><th>Activity</th><th>People</th><th>Team-days</th>
+       <th>MD</th><th>SELL / person-day</th><th>Working SELL</th></tr></thead>
+      <tbody>{selected.siteSurveyRows.map(r=><tr key={r.id}>
+       <td>{r.site}</td><td>{r.work}</td><td>{r.crew}</td><td>{r.days}</td>
+       <td>{r.plannedPersonDays}</td><td>{money(selected.rateTHBPerPersonDay)}</td>
+       <td>{money(r.workingSellTHB)}</td></tr>)}</tbody>
+      <tfoot><tr><th colSpan={3}>Total BF Survey budget allowance</th><th>5</th><th>10</th><th>—</th>
+       <th>{money(selected.siteSurveyWorkingSellTHB)}</th></tr></tfoot>
+     </table></div>
+    </section>;
+   case "site-mr-sat-matrix":
+   return <B3SiteMrSatCoverage0553 workingRow={workingRow}/>;
+  case "veex-mx100":
+   return <section className="p55-panel" data-component-key={ROOT+".veex-mx100"}
+    style={{padding:12,marginTop:12}}>
+    <h4>B3.3.1 — Temporary VeEX MX100+ Test Instrument</h4>
+    <p className="p55-note">{veex.quantity} rental-days × {money(veex.rateTHB)} / day
+     = <strong>{money(veex.workingSellTHB)}</strong> (ex VAT).
+     Cost Owner B3; Working SELL already included; rental Direct Cost NOT ESTABLISHED.
+     No duplicate B11 handover special tool.</p>
+   </section>;
+  case "test-tools-ownership":
+   return <section className="p55-panel" data-component-key={ROOT+".test-tools-ownership"}
+    style={{padding:12,marginTop:12}}>
+    <h4>B3.3.2 — Test Tool Cost Owner / B11 Boundary</h4>
+    <p className="p55-note">Temporary calibrated RF analyser, signal generator,
+     SPL meter and specialised vessel/radar test support used only for FAT/SAT
+     are B3 candidates where independently incurred. No validated Qty × Rate yet,
+     so NO numerical amount or assumed zero-price posting.</p>
+    <p className="p55-note"><strong>B11 = Special Tools for Operation &amp; Maintenance</strong>
+     {" "}<ComponentCopyId projectId="PJ2608-0553"
+     componentKey="bid.budget.working.bc.b11"/>; tools included by MGW/OEM Part A
+     cannot be billed a second time. Confirm SKU / TAG / SPIR / supplier inclusion.</p>
+   </section>;
+  case "fat-training-7d-allocation":
+   return <B3B8SevenDayAllocation0553 b3={workingRow} b8={b8Row} owner="B3"/>;
+  case "working-sell-breakdown":
+   return <B3WorkingSellBreakdown0553 workingRow={workingRow}/>;
+  case "requirement-crosswalk":
+   return <B3RequirementWbsTrace0553 selectedOwner="B3"
+    navigationTarget={navigationTarget}/>;
+  case "source-cost-audit":
+   return <div data-component-key={ROOT+".source-cost-audit"}>{auditContent}</div>;
+  default:
+   throw Error("Unmapped B3 table Module ID: "+item.moduleId+
+    ". Add content to existing render registry before introducing a new B3 module.");
+ }
+}
+
+export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditContent=null}){
+ const rootRef=React.useRef(null);
+ if(!workingRow||workingRow.code!=="B3")return null;
+ const b8Row=selectBcTurnkeyWorkingCost0553().byCode.B8;
+ const integratedScenario=selectB3B8SevenDayCommercialAllocation0553({b3:workingRow,b8:b8Row});
+ const model=selectB3HierarchicalPriceTable0553(workingRow,integratedScenario);
+ const fieldPlan=selectB3SurveySatExecutionPlan0553(workingRow);
+ const expandAll=open=>rootRef.current?.querySelectorAll(
+  "details.p553-b3-table-group, details.p553-b3-table-item").forEach(node=>{node.open=open;});
+ return <section className="p553-b3-worktype p553-b3-price-table-section"
+  ref={rootRef} data-component-key={model.moduleId}>
+  <div className="p553-b3-worktype-header">
+   <div><h4>B3 — Hierarchical Working SELL / Supplier Cost Evidence Table</h4>
+    <p className="p55-note">Module ID: {copyInSummary(model.moduleId)}.
+     All B3.1–B3.4 and child prices visible BEFORE expanding. Click ＋ / −
+     to inspect details, source expense lines and cost ownership.</p>
+    <p className="p55-note"><strong>Canonical B3 Working SELL {money(model.totalWorkingSellTHB)}</strong>; ADDVALUE local FAT, BF Survey, SAT and temporary tools only. Actual Direct Cost NOT ESTABLISHED.</p>
+    <p className="p55-note"><strong>Source-verified split:</strong>
+     BOD Rev.C2 §8 already records prior surveys of ZPQ/ZWP8/ZWP11;
+     any new ADDVALUE BF visit is conditional, not a scheduled 7-site Survey.
+     SPE Rev.C2 §7.3.2 places SAT at JUTAL Zhuhai Fabrication Yard,
+     §7.3.3 requires distinct Offshore Commissioning after installation.
+     BF Survey 3 onsite +2 travel team-days {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
+     are included ONCE in the selected B3 Working SELL budget; actual Direct COST remains unknown and a physical revisit needs a written JUTAL call-out.
+     Current SAT labour is 28 productive team-days (56 MD); +2 Risk days are NOT priced. Old 40 days are audit only.</p>
+   </div>
+   <div className="p553-b3-actions">
+    <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>
+    <button type="button" className="p553-detail-button" onClick={()=>expandAll(false)}>− Collapse All</button>
+   </div>
+  </div>
+  <ServiceCommercialBasis0553 workingRow={workingRow}/>
+  <B3ResourcePriceDossier0553 workingRow={workingRow}/>
+  <div className="p55-table-wrap p553-b3-table-scroll">
+   <table className="p55-table p553-b3-hierarchical-table">
+    <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
+    <tbody>{model.groups.map(group=><tr key={group.moduleId} data-work-family={{fat:"fat",sat:"sat-commissioning",tools:"tools-reserve"}[group.kind]} className={"p553-b3-master-row p553-b3-master-row--"+group.kind}>
+     <td colSpan={gridColumns.length} className="p553-b3-flat-cell">
+      <details className={"p553-b3-table-group p553-b3-table-group--"+group.kind}
+       data-component-key={group.moduleId} open={group.kind==="fat"||group.kind==="sat"}>
+       <summary className="p553-b3-table-summary">
+        <span className="p553-b3-table-plus">+</span>
+        <TablePriceCells0553 number={group.number} title={group.title} row={group}
+         isGroup fx={model.supplierFxTHBPerUSD}/>
+        {copyInSummary(group.moduleId)}
+       </summary>
+       <div className="p553-b3-table-children">
+        {group.kind==="sat"&&<p className="p55-note">
+         <strong>Contractual work-front split: BF 3 sites conditional verification;
+          GF 4 sites Fabrication Yard SAT at Zhuhai; then GF Offshore Commissioning after installation.</strong>
+         {" "}New ADDVALUE persons × days for GF Yard and Offshore are NOT ESTABLISHED.
+         Selected 28 SAT team-days (56 MD) are the CURRENT priced labour basis; +2 risk days are NONPOSTING.
+          Old 40 team-days (80 MD) are historical audit only.
+          BF Survey allowance {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)} is included once in Working SELL, but execution needs a written work order.
+        </p>}
+        <table className="p55-table p553-b3-hierarchical-table p553-b3-subtable">
+         <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
+         <tbody>{group.items.map(item=><tr key={item.moduleId}
+          className={"p553-b3-detail-row p553-b3-detail-row--"+group.kind}>
+          <td colSpan={gridColumns.length} className="p553-b3-flat-cell">
+           <details className="p553-b3-table-item">
+            <summary className="p553-b3-table-summary p553-b3-table-summary--child">
+             <span className="p553-b3-table-plus">+</span>
+             <TablePriceCells0553 row={item} number={item.number} title={item.title}
+              fx={model.supplierFxTHBPerUSD}/>
+             {copyInSummary(item.moduleId)}
+            </summary>
+            <div className="p553-b3-table-expanded">
+             <p className="p55-note">Module ID: {copyInSummary(item.moduleId)} ·
+              <strong> Price Class: {item.priceClass}</strong>.
+              Vendor supplier quotations are purchase COST EVIDENCE; no withdrawn supplier service
+              selected through WS-B3 at 20+5+5 are priced. Historical/audit
+              references NEVER add new Working SELL.</p>
+             {item.supplierRows.length>0&&<div className="p55-table-wrap">
+              <table className="p55-table p55-table--compact">
+               <thead><tr><th>Supplier ID</th><th>Supplier Scope</th>
+                <th>Quoted USD</th><th>Reference THB</th><th>Cost Owner / Price Class</th></tr></thead>
+               <tbody>{item.supplierRows.map(x=><tr key={x.id}>
+                <td>{x.id}</td><td>{x.description}</td><td>{usd(x.usd)}</td>
+                <td>{money(x.usd*model.supplierFxTHBPerUSD)}</td>
+                <td>MGW / supplier cost evidence; B3 SELL non-additive</td>
+               </tr>)}</tbody>
+              </table>
+             </div>}
+             <B3DetailContents0553 item={item} workingRow={workingRow} b8Row={b8Row}
+              navigationTarget={navigationTarget} auditContent={auditContent}/>
+            </div>
+           </details>
+          </td>
+         </tr>)}</tbody>
+         <tfoot><tr><th colSpan={6}>{group.number} — Included Working SELL subtotal
+          (supplier/historical/audit excluded)</th><th className="p553-b3-money">
+          {group.kind==="audit"?"— (NON-POSTING)":money(group.workingSellTHB)}</th><th>ONE B3 owner</th></tr></tfoot>
+        </table>
+       </div>
+      </details>
+     </td>
+    </tr>)}</tbody>
+    <tfoot><tr><th colSpan={6}>B3 TOTAL — SELECTED INTERNAL WORKING SELL (B3.1+B3.2+B3.3;
+     B3.4 non-posting)</th><th className="p553-b3-money">
+     {money(model.totalWorkingSellTHB)}</th>
+     <th>Direct Cost NOT ESTABLISHED · Release HOLD</th></tr></tfoot>
+   </table>
+  </div>
+  <p className="p55-note"><strong>Price calculation rule:</strong>
+   Working SELL sums INCLUDED_WORKING_SELL plus PURCHASED_SERVICE_WORKING_SELL once.
+   Supplier quotations, if selected, are cost evidence;
+   historical and Audit mirror THB are separate non-additive reference columns. A future B3 Module MUST declare Module ID, Qty/Rate,
+   Cost Owner, Price Class, source evidence and content renderer; the
+   normalized table rejects extra/unreconciled postings.</p>
+ </section>;
+}

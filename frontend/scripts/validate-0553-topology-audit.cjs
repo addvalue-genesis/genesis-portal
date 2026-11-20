@@ -1,0 +1,11 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001TopologyQuantityAudit.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+const links=fs.readFileSync(path.join(root,"src/project0553/data/scadaLinkEvidence.js"),"utf8");
+assert.equal((links.match(/\{id:"SCADA-/g)||[]).length,5);
+for(const required of ["endpointCount:endpoints.length","linkCount:SCADA_LINKS_0553.length","requiredBaseRadioQty:null","baseStations:null","remoteUnits:null","siteAllocation:null","releaseAllowed:false","TOPO-04"])assert(model.includes(required),required);
+assert(ui.includes("MR0001_TOPOLOGY_QUANTITY_AUDIT.sites.map"));
+assert(ui.includes("NOT EQUIPMENT"));
+console.log("PASS 0553 RPT five-link topology and endpoint derivation guards; equipment quantities remain OPEN");

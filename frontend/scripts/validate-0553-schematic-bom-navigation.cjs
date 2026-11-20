@@ -1,0 +1,18 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const shell=read("src/common/ui/ProjectWorkspaceShell.jsx");
+const page=read("src/pages/PJ26080553.jsx");
+const schematic=read("src/project0553/ScadaSchematic0553.jsx");
+const commercial=read("src/project0553/CommercialWorkspace.jsx");
+const bom=read("src/project0553/SimpleBom0553.jsx");
+assert(shell.includes("controlledTab??internalTab")&&shell.includes("onTabChange"));
+assert(page.includes('setWorkspaceTab("budget")')&&page.includes("setFocusedBomLocation(site)"));
+assert(page.includes("<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>"));
+assert(/<CommercialWorkspace0553\b[^>]*focusedLocation=\{focusedBomLocation\}[^>]*\/>/.test(page),"Budget workspace must receive selected schematic location even with additional props");
+assert(schematic.includes("onOpenLocationBom?.(site)"));
+assert(/<SimpleBom0553\b[^>]*focusedLocation=\{focusedLocation\}[^>]*\/>/.test(commercial),"Commercial workspace must forward focused location to BOM with its FX/display props");
+assert(bom.includes("focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite"));
+assert(bom.includes('model.locations.filter(g=>site==="ALL"||g.site===site'),"location filter must use current group records");
+assert(bom.includes("const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite"),"selected schematic site must drive BOM focus");
+console.log("PASS 0553 Schematic location click routes to existing Budget Working Preview BOM with site filter");

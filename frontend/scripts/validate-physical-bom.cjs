@@ -1,0 +1,14 @@
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+(async()=>{const source=fs.readFileSync(path.join(__dirname,"../src/common/engineering/physicalBomDerivation.js"),"utf8");
+const {deriveCable,deriveTerminationAccessories,deriveEnclosureCapacity,deriveInstalledAndPurchaseQty}=await import("data:text/javascript;base64,"+Buffer.from(source).toString("base64"));const e={sourceId:"SYNTHETIC_TEST"};
+assert.equal(deriveCable({evidence:e}).status,"OPEN_INPUT");
+const cable=deriveCable({routeM:60,verticalM:10,terminationM:4,spareM:6,routingFactor:1.1,lossDbPer100M:7,evidence:e});
+assert.equal(cable.status,"DERIVED_REVIEW");assert.ok(Math.abs(cable.lengthM-86)<1e-9);assert.ok(Math.abs(cable.feederLossDb-6.02)<1e-9);
+const a=deriveTerminationAccessories({cableRuns:2,terminationEndsPerRun:2,entriesPerCableEnd:1,connectorsPerEnd:1,spareGlandQuantity:0,evidence:e});
+assert.deepEqual(a.value,{terminations:4,connectors:4,cableGlands:4});
+const q=deriveInstalledAndPurchaseQty({facilityQuantities:[{facility:"A",quantity:1},{facility:"B",quantity:1}],spares:1,contingency:0,evidence:e});
+assert.deepEqual(q.value,{installed:2,purchase:3});
+assert.equal(deriveInstalledAndPurchaseQty({facilityQuantities:[{facility:"A",quantity:1}],spares:null,contingency:null,evidence:e}).status,"OPEN_INPUT");
+assert.equal(deriveEnclosureCapacity({evidence:e}).status,"OPEN_INPUT");
+console.log("PASS physical BOM cable loss, connector/gland counts, purchase quantity and fail-closed guards (synthetic only)");
+})().catch(err=>{console.error(err);process.exitCode=1});

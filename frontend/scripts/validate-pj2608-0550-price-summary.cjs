@@ -1,0 +1,214 @@
+const assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+// Exercise webpack's .js-before-.jsx resolution with Windows-like basename
+// lookup. Native Linux compilation alone cannot detect this regression.
+const casePath=p=>{try{if(fs.existsSync(p))return p;const dir=path.dirname(p),name=fs.readdirSync(dir).find(n=>n.toLowerCase()===path.basename(p).toLowerCase());return name?path.join(dir,name):p;}catch{return p;}};
+const windowsFs=new Proxy(fs,{get(target,key){return ['statSync','readFileSync','readlinkSync','realpathSync','readdirSync'].includes(key)?(p,...args)=>target[key](casePath(p),...args):target[key];}});
+const resolveWindows=require('enhanced-resolve').create.sync({extensions:['.js','.jsx'],fileSystem:windowsFs});
+const legacy=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'0550-case-regression-'));
+try{fs.writeFileSync(path.join(legacy,'Widget.jsx'),'export const Widget=()=>null');fs.writeFileSync(path.join(legacy,'widget.js'),'export const widget=()=>[]');assert.equal(path.extname(resolveWindows(legacy,'./Widget')),'.js','Legacy case-only stems reproduce the Windows wrong-module selection');}finally{fs.rmSync(legacy,{recursive:true,force:true});}
+const componentPath=resolveWindows(root+'/project0550','./ReleaseFullBid0550');
+assert.equal(path.basename(componentPath),'ReleaseFullBid0550.jsx');assert.equal(typeof require(componentPath).ReleaseFullBid0550,'function');
+assert.equal(path.basename(resolveWindows(root+'/project0550','./fullBidInventoryModel0550')),'fullBidInventoryModel0550.js');
+const D=require(root+'/project0550/data.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),V=require(root+'/project0550/data/legacyVendorBasis0550.js'),MR=require(root+'/project0550/data/mrWorkingBasis0550.js'),Q=require(root+'/project0550/data/mgwVendorBasis0550.js'),G=require(root+'/project0550/data/mgwDetailPricing0550.js'),Repo=require(root+'/project0550/data/repositoryBidBasis0550.js');
+const {knownPriceGroups0550,BidKnownPrices0550}=require(root+'/project0550/BidKnownPrices0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const today='2026-10-29',tokens=D.SYSTEMS.map(s=>s.token);
+let d=W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId);
+d=V.importLegacyVendorBasis0550(d,{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE,commercialSources:D.COMMERCIAL_SOURCES,commercialPolicy:D.COMMERCIAL_POLICY},today);
+d=Q.importMgwVendorBasis0550(MR.importMrWorkingBasis0550(d,D.COMMERCIAL_POLICY,today),today);
+d=Repo.prepareRepositoryBidBasis0550(d,{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE},today);
+d=G.prepareMgwDetailPricing0550(d,D.COMMERCIAL_POLICY,today);
+const before=JSON.stringify(d),m=W.deriveBidWorkspace(d,tokens,today),groups=knownPriceGroups0550(m.provisional);
+assert.equal(m.provisional.selectedUSD,null,'Incomplete selected subtotal remains OPEN');
+assert.equal(m.official.baseUSD,null);assert.equal(m.provisional.baseUSD,null);assert.equal(m.provisional.releaseAllowed,false);
+assert(groups.find(g=>g.part==='A').usd.value>0,'Real canonical seed prices remain visible despite OPEN totals');
+assert(groups.some(g=>g.usd.missing>0),'Incomplete owner rows stay counted as missing');
+const html=renderToStaticMarkup(React.createElement(BidKnownPrices0550,{provisional:m.provisional,onWorking:()=>{}}));
+assert(html.includes('Known customer prices by part'));assert(html.includes('PROVISIONAL'));assert(html.includes('Known native Working prices'));assert(html.includes('เปิด Working'));assert(html.includes('Optional'));assert.equal(JSON.stringify(d),before,'Summary rendering must not change any raw saved data');
+const noFx=JSON.parse(before);noFx.fx={thbPerUSD:null,thbPerEUR:null,source:'',date:''};
+const nf=W.deriveBidWorkspace(noFx,tokens,today),ng=knownPriceGroups0550(nf.provisional);
+assert(nf.provisional.selected.filter(r=>r.currency!=="USD").every(r=>r.customerUSD===null),"Non-USD conversion remains OPEN without FX");
+const nativeUsd=nf.provisional.selected.filter(r=>r.currency==="USD"&&Number.isFinite(r.provisionalCustomerNative));
+assert(nativeUsd.length>0&&nativeUsd.every(r=>r.customerUSD===r.provisionalCustomerNative),"Native USD customer prices need no conversion or invented FX");
+assert(ng.some(g=>g.usd.value>0),"Known native USD remains visible while converted totals stay OPEN");
+assert.equal(nf.official.baseUSD,null,"Missing FX cannot complete the official Base");
+assert(ng.some(g=>g.native.some(n=>n.currency==='USD'&&n.customer.value>0)),'Native known prices survive missing FX');
+const fixture={selected:[{selected:true,wbs:'A',currency:'USD',customerTHB:0,customerUSD:0,provisionalCostNative:0,provisionalSellNative:0,provisionalCustomerNative:0},{selected:true,wbs:'A',currency:'USD',customerTHB:null,customerUSD:null,provisionalCostNative:null,provisionalSellNative:null,provisionalCustomerNative:null},{selected:false,wbs:'A',currency:'USD',customerTHB:999999,customerUSD:999999},{selected:true,wbs:'C1',currency:'EUR',customerTHB:17,customerUSD:11,provisionalCostNative:5,provisionalSellNative:6,provisionalCustomerNative:7}]};
+const fg=knownPriceGroups0550(fixture);assert.deepEqual(fg[0].usd,{value:0,priced:1,missing:1});assert.equal(fg[2].usd.value,11);assert.equal(fg[1].usd.value,null);assert.equal(fg[2].native[0].currency,'EUR');assert.equal(fg[0].native[0].customer.value,0,'Explicit zero retained; missing/unselected never substituted or summed');
+assert(knownPriceGroups0550({selected:[]}).every(g=>g.usd.value===null));
+const source=fs.readFileSync(root+'/project0550/BidCommercialWorkspace.jsx','utf8');assert.equal((source.match(/<BidKnownPrices0550 /g)||[]).length,1,'All navigation shortcuts share one mounted summary');
+// The same known amounts must be inspectable in the actual 10.7 table.
+const {releasePricePresentation0550}=require(root+'/project0550/releasePricePresentation0550.js');
+const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
+const {RADIO_RELEASE_LOT_0550,releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
+const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
+const dmrGroup={code:'A1-11',releaseModuleId:'dmr-lot',customerUSD:null,problems:[],children:[
+ {id:'R10',systemToken:'TEL-DMR',customerUSD:120.10},{id:'DISH-ESTIMATE',systemToken:'TEL-DMR',customerUSD:20.20},
+ {id:'TOWER',systemToken:'TEL-TELT',customerUSD:300},{id:'OPEN',systemToken:'TEL-DMR',customerUSD:null}
+]};
+const dmrView={pricingBasis:'PROVISIONAL_VENDOR',lines:[],schedule:[dmrGroup]};
+assert.deepEqual(releasePricePresentation0550(dmrView).get('dmr-lot').dmrKnown,{amount:140.30,priced:2});
+assert.equal(releasePricePresentation0550(dmrView).get('dmr-lot').known.amount,440.30);
+assert.equal(releasePricePresentation0550({...dmrView,pricingBasis:'OFFICIAL'}).get('dmr-lot').dmrKnown,null);
+const {releaseFullBid0550}=require(root+'/project0550/fullBidInventoryModel0550.js');
+const inventory=releaseFullBid0550(d,m.provisional,D.SYSTEMS),get=token=>inventory.find(r=>r.token===token);
+assert.equal(inventory.length,20);assert.equal(new Set(inventory.map(r=>r.token)).size,20);assert.equal(inventory.flatMap(r=>r.records).length,MR.MR_WORKING_CATALOG_0550.rows.length,'All catalog requirements appear, including unselected/unmapped/COMPANY and B/C');
+assert(inventory.every(r=>r.mrDocuments.length===1&&r.mrDocuments[0]===MR.MR_WORKING_CATALOG_0550.document),'Every source-backed system identifies the catalog MR document/revision explicitly');
+assert(get('TEL-VSAT').mrReferences.some(r=>r.includes('p07'))&&get('TEL-VSAT').mrReferences.some(r=>r.includes('App.1.2')),'Main clauses and Appendix locators both retained');
+assert.deepEqual(inventory.slice(0,3).map(r=>r.token),['TEL-VSAT','TEL-AIS','TEL-RADIO-DTRS'],'Scope clauses on p07/p08 precede the p09 equipment schedule');
+assert.equal(get('COMMON').records.filter(r=>r.requirement.wbs==='A').length,30);assert.equal(get('COMMON').mappingOpen>0,true);
+assert.equal(get('TEL-AIS').a.COMPANY,1);assert.equal(get('TEL-AIS').bc.TSI,2);assert.equal(get('TEL-AIS').bid,true,'COMPANY hardware does not exclude TSI services');
+const companyOnly={...m.provisional,lines:m.provisional.lines.map(l=>l.systemToken==='TEL-AIS'?{...l,selected:false,mrScopeState:{...l.mrScopeState,excluded:true,responsibility:'COMPANY'}}:l)};
+assert.equal(releaseFullBid0550(d,companyOnly,D.SYSTEMS).find(r=>r.token==='TEL-AIS').bid,false,'An entirely COMPANY scope with no selected additional work is omitted only from Bid, never Full');
+assert.equal(get('TEL-FO').bid,true);assert.equal(get('TEL-VSAT-KU').bid,true,'Unresolved scope stays in Bid view');
+const unselected={...m.provisional,lines:m.provisional.lines.map(l=>({...l,selected:false,requestedSelected:false}))};
+assert.equal(releaseFullBid0550(d,unselected,D.SYSTEMS).length,20);assert(releaseFullBid0550(d,unselected,D.SYSTEMS).every(r=>r.priced===0),'Selection and price never define the Full scope denominator');
+const commonIds=new Set(MR.MR_WORKING_CATALOG_0550.rows.filter(r=>r.wbs==='A'&&r.systemToken==='COMMON').map(r=>r.id));
+const missing={...m.provisional,lines:m.provisional.lines.filter(l=>!commonIds.has(l.mrRequirementId))};
+const common=releaseFullBid0550(d,missing,D.SYSTEMS).find(r=>r.token==='COMMON');assert.equal(common.missing,30);assert.equal(common.records.filter(r=>r.requirement.wbs==='A').length,30);
+const extra=releaseFullBid0550({...d,lines:[...d.lines,{systemToken:'SYNTHETIC-NEW-SYSTEM'}]},m.provisional,D.SYSTEMS).find(r=>r.token==='SYNTHETIC-NEW-SYSTEM');assert(extra&&extra.bid&&extra.records.length===0,'No fixed 19-system cap hides newly registered scope');
+assert.equal(extra.mrDocuments.length,0,'No MR identity invented for a system without a catalog record');
+const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
+const originals=new Map(rowsBefore.map(row=>[row.key,row]));
+const retained=hierarchy.entries.filter(row=>originals.has(row.key)).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,radioScope,radioPackage,packageChild,nestedOwnerIds,mr,workingLine,externalOwners,...row})=>{
+ const original=originals.get(row.key);
+ if(mr){
+  assert(parents.includes(RADIO_RELEASE_LOT_0550));
+  assert.deepEqual(row.cells.slice(3,5),original.cells.slice(3,5),'An MR row can carry a price directly only when its quantity and unit match');
+  row.cells=[...original.cells.slice(0,3),...row.cells.slice(3)];
+ }
+ return row;
+});
+const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
+assert.deepEqual(canonical(retained),canonical(rowsBefore),'Every projected row, ID, quantity, unit, amount and remark retained exactly once');
+assert.equal(new Set(hierarchy.controls.map(n=>n.key)).size,hierarchy.controls.length,'Unique UI expansion keys');
+assert(!hierarchy.controls.some(node=>node.key==='working:A'||(node.parents[0]==='part:A'&&node.label.includes('Working / package')&&node.key!==RADIO_RELEASE_LOT_0550+'/unmatched')),'The only Part A package heading is the unresolved A1-07 group');
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='mr-category').slice(0,8).map(r=>r.key),['mr:1.1','mr:1.2','mr:1.3','mr:1.4','mr:1.5','mr:1.6','mr:1.7','mr:1.8']);
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='group').slice(0,4).map(r=>r.key),['A1-07','A1-08','A1-10','A1-09'],'Actual MR first occurrence puts MF/HF before Aeronautical');
+for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
+ const ids=hierarchy.entries.filter(r=>r.kind==='line'&&r.parents.includes(control.key)).map(r=>m.provisional.lines.find(l=>l.id===r.key)?.mrRequirementId).filter(Boolean);
+ const positions=ids.map(id=>MR.MR_WORKING_CATALOG_0550.rows.findIndex(r=>r.id===id));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
+}
+const defaultOpen=new Set(hierarchy.controls.filter(node=>node.defaultOpen).map(node=>node.key));
+const detailRows=hierarchy.entries.filter(row=>row.kind==='line');
+assert(detailRows.some(row=>row.parents[0]==='part:A'));
+assert(detailRows.every(row=>row.parents.every(key=>defaultOpen.has(key))===(row.parents[0]==='part:A'&&!row.parents.includes(RADIO_RELEASE_LOT_0550+'/unmatched'))),'Part A scope is expanded by default, with unmatched A1-07 packages collapsed. Parts B/C retain their defaults.');
+assert.equal(hierarchy.entries.filter(r=>r.moduleId==='bid.budget.release.customer.A1-11').length,1,'Cross-appendix Microwave/Tower has one Lot amount/ID');
+assert(hierarchy.entries.some(r=>r.kind==='mr-system'&&r.lotModuleId==='bid.budget.release.customer.A1-11'&&r.parents.includes('mr:1.5')),'Microwave detail remains under its actual Appendix 1.5');
+const sparseLines=new Set(m.provisional.lines.filter(line=>['A1-05','A1-11'].includes(line.customerRowCode)).map(line=>line.id));
+const sparseRows=rowsBefore.filter(row=>row.kind!=='line'||!sparseLines.has(row.key));
+const sparse=releaseHierarchy0550(m.provisional,sparseRows);
+assert.deepEqual(sparse.entries.filter(row=>row.kind==='mr-category'&&row.parents[0]==='part:A').map(row=>row.key),['mr:1.1','mr:1.2','mr:1.3','mr:1.4','mr:1.5','mr:1.6','mr:1.7','mr:1.8'],'All eight MR appendices stay visible with sparse pricing');
+assert(sparse.entries.some(row=>row.kind==='mr-empty'&&row.parents.includes('mr:1.4')&&row.parents.includes('bid.budget.release.customer.A1-05')));
+assert(sparse.entries.some(row=>row.kind==='mr-empty'&&row.parents.includes('bid.budget.release.customer.A1-11/appendix/1.5')));
+const microwave={id:'TEST-MICROWAVE-PACKAGE',systemToken:'TEL-DMR',customerRowCode:'A1-11'};
+const microwaveRow={...rowsBefore.find(row=>row.kind==='line'),key:microwave.id};
+const withMicrowave=releaseHierarchy0550({...m.provisional,lines:[...m.provisional.lines,microwave]},[...sparseRows,microwaveRow]);
+const placedMicrowave=withMicrowave.entries.find(row=>row.key===microwave.id);
+assert(placedMicrowave.parents.includes('mr:1.5'),'The DMR package appears under 1.5 even if the combined Lot anchors at 1.1');
+assert.equal(placedMicrowave.mrReference,'','Display grouping cannot invent a native MR reference');
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='total').map(r=>r.cells),rowsBefore.filter(r=>r.kind==='total').map(r=>r.cells));
+const priced=m.provisional.selected.find(l=>Number.isFinite(l.customerUSD)&&l.customerUSD>0);
+assert(priced);assert.equal(rowsBefore.find(r=>r.key===priced.id).cells[6],priced.customerUSD);
+const mr=m.provisional.lines.find(l=>l.selected&&l.mrScopeState?.candidates.length&&l.customerUSD==null);
+assert(mr,'Canonical MR line has unallocated package candidates');
+assert(notes.get(mr.releaseModuleId).reasons.length);assert(notes.get(mr.releaseModuleId).candidates.length);
+assert.equal(rowsBefore.find(r=>r.key===mr.id).cells[6],'OPEN','Package candidates cannot be allocated into MR prices implicitly');
+assert([...notes.values()].some(n=>n.known?.amount>0),'Known subtotal appears at its own incomplete Lot');
+assert([...releasePricePresentation0550(nf.provisional).values()].some(n=>n.native?.amount>0&&n.reasons.some(p=>p.includes('FX'))),'Missing FX retains native candidate price with a specific reason');
+const officialNotes=releasePricePresentation0550(m.official);
+assert([...officialNotes.values()].every(n=>!n.known&&!n.native&&!n.candidates?.length),'Official gates cannot be replaced by draft money');
+assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Internal annotations do not change the customer screen/export cells');
+const context=require(root+'/project0550/BidWorkspaceContext.jsx');context.useBidWorkspace=()=>({data:d,model:m,reviewDate:today});
+const {OfficialCustomerForm}=require(root+'/project0550/OfficialCustomerForm.jsx');
+const {amount}=require(root+'/project0550/BidControls.jsx');
+const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{}}));
+assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
+assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
+assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('DRAFT / NOT ISSUED'));
+assert(!releaseHtml.includes('HOLD / NOT ISSUED'));assert(releaseHtml.includes('ออกและตรวจเอกสารร่าง Schedule A และ C1–C8'));
+assert(!releaseHtml.includes('Part A Full Bid inventory'),'The duplicate inventory is absent from the Release preview');
+// Expand the PAGA detail in the SSR harness as the user does in REL-04.
+const pagaLine=m.provisional.lines.find(l=>l.id==='LINE-LEGACY-TEL-PAGA-1');
+const pagaRow=hierarchy.entries.find(r=>r.key===pagaLine.id);
+const linkedOffer=d.offers.find(o=>o.id===pagaLine.offerId);
+assert(pagaRow&&linkedOffer);
+const pagaLot=m.provisional.schedule.find(group=>group.code===pagaLine.customerRowCode);
+assert.equal(pagaRow.parents.at(-1),pagaLot.releaseModuleId,'Package row stays directly under its existing customer Lot');
+assert.equal(pagaRow.mrReference,'','Display placement does not invent a row-level MR reference');
+const storage=globalThis.localStorage;
+let collapsedRelease;
+try {
+ globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
+  ?JSON.stringify(Object.fromEntries(pagaRow.parents.map(key=>[key,true]))):null};
+ const expanded=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{},onNavigate:()=>{}}));
+ assert(!expanded.includes('Part A Full Bid inventory'),'Expanding Part A keeps only the price hierarchy');
+ const pagaMarkup=expanded.split('data-component-key="'+pagaRow.moduleId+'"')[1].split('</tr>')[0];
+ assert(pagaMarkup.includes('Offer ที่ผูกกับ Working · อ้างอิงภายใน'));
+ assert(pagaMarkup.includes('>'+linkedOffer.quoteRef+'</button>'),'Show the linked PAGA Offer in 10.7');
+ assert(!rowsBefore.find(r=>r.key===pagaLine.id).cells.includes(linkedOffer.quoteRef),'Offer trace is separate from the customer cells');
+ globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
+  ?JSON.stringify({'part:A':false,'part:B':false,'part:C':false}):null};
+ collapsedRelease=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{}}));
+} finally {
+ if(storage===undefined)delete globalThis.localStorage;
+ else globalThis.localStorage=storage;
+}
+const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
+const reviewedRelease=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.official,onSource:()=>{}}));
+const partMarkup=(html,id)=>html.split('data-component-key="'+id+'"')[1].split('</tr>')[0];
+for(const {part,usd} of groups){
+ const id='bid.budget.release.part.'+part;
+ assert.equal(registry.filter(r=>r.id===id).length,1);
+ assert(releaseHtml.includes('Copy component ID '+id));
+ const markup=partMarkup(collapsedRelease,id);
+ assert(markup.includes('aria-expanded="false"'));
+ assert(markup.includes(`<td></td><td>${usd.value==null?'OPEN':amount(usd.value,'USD')}</td><td>PROVISIONAL ·`));
+ assert(!partMarkup(reviewedRelease,id).includes('PROVISIONAL ·'));
+ assert.deepEqual(rowsBefore.find(row=>row.kind==='section'&&row.key===part).cells.slice(5),['','','']);
+}
+assert.deepEqual(officialCustomerRows(m.provisional),rowsBefore,'Screen-only part subtotals preserve the export projection');
+assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
+const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
+assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
+// The APF cabinet is a tender scope reference when its exact, selected
+// supplier rows already carry the price. An unselected owner reopens the gap.
+const {deriveProvisionalPricing}=require(root+'/project0550/data/officialPricing0550.js');
+const {APF_LAN_BID_BASIS_0550,MGW_CURRENT_BATCH_0550,MGW_CURRENT_PREFIX_0550,MGW_CURRENT_QUOTE_0550,
+ MGW_CURRENT_SOURCE_HASH_0550,MGW_SUPERSEDED_0550}=require(root+'/project0550/data/mgwQuoteSelection0550.js');
+const apfParent={...d.lines.find(line=>line.id==='REQ-MR-B1-13-APF-09')};
+const apfSources=[
+ ['LAN-APF-9-01',1,'Lot','A1-01'],['LAN-APF-9-02',2,'SET','A1-01'],
+ ['LAN-APF-9-03',2,'SET','A1-01'],['LAN-APF-9-04',2,'SET','A1-01'],
+ ['LAN-APF-9-05',1,'SET','A1-01'],['LAN-APF-9-06',3,'SET','A1-01'],
+ ['LAN-APF-9-07',2,'SET','A1-01'],['PABX-APF-9-01',1,'U','A1-04'],
+ ['PABX-APF-7-01',3,'SET','A1-04'],
+].map(([id,quantity,unit,code])=>{
+ const included=id==='LAN-APF-9-03';
+ const offer={id:MGW_CURRENT_PREFIX_0550+id,quoteRef:MGW_CURRENT_QUOTE_0550,unit,quoteEvidence:{
+  sourceId:MGW_CURRENT_BATCH_0550,sourceSha256:MGW_CURRENT_SOURCE_HASH_0550,classification:'RATE',
+  quotedQuantity:quantity,quotedTotalText:included?'Included':'',quotedUnitCost:included?null:1,
+  terms:id==='PABX-APF-7-01'?['TL-SG2105P']:['SFP-10G-LR'],
+ }};
+ const line=included?null:{id,wbs:'A',offerId:offer.id,quantity,unit,selected:true,customerRowCode:code,
+  problems:['Quote date/validity missing'],provisionalCustomerUSD:quantity};
+ return {offer,line};
+});
+const apfLines=[{...apfParent,problems:['Cost rate OPEN']},...apfSources.map(row=>row.line).filter(Boolean)];
+const apfData={...d,lines:apfLines,offers:apfSources.map(row=>row.offer),mgwDetailPricingImport:{decision:MGW_SUPERSEDED_0550}};
+const apfCalc={lines:apfLines,requirementGaps:[{id:apfParent.mrRequirementId,code:'A1-01'}]};
+const apfBefore=JSON.stringify(apfData),apfView=deriveProvisionalPricing(apfData,apfCalc);
+const apfRef=apfView.lines.find(line=>line.id===apfParent.id);
+assert.equal(apfRef.bidPriceAllocation?.basisId,APF_LAN_BID_BASIS_0550);
+assert.equal(apfRef.selected,false);
+assert.deepEqual(apfView.requirementGaps,[]);
+assert.deepEqual(apfView.selected.map(line=>[line.id,line.customerUSD]),apfLines.slice(1).map(line=>[line.id,line.provisionalCustomerUSD]));
+assert.equal(JSON.stringify(apfData),apfBefore);
+assert.equal(apfView.releaseAllowed,false);
+const missingAccess=apfLines.map(line=>line.id==='LAN-APF-9-05'?{...line,selected:false}:line);
+assert.deepEqual(deriveProvisionalPricing(apfData,{...apfCalc,lines:missingAccess}).requirementGaps,apfCalc.requirementGaps);
+const editedParent={...apfData,lines:apfLines.map(line=>line.id===apfParent.id?{...line,manualCost:1}:line)};
+assert.deepEqual(deriveProvisionalPricing(editedParent,apfCalc).requirementGaps,apfCalc.requirementGaps);
+console.log('PASS 0550 summary/release: no duplicate Full/Bid table in 10.7, inventory model retains 19 systems + COMMON, all source requirements including unmapped/unselected/COMPANY, split equipment/services obligations, unresolved/new scope retained, actual source page order, MR hierarchy/cross-appendix Lot once, copyable IDs, Official gates and unchanged export cells/financial/history records.');

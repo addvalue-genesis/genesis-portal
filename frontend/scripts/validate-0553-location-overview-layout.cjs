@@ -1,0 +1,66 @@
+// UI regression for compact one-row-per-location BOM. Does not modify source data or cost.
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const babel=require("@babel/core");
+const root=path.resolve(__dirname,"../src");
+// Normalize checkout line endings, retaining all layout ownership assertions.
+const src=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8").replace(/\r\n/g,"\n");
+const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+const compiled=babel.transformSync(src,{babelrc:false,configFile:false,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+assert(compiled?.code?.length>0,"SimpleBom JSX did not compile");
+const index=src.indexOf('p553-location-overview" style=');
+assert(src.includes("p553-location-overview"),"Compact table style missing");
+const start=src.indexOf('<tr className="p553-location-summary">');
+const end=src.indexOf('<tr className="p553-location-expanded">',start);
+assert(start>0&&end>start,"Per-WP summary/details split missing");
+const overview=src.slice(start,end);
+assert(overview.includes("displaySiteTotal(g.site)"),"Original site total must stay visible");
+assert(src.includes('const allLocationAllocated=model.locations.reduce('),"Missing ALL-location cost rollup from same canonical WP ledgers");
+assert(src.includes('const wp=wpSummary(g.site);'),"All-location total must reuse the individual WP's source cost");
+assert(src.includes('site==="ALL"?displayAllLocationTotal():displaySiteTotal(site)'),"Source facts card must show total for ALL, WP total for one WP");
+assert(!src.includes("<AbcCostReadiness0553"),"Keep dashboard compact; no standalone ABC panel");
+assert(src.includes("full A+B+C NOT ESTABLISHED"),"Do not misrepresent partial Working Cost as complete A+B+C");
+
+assert(overview.includes('componentKey={"bid.budget.bom."+g.site.toLowerCase()}'),"Original module IDs and Copy controls missing");
+assert(overview.includes('aria-expanded={siteExpanded(g.site)}'),"Accessible expand/collapse state missing");
+assert(overview.includes("financial.costed")&&overview.includes("financial.total"),"Cost coverage summary missing");
+assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScenarios.map")&&!overview.includes("getMR0001LocationCost0553(g.site).itemAllocations?.map"),"Long source/cost narratives leak into compact WP row");
+const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
+assert(src.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master System-Location MTO table must have its own module ID");
+// The master table title was deliberately renumbered under 10.1.1.3.
+// Keep the real Workflow Number + descriptive function + dynamic System/Location,
+// instead of requiring the retired "BOM Working Table" display wording.
+const masterId='moduleKey="bid.budget.bom.system-location-mto"';
+const masterTitle='title={"10.1.1.3 — System × Location × MTO — "+system+';
+const masterTag='<ControlledModuleSection0553 '+masterId+' '+masterTitle;
+assert(src.includes(masterTag),
+ "Master table must present Workflow 10.1.1.3 with its own Module ID and descriptive title");
+assert(src.includes('(site==="ALL"?"All Locations":site)'),
+ "Master table heading must reflect the selected Location");
+assert(src.includes('description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification.'),
+ "Engineering gate description must remain attached to the master table");
+assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('p553-location-overview" style='),"Master module must wrap, not merely precede, the overview table");
+// The independent 10.1.2 Engineering Verification process follows the closed
+// 10.1.1.3 master module; the source-level closing tag is no longer immediately
+// adjacent to </section>. Assert the real boundaries and their UI ownership.
+const masterStart=src.indexOf(masterTag);
+const tableStart=src.indexOf('p553-location-overview" style=',masterStart);
+const masterEnd=src.indexOf('  </ControlledModuleSection0553>\n  <div className="p55-panel" data-component-key="bid.budget.bom.engineering-verification">',tableStart);
+assert(masterStart>=0&&tableStart>masterStart&&masterEnd>tableStart,
+ "Master 10.1.1.3 must wrap the complete table, then close before the separate 10.1.2 process");
+assert(src.includes('<strong>10.1.2 — Engineering Verification Process</strong>'),
+ "10.1.2 verification process must remain independently visible");
+assert(!src.includes('.engineering-detail"}'),"Do not misattribute the master module ID to a ZWP child detail");
+assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
+assert(!detail.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate hidden TAG drill-down should not be reintroduced");
+assert(detail.includes("extraScenarios.map((v,i)=><tr"),"Additional scenarios missing");
+assert(detail.includes("Vendor Rate Evidence & Currency"),"Original vendor source classes missing");
+for(const key of [".cost-allocation",".vendor-rate-evidence",".unallocated-scenarios",".rpt-link-budget"])assert(detail.includes('g.site.toLowerCase()+"'+key+'"'),"Missing collapsible WP module identity: "+key);
+assert(detail.includes("financial.costed")&&detail.includes("financial.total"),"TAG priced/total coverage missing from summary");
+assert(src.includes("Price evidence<small>covered / MTO</small>"),"Vendor rate coverage must be labelled as evidence, not approved rates");
+assert(detail.includes("g.rfProof.map(p=><tr"),"Original RF/Link evidence removed");
+assert(detail.includes("colSpan={8}"),"Detail column span must match 8-column header");
+assert(src.includes('style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}'),"Fixed column width budget presentation missing");
+assert(css.includes("p553-location-overview")&&css.includes("p553-location-line-detail"),"Scoped compact styles absent");
+assert(!src.includes('<small>{"Basis: "+wpSummary(g.site).basis}'),"Long narrative reintroduced into site summary");
+console.log("PASS 0553 compact BOM layout: one row per WP, directly expandable tagged engineering cost source, no duplicate hidden detail, traceable copy IDs, unchanged site totals, Babel JSX valid.");

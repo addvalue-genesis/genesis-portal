@@ -1,0 +1,18 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"../src/project0553");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const quote=JSON.parse(read("data/quotes/NG-260916-ADV-DAP1.full.json"));
+const lookup=new Map(quote.lines.map(x=>[x.code,x.unitPrice]));
+const radio=["B-1","B-2","B-3","B-5","B-6","B-7","B-8"].reduce((n,k)=>n+lookup.get(k),0);
+const four=Math.round((2*radio+2*lookup.get("B-12"))*100)/100;
+const six=Math.round((2*radio+2*lookup.get("B-11"))*100)/100;
+assert.equal(four,26567.78);assert.equal(six,26658.74);
+const decision=read("data/zwp8Row43CostTrace.js");
+const summary=read("data/siteSystemCostReconciliation.js");
+assert(decision.includes('preferredScenarioId:"ZWP8-ROW43-4FT"'));
+assert(summary.includes("preferredScenarioId"));
+assert(summary.includes('line:"MTO43:4FT"'));
+assert(!summary.includes('line:"MTO43:6FT"'));
+assert(summary.includes('kind:"BUDGETARY_PREFERRED_PARTIAL__NOT_APPROVED"'));
+assert(summary.includes("siteFinalTotals:null"));
+console.log("PASS 0553 ZWP8 preferred 4ft: USD "+four+" partial included once as evidence; 6ft USD "+six+" excluded; final total unverified.");

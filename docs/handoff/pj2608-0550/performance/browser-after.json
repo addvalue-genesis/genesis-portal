@@ -1,0 +1,86 @@
+{
+  "coverageInteractions": "PASS",
+  "browser": "131.0.6778.0",
+  "viewport": "1440x1000",
+  "method": "production; click-to-two-animation-frames; warm 7 cycles; headless environment, not user Windows; memory coarse; not React Profiler",
+  "metrics": {
+    "19 Systems": {
+      "n": 7,
+      "medianMs": 27.3,
+      "maxMs": 38
+    },
+    "PAGA toggle": {
+      "n": 14,
+      "medianMs": 31.6,
+      "maxMs": 32.1
+    },
+    "First Principles": {
+      "n": 8,
+      "medianMs": 46.9,
+      "maxMs": 68.5
+    },
+    "Budget": {
+      "n": 8,
+      "medianMs": 23.1,
+      "maxMs": 30.9
+    },
+    "Working Preview": {
+      "n": 7,
+      "medianMs": 31.7,
+      "maxMs": 33.1
+    },
+    "Released Customer Output": {
+      "n": 7,
+      "medianMs": 31.6,
+      "maxMs": 32.8
+    },
+    "Budgetary Submission": {
+      "n": 7,
+      "medianMs": 33.1,
+      "maxMs": 38.1
+    },
+    "XLSX download": {
+      "n": 1,
+      "medianMs": 61,
+      "maxMs": 61
+    }
+  },
+  "hashes": {
+    "systems": "e7fa9360122cb57387a2de1ee8f4b373e9d4bb4b480845f6b63615b5c4bf20cf",
+    "engineering": "4e62ad096d9f03f27816b2b0bdc1e6994c4db0e90a96fa1b61c0a4ba42b6ac33",
+    "budgetary": "2a09eaff6a53bbabebd4275fb249e02fb2d3f32c9005fc8b4e8f199efe91c07c",
+    "working": "8426905ced0ca4c111cec85c62de18f174bb9492176074e0f52792e3c38bf064",
+    "released": "ec70ce29870db0ddf6214481504c7cd706680abcec4722dde7b66cd9cfe85134",
+    "xlsx": "2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6"
+  },
+  "errors": [],
+  "longtasks": [
+    {
+      "start": 65.10000000149012,
+      "duration": 74
+    },
+    {
+      "start": 306.5,
+      "duration": 54
+    }
+  ],
+  "domNodes": 538,
+  "memory": {
+    "usedJSHeapSize": 10000000
+  },
+  "navigation": [
+    {
+      "domContentLoaded": 139.69999999552965,
+      "load": 139.69999999552965
+    }
+  ],
+  "protectedOutputParity": "PASS",
+  "baselineCommit": "40aee8b5aa428cd2eb58701b35ad0b2f98d9d0cb",
+  "measuredApplicationFiles": {
+    "frontend/src/project0550/coverageModel.js": "e472892b9ff5cd098c12e0259136e53577612fac2d8b485221d920443c4771b7",
+    "frontend/src/project0550/CoverageMatrix.jsx": "37ac3b4856b35e8ba032a29798a56b648926ffbd0425e29c6f3be713dd2bb77c",
+    "frontend/src/project0550/data.js": "13793b198e4842c42160bc4af7f701a99687c46665cf8af7638f6964e3a8140a",
+    "frontend/src/project0550/moduleRegistry.js": "5ea5b89865167e3911718fa6795e6439cb0903ebf757c7abf016120eb715997c",
+    "frontend/src/pages/PJ26080550.jsx": "993705b725829160ff1f54a847202e6c3dd78aa9d1ffac401df73dbcf5842ba0"
+  }
+}

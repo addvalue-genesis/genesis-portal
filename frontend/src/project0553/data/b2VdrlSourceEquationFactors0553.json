@@ -1,0 +1,181 @@
+{
+  "moduleId": "bid.budget.working.bc.b2.independent-recalculation.formula-factors",
+  "sourceTitle": "PJ2608-0553_B2_VDRL_ACTUAL_SUBSTITUTION_PRICED_GROUPED_Rev00b-DRAFT_20260901.xlsx",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1URBWHdvZGzyKQ5xj2SFx1g-OizcUT4Wa/edit",
+  "sourceSheets": [
+    "03_DOC_CLASSES",
+    "04_ROLE_FACTORS",
+    "05_WORK_OBJECTS"
+  ],
+  "status": "TEMP_ESTIMATING_20260901_HUMAN_REVIEW_REQUIRED",
+  "notes": "Source class UMH, complexity, work mode and two provisional review cycles for MR Approval A. No old B2 580k quote input. Formula: BaseMH[class,role] × Complexity × WorkMode × EffectiveUnits × [1+ NreviewCycle×ReviewDeltaFactor].",
+  "classBaseMH": {
+    "D0": [
+      0,
+      0,
+      0,
+      0,
+      0.75
+    ],
+    "D1": [
+      0,
+      0.25,
+      0.75,
+      0,
+      0.5
+    ],
+    "D2": [
+      0,
+      0.5,
+      1.5,
+      0,
+      0.5
+    ],
+    "D3": [
+      0.25,
+      1,
+      2.5,
+      0,
+      0.5
+    ],
+    "D4": [
+      0,
+      0.75,
+      1.5,
+      3,
+      0.5
+    ],
+    "D5": [
+      0.5,
+      2,
+      4,
+      6,
+      0.75
+    ],
+    "D6": [
+      1.5,
+      6,
+      2,
+      0.5,
+      0.5
+    ],
+    "D7": [
+      1,
+      4,
+      4,
+      0,
+      0.75
+    ],
+    "D8": [
+      0.5,
+      2,
+      3,
+      0,
+      0.75
+    ],
+    "D9": [
+      0,
+      1,
+      1,
+      0,
+      4
+    ],
+    "D10": [
+      0,
+      0.25,
+      0.5,
+      0,
+      1.5
+    ]
+  },
+  "complexityFactors": {
+    "ROUTINE": [
+      0.75,
+      0.8,
+      0.85,
+      0.9,
+      0.9
+    ],
+    "STANDARD": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "COMPLEX": [
+      1.5,
+      1.25,
+      1.15,
+      1.15,
+      1.05
+    ],
+    "CRITICAL": [
+      2,
+      1.5,
+      1.25,
+      1.2,
+      1.1
+    ]
+  },
+  "workModeFactors": {
+    "VENDOR_REVIEW": [
+      0.8,
+      0.85,
+      0.8,
+      0.5,
+      0.9
+    ],
+    "UPDATE_EXISTING": [
+      0.9,
+      0.85,
+      0.8,
+      0.8,
+      0.9
+    ],
+    "NEW": [
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "COMPILE_ONLY": [
+      0.5,
+      0.6,
+      0.5,
+      0,
+      1
+    ],
+    "TEMPLATE_ADAPT": [
+      0.85,
+      0.85,
+      0.8,
+      0.8,
+      0.9
+    ],
+    "TECHNICAL_B1_DOC_ONLY": [
+      0,
+      0.2,
+      0.2,
+      0,
+      1
+    ]
+  },
+  "reviewPerCycleFactors": [
+    0.1,
+    0.15,
+    0.15,
+    0.15,
+    0.25
+  ],
+  "approvalAProvisionalReviewCycles": 2,
+  "nonApprovalDocumentReviewCycles": 0,
+  "roleOrder": [
+    "Lead",
+    "Senior",
+    "Telecom Engineer",
+    "CAD/Drafter",
+    "DC/Admin"
+  ]
+}

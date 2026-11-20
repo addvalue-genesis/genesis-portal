@@ -1,0 +1,84 @@
+{
+  "projectId": "PJ2608-0553",
+  "sourceId": "1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h",
+  "revision": "Rev04",
+  "status": "WORKING_REVIEW",
+  "systems": [
+    {
+      "mr": "MR-0001",
+      "name": "SCADA Radio",
+      "rowCount": 42,
+      "facilities": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "equipmentFamilies": [
+        "Subscriber Radio ODU",
+        "Subscriber Radio IDU",
+        "Antenna",
+        "L3 Switch",
+        "DATO",
+        "Enclosure",
+        "Surge Arrestor",
+        "Bulk Materials"
+      ],
+      "pricingState": "OPEN"
+    },
+    {
+      "mr": "MR-0002",
+      "name": "DMR Trunk Radio",
+      "rowCount": 15,
+      "facilities": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "equipmentFamilies": [
+        "LNA",
+        "Yagi Antenna",
+        "Omni Antenna",
+        "Ex Enclosure",
+        "RF Surge",
+        "Bulk",
+        "Engineering Integration"
+      ],
+      "pricingState": "OPEN"
+    },
+    {
+      "mr": "MR-0003",
+      "name": "Explosion-Proof Telephone and Sounder",
+      "rowCount": 4,
+      "facilities": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "equipmentFamilies": [
+        "Ex Telephone",
+        "Ex Sounder",
+        "Ex Junction Box"
+      ],
+      "pricingState": "OPEN"
+    },
+    {
+      "mr": "MR-0004",
+      "name": "Marine RACON",
+      "rowCount": 6,
+      "facilities": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "equipmentFamilies": [
+        "RACON",
+        "RACON Junction Box",
+        "RACON Control Box",
+        "Adapter and Charging Kit"
+      ],
+      "pricingState": "OPEN"
+    }
+  ]
+}

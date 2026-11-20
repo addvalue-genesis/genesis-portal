@@ -1,0 +1,179 @@
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const babel = require('@babel/core');
+
+const root = path.resolve(__dirname, '../src');
+const old = require.extensions['.js'];
+const compile = (m, f) =>
+  f.startsWith(root + path.sep)
+    ? m._compile(
+        babel.transformFileSync(f, {
+          babelrc: false,
+          configFile: false,
+          presets: [['@babel/preset-env', { targets: { node: 'current' }, modules: 'commonjs' }], '@babel/preset-react'],
+        }).code,
+        f
+      )
+    : old(m, f);
+require.extensions['.js'] = compile;
+require.extensions['.jsx'] = compile;
+require.extensions['.css'] = () => {};
+
+const D = require(root + '/project0550/data.js');
+const W = require(root + '/project0550/data/bidWorkspaceModel.js');
+const V = require(root + '/project0550/data/legacyVendorBasis0550.js');
+const MR = require(root + '/project0550/data/mrWorkingBasis0550.js');
+const Q = require(root + '/project0550/data/mgwVendorBasis0550.js');
+const Repo = require(root + '/project0550/data/repositoryBidBasis0550.js');
+const G = require(root + '/project0550/data/mgwDetailPricing0550.js');
+const I = require(root + '/project0550/data/integrationWorkspace0550.js');
+const Engine = require(root + '/project0550/data/dtsFormEngine0550.js');
+const React = require('react');
+const { renderToStaticMarkup } = require('react-dom/server');
+const { DtsFormStudio0550 } = require(root + '/project0550/DtsFormStudio0550.jsx');
+
+const today = '2026-11-17';
+const tokens = D.SYSTEMS.map(s => s.token);
+let d = W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId);
+d = V.importLegacyVendorBasis0550(
+  d,
+  { meta: D.DATA_LAYER_META, budgetaryEstimate: D.BUDGETARY_ESTIMATE, commercialSources: D.COMMERCIAL_SOURCES, commercialPolicy: D.COMMERCIAL_POLICY },
+  today
+);
+d = Q.importMgwVendorBasis0550(MR.importMrWorkingBasis0550(d, D.COMMERCIAL_POLICY, today), today);
+d = Repo.prepareRepositoryBidBasis0550(d, { meta: D.DATA_LAYER_META, budgetaryEstimate: D.BUDGETARY_ESTIMATE }, today);
+d = G.prepareMgwDetailPricing0550(d, D.COMMERCIAL_POLICY, today);
+const integration = I.deriveIntegration0550(d, D.SYSTEMS, today);
+const model = { ...W.deriveBidWorkspace(d, tokens, today, integration), integration };
+
+// 1. Validate all 19 systems + COMMON across all 4 Areas (APF, ACP, ABV01, AMS01)
+let totalChecked = 0;
+for (const tok of [...tokens, 'COMMON']) {
+  for (const area of Engine.DTS_FORM_AREAS_0550) {
+    const cust = Engine.buildDtsFormModel0550({
+      data: d,
+      model,
+      systems: D.SYSTEMS,
+      systemToken: tok,
+      area,
+      revision: 'INT-00',
+      mode: 'customer',
+      today,
+    });
+    totalChecked++;
+    assert.equal(cust.revision, '00', 'INT-00 auto-maps to 00 in Customer Preview');
+    assert.equal(cust.revisionHistory.some(r => /^INT-/i.test(r.rev)), false, 'INT-XX hidden in Customer Preview');
+    assert.equal(cust.internalNotes.length, 0, 'Internal notes stripped in Customer Preview');
+    assert(cust.sections.length > 0, `Sections non-empty for ${tok}/${area}`);
+    assert(cust.tagList.length > 0, `Tag list non-empty for ${tok}/${area}`);
+    const payload = JSON.stringify({
+      systemTitle: cust.systemTitle,
+      sections: cust.sections,
+      tagList: cust.tagList,
+      notes: cust.notes,
+      revisionHistory: cust.revisionHistory,
+    });
+    assert.equal(
+      Engine.FORBIDDEN_DTS_FORM_PLACEHOLDERS_RE.test(payload),
+      false,
+      `Zero leaked/placeholder strings in ${tok}/${area}: ${payload.match(Engine.FORBIDDEN_DTS_FORM_PLACEHOLDERS_RE)?.[0]}`
+    );
+  }
+}
+
+// 2. PTTEP §7.5 Electronic File Naming
+const dmrCust = Engine.buildDtsFormModel0550({
+  data: d,
+  model,
+  systems: D.SYSTEMS,
+  systemToken: 'TEL-DMR',
+  area: 'APF',
+  revision: 'A1',
+  mode: 'customer',
+  today,
+});
+assert.equal(dmrCust.docFileNameDocx, 'MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.A1.docx');
+assert.equal(dmrCust.docFileNamePdf, 'MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.A1.pdf');
+
+const dmrInt = Engine.buildDtsFormModel0550({
+  data: d,
+  model,
+  systems: D.SYSTEMS,
+  systemToken: 'TEL-DMR',
+  area: 'ACP',
+  revision: 'INT-00',
+  mode: 'internal',
+  today,
+});
+assert.equal(dmrInt.docFileNameDocx, 'MM-ASK-00-ACP-DMR-TEL-DTS-0010_INTERNAL Rev.INT-00.docx');
+assert.equal(dmrInt.docFileNamePdf, 'MM-ASK-00-ACP-DMR-TEL-DTS-0010_INTERNAL Rev.INT-00.pdf');
+assert(dmrInt.internalNotes.length > 0, 'Internal mode retains engineering notes');
+
+// 3. React SSR render of DtsFormStudio0550 (Customer Preview default)
+const ssr = renderToStaticMarkup(
+  React.createElement(DtsFormStudio0550, {
+    data: d,
+    model,
+    systems: D.SYSTEMS,
+    defaultSystem: 'TEL-DMR',
+    today,
+  })
+);
+assert(ssr.includes('data-dts-form-studio="true"'));
+assert(ssr.includes('data-mode="customer"'));
+assert(ssr.includes('page cover'));
+assert(ssr.includes('DOCUMENT REVISION HISTORY'));
+assert(ssr.includes('Equipment Tag list'));
+assert(ssr.includes('<th>Compliance</th><th>Remarks</th>'), 'Customer Preview uses 6-col EPC Turnaround DTS format');
+assert(ssr.includes('Refer to Tag Number on page 4'), 'Rows 1-3 verbatim COMPANY Requirement');
+assert(ssr.includes('Refer to Equipment Tag List (Page 4)'), 'Rows 1-3 verbatim Vendor Offered Data');
+assert(ssr.includes('CommScope VHLP4-7W/E'), 'Page 4 Sheet 3 Antenna Datasheet');
+assert(ssr.includes('APF-MR-320-201') && ssr.includes('ACP-MR-320-002') && ssr.includes('MR-320'), 'Page 5 exact client tags');
+assert(ssr.includes('Page 5 of 5'), '5-page footer for TEL-DMR');
+assert(ssr.includes('Issued for Bidding'), 'Default Rev.00 Issued for Bidding');
+assert(ssr.includes('Submitted WITH BID based on selected equipment in Volume I (Schedule C1)'), 'WITH BID basis note on Page 3');
+assert(ssr.includes('MM-ASK-00-APF-DMR-TEL-DTS-0010 Rev.00.docx'));
+assert(!ssr.includes('class="vm-warn intblock"'), 'Customer Preview SSR omits .intblock');
+assert(!ssr.includes('class="devref"'), 'Customer Preview SSR omits [DEV-XXX] tags');
+
+// 4. TEL-PAGA (MM-ASK-1A-APF-TEL-DTS-0003 Rev.B1 -> 9-page INDUSTRONIC INTRON-X WITH BID)
+const ssrPaga = renderToStaticMarkup(
+  React.createElement(DtsFormStudio0550, {
+    data: d,
+    model,
+    systems: D.SYSTEMS,
+    defaultSystem: 'TEL-PAGA',
+    today,
+  })
+);
+assert(ssrPaga.includes('MM-ASK-00-APF-PAGA-TEL-DTS-0003 Rev.00.docx'), 'PAGA PTTEP §7.5 file name');
+assert(ssrPaga.includes('INTRON-X Main Rack'), 'PAGA AS-IS Volume I INDUSTRONIC INTRON-X');
+assert(ssrPaga.includes('Override Control Units (OCU)'), 'PAGA Sheet 3 OCU');
+assert(ssrPaga.includes('Operator Access Panel (OAP)'), 'PAGA Sheet 4 OAP');
+assert(ssrPaga.includes('Horn Speaker Explosion Proof'), 'PAGA Sheet 5 Horn Speaker');
+assert(ssrPaga.includes('Loud Speaker Ceiling/Wall Mounted'), 'PAGA Sheet 6 Indoor Speaker');
+assert(ssrPaga.includes('Flashing Beacon (Ex d)'), 'PAGA Sheet 7 Flashing Beacon');
+assert(ssrPaga.includes('Page 9 of 9'), 'PAGA 9-page split');
+assert(ssrPaga.includes('LSN-303-365') && ssrPaga.includes('LSN-303-414'), 'PAGA Rev.B1 ITR & Lab tags');
+
+// 5. All 4 official header logos in order (PTTEP, CNEEC, SAMTEL, ADDVALUE)
+const Logos = require(root + '/project0550/data/dtsFormLogos0550.js');
+assert.deepEqual(
+  Logos.DTS_HEADER_LOGOS_0550.map(l => l.id),
+  ['PTTEP', 'CNEEC', 'SAMTEL', 'ADDVALUE'],
+  'Header logo registry order must be PTTEP, CNEEC, SAMTEL, ADDVALUE'
+);
+assert(Logos.CNEEC_LOGO_DATA_URI.startsWith('data:image/png;base64,'), 'CNEEC logo embedded as PNG data URI');
+const logoIdsInOrder = [...ssr.matchAll(/data-logo-id="([^"]+)"/g)].map(m => m[1]);
+assert(logoIdsInOrder.length >= 20, 'All 5 pages include the 4-logo header strip (5 x 4 = 20)');
+for (let i = 0; i < logoIdsInOrder.length; i += 4) {
+  assert.deepEqual(
+    logoIdsInOrder.slice(i, i + 4),
+    ['PTTEP', 'CNEEC', 'SAMTEL', 'ADDVALUE'],
+    `Header strip ${i / 4 + 1} preserves 4-logo order`
+  );
+}
+
+console.log(
+  `PASS 12.T DTS Form Studio: ${totalChecked} system/area combinations, zero placeholders/leaks, PTTEP §7.5 naming, 4-logo header strip, 4-page A4 SSR.`
+);

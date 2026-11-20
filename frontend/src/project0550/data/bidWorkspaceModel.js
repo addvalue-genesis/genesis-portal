@@ -1,0 +1,308 @@
+import {radioAppendix11PriceProblems0550} from './radioAppendix11Budget0550';
+import {mgwCurrentOffer0550,mgwCurrentIncluded0550,mgwRadioPrintedExtension0550,mgwReplacementActive0550,MGW_SUPERSEDED_0550} from "./mgwQuoteSelection0550";
+import {validateOfferAtomicLines0550} from './atomicLines0550';
+import {validateVendorBidTags0550} from './vendorBidTags0550';
+import {CERAGON_DISH_ALLOWANCE_0550,CERAGON_R10_0550,ceragonR11Selected0550} from './ceragonSelection0550';
+import {isTowerFullQuote0550,TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
+import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
+import {pagaRevisionNet0550,validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
+import {validPagaMobPlan0550} from './pagaMobWorking0550';
+import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
+import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
+import {mgwDetailGroup0550,mgwDetailGroupPrice0550} from "./mgwDetailPricing0550";
+import {quoteValidity0550} from "./quoteValidity0550";
+import {mgwOfferProblems0550,MGW_QUOTE_0550,mgwWorkingLineExcluded0550,mgwHistoricalLine0550,mgwGroupExcluded0550,MGW_SCOPE_EXCLUDED_0550,mgwProjectWideLineConflict0550,MGW_PROJECT_WIDE_SERVICE_0550} from "./mgwVendorBasis0550";
+import {mrLineScope0550,mrWorkingGaps0550,MR_WORKING_CATALOG_0550} from "./mrWorkingBasis0550";
+import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationRuntime";
+import {addvalueSell0550} from "../bidWorkingBasis0550";
+import { validateSourceIntake } from "./sourceIntakeModel";
+import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
+import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
+import {a1OthersEstimateRate0550,c3AllowanceIds0550,generatedBidEstimate0550,mgwDependentEstimateOpen0550,spareBudgetRate0550,cusQuantityPricingProblems0550,reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
+import {c3GoodsBasis0550} from './c3GoodsAllowance0550';
+import {isBidScopeWarning0550} from "./bidProcess0550";
+import {validateIntegration0550} from "./integrationWorkspace0550";
+import {roundMoney0550 as round,sumMoney0550} from "./money0550";
+import {validateReleaseRegister0550} from "./releaseIssue0550";
+import {validateSourceControl0550} from "./sourceReadiness0550";
+import {validateTechnicalProposal0550} from "./technicalProposal0550";
+import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
+import {PRESERVATION_PACKING_OWNER_0550,preservationPackingOverlap0550,validateBidVolumes0550} from "./bidVolumes0550";
+import {validateBidPunchPlans} from "../../common/governance/bidPunch";
+import {COMMISSIONING_PHASES_0550,deriveB5StartupAllowance0550,validB5StartupPct0550} from './commissioningSparePhases0550';
+import {chevalierPbxAllocation0550,chevalierPbxOwnerCode0550,chevalierPbxQuote0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
+import {chevalierPbxCostConflict0550} from './chevalierPbxWorking0550';
+import {validateCostImpactRevisions0550} from './costImpactRev0550';
+export const BID_SCHEMA="genesis.0550.bidding.v1";
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans","b5StartupPct","costImpactRevisions"];
+export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
+export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
+export function newId(prefix){
+ // UUIDs identify workspace records, never authentication or approvals. Preview
+ // origins may expose getRandomValues without the secure-context randomUUID API.
+ const crypto=globalThis.crypto;
+ if(typeof crypto?.randomUUID==="function")return prefix+"-"+crypto.randomUUID();
+ const bytes=crypto.getRandomValues(new Uint8Array(16));
+ bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+ const hex=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+ return prefix+"-"+[hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join("-");
+}
+const finite=n=>typeof n==="number"&&Number.isFinite(n);
+const nonnegative=n=>finite(n)&&n>=0;
+const fail=m=>{throw Error(m);};
+export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
+export function validateBidWorkspace(data,snapshotId,systems){
+ if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
+ const unsupportedFields=Object.keys(data).filter(k=>!BID_WORKSPACE_FIELDS_0550.includes(k)).sort();
+ if(unsupportedFields.length){const error=Error("Unsupported workspace field: "+unsupportedFields.join(", "));error.code="WORKSPACE_UNSUPPORTED_FIELDS";error.unsupportedFields=unsupportedFields;throw error;}
+ if(data.b5StartupPct!==undefined&&!validB5StartupPct0550(data.b5StartupPct))fail("Invalid B5 PCT_START fraction");
+ if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
+ for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
+  if(!Array.isArray(data[key])||data[key].length>2000)fail("Invalid "+key);
+  if(key!=="audit"&&(data[key].some(r=>!r||typeof r.id!=="string"||!/^[\w.-]{1,100}$/.test(r.id))||new Set(data[key].map(r=>r.id)).size!==data[key].length))fail("Duplicate/invalid "+key+" ID");
+ }
+ const string=(v,k,max=4000)=>{if(typeof v!=="string"||v.length>max)fail("Invalid "+k);};
+ const date=(v,k)=>{string(v,k,10);if(v&&(!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(new Date(v).getTime())||new Date(v).toISOString().slice(0,10)!==v))fail("Invalid "+k);};
+ const fields=(o,allowed)=>{if(Object.keys(o).some(k=>!allowed.includes(k)))fail("Unsupported record field");};
+ const number=n=>{if(n!==null&&(!finite(n)||n<0||n>1e12))fail("Invalid numeric input");};
+ const system=s=>{if(s!=="COMMON"&&!systems.includes(s))fail("Unknown system");};
+ for(const v of data.vendors){fields(v,["id","name","kind","reference"]);["name","kind","reference"].forEach(k=>string(v[k],k));if(!v.name.trim())fail("Vendor name required");}
+ const atomicIds=new Set();
+ for(const o of data.offers){fields(o,["id","vendorId","description","brand","quoteRef","sourceRef","date","validUntil","currency","unit","unitCost","mgwQuoteLineId","unitBasis","supplierQuoteRow","quoteEvidence","bidTags","atomicLines","components"]);validateVendorBidTags0550(o.bidTags);validateOfferAtomicLines0550(o);
+  if(o.components!==undefined){if(!Array.isArray(o.components)||o.components.length>200)fail("Invalid radio lot components");for(const c of o.components){fields(c,["quantity","unit","description","partNo","group","included","remarks","sourceLine"]);if(c.quantity!==null&&(!finite(c.quantity)||c.quantity<0||c.quantity>1e12))fail("Invalid component quantity");if(typeof c.included!=="boolean")fail("Invalid component inclusion");for(const k of ["unit","description","partNo","group"])string(c[k],"component "+k,1000);string(c.remarks,"component remarks",4000);string(c.sourceLine,"component source",4000);}}
+  for(const {line_id} of o.atomicLines||[]){
+   if(atomicIds.has(line_id))fail("Duplicate ALIE line ID / "+line_id);
+   atomicIds.add(line_id);
+  }
+  validateSupplierQuoteRow0550(o);validateVendorQuoteEvidence0550(o.quoteEvidence,systems);if(o.mgwQuoteLineId!==undefined&&!MGW_QUOTE_0550.rows.some(r=>r.id===o.mgwQuoteLineId))fail("Unknown MGW quote row");if(o.unitBasis!==undefined)string(o.unitBasis,"unit basis");["description","brand","quoteRef","sourceRef"].forEach(k=>string(o[k],k));date(o.date,"quote date");date(o.validUntil,"quote validity");if(o.date&&o.validUntil&&o.validUntil<o.date)fail("Quote validity precedes quote date");if(!data.vendors.some(v=>v.id===o.vendorId))fail("Offer vendor missing");if(!["THB","USD","EUR"].includes(o.currency)||!BID_UNITS.includes(o.unit))fail("Invalid offer currency/unit");number(o.unitCost);}
+ for(const c of data.calculations){fields(c,["id","title","systemToken","equationId","inputs","sourceRef"]);string(c.title,"calculation title");string(c.sourceRef,"calculation source");system(c.systemToken);if(!c.inputs||typeof c.inputs!=="object"||Array.isArray(c.inputs))fail("Invalid equation inputs");if(evaluateServiceEquation(c.equationId,c.inputs).errors?.includes("Unknown equation"))fail("Unknown equation");}
+ for(const l of data.lines){fields(l,["id","systemToken","wbs","description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey","quantity","unit","currency","manualCost","sellMode","sellRate","markupPct","contingencyPct","marginPct","primePct","selected","customerRowCode","customerRemark","brand","supplyDraft","officialReview","satelliteScope","scopeBasis","mrRequirementId","responsibility","coveredByLineId","coverageBasis","mgwDetailGroupId","mgwDetailBasis","commissioningPhase"]);if(l.commissioningPhase!==undefined&&(l.wbs!=="B5"||!COMMISSIONING_PHASES_0550.some(p=>p.id===l.commissioningPhase)))fail("Invalid commissioning phase");if(l.supplyDraft!==undefined){if(l.wbs!=="A")fail("Supply proposal draft requires a Part A owner");validateSupplyProposalDraft0550(l.supplyDraft,BID_UNITS);}if(l.mgwDetailGroupId!==undefined&&!mgwDetailGroup0550(l.mgwDetailGroupId))fail("Unknown MGW pricing group");if(l.mgwDetailGroupId){const b=l.mgwDetailBasis,g=mgwDetailGroup0550(l.mgwDetailGroupId);if(!b||typeof b!=="object")fail("MGW quoted quantity basis missing");fields(b,["quoteVersion","sourceSha256","rows"]);string(b.quoteVersion,"MGW quote version",100);string(b.sourceSha256,"MGW source hash",100);if(!Array.isArray(b.rows)||b.rows.length!==g.rowIds.length||new Set(b.rows.map(r=>r.rowId)).size!==g.rowIds.length)fail("Invalid MGW quote row basis");for(const r of b.rows){fields(r,["rowId","quantity","unit"]);if(!g.rowIds.includes(r.rowId)||!BID_UNITS.includes(r.unit)||!finite(r.quantity)||r.quantity<=0||r.quantity>1e12)fail("Invalid MGW quoted quantity/unit");}}system(l.systemToken);for(const k of ["mrRequirementId","responsibility","coveredByLineId","coverageBasis"])if(l[k]!==undefined)string(l[k],k);if(l.mrRequirementId&&!MR_WORKING_CATALOG_0550.rows.some(r=>r.id===l.mrRequirementId))fail("Unknown MR requirement");if(l.responsibility&&!["TSI","COMPANY","CLARIFICATION"].includes(l.responsibility))fail("Invalid responsibility");if(l.satelliteScope!==undefined&&!SATELLITE_SCOPE_OPTIONS.some(([key])=>key===l.satelliteScope))fail("Invalid satellite scope");if(l.scopeBasis!==undefined)string(l.scopeBasis,"scope basis");if(l.officialReview!==undefined)validateOfficialReview(l.officialReview);for(const k of ["customerRowCode","customerRemark","brand"])if(l[k]!==undefined)string(l[k],k);if(!BID_WBS.includes(l.wbs))fail("Unknown 0550 WBS");["description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey"].forEach(k=>string(l[k],k));if(!BID_UNITS.includes(l.unit)||!["THB","USD","EUR"].includes(l.currency)||!["DIRECT","MARKUP","MARGIN"].includes(l.sellMode)||typeof l.selected!=="boolean")fail("Invalid line selection/unit/currency/pricing");["quantity","manualCost","sellRate","markupPct","marginPct","primePct"].forEach(k=>number(l[k]));if(l.contingencyPct!=null){number(l.contingencyPct);if(l.sellMode!=="MARKUP"||l.contingencyPct>100)fail("Invalid shortage contingency");}}
+ for(const n of data.nodes){fields(n,["id","systemToken","site","label","kind","sourceRef"]);system(n.systemToken);["site","label","kind","sourceRef"].forEach(k=>string(n[k],k));}
+ for(const e of data.edges){fields(e,["id","from","to","label","sourceRef"]);["from","to","label","sourceRef"].forEach(k=>string(e[k],k));if(!data.nodes.some(n=>n.id===e.from)||!data.nodes.some(n=>n.id===e.to)||e.from===e.to)fail("Invalid schematic edge");}
+ if(!data.fx||typeof data.fx!=="object")fail("Missing FX record");fields(data.fx,["thbPerUSD","thbPerEUR","source","date"]);number(data.fx.thbPerUSD);number(data.fx.thbPerEUR);string(data.fx.source,"FX source");date(data.fx.date,"FX date");
+ for(const a of data.audit){fields(a,["revision","at","action"]);if(!Number.isSafeInteger(a.revision)||a.revision<1)fail("Invalid audit revision");string(a.at,"audit time",100);string(a.action,"audit action");}
+ if(data.customerReviews!==undefined){if(!Array.isArray(data.customerReviews)||data.customerReviews.length>24||new Set(data.customerReviews.map(r=>r.code)).size!==data.customerReviews.length)fail("Invalid customer reviews");data.customerReviews.forEach(r=>validateOfficialReview(r,true));}
+ if(data.vendorBasisImport!==undefined){const r=data.vendorBasisImport;fields(r,["version","date","importedLineIds","skippedSystems"]);string(r.version,"vendor import version",100);date(r.date,"vendor import date");for(const k of ["importedLineIds","skippedSystems"]){if(!Array.isArray(r[k])||r[k].length>2000||r[k].some(v=>typeof v!=="string"||v.length>100))fail("Invalid vendor import list");}}
+ if(data.mgwQuoteImport!==undefined){const r=data.mgwQuoteImport;fields(r,["version","date","importedOfferIds","conflicts"]);string(r.version,"MGW version",100);date(r.date,"MGW import date");for(const key of ["importedOfferIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW import list");}}
+ if(data.mrWorkingImport!==undefined){const r=data.mrWorkingImport;fields(r,["version","date","importedLineIds","conflicts"]);string(r.version,"MR import version",100);date(r.date,"MR import date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid MR import list");}}
+ if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
+ validateSourceControl0550(data);
+ validateSourcePreparationImports0550(data.sourcePreparationImports);
+ validateSupplierRevisionImports0550(data.supplierRevisionImports);
+ if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
+ if(data.mgwDetailPricingImport!==undefined){const r=data.mgwDetailPricingImport;fields(r,["version","date","importedLineIds","conflicts","replacedLineIds","decision"]);if(r.decision!==undefined)string(r.decision,"MGW pricing decision");if(r.replacedLineIds!==undefined&&(!Array.isArray(r.replacedLineIds)||r.replacedLineIds.some(v=>typeof v!=="string"||v.length>100)))fail("Invalid replaced MGW owner list");string(r.version,"MGW pricing preparation version",100);date(r.date,"MGW pricing preparation date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW pricing preparation list");}}
+ if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited","eurThbConversionVersion","tsiActivityBudget","bidProcess","bidCompletion","pricedVolumeDraftIds","pagaMobPlan"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");
+  if(r.pagaMobPlan!==undefined&&!validPagaMobPlan0550(r.pagaMobPlan))fail("Invalid PAGA mobilization planning basis");
+  validateBidCompletion0550(r.bidCompletion);
+  const pricedDrafts=r.pricedVolumeDraftIds;
+  if(pricedDrafts!==undefined&&(!Array.isArray(pricedDrafts)||pricedDrafts.length>2000||new Set(pricedDrafts).size!==pricedDrafts.length||pricedDrafts.some(id=>typeof id!=='string'||!/^[\w.-]{1,100}$/.test(id))))fail('Invalid priced Volume I draft receipt');
+  if(r.eurThbConversionVersion!==undefined)string(r.eurThbConversionVersion,"EUR conversion version",100);
+  if(r.bidProcess!==undefined){const p=r.bidProcess;fields(p,['version','preparedOn','controlLineIds','ceragonHandled','pagaRevisionHandled','pagaIdieDraftOfferIds']);if(p.pagaRevisionHandled!==undefined&&typeof p.pagaRevisionHandled!=='boolean')fail('Invalid PAGA revision receipt');if(p.version!=='0550-bid-process-20261104-1'||typeof p.ceragonHandled!=='boolean'||!Array.isArray(p.controlLineIds)||p.controlLineIds.length>4||new Set(p.controlLineIds).size!==p.controlLineIds.length||p.controlLineIds.some(id=>!['REQ-MR-ACT-B5-D04','REQ-MR-ACT-B6-D05','REQ-MR-ACT-C2-D04','REQ-MR-ACT-C3-D04'].includes(id)))fail('Invalid bid process receipt');date(p.preparedOn,'bid process date');}
+  const pagaServices=r.bidProcess?.pagaIdieDraftOfferIds;
+  if(pagaServices!==undefined&&(!Array.isArray(pagaServices)||pagaServices.length>2||
+   new Set(pagaServices).size!==pagaServices.length||pagaServices.some(id=>!['OFFER-IDIE-QO26169-LOCAL-FAT-DAY','OFFER-IDIE-QO26163R1-ENG-DAY'].includes(id))))
+   fail('Invalid PAGA service preparation receipt');
+  if(r.tsiActivityBudget!==undefined){const b=r.tsiActivityBudget;fields(b,["version","preparedOn","updatedLineIds","calculationIds","conflicts","expenseVersion","expenseLineIds","expenseConflicts"]);string(b.version,"TSI estimate version",100);date(b.preparedOn,"TSI estimate date");if(b.expenseVersion!==undefined)string(b.expenseVersion,"TSI expense version",100);for(const key of ["updatedLineIds","calculationIds","conflicts",...(b.expenseVersion!==undefined?["expenseLineIds","expenseConflicts"]:[])]){if(!Array.isArray(b[key])||b[key].length>100||b[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid TSI estimate receipt");}}
+ }
+ validateBidPunchPlans(data.bidPunchPlans);
+ validateIntegration0550(data);
+ validateTechnicalProposal0550(data.technicalProposal,[...new Set([...systems,...(data.integrationWorkspace?.requirements||[]).map(r=>r.systemToken)])]);
+ validateBidVolumes0550(data);
+ validateCostImpactRevisions0550(data.costImpactRevisions);
+ validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
+ return data;
+}
+const SPARE_BUDGET_REVIEW_0550="SPARE_BUDGET_REVIEW: Draft allowance from known current Part A costs. Verify OEM parts and deduct confirmed package inclusions.";
+const A1_OTHERS_ESTIMATE_REVIEW_0550="A1_OTHERS_ESTIMATE_REVIEW: Draft freight, handling or insurance allowance. Verify delivery scope and actual rates.";
+export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
+ data=reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(data));
+ const towerSurveyOpen=towerSurveyReviewPending0550(data);
+ const r11=ceragonR11Selected0550(data);
+ const supersededCeragon=line=>r11&&(line.id===CERAGON_DISH_ALLOWANCE_0550||line.offerId===CERAGON_R10_0550);
+ const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
+ const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
+ const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
+ const eligible=data.lines.filter(l=>l.selected&&!supersededCeragon(l)&&!mgwWorkingLineExcluded0550(data,l)&&!satelliteScope0550(l).excluded&&!mrLineScope0550(data,l).excluded&&!mrLineScope0550(data,l).covered);
+ const counts=new Map();
+ for(const line of eligible)if(line.scopeKey.trim()){const key=line.scopeKey.trim().toLowerCase();counts.set(key,(counts.get(key)||0)+1);}
+ const pagaNetIds=new Set(data.offers.filter(pagaRevisionNet0550).map(o=>o.id));
+ const pagaOwners=eligible.filter(l=>l.systemToken==='TEL-PAGA'&&l.wbs==='A'&&pagaNetIds.has(l.offerId));
+ const pbxQuote=chevalierPbxQuote0550(data.offers);
+ const hasPbxAllocation=data.lines.some(l=>l.selected&&chevalierPbxOwnerCode0550(l.id));
+ const priceLine=(l,procurementBasisTHB,c3BasisTHB)=>{
+  const satelliteScope=satelliteScope0550(l),mrScope=mrLineScope0550(data,l),historicalMgwPackage=mgwGroupExcluded0550(l.mgwDetailGroupId);
+  const retiredMgw=mgwHistoricalLine0550(data,l);
+  const selected=l.selected&&!supersededCeragon(l)&&!retiredMgw&&!historicalMgwPackage&&!satelliteScope.excluded&&!mrScope.excluded&&!mrScope.covered;
+  const problems=[...satelliteScope.problems,...mrScope.problems,...cusQuantityPricingProblems0550(data,l),...radioAppendix11PriceProblems0550(data,l),...(mrScope.covered?["INCLUDED_IN_OWNER: non-additive requirement / "+mrScope.owner.id]:[])],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
+  const pbxAllocation=chevalierPbxAllocation0550(pbxQuote,l,offer);
+  let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
+  if(selected&&l.id===PRESERVATION_PACKING_OWNER_0550&&preservationPackingOverlap0550(data)){
+   problems.push('PACKING_SCOPE_OVERLAP: reconcile the allowance with the existing packing owner');
+  }
+  if(l.mgwDetailGroupId){const priced=mgwDetailGroupPrice0550(data,l.mgwDetailGroupId,l,reviewDate);costRate=priced.costUSD;problems.push(...priced.problems);if(l.quantity!==1||l.unit!=="Lot"||l.currency!=="USD"||l.manualCost!==null||l.offerId||l.calculationId)problems.push("MGW_QUOTED_PACKAGE_BASIS: use one USD Lot from canonical source offers");}
+  if(!l.description.trim()||!l.sourceRef.trim()||!l.scopeKey.trim())problems.push("Description, scope key and source/basis required");
+  if(counts.get(l.scopeKey.trim().toLowerCase())>1&&selected)problems.push("DUPLICATE_SCOPE_OWNER");
+  if(l.vendorId&&!data.vendors.some(v=>v.id===l.vendorId))problems.push("Vendor missing");
+  if(l.offerId){
+   if(!offer)problems.push("Selected offer missing");
+   else {
+    currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;
+    if(chevalierPbxOwnerCode0550(l.id)){
+     costRate=pbxAllocation?.cost??null;
+     if(!pbxAllocation)problems.push('CHEVALIER_PBX_BASIS_OPEN: verify quoted Products, discount and service lots');
+     else if(selected&&chevalierPbxCostConflict0550(data,l,pbxQuote)){
+      costRate=null;
+      problems.push('SUPPLIER_ROW_COST_OWNER_DUPLICATE: reconcile overlapping PABX price owners');
+     }
+    }else if((chevalierPbxSource0550(offer)&&hasPbxAllocation)||(offer.supplierQuoteRow&&offer.supplierQuoteRow.classification!=="NET_PACKAGE")){
+     costRate=null;
+     problems.push("SUPPLIER_ROW_NON_ADDITIVE: use the approved quote allocation or net package owner");
+    }
+    problems.push(...mgwOfferProblems0550(offer,l));
+    if(mgwCurrentOffer0550(offer)&&selected){
+     if(mgwCurrentIncluded0550(offer)||offer.quoteEvidence.classification==='OPTION')problems.push('MGW_QUOTE_NON_ADDITIVE_OR_OPTION');
+     if(data.lines.some(other=>other.id!==l.id&&other.selected&&!other.coveredByLineId&&other.offerId===offer.id))problems.push('MGW_SOURCE_COST_OWNER_DUPLICATE / '+offer.id);
+    }
+    if(pagaNetIds.has(offer.id)&&selected){
+     if(l.systemToken!=='TEL-PAGA'||l.wbs!=='A'||l.quantity!==1||l.calculationId)problems.push('PAGA_NET_PACKAGE_BASIS: select one EUR Lot in Working A for TEL-PAGA');
+     if(pagaOwners.length>1)problems.push('PAGA_NET_COST_OWNER_DUPLICATE: select one PAGA NET revision');
+    }
+    if(offer.vendorId!==l.vendorId)problems.push("Vendor/offer mismatch");
+    if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");
+    if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
+    if(offer.date&&offer.date>reviewDate)problems.push("Quote dated in future — confirm source date");
+    if(quoteValidity0550(offer,reviewDate).expired)problems.push("Quote expired — review replacement source");
+   }
+  }
+  if(l.calculationId){
+   if(!calc)problems.push("Calculation missing");
+   else {result=evaluateServiceEquation(calc.equationId,calc.inputs);quantity=result[l.resultKey];
+    if(calc.systemToken!==l.systemToken&&calc.systemToken!=="COMMON")problems.push("Calculation system mismatch");
+    if(!calc.sourceRef.trim())problems.push("Calculation source required");
+    const outputUnit=l.resultKey==="MD"?"MD":l.resultKey==="MH"&&calc.equationId==="E05"?"MH":result.unit;
+    const spareQuantity=outputUnit==='COUNT';
+    const spareWbs={'C2-SPARE-QTY':'B5','C3-SPARE-QTY':'C3','C4-SPARE-QTY':'C2'}[calc.equationId]||'B5';
+    if(spareQuantity&&l.wbs!==spareWbs)problems.push('Spare quantity requires matching Working WBS '+spareWbs);
+    if(spareQuantity?!['U','Pc','SET'].includes(unit):unit!==bidQuantityUnit0550(outputUnit))problems.push("Equation output/rate unit mismatch");
+    if(result.state!=="CALCULATED")problems.push(...result.errors);
+   }
+  }
+  if(mgwWorkingLineExcluded0550(data,l,offer)){
+   costRate=null;
+   problems.push(retiredMgw?MGW_SUPERSEDED_0550:MGW_SCOPE_EXCLUDED_0550);
+  }
+  let spareBudget,a1OthersEstimate;
+  if(mgwDependentEstimateOpen0550(data,l)){
+   const rate=spareBudgetRate0550(l.id);
+   const spareBasisTHB=c3AllowanceIds0550.includes(l.id)?c3BasisTHB:procurementBasisTHB;
+   const othersRate=selected?a1OthersEstimateRate0550(data,l,procurementBasisTHB):null;
+   // The existing receipt check only allows an untouched generated estimate.
+   // This calculation uses current cost owners and is a draft price basis only.
+   if(selected&&rate&&finite(spareBasisTHB)&&spareBasisTHB>=0){
+    spareBudget={rate,basisTHB:spareBasisTHB};
+    const estimateFx=fx(currency);costRate=estimateFx!==null?round((spareBasisTHB*rate)/estimateFx):null;
+    problems.push(SPARE_BUDGET_REVIEW_0550);
+   }else if(nonnegative(othersRate?.amount)){
+    a1OthersEstimate=true;
+    const srcFx=fx(othersRate.currency),targetFx=fx(currency);
+    costRate=srcFx!==null&&targetFx!==null?round((othersRate.amount*srcFx)/targetFx):null;
+    problems.push(A1_OTHERS_ESTIMATE_REVIEW_0550);
+   }else{
+    costRate=null;
+    problems.push('MGW_DEPENDENT_ESTIMATE_OPEN: ตรวจฐานประมาณการหลังเปลี่ยนขอบเขตและต้นทุน MGW');
+   }
+  }
+  if(mgwProjectWideLineConflict0550(l,offer)){
+   costRate=null;
+   problems.push(MGW_PROJECT_WIDE_SERVICE_0550);
+  }
+  if(l.id===RETIRED_TOWER_OWNER_0550||l.offerId===RETIRED_TOWER_OFFER_0550){
+   costRate=null;
+   problems.push(RETIRED_TOWER_BASIS_0550);
+  }
+  if(isTowerFullQuote0550(offer)){
+   costRate=null;
+   problems.push("TOWER_FULL_QUOTE_REFERENCE: use the allocated supply and erection owners");
+  }
+  if(towerSurveyOpen&&l.id===TOWER_SURVEY_ID_0550){
+   costRate=null;
+   problems.push("TOWER_GEOTECH_OPEN: ตรวจฐานราคา TSSR ที่เคยรวมค่าเจาะสำรวจก่อนใช้ยอด");
+  }
+  if(!finite(quantity)||quantity<=0)problems.push("Positive quantity/driver required");
+  if(!nonnegative(costRate))problems.push("Cost rate OPEN");
+  const factor=fx(currency);if(factor===null)problems.push("FX source/date/rate OPEN");
+  const costNative=finite(quantity)&&nonnegative(costRate)?quantity*costRate:null;
+  // The printed Radio extension can be carried in the bid draft while its
+  // missing unit remains an Official Working problem.
+  const radioPrintedExtension=mgwRadioPrintedExtension0550(offer,l);
+  const draftBlocker=p=>p!==SPARE_BUDGET_REVIEW_0550&&p!==A1_OTHERS_ESTIMATE_REVIEW_0550&&!isBidScopeWarning0550(p)&&
+   !(radioPrintedExtension&&p.startsWith("MGW_UNIT_OPEN:"))&&
+   !(p.startsWith("SATELLITE_SCOPE_OPEN:")&&data.repositoryBasisImport?.bidCompletion?.rows.some(r=>r.lineId===l.id&&r.kind==="ESTIMATE"))&&
+   !["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p);
+  // The spare provision consumes procurement cost, before any sell/Prime checks.
+  const c3ProcurementCostTHB=selected&&l.wbs==="A"&&factor!==null&&finite(costNative)&&
+   Math.abs(costNative)<=Number.MAX_SAFE_INTEGER/100&&!problems.some(draftBlocker)?round(costNative*factor):null;
+  const spareProcurementCostTHB=problems.some(p=>p.startsWith("MGW_UNIT_OPEN:"))?null:c3ProcurementCostTHB;
+  // Cargo and liability estimates use a pass-through rate equal to the current premium.
+  const sellInputs=a1OthersEstimate&&l.sellMode==='DIRECT'?{...l,sellRate:costRate}:l;
+  const addvalueSell=addvalueSell0550(sellInputs,costNative,quantity);
+  if(addvalueSell===null)problems.push("Working sell inputs OPEN/invalid");
+  const customerNative=addvalueSell!==null&&nonnegative(l.primePct)?eq("E13",{sell:addvalueSell,primeMarkup:l.primePct/100}):null;
+  if(customerNative===null)problems.push("Prime commercial treatment OPEN/invalid");
+  if(factor!==null&&[customerNative,costNative,addvalueSell].some(n=>n!==null&&(!Number.isFinite(n*factor)||Math.abs(n*factor)>Number.MAX_SAFE_INTEGER/100)))problems.push("Converted amount exceeds supported precision");
+  const ready=problems.length===0;
+  const customerTHB=ready?round(customerNative*factor):null;
+  const usdRate=fx("USD");
+  const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
+  // A sourced DIRECT selling rate is independent of unestablished internal cost.
+  // Cost stays null; the strict Working/Official problems above are retained.
+  const provisionalProblems=problems.filter(p=>draftBlocker(p)&&!(l.sellMode==="DIRECT"&&p==="Cost rate OPEN"));
+  const nativeReady=!retiredMgw&&provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
+  const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
+  // Keep the established FX/rounding path when available; native USD needs no invented FX.
+  const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
+  const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
+   provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
+  const pbxProducts=pbxAllocation?.products?.map(item=>({
+   itemCode:item.supplierQuoteRow.itemCode,description:item.description,quantity:item.supplierQuoteRow.quantity,unit:item.unit,
+  }));
+  return {...l,...provisional,...(spareBudget?{spareBudget}:{}),...(a1OthersEstimate?{a1OthersEstimate}:{}),...(pbxProducts?{pbxProducts}:{}),c3ProcurementCostTHB,spareProcurementCostTHB,historicalMgwPackage:historicalMgwPackage||retiredMgw,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+ };
+ const equipment=new Map();
+ if(mgwReplacementActive0550(data)&&data.repositoryBasisImport?.bidCompletion){
+  for(const line of data.lines)if(line.wbs==='A')equipment.set(line.id,priceLine(line,null));
+ }
+ const procurementBasisTHB=sumMoney0550([...equipment.values()]
+  .map(line=>line.spareProcurementCostTHB).filter(finite));
+ const c3Bindings=new Set((data.bidVolumes?.bindings||[]).filter(b=>b.schedule==='C3'&&b.treatment==='OPTION').map(b=>b.lineId));
+ const activeAllowances=eligible.filter(line=>c3AllowanceIds0550.includes(line.id));
+ const allocatedAllowances=activeAllowances.filter(line=>c3Bindings.has(line.id));
+ const allowSystemReplacement=equipment.size>0&&allocatedAllowances.length>0&&activeAllowances.every(line=>generatedBidEstimate0550(data,line));
+ const c3NamedLines=new Map();
+ const namedPrices=new Map();
+ for(const line of eligible){
+  if(!allowSystemReplacement||line.wbs!=='C3'||line.systemToken==='COMMON'||!c3Bindings.has(line.id))continue;
+  const priced=priceLine(line,procurementBasisTHB);
+  if(!finite(priced.provisionalCustomerTHB)||!finite(priced.provisionalCustomerUSD))continue;
+  namedPrices.set(line.id,priced);
+  if(!c3NamedLines.has(line.systemToken))c3NamedLines.set(line.systemToken,[]);
+  c3NamedLines.get(line.systemToken).push(line.id);
+ }
+ const c3GoodsBasis=equipment.size?c3GoodsBasis0550(data,[...equipment.values()],systemTokens,pbxQuote).map(row=>
+  ({...row,replaced:c3NamedLines.get(row.systemToken)||null})):[];
+ const c3BasisTHB=c3GoodsBasis.some(row=>row.costTHB>0)?
+  sumMoney0550(c3GoodsBasis.filter(row=>!row.replaced).map(row=>row.costTHB).filter(finite))??0:null;
+ const lines=data.lines.map(line=>equipment.get(line.id)??namedPrices.get(line.id)??priceLine(line,procurementBasisTHB,c3BasisTHB));
+ const selected=lines.filter(l=>l.selected);
+ const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
+ const sum=(rows,key)=>sumMoney0550(rows.map(r=>r[key]));
+ const groups=BID_WBS.map(code=>{const rows=selected.filter(l=>l.wbs===code);return {code,rows,costTHB:sum(rows,"costTHB"),customerTHB:sum(rows,"customerTHB"),customerUSD:sum(rows,"customerUSD")};});
+ const missingSystems=systemTokens.filter(t=>!selected.some(l=>l.systemToken===t&&l.wbs==="A"));
+ const missingWbs=BID_WBS.filter(c=>c!=="A"&&c!=="C1"&&!selected.some(l=>l.wbs===c));
+ const requirementGaps=mrWorkingGaps0550(data,lines);
+ const baseScopeOpen=requirementGaps.some(g=>!g.code||!g.code.startsWith("C")),optionScopeOpen=requirementGaps.some(g=>!g.code||g.code.startsWith("C"));
+ const result={requirementGaps,lines,selected,groups,complete:complete&&!requirementGaps.length,missingSystems,missingWbs,baseTHB:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0&&requirementGaps.length===0,revision:data.revision};
+ const provisional=deriveProvisionalPricing(data,result);
+ return {...result,c3GoodsBasis,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional,
+  b5StartupAllowance:deriveB5StartupAllowance0550(data,provisional.selected)};
+}

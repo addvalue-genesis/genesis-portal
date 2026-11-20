@@ -1,0 +1,182 @@
+// Executable bindings for the existing 0550 E01–E18 register. No rates or FX defaults.
+import { SERVICE_EQUATIONS } from "./serviceEquationModel";
+import Decimal from 'decimal.js';
+const SpareCountDecimal=Decimal.clone({precision:40});
+export const SPARE_EQUATION_SCHEDULES_0550={'C2-SPARE-QTY':'C2','C3-SPARE-QTY':'C3','C4-SPARE-QTY':'C4'};
+const f=(key,label,min=0,max=1e12)=>({key,label,min,max});
+const optional=(key,label,min=0,max=1e12)=>({...f(key,label,min,max),optional:true});
+export const C2_OEM_QUANTITY_ID_0550="B5-C2-OEM-QTY";
+export const C2_OEM_POPULATIONS_0550=[
+ ["MAIN_EQUIPMENT","Main equipment items (B)"],
+ ["INSTALLED_PARTS","Identical installed parts (A × B)"]
+];
+const c2Recommended=f("recommended","Required quantity per CUS / OEM spare list");
+const c2RatioFields=[
+ f("sparesPerGroup","Spares per group"),
+ f("groupSize","Equipment items / installed parts per group",1)
+];
+export const C2_OEM_ROUNDING_0550=[
+ ["CEIL","CEIL · นับเศษเป็นหนึ่งกลุ่ม"],
+ ["FLOOR","FLOOR · นับเฉพาะกลุ่มเต็ม"]
+];
+export const C2_OEM_RATIO_FORMULA_0550=roundingMode=>
+ "Q_required = "+(roundingMode==="CEIL"?"ceil":roundingMode==="FLOOR"?"floor":"CEIL/FLOOR")+"(population / groupSize) × sparesPerGroup; Q_add = max(0, Q_required − Q_included)";
+export function serviceEquationFields0550(id,inputs){
+ const fields=EQUATION_INPUTS[id].fields;
+ if(id!==C2_OEM_QUANTITY_ID_0550||inputs?.mode!=="RATIO")return fields;
+ return fields.flatMap(field=>{
+  if(field===c2Recommended)return c2RatioFields;
+  if(field.key==="A"&&inputs.populationBasis==="MAIN_EQUIPMENT")return [{...field,optional:true}];
+  return [field];
+ });
+}
+export const EQUATION_INPUTS = {
+ // SI quantity only: N is the matching installed Working A / CUS-MR population;
+ // vendorQty/oemListQty reference the linked 07 spare offer, never equipment qty.
+ // Rates/minima require a recorded engineering basis; no universal % is assumed.
+ // Q_add is display-only until a distinct spare Working owner is bound in 11.M.
+ 'C2-SPARE-QTY':{fields:[optional('N','Matching installed parts from Working A'),optional('mmcPct','MMC internal benchmark fraction (0.1 = 10%)',0,1),optional('mmcMin','MMC minimum'),optional('planQty','Commissioning plan quantity'),optional('vendorQty','Vendor commissioning spare quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_mmc = max(ceil(N × mmcPct), mmcMin); Q_required = max(Q_mmc, planQty, vendorQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
+ 'C3-SPARE-QTY':{fields:[optional('demand24m','Demand for full 24 months'),optional('safetyStock','Separate safety stock'),optional('vendorQty','Vendor two-year spare quantity'),optional('engReviewQty','Engineering reviewed operating quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_required = max(demand24m + safetyStock, vendorQty, engReviewQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
+ 'C4-SPARE-QTY':{fields:[optional('N','Matching installed parts from Working A'),optional('capitalPct','Source-backed capital fraction',0,1),optional('capitalMin','Capital minimum'),optional('oemListQty','OEM capital spare list quantity'),f('includedInKit','Confirmed same-purpose kit spares'),f('approvedStock','Approved same-purpose stock')],unit:'COUNT',formula:'Q_pct = max(ceil(N × capitalPct), capitalMin); Q_required = max(Q_pct, oemListQty); Q_add = max(0, Q_required − includedInKit − approvedStock)'},
+ E01:{fields:[f("I","Applicability 0/1",0,1),f("Q","Work objects"),f("UMH","MH per object"),f("F","Factor")],unit:"MH"},
+ E02:{fields:[f("Qdoc","Documents"),f("Hinitial","Initial MH/document"),f("Ncycles","Review cycles"),f("Hcycle","MH/review"),f("Hfinal","Final MH/document")],unit:"MH"},
+ E03:{fields:[f("months","Months"),f("FTE","FTE"),f("Hmonth","Paid hours/month")],unit:"MH"},
+ E04:{fields:[],rows:[f("I","Applicable 0/1",0,1),f("UMH","MH/interface"),f("F","Factor")],unit:"MH"},
+ E05:{fields:[f("events","Events"),f("days","Days/event"),f("crew","Persons"),f("Hday","Paid hours/day")],unit:"MD",outputs:["MD","MH"]},
+ E06:{fields:[f("MHwork","Required MH"),f("crew","Persons",0.000001),f("Hday","Hours/day",0.000001),f("eta","Productive efficiency 0–1",0.000001,1)],unit:"DAYS"},
+ E07:{fields:[],rows:[f("MHpaid","Paid MH"),f("costRate","Cost per MH")],unit:"CURRENCY"},
+ E08:{fields:[f("fare","Fare"),f("hotel","Hotel"),f("perDiem","Per diem"),f("transport","Transport"),f("permits","Permits"),f("insurance","Insurance"),f("other","Other")],unit:"CURRENCY"},
+ E09:{fields:[f("labor","Labor cost"),f("trip","Trip cost"),f("OEM","OEM cost"),f("test","Test cost"),f("other","Other cost")],unit:"CURRENCY"},
+ E10:{fields:[f("other","Other selling amount")],rows:[f("quantity","Paid MH or MD"),f("sellRate","Sell per matching MH/MD")],unit:"CURRENCY"},
+ E11:{fields:[f("cost","Loaded cost"),f("markup","Markup fraction (0.2 = 20%)",0,100)],unit:"CURRENCY"},
+ E12:{fields:[f("cost","Loaded cost"),f("margin","Gross margin fraction",0,0.999999)],unit:"CURRENCY"},
+ E13:{fields:[f("sell","ADDVALUE sell"),f("primeMarkup","Prime markup fraction",0,100)],unit:"CURRENCY"},
+ E14:{fields:[f("pool","Shared pool"),f("driver","This causal driver"),f("totalDrivers","Total causal drivers",0.000001)],unit:"CURRENCY"},
+ E15:{fields:[f("laborDelta","Labor delta",-1e12),f("tripDelta","Trip delta",-1e12),f("OEMDelta","OEM delta",-1e12)],unit:"CURRENCY"},
+ E16:{fields:[f("sessions","Sessions"),f("days","Days/session"),f("trainers","Trainers"),f("Hday","Paid hours/day"),f("prepMH","Preparation MH"),f("closeMH","Closeout MH")],unit:"MH"},
+ E17:{fields:[f("THB","THB amount"),f("fx","THB per USD",0.000001)],unit:"USD"},
+ E18:{fields:[],rows:[f("qtyInstalled","Installed activity quantity"),f("UMH","MH per installed activity")],unit:"MH"},
+ [C2_OEM_QUANTITY_ID_0550]:{fields:[f("A","Identical parts per Main Equipment item",1),f("B","Count of matching Main Equipment items",1),c2Recommended,f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"N_installed = A × B; Q_add = max(0, Q_required − Q_included)"},
+ "B5-SPARE-QTY":{fields:[f("drivers","Consumption events / concurrent teams / OEM lot (1)"),f("perDriver","Spares per event / team / OEM lot"),f("reserve","Separate specified reserve"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"Q_add = max(0, N × Q_per_driver + Q_separate_reserve − Q_included)"},
+ "B5-SPARE-STOCK":{fields:[f("installed","Installed units with the same replaceable Part No."),f("failureRate","OEM failures per unit-hour",Number.MIN_VALUE,1),f("exposureHours","Unreplenished exposure hours",Number.MIN_VALUE),f("coveragePct","Stock sufficiency target (%)",0.000001,99.999999),f("planned","Separate planned consumption"),f("included","Same Part No. and duty already included")],unit:"COUNT",formula:"λ = N × failure rate × t; S = smallest integer with P(Poisson(λ) ≤ S) ≥ target; Q_add = max(0, Q_planned + S − Q_included)"},
+ "PAGA-SPL":{fields:[f("ambient","Ambient noise dBA"),f("margin","Required SNR margin dB")],unit:"dBA",formula:"SPL_required = Ambient_Noise + Required_SNR_Margin"},
+ "PAGA-UPS":{fields:[f("loadW","Alarm load W"),f("hours","Autonomy hours"),f("efficiency","Efficiency 0–1",0.000001,1),f("DoD","Depth of discharge 0–1",0.000001,1),f("derating","Derating factor 0–1",0.000001,1)],unit:"Wh",formula:"E_required = P_load × t / (η × DoD × Derating)"},
+ "PAGA-AMPLIFIER":{fields:[f("tapW","Total speaker tap load W"),f("lossW","Loop losses W"),f("ratedW","Rated amplifier capacity W",0.000001),f("usable","Usable fraction 0–1",0.000001,1)],unit:"W",formula:"Headroom = Rated × Usable − (Speaker taps + Loop losses)"},
+ "AVAILABILITY":{fields:[f("MTBF","MTBF hours",0.000001),f("MTTR","MTTR hours")],unit:"RATIO",formula:"A = MTBF / (MTBF + MTTR)"},
+ "CCTV-STORAGE":{fields:[f("cameras","Recording streams"),f("Mbps","Mbps per stream"),f("days","Retention days"),f("overhead","Overhead multiplier",1),f("usable","Usable storage fraction",0.000001,1)],unit:"TB",formula:"Required decimal TB = streams × Mbps × days × 86400 × overhead / (8 × 1000000 × usable)"},
+ "NETWORK-HEADROOM":{fields:[f("capacityMbps","Link capacity Mbps"),f("usable","Usable fraction",0.000001,1),f("demandMbps","Aggregate demand Mbps")],unit:"Mbps",formula:"Headroom Mbps = capacity × usable − aggregate demand"},
+ "POWER-HEADROOM":{fields:[f("capacityW","Available power W"),f("usable","Usable fraction",0.000001,1),f("demandW","Connected load W")],unit:"W",formula:"Power headroom = capacity × usable − connected load"},
+ "PORT-HEADROOM":{fields:[f("available","Available compatible ports"),f("connected","Connected ports"),f("reserved","Required spare ports")],unit:"PORT",formula:"Port headroom = available − connected − required spares"},
+ "LICENSE-HEADROOM":{fields:[f("licensed","Licensed matching functions/channels"),f("required","Required matching functions/channels")],unit:"LICENSE",formula:"License headroom = licensed − required (same license metric)"},
+ "FO-LOSS":{fields:[f("lengthKm","Route length km"),f("dBperKm","Fiber attenuation dB/km"),f("splices","Splices"),f("spliceLoss","Loss per splice dB"),f("connectors","Connectors"),f("connectorLoss","Loss per connector dB"),f("margin","Design margin dB")],unit:"dB",formula:"Required optical budget = km × dB/km + splices × loss + connectors × loss + margin"},
+ "RF-MARGIN":{fields:[f("txDBm","Transmit power dBm",-200,200),f("txGain","Tx antenna gain dBi",-100,200),f("rxGain","Rx antenna gain dBi",-100,200),f("lossDB","Total verified path/feed losses dB"),f("sensitivityDBm","Receiver threshold dBm",-300,200)],unit:"dB",formula:"Receive margin = Tx dBm + gains − verified losses − receiver threshold dBm"}
+};
+// Equation units remain scientific/model units; bidding uses its existing day code.
+export const bidQuantityUnit0550 = unit => unit === "DAYS" ? "day" : unit;
+function poissonStock(mean,coverage){
+ let probability=Math.exp(-mean),cumulative=probability,reserve=0;
+ while(cumulative<coverage){
+  reserve+=1;
+  probability*=mean/reserve;
+  cumulative+=probability;
+ }
+ return {meanFailures:mean,reserve,coveragePct:100*cumulative};
+}
+export function evaluateServiceEquation(id, inputs={}) {
+ const definition=EQUATION_INPUTS[id];
+ if(!definition)return {state:"INVALID",value:null,errors:["Unknown equation"],unit:null};
+ if(!inputs||typeof inputs!=="object"||Array.isArray(inputs))return {state:"INVALID",value:null,errors:["Inputs must be an object"],unit:definition.unit};
+ const errors=[],missing=[],fields=serviceEquationFields0550(id,inputs);
+ const c2Oem=id===C2_OEM_QUANTITY_ID_0550,ratio=c2Oem&&inputs.mode==="RATIO";
+ // Legacy ratio records used CEIL before these inputs existed.
+ const legacyRounding=ratio&&inputs.roundingMode===undefined&&inputs.roundingSourceRef===undefined;
+ const roundingMode=legacyRounding?"CEIL":inputs.roundingMode;
+ if(c2Oem&&inputs.mode!==undefined&&!["DIRECT","RATIO"].includes(inputs.mode))errors.push("Unknown C2 OEM quantity mode");
+ if(ratio){
+  if(inputs.populationBasis==null||inputs.populationBasis==="")missing.push("populationBasis");
+  else if(!C2_OEM_POPULATIONS_0550.some(([key])=>key===inputs.populationBasis))errors.push("Unknown C2 OEM population basis");
+  if(!legacyRounding){
+   if(roundingMode==null||roundingMode==="")missing.push("roundingMode");
+   else if(!C2_OEM_ROUNDING_0550.some(([key])=>key===roundingMode))errors.push("Unknown C2 OEM rounding mode");
+   if(inputs.roundingSourceRef!=null&&typeof inputs.roundingSourceRef!=="string")errors.push("Invalid C2 OEM rounding source");
+   else if(!inputs.roundingSourceRef?.trim())missing.push("roundingSourceRef");
+  }
+ }
+ const check=(spec,obj,prefix="")=>{for(const field of spec){const v=obj?.[field.key],k=prefix+field.key;
+  if(v===null||v===undefined||v===""){if(!field.optional)missing.push(k);}
+  else if(typeof v!=="number"||!Number.isFinite(v)||v<field.min||v>field.max)errors.push(k+" outside allowed range");
+ }};
+ check(fields,inputs);
+ if(SPARE_EQUATION_SCHEDULES_0550[id]){
+  const has=k=>inputs[k]!==null&&inputs[k]!==undefined&&inputs[k]!=='';
+  for(const field of fields)if(has(field.key)&&!['mmcPct','capitalPct'].includes(field.key)&&!Number.isSafeInteger(inputs[field.key]))errors.push(field.key+' must be a whole safe count');
+  const candidates=[];let percentQuantity=null;
+  const pct=id==='C2-SPARE-QTY'?'mmcPct':id==='C4-SPARE-QTY'?'capitalPct':null,min=pct==='mmcPct'?'mmcMin':'capitalMin';
+  if(pct&&(has(pct)||has(min))){
+   for(const k of ['N',pct,min])if(!has(k))missing.push(k);
+   if(['N',pct,min].every(has)&&!errors.length)percentQuantity=Math.max(new SpareCountDecimal(inputs.N).times(inputs[pct]).ceil().toNumber(),inputs[min]);
+   if(percentQuantity!==null)candidates.push(percentQuantity);
+  }
+  if(id==='C3-SPARE-QTY'&&(has('demand24m')||has('safetyStock'))){
+   for(const k of ['demand24m','safetyStock'])if(!has(k))missing.push(k);
+   if(has('demand24m')&&has('safetyStock'))candidates.push(inputs.demand24m+inputs.safetyStock);
+  }
+  for(const k of id==='C2-SPARE-QTY'?['planQty','vendorQty']:id==='C3-SPARE-QTY'?['vendorQty','engReviewQty']:['oemListQty'])if(has(k))candidates.push(inputs[k]);
+  if(!candidates.length)missing.push('source-backed spare quantity basis');
+  if(errors.length||missing.length)return {state:errors.length?'INVALID':'OPEN',value:null,unit:'COUNT',errors:[...errors,...[...new Set(missing)].map(k=>'Missing '+k)],engineeringAccepted:false};
+  const requiredQuantity=Math.max(...candidates),value=Math.max(0,requiredQuantity-inputs.includedInKit-inputs.approvedStock);
+  if(!Number.isSafeInteger(requiredQuantity)||!Number.isSafeInteger(inputs.includedInKit+inputs.approvedStock))return {state:'INVALID',value:null,unit:'COUNT',errors:['Spare quantity overflow'],engineeringAccepted:false};
+  return {state:'CALCULATED',value,Q_add:value,requiredQuantity,percentQuantity,unit:'COUNT',errors:[],formula:definition.formula,engineeringAccepted:false};
+ }
+ if(definition.rows){
+  if(!Array.isArray(inputs.rows)||!inputs.rows.length)missing.push("rows");
+  else if(inputs.rows.length>2000)errors.push("Too many work objects");
+  else {const ids=new Set();inputs.rows.forEach((row,i)=>{if(!row||typeof row!=="object"||typeof row.id!=="string"||!row.id||ids.has(row.id)){errors.push("Duplicate/missing work-object ID");return;}ids.add(row.id);check(definition.rows,row,`rows[${i}].`);});}
+ }
+ if(id==="E01"&&inputs.I!==undefined&&inputs.I!==null&&![0,1].includes(inputs.I))errors.push("Applicability must be 0 or 1");
+ if(id==="E04"&&Array.isArray(inputs.rows)&&inputs.rows.some(r=>r&&r.I!==null&&r.I!==undefined&&![0,1].includes(r.I)))errors.push("Applicability must be 0 or 1");
+ if(id==="E05")for(const key of ["events","crew"])if(inputs[key]!==null&&inputs[key]!==undefined&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(c2Oem||id==="B5-SPARE-QTY")for(const {key} of fields)if(inputs[key]!=null&&!(ratio&&inputs[key]==="")&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(id==="B5-SPARE-STOCK")for(const key of ["installed","planned","included"])if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(id==="E14"&&inputs.driver>inputs.totalDrivers)errors.push("Driver exceeds total drivers");
+ if(["PORT-HEADROOM","LICENSE-HEADROOM","CCTV-STORAGE","FO-LOSS"].includes(id))for(const key of ({"PORT-HEADROOM":["available","connected","reserved"],"LICENSE-HEADROOM":["licensed","required"],"CCTV-STORAGE":["cameras"],"FO-LOSS":["splices","connectors"]}[id]))if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
+ if(errors.length||missing.length)return {state:errors.length?"INVALID":"OPEN",value:null,errors:[...errors,...missing.map(k=>"Missing "+k)],unit:definition.unit};
+ const x=inputs, sum=fn=>x.rows.reduce((n,r)=>n+fn(r),0);
+ const mean=id==="B5-SPARE-STOCK"?x.installed*x.failureRate*x.exposureHours:null;
+ const installedPopulation=c2Oem&&Number.isInteger(x.A)?x.A*x.B:null;
+ if(mean>200||id==="B5-SPARE-QTY"&&!Number.isSafeInteger(x.drivers*x.perDriver+x.reserve)||installedPopulation!==null&&!Number.isSafeInteger(installedPopulation))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
+ let requiredQuantity=x.recommended;
+ if(ratio){
+  const population=BigInt(x.populationBasis==="MAIN_EQUIPMENT"?x.B:installedPopulation);
+  const groupSize=BigInt(x.groupSize);
+  const groups=roundingMode==="CEIL"?(population+groupSize-BigInt(1))/groupSize:population/groupSize;
+  const required=groups*BigInt(x.sparesPerGroup);
+  if(required>BigInt(Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Spare quantity is outside the supported calculation range"]};
+  requiredQuantity=Number(required);
+ }
+ const stock=mean===null?null:poissonStock(mean,x.coveragePct/100);
+ const calculations={
+  E01:()=>x.I*x.Q*x.UMH*x.F,E02:()=>x.Qdoc*(x.Hinitial+x.Ncycles*x.Hcycle+x.Hfinal),E03:()=>x.months*x.FTE*x.Hmonth,
+  E04:()=>sum(r=>r.I*r.UMH*r.F),E05:()=>x.events*x.days*x.crew,E06:()=>x.MHwork/(x.crew*x.Hday*x.eta),
+  E07:()=>sum(r=>r.MHpaid*r.costRate),E08:()=>x.fare+x.hotel+x.perDiem+x.transport+x.permits+x.insurance+x.other,
+  E09:()=>x.labor+x.trip+x.OEM+x.test+x.other,E10:()=>sum(r=>r.quantity*r.sellRate)+x.other,
+  E11:()=>x.cost*(1+x.markup),E12:()=>x.cost/(1-x.margin),E13:()=>x.sell*(1+x.primeMarkup),
+  E14:()=>x.pool*x.driver/x.totalDrivers,E15:()=>x.laborDelta+x.tripDelta+x.OEMDelta,
+  E16:()=>x.sessions*x.days*x.trainers*x.Hday+x.prepMH+x.closeMH,E17:()=>x.THB/x.fx,E18:()=>sum(r=>r.qtyInstalled*r.UMH),
+  [C2_OEM_QUANTITY_ID_0550]:()=>Math.max(0,requiredQuantity-x.included),
+  "B5-SPARE-QTY":()=>Math.max(0,x.drivers*x.perDriver+x.reserve-x.included),
+  "B5-SPARE-STOCK":()=>Math.max(0,x.planned+stock.reserve-x.included),
+  "PAGA-SPL":()=>x.ambient+x.margin,"PAGA-UPS":()=>x.loadW*x.hours/(x.efficiency*x.DoD*x.derating),
+  "PAGA-AMPLIFIER":()=>x.ratedW*x.usable-x.tapW-x.lossW,"AVAILABILITY":()=>x.MTBF/(x.MTBF+x.MTTR),
+  "CCTV-STORAGE":()=>x.cameras*x.Mbps*x.days*86400*x.overhead/(8*1000000*x.usable),
+  "NETWORK-HEADROOM":()=>x.capacityMbps*x.usable-x.demandMbps,
+  "POWER-HEADROOM":()=>x.capacityW*x.usable-x.demandW,
+  "PORT-HEADROOM":()=>x.available-x.connected-x.reserved,"LICENSE-HEADROOM":()=>x.licensed-x.required,
+  "FO-LOSS":()=>x.lengthKm*x.dBperKm+x.splices*x.spliceLoss+x.connectors*x.connectorLoss+x.margin,
+  "RF-MARGIN":()=>x.txDBm+x.txGain+x.rxGain-x.lossDB-x.sensitivityDBm
+ };
+ const value=calculations[id]();
+ if(!Number.isFinite(value)||Math.abs(value)>Number.MAX_SAFE_INTEGER||(id==="E05"&&value*x.Hday>Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Result overflow"]};
+ return {state:"CALCULATED",value,unit:definition.unit,errors:[],formula:ratio?C2_OEM_RATIO_FORMULA_0550(roundingMode):SERVICE_EQUATIONS.find(e=>e.id===id)?.equation||definition.formula,
+  ...(id==="E05"?{MD:value,MH:value*x.Hday}:{}),...(installedPopulation===null?{}:{installedPopulation}),...(ratio?{requiredQuantity}:{}),...stock,engineeringAccepted:false};
+}

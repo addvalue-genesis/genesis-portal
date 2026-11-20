@@ -1,0 +1,66 @@
+import React from "react";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+// Historic filename retained for routing compatibility; view ALWAYS filters by contractual cost owner.
+export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServices=null,workingRow=null}){
+ if(!budget)return null;
+ const isFat=selectedOwner==="B3", owner=isFat?"B3":"B9";
+ const rows=budget.rows.filter(x=>x.costOwner===owner);
+ const total=isFat?budget.fatWorkingSellTHB:budget.conditionalYardSellTHB;
+ // This component's eight B3 source lines are ADDVALUE witnesses only.
+ // The purchased MGW factory-service WS is already selected in the parent B3.
+ // Include that source in the FULL-B3 preview only when supplied by its caller;
+ // never modify rows, POST an extra line, or claim quoted cost is paid cost.
+ const purchasedFatSell=isFat&&Number.isFinite(purchasedServices?.selectedIncrementalWorkingSellTHB)?
+  purchasedServices.selectedIncrementalWorkingSellTHB:0;
+ if(isFat&&purchasedServices&&
+   (purchasedFatSell!==0||purchasedServices.vendorPurchasedQuoteUSD!==0))
+  throw Error("B3 purchased MGW FAT quotation and Working SELL source mismatch");
+ // FULL B3 must originate from canonical 10.2 owner, not historical 40d
+ // SAT THB2,046,000. Missing canonical input means NO full-total claim.
+ const ownerPreviewB3THB=isFat&&workingRow?.code==="B3"?
+  workingRow.workingSellTHB:null;
+ if(isFat&&Number.isFinite(ownerPreviewB3THB)&&
+  Math.round((workingRow.b3SelectedSatSurveyBudget.includedB3SatSurveyToolsWorkingSellTHB+
+   total+purchasedFatSell)*100)!==Math.round(ownerPreviewB3THB*100))
+  throw Error("B3 FAT detail FULL preview must reconcile to canonical WS-B3");
+ if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
+  throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
+ return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
+  <p className="p55-note">SAMTEL Warehouse: ADDVALUE preparation, FAT, shared tools/facility, meals and closeout are budgeted in B3. MGW equipment supply only.</p>
+  <h4>{isFat?"IC-FAT — ADDVALUE SAMTEL Local Execution · Internal Working SELL Detail":"IC-YARD — Specialist Field Assistance · Quoted Base Working SELL (Call-out Execution)"}</h4>
+  <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
+  <div className="p55-metric-grid">
+   <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Included in Base Once · On-call Yard Working SELL"}</strong><p>{thb(total)}</p>
+    <small>{isFat?"ADDVALUE Senior + Field execution: 4 prep + FAT2+1 including closeout; shared9-day facilities/tools/transport":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
+   <div><strong>{isFat?
+    (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (local execution included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
+    "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
+    <small>{isFat?
+     (Number.isFinite(ownerPreviewB3THB)?"SAT28 + BF conditional Survey + VeEX + ADDVALUE preparation/FAT + shared facility/tools/hosting included ONCE; vendor quote is not paid cost":"Standalone FAT source detail only; total WS-B3 cannot be inferred from this budget object"):
+     "B9 1 LS included in quoted Base; actual deployment requires written Yard call-out"}</small></div>
+  </div>
+  {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
+   <summary><strong>SAMTEL FAT / MR0001–MR0004 — 2 Formal Days +1 Reserve — Owner-selected Budget</strong></summary>
+   <p className="p55-note">Execution team: {budget.fatWitnessRoles.join(" + ")}. Both roles are paid execution staff. Shared tools and facility allowances are in B3; supplier/calibration evidence remains unconfirmed. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Owner selects 2 formal FAT days +1 reserve. The earlier48-hour estimate is allocated32h to preparation and16h to formal demonstration; actual witness points/TAG repetitions need approved ITP and no required test is waived.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Day / Test ID</th><th>MR</th><th>Test Requirement</th><th>Hours</th><th>Evidence</th></tr></thead>
+    <tbody>{budget.fatWbs.rows.map(x=><tr key={x.id}><td>{x.day} · {x.id}</td><td>{x.mr}</td><td>{x.activity}</td><td>{x.hours}</td><td>{x.evidence}</td></tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">FAT notice: plan at least 30 calendar days under BOD; actual notice and approved ITP still required.</p>
+  </details>}
+  {!isFat&&<p className="p55-note"><strong>Yard scope:</strong> configuration verification, IP/VLAN/NMS/PLC/PABX integration, troubleshooting and OEM coordination if called out by JUTAL. Base Yard SAT outcome remains mandatory for CONTRACTOR/VENDOR, but ADDVALUE Specialist attendance is conditional on signed RACI or written request. The second Field Telecom Technician is a paid B9 resource (USD600/MD, 7+2 days); associated two-person travel/insurance allowances are INCLUDED ONCE in WS-B9. Actual internal payroll/expenses remain unverified. CCL Item31 18 Yard / 45 Offshore days remains unchanged and needs separate scope/RACI reconciliation.</p>}
+  <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:1050,tableLayout:"fixed"}}>
+   <thead><tr><th>Internal Cost Activity ID / Technical Module</th><th>Activity</th><th>Qty / Unit</th><th>Internal Working SELL Unit Rate</th><th>Internal Working SELL THB</th><th>Evidence / Treatment</th></tr></thead>
+   <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
+    <td><strong>{x.internalCostLineId}</strong><small>Legacy WBS source: {x.legacySourceExpenseId}</small><small>Technical Module: {x.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
+    <td><strong>{x.description}</strong><small>{x.status}</small></td>
+    <td>{x.qty} {x.unit}</td><td>{thb(x.unitRateTHB)}</td><td><strong>{thb(x.workingSellTHB)}</strong></td>
+    <td>{x.evidence}<small>{x.optional?"SOW-B9 / WS-B9 INCLUDED IN BASE — EXECUTION ON WRITTEN CALL-OUT":"SOW-B3 / WS-B3 INTERNAL WORKING ESTIMATE"}</small><small>Direct Cost NOT VERIFIED · CP NOT ISSUED</small></td>
+   </tr>)}
+   <tr><td colSpan={4}><strong>{isFat?"WS-B3 / IC-FAT — Preparation / FAT / Shared Expenses / Closeout":"WS-B9 / IC-YARD — Quoted Base Yard 1 LS"}</strong></td>
+     <td><strong>{thb(total)}</strong></td><td>Direct Cost is NOT VERIFIED; Internal WS only · CP NOT ISSUED. Scope Owner SOW-{owner}</td></tr></tbody>
+  </table></div>
+  <p className="p55-note"><strong>Cost rule:</strong> 4-Scope of Supply.xlsx B3 = Inspection, Testing and Certification as per ITP; B9 = Specialist Field Assistance. No FAT personnel/travel may be posted to B9. Included OEM factory pretests remain in equipment scope where evidenced; ADDVALUE integrated FAT and temporary shared tools are B3, never a duplicate supplier-service charge. Direct Cost must be derived from real payroll, fare, room, insurance and paid supplier evidence, not from the Working Sell daily rate.</p>
+ </section>;
+}

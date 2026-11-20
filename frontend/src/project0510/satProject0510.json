@@ -1,0 +1,55 @@
+{
+  "project": {
+    "id": "PJ2601-0510",
+    "po": "3450075822",
+    "title": "Provision of Wi-Max Communication System for the ZMS-MS Point-to-Point Wireless Communication Link Upgrade",
+    "documentNo": "MM-ZTK-1A-ONEP-SAT-001",
+    "documentStatus": "INTERNAL WORKING DRAFT"
+  },
+  "network": {
+    "distanceKm": 1.854,
+    "frequencyMHz": 5495,
+    "channelMHz": 80,
+    "source": "Network Planning Report Rev.01 (planning; field verification required)",
+    "sites": [
+      {
+        "id": "ZMS",
+        "role": "HBS",
+        "radioIP": "10.15.160.224",
+        "subnet": "255.255.255.0",
+        "gateway": "10.15.160.1",
+        "antenna": "RW-9721-5158"
+      },
+      {
+        "id": "MS",
+        "role": "HSU",
+        "radioIP": "10.15.160.225",
+        "subnet": "255.255.255.0",
+        "gateway": "10.15.160.1",
+        "antenna": "RW-9721-5158"
+      }
+    ]
+  },
+  "tests": [
+    {
+      "id": "TP-101",
+      "name": "Baseline and equipment verification",
+      "status": "NOT TESTED"
+    },
+    {
+      "id": "TP-102",
+      "name": "IP connectivity",
+      "status": "NOT TESTED"
+    },
+    {
+      "id": "TP-103",
+      "name": "Wireless link installation",
+      "status": "NOT TESTED"
+    },
+    {
+      "id": "TP-104",
+      "name": "End-to-end throughput",
+      "status": "NOT TESTED"
+    }
+  ]
+}

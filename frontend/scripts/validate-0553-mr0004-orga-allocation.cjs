@@ -1,0 +1,16 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const model=read("data/mr0004WorkingBom0553.js");
+const view=read("data/bomReadModel0553.js");
+const reconcile=read("data/siteSystemCostReconciliation.js");
+assert(model.includes('e.system==="MARINE_RACON"&&e.tag==="MAR-514-001"'));
+assert(model.includes("qty:1,sourceQty:1"));
+assert(model.includes("unitCost:quotation.packageUSD,extended:quotation.packageUSD"));
+assert(model.includes('countedInWorkingTotal:false'));
+assert(model.includes('budgetTotalUSD:sites.reduce('));
+assert(view.includes('MR0004_WORKING_BOM_0553'));
+assert(view.includes('subtotals:[{currency:"USD",amount:site.controlledTotalUSD}]'));
+assert(!reconcile.includes('"MR-0004":["RACON-1"]'));
+console.log("PASS MR0004 budgetary site allocation uses MDS/ORGA only, derives sites from LAY and does not double-count included kit");

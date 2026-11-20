@@ -1,0 +1,231 @@
+{
+  "projectId": "PJ2608-0553",
+  "version": "EngineeringKnowledgeCases_Rev01_20261013",
+  "schemaStatus": "DESIGN_VALIDATION_PENDING_EXPERT_SIGNOFF",
+  "purpose": "Preserve engineering selection rationale and negative constraints as reusable cases; NOT automatically executable product selection, technical approval, quote or cost posting",
+  "rules": {
+    "neverAutoApprove": true,
+    "neverAutoPostCost": true,
+    "ruleReuseNeedsCurrentRFQProof": true,
+    "provenanceRequired": true,
+    "approvedStatusMustBeHumanAuthorized": true,
+    "preferredNonAVLNeedsExplicitDeviationDisposition": true,
+    "historicQuoteNeverBecomesCurrentFirmRate": true
+  },
+  "cases": [
+    {
+      "caseId": "KBE-0553-SCADA-REGION-001",
+      "system": "MR-0001 SCADA Radio",
+      "site": "ZWP20",
+      "tag": "MR-502-001",
+      "mtoIndex": 4,
+      "pattern": "Country specific radio region option is a hard entitlement constraint; a missing vendor quote price is not an included confirmed license",
+      "requiredFunctions": [
+        "RADIO_REMOTE",
+        "COUNTRY_FREQUENCY_ENTITLEMENT",
+        "CAPACITY_LICENCE",
+        "NMS_INTEGRATION"
+      ],
+      "sourceEvidence": [
+        {
+          "documentId": "NG-260916",
+          "line": "B-4",
+          "sku": "OPK-REGION-3000-04",
+          "sourceRate": null,
+          "sourcePricingState": "DASH_AS_QUOTED"
+        },
+        {
+          "documentId": "MM-ZTK-1F-GEN-TEL-RPT-0001",
+          "revision": "C1",
+          "role": "Topology and RF calculation"
+        }
+      ],
+      "negativeExample": {
+        "offeredCapability": "Region 04 refers to US, Canada, Oman",
+        "requiredContext": "Myanmar radio use",
+        "decision": "CONFLICT_NOT_TECHNICALLY_APPROVED"
+      },
+      "budgetScenario": {
+        "source": "USER_MANAGEMENT_BUDGETARY_INCLUDED_ASSUMPTION",
+        "incrementalRateUSD": 0,
+        "approval": "WORKING_ASSUMPTION_NOT_VENDOR_RATE"
+      },
+      "proofNeeded": [
+        "OEM letter covering Myanmar region/functional entitlement",
+        "Licensing and frequency acceptance",
+        "NMS licensing compatibility",
+        "RF CAL/reliability check"
+      ],
+      "approvalState": "PROPOSED_CASE_NOT_APPROVED",
+      "learningScope": "REUSE_PATTERN_ONLY_NO_AUTO_REGION_MATCH"
+    },
+    {
+      "caseId": "KBE-0553-PHONE-PACKAGE-002",
+      "system": "MR-0003 Ex IP Phone",
+      "siteScope": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "pattern": "A single customer functional telephone TAG can be supplied as one quoted package that includes multiple devices and accessories, or as several priced items from alternatives",
+      "sourceEvidence": [
+        {
+          "documentId": "MGW-P26-058",
+          "line": "PHONE-1",
+          "packageSku": "JR-JREX106-SIP-PACKAGE"
+        },
+        {
+          "documentId": "EXION-1260576-R0",
+          "lines": [
+            "1",
+            "2"
+          ],
+          "status": "CURRENT_PROJECT_QUOTE_EXPIRED_RECONFIRM"
+        }
+      ],
+      "verifiedSourcePackageClaims": {
+        "mgwIncludes": [
+          "IP Phone",
+          "wall bracket",
+          "Ex headset with 15m cable",
+          "alarm sounder/strobe",
+          "Ex junction box",
+          "certified gland"
+        ],
+        "exionSeparatelyQuoted": [
+          "Auteldac 6 Ex Phone",
+          "DB3B alarm sounder"
+        ]
+      },
+      "negativeExample": {
+        "incorrectApproach": "Count MGW included sounder and JB again as separately priced bulk",
+        "decision": "DUPLICATE_COST_ERROR"
+      },
+      "requiredDecision": "Separate complete installed package comparisons by supplier; never sum competing MGW and EXION alternatives; verify site quantities/Ex interfaces and missing accessories.",
+      "approvalState": "PROPOSED_CASE_NOT_APPROVED",
+      "learningScope": "BUNDLE_EXPLOSION_AND_INCLUSION_RATIONALE"
+    },
+    {
+      "caseId": "KBE-0553-RFI-LNA-003",
+      "system": "MR-0002 Trunk Radio",
+      "siteScope": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "pattern": "An OEM technical product associated with a preferred supplier does not become a priced quotation from that supplier",
+      "sourceEvidence": [
+        {
+          "documentId": "V-RFI-LNA",
+          "sku": "RX3852-2002-11",
+          "role": "RFI manufacturer datasheet"
+        },
+        {
+          "documentId": "MGW-P26-058",
+          "line": "UHF-1",
+          "sku": "HYTERA-TS-9200",
+          "role": "Unselected Hytera BDA; not RFI LNA"
+        },
+        {
+          "documentId": "rfiLnaPriceDecision0553.js",
+          "role": "Management budget allowance 500000 THB/unit"
+        }
+      ],
+      "nominalProductProperties": {
+        "manufacturer": "RFI",
+        "frequencyMHz": {
+          "min": 380,
+          "max": 520
+        },
+        "dcVoltageV": {
+          "min": 11,
+          "max": 28
+        }
+      },
+      "negativeExample": {
+        "incorrectApproach": "Treat MGW P26-058 HYTERA BDA price as quoted RFI LNA",
+        "decision": "WRONG_PRODUCT_WRONG_QUOTATION"
+      },
+      "proofNeeded": [
+        "OEM offer for RFI LNA",
+        "A2671 DC mating connector",
+        "A2881 alarm mating connector",
+        "TCAB Ex enclosure supply boundary and certified integration",
+        "Site radio system gain/reliability verification"
+      ],
+      "supplierAssignment": "MGW MANAGEMENT PROVISIONAL (NOT QUOTED)",
+      "approvalState": "PROPOSED_CASE_NOT_APPROVED",
+      "learningScope": "DISTINGUISH_BRAND_SUPPLIER_QUOTE_ALLOWANCE"
+    },
+    {
+      "caseId": "KBE-0553-DATO-IP20-004",
+      "system": "MR-0001 SCADA",
+      "site": "ZWP20",
+      "tag": "DATO-507-001",
+      "pattern": "Similar RJ45 connector name, speed or physical fit cannot replace an Ex-rated socket-and-plug function without hazardous-area documentation",
+      "sourceEvidence": [
+        {
+          "documentId": "V-DATO-WEIDMULLER-DS",
+          "manufacturer": "Weidmüller",
+          "sku": "IE-PS-RJ45-FH-BK",
+          "ingressProtection": "IP20"
+        },
+        {
+          "documentId": "WEB-RS-WEIDMULLER-1963600000",
+          "sourceClass": "WEB_RETAIL",
+          "role": "RS Thailand indicative price reference"
+        },
+        {
+          "documentId": "SONIC-CCY24-PXC-633",
+          "sku": "FL-PP-RJ45-SC",
+          "role": "Historic Phoenix RJ45 interface candidate"
+        }
+      ],
+      "negativeExample": {
+        "incorrectApproach": "Accept IP20 field-assembled RJ45 plug as certified Ex quick-disconnecting socket & plug",
+        "decision": "TECHNICAL_NON_EQUIVALENCE"
+      },
+      "proofNeeded": [
+        "Hazardous-area applicability and Ex certificate",
+        "Mating socket+plug interface",
+        "Cable termination and qualified enclosure/installation",
+        "Complete functional quantity"
+      ],
+      "approvalState": "PROPOSED_CASE_NOT_APPROVED",
+      "learningScope": "HARD_CONSTRAINT_OVERRIDES_SEMANTIC_SIMILARITY"
+    },
+    {
+      "caseId": "KBE-0553-ANTENNA-PREFERENCE-005",
+      "system": "MR-0001 SCADA",
+      "site": "ZWP20",
+      "tag": "ANT-502-001",
+      "pattern": "Management preferred product alternative is not a customer requirement change, technical acceptance or AVL approval",
+      "sourceEvidence": [
+        {
+          "documentId": "NG-260916",
+          "line": "B-12",
+          "sku": "086-050122-602",
+          "role": "4ft antenna candidate"
+        },
+        {
+          "documentId": "MM-ZTK-1F-GEN-TEL-RPT-0001",
+          "revision": "C1",
+          "role": "6ft existing RPT reference"
+        }
+      ],
+      "negativeExample": {
+        "incorrectApproach": "Change antenna from 6ft report basis to 4ft without refreshed availability/fade/tide/reflection and wind-load engineering",
+        "decision": "CALCULATION_EVIDENCE_REQUIRED"
+      },
+      "preferredConfiguration": "4ft B-12 INTERNAL WORKING ONLY",
+      "proofNeeded": [
+        "RF availability at required PTTEP threshold",
+        "Tide/reflection sensitivity, antenna height",
+        "Mechanics and wind/Ex/site class",
+        "Contractual customer approval where needed"
+      ],
+      "approvalState": "PROPOSED_CASE_NOT_APPROVED",
+      "learningScope": "PREFERENCE_VERSUS_CONTRACTUAL_COMPLIANCE"
+    }
+  ]
+}

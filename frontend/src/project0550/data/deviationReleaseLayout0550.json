@@ -1,0 +1,10 @@
+{
+  "sourceName": "5-Deviation List.xls",
+  "sourceSha256": "1f55f7e0e7e63dc51b4ac4ed659d4ba7e105fc86201120ee638d5c8b3f3b525d",
+  "sheetName": "Deviation List",
+  "title": "DEVIATION LIST",
+  "note": "(Note: BIDDER is requested to submit Deviation by using this format, if any. In case where no exception exists, indicate “NONE” )",
+  "columns": ["No.", "Page No / Clause/Section", "PURCHASER's Specification Requirement", "BIDDER's Clarification", "BIDDER's Deviation", "BIDDER's Proposal / Notification", "BIDDER's Technical Justification or Reason for Deviation", "PURCHASER's Reply", "COMPANY's Reply", "Status\n(Open / Closed)", "Remarks"],
+  "widths": [6.6328125, 17.90625, 45.6328125, 30.6328125, 30.6328125, 35.6328125, 35.6328125, 40.6328125, 40.6328125, 40.6328125, 40.6328125],
+  "metadata": {"projectNo": "PJ2608-0550", "project": "EPC for Onshore Processing Facilities and Associated Onshore Pipelines for Aung Sinkha Development Project (ASK) Phase 1A", "requisition": "MM-ASK-1A-APF-TEL-MR-0001", "description": "Telecommunication & Security System", "vendor": "SAMTEL / ADDVALUE"}
+}

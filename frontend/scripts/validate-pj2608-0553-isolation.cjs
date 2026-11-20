@@ -1,0 +1,52 @@
+const fs = require("fs");
+const path = require("path");
+const src = path.resolve(__dirname,"../src");
+const read = rel => fs.readFileSync(path.join(src,rel),"utf8");
+const assert = (ok,message) => {if(!ok) throw Error(message);};
+const commonCost=read("common/cost/derivationKernel.js");
+const commonUi=read("common/ui/ProjectAuditPrimitives.jsx");
+const p0553=read("project0553/data/controlledSnapshot.js");
+const page=read("pages/PJ26080553.jsx");
+const p0550=read("pages/PJ26080550.jsx");
+const app=read("App.jsx");
+assert(!/PJ2608-0550|project0550|19 systems|19 ASK|EUR 226,454|24.000M/.test(commonCost),"0550 facts in shared cost kernel");
+assert(!/PJ2608-0550|project0550|19 systems|19 ASK/.test(commonUi),"0550 facts in shared UI");
+assert(p0553.includes('projectId:"PJ2608-0553"'),"0553 snapshot project ID missing");
+assert(p0553.includes('issuePermission:false'),"0553 release must default closed");
+assert(page.includes('getProject0553Dataset()'),"0553 UI must consume project repository");
+assert(page.includes('ProjectTabs')&&page.includes('STANDARD_PROJECT_TABS'),"0553 UI must reuse standard tabs");
+assert(page.includes('common/cost/derivationKernel'),"0553 UI must use shared cost kernel");
+assert(!page.includes('from "../project0550/data"'),"0553 UI imports particular 0550 data");
+const projectRegistry=read("projectRegistry.js");
+assert(projectRegistry.includes('route: "/projects/pj2608-0550"')&&projectRegistry.includes('route: "/projects/pj2608-0553"'),"Project registry identities/routes missing");
+// The dedicated 0550 branch mounts its own route; other registered workspaces
+// remain in separate checkouts/servers, not the old registry-driven router.
+assert(app.includes('const PROJECT_ROUTE = "/projects/pj2608-0550"')&&app.includes('path={PROJECT_ROUTE}')&&app.includes('import("./pages/PJ26080550")')&&!/pages\/PJ26080553|path=\{project.route\}/.test(app),"Dedicated 0550 router must mount only its own workspace");
+assert(p0550.includes('from "../project0550/data"'),"0550 regression guard: original facade not found");
+const engineering=read("common/ui/EngineeringView.jsx");
+const binding=read("project0553/engineeringViewModel.js");
+// 0550's approved 26-Oct bidding branch has its own executable equation workbench.
+// Keep 0553 on the established shared engineering view and 0550 on its own data.
+assert(p0550.includes('from "../project0550/EquationWorkbench"') && p0550.includes("<EquationWorkbench/>") && page.includes("SharedEngineeringView"),"Integrated 0550 equation workbench / 0553 shared engineering view missing");
+assert(!/PROJECT_0550|REQUIREMENT_COMPLETENESS|PJ2608-0550 contains/.test(engineering),"Shared First Principles has 0550 particular dependencies");
+assert(!/project0550\/data|TEL-LAN|RC-0550-001/.test(binding),"0553 First Principles binding inherited 0550 particular facts");
+assert(binding.includes("BID_0553_GATES")&&binding.includes("TECHNICAL_HOLDS"),"0553 requirement control must be evidence-bound");
+assert(page.includes("<MR0001RFProofPilot/>"),"0553 First Principles must retain live RF pilot");
+const equationDefinitions=read("common/cost/serviceEquations.js");
+const engineeringView=read("common/ui/EngineeringView.jsx");
+const p0553Methods=read("project0553/engineeringViewModel.js");
+for(let i=1;i<=18;i++)assert(equationDefinitions.includes('id:"E'+String(i).padStart(2,"0")+'"'),"Missing original E"+i+" equation");
+assert(p0553Methods.includes("serviceEquations:SERVICE_EQUATIONS"),"0553 must receive full shared service method definitions");
+assert(engineeringView.includes("serviceEquations.map"),"Shared First Principles must render all service equations");
+const formulaInventory=read("common/engineering/masterFormulaInventory.js");
+assert(formulaInventory.includes("ENGINEERING_LAW_KERNELS")&&formulaInventory.includes("SERVICE_EQUATIONS"),"Master inventory must reuse canonical law and E01-E18 formula definitions");
+assert(engineeringView.includes("<ExpandableFormulaTable rows={MASTER_FORMULA_INVENTORY}/>"),"All canonical formulas must be passed to shared expandable table");
+const formulaUi=read("common/ui/ExpandableFormulaTable.jsx");
+assert(formulaUi.includes("aria-expanded")&&formulaUi.includes("onClick={expandAll}")&&formulaUi.includes("onClick={collapseAll}")&&formulaUi.includes("onClick={()=>toggle(group.domain,setExpanded)}")&&formulaUi.includes("onClick={()=>toggle(eq.id,setDetails)}"),"Hierarchical formula table must support real expand/collapse at group and equation level");
+assert(!/project0550\/|project0553\//.test(formulaInventory),"Master formula inventory cannot depend on particular project data");
+const linkedHierarchy=read("common/ui/LinkedEngineeringHierarchy.jsx");
+assert(engineeringView.includes("<LinkedEngineeringHierarchy"),"First Principles must use shared reference-coded hierarchy");
+assert(linkedHierarchy.includes("aria-expanded")&&linkedHierarchy.includes("Expand all")&&linkedHierarchy.includes("Collapse all"),"Hierarchy toggles must work");
+for(const prefix of ["AUD","STEP","DOM-","KERNEL-"])assert(linkedHierarchy.includes(prefix),"Missing reference prefix "+prefix);
+assert(!/from ["'].*project0550|from ["'].*project0553/.test(linkedHierarchy),"COMMON hierarchy must not import project facts");
+console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");

@@ -1,0 +1,352 @@
+{
+  "contract": "PJ2608-0550 Schedule A1 shared line items (10.2 SI / Master Schedule)",
+  "version": "0.4.0-skeleton",
+  "status": "DRAFT - NOT WIRED INTO ANY SCREEN OR EXPORT",
+  "currency": "USD",
+  "numberingNote": "SN 5 appears twice on the customer form itself (once for Two years Operation Spare parts → C-3 Option, once for Special Tools → C-5). The UI already renders this correctly by using internal row numbers, not the SN value. Do not assume SN is unique; use itemKey to distinguish the two SN 5 rows. Previous note that claimed Tools=SN 6 and Field Service=SN 7 was incorrect (it was based on internal row position, not form text).",
+  "displaySnNote": "displaySn is INTERNAL-ONLY sequential numbering (1-10) for internal screens. The official customer form, its template and the official export keep the form SN (1, 2, 3, 4, 5, 5, 6, 8, 9, …), including the duplicate SN 5. Never print displaySn on a customer document.",
+  "rules": [
+    "WORKSTREAM_A_FORM_C writes only items whose sourceForm starts with C-. It never writes a1DirectItems.",
+    "WORKSTREAM_B_A1_DIRECT writes only a1DirectItems (sourceForm A1_DIRECT) and the rollup block. It never changes Form C schemas.",
+    "sn is the SN text printed on the customer form (Exhibit C Schedule A1): 1, 2, 3, 4, 5, 5, 6, 8, 9, …. sn is NOT unique: use itemKey as the unique id. templateRow is the internal row used by a1SummarySlot0550 in exhibitCNative0550.js.",
+    "A null price means OPEN/TBA. A rollup total stays null while any base item is OPEN (same rule as scheduleRollup0550).",
+    "isOption items are excluded from the A1 base total; options belong to Schedule A2."
+  ],
+  "snMap": [
+    {
+      "itemKey": "A1-SN1-C1",
+      "sn": "1",
+      "displaySn": "1",
+      "templateRow": 2,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-1",
+      "title": "GOODS",
+      "codeSelector": "summary GOODS"
+    },
+    {
+      "itemKey": "A1-SN2-INSPECTION",
+      "sn": "2",
+      "displaySn": "2",
+      "templateRow": 3,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Inspection and tests",
+      "codeSelector": "summary INSPECTION",
+      "breakdownRef": "11.D"
+    },
+    {
+      "itemKey": "A1-SN3-PACKING",
+      "sn": "3",
+      "displaySn": "3",
+      "templateRow": 4,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Preservation and packing",
+      "codeSelector": "summary PACKING"
+    },
+    {
+      "itemKey": "A1-SN4-C2",
+      "sn": "4",
+      "displaySn": "4",
+      "templateRow": 5,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-2",
+      "title": "Commissioning spares",
+      "codeSelector": "schedule C2"
+    },
+    {
+      "itemKey": "A1-SN5-OPTION-C3",
+      "sn": "5",
+      "displaySn": "5",
+      "templateRow": 6,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-3",
+      "title": "Two years Operation Spare parts",
+      "codeSelector": "A2 option (schedule C3)",
+      "isOption": true
+    },
+    {
+      "itemKey": "A1-SN5-TOOLS-C5",
+      "sn": "5",
+      "displaySn": "6",
+      "templateRow": 7,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-5",
+      "title": "Special Tools for Commissioning and Maintenance",
+      "codeSelector": "schedule C5"
+    },
+    {
+      "itemKey": "A1-SN6-C7",
+      "sn": "6",
+      "displaySn": "7",
+      "templateRow": 8,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-7",
+      "title": "Field Service including Training at SITE",
+      "codeSelector": "schedule C7"
+    },
+    {
+      "itemKey": "A1-SN8-C8",
+      "sn": "8",
+      "displaySn": "8",
+      "templateRow": 9,
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-8",
+      "title": "Facilities and Services for COMPANY and PURCHASER",
+      "codeSelector": "schedule C8"
+    },
+    {
+      "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
+      "sn": "9",
+      "displaySn": "9",
+      "templateRow": 10,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Vendor documents",
+      "codeSelector": "summary VENDOR_DOCUMENTS"
+    },
+    {
+      "itemKey": "A1-OTHERS",
+      "sn": "…",
+      "displaySn": "10",
+      "templateRow": 11,
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "title": "Others (Please specify)",
+      "codeSelector": "summary OTHER",
+      "breakdownRef": "11.E / 11.F"
+    }
+  ],
+  "formCItems": [
+    {
+      "itemKey": "A1-SN1-C1",
+      "sn": "1",
+      "displaySn": "1",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-1",
+      "description": "GOODS",
+      "breakdownRef": "Form C-1",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 4649195.28,
+      "totalPriceUsd": 4649195.28,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-1",
+      "valueStatus": "LOCKED_REV00_CEILING"
+    },
+    {
+      "itemKey": "A1-SN4-C2",
+      "sn": "4",
+      "displaySn": "4",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-2",
+      "description": "Commissioning spares",
+      "breakdownRef": "Form C-2",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 47492.76,
+      "totalPriceUsd": 47492.76,
+      "isOption": false,
+      "pricingStats": {
+        "priced": 12,
+        "total": 15,
+        "open": 3
+      },
+      "customerNotes": "Breakdown in Form C-2",
+      "valueStatus": "RECONCILED_PARTIAL_MASTER_C2"
+    },
+    {
+      "itemKey": "A1-SN5-OPTION-C3",
+      "sn": "5",
+      "displaySn": "5",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-3",
+      "description": "Two years Operation Spare parts (option, excluded from A1 base)",
+      "breakdownRef": "Form C-3",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": true,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-3",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
+    },
+    {
+      "itemKey": "A1-SN5-TOOLS-C5",
+      "sn": "5",
+      "displaySn": "6",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-5",
+      "description": "Special Tools for Commissioning and Maintenance",
+      "breakdownRef": "Form C-5",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 42100,
+      "totalPriceUsd": 42100,
+      "isOption": false,
+      "pricingStats": {
+        "priced": 15,
+        "total": 15,
+        "open": 0
+      },
+      "customerNotes": "Breakdown in Form C-5",
+      "valueStatus": "CATALOG_BASELINE_C5"
+    },
+    {
+      "itemKey": "A1-SN6-C7",
+      "sn": "6",
+      "displaySn": "7",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-7",
+      "description": "Field Service including Training at SITE",
+      "breakdownRef": "Form C-7",
+      "unit": "Day",
+      "qty": null,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Site Service Time shall be specified.",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
+    },
+    {
+      "itemKey": "A1-SN8-C8",
+      "sn": "8",
+      "displaySn": "8",
+      "owner": "WORKSTREAM_A_FORM_C",
+      "sourceForm": "C-8",
+      "description": "Facilities and Services for COMPANY and PURCHASER",
+      "breakdownRef": "Form C-8",
+      "unit": "Day",
+      "qty": null,
+      "unitPriceUsd": null,
+      "totalPriceUsd": null,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in Form C-8",
+      "valueStatus": "OPEN_PRIVATE_DATA_REQUIRED"
+    }
+  ],
+  "a1DirectItems": [
+    {
+      "itemKey": "A1-SN2-INSPECTION",
+      "sn": "2",
+      "displaySn": "2",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Inspection and tests with witness by COMPANY and PURCHASER",
+      "breakdownRef": "11.D",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 20999.96,
+      "totalPriceUsd": 20999.96,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in 11.D",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary INSPECTION"
+    },
+    {
+      "itemKey": "A1-SN3-PACKING",
+      "sn": "3",
+      "displaySn": "3",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Preservation and packing",
+      "breakdownRef": "",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 25718.4,
+      "totalPriceUsd": 25718.4,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary PACKING"
+    },
+    {
+      "itemKey": "A1-SN9-VENDOR-DOCUMENTS",
+      "sn": "9",
+      "displaySn": "9",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Vendor documents",
+      "breakdownRef": "",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 153649.41,
+      "totalPriceUsd": 153649.41,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary VENDOR_DOCUMENTS"
+    },
+    {
+      "itemKey": "A1-OTHERS",
+      "sn": "…",
+      "displaySn": "10",
+      "owner": "WORKSTREAM_B_A1_DIRECT",
+      "sourceForm": "A1_DIRECT",
+      "description": "Others (Please specify)",
+      "breakdownRef": "11.E / 11.F",
+      "unit": "Lot",
+      "qty": 1,
+      "unitPriceUsd": 348737.07,
+      "totalPriceUsd": 348737.07,
+      "isOption": false,
+      "pricingStats": {
+        "priced": null,
+        "total": null,
+        "open": null
+      },
+      "customerNotes": "Breakdown in 11.E / 11.F",
+      "valueStatus": "PROVISIONAL_USER_REPORTED",
+      "codeSelector": "BASE bindings with schedule A1, summary OTHER"
+    }
+  ],
+  "rollup": {
+    "owner": "WORKSTREAM_B_A1_DIRECT",
+    "a1DirectKnownUsd": 549104.84,
+    "formCKnownUsd": null,
+    "baseTotalUsd": null,
+    "note": "KNOWN SUBTOTAL ONLY. Base total stays null until every base sn is priced.",
+    "openItemKeys": [
+      "A1-SN1-C1",
+      "A1-SN4-C2",
+      "A1-SN5-TOOLS-C5",
+      "A1-SN6-C7",
+      "A1-SN8-C8"
+    ]
+  }
+}

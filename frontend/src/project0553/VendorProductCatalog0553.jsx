@@ -1,0 +1,184 @@
+import React,{useMemo,useState} from "react";
+import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
+import {canonicalCompanyId0553,resolveCompany0553} from "./data/companyIdentity0553";
+import HISTORICAL_VENDOR from "./data/historicalVendorEvidence0553.json";
+import EXION_REFERENCE from "./data/quotes/EXION-1240515-R0.reference.json";
+import EXION_LATEST from "./data/quotes/EXION-1260576-R0.current.json";
+import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
+import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {SmartFilterBar,SmartDataGroup,moduleSegment} from "../common/ui/SmartDataExplorer";
+import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
+import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
+import {QuotationTermsDetail0553} from "./QuotationTermsDetail0553";
+import {EngineeringIntelligencePreview0553} from "./EngineeringIntelligencePreview0553";
+
+// Read-only quotation-to-product index. Never silently promotes a quote line into BOM.
+export function VendorProductCatalog0553(){
+ const [view,setView]=useState("supplier");
+ const [mr,setMr]=useState("ALL");
+ const [vendor,setVendor]=useState("ALL");
+ const [companyQuery,setCompanyQuery]=useState("");
+ const [search,setSearch]=useState("");
+ const [evidenceClass,setEvidenceClass]=useState("ALL");
+ const [chosenQuote,setChosenQuote]=useState("");
+ const [inspectedQuote,setInspectedQuote]=useState("");
+ const commercial=useMemo(()=>buildQuotationCommercialRegister([{id:EXION_LATEST.id,vendor:"EXION (Thailand)",quotation:EXION_LATEST.quotation,source:EXION_LATEST.source,scope:EXION_LATEST.scope,date:EXION_LATEST.date,currency:EXION_LATEST.currency,quotedTotal:EXION_LATEST.quotedTotal,status:EXION_LATEST.status,validUntil:EXION_LATEST.validUntil,terms:EXION_LATEST.terms},...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms}]),[]);
+ const selectedCommercial=commercial.find(q=>q.quoteId===(chosenQuote||inspectedQuote));
+ const catalog=VENDOR_UNIFIED_CATALOG_0553;
+ const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
+ const productsById=new Map(catalog.products.map(p=>[p.id,p]));
+ const quoteById=new Map(commercial.map(q=>[q.quoteId,q]));
+ const companyCollator=new Intl.Collator("en",{sensitivity:"base",numeric:true});
+ const sortedSuppliers=[...catalog.suppliers].sort((a,b)=>companyCollator.compare(a.name,b.name));
+ const matchingSuppliers=sortedSuppliers.filter(company=>[company.name,...(company.aliases||[]),...(company.sourceSupplierLabels||[])].join(" ").toLocaleLowerCase().includes(companyQuery.trim().toLocaleLowerCase()));
+ const sortedQuotes=[...commercial].sort((a,b)=>companyCollator.compare(resolveCompany0553(a.vendor).name,resolveCompany0553(b.vendor).name)||companyCollator.compare(a.quotationNo||"",b.quotationNo||""));
+ const allowedQuotes=sortedQuotes.filter(q=>(vendor==="ALL"||canonicalCompanyId0553(q.vendor)===vendor)&&(!companyQuery||matchingSuppliers.some(s=>s.id===canonicalCompanyId0553(q.vendor))));
+ const chooseVendor=value=>{setVendor(value);setChosenQuote("");setInspectedQuote("");};
+ const chooseQuote=value=>{setChosenQuote(value);setInspectedQuote("");if(value){const q=quoteById.get(value);if(q)setVendor(canonicalCompanyId0553(q.vendor));}};
+ const rows=catalog.relationships.filter(x=>{
+  if(evidenceClass!=="ALL"&&(evidenceClass==="CURRENT"?x.sourceClass!=="SUPPLIER_QUOTATION":evidenceClass==="HISTORICAL"?!String(x.sourceClass||"").includes("HISTORICAL"):evidenceClass==="DATASHEET"?!["MANUFACTURER_BROCHURE","DATASHEET_ONLY"].includes(x.sourceClass):!String(x.sourceClass||"").startsWith("WEB")))return false;
+  if((view==="supplier"||view==="quote")&&companyQuery.trim()){
+   const selected=suppliersById.get(x.vendorId);
+   const source=[selected?.name,...(selected?.aliases||[]),...(selected?.sourceSupplierLabels||[])].join(" ").toLocaleLowerCase();
+   if(!source.includes(companyQuery.trim().toLocaleLowerCase()))return false;
+  }
+  if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
+  if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
+  if(view==="quote" && !x.quoteId)return false;
+  if(view==="quote" && chosenQuote&&x.quoteId!==chosenQuote)return false;
+  if(view==="quote" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
+  if(view==="product"&&chosenQuote&&x.quoteId!==chosenQuote)return false;
+  if(view==="mr"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
+  if(view==="compare"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
+  if(!search)return true;
+  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,x.sourceSupplierLabel,x.sourceThirdParty,x.sourceSupplierRole,suppliersById.get(x.vendorId)?.name,...(suppliersById.get(x.vendorId)?.aliases||[])].join(" ").toLowerCase().includes(search.toLowerCase());
+ });
+ const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setCompanyQuery("");setSearch("");setEvidenceClass("ALL");setChosenQuote("");setInspectedQuote("");};
+ const groups=new Map();
+ const groupKey=r=>view==="quote"?(r.quoteId||"NO_QUOTE"):view==="product"?r.productKey:(view==="mr"||view==="compare")?(r.mr||"NO_MR"):r.vendorId;
+ const groupLabel=id=>{
+  if(view==="quote"){const item=commercial.find(q=>q.quoteId===id);return item?resolveCompany0553(item.vendor).name+" · "+item.quotationNo:id;}
+  if(view==="product")return productsById.get(id)?.partNumber||id;
+  if(view==="mr"||view==="compare")return id;
+  return suppliersById.get(id)?.name||id;
+ };
+ rows.forEach(r=>{const k=String(groupKey(r)||"UNASSIGNED");if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
+ const grouped=[...groups.entries()].map(([id,items])=>({id,items,title:groupLabel(id)}))
+  .sort((a,b)=>String(a.title).localeCompare(String(b.title),"en"));
+ // Rendering is shared by Company / Quote / Product / MR grouping; never duplicate the underlying source lines.
+ const renderLines=items=>(<>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
+   <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
+  </tr></thead><tbody>{items.map(r=>{
+    const p=productsById.get(r.productKey);
+    const isQuote=Boolean(r.quoteId);
+    return <tr key={r.id}>
+     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>Source / assignment: {r.sourceSupplierLabel}</small>{r.sourceClass==="DATASHEET_ONLY"&&<small>Relationship: {r.relationshipRole||"DATA_SOURCE_ASSOCIATION"}</small>}{r.sourceThirdParty&&<small>{r.sourceSupplierRole}: {r.sourceThirdParty}</small>}<small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
+     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div>{r.manufacturer&&<small>Manufacturer: {r.manufacturer}</small>}{r.manufacturerOrderNo&&<small>Order No.: {r.manufacturerOrderNo}</small>}{r.tagCandidate&&<small>Candidate TAG: {r.tagCandidate}</small>}<ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.sourceClass==="DATASHEET_ONLY"?"bid.vendor.products.datasheet."+r.id:"bid.vendor.products.evidence."+moduleSegment(r.id)} componentName={p?.partNumber||r.description||r.id}/></td>
+     <td>{r.mr}</td>
+     <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
+      {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
+     <td>{r.quantity??"—"} / {Number.isFinite(r.unitPrice)?r.currency+" "+r.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"} / {r.pricingUnit||"SOURCE UOM / REVIEW"}<small>{r.vat||""}</small></td>
+     <td><strong>{r.approvedForBudget?"SOURCE ELIGIBLE / ENGINEERING CHECK":"REFERENCE_ONLY / NOT SELECTED"}</strong><small>{r.technicalCompliance||"NOT VERIFIED"}</small><small>{r.scopeDriver||""}</small>{r.relatedRetailEvidenceId&&<small>Linked retail evidence: {r.relatedRetailEvidenceId}</small>}{r.relatedBudgetBasis&&<small>Internal budget only: {r.relatedBudgetBasis}</small>}</td>
+    </tr>})}</tbody></table></div>
+ </>);
+ const groupQuotes=items=>{
+  const byQuote=new Map(),unquoted=[];
+  items.forEach(item=>{
+   if(!item.quoteId){unquoted.push(item);return;}
+   if(!byQuote.has(item.quoteId))byQuote.set(item.quoteId,[]);
+   byQuote.get(item.quoteId).push(item);
+  });
+  const quotations=[...byQuote.entries()].map(([id,lines])=>({id,lines,header:quoteById.get(id)}))
+   .sort((a,b)=>String(b.header?.date||"").localeCompare(String(a.header?.date||""))||companyCollator.compare(a.header?.quotationNo||a.id,b.header?.quotationNo||b.id));
+  return {quotations,unquoted};
+ };
+ return <section className="p55-section" style={{marginTop:18}}>
+  <h2>Vendor Products · Datasheets · Quotations</h2>
+  <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products"/></p>
+  <p><strong>Active View Module</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view}/></p>
+  <p>แสดงเฉพาะเอกสารที่ได้รับจริง: Quotation แสดงราคาและเงื่อนไข Vendor; Datasheet ที่ไม่มีราคาให้เว้นว่าง โดยไม่มีการเพิ่มสินค้าเข้า BOM อัตโนมัติ</p>
+  <SmartFilterBar moduleKey="bid.vendor.products.search" title="Company / Product / Quotation · Smart Filter"
+    total={catalog.relationships.length} shown={rows.length} onReset={resetSearch}
+    description="Search known companies, manufacturers, part numbers, functions, MR and historical quotations; matches do not imply AVL approval."
+    controls={[
+     {key:"view",label:"View / Group By",type:"select",value:view,onChange:value=>{setView(value);setVendor("ALL");setCompanyQuery("");setChosenQuote("");setInspectedQuote("");setMr("ALL");},
+       options:[{value:"supplier",label:"Company / Supplier"},{value:"quote",label:"Quotation"},{value:"product",label:"Product / Model"},{value:"mr",label:"MR / System"},{value:"compare",label:"TBE / CBE Candidates"}]},
+     ...(view==="supplier"||view==="quote"?[
+       {key:"companyQuery",label:"Type company / ค้นหาบริษัท (A–Z)",type:"search",value:companyQuery,
+        onChange:value=>{setCompanyQuery(value);setVendor("ALL");setChosenQuote("");},
+        placeholder:"CSS, EXION, MGW, RS, CommScope"},
+       {key:"vendor",label:"Supplier (alphabetical)",type:"select",value:vendor,onChange:chooseVendor,
+        options:[{value:"ALL",label:"All suppliers ("+matchingSuppliers.length+" / "+sortedSuppliers.length+")"},
+        ...matchingSuppliers.map(v=>({value:v.id,label:v.name}))]}
+     ]:[]),
+     ...(view==="mr"||view==="compare"?[{key:"mr",label:"MR / System",type:"select",value:mr,onChange:setMr,
+       options:[{value:"ALL",label:"All MR Systems"},...["MR-0001","MR-0002","MR-0003","MR-0004"].map(v=>({value:v,label:v}))]}]:[]),
+     {key:"evidence",label:"Evidence class",type:"select",value:evidenceClass,onChange:setEvidenceClass,
+       options:[{value:"ALL",label:"All evidence"},{value:"CURRENT",label:"Supplier quotations"},{value:"HISTORICAL",label:"Historical / ERP"},{value:"WEB",label:"Web references"},{value:"DATASHEET",label:"Manufacturer datasheets"}]},
+     {key:"search",label:"Search (Company / Product / Source)",type:"search",value:search,onChange:setSearch,placeholder:"e.g. EXION, CommScope, Zone 2, 1260576"}
+    ]}/>
+  {(view==="supplier"||view==="quote")&&<div className="p55-filterbar">
+    <label>Quotation &amp; commercial conditions <select value={chosenQuote} onChange={e=>chooseQuote(e.target.value)}>
+     <option value="">All quotations / Select to inspect</option>
+     {allowedQuotes.map(q=><option key={q.quoteId} value={q.quoteId}>{resolveCompany0553(q.vendor).name} · {q.quotationNo}</option>)}
+    </select></label>
+    <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.quotation-selector"/>
+  </div>}
+  {(view==="supplier"||view==="quote")&&selectedCommercial&&<div className="p55-panel" style={{padding:14,marginBottom:12}}>
+   <h3>{resolveCompany0553(selectedCommercial.vendor).name} — {selectedCommercial.quotationNo}</h3>{inspectedQuote&&!chosenQuote&&<button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote("")}>Close details</button>}<p className="p55-note">Original source supplier label: {selectedCommercial.vendor}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
+   <QuotationTermsDetail0553 quote={selectedCommercial}/>
+   <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
+   <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
+   <p><strong>Commercial verification:</strong> {selectedCommercial.verification}. Delivery, incoterm, payment, warranty, taxes, exclusions, freight and certifications must be verified against the original PDF before project-cost adoption.</p>
+   <p className="p55-note">Quotation commercial conditions are rendered by the shared source-preserving component above. Different supplier data schemas are supported without replacing the original quotation record.</p>
+   <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
+  </div>}
+  <SmartDataGroup key={"quote-lines-"+view} projectId="PJ2608-0553"
+   moduleKey={"bid.vendor.products."+view+".quote-lines"}
+   title={"Supplier / Product / Source Lines — "+(view==="supplier"?"Company → Quotation → Product":view==="quote"?"Quotation → Product":view==="product"?"Product → Vendor":view==="mr"?"MR → Product":"Technical/Commercial Candidates")}
+   count={rows.length}
+   defaultOpen={Boolean(search.trim())||Boolean(companyQuery.trim())||vendor!=="ALL"||Boolean(chosenQuote)||evidenceClass!=="ALL"||mr!=="ALL"}
+   description="07 Vendor → Source Line Registry. Expand this group to view companies, their quotation history and individual products. Each group and quote line has a separate Copy ID; this is one source dataset, not a second BOM.">
+  <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (all matching entries, no hidden 150-row cap). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
+  {grouped.map(g=><SmartDataGroup key={g.id} projectId="PJ2608-0553"
+    moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
+    title={g.title} count={g.items.length}
+    description={view==="supplier"?"Company 360 · Quotation history and other evidence (datasheets, web, ERP) grouped separately. Original source labels: "+(suppliersById.get(g.id)?.sourceSupplierLabels||[]).join(" · "):null}
+    defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)||grouped.length===1}>
+    {view==="supplier"?(()=>{
+     const sections=groupQuotes(g.items);
+     return <>
+      {sections.quotations.map(q=><SmartDataGroup key={q.id} projectId="PJ2608-0553"
+        moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".quotation."+moduleSegment(q.id)}
+        title={(q.header?.quotationNo||q.lines[0]?.quotation||q.id)+" · "+(q.header?.date||"Date not recorded")}
+        count={q.lines.length}
+        description={(q.header?.quoteStatus||q.lines[0]?.priceStatus||"SOURCE_QUOTATION")+
+          " · Original currency: "+(q.header?.currency||q.lines[0]?.currency||"UNVERIFIED")+
+          " · Original vendor: "+(q.header?.vendor||g.title)}
+        defaultOpen={Boolean(search)||chosenQuote===q.id}>
+        {q.header&&<div className="p55-filterbar">
+         <button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote(q.id)}>Inspect quotation header / source</button>
+         <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+q.id}
+          componentName={q.header.quotationNo}/>
+        </div>}
+        <QuotationTermsDetail0553 quote={q.header}/>
+        {renderLines(q.lines)}
+       </SmartDataGroup>)}
+      {sections.unquoted.length>0&&<SmartDataGroup projectId="PJ2608-0553"
+         moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".other-evidence"}
+         title="Other evidence · Datasheets / Web / ERP / Manufacturer" count={sections.unquoted.length}
+         defaultOpen={Boolean(search)||["WEB","HISTORICAL","DATASHEET"].includes(evidenceClass)}>
+          {renderLines(sections.unquoted)}
+       </SmartDataGroup>}
+     </>;
+    })():renderLines(g.items)}
+  </SmartDataGroup>)}
+  {!grouped.length&&<p role="status" className="p55-note">No matching Vendor evidence. Clear filters or broaden the search.</p>}
+  </SmartDataGroup>
+  {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
+  <EngineeringIntelligencePreview0553/>
+  <p className="p55-note"><strong>Release gate:</strong> Product selection requires MR/DTS compliance, datasheet/certification, configuration, supplier price validity and approved project decision. Historical/expired/alternative quotations never enter costing automatically.</p>
+ </section>;
+}

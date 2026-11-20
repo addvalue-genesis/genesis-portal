@@ -1,0 +1,168 @@
+# A1 commissioning and operating spare pricing
+
+## 11 Nov · Provisional B5 startup allowance
+
+Grok Part B Price Model Rev00 uses `D_PARAM!C47` for `PCT_START`,
+`D_ITEM!D8:D22` for inclusion and `D_ITEM!J8:J22` for historical
+Part A prices. `C_B5B6!E22` feeds `S_FORM!F28`. All 15 historical
+price inputs are zero in the source workbook, as are `PCT_START` and
+`LUMP_B5`. The existing workbook was used as a read-only reference.
+
+Working B5 and 11.C2 now share a saved PCT_START scenario with a 5% default.
+E08 uses LUMP_B5 (USD 0) plus the sum of IN × basis USD × PCT_START.
+The basis is the known procurement cost of selected Working A owners using
+existing FX and A1 mappings. It is a proxy for the blank historical input,
+and the UI identifies it as such. Rev00 scope keeps A1-03 VCS out and
+excludes Telecom Tower from the Microwave basis. Missing price inputs
+remain OPEN. The three Rev00 D_QTY drivers give 6 phones, 3 cameras and
+1 PAGA amplifier at 5% using Excel ROUND (half-up).
+
+The same budget reference is visible in the provisional 10.7 B5 row and
+11.A1 commissioning breakdown, marked Provisional – Subject to Company
+Approval. It has no price owner or Schedule allocation. C2 and A1
+commercial totals continue to use the itemized owners allocated through
+11.M. The GENESIS E08 travel equation and other B/C calculations retain
+their existing implementations. The scenario is saved in the working
+backup and excluded from controlled issue snapshots and fingerprints.
+
+ADR-0550-001 principles 2, 5, 6 and 8–12 apply. The Bid Completion
+regression checks recalculation, deliberate zero, missing input, scope,
+and the unchanged Release fingerprint. Working Schedules checks the
+rendered C2 and A1 estimate plus unchanged schedule bindings and native
+A1 rows. The source workbook still has no independently filled Price_old
+basis. The owner's browser workspace was outside the verification.
+
+## Volume I takes the available priced Working rows
+
+Existing 11.C2–C6 draft Word, HTML and screen forms show known Working selling rates and amounts in the price cells. Prices span the two term columns until the customer CIF/FOB basis is saved. C7 continues to use the existing hours calculation or an OPEN hour basis. 11.0, A1 and 11.P show C2–C8 plus the D/E/F supporting subtotals and a direct route to 11.M. D uses A1 inspection and E/F partition A1 Others without double counting. C6 and C8 still have no eligible Working allocation in the checked data.
+
+Startup preparation applies the existing allocation rules to priced, selected and unbound rows with source evidence in C3–C5, B3/B4 for C7, and A1 inspection and Others. It saves only DRAFT bindings, preserves authored bindings and records handled identities so a removed draft stays removed. Source substitution is limited to one explicitly registered, readable, current replacement of the same document number and revision. Uncertain C7 site survey proposals and unresolved references remain separate for review. Existing C2 draft bindings still come from the LAN preparation. Commercial and engineering review remain separate from this save path.
+
+The prepared project replay persisted 38 additional draft bindings, for 40 saved active allocations, with the same draft A1/A2 amounts before and after the allocation save. It verified current source references, idempotence, deletion preservation, price and FX ownership, and HOLD for reviewed issue.
+
+Production Chromium with the prepared project verified the 38 added bindings in IndexedDB and their visibility through 11.M, the 11.0 links, native C2–C6 price cells, C7/C8 and the D–F breakdowns. The bootstrapped draft USD totals were C2 27,495.15, C3 38,581.93, C4 12,942.00, C5 27,228.48, C7 209,862.47, D 20,999.96, E 239,423.50 and F 3,746.26. C6/C8 showed no allocated Working rows. The owner's Windows IndexedDB was outside the test.
+
+## TEL-LAN C2 reassessment against the nine CUS groups
+
+SPE-0002 B1 §7.3.4 requires N+1 or controller high availability and DTS-0001 B1 sheet 10 requires 200 AP, 2,000 clients and 5 Gbps. The Cisco 9800-L data sheet Table 9 confirms hardware capacity of 250 AP, 5,000 clients and 5 Gbps. MR Appendix 1.3 APF item 9 lists one controller. The two selected Working sets are used as the provisional HA design basis. The 30-day/99% calculation gives one spare. Working B5 uses the existing MGW Q26-063 APF SN 9.0 row 7 rate of USD 12,253/SET as a complete-set cost proxy. E12/E13 yield USD 15,477.47, added via a DRAFT C2 binding linked to the current MR, SPE and DTS. The 50-AP licence shown in the quote, HA entitlement and dedicated spare configuration require review. A missing or superseded CUS basis holds the automatic controller price OPEN.
+
+DTS-0001 B1 sheet 9 requires 6 GHz. Cisco's C9105AXI guide confirms 2.4/5 GHz dual band. Preparation stops creating the old AP estimate and deselects only the unchanged generated legacy AP owner on the verified DTS basis. Its offer, calculation, binding, original price basis and history are preserved. An authored AP decision is retained and remains visible for review. No 6 GHz replacement rate was found in the checked Working offer register. The existing Access Switch still contributes USD 12,017.68. Native C2 and A1 S/N 4 now show a known draft subtotal of USD 27,495.15, or THB 924,758.39 at the checked FX.
+
+In WP.5 and 11.C2, Core Switch shows a conditional 0 reserve at PHI four units and Cisco 316,960 h. Industrial Switch shows a conditional 0 at Working two units and Cisco IE-9320-24P4X-E 489,710 h pending SKU confirmation. The DTS VTA C8300-1N1S-4T2X shows a conditional 0 at the three APF Working units and Cisco 536,060 h, under TEL-VSAT ownership. Distribution Switch remains zero for random failure stock in this scenario. These are 720-hour/99% results for unplanned failures. Planned consumption, part-level configurations and each stock location require separate review. Palo Alto's PA-400 reference supplies 29 years MTBF; unresolved IT/OT roles and throughput prevent assigning that reliability to the required firewall solution. Media Converter remains without a verified Working component Part No. and rate.
+
+Validated on the prepared project: prior automatic AP retired, an edited AP record preserved, controller price held when CUS evidence is missing, and reapplying the preparation is idempotent. Bid Completion, Working Preview, Native Exhibit and continuity validators passed. Production Chromium verified the two new draft price cells in USD and THB, the A1 subtotal, all ten equipment checks and the C2 to WP.5 link. The owner's Windows workspace was outside the test.
+
+## TEL-LAN customer equipment coverage in WP.5 and C2
+
+The shared coverage table starts with ten customer equipment checks from MR B1 Appendix 1.3, PHI B1 Table 7-7, SPE-0002 B1 §7.3 and DTS-0001 B1. It splits IT and OT Firewall and includes the Router and Media Converter. It then shows the actual selected Working owners, the available 30-day/99% stock result and any saved C2 B5 allocation matched by Part No. WP.5 TEL-LAN and 11.C2 TEL-LAN both open the table with source and Working links. The two firewall rows reference the same unsplit Working lines. The Router points to TEL-VSAT and the Media Converter points to cabinet evidence pending a component-level quantity. The table does not assign additional cost owners or treat an installed package as proof that spares are included.
+
+The four calculable reserves are unchanged. The AP and Access Switch remain the two priced Start-up B5 allocations. The Distribution Switch result is zero for random-failure stock, while planned parts still need review. The Controller reserve is one with the MR/Working quantity and DTS licence capacity checks pending. Core Switch, Firewall, Industrial Switch and Media Converter still need their named evidence checks. The AP draft also retains its DTS 6 GHz and Substation applicability checks. Pre-commissioning and Commissioning continue to require ITP/OEM evidence. The displayed scope does not modify the commercial issue or add lines to the customer form.
+
+Production webpack, Working Preview 1–8 and continuity checks passed. Chromium with the prepared project workspace verified ten coverage rows, the C2 to WP.5 navigation and identical coverage results, USD and THB row pricing, A1 reconciliation and saved C2 bindings. The owner's Windows workspace was outside the test.
+
+## C2 customer price columns and price trace
+
+Parts Description contains the spare description. The native draft shows the Working **customer selling price** in Unit Cost and Total Cost. If no unique CIF/FOB basis is saved, each price cell spans both term columns and the form explains the pending allocation. An explicit CIF or FOB continues to use its corresponding subcolumn. Unknown price stays OPEN. The Word/HTML drafts follow the native layout and the Excel draft uses the cleaned description and its existing selling-price columns. Stored Working data, allocation, release approval, and frozen issue artifacts are preserved. ADR 5, 6, 8 and 10–12 apply.
+
+The two LAN lines take USD 281.00 and USD 9,514.00 per complete matching set from MGW Q26-063 LAN/PBX/FO PDF p1, APF SN 8.0 row 1 and SN 9.0 row 5. `B5-SPARE-STOCK` returns one SET each. Working applies E12 (cost ÷ 0.95) and E13 (ADDVALUE sell × 1.20). It converts the unrounded result using the saved 33.6335 THB/USD, rounds the THB total to cents, and exposes the USD equivalent through E17. C2 reads the derived customer amount and its unit rate from 11.M. The THB examples are 11,938.12 and 404,196.78, totaling 416,134.90. Internal procurement, margin, and source assumptions stay in Working.
+
+Chromium on the prepared workspace verified the two price cells per LAN row in both USD and THB, the clean description, the A1 reconciliation, and the saved C2 bindings. Native regressions cover Word, HTML, XLSX, explicit CIF/FOB placement and the strict issue layout. Schedule diagnostics, Working Schedules and controlled issue checks passed. The owner's Windows workspace was outside the test.
+
+## LAN C2 draft Start-up prices
+
+11.C2 stayed OPEN because the LAN reliability view calculated quantities without creating Working B5 owners or 11.M allocations. Startup preparation now creates the two source-bound `LINE-B5-LAN-STARTUP-*` owners, their `B5-SPARE-STOCK` calculations and DRAFT C2 bindings on the current MGW and MR basis. A1 S/N 4 reads the same amounts once. ADR 2, 5, 6, 8, 10–12 apply.
+
+| Current matching MGW equipment set | Installed | MTBF (h) | Start-up stock (SET) | Cost proxy (USD/SET) | Draft sell (USD) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Cisco C9105AXI-H | 27 | 614,054 | 1 | 281.00 | 354.95 |
+| Cisco C9200-48P-A | 24 | 375,570 | 1 | 9,514.00 | 12,017.68 |
+| Total | | | 2 | | 12,372.63 |
+
+The quantity basis is one compatible project stock pool, 720 hours with no replenishment and 99% probability of sufficient stock, with no planned consumption or unconfirmed spare inclusion credited. The cost basis is the complete matching installed equipment SET from Q26-063 LAN/PBX/FO, using the existing Goods sell policy. Q26-063 has no dedicated commissioning spare quantity or rate for either model. Existing edited/deleted budget owners are preserved. Overlapping Working B5 scope or a changed supporting Offer or installed population invalidates the unchanged estimate.
+
+Pre-commissioning awaits the LAN ITP material list and quantities. Commissioning awaits the OEM parts consumed during testing through PAC and the quantity already included. The two Start-up entries remain DRAFT with Main Equipment TAG, delivery, weight, origin, shipping and customer CIF/FOB unresolved. The earlier C9300L spare does not establish applicability to C9300-48P-A, and the 9800-L licence/capacity comparison remains OPEN. No frozen issue is changed.
+
+Production webpack and isolated Chromium on the prepared project with the current MGW register passed. Chromium verified the two native C2 row amounts, A1 S/N 4, cause-level LAN OPEN notes, existing C3–C8 results and both sets of saved Working, calculation and C2 binding records in IndexedDB. Model checks confirmed duplicate, stale source, edited/deleted and frozen issue behavior. The owner's Windows workspace was outside the test.
+
+## Price trace inside 11.C2–11.C8
+
+Each detail Schedule shows the existing Working amounts by A1 Base and A2 Option. C2 shows the whole-project totals separately from the selected system. C3 stays an A2 Option reference in A1 Notes. Call-off rows are shown as rate references. Draft native C2–C6 sheets show the Working amount for the rows on that sheet when CIF/FOB is unresolved. Existing template price columns still require their delivery basis. ADR 2, 5, 6, 8, 10–12 apply.
+
+Re-read both MGW Q26-063 quotations. Current LAN/PBX/FO PDF p1, APF SN 9.0 row 4 quotes two C9300-48P-A Distribution Switch sets with a PWR-C1-715WAC power supply in each set. Earlier Q26-063 v1.0 PDF pp24–25 mentions PWR-C1-715WAC-P as a spare on the C9300L-24P-4X-A package. The current quotation does not establish a separately supplied C2 spare quantity or unit rate. 11.C2 shows that distinction under the current Offer and Working owner. MR B1 Appendix 10 and STD TEL-001 §7.7.1 remain the basis for the itemized C2 spare schedule.
+
+Production webpack, Working Schedules, and Chromium on the prepared project fixture passed. The browser verified all seven detail pages, the LAN scope separation and C4/C5 draft notes. The Windows IndexedDB and final LAN spare list remain unverified.
+
+## Preparation for all 19 systems
+
+An empty draft C2 system sheet now shows Pre-commissioning, Commissioning and Start-up preparation rows with OPEN part, quantity, commercial and logistics cells. A system with actual allocations retains its native Main Equipment forms and lists the phases awaiting B5. Draft Word, HTML/PDF and Excel use the same preparation basis. COMMON continues to represent existing shared allocations. The preparation slots are presentation only and never enter Working, 11.M, A1 totals or frozen issue data.
+
+From 11.C2, `เตรียมรายการ Working B5` opens the existing B5 group with the chosen system. The B5 preparation picker supports all 19 systems and three phases. Each action uses the existing Working editor, prefilling system, phase, B5 customer row, piece unit and the general CUS reference. Actual scope, Part No., quantity, price and equipment allocation still need evidence and entry. No new module, automatic save or manufactured cost owner is introduced. ADR 5, 6 and 10–12 apply.
+
+The preparation is integrated on top of `96fa2a3`. It retains its C2 Project Lot overlap warning and both OEM quantity modes. DIRECT uses the documented requirement and reports A × B separately. RATIO selects B or A × B according to the OEM source, rounds up the number of groups before multiplying by spares per group, then deducts confirmed included parts. C2 displays the ratio basis and required quantity for linked calculations. No OEM ratio is assumed for prepared phases. For example, 21 units at two spares per group of ten gives six required, or five extra when one is included.
+
+Native Exhibit, controlled release, Working Schedules and production webpack passed. Native regression checks all 19 empty system forms, all three OPEN rows per form and Excel, the unchanged A1 roll-up and historical outputs. Isolated Chromium verifies OPEN Word export, missing phases for an allocated system and C2 → B5 → editor with the selected system/phase, blank quantity/cost and unchanged saved B5 rows. The owner's Windows workspace was outside the test.
+
+## Draft C2 forms by system
+
+11.C2 and 11.P preview use the existing 19 system tokens and canonical C2 allocations. The selector opens one system at a time and also offers all systems. Each system has its own draft form set. The native Exhibit C rule still starts a separate form for each Main Equipment No., with continuation sheets for overflow. Systems awaiting allocations show an OPEN form. Existing shared owners appear once under COMMON.
+
+The C2 Word and Print/PDF controls use the chosen system. Full draft Word and HTML include all system sets, and the draft Volume I Excel export uses one C2 tab per system. The screen and exports use the same system grouping. A1 S/N 4 still rolls up the same canonical B5 prices. There is no change to frozen package layout, release gates, saved rows or allocations. ADR 5, 6 and 10–12 apply.
+
+Native Exhibit, controlled release, Working Schedules and production webpack passed. The native test verifies separate LAN and DMR headers even with the same Main Equipment No., independent subforms, selected print HTML/Word, the single-sheet Word page break and unchanged A1 amount. Isolated Chromium on the prepared workspace plus synthetic B5 rows verified the selector, an OPEN PAGA form, selected-only and full Word downloads, system Excel tabs and unchanged Working records. The owner's Windows workspace and a physical printout were outside the test.
+
+## C2 quantity basis from the existing CUS register
+
+Exhibit C2 Notes 1–3 require a form per Main Equipment No. and define the scope from construction through start-up, testing and PAC. A is the count of an identical part per main equipment item and B is the count of matching main equipment items. A × B is installed population. It does not prescribe spare quantity. Use the quantity required by the applicable CUS clause or supported by the OEM spare list under STD TEL-001 §7.7.1 and MR B1 Appendix 10. The executable `B5-C2-OEM-QTY` in existing 02.1 gives max(0, required − documented same-part/same-duty included quantity). Missing inputs remain OPEN. Capture OEM Part No., availability/lead time and source. Use the existing price/FX path in Working B5. B5-SPARE-QTY can support a documented activity-based takeoff. The Poisson scenario remains a separate comparison.
+
+Read the owner's four R00 PDFs. TEL-001 §7.2.3 and §7.7.1 cover LAN scope and separate C2/C3 lists. TEL-011 §§7.2.1.3, 7.2.2.2 and 7.3.2 cover layered LAN, firewall/DMZ and acceptance tests. ICT-003 §§8.6 and 9.2 cover cable specifications and tests. INT-001 §7.2.1 requires item-level ITP with activities, acceptance criteria and evidence. CUS already has a read TEL-011 copy under a different Drive ID. Working and C2 link to current read CUS records via the existing source module.
+
+For APF MGW row 9-02, quote scope is two PA-460 sets, each with ATP and WildFire subscriptions and premium support for 12 months. Quoted performance is 4.2/1.8/1.6 Gbps (Firewall/Threat Prevention/VPN). PHI B1 Table 7-7 separates two redundant IT units and two OT units at APF. The IT throughput basis is >10 Gbps. DTS B1 sheets 7–8 show Threat Prevention 2.2 Gbps for OT and 2.6 for IT. Confirm TAG and role, test basis and HA/DMZ scope. For APF row 9-07, MGW quotes two Catalyst 9800-L sets with 50 AP license and support per set. DTS sheet 10 asks for at least 200 AP, 2,000 clients and 5 Gbps. Confirm the quoted entitlement and capacity under the selected topology/failover. Keep both CUS comparisons OPEN without changing adopted Working prices or approval state.
+
+## Working LAN inventory and reliability coverage
+
+Replace the five hard-coded C9200 Offer IDs and three quote samples with the complete Part A TEL-LAN Working register. Each row exposes the Working owner, Working quantity, original quote and package BOM, including unresolved cable and cabinet requirements. The calculated stock cohort counts selected, independent Working quantities multiplied by the first quoted physical item quantity per set, grouped by the identified Part No. Duplicate selected offers, missing quantity, unmatched units and unlinked source rows cannot contribute a stock quantity. Current unlinked offers display separately, including the included C9500 rows and the coverage-study option. This is a read-only projection. Source amounts, saved Working owners, C2 allocations, prices and frozen issues are preserved under ADR 3, 5, 6 and 8–12.
+
+Rev36 plus current MGW shows 40 Working records (39 current rows and one superseded package) and three unlinked quote rows. Four stock groups have matching evidence: C9105AXI-H (27, Cisco 9105AXI 614,054 h at 40°C), C9200-48P-A (24, 375,570 h), C9300-48P-A (2, 277,770 h) and 9800-L-C-K9 (2, Cisco C9800-L 100,000 h). The default 30-day/99% one-pool scenario returns 1, 1, 0 and 1 random-failure reserves respectively. C9500-48Y4C-A is included in MGW (APF 2, ACP 2) with OEM MTBF available and no independent Working quantity link in the fixture. Industrial switch ABV01 has two sets, with `E-9320-24P4X-E` quoted and `IE-9320-24P4X-E` in the Cisco ordering data. Match the exact ordered SKU before applying OEM reliability. The firewall, component-level replacement strategy and material use remain open for scope and quantity review. The stock scenario does not set purchases or prices.
+
+Working Schedules, Native Exhibit, controlled issue and production webpack passed. The Working Schedules regression verifies that quantities follow selected Working owners and per-set multipliers rather than vendor quantities, with duplicates held open. It also verifies the source-based equation and quantity/sell propagation to C2 and A1. Isolated Chromium with the prepared fixture verified all 40 LAN records, three unlinked vendor rows, four LAN stock models, the two CUS comparisons and equation execution. The owner's Windows workspace was not part of the test.
+
+## Phase breakdown and quantity equations
+
+The draft A1 breakdown displays 5.1 Pre-commissioning, 5.2 Commissioning and 5.3 Start-up. These are breakdown labels. Native A1 S/N 4 is the C2 Base lot and S/N 5 references C3 in A2 Option. The draft lists C3 Working owners separately. 11.C2 reads the same B5/Schedule bindings by phase for all 19 systems plus COMMON, with drill-through to Working, supplier evidence, WP.5, WP.7, 11.M and saved calculations. Older B5 control IDs identify their existing phases. New SKU owners can use the optional `commissioningPhase` on the existing Working editor. Unassigned rows remain visible for reconciliation.
+
+02.1 executes `B5-SPARE-QTY` using evidenced per-activity or directly quoted quantity, separately required reserve and same-duty package inclusion. `B5-SPARE-STOCK` uses Poisson under constant independent random failures with no replenishment during the given exposure. It calculates the smallest stock meeting the chosen sufficiency target. Both return whole counts for U, Pc or SET. Separate planned consumption and random failure stock and avoid allocating shared physical stock twice. A zero required purchase is documented at the existing package owner. Working applies its existing selling and FX rules. These additions use the existing calculation and Working record mechanisms. Historic issues and native form numbering retain their original representation.
+
+Supplier evidence reads the project offer registry. The INDUSTRONIC item 18020 has one kit included in its corresponding net package. CERAGON R11 shows two installed ODUs and R12 remains C4 capital spares. MGW Q26-063 LAN/PBX/FO quotes 24 Cisco C9200-48P-A across five rows (APF 17, ACP 5, AMS01 2). The scenario compares OEM Cisco Table 12 C9200-48P MTBF 375,570 h and CERAGON IP-50CX Technical Description §8.23 126 years, pending exact DMR configuration match. The scenario starts at 30 days / 99% and assumes compatible stock accessible from one pool. The scenario has no price posting. The itemized C2 quantities, purchase rates and allocation evidence remain open. ADR 2,3,5,6,8–12 apply.
+
+Production webpack, Working Schedules model including quantity/Poisson and A1 tie-out, Native Exhibit, controlled issue and Bid Completion checks passed. Isolated Chromium on Rev36 plus the current MGW register showed 19 systems plus COMMON, PAGA and MGW evidence, adjustable LAN stock probability, A1 breakdown and Equation Workbench navigation. The owner's Windows workspace has not been checked.
+
+## CUS basis for live C2
+
+Current CUS records are STD `10008-STD-6-TEL-001` R00 §7.7.1 (printed p36 / PDF p40) and MR `MM-ASK-1A-APF-TEL-MR-0001` B1 §2.0(n) and Appendix 10 (printed p48 / PDF p50). STD requires separate commissioning/start-up and two-year spare lists. MR Appendix 10 requires itemized parts, numbers, prices, availability and installation/start-up coverage. The required quantities follow the applicable system documents and selected OEM parts list. PHI-0001 §6.11 terminal reserve and PAGA SPE-0004's 25% amplifier expansion are design capacity; CCTV DTS-0004's RAID hot spare is installed equipment. PAGA SPE-0004 §15.1 includes commissioning spares in tender supply and separately requests the two-year list. The clauses reviewed give no common percentage of equipment cost for C2.
+
+Use the existing Working quantity × unit-cost path for B5. Track OEM Part No., quantity, quote price and package inclusion by system before allocating to 11.C2 via 11.M and A1 row 4. INDUSTRONIC A20261632-002 item 18020 (PDF p11) is one commissioning kit, gross EUR160, classified under Special Tools and contained in the net quotation. CERAGON RevA1 R12 is the C4 capital-spare package. Neither is evidence of an additional C2 charge. The priced OEM commissioning-spare list remains open in the checked workspace.
+
+Live preparation retires the three untouched 2%/1%/1% B5 estimates and their active receipts. It preserves authored Working edits, deletions and the old derivation used to verify frozen issues. Initial preparation no longer creates the B5 percentages. 11.C2 shows the pricing basis and links to `l3.original`. The existing C3 option reference remains separate.
+
+The Rev36 fixture plus the current MGW import confirmed three B5 owners reopen and an itemized quantity × unit rate reaches C2. Bid Completion, Working Schedules model, Native Exhibit, controlled issue, production webpack and a focused Chromium C2/CUS check passed. The broader Working Schedules browser test still fails at its existing `556,874.01` fixture assertion, reproduced on parent `680d43c`. These checks cover the prepared fixture. The owner's Windows IndexedDB and the missing OEM quantities and rates remain unverified.
+
+## Earlier allowance refresh
+
+Reproduced against the prepared 0550 Rev36 workspace with the current MGW LAN/PBX/FO register. After retiring the superseded MGW quote, the stale estimate guard held all three B5 prices and both C3 price owners OPEN. The A1 renderer left the C3 row blank because the existing C3 allocation is Option. The source Exhibit C rev-0 A1 note explicitly excludes two-year operation spares from the Base price. The MR still calls for an itemized operating-spare offer.
+
+| A1 row | Working owner | Draft treatment |
+| --- | --- | --- |
+| 4 · Form C-2 | B5-D01/D02/D03 | Base. Existing 2% + 1% + 1% of known current Part A procurement cost |
+| 5 · Form C-3 | C3-D02/D03 | Option. Existing 2% + 1% of the same cost basis. A1 Notes references the Option amount counted in A2 |
+
+The refresh applies only to untouched, selected generated estimates under the MGW replacement guard, with a positive, calculated Part A cost basis. It uses the existing selling and FX equations. The old saved manual cost, receipt, vendor offers and user edits stay intact. The live calculation is a Working allowance and is held out of Official pricing. Other dependent allowances keep their existing review rules. Form C2/C3 and A2 show the known Working price even when the CIF/FOB price columns await allocation. The A1 notes and detail summaries are draft-only. The existing C4 capital-spare owner is separate.
+
+ADR-0550-001 principles 2, 5, 6, 8–12 apply. A positive known procurement subtotal can still be incomplete. The estimate does not establish actual OEM SKU, quantity, delivery or availability, package inclusion or purchaser acceptance. Verify the OEM breakdown, deduct proven package overlap and record the customer delivery term before submitting. Frozen outputs, official review requirements and existing Module IDs remain in use.
+
+Verified on the prepared project fixture after the real MGW import: all five owners calculate, the USD and THB amounts tie out to A1 and C2/C3, and Reviewed prices stay OPEN. Deselecting a Part A price owner updates the basis, no eligible cost leaves the price OPEN, and saved price edits and deletions are preserved. Production webpack and isolated Chromium passed. The browser checked both new shortcuts, the Base/Option presentation and the read-only 11.E/F regression. Bid Completion, Working Schedules model, Native Exhibit C, controlled issue and continuity checks passed. This is a prepared fixture, separate from the owner's Windows IndexedDB.
+
+## Vendor trace and cost-only check
+
+07.2 Vendor and the selected Working Part A records read the same canonical Offer IDs. The C2 form consumes the B5 lines via 11.M and adds their customer selling amounts to A1 row 4. It uses Working quantities and FX for the selected cost owners, rather than the vendor page's display subtotal. The 07.2 screen was reproduced with the current MGW register. The current quote's priced Base lines were matched by Offer ID to all 37 selected MGW price owners. Its Option stays outside that basis.
+
+The initial refresh used the provisional customer-pricing projection as its cost gate. A missing selling margin or Prime input could therefore suppress otherwise known procurement cost. The revised refresh computes the spare procurement basis before selling validation, using the existing selection, quantity, source, scope and FX checks. Removing Prime from a known equipment line leaves its procurement cost in the B5/C3 basis and its selling price OPEN. Removing the owner from the selected scope removes its cost. No saved inputs, module IDs, official approval or historic outputs change. This follows ADR-0550-001 principles 5, 6, 8, 10 and 11.

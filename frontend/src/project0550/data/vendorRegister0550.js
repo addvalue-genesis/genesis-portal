@@ -1,0 +1,290 @@
+import {mgwBulkOffer0550,mgwCurrentIncluded0550,mgwCurrentMr0550,mgwFocSupplyOffer0550} from "./mgwQuoteSelection0550";
+import {mrRequirement0550} from './mrWorkingBasis0550';
+import Decimal from 'decimal.js';
+import {integrationFingerprint0550} from './integrationWorkspace0550';
+import {validateBidWorkspace} from './bidWorkspaceModel';
+import {safeSourceUrl} from './sourceIntakeModel';
+import {mgwQuoteItem0550,mgwOfferSystemTokens0550,currentSupplierOffers0550,supplierOfferExcluded0550,mgwProjectWideService0550} from './mgwVendorBasis0550';
+import {workingOffers0550} from './workingOffers0550';
+import {bidCompletionSourceUsages0550} from './bidCompletion0550';
+import {validateSupplierCommercialTotals0550,validateSupplierQuoteRow0550} from './supplierRevision0550';
+import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
+import {atomicRoute0550,validateAtomicPackage0550} from './atomicLines0550';
+import {vendorOfferLocation0550} from './vendorOfferLocation0550';
+import {CHEVALIER_PBX_REGISTER_0550,chevalierPbxSource0550} from './chevalierPbxQuote0550';
+
+// Extend the existing offer registry; this importer never creates Working prices.
+export const VENDOR_REGISTER_SCHEMA_0550='genesis.0550.vendor-register.v1';
+const fail=m=>{throw Error('Vendor register: '+m);};
+const fields=(o,allowed)=>{if(!o||typeof o!=='object'||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail('unsupported fields');};
+const text=(s,max=4000)=>{if(typeof s!=='string'||s.length>max)fail('invalid text');};
+const same=(a,b)=>a===b||a!==undefined&&b!==undefined&&integrationFingerprint0550(a)===integrationFingerprint0550(b);
+const nameKey=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
+export function validateVendorQuoteEvidence0550(e,systems){
+ if(e===undefined)return;
+ fields(e,['revision','systemTokens','sourceId','sourceSha256','sourceUrl','locator','quotedQuantity','quotedUnit','quotedUnitCost','quotedCurrency','classification','rateBasis','terms','quotedTotal','quotedTotalText','originBatchId','fileName','workingReferenceOfferIds','commercialTotals']);
+ for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
+ if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
+ if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
+ const unquantified=e.quotedQuantity===null&&e.quotedTotal===null&&e.classification==='RATE';
+ if(!unquantified&&(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<0||e.quotedQuantity===0&&e.classification!=='OPTION'||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification)))fail('invalid quotation quantity/classification');
+ if(!['THB','USD','EUR'].includes(e.quotedCurrency)||e.quotedUnitCost!==null&&(!Number.isFinite(e.quotedUnitCost)||e.quotedUnitCost<0||e.quotedUnitCost>1e12))fail('invalid native quotation rate/currency');
+ if(e.quotedTotal!==undefined&&e.quotedTotal!==null&&(!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||e.quotedTotal>1e12))fail('invalid original line total');
+ if(e.originBatchId!==undefined&&(typeof e.originBatchId!=='string'||!/^[\w.-]{1,100}$/.test(e.originBatchId)))fail('invalid origin batch');
+ if(e.fileName!==undefined)text(e.fileName,200);
+ if(e.quotedTotalText!==undefined){text(e.quotedTotalText,200);if(e.quotedTotal!==null||!e.quotedTotalText.trim())fail('original total text requires an unpriced total');}
+ if(e.workingReferenceOfferIds!==undefined&&(!Array.isArray(e.workingReferenceOfferIds)||e.workingReferenceOfferIds.length>100||new Set(e.workingReferenceOfferIds).size!==e.workingReferenceOfferIds.length||e.workingReferenceOfferIds.some(id=>typeof id!=='string'||!/^[\w.-]{1,100}$/.test(id))))fail('invalid Working reference offers');
+ if(!Array.isArray(e.terms)||e.terms.length>30)fail('invalid quotation terms');
+ e.terms.forEach(t=>text(t,6000));
+ if(e.commercialTotals!==undefined){
+  const t=e.commercialTotals;
+  fields(t,['gross','discountable','discount','net','discountPercent']);
+  if(Object.keys(t).length!==5||Object.values(t).some(v=>!Number.isFinite(v)||v<0||v>1e12)||t.discountPercent>100||t.net!==e.quotedTotal)fail('invalid printed commercial totals');
+ }
+}
+export function planVendorRegister0550(data,pack,systems){
+ fields(pack,['schema','projectId','batchId','preparedOn','coverageNote','vendors','offers']);
+ if(pack.schema!==VENDOR_REGISTER_SCHEMA_0550||pack.projectId!==data.projectId||pack.projectId!=='PJ2608-0550')fail('wrong project/schema');
+ if(!/^[\w.-]{1,100}$/.test(pack.batchId)||!/^\d{4}-\d{2}-\d{2}$/.test(pack.preparedOn)||new Date(pack.preparedOn).toISOString().slice(0,10)!==pack.preparedOn)fail('invalid batch/date');
+ text(pack.coverageNote,6000);
+ if(!Array.isArray(pack.vendors)||!pack.vendors.length||pack.vendors.length>100||!Array.isArray(pack.offers)||!pack.offers.length||pack.offers.length>1000)fail('invalid vendors/offers');
+ const key=integrationFingerprint0550(pack),receipt=(data.supplierRevisionImports||[]).find(r=>r.batchId===pack.batchId);
+ if(receipt){if(receipt.packageKey!==key)fail('consumed batch changed');return {workspace:data,changed:false,sourceState:'CURRENT',stats:[]};}
+ if(new Set(pack.vendors.map(v=>v.id)).size!==pack.vendors.length||new Set(pack.offers.map(o=>o.id)).size!==pack.offers.length)fail('duplicate IDs');
+ validateAtomicPackage0550(pack.offers);
+ for(const net of pack.offers.filter(o=>o.quoteEvidence?.commercialTotals)){
+  const evidence=net.quoteEvidence,items=pack.offers.filter(o=>o.supplierQuoteRow?.parentOfferId===net.id);
+  if(net.supplierQuoteRow?.classification!=='NET_PACKAGE'||items.some(o=>o.vendorId!==net.vendorId||o.quoteRef!==net.quoteRef||
+   o.quoteEvidence?.sourceSha256!==evidence.sourceSha256||o.quoteEvidence?.sourceId!==evidence.sourceId||
+   o.currency!==evidence.quotedCurrency||o.quoteEvidence.quotedUnitCost!==o.unitCost))fail('commercial totals require one matching original package');
+  validateSupplierCommercialTotals0550(evidence.commercialTotals,items,net);
+ }
+ const vendors=[...data.vendors],vendorIds=new Map(),stats=[];
+ let addedVendors=0;
+ for(const v of pack.vendors){
+  fields(v,['id','name','kind','reference']);
+  for(const k of ['id','name','kind','reference'])text(v[k]);
+  if(!/^[\w.-]{1,100}$/.test(v.id)||!v.name.trim())fail('invalid supplier identity');
+  const byId=vendors.find(x=>x.id===v.id),byName=vendors.filter(x=>nameKey(x.name)===nameKey(v.name));
+  if(byId&&nameKey(byId.name)!==nameKey(v.name)||byName.length>1)fail('supplier identity conflict / '+v.id);
+  const existing=byId||byName[0];vendorIds.set(v.id,existing?.id||v.id);
+  const defaultDeleted=hasVendorDefaultReceipt0550(data,v.id)&&isVendorDefaultVendor0550(v.id)&&pack.offers.filter(o=>o.vendorId===v.id).every(o=>isVendorDefaultOffer0550(o.id)&&!data.offers.some(old=>old.id===o.id));
+  if(!existing&&!defaultDeleted){vendors.push(v);addedVendors++;}
+ }
+ const offers=[...data.offers],preserved=[];let addedOffers=0,existingOffers=0,updatedOffers=0;
+ for(const incoming of pack.offers){
+  if(!vendorIds.has(incoming.vendorId)||!incoming.quoteEvidence||incoming.mgwQuoteLineId)fail('quoted source evidence required');
+  validateVendorQuoteEvidence0550(incoming.quoteEvidence,systems);
+  validateSupplierQuoteRow0550(incoming);
+  const o={...incoming,vendorId:vendorIds.get(incoming.vendorId)},e=o.quoteEvidence,defaultsConsumed=hasVendorDefaultReceipt0550(data,o.id);
+  for(const id of e.workingReferenceOfferIds||[]){const target=data.offers.find(old=>old.id===id);if(id===o.id||target&&target.vendorId!==o.vendorId)fail('invalid cross-supplier Working reference');}
+  if(o.supplierQuoteRow&&(o.supplierQuoteRow.sourceId!==e.sourceId||o.supplierQuoteRow.quantity!==e.quotedQuantity||o.supplierQuoteRow.quotedUnit!==e.quotedUnit))fail('source row identity differs from quotation evidence');
+  const matches=offers.filter(old=>old.id===o.id||(old.vendorId===o.vendorId&&old.quoteRef===o.quoteRef&&old.quoteEvidence?.revision===e.revision&&old.quoteEvidence?.sourceSha256===e.sourceSha256&&old.quoteEvidence?.locator===e.locator));
+  if(matches.length>1)fail('ambiguous quotation identity / '+o.id);
+  const old=matches[0];
+  // A previously consumed source package also owns deliberate row deletions.
+  if(!old&&e.originBatchId&&((data.supplierRevisionImports||[]).some(r=>r.batchId===e.originBatchId)||data.vendorBasisImport?.version===e.originBatchId)){preserved.push(o.id+' / deleted source row retained');continue;}
+  if(!old&&defaultsConsumed&&isVendorDefaultOffer0550(o.id)){preserved.push(o.id+' / deleted default retained');continue;}
+  if(old){
+   // Add original-source metadata only when every pre-existing field is exact.
+   // This cannot reprice a saved offer or change a legacy Working addition.
+   if(!old.quoteEvidence){
+    const {quoteEvidence,...sourceOffer}=o;
+    if(same(old,sourceOffer)){offers[offers.indexOf(old)]={...old,quoteEvidence};existingOffers++;updatedOffers++;continue;}
+    if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.sourceRef!==o.sourceRef||!same(old.supplierQuoteRow,o.supplierQuoteRow))fail('Offer ID belongs to another quotation/version / '+o.id);
+    existingOffers++;preserved.push(old.id+' / saved offer retained');continue;
+   }
+   if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.quoteEvidence?.revision!==e.revision||old.quoteEvidence?.sourceSha256!==e.sourceSha256||old.quoteEvidence?.locator!==e.locator)fail('Offer ID belongs to another quotation/version / '+o.id);
+   existingOffers++;
+   if(pack.batchId===CHEVALIER_PBX_REGISTER_0550&&chevalierPbxSource0550(o)){
+    const {originBatchId,commercialTotals,...source}=e;
+    const {originBatchId:oldOrigin,commercialTotals:oldTotals,...previous}=old.quoteEvidence;
+    const {atomicLines:atoms,quoteEvidence,...row}=o;
+    const {atomicLines:oldAtoms,quoteEvidence:oldEvidence,...previousRow}=old;
+    const code=o.supplierQuoteRow?.itemCode;
+    const targetClass=o.supplierQuoteRow?.classification==='BASE_PRICE'?
+     /^1\.[23]\./.test(code)?'EQUIP':code==='2.2'?'OTHER_COST':null:null;
+    const priorClass=code==='2.2'?'SERVICE_SITE':'OTHER_COST';
+    const expected=oldAtoms?.map(atom=>targetClass&&atom.route.line_class===priorClass?
+     {...atom,route:atomicRoute0550(targetClass)}:atom);
+    if(same(source,previous)&&same(row,previousRow)&&(!oldTotals||same(oldTotals,commercialTotals))&&
+     (!oldAtoms||same(expected,atoms))){
+     const enriched={...old,...(atoms?{atomicLines:atoms}:{}),quoteEvidence:{...old.quoteEvidence,...(commercialTotals?{commercialTotals}:{})}};
+     if(!same(enriched,old)){offers[offers.indexOf(old)]=enriched;updatedOffers++;}
+     continue;
+    }
+   }
+   if(o.atomicLines&&!old.atomicLines){
+    const {originBatchId,...source}=e;
+    const {originBatchId:priorBatch,...priorSource}=old.quoteEvidence;
+    if(!same(priorSource,source)||!same(old.supplierQuoteRow,o.supplierQuoteRow))fail('ALIE source facts differ / '+o.id);
+    offers[offers.indexOf(old)]={...old,atomicLines:o.atomicLines};updatedOffers++;continue;
+   }
+   const additions=['quotedTotal','quotedTotalText','fileName'].filter(k=>old.quoteEvidence[k]===undefined&&e[k]!==undefined);
+   // Supplement only missing printed amount/filename facts from an otherwise
+   // exact original. Never replace an authored value or change any active rate.
+   if(additions.length&&same(old.quoteEvidence,Object.fromEntries(Object.entries(e).filter(([k])=>!additions.includes(k))))){
+    offers[offers.indexOf(old)]={...old,quoteEvidence:{...old.quoteEvidence,...Object.fromEntries(additions.map(k=>[k,e[k]]))}};updatedOffers++;
+   }
+   // Only an exact, untouched OPEN default can receive the original private
+   // quote. Any saved edit/deletion or already priced record remains owned locally.
+   else if(defaultsConsumed&&untouchedVendorDefault0550(old)){offers[offers.indexOf(old)]={...o,id:old.id};updatedOffers++;}
+   else if(!same(old,{...o,id:old.id}))preserved.push(old.id+' / saved offer retained');
+  }else{offers.push(o);addedOffers++;}
+ }
+ stats.push({collection:'vendors',added:addedVendors,unchanged:pack.vendors.length-addedVendors,preserved:[]},{collection:'offers',added:addedOffers,unchanged:existingOffers-updatedOffers,updated:updatedOffers,preserved});
+ for(const o of offers.filter(o=>pack.offers.some(p=>p.id===o.id)&&o.supplierQuoteRow)){
+  const parent=offers.find(p=>p.id===o.supplierQuoteRow.parentOfferId);
+  if(!parent||parent.vendorId!==o.vendorId||parent.quoteRef!==o.quoteRef)fail('source package parent missing / '+o.id);
+ }
+ const workspace={...data,vendors,offers,supplierRevisionImports:[...(data.supplierRevisionImports||[]),{batchId:pack.batchId,packageKey:key,importedOn:pack.preparedOn}]};
+ validateBidWorkspace(workspace,data.baselineSnapshotId,systems);
+ return {workspace,changed:true,sourceState:'VENDOR_REGISTER',stats};
+}
+
+// All groupings are read-only projections of these same canonical Offer IDs.
+export function vendorOfferEntries0550(data){
+ const offers=currentSupplierOffers0550(data);
+ const links=new Map(offers.map(o=>[o.id,{offer:o,systems:new Set(),working:[]}]));
+ const sourceSystems=new Map(offers.map(o=>{
+  const tokens=mgwProjectWideService0550(o)?['COMMON']:[...(o.quoteEvidence?.systemTokens||[]),...mgwOfferSystemTokens0550(o)];
+  return [o.id,[...new Set(tokens.filter(token=>!supplierOfferExcluded0550(data,o,token)))].sort()];
+ }));
+ const add=(id,token)=>{
+  const link=links.get(id);
+  if(token&&link&&!supplierOfferExcluded0550(data,link.offer,token))link.systems.add(mgwProjectWideService0550(link.offer)?'COMMON':token);
+ };
+ for(const [id,systems] of sourceSystems)for(const system of systems)add(id,system);
+ for(const r of data.integrationWorkspace?.requirements||[])for(const id of r.offerIds||[])add(id,r.systemToken);
+ for(const offer of offers)if(mgwCurrentMr0550(offer).some(id=>id.startsWith('MR-B1-13-'))&&offer.quoteEvidence?.systemTokens.includes('TEL-FO'))add(offer.id,'TEL-LAN');
+ for(const l of data.lines)for(const o of workingOffers0550(data,l)){add(o.id,l.systemToken);links.get(o.id)?.working.push(l);}
+ const referenced=new Set(data.offers.flatMap(o=>o.quoteEvidence?.workingReferenceOfferIds||[]));
+ const allocations=new Map();
+ for(const usage of bidCompletionSourceUsages0550(data))for(const id of usage.offerIds){
+  if(!allocations.has(id))allocations.set(id,[]);
+  allocations.get(id).push(usage);
+ }
+ const focLocation=offer=>{
+  if(!mgwFocSupplyOffer0550(offer))return null;
+  const requirements=mgwCurrentMr0550(offer).map(mrRequirementId=>mrRequirement0550({mrRequirementId})).filter(Boolean);
+  if(!requirements.length)return null;
+  return {state:'DRAFT',sites:[...new Set(requirements.map(r=>r.site))],requirements,note:mgwBulkOffer0550(offer)?
+   'Appendix 1.8 · ตรวจปริมาณและเส้นทางสายตาม MR/MTO':'Appendix 1.8 · FODP / Patch Cords · อ้างอิงจุดต่อกับตู้ LAN ตาม Appendix 1.3'};
+ };
+ return offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),sourceSystemTokens:sourceSystems.get(offer.id),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,location:vendorOfferLocation0550(offer)||focLocation(offer),
+  allocatedWorking:allocations.get(offer.id)||[],
+  referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
+  referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
+}
+export function latestVendorPackageQuotes0550(offers){
+ const latest=new Map();
+ for(const offer of offers){
+  if(offer.supplierQuoteRow?.classification!=='NET_PACKAGE'||!offer.quoteEvidence?.commercialTotals)continue;
+  const previous=latest.get(offer.vendorId);
+  if(!previous||offer.date>previous.date||offer.date===previous.date&&offer.quoteRef.localeCompare(previous.quoteRef,'en',{numeric:true})>0){
+   latest.set(offer.vendorId,offer);
+  }
+ }
+ return latest;
+}
+
+const isPagaPackageQuote0550=offer=>/^A20261632(?:-\d{3})?$/.test(offer.quoteRef);
+
+export function latestPagaVendorPackage0550(offers){
+ const packages=offers.filter(offer=>isPagaPackageQuote0550(offer)&&offer.quoteEvidence?.systemTokens.includes('TEL-PAGA'));
+ return [...latestVendorPackageQuotes0550(packages).values()].sort((a,b)=>b.date.localeCompare(a.date)||
+  b.quoteRef.localeCompare(a.quoteRef,'en',{numeric:true}))[0];
+}
+
+export function vendorPagaHistoricalQuote0550(offer,latest){
+ return Boolean(latest&&offer.vendorId===latest.vendorId&&isPagaPackageQuote0550(offer)&&
+  offer.quoteRef.localeCompare(latest.quoteRef,'en',{numeric:true})<0);
+}
+
+const vendorSourceGroup0550=({sourceSystemTokens=[]})=>
+ sourceSystemTokens.length===1?sourceSystemTokens[0]:sourceSystemTokens.length?'SHARED':'UNASSIGNED';
+
+export function groupVendorOffers0550(entries,mode,systems,{sourceGroups=false}={}){
+ const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),quoteEntries=new Map();
+ const systemName=s=>s==='UNASSIGNED'?'รอยืนยันระบบในใบเสนอราคา':s==='SHARED'?'งานร่วมหลายระบบตามใบเสนอราคา':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
+ const evidence=new Map();
+ for(const {offer:o} of entries)if(o.quoteEvidence){const k=JSON.stringify([o.vendorId,o.quoteRef,o.quoteEvidence.revision]);if(!evidence.has(k))evidence.set(k,new Set());evidence.get(k).add(o.quoteEvidence.sourceSha256);}
+ for(const entry of entries){
+ const scopes=entry.sourceSystemTokens?.length?entry.sourceSystemTokens:entry.systemTokens;
+ // The VND register assigns each source row to one group. Working can still
+ // look up the same quotation under every system that the source supports.
+ for(const system of sourceGroups?[vendorSourceGroup0550(entry)]:scopes?.length?scopes:['UNASSIGNED']){
+  const company=entry.vendor?.id||entry.offer.vendorId,companyName=entry.vendor?.name||company;
+  const first=mode==='system'?system:company,second=mode==='system'?company:system;
+  if(!groups.has(first))groups.set(first,{key:first,title:mode==='system'?systemName(system):companyName,system:mode==='system'?system:null,children:new Map(),offerIds:new Set()});
+  const g=groups.get(first);g.offerIds.add(entry.offer.id);
+  if(!g.children.has(second))g.children.set(second,{key:second,title:mode==='system'?companyName:systemName(system),system:mode==='system'?null:system,quotes:new Map()});
+  const child=g.children.get(second),o=entry.offer,e=o.quoteEvidence;
+  const versions=evidence.get(JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'']));
+  const hash=e?.sourceSha256||(versions?.size===1?[...versions][0]:'');
+  const quoteKey=JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'',hash||o.supplierQuoteRow?.sourceId||'']);
+  if(!quoteEntries.has(quoteKey))quoteEntries.set(quoteKey,new Map());
+  quoteEntries.get(quoteKey).set(o.id,entry);
+  if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,system,referenceOnly:entry.referenceOnly,entries:[]});
+  if(e?.fileName)child.quotes.get(quoteKey).fileName=e.fileName;
+  child.quotes.get(quoteKey).entries.push(entry);
+ }
+ }
+ const sort=(a,b)=>a.title.localeCompare(b.title,'en',{numeric:true});
+ return [...groups.values()].sort(sort).map(g=>({...g,children:[...g.children.values()].sort(sort).map(c=>({...c,quotes:[...c.quotes.values()].sort(sort).map(q=>({...q,totalEntries:[...quoteEntries.get(q.key).values()]}))}))}));
+}
+
+// Supplier totals are a read-only projection, never Working cost adoption.
+export const vendorWorkingRateReference0550=offer=>/Working rate reference/i.test(offer.quoteEvidence?.locator||'');
+export function vendorQuoteNetUnitRate0550(offer,parent){
+ const item=offer.supplierQuoteRow,evidence=offer.quoteEvidence,totals=parent?.quoteEvidence?.commercialTotals;
+ if(!totals||chevalierPbxSource0550(parent)||item?.classification!=='BASE_PRICE'||item.parentOfferId!==parent.id||!Number.isFinite(evidence?.quotedUnitCost)||
+  evidence.sourceSha256!==parent.quoteEvidence.sourceSha256||evidence.sourceId!==parent.quoteEvidence.sourceId)return null;
+ const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
+ const rate=item.discountable?totals.discountPercent:0;
+ return new Money(evidence.quotedUnitCost).times(new Money(1).minus(new Money(rate).div(100))).toNumber();
+}
+export function vendorQuoteRowTreatment0550(entry){
+ const {offer}=entry,classification=offer.supplierQuoteRow?.classification;
+ if(entry.referenceOnly||vendorWorkingRateReference0550(offer)||classification==='INCLUDED_REFERENCE'||mgwCurrentIncluded0550(offer))return 'REFERENCE';
+ return classification==='OPTION'||offer.quoteEvidence?.classification==='OPTION'?'OPTION':'BASE';
+}
+export function vendorQuoteTotals0550(quote,fx={},groupOnly=false){
+ const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
+ const entries=[...new Map((quote.totalEntries||quote.entries).filter(e=>!e.referenceOnly&&!vendorWorkingRateReference0550(e.offer)).map(e=>[e.offer.id,e])).values()];
+ const net=e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE'||(!e.offer.supplierQuoteRow&&/\bitem\s+NET\b/i.test(e.offer.quoteEvidence?.locator||''));
+ const option=e=>vendorQuoteRowTreatment0550(e)==='OPTION';
+ const owners=entries.filter(net),hasComponents=entries.some(e=>e.offer.supplierQuoteRow);
+ const base=owners.length?owners:entries.filter(e=>vendorQuoteRowTreatment0550(e)==='BASE'&&(!hasComponents||e.offer.supplierQuoteRow));
+ // Choose the original net basis before narrowing to displayed rows. A package
+ // spanning source groups has one full price, with no evidenced split by system.
+ const packageUnallocated=groupOnly&&owners.length>0&&new Set(entries.filter(e=>!option(e)).map(vendorSourceGroup0550)).size>1;
+ const localIds=new Set(quote.entries.map(e=>e.offer.id));
+ const withinGroup=rows=>groupOnly?rows.filter(e=>localIds.has(e.offer.id)):rows;
+ const baseRows=packageUnallocated?[]:withinGroup(base),options=withinGroup(entries.filter(option));
+ const summarize=(rows,ambiguous=false)=>{
+  const native=new Map();let missingPrices=0;
+  for(const {offer:o} of rows){
+   const e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow;
+   let value=null,currency=e?.quotedCurrency||(r?'USD':o.currency);
+   if(e){
+    // Explicit null includes As actual: it must not become a fabricated extension.
+    value=e.quotedTotal!==undefined?e.quotedTotal:Number.isFinite(e.quotedQuantity)&&Number.isFinite(e.quotedUnitCost)?new Money(e.quotedQuantity).times(e.quotedUnitCost):null;
+   }else if(r)value=r.extended;
+   else if(s&&Number.isFinite(o.unitCost))value=new Money(s.quantity).times(o.unitCost);
+   if(value===null||value===undefined||!new Money(value).isFinite()){missingPrices++;continue;}
+   native.set(currency,(native.get(currency)||new Money(0)).plus(value));
+  }
+  let thb=new Money(0);const missingFX=[],rates=[];
+  const fxReady=Boolean(fx.source?.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(fx.date||''));
+  for(const [currency,value] of native){
+   const rate=currency==='THB'?1:fxReady&&Number.isFinite(fx['thbPer'+currency])&&fx['thbPer'+currency]>0?fx['thbPer'+currency]:null;
+   if(rate===null)missingFX.push(currency);else{thb=thb.plus(value.times(rate));rates.push({currency,rate});}
+  }
+  const knownTHB=thb.toDecimalPlaces(2).toNumber(),complete=rows.length>0&&!missingPrices&&!missingFX.length&&!ambiguous;
+  return {totalTHB:complete?knownTHB:null,knownTHB,hasConverted:rates.length>0,missingPrices,missingFX,rates,ambiguous,
+   native:[...native].map(([currency,value])=>({currency,value:value.toDecimalPlaces(2).toNumber()}))};
+ };
+ return {base:summarize(baseRows,owners.length>1),option:options.length?summarize(options):null,net:owners.length===1,
+  referenceOnly:quote.referenceOnly,packageUnallocated,hasBase:baseRows.length>0,fxSource:fx.source||'',fxDate:fx.date||''};
+}

@@ -1,0 +1,73 @@
+{
+  "browser": "131.0.6778.0",
+  "viewport": "1440x1000",
+  "method": "production; click-to-two-animation-frames; warm 7 cycles; headless environment, not user Windows; memory coarse; not React Profiler",
+  "metrics": {
+    "19 Systems": {
+      "n": 7,
+      "medianMs": 28.6,
+      "maxMs": 31.6
+    },
+    "PAGA toggle": {
+      "n": 14,
+      "medianMs": 31.3,
+      "maxMs": 32.1
+    },
+    "First Principles": {
+      "n": 7,
+      "medianMs": 32.4,
+      "maxMs": 56.8
+    },
+    "Budget": {
+      "n": 7,
+      "medianMs": 28.6,
+      "maxMs": 35.7
+    },
+    "Working Preview": {
+      "n": 7,
+      "medianMs": 31.7,
+      "maxMs": 32
+    },
+    "Released Customer Output": {
+      "n": 7,
+      "medianMs": 29.1,
+      "maxMs": 31.8
+    },
+    "Budgetary Submission": {
+      "n": 7,
+      "medianMs": 28.2,
+      "maxMs": 32.1
+    },
+    "XLSX download": {
+      "n": 1,
+      "medianMs": 52,
+      "maxMs": 52
+    }
+  },
+  "hashes": {
+    "systems": "e7fa9360122cb57387a2de1ee8f4b373e9d4bb4b480845f6b63615b5c4bf20cf",
+    "engineering": "47a1c3059c2bf2b29ba29bf7021096dea031e5ff70ea62b941d340135cb3f651",
+    "budgetary": "2a09eaff6a53bbabebd4275fb249e02fb2d3f32c9005fc8b4e8f199efe91c07c",
+    "working": "8426905ced0ca4c111cec85c62de18f174bb9492176074e0f52792e3c38bf064",
+    "released": "ec70ce29870db0ddf6214481504c7cd706680abcec4722dde7b66cd9cfe85134",
+    "xlsx": "2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6"
+  },
+  "errors": [],
+  "longtasks": [
+    {
+      "start": 45.29999999701977,
+      "duration": 70
+    }
+  ],
+  "domNodes": 538,
+  "memory": {
+    "usedJSHeapSize": 10000000
+  },
+  "navigation": [
+    {
+      "domContentLoaded": 116.39999999850988,
+      "load": 116.39999999850988
+    }
+  ],
+  "baselineCommit": "40aee8b5aa428cd2eb58701b35ad0b2f98d9d0cb"
+}

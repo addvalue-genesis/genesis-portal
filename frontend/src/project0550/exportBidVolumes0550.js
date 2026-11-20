@@ -1,0 +1,121 @@
+import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
+import {nativeExhibitHtml0550,a1SummarySlot0550} from './exhibitCNative0550';
+import {a1DisplaySn0550} from './data/a1DisplaySn0550';
+import {zipStore} from './exportOriginalPriceForm';
+import {formatPttepFileName0550,normalizePttepRev0550} from './data/pttepDocControl0550';
+import {SCHEDULES_0550,QUALIFICATIONS_0550,paymentSchedule0550} from './data/bidVolumes0550';
+import {sumMoney0550} from './data/money0550';
+import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
+import {c2PartsDescription0550,c2SystemGroups0550} from './data/c2SystemForms0550';
+import {c4CapitalSparesRows0550} from './data/c4CapitalSpares0550';
+import {c5SpecialToolsRows0550} from './data/c5ToolsScope0550';
+import {chevalierPbxScheduleTrace0550} from './data/chevalierPbxQuote0550';
+import {C8_TOTAL_DESCRIPTION_0550,C8_TOTAL_NOTE_0550,c8CalloffTotal0550,c8Country0550,c8OtherFacilities0550,c8Revision0550,c8SingleForm0550,c8Unit0550} from './data/c8Calloff0550';
+const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+export function scheduleTable0550(view,id){
+ if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
+ const rows=view.scheduleRows(id);
+ if(id==='A'){
+  const rows=[['Base Scope',view.baseAssigned,'A1 — mapped canonical Working only'],['Optional Scope',view.optionsAssigned,'A2 — excluded from Base'],['Initial Contract Price','OPEN','Confirm ordered options and contract scope; do not add options automatically.']];
+  if(view.workingPreview)for(const treatment of ['BASE','OPTION']){
+   const subtotal=scheduleRollup0550(view.bindings.filter(b=>b.line&&b.treatment===treatment));
+   if(subtotal.priced)rows.push(['Working Draft — '+treatment+' priced items subtotal',subtotal.knownUSD,subtotal.priced+'/'+subtotal.count+' allocated owners priced']);
+  }
+  return {heads:['Description','Amount (USD)','Notes'],rows};
+ }
+ if(['A1','A2'].includes(id)){
+  const part=id==='A1'?'BASE':'OPTION',groups=new Map();
+  for(const b of view.bindings.filter(b=>b.line&&b.treatment===part)){const key=b.summary||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}
+  const draftRows=[...groups].map(([name,bs])=>[name,'Lot',1,view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')+(view.workingPreview?' / '+rollupNote0550(scheduleRollup0550(bs)):'')]);
+  if(id==='A1'&&view.workingPreview){
+   const c3=scheduleRollup0550(view.scheduleRows('C3').filter(b=>b.treatment==='OPTION'&&!b.nonAdditive));
+   const conflict=view.bindings.some(b=>b.line&&b.schedule==='C3'&&b.treatment==='BASE');
+   draftRows.push(['Item 5 · Two years Operation Spare parts','Lot',1,'',conflict?'OPEN':c3.knownUSD??'OPEN',
+    conflict?'Review Base allocation in 11.M':'C3 / A2 Option reference. '+rollupNote0550(c3)]);
+  }
+  if(id==='A1'){
+   // A1 sheet matches the internal screen: the SN column is the internal sequential
+   // displaySn (1 GOODS ... 10 Others), not the customer-form S/N. The official
+   // customer Word form (exhibitCNativeTemplate0550.json / buildNativeExhibitDocx0550)
+   // keeps its own S/N text, which has SN 5 twice. Labels and order only; amounts unchanged.
+   const snOf=(row,i)=>i<groups.size?a1DisplaySn0550(a1SummarySlot0550(groups.get([...groups.keys()][i])[0])):a1DisplaySn0550(6);
+   const numbered=draftRows.map((row,i)=>[snOf(row,i)??'',...row]).sort((a,b)=>(a[0]===''?99:a[0])-(b[0]===''?99:b[0]));
+   return {heads:['SN','Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...numbered,['','Lump Sum Base','Lot',1,view.baseAssigned,view.baseAssigned,'OPEN until complete mapping / review']]};
+  }
+  return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...draftRows,['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
+ }
+ if(id==='B'){
+  const payment=paymentSchedule0550(view),response=view.getRecord('I.B').content||'OPEN';
+  if(payment)return {heads:['Payment milestone','Payment terms','Percentage'],rows:[...(payment.rows.length?payment.rows:[['OPEN','Confirm the current tender payment schedule before issue.','']]),['BIDDER response',response,'']]};
+  return {heads:['Payment milestone','Percentage / response'],rows:[['Advance','10%'],['Engineering approval','5%'],['Major materials PO','15%'],['Ready for shipment / FAT / B/L or AWB','30%'],['Site receipt','20%'],['PAC','10%'],['FAC','10%'],['BIDDER response',response]]};
+ }
+ if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};
+ if(['C2','C3','C4'].includes(id)){
+  const effectiveRows=id==='C4'&&!rows.length?c4CapitalSparesRows0550(view):rows;
+  const details=effectiveRows.map(b=>[b.mainEquipment,id==='C2'?c2PartsDescription0550(b):(b.line?.description||b.description),b.partNo,b.interchangeA,b.interchangeB,b.quantity,b.unit,b.delivery,b.physical?.estimatedWeightKg>0?b.physical.estimatedWeightKg*b.quantity:'OPEN',b.origin,b.shippingFrom,b.unitPrice,b.amount]);
+  if(id==='C3'&&view.workingPreview){
+   const subtotal=scheduleRollup0550(rows.filter(b=>b.treatment==='OPTION'&&!b.nonAdditive));
+   details.push(['','Schedule C3 total (A2 Option)','','','','','',rollupNote0550(subtotal),'','','','',subtotal.knownUSD??'OPEN']);
+  }
+  return {heads:['Main Equipment','Parts Description','Part No.','Interchangeability A','Interchangeability B','Recommended Qty','Unit','Delivery','Total Weight (kg)','Point of Manufacture','Shipping From','Unit Price (USD)','Total Price (USD)'],rows:details};
+ }
+ if(id==='C7')return {heads:['Service / Personnel Category','Total Hours (h)','Rate (USD/h)','Total (USD)','Notes'],rows:rows.map(b=>[b.line.description,b.unit==='MH'?b.quantity:'OPEN',b.unit==='MH'?b.unitPrice:'OPEN',b.amount,b.unit==='MH'?b.treatment:'Man-hour basis OPEN / '+b.treatment])};
+ if(id==='C8'){
+  const total=c8CalloffTotal0550(view,rows);
+  const facilities=total?rows.filter(c8OtherFacilities0550):rows;
+  if(c8SingleForm0550(view)||(total&&!facilities.length))return {heads:['Description / Scope of Supply','Unit','Total Price (USD)','Notes'],
+   rows:[[C8_TOTAL_DESCRIPTION_0550,'Lot',total?.amount??'OPEN',C8_TOTAL_NOTE_0550]]};
+  return {heads:['Country','Description / Scope','Unit','Estimated Quantity','Unit Price (USD)','Total Price (USD)','Notes'],
+   rows:[...(total?[['',C8_TOTAL_DESCRIPTION_0550,'Lot','','',total.amount??'OPEN',C8_TOTAL_NOTE_0550]]:[]),...facilities.map(b=>{
+    const country=c8Country0550(b);
+    return [country||'',b.line.description,country?c8Unit0550(b):b.unit,country||b.unit==='MD'?b.quantity:'OPEN',b.unitPrice,b.amount,
+     b.treatment==='CALLOFF'?[c8Revision0550(b),'Call-off / excluded from Base and Options'].filter(Boolean).join(' / '):b.treatment];
+   })]};
+ }
+ if(id==='C5'){
+  const effectiveRows=!rows.length?c5SpecialToolsRows0550(view):rows;
+  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:effectiveRows.map((b,i)=>[i+1,b.line?.description||b.description,(b.line?.brand||b.brand||'OPEN')+' / '+(b.line?.model||b.model||'Standard'),b.unit,b.quantity,b.unitPrice,b.amount])};
+ }
+ if(id==='C6')return {heads:['SN','Item Name','Specification','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.specification,b.unit,b.quantity,b.unitPrice,b.amount])};
+ return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.line.brand||b.line.offer?.brand||'OPEN',b.unit,b.quantity,b.unitPrice,b.amount])};
+}
+export function bidVolumeSheets0550(view,volume){
+ const pbx=volume==='I'?chevalierPbxScheduleTrace0550(view):[];
+ if(volume==='I')return [{name:'Cover',heads:['Document','Response'],rows:[['Document No.',view.proposal.documentNo||'OPEN'],['Revision',view.proposal.revision],['Power of Attorney / Undertaking',view.getRecord('I.cover').content||'OPEN']]},...SCHEDULES_0550.flatMap(s=>{
+  const note=view.getRecord('I.'+s.id).content||(s.id==='C1'&&view.c1LayoutVersion===C1_APPENDIX_LAYOUT_0550?'':'OPEN — response / applicability not reviewed');
+  if(s.id==='C2'&&view.c2Systems)return c2SystemGroups0550(view).map(group=>{
+   const table=scheduleTable0550({...view,scheduleRows:()=>group.rows},'C2');
+   const rows=table.rows.length?table.rows:group.pendingPhases.map(phase=>table.heads.map((_,i)=>i===1?phase.title+' spares':'OPEN'));
+   const pending=group.pendingPhases.length?' / Awaiting Working B5: '+group.pendingPhases.map(phase=>phase.title).join(', '):'';
+   return {name:'C2 '+group.token,heads:table.heads,rows,note:group.name+' / '+note+pending};
+  });
+  return [{name:'Schedule '+s.id,...scheduleTable0550(view,s.id),note}];
+ }),...(pbx.length?[{name:'PABX Schedule Trace',heads:['Volume I','Draft status','Scope'],rows:pbx}]:[])];
+ if(volume==='VDRL')return [{name:'VDRL',heads:['Document No.','Title','System','Submission phase','Invitation sections','Owner','Due date','Deliverable reference','Review'],rows:view.vdrl.map(r=>[r.documentNo,r.title,r.systemToken,r.phase,r.sectionIds.join(', '),r.owner,r.dueOn,r.deliverableRef,r.state])}];
+ return [{name:'Volume III',heads:['Item','Qualification','BIDDER response','Review'],rows:QUALIFICATIONS_0550.map(q=>{const r=view.getRecord('III.'+q.id);return [q.id,q.title,r.content||'OPEN',r.state];})},{name:'Commercial Deviations',heads:['Title','Customer clause','Requirement','BIDDER proposal','Justification','Decision / Review'],rows:view.commercialDeviations.map(d=>[d.title,d.locator,d.requirement,d.proposal,d.reason,d.decision+' / '+d.state])}];
+}
+const col=i=>{let s='';for(let n=i+1;n;n=Math.floor((n-1)/26))s=String.fromCharCode(65+(n-1)%26)+s;return s;};
+export function buildBidVolumeXlsx0550(view,volume,frozenSheets){
+ const sheets=frozenSheets||bidVolumeSheets0550(view,volume),parts={};
+ const cell=(v,r,c,style)=>typeof v==='number'&&Number.isFinite(v)?`<c r="${col(c)}${r}" s="${style}"><v>${v}</v></c>`:`<c r="${col(c)}${r}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${esc(v)}</t></is></c>`;
+ sheets.forEach((s,i)=>{
+  const rows=[[`PJ2608-0550 / ${s.name}`],[(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')+' / '+(view.proposal.documentNo||'OPEN')+' / '+view.proposal.revision],s.heads,...(s.rows.length?s.rows:[s.heads.map((_,j)=>j===0?'OPEN — no reviewed rows':'')]),...(s.note?[[s.note]]:[])];
+  if(rows.flat().some(v=>/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(String(v??''))))throw Error('Unsupported XML control character');
+  parts[`xl/worksheets/sheet${i+1}.xml`]=`<?xml version="1.0" encoding="UTF-8"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0"><pane ySplit="3" topLeftCell="A4" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${s.heads.map((_,j)=>`<col min="${j+1}" max="${j+1}" width="${j===0?24:j===1?46:22}" customWidth="1"/>`).join('')}</cols><sheetData>${rows.map((row,r)=>`<row r="${r+1}">${row.map((v,c)=>cell(v,r+1,c,r===0?1:r===1?2:r===2?1:0)).join('')}</row>`).join('')}</sheetData><mergeCells count="2"><mergeCell ref="A1:${col(s.heads.length-1)}1"/><mergeCell ref="A2:${col(s.heads.length-1)}2"/></mergeCells><printOptions horizontalCentered="1"/><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/><headerFooter><oddFooter>&amp;L${esc(view.outputLabel||'DRAFT — NOT ISSUED')}&amp;RPage &amp;P of &amp;N</oddFooter></headerFooter></worksheet>`;
+ });
+ parts['[Content_Types].xml']=`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((s,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`;
+ parts['_rels/.rels']='<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>';
+ parts['xl/workbook.xml']=`<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${sheets.map((s,i)=>`<sheet name="${esc(s.name)}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets><definedNames>${sheets.map((s,i)=>`<definedName name="_xlnm.Print_Titles" localSheetId="${i}">'${s.name}'!$1:$3</definedName>`).join('')}</definedNames></workbook>`;
+ parts['xl/_rels/workbook.xml.rels']=`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((s,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="styles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+ parts['xl/styles.xml']='<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Arial"/></font><font><b/><color rgb="FFFFFFFF"/><sz val="11"/><name val="Arial"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF123F61"/></patternFill></fill></fills><borders count="1"><border><left style="thin"><color rgb="FFD9D9D9"/></left><right style="thin"><color rgb="FFD9D9D9"/></right><top style="thin"><color rgb="FFD9D9D9"/></top><bottom style="thin"><color rgb="FFD9D9D9"/></bottom></border></borders><cellStyleXfs count="1"><xf/></cellStyleXfs><cellXfs count="3"><xf fontId="0" fillId="0" borderId="0" numFmtId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf fontId="1" fillId="2" borderId="0" numFmtId="0" xfId="0" applyAlignment="1"><alignment vertical="center" wrapText="1"/></xf><xf fontId="0" fillId="0" borderId="0" numFmtId="0" xfId="0" applyAlignment="1"><alignment wrapText="1"/></xf></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>';
+ return zipStore(parts);
+}
+export function bidVolumeHtml0550(view,volume,frozenSheets){if(volume==='I'&&!frozenSheets)return nativeExhibitHtml0550(view,undefined,true);return `<!doctype html><html lang="en"><meta charset="utf-8"><title>PJ2608-0550 Volume ${esc(volume)}</title><style>body{font:14px Arial;margin:24px;color:#172e43}table{border-collapse:collapse;width:100%;margin:16px 0}td,th{border:1px solid #d9d9d9;padding:8px;vertical-align:top;overflow-wrap:anywhere}th{background:#edf3f7}h2{break-before:page}thead{display:table-header-group}pre{white-space:pre-wrap}@page{size:A4 landscape;margin:14mm}</style><h1>PJ2608-0550 / Volume ${esc(volume)}</h1><p>${esc(view.outputLabel||'DRAFT — NOT FOR SUBMISSION')}</p>${(frozenSheets||bidVolumeSheets0550(view,volume)).map(s=>`<h2>${esc(s.name)}</h2><table><thead><tr>${s.heads.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${(s.rows.length?s.rows:[['OPEN']]).map(row=>`<tr>${row.map(v=>`<td>${esc(v)}</td>`).join('')}</tr>`).join('')}</tbody></table><pre>${esc(s.note||'')}</pre>`).join('')}</html>`;}
+export function downloadBidVolume0550(view,volume,format='xlsx'){
+ const html=format==='html',source=html&&volume==='I'?{...view,customerIssue:true}:view;
+ const docType=volume==='VDRL'?'VDR':volume==='III'?'SPE':'MTO';
+ const rev=normalizePttepRev0550(view.proposal?.revision,'A1');
+ const fileName=formatPttepFileName0550({docType,rev,ext:html?'html':'xlsx'});
+ const url=URL.createObjectURL(new Blob([html?bidVolumeHtml0550(source,volume):buildBidVolumeXlsx0550(view,volume)],{type:html?'text/html;charset=utf-8':'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})),a=document.createElement('a');a.href=url;a.download=fileName;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+
+}

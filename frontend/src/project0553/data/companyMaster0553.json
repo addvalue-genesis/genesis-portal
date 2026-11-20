@@ -1,0 +1,123 @@
+{
+  "projectId": "PJ2608-0553",
+  "version": "CompanyIdentity_Rev01",
+  "policy": "EXACT_EVIDENCE_BACKED_ALIAS_ONLY",
+  "companies": [
+    {
+      "id": "css thai",
+      "displayName": "CSS Thai",
+      "legalName": null,
+      "verification": "CANONICAL_UI_GROUP_PENDING_LEGAL_NAME_EVIDENCE",
+      "roles": [
+        "SUPPLIER",
+        "HISTORICAL_PROCUREMENT_SOURCE"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "CSS Thai",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "CSS Thai / CommScope",
+          "relation": "SUPPLIER_WITH_MANUFACTURER_LABEL",
+          "thirdParty": "CommScope"
+        },
+        {
+          "sourceLabel": "CSS Thai / Royaltec customer reference",
+          "relation": "SUPPLIER_WITH_CUSTOMER_REFERENCE",
+          "thirdParty": "Royaltec"
+        },
+        {
+          "sourceLabel": "CSS Thai / Royaltec",
+          "relation": "SUPPLIER_WITH_CUSTOMER_REFERENCE",
+          "thirdParty": "Royaltec"
+        },
+        {
+          "sourceLabel": "CSS Thai / Phelps Dodge",
+          "relation": "SUPPLIER_WITH_BRAND_LABEL",
+          "thirdParty": "Phelps Dodge"
+        },
+        {
+          "sourceLabel": "CSS Thai / BCC",
+          "relation": "SUPPLIER_WITH_BRAND_LABEL",
+          "thirdParty": "BCC"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quoted source labels are retained verbatim on every relationship",
+        "CommScope and Royaltec are independent third-party roles, not CSS aliases when named without CSS Thai",
+        "Never infer purchasing relationship or AVL approval from matching names"
+      ]
+    },
+    {
+      "id": "exion (thailand)",
+      "displayName": "EXION (Thailand)",
+      "legalName": "EXION (Thailand) Company Limited",
+      "verification": "SOURCE_QUOTATION_NAMES",
+      "aliases": [
+        {
+          "sourceLabel": "EXION (Thailand)",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "EXION (Thailand) Company Limited",
+          "relation": "SUPPLIER"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED"
+    },
+    {
+      "id": "rs thailand",
+      "displayName": "RS Thailand",
+      "legalName": null,
+      "verification": "PUBLIC_WEB_PRICE_DISCOVERY_ONLY__NO_PROJECT_PURCHASE_OR_AVL_VERIFIED",
+      "roles": [
+        "WEB_RETAIL_PRICE_SOURCE"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "RS Thailand",
+          "relation": "RETAIL_PRICE_REFERENCE_ONLY"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Weidmüller is manufacturer, RS Thailand is a retail source link, not confirmed authorized distributor or awarded supplier",
+        "No automatic adoption of listed web rates"
+      ]
+    },
+    {
+      "id": "mgw technologies pte ltd",
+      "displayName": "MGW Technologies Pte Ltd",
+      "legalName": "MGW Technologies Pte Ltd",
+      "verification": "SOURCE_MGW_P26_058_PLUS_MANAGEMENT_WORKING_ASSIGNMENT",
+      "roles": [
+        "QUOTED_SUPPLIER",
+        "RFI_LNA_MANAGEMENT_WORKING_SUPPLIER_ASSIGNMENT"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "MGW Technologies Pte Ltd",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "MGW",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "P26-058 quotes UHF antennas/feeder and other systems; it does not quote RFI RX3852-2002-11 directly",
+        "RFI LNA THB500000/unit is management budgetary allowance and not MGW firm price"
+      ]
+    }
+  ],
+  "noAutomaticCostSelection": true,
+  "noAutomaticProjectAVLApproval": true,
+  "sourceLabelPreservation": true
+}

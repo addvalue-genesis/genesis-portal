@@ -1,31 +1,68 @@
-const path = require('path');
+const path = require("path");
+const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const {execFileSync} = require("node:child_process");
+
+// This is build identification only. No files are written and no price source is modified.
+// Restart webpack serve after Git Pull to refresh the commit embedded in the bundle.
+const currentGitRevision = () => {
+  try {
+    return execFileSync("git",["rev-parse","--short=12","HEAD"],{
+      cwd:path.resolve(__dirname,".."),encoding:"utf8",timeout:2500,
+      stdio:["ignore","pipe","ignore"]
+    }).trim();
+  } catch (_) {return "UNAVAILABLE";}
+};
+const buildRevision = JSON.stringify(currentGitRevision());
 
 module.exports = {
-  entry: './src/index.jsx',
+  entry: "./src/index.jsx",
+  plugins: [
+    new MiniCssExtractPlugin({filename: "bundle.css", chunkFilename: "[id].css"}),
+    new webpack.DefinePlugin({
+      __PJ0553_BUILD_REVISION__:buildRevision,
+      __PJ0550_BUILD_REVISION__:buildRevision,
+      __PJ0550_ALIE_GOOGLE_CLIENT__:JSON.stringify(process.env.GENESIS_0550_GOOGLE_CLIENT_ID||''),
+      __PJ0550_ALIE_DRIVE_FOLDER__:JSON.stringify(process.env.GENESIS_0550_ALIE_DRIVE_FOLDER||'')
+    })
+  ],
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-    publicPath: '/'
+    path: path.resolve(__dirname, "dist"),
+    filename: "bundle.js",
+    publicPath: "/"
   },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: [".js", ".jsx"]
+  },
+  watchOptions: {
+    // Windows can emit events for its paging file when Watchpack watches a drive ancestor.
+    ignored: /^[a-z]:[\\/]pagefile\.sys$/i
   },
   module: {
     rules: [
+      {test: /\.css$/, use: [MiniCssExtractPlugin.loader, "css-loader"]},
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader'
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env", "@babel/preset-react"]
+          }
         }
       }
     ]
   },
   devServer: {
+    setupMiddlewares: (middlewares) => {
+      middlewares.unshift({name: "local-private-source-0550", middleware: require("./scripts/source-drive-0550.cjs").createMiddleware()});
+      middlewares.unshift({name: "local-alie-pdf-0550", middleware: require("./scripts/alie-pdf-0550.cjs").createAliePdfMiddleware()});
+      return middlewares;
+    },
     static: {
-      directory: path.join(__dirname, 'public')
+      directory: path.join(__dirname, "public")
     },
     historyApiFallback: true,
-    port: 3000
+    port: 3050
   }
 };

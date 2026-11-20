@@ -1,0 +1,15 @@
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+(async()=>{const source=fs.readFileSync(path.join(__dirname,"../src/common/engineering/seaReflection.js"),"utf8");
+const {assessSeaReflection,assessTideScenarios}=await import("data:text/javascript;base64,"+Buffer.from(source).toString("base64"));
+assert.equal(assessSeaReflection({}).status,"OPEN_INPUT");
+const evidence={sourceId:"TEST_SYNTHETIC_GEOMETRY_ONLY"};
+const x={distanceKm:10,frequencyMHz:6000,txElevationM:35,rxElevationM:30,evidence};
+const a=assessSeaReflection({...x,tideElevationM:0}),b=assessSeaReflection({...x,tideElevationM:3});
+assert.equal(a.status,"PRELIMINARY_GEOMETRY_ONLY");assert.equal(b.status,"PRELIMINARY_GEOMETRY_ONLY");
+assert.ok(a.pathDifferenceM>b.pathDifferenceM);
+assert.ok(a.reflectionPointFromTxM>0&&a.reflectionPointFromTxM<10000);
+assert.equal(assessSeaReflection({...x,tideElevationM:35}).status,"OPEN_INPUT");
+const report=assessTideScenarios({...x,tideScenarios:[{name:"LOW",tideElevationM:0},{name:"HIGH",tideElevationM:3}]});
+assert.equal(report.scenarios.length,2);assert.equal(report.status,"PRELIMINARY_GEOMETRY_ONLY");
+console.log("PASS preliminary tide reflection geometry regression (synthetic inputs, not project facts)");
+})().catch(e=>{console.error(e);process.exitCode=1});
