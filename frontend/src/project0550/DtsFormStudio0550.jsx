@@ -7,11 +7,98 @@ import {
   exportDtsFormWord0550,
   fixWidths,
 } from './data/dtsFormEngine0550';
-import {
-  AVS_LOGO_DATA_URI,
-  PTTEP_LOGO_DATA_URI,
-  SAMTEL_LOGO_DATA_URI,
-} from './data/dtsFormLogos0550';
+import { DTS_HEADER_LOGOS_0550 } from './data/dtsFormLogos0550';
+
+const DTS_LOGO_CLASS_KEY = {
+  PTTEP: 'pttep',
+  CNEEC: 'cneec',
+  SAMTEL: 'samtel',
+  ADDVALUE: 'avs',
+};
+
+const DTS_LOGO_SIZE_MM_0550 = {
+  cv: {
+    PTTEP: { w: 11, h: 11 },
+    CNEEC: { w: 30, h: 5.93 },
+    SAMTEL: { w: 20, h: 10.26 },
+    ADDVALUE: { w: 26, h: 8.4 },
+  },
+  hd: {
+    PTTEP: { w: 10, h: 10 },
+    CNEEC: { w: 28, h: 5.53 },
+    SAMTEL: { w: 18, h: 9.23 },
+    ADDVALUE: { w: 24, h: 7.76 },
+  },
+  ph: {
+    PTTEP: { w: 7.5, h: 7.5 },
+    CNEEC: { w: 24, h: 4.74 },
+    SAMTEL: { w: 15, h: 7.69 },
+    ADDVALUE: { w: 20, h: 6.46 },
+  },
+};
+
+function DtsLogoColGroup0550() {
+  return (
+    <colgroup>
+      <col style={{ width: '18%' }} />
+      <col style={{ width: '30%' }} />
+      <col style={{ width: '24%' }} />
+      <col style={{ width: '28%' }} />
+    </colgroup>
+  );
+}
+
+function DtsLogoStripRow0550({ variant = 'ph', cellClassName = 'ph-logo' }) {
+  const sizes = DTS_LOGO_SIZE_MM_0550[variant] || DTS_LOGO_SIZE_MM_0550.ph;
+  return (
+    <tr className="logo-strip-row">
+      {DTS_HEADER_LOGOS_0550.map(logo => {
+        const clsKey = DTS_LOGO_CLASS_KEY[logo.id] || 'avs';
+        const dims = sizes[logo.id] || { w: 20, h: 8 };
+        return (
+          <td key={logo.id} className={cellClassName}>
+            <img
+              className={`lg lg-${clsKey}-${variant}`}
+              data-logo-id={logo.id}
+              data-width-mm={dims.w}
+              data-height-mm={dims.h}
+              alt={logo.alt}
+              src={logo.src}
+            />
+          </td>
+        );
+      })}
+    </tr>
+  );
+}
+
+function DtsPageHeader0550({ projectTitle, subtitle, docId, revision, dateDmy, isInternal, internalTrace }) {
+  return (
+    <table className="ph">
+      <DtsLogoColGroup0550 />
+      <tbody>
+        <DtsLogoStripRow0550 variant="ph" cellClassName="ph-logo" />
+        <tr>
+          <td colSpan={4} className="ph-t">{projectTitle}</td>
+        </tr>
+        <tr>
+          <td colSpan={4} className="ph-i">{subtitle}</td>
+        </tr>
+        <tr>
+          <td colSpan={4} className="ph-i">
+            DOC: {docId} &nbsp;·&nbsp; REV: {revision} &nbsp;·&nbsp; {dateDmy}
+            {isInternal && internalTrace && (
+              <>
+                {' '}
+                &nbsp;·&nbsp; <i>{internalTrace}</i>
+              </>
+            )}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  );
+}
 
 function collectDtsFormCssText() {
   if (typeof document === 'undefined') return '';
@@ -343,17 +430,21 @@ export function DtsFormStudio0550({
                 </tbody>
               </table>
 
+              <table className="cv-tb-logos">
+                <DtsLogoColGroup0550 />
+                <tbody>
+                  <DtsLogoStripRow0550 variant="cv" cellClassName="tb-logo" />
+                </tbody>
+              </table>
               <table className="cv-tb">
+                <colgroup>
+                  <col style={{ width: '64%' }} />
+                  <col style={{ width: '18%' }} />
+                  <col style={{ width: '18%' }} />
+                </colgroup>
                 <tbody>
                   <tr>
-                    <td rowSpan={3} className="tb-logo">
-                      <img className="lg lg-pttep-cv" alt="PTTEP" src={PTTEP_LOGO_DATA_URI} />
-                    </td>
                     <td colSpan={3} className="tb-client">{form.clientName}</td>
-                    <td rowSpan={3} className="tb-logo tb-avs">
-                      <img className="lg lg-omega-cv" alt="SAMTEL" src={SAMTEL_LOGO_DATA_URI} />
-                      <img className="lg lg-avs-cv" alt="Add Value System" src={AVS_LOGO_DATA_URI} />
-                    </td>
                   </tr>
                   <tr>
                     <td colSpan={3} className="tb-proj">{form.projectTitle}</td>
@@ -379,16 +470,11 @@ export function DtsFormStudio0550({
         <div className="page">
           <div className="inner">
             <table className="as-hd">
+              <DtsLogoColGroup0550 />
               <tbody>
+                <DtsLogoStripRow0550 variant="hd" cellClassName="as-logo" />
                 <tr>
-                  <td className="as-logo">
-                    <img className="lg lg-pttep-hd" alt="PTTEP" src={PTTEP_LOGO_DATA_URI} />
-                  </td>
-                  <td className="as-proj">{form.projectTitle}</td>
-                  <td className="as-logo as-avs">
-                    <img className="lg lg-omega-hd" alt="SAMTEL" src={SAMTEL_LOGO_DATA_URI} />
-                    <img className="lg lg-avs-hd" alt="Add Value System" src={AVS_LOGO_DATA_URI} />
-                  </td>
+                  <td colSpan={4} className="as-proj">{form.projectTitle}</td>
                 </tr>
               </tbody>
             </table>
@@ -542,29 +628,15 @@ export function DtsFormStudio0550({
         {/* PAGE 3: TECHNICAL DATASHEET SPECIFICATION TABLE */}
         <div className="page">
           <div className="inner">
-            <table className="ph">
-              <tbody>
-                <tr>
-                  <td className="ph-t">{form.projectTitle}</td>
-                </tr>
-                <tr>
-                  <td className="ph-i">
-                    DATA SHEET FOR {form.systemTitleUpper} — {form.area} — Vendor equipment data
-                  </td>
-                </tr>
-                <tr>
-                  <td className="ph-i">
-                    DOC: {form.docId} &nbsp;·&nbsp; REV: {form.revision} &nbsp;·&nbsp; {form.dateDmy}
-                    {isInternal && (
-                      <>
-                        {' '}
-                        &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken} · C1 rows: {form.c1SyncCount} · Vol.I AS-IS Lock: {form.volumeIAsIsLock?.locked ? 'LOCKED' : 'CHECK'})</i>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <DtsPageHeader0550
+              projectTitle={form.projectTitle}
+              subtitle={`DATA SHEET FOR ${form.systemTitleUpper} — ${form.area} — Vendor equipment data`}
+              docId={form.docId}
+              revision={form.revision}
+              dateDmy={form.dateDmy}
+              isInternal={isInternal}
+              internalTrace={`INTERNAL TRACE (${form.systemToken} · C1 rows: ${form.c1SyncCount} · Vol.I AS-IS Lock: ${form.volumeIAsIsLock?.locked ? 'LOCKED' : 'CHECK'})`}
+            />
 
             <div className="basis">
               Submitted WITH BID based on selected equipment in Volume I (Schedule C1) and manufacturer standard datasheets (Volume II VDB). Final VTA / link-budget-dependent parameters shall be confirmed during detail engineering post-award. Deviations and exclusions are listed in MM-ASK-1A-WP01-TEQ-TEL-LIS-0004.
@@ -658,29 +730,15 @@ export function DtsFormStudio0550({
           subSheets.map((sec, sheetIdx) => (
             <div className="page" key={`sub-sheet-${sec.title}`}>
               <div className="inner">
-                <table className="ph">
-                  <tbody>
-                    <tr>
-                      <td className="ph-t">{form.projectTitle}</td>
-                    </tr>
-                    <tr>
-                      <td className="ph-i">
-                        DATA SHEET FOR {form.systemTitleUpper} — {form.area} — {sec.title}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="ph-i">
-                        DOC: {form.docId} &nbsp;·&nbsp; REV: {form.revision} &nbsp;·&nbsp; {form.dateDmy}
-                        {isInternal && (
-                          <>
-                            {' '}
-                            &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken})</i>
-                          </>
-                        )}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                <DtsPageHeader0550
+                  projectTitle={form.projectTitle}
+                  subtitle={`DATA SHEET FOR ${form.systemTitleUpper} — ${form.area} — ${sec.title}`}
+                  docId={form.docId}
+                  revision={form.revision}
+                  dateDmy={form.dateDmy}
+                  isInternal={isInternal}
+                  internalTrace={`INTERNAL TRACE (${form.systemToken})`}
+                />
 
                 <table className="tb ds">
                   {isInternal ? (
@@ -745,29 +803,15 @@ export function DtsFormStudio0550({
         {/* FINAL PAGE (SHEET 4): EQUIPMENT TAG LIST & NOTES */}
         <div className="page">
           <div className="inner">
-            <table className="ph">
-              <tbody>
-                <tr>
-                  <td className="ph-t">{form.projectTitle}</td>
-                </tr>
-                <tr>
-                  <td className="ph-i">
-                    DATA SHEET FOR {form.systemTitleUpper} — {form.area} — Vendor equipment data
-                  </td>
-                </tr>
-                <tr>
-                  <td className="ph-i">
-                    DOC: {form.docId} &nbsp;·&nbsp; REV: {form.revision} &nbsp;·&nbsp; {form.dateDmy}
-                    {isInternal && (
-                      <>
-                        {' '}
-                        &nbsp;·&nbsp; <i>INTERNAL TRACE ({form.systemToken})</i>
-                      </>
-                    )}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <DtsPageHeader0550
+              projectTitle={form.projectTitle}
+              subtitle={`DATA SHEET FOR ${form.systemTitleUpper} — ${form.area} — Vendor equipment data`}
+              docId={form.docId}
+              revision={form.revision}
+              dateDmy={form.dateDmy}
+              isInternal={isInternal}
+              internalTrace={`INTERNAL TRACE (${form.systemToken})`}
+            />
 
             <div className="st2">Equipment Tag list</div>
             <table className="tb">

@@ -213,6 +213,19 @@
   line-height: 1.5;
   padding: 5px 8px !important;
 }
+.cv-tb-logos {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  margin-top: 0;
+}
+.cv-tb-logos td {
+  border: 0.5px solid #000;
+  border-bottom: none;
+  padding: 4px 4px;
+  text-align: center;
+  vertical-align: middle;
+}
 .cv-tb {
   width: 100%;
   border-collapse: collapse;
@@ -270,17 +283,17 @@
 .as-hd {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 9pt;
   margin-bottom: 4mm;
 }
 .as-hd td {
   border: 0.5px solid #555;
-  padding: 5px 8px;
+  padding: 4px 6px;
   text-align: center;
   vertical-align: middle;
 }
 .as-logo {
-  width: 20%;
   font-weight: 700;
   color: #1f3864;
 }
@@ -431,12 +444,18 @@
 .ph {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
   font-size: 8pt;
   margin-bottom: 7px;
 }
 .ph td {
   border: 0.6px solid #000;
   padding: 3px 6px;
+}
+.ph td.ph-logo {
+  text-align: center;
+  vertical-align: middle;
+  padding: 3px 4px;
 }
 .ph-t {
   background: #fff;
@@ -553,32 +572,55 @@
 img.lg {
   display: block;
   margin: 0 auto;
+  max-width: 100%;
 }
 img.lg-pttep-cv {
-  width: 14mm;
-  height: 14mm;
+  width: 11mm;
+  height: 11mm;
+}
+img.lg-cneec-cv {
+  width: 30mm;
+  height: 5.93mm;
+}
+img.lg-samtel-cv {
+  width: 20mm;
+  height: 10.26mm;
 }
 img.lg-avs-cv {
   width: 26mm;
-  height: 8.38mm;
+  height: 8.40mm;
 }
 img.lg-pttep-hd {
-  width: 9mm;
-  height: 9mm;
+  width: 10mm;
+  height: 10mm;
 }
-img.lg-omega-cv {
-  width: 26mm;
-  height: 6.01mm;
-  margin-bottom: 1.6mm;
+img.lg-cneec-hd {
+  width: 28mm;
+  height: 5.53mm;
 }
-img.lg-omega-hd {
+img.lg-samtel-hd {
   width: 18mm;
-  height: 4.16mm;
-  margin-bottom: 1.2mm;
+  height: 9.23mm;
 }
 img.lg-avs-hd {
-  width: 18mm;
-  height: 5.82mm;
+  width: 24mm;
+  height: 7.76mm;
+}
+img.lg-pttep-ph {
+  width: 7.5mm;
+  height: 7.5mm;
+}
+img.lg-cneec-ph {
+  width: 24mm;
+  height: 4.74mm;
+}
+img.lg-samtel-ph {
+  width: 15mm;
+  height: 7.69mm;
+}
+img.lg-avs-ph {
+  width: 20mm;
+  height: 6.46mm;
 }
 
 @media print {

@@ -492,6 +492,11 @@ export function fixWidths(root, widthCm = 17) {
   root.querySelectorAll('table').forEach(tb => {
     const cols = tb.querySelectorAll('colgroup col');
     if (!cols.length || tb.getAttribute('data-cm')) return;
+    const explicitCm = parseFloat(tb.getAttribute('data-width-cm'));
+    const inCoverFrame = typeof tb.closest === 'function' && Boolean(tb.closest('.cv-frame'));
+    const targetWidthCm = Number.isFinite(explicitCm) && explicitCm > 0
+      ? explicitCm
+      : (inCoverFrame ? +(widthCm - 2.4).toFixed(2) : widthCm);
     const pct = [];
     let ok = true;
     cols.forEach(c => {
@@ -503,13 +508,13 @@ export function fixWidths(root, widthCm = 17) {
     const sum = pct.reduce((a, b) => a + b, 0) || 100;
     const w = [];
     cols.forEach((c, i) => {
-      const cm = (widthCm * pct[i]) / sum;
+      const cm = (targetWidthCm * pct[i]) / sum;
       w.push(cm.toFixed(2));
       c.setAttribute('style', `width:${cm.toFixed(2)}cm`);
     });
     tb.setAttribute('data-cm', w.join(','));
     tb.style.tableLayout = 'fixed';
-    tb.style.width = `${widthCm}cm`;
+    tb.style.width = `${targetWidthCm}cm`;
   });
 }
 
@@ -555,6 +560,15 @@ export function wordify(root, doc, widthCm = 17) {
   });
   root.querySelectorAll('.tblk').forEach(e => {
     e.setAttribute('style', 'width:100%;border-collapse:collapse;font-size:7pt;margin-top:6mm');
+  });
+
+  // Preserve exact fixed logo dimensions & aspect ratios for MS Word import
+  root.querySelectorAll('img.lg').forEach(img => {
+    const wMm = img.getAttribute('data-width-mm');
+    const hMm = img.getAttribute('data-height-mm');
+    if (wMm && hMm) {
+      img.setAttribute('style', `display:block;margin:0 auto;width:${wMm}mm;height:${hMm}mm`);
+    }
   });
 }
 

@@ -156,6 +156,24 @@ assert(ssrPaga.includes('Flashing Beacon (Ex d)'), 'PAGA Sheet 7 Flashing Beacon
 assert(ssrPaga.includes('Page 9 of 9'), 'PAGA 9-page split');
 assert(ssrPaga.includes('LSN-303-365') && ssrPaga.includes('LSN-303-414'), 'PAGA Rev.B1 ITR & Lab tags');
 
+// 5. All 4 official header logos in order (PTTEP, CNEEC, SAMTEL, ADDVALUE)
+const Logos = require(root + '/project0550/data/dtsFormLogos0550.js');
+assert.deepEqual(
+  Logos.DTS_HEADER_LOGOS_0550.map(l => l.id),
+  ['PTTEP', 'CNEEC', 'SAMTEL', 'ADDVALUE'],
+  'Header logo registry order must be PTTEP, CNEEC, SAMTEL, ADDVALUE'
+);
+assert(Logos.CNEEC_LOGO_DATA_URI.startsWith('data:image/png;base64,'), 'CNEEC logo embedded as PNG data URI');
+const logoIdsInOrder = [...ssr.matchAll(/data-logo-id="([^"]+)"/g)].map(m => m[1]);
+assert(logoIdsInOrder.length >= 20, 'All 5 pages include the 4-logo header strip (5 x 4 = 20)');
+for (let i = 0; i < logoIdsInOrder.length; i += 4) {
+  assert.deepEqual(
+    logoIdsInOrder.slice(i, i + 4),
+    ['PTTEP', 'CNEEC', 'SAMTEL', 'ADDVALUE'],
+    `Header strip ${i / 4 + 1} preserves 4-logo order`
+  );
+}
+
 console.log(
-  `PASS 12.T DTS Form Studio: ${totalChecked} system/area combinations, zero placeholders/leaks, PTTEP §7.5 naming, 4-page A4 SSR.`
+  `PASS 12.T DTS Form Studio: ${totalChecked} system/area combinations, zero placeholders/leaks, PTTEP §7.5 naming, 4-logo header strip, 4-page A4 SSR.`
 );

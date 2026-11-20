@@ -4,6 +4,25 @@ import {
   listEquations,
 } from './data/documentEquations_Rev0';
 import sdrlDocumentEquations from './data/sdrlDocumentEquations0550.json';
+import { DTS_HEADER_LOGOS_0550 } from './data/dtsFormLogos0550';
+
+const APPENDIX3_LOGO_SIZE_MM = {
+  PTTEP: { w: 10, h: 10 },
+  CNEEC: { w: 28, h: 5.53 },
+  SAMTEL: { w: 18, h: 9.23 },
+  ADDVALUE: { w: 24, h: 7.76 },
+};
+
+function appendix3LogoStripHtml() {
+  const cells = DTS_HEADER_LOGOS_0550.map(logo => {
+    const dims = APPENDIX3_LOGO_SIZE_MM[logo.id] || { w: 20, h: 8 };
+    return `<td style="text-align:center;vertical-align:middle;padding:4px 6px"><img src="${logo.src}" alt="${escapeHtml(logo.alt)}" data-logo-id="${logo.id}" style="display:block;margin:0 auto;width:${dims.w}mm;height:${dims.h}mm"/></td>`;
+  }).join('');
+  return `<table class="hdr-logos" style="width:100%;table-layout:fixed;border-collapse:collapse;margin-bottom:8px">
+<colgroup><col style="width:18%"/><col style="width:30%"/><col style="width:24%"/><col style="width:28%"/></colgroup>
+<tbody><tr>${cells}</tr></tbody>
+</table>`;
+}
 
 const TREATMENT_LABEL = {
   SAMPLE: 'SAMPLE — representative With-Bid excerpt from Memory',
@@ -52,6 +71,7 @@ pre{white-space:pre-wrap;font:inherit;margin:0}
 </style>
 </head>
 <body>
+${appendix3LogoStripHtml()}
 <h1>APPENDIX 3 · SDRL / VDRL With Bid — PJ2608-0550</h1>
 <p class="draft"><strong>DRAFT — Volume II ≡ 12.V VDRL · Code Revision 0</strong><br/>
 HTML-to-Word export. Not a customer issue. Confirm current MR Appendix 3 authority separately.</p>
@@ -96,6 +116,31 @@ export function EnhancedVdrlPanel0550({ data }) {
 
   return (
     <section className="p55-panel" data-component-key="bid.technical.vdrl.enhanced-rev0" aria-label="Enhanced VDRL equations Rev.0">
+      <table className="p55-table" style={{ width: '100%', tableLayout: 'fixed', marginBottom: 8 }}>
+        <colgroup>
+          <col style={{ width: '18%' }} />
+          <col style={{ width: '30%' }} />
+          <col style={{ width: '24%' }} />
+          <col style={{ width: '28%' }} />
+        </colgroup>
+        <tbody>
+          <tr>
+            {DTS_HEADER_LOGOS_0550.map(logo => {
+              const dims = APPENDIX3_LOGO_SIZE_MM[logo.id] || { w: 20, h: 8 };
+              return (
+                <td key={logo.id} style={{ textAlign: 'center', verticalAlign: 'middle', padding: '4px 6px' }}>
+                  <img
+                    src={logo.src}
+                    alt={logo.alt}
+                    data-logo-id={logo.id}
+                    style={{ display: 'block', margin: '0 auto', width: `${dims.w}mm`, height: `${dims.h}mm` }}
+                  />
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
       <h3>12.V · Enhanced VDRL / With Bid equations (Rev.0)</h3>
       <p>
         Volume II ≡ 12.V VDRL. Priority SDRL codes draw WITH BID treatment and equations from Memory
