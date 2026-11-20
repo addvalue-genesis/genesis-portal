@@ -4,6 +4,7 @@ import {
   listEquations,
 } from './data/documentEquations_Rev0';
 import sdrlDocumentEquations from './data/sdrlDocumentEquations0550.json';
+import catalogueBook0550 from './data/catalogueBook0550.json';
 import { DTS_HEADER_LOGOS_0550 } from './data/dtsFormLogos0550';
 
 const APPENDIX3_LOGO_SIZE_MM = {
@@ -225,6 +226,51 @@ export function EnhancedVdrlPanel0550({ data }) {
           </tbody>
         </table>
       </div>
+      <h4 style={{ marginTop: 16 }}>
+        {catalogueBook0550.sdrlCode} · {catalogueBook0550.title} ({catalogueBook0550.revision})
+      </h4>
+      <p>
+        <strong>Compiled PDF:</strong> <code>{catalogueBook0550.outputFileName}</code>
+        {' · '}
+        <strong>{catalogueBook0550.totalCatalogues}</strong> catalogues / <strong>{catalogueBook0550.totalPages}</strong> pages
+        {' · '}
+        Generated: {catalogueBook0550.generatedDate}
+        <br />
+        <small>
+          <strong>Canonical Source:</strong> <code>{catalogueBook0550.sourceCatalogRoot}</code>
+          {' · '}
+          <strong>Builder Script:</strong> <code>{catalogueBook0550.builderScript}</code> (run <code>python scripts/build-pj0550-catalogue-pdf.py --rev 01</code> to revise)
+        </small>
+      </p>
+      <details>
+        <summary>
+          ดูรายการต้นฉบับและเลขหน้าทั้งหมด ({catalogueBook0550.totalCatalogues} รายการ · Appendix 1.1 – 1.8)
+        </summary>
+        <div className="p55-table-wrap" style={{ marginTop: 8 }}>
+          <table className="p55-table" aria-label="B11 Compiled Catalogues and Brochures Index">
+            <thead>
+              <tr>
+                <th>Appendix</th>
+                <th>Sub-section</th>
+                <th>Catalogue / Brochure</th>
+                <th>PDF Pages</th>
+                <th>Source File (Catalog Rev01)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(catalogueBook0550.items || []).map((item, idx) => (
+                <tr key={`${item.appendix}-${idx}`}>
+                  <td><strong>{item.appendix}</strong></td>
+                  <td>{item.subSection}</td>
+                  <td>{item.title}</td>
+                  <td>p.{item.startPage} ({item.pageCount}p)</td>
+                  <td><code>{item.sourceRelPath}</code></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </section>
   );
 }

@@ -1,0 +1,1032 @@
+{
+  "sdrlCode": "B11",
+  "title": "Catalogues and brochures (Appendix 1.1 – 1.8)",
+  "revision": "Rev.00",
+  "generatedDate": "2026-11-20",
+  "outputFileName": "PJ2608-0550_Volume-II_Catalogues-and-Brochures_Appendix-1.1-1.8_Rev00.pdf",
+  "sourceCatalogRoot": "10_PRE_AWARD/05_VENDOR/by company/Volumn II Cataloge/Catalog Rev01",
+  "builderScript": "frontend/scripts/build-pj0550-catalogue-pdf.py",
+  "totalCatalogues": 113,
+  "totalDatasheetPages": 713,
+  "totalPages": 718,
+  "missingCount": 0,
+  "items": [
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "1.Protable Radio_XiR P8600Ex",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/1.Protable Radio_XiR P8600Ex.pdf",
+      "startPage": 6,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "2.Fixed adio_m8600i",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/2.Fixed adio_m8600i.pdf",
+      "startPage": 10,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "3.Repeater_SLR5500",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/3.Repeater_SLR5500.pdf",
+      "startPage": 14,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "4.DMR Tier III System Server(handle by GTPL contractor)",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/4.DMR Tier III System Server(handle by GTPL contractor).pdf",
+      "startPage": 18,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "5.SmartPTT VHF‑DMR IP gateway",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/5.SmartPTT VHF‑DMR IP gateway.pdf",
+      "startPage": 20,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.1 VHF DMR Radio System",
+      "title": "6.SmartPTT Dispatch",
+      "sourceRelPath": "Marine Radio/VHF DMR RADIO/6.SmartPTT Dispatch.pdf",
+      "startPage": 22,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.2 VHF-FM Marine Radio",
+      "title": "71_128756_sailor_6210_6215_vhf_dsc_class_d_hi_194322c9d0",
+      "sourceRelPath": "Marine Radio/VHF-FM MARINE RADIO/71_128756_sailor_6210_6215_vhf_dsc_class_d_hi_194322c9d0.pdf",
+      "startPage": 30,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.3 MF/HF SSB Radio",
+      "title": "Sailor_6320 MF-HF",
+      "sourceRelPath": "Marine Radio/MF HF/Sailor_6320 MF-HF.pdf",
+      "startPage": 32,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.4 VHF-AM Aeronautical Radio",
+      "title": "1.Emergency VHF AM radio_Tron TR30 AIR",
+      "sourceRelPath": "Marine Radio/VHF-AM AERONAUTICAL RADIO/1.Emergency VHF AM radio_Tron TR30 AIR.pdf",
+      "startPage": 36,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.4 VHF-AM Aeronautical Radio",
+      "title": "2.Multipurpose VHF Airband Radio_TR-910",
+      "sourceRelPath": "Marine Radio/VHF-AM AERONAUTICAL RADIO/2.Multipurpose VHF Airband Radio_TR-910.pdf",
+      "startPage": 38,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.5 Telecom Towers",
+      "title": "RQ2609-1204 Telecom Mast Specification RevA1",
+      "sourceRelPath": "VENDOR/Telecom Tower/RQ2609-1204_Telecom_Mast_Specification_RevA1.pdf",
+      "startPage": 42,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.1",
+      "appendixTitle": "Appendix 1.1 — VHF and MF/HF (incl. Telecom Towers & Antenna Cables)",
+      "subSection": "1.1.6 Antenna Feeder Cable",
+      "title": "RF LLF 1-2 UFL SHF1 (HYR0211I025)-(A03)",
+      "sourceRelPath": "Bulk Material Datasheet/RF LLF 1-2 UFL SHF1 (HYR0211I025)-(A03).pdf",
+      "startPage": 47,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.2",
+      "appendixTitle": "Appendix 1.2 — Satellite Communication System (VSAT)",
+      "subSection": "1.2.1 VSAT Cabinet & Rack",
+      "title": "Rittal 5307114 Network/Server Rack VX IT",
+      "sourceRelPath": "5307114-Network_server rack VX IT.pdf",
+      "startPage": 50,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.2",
+      "appendixTitle": "Appendix 1.2 — Satellite Communication System (VSAT)",
+      "subSection": "1.2.1 VSAT Cabinet & Rack",
+      "title": "Rittal 5311116 Network/Server Rack VX IT",
+      "sourceRelPath": "5311116-Network_server rack VX IT.pdf",
+      "startPage": 58,
+      "pageCount": 9
+    },
+    {
+      "appendix": "1.2",
+      "appendixTitle": "Appendix 1.2 — Satellite Communication System (VSAT)",
+      "subSection": "1.2.2 VSAT L3 Switch",
+      "title": "VSAT L3 Switch — Cisco C9200-24P-A",
+      "sourceRelPath": "LAN/11. Vsat L3 Switch_Cisco C9200-24P-A.pdf",
+      "startPage": 67,
+      "pageCount": 55
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "1. Core Switch_Cisco C9500-48Y4C-A",
+      "sourceRelPath": "LAN/1. Core Switch_Cisco C9500-48Y4C-A.pdf",
+      "startPage": 122,
+      "pageCount": 52
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "10. Putian Keyston Jack SPL5.566.2008",
+      "sourceRelPath": "LAN/10. Putian Keyston Jack SPL5.566.2008.pdf",
+      "startPage": 174,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "2. Distribution Switch_Cisco C9300-48P-A",
+      "sourceRelPath": "LAN/2. Distribution Switch_Cisco C9300-48P-A.pdf",
+      "startPage": 175,
+      "pageCount": 71
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "3. Access Switch_Cisco C9200-48P-A",
+      "sourceRelPath": "LAN/3. Access Switch_Cisco C9200-48P-A.pdf",
+      "startPage": 246,
+      "pageCount": 55
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "4. Industrial Aceess Switch_E-9320-24P4X-E(For ABV01)",
+      "sourceRelPath": "LAN/4. Industrial Aceess Switch_E-9320-24P4X-E(For ABV01).pdf",
+      "startPage": 301,
+      "pageCount": 28
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "5. Wireless Controller_Cisco 9800-L-C-K9",
+      "sourceRelPath": "LAN/5. Wireless Controller_Cisco 9800-L-C-K9.pdf",
+      "startPage": 329,
+      "pageCount": 22
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "6. Access Point_Cisco C9105AXI-H",
+      "sourceRelPath": "LAN/6. Access Point_Cisco C9105AXI-H.pdf",
+      "startPage": 351,
+      "pageCount": 15
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "7. Firewall_Palo Alto PA-460",
+      "sourceRelPath": "LAN/7. Firewall_Palo Alto PA-460.pdf",
+      "startPage": 366,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "8. Putian CAT6A Patch Panel SPFA3-08C8",
+      "sourceRelPath": "LAN/8. Putian CAT6A Patch Panel SPFA3-08C8.pdf",
+      "startPage": 374,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.1 Network System (LAN / WLAN / Firewall)",
+      "title": "9. Putian CAT6A Patch Cord SPL3.695.2040",
+      "sourceRelPath": "LAN/9. Putian CAT6A Patch Cord SPL3.695.2040.pdf",
+      "startPage": 375,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "1. PABX Server Software_Avaya IPO",
+      "sourceRelPath": "PABX/1. PABX Server Software_Avaya IPO.pdf",
+      "startPage": 379,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "1.1 PABX Server_Dell R250 server",
+      "sourceRelPath": "PABX/1.1 PABX Server_Dell R250 server.pdf",
+      "startPage": 384,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "2. IP Telephone AVAYA J139",
+      "sourceRelPath": "PABX/2. IP Telephone AVAYA J139.pdf",
+      "startPage": 387,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "3. EX IP Tel_J&R JREX106-SIP",
+      "sourceRelPath": "PABX/3. EX IP Tel_J&R JREX106-SIP.pdf",
+      "startPage": 390,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "4. EX Sounder&beacon_ Warom BBJ81",
+      "sourceRelPath": "PABX/4. EX Sounder&beacon_ Warom BBJ81.pdf",
+      "startPage": 394,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "5.  JB_WAROM BXJ-S",
+      "sourceRelPath": "PABX/5.  JB_WAROM BXJ-S.pdf",
+      "startPage": 396,
+      "pageCount": 6
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.2 PABX & IP Telephone System",
+      "title": "6. Acoustic Hood_JR-TH-01",
+      "sourceRelPath": "PABX/6. Acoustic Hood_JR-TH-01.pdf",
+      "startPage": 402,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "27'' monitor_ Dell s2725dsm",
+      "sourceRelPath": "CCTV/27'' monitor_ Dell s2725dsm.pdf",
+      "startPage": 404,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "75‘’ monitor _ TCL 75V8M Pro",
+      "sourceRelPath": "CCTV/75‘’ monitor _ TCL 75V8M Pro.pdf",
+      "startPage": 409,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "Camera Indoor _ Hikvision DS-2DE4225IW-DET5",
+      "sourceRelPath": "CCTV/Camera Indoor _ Hikvision DS-2DE4225IW-DET5.pdf",
+      "startPage": 410,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "Ex FIXED Camera Outdoor _ Hikvision DS-2XE6422FWD-IZHRSD",
+      "sourceRelPath": "CCTV/Ex FIXED Camera Outdoor _ Hikvision DS-2XE6422FWD-IZHRSD.pdf",
+      "startPage": 418,
+      "pageCount": 7
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "Ex PTZ Camera Outdoor _ Hikvision DS-2DY7436IXG-CXLWF316L",
+      "sourceRelPath": "CCTV/Ex PTZ Camera Outdoor _ Hikvision DS-2DY7436IXG-CXLWF316L.pdf",
+      "startPage": 425,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "Media Convertor_ Tplink",
+      "sourceRelPath": "CCTV/Media Convertor_ Tplink.pdf",
+      "startPage": 433,
+      "pageCount": 6
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "NVR _ Hikvision DS-96128NI-M8",
+      "sourceRelPath": "CCTV/NVR _ Hikvision DS-96128NI-M8.pdf",
+      "startPage": 439,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "NVR _ Hikvision DS-9616NI-M8_R",
+      "sourceRelPath": "CCTV/NVR _ Hikvision DS-9616NI-M8_R.pdf",
+      "startPage": 444,
+      "pageCount": 6
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "PTZ Camera Indoor _ Hikvision DS-2CD3121G2E-LIU",
+      "sourceRelPath": "CCTV/PTZ Camera Indoor _ Hikvision DS-2CD3121G2E-LIU.pdf",
+      "startPage": 450,
+      "pageCount": 7
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.3 CCTV System",
+      "title": "Workstation _ Dell OptiPlex Tower 7020",
+      "sourceRelPath": "CCTV/Workstation _ Dell OptiPlex Tower 7020.pdf",
+      "startPage": 457,
+      "pageCount": 6
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.4 Meteorological System (MET)",
+      "title": "WEA-MAR-Brochure-Shipboard-display-system-B211740EN",
+      "sourceRelPath": "MET/1 DATASHEET/WEA-MAR-Brochure-Shipboard-display-system-B211740EN.pdf",
+      "startPage": 463,
+      "pageCount": 9
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.4 Meteorological System (MET)",
+      "title": "WXT530-Datasheet-B211500EN-K",
+      "sourceRelPath": "MET/1 DATASHEET/WXT530-Datasheet-B211500EN-K.pdf",
+      "startPage": 472,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.3",
+      "appendixTitle": "Appendix 1.3 — Network System, PABX, CCTV and MET",
+      "subSection": "1.3.4 Meteorological System (MET)",
+      "title": "WXT530-Datasheet-B211593EN-E",
+      "sourceRelPath": "MET/1 DATASHEET/WXT530-Datasheet-B211593EN-E.pdf",
+      "startPage": 474,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-001-208-010_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-001-208-010_EN.PDF",
+      "startPage": 476,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-001-208-012_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-001-208-012_EN.PDF",
+      "startPage": 479,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-001-225-037_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-001-225-037_EN.pdf",
+      "startPage": 482,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-008-723-028_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-008-723-028_EN.pdf",
+      "startPage": 485,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-012-023-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-012-023-001_EN.PDF",
+      "startPage": 487,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-013-018-006_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-013-018-006_EN.PDF",
+      "startPage": 490,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-021-202-003_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-021-202-003_EN.PDF",
+      "startPage": 492,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-070-000-101_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-070-000-101_EN.pdf",
+      "startPage": 493,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-070-028-045_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-070-028-045_EN.PDF",
+      "startPage": 495,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-100-702-300_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-100-702-300_EN.PDF",
+      "startPage": 498,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-100-710-100_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-100-710-100_EN.PDF",
+      "startPage": 501,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-100-720-200_V07_EN_SIPInterface",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-100-720-200_V07_EN_SIPInterface.pdf",
+      "startPage": 503,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-100-720-500_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-100-720-500_EN.PDF",
+      "startPage": 505,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-101-300-101_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-101-300-101_EN.PDF",
+      "startPage": 507,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-218-799-410_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-218-799-410_EN.PDF",
+      "startPage": 509,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-218-810-200_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-218-810-200_EN.PDF",
+      "startPage": 511,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-218-825-000_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-218-825-000_EN.PDF",
+      "startPage": 513,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-225-900-060_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-225-900-060_EN.PDF",
+      "startPage": 515,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-301-650-200_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-301-650-200_EN.PDF",
+      "startPage": 517,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-302-053-000_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-302-053-000_EN.PDF",
+      "startPage": 520,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-302-144-100_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-302-144-100_EN.pdf",
+      "startPage": 523,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-325-310-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-325-310-001_EN.PDF",
+      "startPage": 526,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-000-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-000-001_EN.pdf",
+      "startPage": 534,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-001-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-001-001_EN.pdf",
+      "startPage": 537,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-010-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-010-001_EN.pdf",
+      "startPage": 542,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-020-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-020-001_EN.pdf",
+      "startPage": 547,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-030-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-030-001_EN.pdf",
+      "startPage": 551,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-040-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-040-001_EN.pdf",
+      "startPage": 555,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-060-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-060-001_EN.pdf",
+      "startPage": 558,
+      "pageCount": 7
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-060-006_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-060-006_EN.pdf",
+      "startPage": 565,
+      "pageCount": 7
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-326-061-001_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-326-061-001_EN.pdf",
+      "startPage": 572,
+      "pageCount": 5
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-330-005-002_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-330-005-002_EN.PDF",
+      "startPage": 577,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "DAT-351-700-100_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/DAT-351-700-100_EN.pdf",
+      "startPage": 579,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.4",
+      "appendixTitle": "Appendix 1.4 — Public Address and General Alarm (PAGA) System",
+      "subSection": "1.4.1 INDUSTRONIC INTRON-X PAGA Datasheets",
+      "title": "PDT-101-100-010_EN",
+      "sourceRelPath": "PAGA/Datasheets A20261632/PDT-101-100-010_EN.PDF",
+      "startPage": 581,
+      "pageCount": 8
+    },
+    {
+      "appendix": "1.5",
+      "appendixTitle": "Appendix 1.5 — Microwave Communication System (DMR)",
+      "subSection": "1.5.1 Ceragon IP-50CX & 4ft Dual-Pol Antenna",
+      "title": "Ceragon FibeAir IP-50CX Datasheet Rev F",
+      "sourceRelPath": "IP50CX_Datasheet_Rev_F.pdf",
+      "startPage": 589,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.5",
+      "appendixTitle": "Appendix 1.5 — Microwave Communication System (DMR)",
+      "subSection": "1.5.1 Ceragon IP-50CX & 4ft Dual-Pol Antenna",
+      "title": "ANT 4FT 7.125-8.500GHz DP RFU-C Circular",
+      "sourceRelPath": "ANT,4FT,7.125-8.500GHz,DP,RFU-C TYPE CIRCULAR.pdf",
+      "startPage": 593,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "180‘’ Screen _ N series Motorized Screen",
+      "sourceRelPath": "ENTERTAINMENT/180‘’ Screen _ N series Motorized Screen.pdf",
+      "startPage": 597,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "55inch TV_TCL 55T5M Plus",
+      "sourceRelPath": "ENTERTAINMENT/55inch TV_TCL 55T5M Plus.pdf",
+      "startPage": 600,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "75inch TV_TCL 75V8M Pro",
+      "sourceRelPath": "ENTERTAINMENT/75inch TV_TCL 75V8M Pro.pdf",
+      "startPage": 601,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Coaxial Cable_RF 400-75",
+      "sourceRelPath": "ENTERTAINMENT/Coaxial Cable_RF 400-75.pdf",
+      "startPage": 602,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Coaxial Cable_RG 6",
+      "sourceRelPath": "ENTERTAINMENT/Coaxial Cable_RG 6.pdf",
+      "startPage": 605,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Faceplate_Putian SPFA3-08C1",
+      "sourceRelPath": "ENTERTAINMENT/Faceplate_Putian SPFA3-08C1.pdf",
+      "startPage": 607,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "KU Band Satellite Dish _ KU-120 antenna",
+      "sourceRelPath": "ENTERTAINMENT/KU Band Satellite Dish _ KU-120 antenna.pdf",
+      "startPage": 609,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Karaoke_Hichang",
+      "sourceRelPath": "ENTERTAINMENT/Karaoke_Hichang.pdf",
+      "startPage": 610,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Keyston Jack_ Putian SPL5.566.2008",
+      "sourceRelPath": "ENTERTAINMENT/Keyston Jack_ Putian SPL5.566.2008.pdf",
+      "startPage": 611,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "LNB _ Four output",
+      "sourceRelPath": "ENTERTAINMENT/LNB _ Four output.pdf",
+      "startPage": 612,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "LNB _ Two output",
+      "sourceRelPath": "ENTERTAINMENT/LNB _ Two output.pdf",
+      "startPage": 613,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Multiswitch_Gecen ms4016b",
+      "sourceRelPath": "ENTERTAINMENT/Multiswitch_Gecen ms4016b.pdf",
+      "startPage": 614,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Projector _ Panasonic PT-MZ880",
+      "sourceRelPath": "ENTERTAINMENT/Projector _ Panasonic PT-MZ880.pdf",
+      "startPage": 615,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Radio receiver and Speaker with Subwoofer_TAB8510",
+      "sourceRelPath": "ENTERTAINMENT/Radio receiver and Speaker with Subwoofer_TAB8510.pdf",
+      "startPage": 617,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "Wireless microphone_VM200",
+      "sourceRelPath": "ENTERTAINMENT/Wireless microphone_VM200.pdf",
+      "startPage": 620,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.6",
+      "appendixTitle": "Appendix 1.6 — Entertainment System & Conferencing",
+      "subSection": "1.6.1 Entertainment & AV Equipment",
+      "title": "projector_spec_11580",
+      "sourceRelPath": "ENTERTAINMENT/projector_spec_11580.pdf",
+      "startPage": 622,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "1. NDB Transmitter_VR125D",
+      "sourceRelPath": "NDB/1 DATASHEET/1. NDB Transmitter_VR125D.pdf",
+      "startPage": 624,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "2. Antenna Tuning Unit_ATU500SROS",
+      "sourceRelPath": "NDB/1 DATASHEET/2. Antenna Tuning Unit_ATU500SROS.pdf",
+      "startPage": 627,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "3. Comrod AS1R",
+      "sourceRelPath": "NDB/1 DATASHEET/3. Comrod AS1R.pdf",
+      "startPage": 629,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "4. Remote Control_ECMP3",
+      "sourceRelPath": "NDB/1 DATASHEET/4. Remote Control_ECMP3.pdf",
+      "startPage": 630,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "5. Monitor Alarm Receiver_NRB4-NLA2",
+      "sourceRelPath": "NDB/1 DATASHEET/5. Monitor Alarm Receiver_NRB4-NLA2.pdf",
+      "startPage": 632,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.7",
+      "appendixTitle": "Appendix 1.7 — Non-Directional Beacon (NDB)",
+      "subSection": "1.7.1 Nautel NDB System Datasheets",
+      "title": "NDB_Nautel-Nav-Offshore-brochure",
+      "sourceRelPath": "NDB/1 DATASHEET/NDB_Nautel-Nav-Offshore-brochure.pdf",
+      "startPage": 634,
+      "pageCount": 4
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.1 Fiber Optic Termination & Management",
+      "title": "1 PuTian FO Patch Panel WL-OFSM-24(LC)",
+      "sourceRelPath": "FO/1 PuTian FO Patch Panel WL-OFSM-24(LC).pdf",
+      "startPage": 638,
+      "pageCount": 1
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.1 Fiber Optic Termination & Management",
+      "title": "2. Putian FO Patch Cord WLSMUPC-2(LC-LC)-2M",
+      "sourceRelPath": "FO/2. Putian FO Patch Cord WLSMUPC-2(LC-LC)-2M.pdf",
+      "startPage": 639,
+      "pageCount": 9
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.1 Fiber Optic Termination & Management",
+      "title": "3. Rittal FO Cable Management DK7159.035",
+      "sourceRelPath": "FO/3. Rittal FO Cable Management DK7159.035.pdf",
+      "startPage": 648,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "CAT6A AFL F-FTP 4PR 23AWG-1 SHF1 (GSWB) (HYC0321I103)-(A02)",
+      "sourceRelPath": "Bulk Material Datasheet/CAT6A AFL F-FTP 4PR 23AWG-1 SHF1 (GSWB) (HYC0321I103)-(A02).pdf",
+      "startPage": 650,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "CAT6A UFL F-FTP 4PR 23AWG-1 SHF1 (HYC0311I132)-(A02)",
+      "sourceRelPath": "Bulk Material Datasheet/CAT6A UFL F-FTP 4PR 23AWG-1 SHF1 (HYC0311I132)-(A02).pdf",
+      "startPage": 652,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "QFNI-FL    Fiber Optic Cable (HYF0121I008)-(A01)",
+      "sourceRelPath": "Bulk Material Datasheet/QFNI-FL    Fiber Optic Cable (HYF0121I008)-(A01).pdf",
+      "startPage": 654,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "QFNI-FL (HDPE)  Fiber Optic Cable (HYF0121I088)-(A01)",
+      "sourceRelPath": "Bulk Material Datasheet/QFNI-FL (HDPE)  Fiber Optic Cable (HYF0121I088)-(A01).pdf",
+      "startPage": 657,
+      "pageCount": 3
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "RG 59 AFL SHF1 (GSWB) (HYR0121I114)-(A03)  (0.81mmCU、发泡PE)",
+      "sourceRelPath": "Bulk Material Datasheet/RG 59 AFL SHF1 (GSWB) (HYR0121I114)-(A03)  (0.81mmCU、发泡PE).pdf",
+      "startPage": 660,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "RS485 UFL 1×2×0.75 SHF1 (HYB0311I004)-(A02)",
+      "sourceRelPath": "Bulk Material Datasheet/RS485 UFL 1×2×0.75 SHF1 (HYB0311I004)-(A02).pdf",
+      "startPage": 662,
+      "pageCount": 2
+    },
+    {
+      "appendix": "1.8",
+      "appendixTitle": "Appendix 1.8 — FOC and Cables",
+      "subSection": "1.8.2 Bulk Cables (FOC, CAT6A, RG59, RS485, Power)",
+      "title": "XLPE POWER CABLE VOLTAGE UPTO 35kV(1)",
+      "sourceRelPath": "Bulk Material Datasheet/XLPE POWER CABLE VOLTAGE UPTO 35kV(1).pdf",
+      "startPage": 664,
+      "pageCount": 55
+    }
+  ]
+}
