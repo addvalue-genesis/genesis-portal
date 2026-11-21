@@ -8,6 +8,7 @@ import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
 import EXION_LATEST from "./quotes/EXION-1260576-R0.current.json";
 import MOT_EN113_69 from "./quotes/MOT-EN113-69.current.json";
 import VERSED_QT2603_149 from "./quotes/VERSED-QT2603-149.current.json";
+import ROYALTEC_QIN2311155 from "./quotes/ROYALTEC-QIN2311155.reference.json";
 import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
 import DATASHEET_ASSIGNMENTS from "./vendorDatasheetAssignments0553.json";
 import {VENDOR_0553_SOURCES} from "../vendorEvidence";
@@ -92,7 +93,7 @@ KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
   scopeDriver:p.category,approvedForBudget:false,
   specifications:p.specifications,sourceLine:i+1});
 });
-[EXION_LATEST,MOT_EN113_69,VERSED_QT2603_149].forEach(quote=>{
+[EXION_LATEST,MOT_EN113_69,VERSED_QT2603_149,ROYALTEC_QIN2311155].forEach(quote=>{
  const vendorId=quote.vendor.trim().toLowerCase();
  if(!suppliers.has(vendorId))suppliers.set(vendorId,{id:vendorId,name:quote.vendor,quoteIds:[]});
  suppliers.get(vendorId).quoteIds.push(quote.id);

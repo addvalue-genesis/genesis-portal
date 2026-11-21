@@ -51,7 +51,7 @@ assert.equal(xlsxBytes[1], 0x4b, "XLSX must start with PK zip signature");
 
 const lisRow = catalog.records.find((r) => r.docType === "LIS");
 const lisPreview = buildVdrlDocumentPreview0553(lisRow);
-assert.deepEqual(lisPreview.columns, ["No.", "QTY.", "TAG NUMBER", "SERVICE AND EQUIPMENT DESCRIPTION", "LOCATION", "REMARKS"]);
+assert.deepEqual(lisPreview.columns, ["No.", "TAG NUMBER", "SERVICE AND EQUIPMENT DESCRIPTION", "Brand", "Model", "Part No.", "LOCATION", "QTY.", "UNIT", "REMARKS"]);
 
 const html = renderToStaticMarkup(React.createElement(VdrlReportWorkspace0553, {}));
 assert.equal(html.includes("bid.vdrl"), true);

@@ -94,12 +94,13 @@ export function resolveVendorBrandModelPart0553({ tag = "", description = "", ra
   let rawPartNo = "";
 
   if (/^MR-502-001$|^MR-502-003$|^MR-502-004$|^MR-502-005A$|^MR-LQM-202-025A$/.test(t)) {
-    const q = findQuoteLine("CONN-OW-HAZ-4958ER-01");
+    const isBase = /^MR-502-003$|^MR-LQM-202-025A$/.test(t);
+    const q = findQuoteLine(isBase ? "3K-SC-HAZ-RF4958-GPS-01" : "CONN-OW-HAZ-4958ER-01");
     brand = "Aviat";
-    rawModel = /^MR-502-003$|^MR-LQM-202-025A$/.test(t)
-      ? "CTR 4958 PTMP Base Radio (ODU)"
-      : "CTR 4958 Subscriber Radio (ODU)";
-    rawPartNo = q ? `${q.partNumber} + FLK-MAR-4958-EXT-D1` : "CONN-OW-HAZ-4958ER-01";
+    rawModel = isBase
+      ? "RDL3000 Ellipse 4.9–5.8GHz Base Station (ODU)"
+      : "RDL3000 Connect-OW-ER 4.9–5.8GHz Remote Terminal (ODU)";
+    rawPartNo = q ? `${q.partNumber} + FLK-MAR-4958-EXT-D1` : (isBase ? "3K-SC-HAZ-RF4958-GPS-01" : "CONN-OW-HAZ-4958ER-01");
   } else if (/^MR-502-001A$|^MR-502-003A$|^MR-502-004A$|^MR-502-005B$|^MR-LQM-202-025B$/.test(t)) {
     const q = findQuoteLine("PS-DCDC-HAZ-POE-IND-01");
     brand = "Aviat";
@@ -138,9 +139,9 @@ export function resolveVendorBrandModelPart0553({ tag = "", description = "", ra
     rawModel = "Industrial PoE Surge Arrestor";
     rawPartNo = "LP-POE-INL-IND-01";
   } else if (/BULK/.test(t) && !/MR-0002|RF/.test(t)) {
-    brand = "TECKNIKABEL / CMP";
-    rawModel = "CAT6A S/FTP + Ex Cable Glands";
-    rawPartNo = "501/453/UNIV/A/M20";
+    brand = "Belden / CMP";
+    rawModel = "CAT6A SWB S/FTP + Ex Cable Glands";
+    rawPartNo = "50106ASFLB 010305M + 20TE1FU1RA4";
   } else if (/TCAB-508-/.test(t) || /BD4345/i.test(s)) {
     brand = "RFI / WAROM";
     rawModel = "UHF BDA + Ex d Enclosure";

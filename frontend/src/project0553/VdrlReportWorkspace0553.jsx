@@ -41,24 +41,82 @@ function buildVdrlCsv(preview) {
   return [...meta, preview.columns, ...preview.rows].map((row) => row.map(esc).join(",")).join("\n") + "\n";
 }
 
+function groupRowsGfBf(preview) {
+  const locationOrder = ["ZWP20", "ZWP21", "ZWP22", "ZWP23", "ZPQ", "ZWP8", "ZWP11"];
+  const buckets = new Map();
+  for (const r of preview.rows || []) {
+    const joined = r.map((c) => (c == null ? "" : String(c))).join(" ");
+    const matchedLoc = locationOrder.find((loc) => new RegExp(`\\b${loc}\\b`, "i").test(joined));
+    const isBf = matchedLoc ? ["ZPQ", "ZWP8", "ZWP11"].includes(matchedLoc) : /\bBROWNFIELD\b/i.test(joined);
+    const isGf = matchedLoc ? ["ZWP20", "ZWP21", "ZWP22", "ZWP23"].includes(matchedLoc) : /\bGREENFIELD\b/i.test(joined);
+    const key = matchedLoc ? `${isBf ? "BF" : "GF"}-${matchedLoc}` : isBf ? "BF-ALL" : isGf ? "GF-ALL" : "GEN";
+    const title = matchedLoc
+      ? `${isBf ? "BROWNFIELD" : "GREENFIELD"} — Location: ${matchedLoc} Platform`
+      : isBf
+      ? "BROWNFIELD PLATFORMS — Location: ZPQ, ZWP8, ZWP11"
+      : isGf
+      ? "GREENFIELD PLATFORMS — Location: ZWP20, ZWP21, ZWP22, ZWP23"
+      : "GENERAL / COMMON SCOPE";
+    if (!buckets.has(key)) buckets.set(key, { key, title, order: matchedLoc ? locationOrder.indexOf(matchedLoc) : 99, rows: [] });
+    buckets.get(key).rows.push(r);
+  }
+  return [...buckets.values()].sort((a, b) => a.order - b.order);
+}
+
+function colWidthPct(colName) {
+  const c = String(colName || "").toUpperCase();
+  if (/^(NO\.|ITEM NO\.|UNIT|Q'TY|QTY\.|REV)$/.test(c)) return "5%";
+  if (/^(SYSTEM|LOCATION)$/.test(c)) return "7%";
+  if (/^TAG NUMBER$/.test(c)) return "9%";
+  if (/^BRAND$/.test(c)) return "8%";
+  if (/^MODEL$/.test(c)) return "14%";
+  if (/^PART NO\.$/.test(c)) return "14%";
+  if (/DESCRIPTION|TITLE|SPECIFICATION/.test(c)) return "20%";
+  if (/REMARK/.test(c)) return "13%";
+  return "10%";
+}
+
 function buildVdrlWordHtml(preview, logos = {}) {
   const h = preview.header;
-  const ths = preview.columns.map((c) => `<th>${c}</th>`).join("");
-  const trs = preview.rows
-    .map((r) => `<tr>${r.map((cell) => `<td>${cell == null ? "" : String(cell)}</td>`).join("")}</tr>`)
+  const ths = preview.columns.map((c) => `<th style="width:${colWidthPct(c)};">${c}</th>`).join("");
+  const grouped = groupRowsGfBf(preview);
+  const colCount = preview.columns.length;
+  const tbody = grouped
+    .map((g) => {
+      const banner = `<tr><td colspan="${colCount}" style="background:#e2e8f0;font-weight:bold;padding:5px 6px;">${g.title}</td></tr>`;
+      const trs = g.rows
+        .map((r) => `<tr>${r.map((cell) => `<td>${cell == null ? "" : String(cell)}</td>`).join("")}</tr>`)
+        .join("");
+      return banner + trs;
+    })
     .join("");
   const pttepImg = logos.pttep ? `<img src="${logos.pttep}" alt="PTTEP" style="height:48px;width:auto;"/>` : `<strong>PTTEP</strong>`;
   const rightLogos = [
-    logos.jutal ? `<img src="${logos.jutal}" alt="JUTAL" style="height:30px;width:auto;margin:2px;"/>` : `<strong>JUTAL</strong>`,
-    logos.samtel ? `<img src="${logos.samtel}" alt="SAMTEL" style="height:26px;width:auto;margin:2px;"/>` : `<span>SAMTEL</span>`,
-    logos.avs ? `<img src="${logos.avs}" alt="ADDVALUE" style="height:26px;width:auto;margin:2px;"/>` : `<span>ADDVALUE</span>`,
+    logos.jutal ? `<img src="${logos.jutal}" alt="JUTAL" style="height:26px;width:auto;margin:2px;"/>` : `<strong>JUTAL</strong>`,
+    logos.samtel ? `<img src="${logos.samtel}" alt="SAMTEL" style="height:22px;width:auto;margin:2px;"/>` : `<span>SAMTEL</span>`,
+    logos.avs ? `<img src="${logos.avs}" alt="ADDVALUE" style="height:22px;width:auto;margin:2px;"/>` : `<span>ADDVALUE</span>`,
   ].join("<br/>");
   return (
     `<html><head><meta charset="utf-8"><title>${h.addvalueDocNo}</title>` +
-    `<style>body{font-family:Arial,sans-serif;font-size:10pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #000;padding:4px 6px;vertical-align:top;}th{background:#f3f4f6;}.center{text-align:center;vertical-align:middle;}.pb{page-break-after:always;}</style></head><body>` +
-    `<div class="pb" style="border:1px solid #000;padding:18px;">` +
-    `<div class="center" style="margin:28px 0 40px 0;"><strong>ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS<br/><br/>FOR<br/><br/>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</strong></div>` +
-    `<div class="center" style="margin:36px 0 60px 0;font-size:13pt;"><strong>${String(h.title || "").toUpperCase()}</strong></div>` +
+    `<style>` +
+    `@page portrait_page{size:A4 portrait;margin:12mm;}` +
+    `@page landscape_page{size:A4 landscape;margin:8mm;}` +
+    `*{box-sizing:border-box;}` +
+    `body{font-family:Arial,sans-serif;font-size:9pt;margin:0;line-height:1.35;}` +
+    `.portrait-sec{page:portrait_page;page-break-after:always;}` +
+    `.landscape-sec{page:landscape_page;width:100%;}` +
+    `table{border-collapse:collapse;width:100%;table-layout:fixed;}` +
+    `th,td{border:1px solid #000;padding:4px 5px;vertical-align:top;overflow-wrap:break-word;word-break:normal;font-size:7.8pt;}` +
+    `th{background:#f3f4f6;}` +
+    `thead{display:table-header-group;}` +
+    `tr{page-break-inside:avoid;}` +
+    `.center{text-align:center;vertical-align:middle;}` +
+    `</style></head><body>` +
+    `<div class="portrait-sec" style="border:1px solid #000;padding:18px;min-height:265mm;display:flex;flex-direction:column;justify-content:space-between;">` +
+    `<div>` +
+    `<div class="center" style="margin:28px 0 36px 0;font-size:11pt;"><strong>ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS<br/><br/>FOR<br/><br/>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</strong></div>` +
+    `<div class="center" style="margin:36px 0 40px 0;font-size:13pt;"><strong>${String(h.title || "").toUpperCase()}</strong></div>` +
+    `</div>` +
     `<table><tr><td colspan="4" style="border:none;"></td><th colspan="4">DOCUMENT CLASS: ${h.approvalClass || "1"}</th></tr>` +
     `<tr><th rowspan="2">REV</th><th rowspan="2">DATE</th><th rowspan="2">BY</th><th rowspan="2">DESCRIPTION</th><th colspan="2">CONTRACTOR APPROVAL</th><th colspan="2">COMPANY APPROVAL</th></tr>` +
     `<tr><th>CHECK</th><th>APPR.</th><th>CHECK</th><th>APPR.</th></tr>` +
@@ -66,16 +124,24 @@ function buildVdrlWordHtml(preview, logos = {}) {
     `<tr><td colspan="8" class="center"><strong>REVISION CODE: A = Issued for Review – B = Issued for Approval – C = Approved for Construction</strong></td></tr>` +
     `<tr><td colspan="8" class="center" style="font-size:8pt;">TOTAL OR PARTIAL REPRODUCTION AND/OR UTILIZATION OF THIS DOCUMENT ARE FORBIDDEN WITHOUT PRIOR WRITTEN AUTHORIZATION OF THE OWNER</td></tr>` +
     `<tr><td rowspan="3" class="center">${pttepImg}</td><td colspan="5" class="center"><strong>PTTEP INTERNATIONAL LIMITED</strong><br/>EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</td><td colspan="2" rowspan="3" class="center">${rightLogos}</td></tr>` +
-    `<tr><td colspan="4" class="center"><strong>${h.addvalueDocNo}</strong><br/><small>Client Ref: ${h.clientDocNo}</small></td><th class="center">REV</th></tr>` +
-    `<tr><td colspan="4" class="center">${h.mr} · ${h.dossier} (UNPRICED)</td><td class="center"><strong>${h.revision}</strong></td></tr>` +
+    `<tr><td colspan="4" rowspan="2" class="center"><strong>${h.addvalueDocNo}</strong></td><th class="center">REV</th></tr>` +
+    `<tr><td class="center"><strong>${h.revision}</strong></td></tr>` +
     `</table></div>` +
-    `<table style="margin-bottom:10px;"><tr><td class="center" style="width:14%;">${pttepImg}</td><th colspan="2" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:16%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
-    `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>` +
-    `</body></html>`
+    `<div class="portrait-sec">` +
+    `<table style="margin-bottom:12px;"><tr><td class="center" style="width:16%;">${pttepImg}</td><th class="center" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:14%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
+    `<h3 class="center" style="margin:8px 0;">TABULATION OF REVISED PAGES</h3>` +
+    `<table><thead><tr><th>SHEET</th><th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>` +
+    `<tbody><tr><td class="center">1 (Cover)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr>` +
+    `<tr><td class="center">2 (Tabulation)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr>` +
+    `<tr><td class="center">3 (Data Sheet)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr></tbody></table></div>` +
+    `<div class="landscape-sec">` +
+    `<table style="margin-bottom:8px;"><tr><td class="center" style="width:12%;">${pttepImg}</td><th class="center" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:18%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
+    `<table><thead><tr>${ths}</tr></thead><tbody>${tbody}</tbody></table>` +
+    `</div></body></html>`
   );
 }
 
-async function exportVdrlWordWithLogos(preview) {
+async function loadVdrlLogos() {
   const toDataUrl = async (url) => {
     try {
       const res = await fetch(url);
@@ -96,11 +162,43 @@ async function exportVdrlWordWithLogos(preview) {
     toDataUrl("/project0553/logos/logo-samtel.jpg"),
     toDataUrl("/project0553/logos/logo-avs.png"),
   ]);
+  return { pttep, jutal, samtel, avs };
+}
+
+async function exportVdrlWordWithLogos(preview) {
+  const logos = await loadVdrlLogos();
   downloadText(
-    buildVdrlWordHtml(preview, { pttep, jutal, samtel, avs }),
+    buildVdrlWordHtml(preview, logos),
     "application/msword;charset=utf-8",
     `${preview.header.addvalueDocNo}.doc`
   );
+}
+
+async function printVdrlWithLogos(preview) {
+  const logos = await loadVdrlLogos();
+  const html = buildVdrlWordHtml(preview, logos);
+  const iframe = document.createElement("iframe");
+  iframe.style.position = "fixed";
+  iframe.style.right = "0";
+  iframe.style.bottom = "0";
+  iframe.style.width = "0";
+  iframe.style.height = "0";
+  iframe.style.border = "0";
+  document.body.appendChild(iframe);
+  const doc = iframe.contentWindow?.document;
+  if (!doc) {
+    iframe.remove();
+    window.print();
+    return;
+  }
+  doc.open();
+  doc.write(html);
+  doc.close();
+  window.setTimeout(() => {
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+    window.setTimeout(() => iframe.remove(), 2000);
+  }, 300);
 }
 
 export function VdrlReportWorkspace0553({ onNavigate = null }) {
@@ -110,6 +208,8 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
   const [phaseFilter, setPhaseFilter] = useState("ALL");
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState("VDRL-004");
+  const [previewTab, setPreviewTab] = useState("DATA");
+  const [fullHeight, setFullHeight] = useState(true);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -230,6 +330,13 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
             >
               Export Word ({preview.header.addvalueDocNo}.doc)
             </button>
+            <button
+              type="button"
+              className="p553-detail-button"
+              onClick={() => printVdrlWithLogos(preview)}
+            >
+              Print / Save PDF
+            </button>
             {onNavigate && (
               <button
                 type="button"
@@ -243,6 +350,59 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
           <p className="p55-note">
             <strong>Template:</strong> {preview.template.name} — {preview.template.purpose}
           </p>
+          <div className="p553-filterbar p553-filterbar--simple" role="tablist" aria-label="VDRL Preview Sheets" style={{ marginBottom: 10 }}>
+            <button type="button" className="p553-detail-button" aria-selected={previewTab === "COVER"} onClick={() => setPreviewTab("COVER")}>1. Cover Page</button>
+            <button type="button" className="p553-detail-button" aria-selected={previewTab === "TABULATION"} onClick={() => setPreviewTab("TABULATION")}>2. Tabulation</button>
+            <button type="button" className="p553-detail-button" aria-selected={previewTab === "DATA"} onClick={() => setPreviewTab("DATA")}>3. Data Sheet ({preview.rows.length} rows)</button>
+            {previewTab === "DATA" && (
+              <button type="button" className="p553-detail-button" aria-pressed={fullHeight} onClick={() => setFullHeight((v) => !v)}>
+                {fullHeight ? "ย่อความสูงตาราง (Compact)" : "ขยายเต็มหน้า (Full Height)"}
+              </button>
+            )}
+          </div>
+          {previewTab === "COVER" && (
+            <div className="p55-table-wrap" style={{ border: "1px solid #1e293b", padding: 16, background: "#fff" }}>
+              <div style={{ textAlign: "center", margin: "12px 0 20px 0", fontWeight: 700 }}>
+                ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS<br />FOR<br />ZAWTIKA DEVELOPMENT PROJECT PHASE 1F
+              </div>
+              <div style={{ textAlign: "center", margin: "16px 0 24px 0", fontSize: "1.1rem", fontWeight: 700 }}>
+                {String(preview.header.title || "").toUpperCase()}
+              </div>
+              <table className="p55-table p55-table--compact">
+                <tbody>
+                  <tr><td colSpan={4} style={{ border: "none" }} /><th colSpan={4}>DOCUMENT CLASS: {preview.header.approvalClass || "1"}</th></tr>
+                  <tr><th rowSpan={2}>REV</th><th rowSpan={2}>DATE</th><th rowSpan={2}>BY</th><th rowSpan={2}>DESCRIPTION</th><th colSpan={2}>CONTRACTOR APPROVAL</th><th colSpan={2}>COMPANY APPROVAL</th></tr>
+                  <tr><th>CHECK</th><th>APPR.</th><th>CHECK</th><th>APPR.</th></tr>
+                  <tr><td>{preview.header.revision}</td><td>21-Nov-26</td><td>ADDV</td><td>{preview.header.purpose}</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td colSpan={8} style={{ textAlign: "center", fontWeight: 600 }}>REVISION CODE: A = Issued for Review – B = Issued for Approval – C = Approved for Construction</td></tr>
+                  <tr>
+                    <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle" }}><img src="/project0553/logos/logo-pttep.png" alt="PTTEP" style={{ height: 42, width: "auto" }} /></td>
+                    <td colSpan={5} style={{ textAlign: "center" }}><strong>PTTEP INTERNATIONAL LIMITED</strong><br />EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</td>
+                    <td colSpan={2} rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle" }}>
+                      <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 22, width: "auto", marginRight: 4 }} />
+                      <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 20, width: "auto", marginRight: 4 }} />
+                      <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 22, width: "auto" }} />
+                    </td>
+                  </tr>
+                  <tr><td colSpan={4} rowSpan={2} style={{ textAlign: "center" }}><strong>{preview.header.addvalueDocNo}</strong></td><th>REV</th></tr>
+                  <tr><td style={{ textAlign: "center", fontWeight: 700 }}>{preview.header.revision}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          {previewTab === "TABULATION" && (
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--compact">
+                <thead><tr><th>SHEET</th><th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>
+                <tbody>
+                  <tr><td>1 (Cover)</td><td>X</td><td /><td /><td /><td /></tr>
+                  <tr><td>2 (Tabulation)</td><td>X</td><td /><td /><td /><td /></tr>
+                  <tr><td>3 (Data)</td><td>X</td><td /><td /><td /><td /></tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          {previewTab === "DATA" && (<>
           <div className="p55-table-wrap" style={{ marginBottom: 10 }}>
             <table className="p55-table p55-table--compact">
               <tbody>
@@ -269,18 +429,28 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
               </tbody>
             </table>
           </div>
-          <div className="p55-table-wrap" style={{ maxHeight: 340, overflowY: "auto" }}>
-            <table className="p55-table p55-table--compact">
+          <div className="p55-table-wrap" style={fullHeight ? { overflowX: "auto" } : { maxHeight: 340, overflowY: "auto", overflowX: "auto" }}>
+            <table className="p55-table p55-table--compact" style={{ width: "100%", tableLayout: "auto", fontSize: "0.78rem", lineHeight: 1.35 }}>
               <thead>
-                <tr>{preview.columns.map((c) => <th key={c}>{c}</th>)}</tr>
+                <tr>{preview.columns.map((c) => <th key={c} style={{ minWidth: colWidthPct(c), whiteSpace: "normal", wordBreak: "normal", overflowWrap: "break-word", padding: "5px 6px" }}>{c}</th>)}</tr>
               </thead>
               <tbody>
-                {preview.rows.map((row, i) => (
-                  <tr key={i}>{row.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+                {groupRowsGfBf(preview).map((g) => (
+                  <React.Fragment key={g.key}>
+                    <tr>
+                      <td colSpan={preview.columns.length} style={{ background: "#e2e8f0", fontWeight: 700, padding: "6px 8px" }}>
+                        {g.title} ({g.rows.length})
+                      </td>
+                    </tr>
+                    {g.rows.map((row, i) => (
+                      <tr key={`${g.key}-${i}`}>{row.map((cell, j) => <td key={j} style={{ whiteSpace: "normal", wordBreak: "normal", overflowWrap: "break-word", padding: "5px 6px" }}>{cell}</td>)}</tr>
+                    ))}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
           </div>
+          </>)}
         </AuditSection>
       )}
 

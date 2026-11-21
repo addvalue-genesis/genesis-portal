@@ -172,6 +172,30 @@
       "notes": [
         "Quotation QT2603-149 (2026-03-20) quotes CMP Stainless Steel Ex Cable Glands & Exd/Exe Stopping Plugs (Subtotal THB 336,265 ex VAT)"
       ]
+    },
+    {
+      "id": "royaltec international co., ltd.",
+      "displayName": "Royaltec International Co., Ltd.",
+      "legalName": "Royaltec International Co., Ltd.",
+      "verification": "SOURCE_QUOTATION_QIN2311155",
+      "roles": [
+        "QUOTED_SUPPLIER"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "Royaltec International Co., Ltd.",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "Royaltec",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quotation QIN/2311155 (2023-11-21) quotes Belden #50106ASFLB 010305M CAT6A SWB S/FTP cable at 210 THB/m (1 reel = 305m)"
+      ]
     }
   ],
   "noAutomaticCostSelection": true,
