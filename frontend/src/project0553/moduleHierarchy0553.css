@@ -70,6 +70,18 @@
 .p553-dashboard :is(.p55-stack,.p55-grid)>*{min-width:0}
 .p553-dashboard :is(.p55-table-wrap,.p553-sheet-scroll){max-width:100%;min-width:0}
 .p553-dashboard :is(.p55-panel,details,summary){overflow-wrap:anywhere}
+.p553-dashboard .p55-table th,
+.p553-dashboard .p55-table td{overflow-wrap:break-word}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table{width:100%;min-width:860px;table-layout:fixed}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th,
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table td{white-space:normal;overflow-wrap:break-word;word-break:normal;vertical-align:top}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(1){width:9%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(2){width:17%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(3){width:11%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(4){width:13%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(5){width:14%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(6){width:12%}
+.p553-dashboard :is([data-component-key="bid.budget.scope"],[data-component-key^="bid.budget.summary.workbook.scope-of-supply"])>.p55-table-wrap>.p55-table th:nth-child(7){width:24%}
 .p553-dashboard .gns-copy-id{min-width:0;max-width:100%;flex-wrap:wrap}
 .p553-dashboard .gns-copy-id code{white-space:normal;overflow-wrap:anywhere}
 
