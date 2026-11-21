@@ -104,20 +104,32 @@ function buildSheetXml(rows) {
 export function buildVdrlXlsxBytes0553(preview) {
   const h = preview.header;
   const coverRows = [
-    ["PTTEP / ZAWTIKA DEVELOPMENT PROJECT PHASE 1F — VDRL DELIVERABLE (UNPRICED)"],
-    ["Project", h.project],
-    ["Client", h.client],
-    ["Contractor", h.contractor],
-    ["ADDVALUE Document No.", h.addvalueDocNo],
-    ["Client Document No.", h.clientDocNo],
-    ["Document Title", h.title],
-    ["MR / Dossier", `${h.mr} / ${h.dossier}`],
-    ["Doc Type / Approval Class", `${h.docType} / Class ${h.approvalClass}`],
-    ["Revision / Purpose", `${h.revision} / ${h.purpose}`],
-    ["Commercial Note", "UNPRICED TECHNICAL DELIVERABLE"],
+    ["ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS"],
+    ["FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F"],
+    [],
+    [String(h.title || "").toUpperCase()],
+    [],
+    ["", "", "", "", "", "", `DOCUMENT CLASS: ${h.approvalClass || "1"}`, ""],
+    ["REV", "DATE", "BY", "DESCRIPTION", "CONTRACTOR CHECK", "CONTRACTOR APPR.", "COMPANY CHECK", "COMPANY APPR."],
+    [h.revision || "Rev.0", "2026-11-21", "ADDV", h.purpose || "Issued for Review (IFR) - Unpriced", "-", "-", "-", "-"],
+    ["REVISION CODE: A = Issued for Review - B = Issued for Approval - C = Approved for Construction"],
+    ["TOTAL OR PARTIAL REPRODUCTION AND/OR UTILIZATION OF THIS DOCUMENT ARE FORBIDDEN WITHOUT PRIOR WRITTEN AUTHORIZATION OF THE OWNER"],
+    [],
+    ["OWNER", "PTTEP INTERNATIONAL LIMITED", "PROJECT", "EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F"],
+    ["ADDVALUE DOC NO.", h.addvalueDocNo, "CLIENT DOC NO.", h.clientDocNo, "CONTRACTOR", h.contractor, "REV", h.revision || "Rev.0"],
+    ["MR / DOSSIER", `${h.mr} / ${h.dossier}`, "DOC TYPE", h.docType, "CLIENT / EPC", h.client, "COMMERCIAL", "UNPRICED"],
+  ];
+  const tabulationRows = [
+    ["PTTEP", String(h.title || "").toUpperCase(), "", "JUTAL / GCME", "Contract No: MMC25-5001"],
+    ["TABULATION OF REVISED PAGES"],
+    ["SHEET", "A1", "B1", "C1", "C2", "C3"],
+    [1, "X", "", "", "", ""],
+    [2, "X", "", "", "", ""],
+    [3, "X", "", "", "", ""],
   ];
   const dataRows = [
-    [`${h.addvalueDocNo} — ${h.title} (${h.revision} · UNPRICED)`],
+    ["PTTEP", String(h.title || "").toUpperCase(), "JUTAL / GCME", "PROJECT:", "ZAWTIKA DEVELOPMENT PROJECT PHASE 1F", "REV", h.revision || "Rev.0"],
+    ["DOCUMENT NO.", h.addvalueDocNo, "CLIENT REF:", h.clientDocNo, "MR / DOSSIER:", `${h.mr} / ${h.dossier}`, "UNPRICED"],
     [],
     preview.columns,
     ...preview.rows,
@@ -127,7 +139,7 @@ export function buildVdrlXlsxBytes0553(preview) {
     {
       name: "[Content_Types].xml",
       data: encode.encode(
-        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet2.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/worksheets/sheet3.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/></Types>'
       ),
     },
     {
@@ -139,17 +151,18 @@ export function buildVdrlXlsxBytes0553(preview) {
     {
       name: "xl/workbook.xml",
       data: encode.encode(
-        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Cover_DocControl" sheetId="1" r:id="rId1"/><sheet name="VDRL_Data" sheetId="2" r:id="rId2"/></sheets></workbook>'
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Cover_DocControl" sheetId="1" r:id="rId1"/><sheet name="Tabulation" sheetId="2" r:id="rId2"/><sheet name="VDRL_Data" sheetId="3" r:id="rId3"/></sheets></workbook>'
       ),
     },
     {
       name: "xl/_rels/workbook.xml.rels",
       data: encode.encode(
-        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/></Relationships>'
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet2.xml"/><Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet3.xml"/></Relationships>'
       ),
     },
     { name: "xl/worksheets/sheet1.xml", data: encode.encode(buildSheetXml(coverRows)) },
-    { name: "xl/worksheets/sheet2.xml", data: encode.encode(buildSheetXml(dataRows)) },
+    { name: "xl/worksheets/sheet2.xml", data: encode.encode(buildSheetXml(tabulationRows)) },
+    { name: "xl/worksheets/sheet3.xml", data: encode.encode(buildSheetXml(dataRows)) },
   ];
 
   return buildZip(files);

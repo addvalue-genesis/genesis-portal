@@ -41,22 +41,65 @@ function buildVdrlCsv(preview) {
   return [...meta, preview.columns, ...preview.rows].map((row) => row.map(esc).join(",")).join("\n") + "\n";
 }
 
-function buildVdrlWordHtml(preview) {
+function buildVdrlWordHtml(preview, logos = {}) {
   const h = preview.header;
   const ths = preview.columns.map((c) => `<th>${c}</th>`).join("");
   const trs = preview.rows
     .map((r) => `<tr>${r.map((cell) => `<td>${cell == null ? "" : String(cell)}</td>`).join("")}</tr>`)
     .join("");
+  const pttepImg = logos.pttep ? `<img src="${logos.pttep}" alt="PTTEP" style="height:48px;width:auto;"/>` : `<strong>PTTEP</strong>`;
+  const rightLogos = [
+    logos.jutal ? `<img src="${logos.jutal}" alt="JUTAL" style="height:30px;width:auto;margin:2px;"/>` : `<strong>JUTAL</strong>`,
+    logos.samtel ? `<img src="${logos.samtel}" alt="SAMTEL" style="height:26px;width:auto;margin:2px;"/>` : `<span>SAMTEL</span>`,
+    logos.avs ? `<img src="${logos.avs}" alt="ADDVALUE" style="height:26px;width:auto;margin:2px;"/>` : `<span>ADDVALUE</span>`,
+  ].join("<br/>");
   return (
-    `<html><head><meta charset="utf-8"><title>${h.addvalueDocNo}</title></head><body>` +
-    `<h2>${h.project}</h2>` +
-    `<table border="1" cellspacing="0" cellpadding="5" style="margin-bottom:12px;">` +
-    `<tr><th>ADDVALUE Doc No.</th><td>${h.addvalueDocNo}</td><th>Client Doc No.</th><td>${h.clientDocNo}</td></tr>` +
-    `<tr><th>Title</th><td>${h.title}</td><th>MR / Dossier</th><td>${h.mr} / ${h.dossier}</td></tr>` +
-    `<tr><th>Contractor</th><td>${h.contractor}</td><th>Revision / Purpose</th><td>${h.revision} · ${h.purpose}</td></tr>` +
-    `</table>` +
-    `<table border="1" cellspacing="0" cellpadding="5"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>` +
+    `<html><head><meta charset="utf-8"><title>${h.addvalueDocNo}</title>` +
+    `<style>body{font-family:Arial,sans-serif;font-size:10pt;}table{border-collapse:collapse;width:100%;}th,td{border:1px solid #000;padding:4px 6px;vertical-align:top;}th{background:#f3f4f6;}.center{text-align:center;vertical-align:middle;}.pb{page-break-after:always;}</style></head><body>` +
+    `<div class="pb" style="border:1px solid #000;padding:18px;">` +
+    `<div class="center" style="margin:28px 0 40px 0;"><strong>ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS<br/><br/>FOR<br/><br/>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</strong></div>` +
+    `<div class="center" style="margin:36px 0 60px 0;font-size:13pt;"><strong>${String(h.title || "").toUpperCase()}</strong></div>` +
+    `<table><tr><td colspan="4" style="border:none;"></td><th colspan="4">DOCUMENT CLASS: ${h.approvalClass || "1"}</th></tr>` +
+    `<tr><th rowspan="2">REV</th><th rowspan="2">DATE</th><th rowspan="2">BY</th><th rowspan="2">DESCRIPTION</th><th colspan="2">CONTRACTOR APPROVAL</th><th colspan="2">COMPANY APPROVAL</th></tr>` +
+    `<tr><th>CHECK</th><th>APPR.</th><th>CHECK</th><th>APPR.</th></tr>` +
+    `<tr><td class="center">${h.revision}</td><td class="center">21-Nov-26</td><td class="center">ADDV</td><td>${h.purpose}</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>` +
+    `<tr><td colspan="8" class="center"><strong>REVISION CODE: A = Issued for Review – B = Issued for Approval – C = Approved for Construction</strong></td></tr>` +
+    `<tr><td colspan="8" class="center" style="font-size:8pt;">TOTAL OR PARTIAL REPRODUCTION AND/OR UTILIZATION OF THIS DOCUMENT ARE FORBIDDEN WITHOUT PRIOR WRITTEN AUTHORIZATION OF THE OWNER</td></tr>` +
+    `<tr><td rowspan="3" class="center">${pttepImg}</td><td colspan="5" class="center"><strong>PTTEP INTERNATIONAL LIMITED</strong><br/>EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</td><td colspan="2" rowspan="3" class="center">${rightLogos}</td></tr>` +
+    `<tr><td colspan="4" class="center"><strong>${h.addvalueDocNo}</strong><br/><small>Client Ref: ${h.clientDocNo}</small></td><th class="center">REV</th></tr>` +
+    `<tr><td colspan="4" class="center">${h.mr} · ${h.dossier} (UNPRICED)</td><td class="center"><strong>${h.revision}</strong></td></tr>` +
+    `</table></div>` +
+    `<table style="margin-bottom:10px;"><tr><td class="center" style="width:14%;">${pttepImg}</td><th colspan="2" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:16%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
+    `<table><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>` +
     `</body></html>`
+  );
+}
+
+async function exportVdrlWordWithLogos(preview) {
+  const toDataUrl = async (url) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      const blob = await res.blob();
+      return await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (_) {
+      return null;
+    }
+  };
+  const [pttep, jutal, samtel, avs] = await Promise.all([
+    toDataUrl("/project0553/logos/logo-pttep.png"),
+    toDataUrl("/project0553/logos/logo-jutal.png"),
+    toDataUrl("/project0553/logos/logo-samtel.jpg"),
+    toDataUrl("/project0553/logos/logo-avs.png"),
+  ]);
+  downloadText(
+    buildVdrlWordHtml(preview, { pttep, jutal, samtel, avs }),
+    "application/msword;charset=utf-8",
+    `${preview.header.addvalueDocNo}.doc`
   );
 }
 
@@ -183,7 +226,7 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
             <button
               type="button"
               className="p553-detail-button"
-              onClick={() => downloadText(buildVdrlWordHtml(preview), "application/msword;charset=utf-8", `${preview.header.addvalueDocNo}.doc`)}
+              onClick={() => exportVdrlWordWithLogos(preview)}
             >
               Export Word ({preview.header.addvalueDocNo}.doc)
             </button>
@@ -204,8 +247,16 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
             <table className="p55-table p55-table--compact">
               <tbody>
                 <tr>
+                  <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle", width: 90 }}>
+                    <img src="/project0553/logos/logo-pttep.png" alt="PTTEP" style={{ height: 40, width: "auto" }} />
+                  </td>
                   <th>ADDVALUE Doc No.</th><td><code>{preview.header.addvalueDocNo}</code></td>
                   <th>Client Doc No.</th><td><code>{preview.header.clientDocNo}</code></td>
+                  <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle", width: 170 }}>
+                    <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 22, width: "auto", marginRight: 6 }} />
+                    <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 20, width: "auto", marginRight: 6 }} />
+                    <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 22, width: "auto" }} />
+                  </td>
                 </tr>
                 <tr>
                   <th>Title</th><td>{preview.header.title}</td>

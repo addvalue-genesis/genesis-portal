@@ -24,6 +24,7 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
+import {RevisionComparison0553} from "./RevisionComparison0553";
 import {CustomerPriceBreakdown0553,BreakdownSourceRow0553,BreakdownSourcePicker0553} from "./CustomerPriceBreakdown0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
@@ -51,7 +52,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [recipient,setRecipient]=useState("INTERNAL");
  // These are three workflow navigation shortcuts, NOT three independent price models.
  const [pricingStage,setPricingStage]=useState(()=>
-  ["working","budgetary","released","official"].includes(initialMode)?initialMode:"released");
+  ["working","budgetary","released","official","compare"].includes(initialMode)?initialMode:"released");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
  const [bcTab,setBcTab]=useState("ALL");
@@ -278,9 +279,20 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
       aria-pressed={pricingStage==="official"} onClick={()=>openPricingStage("official")}>
       <strong>10.3.4 · Official Release</strong><small>English / USD · Export Excel</small>
      </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--official"+(pricingStage==="compare"?" is-active":"")}
+      aria-pressed={pricingStage==="compare"} onClick={()=>openPricingStage("compare")}>
+      <strong>10.3.5 · Revision Compare</strong><small>Rev02 / Rev03 / Rev03.1 Table</small>
+     </button>
     </nav>
  );
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
+ if(pricingStage==="compare")return <div className="p55-stack">
+  <div className="p55-filterbar p55-filterbar--simple">
+   {pricingNavigation}
+   <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
+  </div>
+  <RevisionComparison0553/>
+ </div>;
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">
    {pricingNavigation}

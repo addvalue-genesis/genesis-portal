@@ -150,7 +150,7 @@ function resolveVdrlLineage(row) {
   const cus = `${row.mr} Table 11 §${row.sourceItem} (${row.projectDocumentNo})`;
   const vndByMr = {
     "MR-0001": "07 VND: Aviat, Cisco, BARTEC, Phoenix/Weidmüller, TECKNIKABEL",
-    "MR-0002": "07 VND: RFI (BDA/Yagi), Kenbotong (Omni), CSS, BARTEC",
+    "MR-0002": "07 VND: RFI (LNA RX3852-2002-11, RAD16-99, COL45-400P), Sinclair (MR356N-4), BARTEC (Ex d), CMP (SS Glands)",
     "MR-0003": "07 VND: EXION (Auteldac 6 + EATON MEDC DB3B), PROSPER JB",
     "MR-0004": "07 VND: MDS (SeaBeacon 2 System 6), BARTEC, TECKNIKABEL",
   };
@@ -164,23 +164,91 @@ let cachedPartARows = null;
 function getUnpricedPartARows0553() {
   if (cachedPartARows) return cachedPartARows;
   const model = buildReleaseCommercialModel0553({ thbPerUsd: 31.5 });
-  const allRows = (model.a || []).flatMap((g) => g.sourceRows || []);
-  cachedPartARows = allRows.map((r, idx) => {
-    const brand = resolveVendorBrandModelPart0553(r);
-    return {
-      idx: idx + 1,
-      mr: r.mr || "MR-0001",
-      site: r.site || "ALL",
-      tag: r.tag || r.code || "—",
-      description: r.description || r.name || "—",
-      oemModel: [brand?.manufacturer, brand?.model].filter(Boolean).join(" · ") || r.specification || "Per MR Specification",
-      qty: r.qty ?? 1,
-      unit: r.unit || "set",
-      exIp: r.exRating || (r.site ? "Zone 2 / Offshore" : "—"),
-      docRef: `MTO-0001 Rev.C1 / ${r.mr || "MR"} §5`,
+  const nonMr0002Rows = (model.a || [])
+    .filter((g) => g.mr !== "MR-0002")
+    .flatMap((g) => g.sourceRows || [])
+    .map((r, idx) => {
+      const brand = resolveVendorBrandModelPart0553(r);
+      return {
+        idx: idx + 1,
+        mr: r.mr || "MR-0001",
+        site: r.site || "ALL",
+        tag: r.tag || r.code || "—",
+        description: r.description || r.name || "—",
+        oemModel: [brand?.manufacturer, brand?.model].filter(Boolean).join(" · ") || r.specification || "Per MR Specification",
+        qty: r.qty ?? 1,
+        unit: r.unit || "set",
+        exIp: r.exRating || (r.site ? "Zone 2 / Offshore" : "—"),
+        docRef: `MTO-0001 Rev.C1 / ${r.mr || "MR"} §5`,
+        remarks: "Included in 1 Lot Scope (Unpriced)",
+      };
+    });
+
+  // MR-0002 Trunk Radio (LNA Configuration per Purchaser Engineering Comments; no supplier/internal notes)
+  const mr0002LnaRows = [
+    {
+      mr: "MR-0002",
+      site: "ZWP20, ZWP21, ZWP22",
+      tag: "RAD-508-001",
+      description: "DTRS UHF Low Noise Amplifier (380–520 MHz, 40 dB Gain, NF <= 2 dB) & Duplexer (380–400 MHz)",
+      oemModel: "RFI RX3852-2002-11 / Sinclair MR356N-4",
+      qty: "6 LNA + 3 Duplexer",
+      unit: "set",
+      exIp: "Mounted inside Certified Ex d IP66 Enclosure",
+      docRef: "MTO-0001 Rev.C1 / MR-0002 §5",
+      remarks: "Included in 1 Lot Scope (Unpriced · LNA Configuration)",
+    },
+    {
+      mr: "MR-0002",
+      site: "ZWP20, ZWP21, ZWP22",
+      tag: "TCAB-508-001",
+      description: "Certified Ex d IP66 Enclosure Assembly for DTRS LNA & Duplexer (incl. SS Ex d/Ex e Cable Glands & Stopping Plugs)",
+      oemModel: "Ex d IP66 Enclosure + SS Ex Cable Glands",
+      qty: 3,
+      unit: "set",
+      exIp: "Zone 2 / Ex d IP66",
+      docRef: "MTO-0001 Rev.C1 / MR-0002 §5",
       remarks: "Included in 1 Lot Scope (Unpriced)",
-    };
-  });
+    },
+    {
+      mr: "MR-0002",
+      site: "ZWP20, ZWP21, ZWP22",
+      tag: "TCAB-508-002",
+      description: "RF Coaxial Surge Arrester for DTRS Antenna Feeder",
+      oemModel: "Polyphaser RF Surge Arrester",
+      qty: 3,
+      unit: "set",
+      exIp: "Zone 2 / Offshore",
+      docRef: "MTO-0001 Rev.C1 / MR-0002 §5",
+      remarks: "Included in 1 Lot Scope (Unpriced)",
+    },
+    {
+      mr: "MR-0002",
+      site: "ZWP20, ZWP21, ZWP22",
+      tag: "ANT-508-001",
+      description: "DTRS UHF Yagi Donor Antenna (350–600 MHz, 14 dBi, incl. Mounting Clamp Set)",
+      oemModel: "RFI RAD16-99",
+      qty: 3,
+      unit: "set",
+      exIp: "Offshore Marine Grade",
+      docRef: "MTO-0001 Rev.C1 / MR-0002 §5",
+      remarks: "Included in 1 Lot Scope (Unpriced)",
+    },
+    {
+      mr: "MR-0002",
+      site: "ZWP20, ZWP21, ZWP22",
+      tag: "ANT-508-002",
+      description: "DTRS UHF Omni Service Antenna (380–400 MHz, incl. Mounting Clamp Set, 1/2in Coax Feeder & RF Jumpers)",
+      oemModel: "RFI COL45-400P / CommScope LDF4-50RK-50A",
+      qty: 6,
+      unit: "set",
+      exIp: "Offshore Marine Grade",
+      docRef: "MTO-0001 Rev.C1 / MR-0002 §5",
+      remarks: "Included in 1 Lot Scope (Unpriced)",
+    },
+  ].map((r, i) => ({ idx: nonMr0002Rows.length + i + 1, ...r }));
+
+  cachedPartARows = [...nonMr0002Rows, ...mr0002LnaRows];
   return cachedPartARows;
 }
 

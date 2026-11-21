@@ -135,3 +135,34 @@ export function buildRev04DeltaOverlay0553({ includeMotFatInB3 = false, includeM
   });
 }
 export const buildRev031GfLnaOverlay0553 = buildRev04DeltaOverlay0553;
+
+export function buildRev031LumpSumOverlay0553({ includeMotFatInB3 = false, includeMotOffshoreInServices = false, commercialDiscountUSD = 0 } = {}) {
+  const perItem = buildRev04DeltaOverlay0553({ includeMotFatInB3, includeMotOffshoreInServices });
+  const rev03 = selectCurrentReleaseRev03_0553();
+  const scopeAdjustmentUSD = round2(perItem.totalBaseUSD - rev03.totalBaseUSD);
+  const discountUSD = Number.isFinite(commercialDiscountUSD) && commercialDiscountUSD > 0 ? round2(commercialDiscountUSD) : 0;
+  const netBaseUSD = round2(perItem.totalBaseUSD - discountUSD);
+  const rows = rev03.rows.map((r) => Object.freeze({
+    code: r.code,
+    sourceCell: r.sourceCell,
+    rev03AmountUSD: r.amountUSD,
+    amountUSD: r.amountUSD,
+    priceText: r.priceText,
+    deltaUSD: 0,
+    displayEquation: Number.isFinite(r.amountUSD) ? "EQ-DISP-PRICE" : "EQ-DISP-NA",
+    deltaSource: "KEPT_REV03_LINE__ADJUSTED_IN_LUMPSUM"
+  }));
+  return Object.freeze({
+    ...perItem,
+    revision: "Rev03.1 (GF-LNA · Lump-sum)",
+    targetFilename: "4-Scope of Supply Rev03.1 (GF-LNA Lump-sum).xlsx",
+    pricingMode: "LUMPSUM_DISCOUNT_ON_REV03",
+    rev03SubtotalBaseUSD: rev03.totalBaseUSD,
+    scopeAdjustmentUSD,
+    commercialDiscountUSD: discountUSD,
+    totalBaseUSD: netBaseUSD,
+    deltaBaseUSD: round2(netBaseUSD - rev03.totalBaseUSD),
+    combinedBaseAndServicesUSD: round2(netBaseUSD + perItem.proposalOfServices.totalUSD),
+    rows
+  });
+}

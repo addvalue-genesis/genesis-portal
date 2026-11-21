@@ -10,6 +10,7 @@ import {SubmittedWorksheet0553} from "./ReleaseCustomerWorkbook0553";
 import "./releaseWorkbook0553.css";
 import {QuotationBaselineControl0553} from "./QuotationBaselineControl0553";
 import {RecordedQuotation0553} from "./RecordedQuotation0553";
+import {buildRev031GfLnaOverlay0553,buildRev031LumpSumOverlay0553} from "./data/rev04DeltaOverlay0553";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
 const cents=n=>Math.round((n+Number.EPSILON)*100);
@@ -73,8 +74,6 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
  const current=selectCurrentReleaseRev03_0553();
  const historical=releaseVersion==="SUBMITTED_REV02";
  const submitted=historical?selectSubmittedRev02Release0553():current;
- const officialWorksheets=submitted.worksheets.filter(s=>!/^A[1-4] MR000[1-4]$/.test(s.name));
- const archivedSheet=officialWorksheets.find(s=>s.name===submittedSheet)||officialWorksheets[0];
  const model=useMemo(()=>releaseVersion==="WORKING_DRAFT"?buildOfficialUsdRelease0553(source):null,[source,releaseVersion]);
  const rev03Breakdown=useMemo(()=>releaseVersion==="CURRENT_REV03"?buildRev03PartABreakdown0553(source,current):null,[source,current,releaseVersion]);
  const draftBreakdown=useMemo(()=>releaseVersion==="WORKING_DRAFT"&&model?buildCustomerPriceBreakdown0553(source,model):null,[source,model,releaseVersion]);
@@ -82,6 +81,57 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
  const toggleGroup=code=>setExpandedGroups(prev=>({...prev,[code]:!prev[code]}));
  const [sheet,setSheet]=useState("SUMMARY"),[error,setError]=useState("");
  const [recordedQuotation,setRecordedQuotation]=useState(null);
+ const [includeMotFat,setIncludeMotFat]=useState(false);
+ const [includeMotOffshore,setIncludeMotOffshore]=useState(false);
+ const [extraDiscountUSD,setExtraDiscountUSD]=useState(0);
+ const isRev031=releaseVersion==="REV03_1_GF_LNA";
+ const isRev031Lump=releaseVersion==="REV03_1_LUMPSUM";
+ const isOverlay=isRev031||isRev031Lump;
+ const rev031Overlay=useMemo(()=>{
+  if(isRev031)return buildRev031GfLnaOverlay0553({includeMotFatInB3:includeMotFat,includeMotOffshoreInServices:includeMotOffshore});
+  if(isRev031Lump)return buildRev031LumpSumOverlay0553({includeMotFatInB3:includeMotFat,includeMotOffshoreInServices:includeMotOffshore,commercialDiscountUSD:Number(extraDiscountUSD)||0});
+  return null;
+ },[isRev031,isRev031Lump,includeMotFat,includeMotOffshore,extraDiscountUSD]);
+ const rev031Worksheets=useMemo(()=>{
+  if(!isOverlay||!rev031Overlay)return null;
+  const byCode=new Map(rev031Overlay.rows.map(r=>[r.code,r]));
+  const disc=Number(extraDiscountUSD)||0;
+  const netBase=Math.round((rev031Overlay.totalBaseUSD-(isRev031?disc:0))*100)/100;
+  return current.worksheets.filter(s=>!/^A[1-4] MR000[1-4]$/.test(s.name)).map(ws=>{
+   if(ws.name!=="Scope of supply")return ws;
+   const rows=[];
+   for(const row of (ws.rows||[])){
+    const code=String(row?.[0]?.value??"").trim();
+    const ov=byCode.get(code);
+    if(isRev031&&ov&&ov.deltaSource!=="UNCHANGED_FROM_REV03"){
+     const next=row.map(c=>c?{...c}:c);
+     const val=Number.isFinite(ov.amountUSD)?ov.amountUSD:(ov.priceText||"N/A");
+     if(next[5])next[5]={...next[5],value:val};
+     if(next[6])next[6]={...next[6],value:val};
+     if(next[7])next[7]={...next[7],value:ov.deltaSource};
+     rows.push(next);
+     continue;
+    }
+    if(code.startsWith("Total")&&typeof row?.[6]?.value==="number"){
+     if(isRev031Lump){
+      const adj=rev031Overlay.scopeAdjustmentUSD;
+      rows.push([{value:"Lump-sum Adj."},{value:""},{value:"Scope & Technical Adjustment (BDA -> LNA, B3/B8/B9 Services Split, B10)"},{value:""},{value:"1 lot"},{value:adj},{value:adj},{value:"Lump-sum scope adjustment"}]);
+     }
+     if(disc>0){
+      rows.push([{value:"Discount"},{value:""},{value:"Commercial / Final Best Price Discount"},{value:""},{value:"1 lot"},{value:-disc},{value:-disc},{value:"Special commercial discount"}]);
+     }
+     const next=row.map(c=>c?{...c}:c);
+     next[6]={...next[6],value:netBase};
+     rows.push(next);
+     continue;
+    }
+    rows.push(row);
+   }
+   return {...ws,rows};
+  });
+ },[isOverlay,isRev031,isRev031Lump,rev031Overlay,current,extraDiscountUSD]);
+ const officialWorksheets=isOverlay&&rev031Worksheets?rev031Worksheets:submitted.worksheets.filter(s=>!/^A[1-4] MR000[1-4]$/.test(s.name));
+ const archivedSheet=officialWorksheets.find(s=>s.name===submittedSheet)||officialWorksheets[0];
  const baselineControl=useRef(null);
  const SelectedSheet="div";
  const selectedSheetRef=useRef(null);
@@ -186,19 +236,28 @@ export function OfficialUsdRelease0553({source,recipient="INTERNAL",onOpenSource
   <div className="p553-official-toolbar"><h3>10.3.4 · Official Release — English / USD</h3>
    {isSI&&releaseVersion==="WORKING_DRAFT"&&<><button type="button" className="p553-detail-button" onClick={captureBeforeDownload}>บันทึกฉบับก่อน Export Excel — English / USD</button>
    <button type="button" className="p553-detail-button" onClick={captureBeforeDownload}>บันทึกฉบับก่อน Export Breakdown — Draft / 10 sheets</button></>}
-   <button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="CURRENT_REV03"} onClick={()=>setReleaseVersion("CURRENT_REV03")}>Current Rev03 · Agreed quotation</button>
-   <button type="button" className="p553-detail-button" aria-pressed={historical} onClick={()=>setReleaseVersion("SUBMITTED_REV02")}>History Rev02 · 30 Oct 2026</button>
-   {isSI&&<button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="WORKING_DRAFT"} onClick={()=>setReleaseVersion("WORKING_DRAFT")}>Working draft · not issued</button>}</div>
+   <label>Revision <select aria-label="Official release version" value={releaseVersion} onChange={e=>setReleaseVersion(e.target.value)}>
+    <option value="CURRENT_REV03">Current Rev03 · Agreed quotation</option>
+    <option value="REV03_1_GF_LNA">Rev03.1 (GF-LNA) · Per-Item Adjusted</option>
+    <option value="REV03_1_LUMPSUM">Rev03.1 (GF-LNA) · Lump-sum Discount</option>
+    <option value="SUBMITTED_REV02">History Rev02 · 30 Oct 2026</option>
+    {isSI&&<option value="WORKING_DRAFT">Working draft · not issued</option>}
+   </select></label></div>
   {isSI&&<p className="p55-note" data-jutal-register-summary="true"><strong>JUTAL {selectDeviationRegister0553().responseRound}:</strong> {selectDeviationRegister0553().counts.deviations} Formal Deviation · {selectDeviationRegister0553().counts.technicalClarifications} TC · {selectDeviationRegister0553().counts.commercialClarifications} CCL (tracked in Tab 14 / 15; Rev03 totals unchanged).</p>}
   {isSI&&<QuotationBaselineControl0553 controllerRef={baselineControl} mode={releaseVersion} reference={submitted} source={source} onSelectRecord={record=>{setError("");setRecordedQuotation(record);setReleaseVersion("RECORDED");}}/>}
   {error&&<p role="alert">{error}</p>}
-  {releaseVersion==="RECORDED"&&recordedQuotation?<RecordedQuotation0553 key={recordedQuotation.id} record={recordedQuotation}/>:releaseVersion!=="WORKING_DRAFT"?<div data-release-revision={submitted.revision} data-release-state={historical?"HISTORICAL_SUBMITTED_REV02":"OWNER_SELECTED_REV03"}>
-   <p><strong>{submitted.filename} · {historical?"History — submitted to SAMTEL 30 October 2026":"Current owner-selected quotation"}</strong><br/>Total A+B: <strong>USD {money(submitted.totalBaseUSD)}</strong>.</p>
-   <p>{historical?"Historical reference only; this is not the current selected quotation.":"Exact Scope of supply and B10/B11/B13/C1/C2 from the owner-selected Rev03 source workbook. C1/C2 are optional and excluded from Total A+B."}</p>
-   {isSI&&<p><a className="p553-detail-button" href={submitted.originalWorkbookPath} download={submitted.filename} onClick={e=>{e.preventDefault();captureBeforeDownload();}}>{historical?"บันทึกฉบับก่อนดาวน์โหลด Rev02":"บันทึกฉบับก่อนดาวน์โหลด Rev03"}</a>{" · "}<a href={submitted.sourceUrl} target="_blank" rel="noopener noreferrer">Open source workbook</a></p>}
-   <div className="p553-release-tabs" role="tablist" aria-label={historical?"Historical Rev02 worksheets":"Current Rev03 worksheets"}>{officialWorksheets.map(s=><button key={s.name} type="button" role="tab" aria-selected={s.name===submittedSheet} onClick={()=>setSubmittedSheet(s.name)}>{s.name}</button>)}</div>
+  {releaseVersion==="RECORDED"&&recordedQuotation?<RecordedQuotation0553 key={recordedQuotation.id} record={recordedQuotation}/>:releaseVersion!=="WORKING_DRAFT"?<div data-release-revision={isOverlay?rev031Overlay.revision:submitted.revision} data-release-state={isOverlay?"WORKING_DELTA_OVERLAY_NOT_ISSUED":historical?"HISTORICAL_SUBMITTED_REV02":"OWNER_SELECTED_REV03"}>
+   <p><strong>{isOverlay?rev031Overlay.targetFilename:submitted.filename} · {isRev031?"Per-Item Adjusted (BDA->LNA, B3/B8/B9/B10/C1)":isRev031Lump?"Lump-sum Scope Adjustment on Rev03":historical?"History — submitted to SAMTEL 30 October 2026":"Current owner-selected quotation"}</strong><br/>Total A+B: <strong>USD {money(isOverlay?(rev031Overlay.totalBaseUSD-(isRev031?(Number(extraDiscountUSD)||0):0)):submitted.totalBaseUSD)}</strong>{isOverlay&&<> · Proposal of Services: <strong>USD {money(rev031Overlay.proposalOfServices.totalUSD)}</strong> · Combined: <strong>USD {money(rev031Overlay.combinedBaseAndServicesUSD-(isRev031?(Number(extraDiscountUSD)||0):0))}</strong></>}</p>
+   {isOverlay&&<div className="p553-filterbar p553-filterbar--simple" role="group" aria-label="Rev03.1 MOT labor and discount toggles">
+    <label><input type="checkbox" checked={includeMotFat} onChange={e=>setIncludeMotFat(e.target.checked)}/> Include MOT FAT in B3 (+4,400 USD)</label>
+    <label><input type="checkbox" checked={includeMotOffshore} onChange={e=>setIncludeMotOffshore(e.target.checked)}/> Include MOT Install &amp; SAT in Services (+22,300 USD)</label>
+    <label>Commercial Discount (USD): <input type="number" min="0" step="100" value={extraDiscountUSD} onChange={e=>setExtraDiscountUSD(e.target.value)} style={{width:"100px"}}/></label>
+   </div>}
+   <p>{isRev031?"Same 6-sheet Scope of Supply format as Rev03 with per-item Rev03.1 (GF-LNA) values applied on A2, B3, B8, B9, B10, C1.":isRev031Lump?"Same 6-sheet Scope of Supply format keeping Rev03 line prices and applying a single Lump-sum adjustment row before Total A+B.":historical?"Historical reference only; this is not the current selected quotation.":"Exact Scope of supply and B10/B11/B13/C1/C2 from the owner-selected Rev03 source workbook. C1/C2 are optional and excluded from Total A+B."}</p>
+   {isSI&&!isOverlay&&<p><a className="p553-detail-button" href={submitted.originalWorkbookPath} download={submitted.filename} onClick={e=>{e.preventDefault();captureBeforeDownload();}}>{historical?"บันทึกฉบับก่อนดาวน์โหลด Rev02":"บันทึกฉบับก่อนดาวน์โหลด Rev03"}</a>{" · "}<a href={submitted.sourceUrl} target="_blank" rel="noopener noreferrer">Open source workbook</a></p>}
+   <div className="p553-release-tabs" role="tablist" aria-label={isOverlay?"Rev03.1 worksheets":historical?"Historical Rev02 worksheets":"Current Rev03 worksheets"}>{officialWorksheets.map(s=><button key={s.name} type="button" role="tab" aria-selected={s.name===submittedSheet} onClick={()=>setSubmittedSheet(s.name)}>{s.name}</button>)}</div>
    <SubmittedWorksheet0553 sheet={archivedSheet}/>
-   {!historical&&submittedSheet==="Scope of supply"&&renderPartABreakdown()}
+   {!historical&&!isOverlay&&submittedSheet==="Scope of supply"&&renderPartABreakdown()}
   </div>:<>
   <p className="p55-note">Working calculation for internal review. The current agreed quotation is Rev03; historical Rev02 remains separate.</p>
   <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
