@@ -2,6 +2,7 @@
 // Data lineage: CUS (MR Table 11 / VDRL 143 + TC/CCL) -> 07 VND (OEM specs/models) -> SI (Unpriced Schedule C1 / B1-B2).
 // Strictly UNPRICED: never expose THB/USD rates, margins, or internal cost owners in VDRL deliverables.
 import VDRL_LEDGER from "./bcVdrlSourceLedger0553.json";
+import { groupAndRenumberVdrlRows } from "../../common/engineering/vdrlCustomerDeliverableStandard";
 import JUTAL_RESPONSE from "./snapshots/jutal.comments.response.20261118.json";
 import { ADDVALUE_DOCUMENT_COMPANY_CODE_0553 } from "./addvalueDocumentCode0553";
 import { extractVdrlDocType0553 } from "./particularDirectiveRule0553";
@@ -154,6 +155,25 @@ function resolveVdrlLineage(row) {
   return { cus, vnd: vndByMr[row.mr] || "07 VND: Approved Project Vendors", si };
 }
 
+function sanitizeCustomerDescription0553(r) {
+  const raw = String(r?.description || r?.name || "—").trim();
+  const tag = String(r?.tag || r?.code || "").toUpperCase();
+  const mr = String(r?.mr || "").toUpperCase();
+  if (/EXION|1260576|Auteldac|DB3B|JB allowance/i.test(raw) || (mr === "MR-0003" && /TEL|VOIP|PH|SOUNDER/i.test(tag))) {
+    return "Ex VoIP Telephone & Hazardous Area Sounder";
+  }
+  if (/PROSPER|historical budget allowance|MTO assembly\/configuration verification pending/i.test(raw) || (mr === "MR-0003" && /JB/i.test(tag))) {
+    return "Ex e Telephone Junction Box";
+  }
+  if (/MDS|QTORG2609244|extrapolated|one-set quoted rate/i.test(raw) || mr === "MR-0004") {
+    return "Marine RACON (X/S Band) System";
+  }
+  return raw
+    .replace(/\b(?:EXION|PROSPER|MDS|MOT|Versed|Royaltec|MGW|QTORG\w+|1260576(?:\s*Rev\d+)?)\b[:\s-]*/gi, "")
+    .replace(/;\s*(?:owner-selected|historical budget allowance|MTO assembly\/configuration verification pending|one-set quoted rate extrapolated per required site|JB allowance counted separately).*/i, "")
+    .trim() || "—";
+}
+
 let cachedPartARows = null;
 function getUnpricedPartARows0553() {
   if (cachedPartARows) return cachedPartARows;
@@ -163,16 +183,22 @@ function getUnpricedPartARows0553() {
     .flatMap((g) => g.sourceRows || [])
     .map((r, idx) => {
       const brand = resolveVendorBrandModelPart0553(r);
+      const cleanDesc = sanitizeCustomerDescription0553(r);
+      const internalRe = /EXION|PROSPER|MDS|QTORG|allowance|budget|extrapolated|owner-selected|verification pending|1260576/i;
+      const rawSpec = String(r.specification || "").trim();
+      const safeSpec = internalRe.test(rawSpec) ? "Per MR Specification" : rawSpec || "Per MR Specification";
+      const rawModel = String(brand?.model || "").trim();
+      const safeModel = rawModel && !internalRe.test(rawModel) ? rawModel : safeSpec;
       return {
         idx: idx + 1,
         mr: r.mr || "MR-0001",
         site: r.site || "ALL",
         tag: r.tag || r.code || "—",
-        description: r.description || r.name || "—",
+        description: cleanDesc,
         brandName: brand?.brand || brand?.manufacturer || "—",
-        modelName: brand?.model || r.specification || "Per MR Specification",
+        modelName: safeModel,
         partNo: brand?.partNo || "—",
-        oemModel: [brand?.brand || brand?.manufacturer, brand?.model, brand?.partNo].filter(Boolean).join(" · ") || r.specification || "Per MR Specification",
+        oemModel: [brand?.brand || brand?.manufacturer, safeModel, brand?.partNo].filter(Boolean).join(" · ") || safeSpec,
         qty: r.qty ?? 1,
         unit: r.unit || "set",
         exIp: r.exRating || (r.site ? "Zone 2 / Offshore" : "—"),
@@ -302,28 +328,34 @@ export function selectVdrlReportCatalog0553() {
   };
 }
 
-export function buildVdrlDocumentPreview0553(row) {
+export function buildVdrlDocumentPreview0553(row, { includeAllMrs = false, filterMr = null } = {}) {
   if (!row) return null;
+  const effectiveMr = filterMr || (includeAllMrs ? null : row.mr);
   const tpl = VDRL_TEMPLATES_0553[row.templateKey] || VDRL_TEMPLATES_0553.OTHER;
+  const isEquipmentList = row.docType === "LIS" && !/spares|tool/i.test(row.title);
+  const displayTitle =
+    isEquipmentList && /table of contents/i.test(row.title)
+      ? "Telecommunication Equipment List"
+      : row.title;
   const header = {
     project: "Zawtika Development Project Phase 1F (PJ2608-0553)",
     client: "PTTEP / JUTAL (GCME)",
     contractor: `SAMTEL / ADDVALUE (${ADDVALUE_DOCUMENT_COMPANY_CODE_0553})`,
     clientDocNo: row.clientDocNo,
     addvalueDocNo: row.addvalueDocNo,
-    title: row.title,
-    mr: row.mr,
+    title: displayTitle,
+    mr: filterMr ? filterMr : (includeAllMrs ? "MR-0001–MR-0004 (ALL)" : row.mr),
     dossier: row.dossier,
     docType: row.docType,
     revision: "Rev.0",
-    purpose: row.requiredDuringBidding ? "Issued for Bid" : `Issued for Review (${row.submissionTrigger})`,
+    purpose: row.requiredDuringBidding ? "Issued for Bid" : "Issued for Review",
     approvalClass: row.approvalClass,
     unpriced: true,
   };
 
   let rows = [];
   if (row.docType === "MTO") {
-    const partA = getUnpricedPartARows0553().filter((x) => !row.mr || x.mr === row.mr);
+    const partA = getUnpricedPartARows0553().filter((x) => !effectiveMr || x.mr === effectiveMr);
     rows = partA.map((x, i) => [
       `A-${i + 1}`,
       x.mr,
@@ -352,7 +384,7 @@ export function buildVdrlDocumentPreview0553(row) {
       `EXA-A8 §5.0`,
     ]);
   } else if (row.docType === "LIS") {
-    const partA = getUnpricedPartARows0553().filter((x) => !row.mr || x.mr === row.mr);
+    const partA = getUnpricedPartARows0553().filter((x) => !effectiveMr || x.mr === effectiveMr);
     rows = partA.map((x, i) => [
       `1.${i + 1}`,
       x.tag,
@@ -363,13 +395,14 @@ export function buildVdrlDocumentPreview0553(row) {
       x.site,
       x.qty,
       x.unit,
-      [x.exIp, x.remarks].filter(Boolean).join(" · "),
+      x.remarks || "",
     ]);
   } else if (row.docType === "DTS") {
-    const partA = getUnpricedPartARows0553().filter((x) => !row.mr || x.mr === row.mr);
+    const partA = getUnpricedPartARows0553().filter((x) => !effectiveMr || x.mr === effectiveMr);
+    const mrLabel = effectiveMr || row.mr;
     const first = partA[0] || { tag: "MR-502-001", site: "ZWP20–ZWP23", brandName: "As per AML", modelName: "Per Offered Technical Proposal", partNo: "—", qty: 1 };
     rows = [
-      ["GENERAL", 1, "Quantity", "Nos.", `${partA.length || first.qty} (per ${row.mr} Schedule)`],
+      ["GENERAL", 1, "Quantity", "Nos.", `${partA.length || first.qty} (per ${mrLabel} Schedule)`],
       ["GENERAL", 2, "Tag numbers", "—", partA.slice(0, 5).map((x) => x.tag).join(", ") || first.tag],
       ["GENERAL", 3, "Area of installation", "—", "Offshore Wellhead Platforms (ZWP20–23 / Brownfield)"],
       ["GENERAL", 4, "Certification Requirement", "—", "Zone 2 / Safe Area per MR & DTS"],
@@ -419,10 +452,12 @@ export function buildVdrlDocumentPreview0553(row) {
     ];
   }
 
+  const grouped = groupAndRenumberVdrlRows({ header, columns: tpl.columns, rows });
   return {
     header,
     template: tpl,
     columns: tpl.columns,
-    rows,
+    rows: grouped.flatMap((g) => g.rows),
+    grouped,
   };
 }

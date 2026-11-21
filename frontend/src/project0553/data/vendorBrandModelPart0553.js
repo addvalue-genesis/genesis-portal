@@ -85,7 +85,7 @@ function extractFirstCodeToken(spec) {
 /**
  * Resolve Brand, Model, Part No., and Offered Equipment strictly from 07 VND records.
  */
-export function resolveVendorBrandModelPart0553({ tag = "", description = "", rawSpec = "" }) {
+export function resolveVendorBrandModelPart0553({ tag = "", description = "", rawSpec = "", site = "" }) {
   const t = String(tag || "").toUpperCase().trim();
   const s = String(rawSpec || "");
 
@@ -109,15 +109,24 @@ export function resolveVendorBrandModelPart0553({ tag = "", description = "", ra
   } else if (/^ANT-502-001$|^ANT-502-002$|^ANT-502-003$|^ANT-502-005$|^ANT-LQM-202-025$/.test(t)) {
     brand = "Aviat";
     const token = extractFirstCodeToken(s);
-    if (/086-050122-602/i.test(s) || (t === "ANT-502-001" && !/APD-DB/i.test(s))) {
+    if (t === "ANT-LQM-202-025" || (t === "ANT-502-002" && (/sector/i.test(description + " " + s) || /ZWP8/i.test(site)))) {
+      rawModel = "90° Sectoral SCADA Antenna 4.9–5.8GHz 16dBi";
+      rawPartNo = "AFS-DBG-0590-02";
+    } else if (t === "ANT-502-002") {
+      rawModel = "Parabolic SCADA Antenna 2ft (Diversity)";
+      rawPartNo = "APD-DB-05-2FT-02";
+    } else if (t === "ANT-502-003") {
+      rawModel = "Parabolic SCADA Antenna 4ft";
+      rawPartNo = "086-050122-602";
+    } else if (t === "ANT-502-005") {
+      rawModel = "Parabolic SCADA Antenna 3ft w/ Radome";
+      rawPartNo = "APD-DB-05-3FT-RAD-01";
+    } else if (/086-050122-602/i.test(s) || t === "ANT-502-001") {
       rawModel = "Parabolic SCADA Antenna";
       rawPartNo = "086-050122-602";
-    } else if (/APD-DB-05-3FT-RAD-01/i.test(s) || token) {
+    } else {
       rawModel = "Parabolic SCADA Antenna";
       rawPartNo = token || "APD-DB-05-3FT-RAD-01";
-    } else {
-      rawModel = "SCADA Sector / Parabolic Antenna";
-      rawPartNo = "TBC";
     }
   } else if (/^LAN-502-001$|^LAN-502-002$/.test(t)) {
     const q = findQuoteLine("IE-3400-8P2S-E");
@@ -155,6 +164,10 @@ export function resolveVendorBrandModelPart0553({ tag = "", description = "", ra
     brand = "Hytera";
     rawModel = "UHF Omni Antenna 400–470 MHz";
     rawPartNo = cat ? "TQJ-400AD5" : "TQJ-400AD5";
+  } else if (/TCAB-504-001/.test(t)) {
+    brand = "BARTEC";
+    rawModel = "Ex e Telephone Junction Box";
+    rawPartNo = "A7-XXXX-XXXX/Bxxx";
   } else if (/PHONE|TPH-504/.test(t) || /212-02-6008-510/i.test(s)) {
     brand = "Auteldac / EATON";
     rawModel = "Auteldac 6 Ex VoIP Telephone + Sounder";
@@ -164,7 +177,7 @@ export function resolveVendorBrandModelPart0553({ tag = "", description = "", ra
     rawModel = "Ex d Sounder 12–48 VDC";
     rawPartNo = "DB3BDG048N2BNR12-48VDC2xM20";
   } else if (/MAR-514-001/.test(t) || /SeaBeacon/i.test(s)) {
-    brand = "Pharos Marine";
+    brand = "Tideland Signal";
     rawModel = "SeaBeacon-2 System 6 Ex RACON";
     rawPartNo = "024439";
   } else {

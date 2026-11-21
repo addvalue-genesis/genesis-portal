@@ -1,4 +1,8 @@
 import React, { useMemo, useState } from "react";
+import {
+  evaluateCustomerReleaseGate,
+  groupAndRenumberVdrlRows,
+} from "../common/engineering/vdrlCustomerDeliverableStandard";
 import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 import { AuditSection } from "../common/ui/ProjectAuditPrimitives";
 import {
@@ -41,46 +45,68 @@ function buildVdrlCsv(preview) {
   return [...meta, preview.columns, ...preview.rows].map((row) => row.map(esc).join(",")).join("\n") + "\n";
 }
 
-function groupRowsGfBf(preview) {
-  const locationOrder = ["ZWP20", "ZWP21", "ZWP22", "ZWP23", "ZPQ", "ZWP8", "ZWP11"];
-  const buckets = new Map();
-  for (const r of preview.rows || []) {
-    const joined = r.map((c) => (c == null ? "" : String(c))).join(" ");
-    const matchedLoc = locationOrder.find((loc) => new RegExp(`\\b${loc}\\b`, "i").test(joined));
-    const isBf = matchedLoc ? ["ZPQ", "ZWP8", "ZWP11"].includes(matchedLoc) : /\bBROWNFIELD\b/i.test(joined);
-    const isGf = matchedLoc ? ["ZWP20", "ZWP21", "ZWP22", "ZWP23"].includes(matchedLoc) : /\bGREENFIELD\b/i.test(joined);
-    const key = matchedLoc ? `${isBf ? "BF" : "GF"}-${matchedLoc}` : isBf ? "BF-ALL" : isGf ? "GF-ALL" : "GEN";
-    const title = matchedLoc
-      ? `${isBf ? "BROWNFIELD" : "GREENFIELD"} — Location: ${matchedLoc} Platform`
-      : isBf
-      ? "BROWNFIELD PLATFORMS — Location: ZPQ, ZWP8, ZWP11"
-      : isGf
-      ? "GREENFIELD PLATFORMS — Location: ZWP20, ZWP21, ZWP22, ZWP23"
-      : "GENERAL / COMMON SCOPE";
-    if (!buckets.has(key)) buckets.set(key, { key, title, order: matchedLoc ? locationOrder.indexOf(matchedLoc) : 99, rows: [] });
-    buckets.get(key).rows.push(r);
-  }
-  return [...buckets.values()].sort((a, b) => a.order - b.order);
+function getNormalizedColWidths(columns = []) {
+  const weights = columns.map((colName) => {
+    const c = String(colName || "").toUpperCase();
+    if (/^(NO\.|ITEM NO\.|UNIT|Q'TY|QTY\.|REV|QTY)$/.test(c)) return 4.5;
+    if (/^(SYSTEM|REF|SECTION)$/.test(c)) return 6.5;
+    if (/^(LOCATION)$/.test(c)) return 7;
+    if (/^TAG NUMBER$/.test(c)) return 9;
+    if (/^BRAND$/.test(c)) return 8;
+    if (/^MODEL$/.test(c)) return 14.5;
+    if (/^PART NO\.$/.test(c)) return 14.5;
+    if (/DESCRIPTION|TITLE|SPECIFICATION|PARAMETER|ITEM|FINDING/.test(c)) return 22;
+    if (/REMARK|NOTE|STATUS/.test(c)) return 10;
+    return 12;
+  });
+  const total = weights.reduce((a, b) => a + b, 0) || 100;
+  return weights.map((w) => `${((w / total) * 100).toFixed(2)}%`);
 }
 
-function colWidthPct(colName) {
-  const c = String(colName || "").toUpperCase();
-  if (/^(NO\.|ITEM NO\.|UNIT|Q'TY|QTY\.|REV)$/.test(c)) return "5%";
-  if (/^(SYSTEM|LOCATION)$/.test(c)) return "7%";
-  if (/^TAG NUMBER$/.test(c)) return "9%";
-  if (/^BRAND$/.test(c)) return "8%";
-  if (/^MODEL$/.test(c)) return "14%";
-  if (/^PART NO\.$/.test(c)) return "14%";
-  if (/DESCRIPTION|TITLE|SPECIFICATION/.test(c)) return "20%";
-  if (/REMARK/.test(c)) return "13%";
-  return "10%";
+function buildTabulationGridHtml() {
+  const rows = [];
+  for (let i = 1; i <= 50; i += 1) {
+    const mark = i <= 3 ? "X" : "";
+    let rightCells = "";
+    if (i <= 40) {
+      rightCells = `<td class="center">${50 + i}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>`;
+    } else if (i === 41) {
+      rightCells = `<th colspan="8" class="center">ATTACHMENT / APPENDIX</th>`;
+    } else {
+      const appIdx = i - 41;
+      const letter = String.fromCharCode(64 + appIdx);
+      rightCells = `<td class="center">${appIdx}</td><td></td><td></td><td></td><td></td><td></td><td></td><td class="center">${letter}</td>`;
+    }
+    rows.push(
+      `<tr><td class="center">${i}</td><td class="center">${mark}</td><td></td><td></td><td></td><td></td><td></td><td></td>` +
+        `<td style="border-top:none;border-bottom:none;width:2%;"></td>` +
+        `${rightCells}</tr>`
+    );
+  }
+  return (
+    `<table class="tab-grid">` +
+    `<colgroup>` +
+    `<col style="width:7%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/>` +
+    `<col style="width:2%;"/>` +
+    `<col style="width:7%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/><col style="width:6%;"/>` +
+    `</colgroup>` +
+    `<thead>` +
+    `<tr><th rowspan="2" class="center">SHEET</th><th colspan="7" class="center">REVISIONS</th>` +
+    `<th rowspan="2" style="border-top:none;border-bottom:none;background:#fff;"></th>` +
+    `<th rowspan="2" class="center">SHEET</th><th colspan="7" class="center">REVISIONS</th></tr>` +
+    `<tr><th class="center">A1</th><th class="center">B1</th><th class="center">C1</th><th class="center">C2</th><th class="center">C3</th><th></th><th></th>` +
+    `<th class="center">A1</th><th class="center">B1</th><th class="center">C1</th><th class="center">C2</th><th class="center">C3</th><th></th><th></th></tr>` +
+    `</thead><tbody>${rows.join("")}</tbody></table>`
+  );
 }
 
 function buildVdrlWordHtml(preview, logos = {}) {
   const h = preview.header;
-  const ths = preview.columns.map((c) => `<th style="width:${colWidthPct(c)};">${c}</th>`).join("");
-  const grouped = groupRowsGfBf(preview);
   const colCount = preview.columns.length;
+  const colWidths = getNormalizedColWidths(preview.columns);
+  const colgroup = `<colgroup>${colWidths.map((w) => `<col style="width:${w};"/>`).join("")}</colgroup>`;
+  const ths = preview.columns.map((c) => `<th>${c}</th>`).join("");
+  const grouped = preview.grouped || groupAndRenumberVdrlRows(preview);
   const tbody = grouped
     .map((g) => {
       const banner = `<tr><td colspan="${colCount}" style="background:#e2e8f0;font-weight:bold;padding:5px 6px;">${g.title}</td></tr>`;
@@ -90,29 +116,31 @@ function buildVdrlWordHtml(preview, logos = {}) {
       return banner + trs;
     })
     .join("");
-  const pttepImg = logos.pttep ? `<img src="${logos.pttep}" alt="PTTEP" style="height:48px;width:auto;"/>` : `<strong>PTTEP</strong>`;
+  const pttepImg = logos.pttep ? `<img src="${logos.pttep}" alt="PTTEP" style="height:44px;width:auto;max-width:68px;object-fit:contain;"/>` : `<strong>PTTEP</strong>`;
   const rightLogos = [
-    logos.jutal ? `<img src="${logos.jutal}" alt="JUTAL" style="height:26px;width:auto;margin:2px;"/>` : `<strong>JUTAL</strong>`,
-    logos.samtel ? `<img src="${logos.samtel}" alt="SAMTEL" style="height:22px;width:auto;margin:2px;"/>` : `<span>SAMTEL</span>`,
-    logos.avs ? `<img src="${logos.avs}" alt="ADDVALUE" style="height:22px;width:auto;margin:2px;"/>` : `<span>ADDVALUE</span>`,
-  ].join("<br/>");
+    logos.jutal ? `<div style="margin:2px 0;"><img src="${logos.jutal}" alt="JUTAL" style="height:17px;width:auto;max-width:74px;object-fit:contain;"/></div>` : `<div><strong>JUTAL</strong></div>`,
+    logos.samtel ? `<div style="margin:2px 0;"><img src="${logos.samtel}" alt="SAMTEL" style="height:26px;width:auto;max-width:84px;object-fit:contain;"/></div>` : `<div><span>SAMTEL</span></div>`,
+    logos.avs ? `<div style="margin:2px 0;"><img src="${logos.avs}" alt="ADDVALUE" style="height:21px;width:auto;max-width:86px;object-fit:contain;"/></div>` : `<div><span>ADDVALUE</span></div>`,
+  ].join("");
   return (
     `<html><head><meta charset="utf-8"><title>${h.addvalueDocNo}</title>` +
     `<style>` +
+    `@page{size:A4 landscape;margin:8mm;}` +
     `@page portrait_page{size:A4 portrait;margin:12mm;}` +
     `@page landscape_page{size:A4 landscape;margin:8mm;}` +
     `*{box-sizing:border-box;}` +
-    `body{font-family:Arial,sans-serif;font-size:9pt;margin:0;line-height:1.35;}` +
-    `.portrait-sec{page:portrait_page;page-break-after:always;}` +
-    `.landscape-sec{page:landscape_page;width:100%;}` +
-    `table{border-collapse:collapse;width:100%;table-layout:fixed;}` +
-    `th,td{border:1px solid #000;padding:4px 5px;vertical-align:top;overflow-wrap:break-word;word-break:normal;font-size:7.8pt;}` +
+    `body{font-family:Arial,sans-serif;font-size:9pt;margin:0;padding:0;line-height:1.35;}` +
+    `.portrait-sec{page:portrait_page;page-break-after:always;width:calc(100% - 2pt);margin:0 auto;}` +
+    `.landscape-sec{page:landscape_page;width:calc(100% - 2pt);margin:0 auto;}` +
+    `table{border-collapse:collapse;width:calc(100% - 2pt);margin-left:auto;margin-right:auto;table-layout:fixed;border:1pt solid #000;}` +
+    `th,td{border:0.9pt solid #000;padding:3px 4px;vertical-align:top;overflow-wrap:anywhere;word-break:break-word;font-size:7.2pt;}` +
+    `.tab-grid th,.tab-grid td{padding:1.2px 2px;font-size:6pt;line-height:1.12;}` +
     `th{background:#f3f4f6;}` +
     `thead{display:table-header-group;}` +
     `tr{page-break-inside:avoid;}` +
     `.center{text-align:center;vertical-align:middle;}` +
     `</style></head><body>` +
-    `<div class="portrait-sec" style="border:1px solid #000;padding:18px;min-height:265mm;display:flex;flex-direction:column;justify-content:space-between;">` +
+    `<div class="portrait-sec" style="border:1.5pt solid #000;padding:16px;min-height:264mm;display:flex;flex-direction:column;justify-content:space-between;">` +
     `<div>` +
     `<div class="center" style="margin:28px 0 36px 0;font-size:11pt;"><strong>ENGINEERING, PROCUREMENT, CONSTRUCTION, AND INSTALLATION OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS<br/><br/>FOR<br/><br/>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</strong></div>` +
     `<div class="center" style="margin:36px 0 40px 0;font-size:13pt;"><strong>${String(h.title || "").toUpperCase()}</strong></div>` +
@@ -120,23 +148,21 @@ function buildVdrlWordHtml(preview, logos = {}) {
     `<table><tr><td colspan="4" style="border:none;"></td><th colspan="4">DOCUMENT CLASS: ${h.approvalClass || "1"}</th></tr>` +
     `<tr><th rowspan="2">REV</th><th rowspan="2">DATE</th><th rowspan="2">BY</th><th rowspan="2">DESCRIPTION</th><th colspan="2">CONTRACTOR APPROVAL</th><th colspan="2">COMPANY APPROVAL</th></tr>` +
     `<tr><th>CHECK</th><th>APPR.</th><th>CHECK</th><th>APPR.</th></tr>` +
-    `<tr><td class="center">${h.revision}</td><td class="center">21-Nov-26</td><td class="center">ADDV</td><td>${h.purpose}</td><td class="center">—</td><td class="center">—</td><td class="center">—</td><td class="center">—</td></tr>` +
+    `<tr><td class="center">${h.revision}</td><td class="center">21-Nov-26</td><td class="center">ADDV</td><td>${h.purpose}</td><td class="center">SY</td><td class="center">SY</td><td class="center">—</td><td class="center">—</td></tr>` +
     `<tr><td colspan="8" class="center"><strong>REVISION CODE: A = Issued for Review – B = Issued for Approval – C = Approved for Construction</strong></td></tr>` +
     `<tr><td colspan="8" class="center" style="font-size:8pt;">TOTAL OR PARTIAL REPRODUCTION AND/OR UTILIZATION OF THIS DOCUMENT ARE FORBIDDEN WITHOUT PRIOR WRITTEN AUTHORIZATION OF THE OWNER</td></tr>` +
     `<tr><td rowspan="3" class="center">${pttepImg}</td><td colspan="5" class="center"><strong>PTTEP INTERNATIONAL LIMITED</strong><br/>EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</td><td colspan="2" rowspan="3" class="center">${rightLogos}</td></tr>` +
     `<tr><td colspan="4" rowspan="2" class="center"><strong>${h.addvalueDocNo}</strong></td><th class="center">REV</th></tr>` +
     `<tr><td class="center"><strong>${h.revision}</strong></td></tr>` +
     `</table></div>` +
-    `<div class="portrait-sec">` +
-    `<table style="margin-bottom:12px;"><tr><td class="center" style="width:16%;">${pttepImg}</td><th class="center" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:14%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
-    `<h3 class="center" style="margin:8px 0;">TABULATION OF REVISED PAGES</h3>` +
-    `<table><thead><tr><th>SHEET</th><th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>` +
-    `<tbody><tr><td class="center">1 (Cover)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr>` +
-    `<tr><td class="center">2 (Tabulation)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr>` +
-    `<tr><td class="center">3 (Data Sheet)</td><td class="center">X</td><td></td><td></td><td></td><td></td></tr></tbody></table></div>` +
+    `<div class="portrait-sec" style="border:1.5pt solid #000;padding:6px 8px;height:262mm;overflow:hidden;">` +
+    `<table style="margin-bottom:4px;"><tr><td class="center" style="width:14%;">${pttepImg}</td><th class="center" style="width:48%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:20%;">${rightLogos}</td><td style="width:18%;" class="center"><strong>Page 2</strong><br/><span style="font-size:6.5pt;">Contract No:<br/>MMC25-5001</span></td></tr></table>` +
+    `<div class="center" style="margin:3px 0 4px 0;font-size:9pt;"><strong>TABULATION OF REVISED PAGES</strong></div>` +
+    `${buildTabulationGridHtml()}` +
+    `</div>` +
     `<div class="landscape-sec">` +
     `<table style="margin-bottom:8px;"><tr><td class="center" style="width:12%;">${pttepImg}</td><th class="center" style="width:52%;">${String(h.title || "").toUpperCase()}</th><td class="center" style="width:18%;">${rightLogos}</td><td style="width:18%;"><strong>DOC NO:</strong> ${h.addvalueDocNo}<br/><strong>REV:</strong> ${h.revision}</td></tr></table>` +
-    `<table><thead><tr>${ths}</tr></thead><tbody>${tbody}</tbody></table>` +
+    `<table>${colgroup}<thead><tr>${ths}</tr></thead><tbody>${tbody}</tbody></table>` +
     `</div></body></html>`
   );
 }
@@ -223,11 +249,23 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
     });
   }, [catalog.records, mrFilter, docTypeFilter, phaseFilter, query]);
 
-  const selectedRow = useMemo(
-    () => catalog.records.find((r) => r.id === selectedId) || filtered[0] || catalog.records[0],
-    [catalog.records, filtered, selectedId]
+  const selectedRow = useMemo(() => {
+    if (filtered.length) return filtered.find((r) => r.id === selectedId) || filtered[0];
+    return (
+      catalog.records.find((r) => (mrFilter === "ALL" || r.mr === mrFilter) && (docTypeFilter === "ALL" || r.docType === docTypeFilter)) ||
+      catalog.records.find((r) => mrFilter === "ALL" || r.mr === mrFilter) ||
+      catalog.records.find((r) => r.id === selectedId) ||
+      catalog.records[0]
+    );
+  }, [catalog.records, filtered, selectedId, mrFilter, docTypeFilter]);
+  const preview = useMemo(
+    () => buildVdrlDocumentPreview0553(selectedRow, { includeAllMrs: mrFilter === "ALL", filterMr: mrFilter !== "ALL" ? mrFilter : null }),
+    [selectedRow, mrFilter]
   );
-  const preview = useMemo(() => buildVdrlDocumentPreview0553(selectedRow), [selectedRow]);
+  const releaseGate = useMemo(
+    () => (preview ? evaluateCustomerReleaseGate(preview, { filterMr: mrFilter !== "ALL" ? mrFilter : null }) : null),
+    [preview, mrFilter]
+  );
 
   return (
     <div className="p55-stack" data-component-key="bid.vdrl">
@@ -349,6 +387,20 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
           </div>
           <p className="p55-note">
             <strong>Template:</strong> {preview.template.name} — {preview.template.purpose}
+            {releaseGate && (
+              <span
+                className="p55-pill"
+                style={{
+                  marginLeft: 8,
+                  background: releaseGate.passed ? "#dcfce7" : "#fee2e2",
+                  color: releaseGate.passed ? "#166534" : "#991b1b",
+                  fontWeight: 700,
+                }}
+              >
+                Pre-Release Gate (VDRL/SDRL G01–G04): {releaseGate.passed ? "PASS" : "BLOCKED"} (
+                {releaseGate.checks.filter((c) => c.passed).length}/{releaseGate.checks.length})
+              </span>
+            )}
           </p>
           <div className="p553-filterbar p553-filterbar--simple" role="tablist" aria-label="VDRL Preview Sheets" style={{ marginBottom: 10 }}>
             <button type="button" className="p553-detail-button" aria-selected={previewTab === "COVER"} onClick={() => setPreviewTab("COVER")}>1. Cover Page</button>
@@ -373,15 +425,15 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
                   <tr><td colSpan={4} style={{ border: "none" }} /><th colSpan={4}>DOCUMENT CLASS: {preview.header.approvalClass || "1"}</th></tr>
                   <tr><th rowSpan={2}>REV</th><th rowSpan={2}>DATE</th><th rowSpan={2}>BY</th><th rowSpan={2}>DESCRIPTION</th><th colSpan={2}>CONTRACTOR APPROVAL</th><th colSpan={2}>COMPANY APPROVAL</th></tr>
                   <tr><th>CHECK</th><th>APPR.</th><th>CHECK</th><th>APPR.</th></tr>
-                  <tr><td>{preview.header.revision}</td><td>21-Nov-26</td><td>ADDV</td><td>{preview.header.purpose}</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+                  <tr><td>{preview.header.revision}</td><td>21-Nov-26</td><td>ADDV</td><td>{preview.header.purpose}</td><td>SY</td><td>SY</td><td>—</td><td>—</td></tr>
                   <tr><td colSpan={8} style={{ textAlign: "center", fontWeight: 600 }}>REVISION CODE: A = Issued for Review – B = Issued for Approval – C = Approved for Construction</td></tr>
                   <tr>
                     <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle" }}><img src="/project0553/logos/logo-pttep.png" alt="PTTEP" style={{ height: 42, width: "auto" }} /></td>
                     <td colSpan={5} style={{ textAlign: "center" }}><strong>PTTEP INTERNATIONAL LIMITED</strong><br />EPCI OF WELLHEAD PLATFORMS, ASSOCIATED PIPELINES AND BROWNFIELD MODIFICATIONS FOR ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</td>
                     <td colSpan={2} rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle" }}>
-                      <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 22, width: "auto", marginRight: 4 }} />
-                      <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 20, width: "auto", marginRight: 4 }} />
-                      <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 22, width: "auto" }} />
+                      <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 17, width: "auto", maxWidth: 72, objectFit: "contain", marginRight: 6 }} />
+                      <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 26, width: "auto", maxWidth: 82, objectFit: "contain", marginRight: 6 }} />
+                      <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 21, width: "auto", maxWidth: 84, objectFit: "contain" }} />
                     </td>
                   </tr>
                   <tr><td colSpan={4} rowSpan={2} style={{ textAlign: "center" }}><strong>{preview.header.addvalueDocNo}</strong></td><th>REV</th></tr>
@@ -391,13 +443,38 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
             </div>
           )}
           {previewTab === "TABULATION" && (
-            <div className="p55-table-wrap">
-              <table className="p55-table p55-table--compact">
-                <thead><tr><th>SHEET</th><th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th></tr></thead>
+            <div className="p55-table-wrap" style={{ border: "1px solid #1e293b", padding: 12, background: "#fff" }}>
+              <h4 style={{ textAlign: "center", margin: "4px 0 8px 0" }}>TABULATION OF REVISED PAGES</h4>
+              <table className="p55-table p55-table--compact" style={{ width: "100%", tableLayout: "fixed", fontSize: "0.72rem" }}>
+                <thead>
+                  <tr>
+                    <th rowSpan={2}>SHEET</th><th colSpan={7}>REVISIONS</th>
+                    <th rowSpan={2} style={{ width: 12, borderTop: "none", borderBottom: "none", background: "transparent" }} />
+                    <th rowSpan={2}>SHEET</th><th colSpan={7}>REVISIONS</th>
+                  </tr>
+                  <tr>
+                    <th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th><th /><th />
+                    <th>A1</th><th>B1</th><th>C1</th><th>C2</th><th>C3</th><th /><th />
+                  </tr>
+                </thead>
                 <tbody>
-                  <tr><td>1 (Cover)</td><td>X</td><td /><td /><td /><td /></tr>
-                  <tr><td>2 (Tabulation)</td><td>X</td><td /><td /><td /><td /></tr>
-                  <tr><td>3 (Data)</td><td>X</td><td /><td /><td /><td /></tr>
+                  {Array.from({ length: 50 }, (_, idx) => {
+                    const n = idx + 1;
+                    const mark = n <= 3 ? "X" : "";
+                    return (
+                      <tr key={n}>
+                        <td>{n}</td><td>{mark}</td><td /><td /><td /><td /><td /><td />
+                        <td style={{ borderTop: "none", borderBottom: "none" }} />
+                        {n <= 40 ? (
+                          <><td>{50 + n}</td><td /><td /><td /><td /><td /><td /><td /></>
+                        ) : n === 41 ? (
+                          <th colSpan={8} style={{ textAlign: "center" }}>ATTACHMENT / APPENDIX</th>
+                        ) : (
+                          <><td>{n - 41}</td><td /><td /><td /><td /><td /><td /><td>{String.fromCharCode(64 + (n - 41))}</td></>
+                        )}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -412,10 +489,10 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
                   </td>
                   <th>ADDVALUE Doc No.</th><td><code>{preview.header.addvalueDocNo}</code></td>
                   <th>Client Doc No.</th><td><code>{preview.header.clientDocNo}</code></td>
-                  <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle", width: 170 }}>
-                    <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 22, width: "auto", marginRight: 6 }} />
-                    <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 20, width: "auto", marginRight: 6 }} />
-                    <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 22, width: "auto" }} />
+                  <td rowSpan={3} style={{ textAlign: "center", verticalAlign: "middle", width: 190 }}>
+                    <img src="/project0553/logos/logo-jutal.png" alt="JUTAL" style={{ height: 17, width: "auto", maxWidth: 72, objectFit: "contain", marginRight: 6 }} />
+                    <img src="/project0553/logos/logo-samtel.jpg" alt="SAMTEL" style={{ height: 26, width: "auto", maxWidth: 82, objectFit: "contain", marginRight: 6 }} />
+                    <img src="/project0553/logos/logo-avs.png" alt="ADDVALUE" style={{ height: 21, width: "auto", maxWidth: 84, objectFit: "contain" }} />
                   </td>
                 </tr>
                 <tr>
@@ -430,20 +507,25 @@ export function VdrlReportWorkspace0553({ onNavigate = null }) {
             </table>
           </div>
           <div className="p55-table-wrap" style={fullHeight ? { overflowX: "auto" } : { maxHeight: 340, overflowY: "auto", overflowX: "auto" }}>
-            <table className="p55-table p55-table--compact" style={{ width: "100%", tableLayout: "auto", fontSize: "0.78rem", lineHeight: 1.35 }}>
+            <table className="p55-table p55-table--compact" style={{ width: "100%", tableLayout: "fixed", fontSize: "0.76rem", lineHeight: 1.35, borderCollapse: "collapse" }}>
+              <colgroup>
+                {getNormalizedColWidths(preview.columns).map((w, idx) => (
+                  <col key={`${preview.columns[idx]}-${idx}`} style={{ width: w }} />
+                ))}
+              </colgroup>
               <thead>
-                <tr>{preview.columns.map((c) => <th key={c} style={{ minWidth: colWidthPct(c), whiteSpace: "normal", wordBreak: "normal", overflowWrap: "break-word", padding: "5px 6px" }}>{c}</th>)}</tr>
+                <tr>{preview.columns.map((c) => <th key={c} style={{ whiteSpace: "normal", wordBreak: "break-word", overflowWrap: "anywhere", padding: "5px 6px" }}>{c}</th>)}</tr>
               </thead>
               <tbody>
-                {groupRowsGfBf(preview).map((g) => (
+                {(preview.grouped || groupAndRenumberVdrlRows(preview)).map((g) => (
                   <React.Fragment key={g.key}>
                     <tr>
                       <td colSpan={preview.columns.length} style={{ background: "#e2e8f0", fontWeight: 700, padding: "6px 8px" }}>
-                        {g.title} ({g.rows.length})
+                        {g.title}
                       </td>
                     </tr>
                     {g.rows.map((row, i) => (
-                      <tr key={`${g.key}-${i}`}>{row.map((cell, j) => <td key={j} style={{ whiteSpace: "normal", wordBreak: "normal", overflowWrap: "break-word", padding: "5px 6px" }}>{cell}</td>)}</tr>
+                      <tr key={`${g.key}-${i}`}>{row.map((cell, j) => <td key={j} style={{ whiteSpace: "normal", wordBreak: "break-word", overflowWrap: "anywhere", padding: "5px 6px" }}>{cell}</td>)}</tr>
                     ))}
                   </React.Fragment>
                 ))}
