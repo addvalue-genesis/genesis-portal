@@ -100,10 +100,10 @@ for(const site of sites){
     r.functionId==="EXISTING_TCAB_REUSE_AND_MODIFICATION"||
     r.functionId==="SCADA_EX_E_PANEL_ASSEMBLY"));
    if(site==="ZWP11"&&t==="TCAB-500-003"){
-    assert.equal(item.procurementQty,0);
-    assert.equal(item.extended,0);
-    assert(m.required.some(r=>r.functionId==="EXISTING_TCAB_REUSE_AND_MODIFICATION"));
-    assert(m.ownerEvidence.notes.some(x=>x.includes("Zero new-panel procurement")));
+    // eb67cb2f: owner confirms one new cabinet at the existing historical rate. The raw ledger stays at procurement zero.
+    assert.equal(item.procurementQty,1);
+    assert.equal(item.extended,39200);
+    assert(String(item.status||"").includes("OWNER_CONFIRMED_MTO_C1_NEW_ENCLOSURE"));
    }
   }
   familyCounts[expected]++;inspected++;

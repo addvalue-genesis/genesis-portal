@@ -6,14 +6,36 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 241100,
+      "amountUSD": 241290,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 7592914.13,
+      "sourceTHB": 7643874.13,
       "sourceModuleId": "bid.budget.bom.system-location-mto",
       "locations": "ZWP20, ZWP21, ZWP22, ZWP23, ZPQ, ZWP8, ZWP11",
-      "mr": "MR-0001"
+      "mr": "MR-0001",
+      "commercialScopeInclusion": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+      "costDerivedSeedUSD": 242700,
+      "commercialPriceHold": {
+        "date": "2026-11-03",
+        "authority": "PROJECT_OWNER_USER",
+        "baseline": "4-Scope of Supply Rev03.xlsx",
+        "revision": "Rev03",
+        "sourceWorkbookSha256": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+        "sourceLibraryFileId": "libfile_01d1763dc65c8191903ca64b2297eeb6",
+        "quotedUSD": {
+          "A1": 241290,
+          "A2": 137130,
+          "A3": 34200
+        },
+        "scope": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+        "internalBudgetTransferAllowed": true,
+        "additionalPartAChargeUSD": 0,
+        "directCostComplete": false,
+        "technicalApproval": false,
+        "customerIssued": false,
+        "note": "Use the owner-provided Rev03 commercial targets with current Source/Working detail. Retain ZWP11 new cabinet cost, superseded LNA nonposting treatment and the restored telephone JB allowance. Allocate current priced rows to Rev03 A1/A2/A3 totals, without changing supplier cost, FX, quantities or markup. The submitted Rev02 archive remains unchanged."
+      }
     },
     {
       "code": "A2",
@@ -21,14 +43,36 @@
       "serviceText": "",
       "qty": 1,
       "unit": "lot",
-      "amountUSD": 137000,
+      "amountUSD": 137130,
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 4314488.1,
+      "sourceTHB": 4088522.84,
       "sourceModuleId": "bid.budget.bom.system-location-mto",
       "locations": "ZWP20, ZWP21, ZWP22",
-      "mr": "MR-0002"
+      "mr": "MR-0002",
+      "commercialScopeInclusion": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+      "costDerivedSeedUSD": 129800,
+      "commercialPriceHold": {
+        "date": "2026-11-03",
+        "authority": "PROJECT_OWNER_USER",
+        "baseline": "4-Scope of Supply Rev03.xlsx",
+        "revision": "Rev03",
+        "sourceWorkbookSha256": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+        "sourceLibraryFileId": "libfile_01d1763dc65c8191903ca64b2297eeb6",
+        "quotedUSD": {
+          "A1": 241290,
+          "A2": 137130,
+          "A3": 34200
+        },
+        "scope": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+        "internalBudgetTransferAllowed": true,
+        "additionalPartAChargeUSD": 0,
+        "directCostComplete": false,
+        "technicalApproval": false,
+        "customerIssued": false,
+        "note": "Use the owner-provided Rev03 commercial targets with current Source/Working detail. Retain ZWP11 new cabinet cost, superseded LNA nonposting treatment and the restored telephone JB allowance. Allocate current priced rows to Rev03 A1/A2/A3 totals, without changing supplier cost, FX, quantities or markup. The submitted Rev02 archive remains unchanged."
+      }
     },
     {
       "code": "A3",
@@ -40,10 +84,32 @@
       "offerTreatment": null,
       "priceText": null,
       "commercialRemark": "",
-      "sourceTHB": 1076400,
+      "sourceTHB": 1203800,
       "sourceModuleId": "bid.budget.bom.system-location-mto",
       "locations": "ZWP20, ZWP21, ZWP22, ZWP23",
-      "mr": "MR-0003"
+      "mr": "MR-0003",
+      "commercialScopeInclusion": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+      "costDerivedSeedUSD": 38300,
+      "commercialPriceHold": {
+        "date": "2026-11-03",
+        "authority": "PROJECT_OWNER_USER",
+        "baseline": "4-Scope of Supply Rev03.xlsx",
+        "revision": "Rev03",
+        "sourceWorkbookSha256": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+        "sourceLibraryFileId": "libfile_01d1763dc65c8191903ca64b2297eeb6",
+        "quotedUSD": {
+          "A1": 241290,
+          "A2": 137130,
+          "A3": 34200
+        },
+        "scope": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+        "internalBudgetTransferAllowed": true,
+        "additionalPartAChargeUSD": 0,
+        "directCostComplete": false,
+        "technicalApproval": false,
+        "customerIssued": false,
+        "note": "Use the owner-provided Rev03 commercial targets with current Source/Working detail. Retain ZWP11 new cabinet cost, superseded LNA nonposting treatment and the restored telephone JB allowance. Allocate current priced rows to Rev03 A1/A2/A3 totals, without changing supplier cost, FX, quantities or markup. The submitted Rev02 archive remains unchanged."
+      }
     },
     {
       "code": "A4",
@@ -58,7 +124,8 @@
       "sourceTHB": 9213750,
       "sourceModuleId": "bid.budget.bom.system-location-mto",
       "locations": "ZWP20, ZWP21, ZWP22",
-      "mr": "MR-0004"
+      "mr": "MR-0004",
+      "commercialScopeInclusion": "Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge"
     }
   ],
   "b": [

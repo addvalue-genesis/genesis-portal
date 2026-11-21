@@ -28,14 +28,13 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
  const totalRows=groups.reduce((sum,g)=>sum+g.rows.length,0);
  const setAll=isOpen=>root.current?.querySelectorAll("details.p553-rsn-group, details.p553-rsn-leaf")
   .forEach(node=>{node.open=isOpen;});
- return <section className="p55-panel p553-rsn" ref={root}
+ return <details className="p55-panel p553-rsn p553-budget-phase" ref={root}
   data-component-key="bid.budget.pricing.release.source-navigator">
+  <summary><strong>10.3 — Color-coded Module Link Navigator</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.source-navigator"/> <small>{totalRows} linked category rows (A1–A4, B1–B14, C1–C2)</small></summary>
   <div className="p553-rsn-header">
    <div>
-    <h4>10.3 — Color-coded Module Link Navigator</h4>
     <p className="p55-note">Click the colored Module ID to open the exact selected 10.1/10.2 source.
      Colors identify the work type, not release approval. Expand/collapse shows source trace without posting another price.</p>
-    <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.source-navigator"/>
    </div>
    <div className="p553-rsn-actions">
     <button type="button" onClick={()=>setAll(true)}>＋ Expand All</button>
@@ -102,5 +101,5 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
   </details>)}
   <p className="p55-note">{totalRows} linked category rows from the SAME releaseModel (A1–A4, B1–B14, C1–C2).
    B3 working price does not change by opening a source. Not a released quotation.</p>
- </section>;
+ </details>;
 }

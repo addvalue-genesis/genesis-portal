@@ -8,6 +8,7 @@ import {selectB3WorkingSellBreakdown0553} from "./b3WorkingSellBreakdown0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {WORKING_PRICE_ROW_CLASSES_0553 as C,validateWorkingHierarchyPriceTable0553} from "./workingModulePriceTableContract0553";
+import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 
 const ROOT="bid.budget.working.bc.b3";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -121,7 +122,8 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  const totalSell=round(groups.reduce((n,g)=>n+g.workingSellTHB,0));
  const vendorUSD=round(groups.reduce((n,g)=>n+g.vendorQuoteUSD,0));
  const groupsAsExpected={fat:452850,sat:1839600,tools:30000,audit:0};
- if(totalSell!==2322450||totalSell!==b.totalWorkingSellTHB||
+ const dossierRollupTHB=selectB3ResourcePriceDossier0553(workingRow).rollupTotalTHB;
+ if(totalSell!==dossierRollupTHB||totalSell!==b.totalWorkingSellTHB||
   vendorUSD!==0||
   groups.some(g=>g.workingSellTHB!==groupsAsExpected[g.kind])||
   groups.flatMap(g=>g.items).filter(x=>[C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length!==4||

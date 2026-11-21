@@ -133,7 +133,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
  }
  assertOptions(nativeScope);
- assert(cell(nativeScope,"G38").includes("<v>28159255.1</v>"));
+ assert(cell(nativeScope,"G38").includes("<v>28387130.59</v>"));
  assert(cell(nativeScope,"A38").includes("B4, B11, B12"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
@@ -184,12 +184,20 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   const cleanXml=decoder.decode(await api.readEntry(cleanEntry));
   assert(!cleanXml.includes('OBSOLETE EQUIPMENT')&&!cleanXml.includes('<v>987648</v>'));
   assert(cell(cleanXml,'E7').includes('<v>4</v>'),'Reused template must not inflate MR lot count');
-  assert.deepEqual(after.map(x=>x.name),before.map(x=>x.name));
+  assert.deepEqual(after.map(x=>x.name),before.map(x=>x.name).filter(name=>name!=="xl/calcChain.xml"));
+  assert.ok(!after.some(entry=>entry.name==="xl/calcChain.xml"));
   const normalizeCells=xml=>xml.replace(/<c\b([^>]*?)(?:\s*\/>|>[\s\S]*?<\/c>)/g,
    (_,attrs)=>'<c'+attrs.replace(/\s+t="[^"]*"/g,"")+'/>');
-  for(let i=0;i<before.length;i++){
-   const a=await api.readEntry(before[i]),b=await api.readEntry(after[i]);
-   if(before[i].name==='xl/styles.xml'){
+  for(const entry of before){
+   if(entry.name==="xl/calcChain.xml")continue;
+   const next=after.find(item=>item.name===entry.name);
+   assert.ok(next,"Exported workbook dropped "+entry.name);
+   const a=await api.readEntry(entry),b=await api.readEntry(next);
+   if(entry.name==="[Content_Types].xml"||entry.name==="xl/_rels/workbook.xml.rels"){
+    assert.ok(!decoder.decode(b).includes("calcChain"),entry.name+" still names calcChain");
+    continue;
+   }
+   if(entry.name==='xl/styles.xml'){
     const oldStyles=decoder.decode(a),newStyles=decoder.decode(b);
     const xfSection=newStyles.match(/<cellXfs count="(\d+)">([\s\S]*?)<\/cellXfs>/);
     assert.equal(Number(xfSection[1]),(xfSection[2].match(/<xf\b/g)||[]).length,'Style ids must match actual XF elements');
@@ -199,21 +207,21 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
     }
     continue;
    }
-   if(!/^xl\/worksheets\/sheet[1-6]\.xml$/.test(before[i].name)){
-    assert.deepEqual(Array.from(b),Array.from(a),"Unrelated native part changed "+before[i].name);continue;
+   if(!/^xl\/worksheets\/sheet[1-6]\.xml$/.test(entry.name)){
+    assert.deepEqual(Array.from(b),Array.from(a),"Unrelated native part changed "+entry.name);continue;
    }
    const oldXml=decoder.decode(a),newXml=decoder.decode(b);
    const structure=xml=>normalizeCells(xml).replace(/<row\b[^>]*>/g,t=>t.replace(/\s(?:ht|customHeight)="[^"]*"/g,'')).replace(/<c\b[^>]*>/g,t=>t.replace(/\ss="[^"]*"/g,''));
-   if(before[i].name==="xl/worksheets/sheet4.xml"){
+   if(entry.name==="xl/worksheets/sheet4.xml"){
     const refs=xml=>[...xml.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
     assert(refs(oldXml).every(ref=>refs(newXml).includes(ref)),"B13 preserves original merges");
     assert.equal(refs(newXml).length,refs(oldXml).length,"B13 export preserves only original merges");
     const withoutMerges=xml=>structure(xml).replace(/<mergeCells\b[^>]*>[\s\S]*?<\/mergeCells>/,'');
     assert.equal(withoutMerges(newXml),withoutMerges(oldXml),"B13 preserves non-merge structure");
-   }else assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);
+   }else assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+entry.name);
    const formulas=xml=>xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[];
    assert.deepEqual(formulas(newXml),formulas(oldXml),'Native formulas preserved');
-   const index=Number(before[i].name.match(/sheet(\d+)/)[1]);
+   const index=Number(entry.name.match(/sheet(\d+)/)[1]);
    if(index===1){
     assert(cell(newXml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'),'Original quantity formula cache must reflect four current MR lots');
     for(let part=0;part<4;part++)assert(cell(newXml,'D'+(8+part)).includes('Locations: '+[...new Set(real.a[part].sourceRows.map(r=>r.site))].join(', ')));
@@ -229,7 +237,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")));
     }
     assertOptions(newXml);
-    assert(cell(newXml,"G38").includes("<v>28159255.1</v>"));
+    assert(cell(newXml,"G38").includes("<v>28387130.59</v>"));
     assert(cell(newXml,"A38").includes("B4, B11, B12"));
    }else{
     const code=annexCodes[index-2];

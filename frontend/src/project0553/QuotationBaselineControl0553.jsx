@@ -30,7 +30,7 @@ export function QuotationBaselineControl0553({mode,reference,source,onSelectReco
   const backupContent=await serializeBaselineRegister(next);
   await commitBaselineRegister(QUOTATION_SCOPE_0553,register.version,next);setRegister(next);setDiff(null);
   if(!withBackup){setMessage("บันทึกเหตุการณ์เริ่มดาวน์โหลดแล้ว สามารถดาวน์โหลดทะเบียนสำรองล่าสุดเพิ่มเติมได้");return;}
-  try{downloadBaselineBlob(new Blob([backupContent],{type:"application/json"}),"PJ2608-0553_QuotationRegister_INTERNAL_"+new Date().toISOString().replace(/[:.]/g,"-")+".json");setMessage("บันทึกในเบราว์เซอร์แล้ว และเริ่มดาวน์โหลดไฟล์สำรอง โปรดเก็บไฟล์ INTERNAL นี้เพื่อย้ายเครื่อง/กู้คืน");}
+  try{downloadBaselineBlob(new Blob([backupContent],{type:"application/json"}),"PJ2608-0553_QuotationRegister_INTERNAL_"+new Date().toISOString().replace(/[:.]/g,"-")+".json");setMessage("บันทึกในเบราว์เซอร์แล้ว และเริ่มดาวน์โหลดไฟล์สำรอง โปรดเก็บไฟล์สำรองนี้เพื่อย้ายเครื่อง/กู้คืน");}
   catch(e){setError("บันทึกในเบราว์เซอร์แล้ว แต่สำรองไม่สำเร็จ: "+e.message+" — กดดาวน์โหลดสำรองอีกครั้ง");}
  };
  const capture=()=>perform(async()=>{
@@ -75,7 +75,7 @@ export function QuotationBaselineControl0553({mode,reference,source,onSelectReco
  };
  return <details ref={panel} className="p55-panel p553-quotation-baseline">
   <summary><strong>ฉบับที่เลือกใช้จริง / ประวัติราคา</strong> · {lastUsed?"ใช้จริง: "+lastUsed.label:selected?"เลือกไว้: "+selected.label:"ยังไม่ได้บันทึกฉบับใช้จริง"}</summary>
-  <p>เก็บในเบราว์เซอร์นี้ พร้อมไฟล์สำรอง INTERNAL สำหรับย้ายเครื่อง ยังไม่ซิงก์ฐานข้อมูลกลาง การบันทึก/ดาวน์โหลดไม่ใช่การส่งหรืออนุมัติข้อเสนอ</p>
+  <p>เก็บในเบราว์เซอร์นี้ พร้อมไฟล์สำรองสำหรับย้ายเครื่อง ยังไม่ซิงก์ฐานข้อมูลกลาง การบันทึก/ดาวน์โหลดไม่ใช่การส่งหรืออนุมัติข้อเสนอ</p>
   <p>ฉบับที่เลือก: <strong>{selected?selected.label:"ยังไม่มีรายการบันทึก"}</strong><br/>
    ใช้จริงล่าสุดที่บันทึก: <strong>{lastUsed?lastUsed.label:"ยังไม่ได้ยืนยัน"}</strong>
    {lastUseEvent&&<> · ผู้บันทึก {lastUseEvent.actor} · วันใช้จริง {lastUseEvent.occurredAt||"ไม่ทราบ"} · บันทึกเมื่อ {lastUseEvent.recordedAt}</>}</p>
@@ -98,7 +98,7 @@ export function QuotationBaselineControl0553({mode,reference,source,onSelectReco
    <label>ใช้เพื่ออะไร <input value={purpose} onChange={e=>setPurpose(e.target.value)} maxLength={400} disabled={busy}/></label>
    <button type="button" className="p553-detail-button" disabled={busy||!selected||mode!=="RECORDED"} onClick={attest}>ยืนยันว่าใช้ฉบับที่เลือกนี้จริง + สำรอง</button>
   </div>
-  <p><button type="button" className="p553-detail-button" disabled={busy||!register} onClick={()=>perform(()=>backup(register))}>ดาวน์โหลดทะเบียนสำรอง INTERNAL</button>{" "}
+  <p><button type="button" className="p553-detail-button" disabled={busy||!register} onClick={()=>perform(()=>backup(register))}>ดาวน์โหลดทะเบียนสำรอง</button>{" "}
    <button type="button" className="p553-detail-button" disabled={busy||!register} onClick={()=>fileInput.current.click()}>นำเข้าทะเบียนจากไฟล์สำรอง</button>
    <input ref={fileInput} type="file" accept=".json,application/json" onChange={restore} style={{display:"none"}}/>
    {busy&&" กำลังตรวจและบันทึก…"}</p>
@@ -106,7 +106,7 @@ export function QuotationBaselineControl0553({mode,reference,source,onSelectReco
   {diff&&<div><p>Working input / policy / software build ต่างจากตอนตรึง <strong>{diff.count}</strong> จุด ฉบับที่บันทึกยังคงเดิม{diff.truncated?" · แสดง100จุดแรก":""}</p>
    {!!diff.changes.length&&<div className="p553-sheet-scroll"><table className="p553-customer-table"><thead><tr><th>ตำแหน่ง</th><th>ตอนตรึง</th><th>Working ปัจจุบัน</th></tr></thead><tbody>{diff.changes.map((d,i)=><tr key={i}><td>{d.path}</td><td>{d.before?.slice(0,180)}</td><td>{d.after?.slice(0,180)}</td></tr>)}</tbody></table></div>}</div>}
   {selected&&<details open><summary>ไฟล์เดิมที่ตรึงไว้ / ประวัติการเลือกและใช้</summary>
-   <p>ไฟล์ที่ระบุ INTERNAL และทะเบียนสำรองมีข้อมูลต้นทุน/บริบทภายใน ไม่ใช่เอกสารสำหรับลูกค้า</p>
+   <p>ไฟล์สำรองและทะเบียนสำรองมีข้อมูลต้นทุน/บริบทภายใน ไม่ใช่เอกสารสำหรับลูกค้า</p>
    {selected.artifacts.map(a=><p key={a.id}><button type="button" className="p553-detail-button" disabled={busy} onClick={()=>downloadArtifact(a)}>{a.audience} · {a.filename}</button><br/><small>SHA-256: <code>{a.sha256}</code></small></p>)}
    <table className="p553-customer-table"><thead><tr><th>เหตุการณ์</th><th>ฉบับ</th><th>ผู้บันทึก / เวลา</th><th>วันใช้ / เหตุผล</th></tr></thead><tbody>{register.events.map(e=><tr key={e.id}><td>{e.type}</td><td>{register.records.find(r=>r.id===e.revisionId)?.label}</td><td>{e.actor}<br/>{e.recordedAt}</td><td>{e.occurredAt||"ไม่ระบุ"}<br/>{e.purpose}</td></tr>)}</tbody></table>
   </details>}

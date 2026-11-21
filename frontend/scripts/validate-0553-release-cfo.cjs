@@ -5,7 +5,7 @@ const base=path.resolve(__dirname,"../src/project0553");
 const file=(rel)=>fs.readFileSync(path.join(base,rel),"utf8");
 const source=file("data/releaseCommercialModel0553.js");
 const isolated=source.replace(/^import .*?;\s*$/gm,"").replace(/\bexport /g,"");
-const sandbox={};vm.runInNewContext(isolated+";this.calc={priceAorCFromCost0553,priceBWorkingSell0553,buildPartATagGroupBreakdown0553,buildAnnexWorkingPriceBridge0553};",sandbox);
+const sandbox={PART_AC_OMISSION_RESERVE_PCT_0553:5};vm.runInNewContext(isolated+";this.calc={priceAorCFromCost0553,priceBWorkingSell0553,buildPartATagGroupBreakdown0553,buildAnnexWorkingPriceBridge0553};",sandbox);
 const ac=sandbox.calc.priceAorCFromCost0553(100);
 assert.equal(ac.customerSellTHB,130);
 assert.equal(ac.samTelShareTHB,20);
@@ -157,7 +157,7 @@ assert.match(workspace,/data-component-key="bid\.budget\.pricing\.budgetary"/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.temp\.customer-proposal"/);
 assert.match(workspace,/data-component-key="bid\.budget\.working\.bc"/);
 assert.match(workspace,/data-component-key="bid\.budget\.scope"/);
-assert.match(workspace,/10\.2 B3 selected Working SELL does not match 10\.3 Release Preview/);
+assert.match(workspace,/10\.2 B3 Item 7 does not match 10\.3 Release Item 7 × SAMTEL engineering service markup/);
 assert.ok(!workspace.includes('PRICING_VIEWS_0553.map(view=>'),
  "Do not show three competing Pricing buttons");
 assert.ok(!workspace.includes('mode==="budgetary"')&&!workspace.includes('mode==="released"'),
@@ -186,7 +186,7 @@ assert.match(ui,/10\.1.*10\.3|10\.1 \/ 10\.3/);
 assert.match(ui,/10\.2 B1–B14 Working Sell/);
 assert.match(ui,/15 item rows|15 slots|15 item/);
 assert.match(ui,/buyer must accept group-level TAG mapping/);
-assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
+assert.match(ui,/const \[viewer,setViewer\]=useState\(recipient==="INTERNAL"\?"INTERNAL":"CUSTOMER"\)/);
 assert.match(ui,/Export Excel — WORKING DRAFT/);
 assert.match(ui,/Final Customer Release — HOLD/);
 assert.match(ui,/buildNativeWorkingDraft0553\(file,model\)/);

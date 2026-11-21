@@ -9,7 +9,7 @@ const {allocateBreakdown0553,breakdownKey0553,buildCustomerPriceBreakdown0553,cu
 const {buildNativePriceBreakdown0553}=require('../src/project0553/nativePriceBreakdown0553');
 const {buildNativeOfficialRelease0553,entriesFromZip,readEntry}=require('../src/project0553/nativeWorkingDraft0553');
 const source=buildReleaseCommercialModel0553({thbPerUsd:31.5}),official=buildOfficialUsdRelease0553(source),before=JSON.stringify(source),model=buildCustomerPriceBreakdown0553(source,official);
-assert.equal(official.totalUSD,894590);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
+assert.equal(official.totalUSD,903710);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
 assert.equal(model.baselineState,'SUBMITTED_PROPOSAL_NOT_VERIFIED');
 for(const group of model.groups){
  const canonical=selectWorkingBomProjection0553({mr:group.mr}).lines;
@@ -35,7 +35,7 @@ assert.throws(()=>buildCustomerPriceBreakdown0553({...source,a:source.a.map((r,i
 const {renderToStaticMarkup}=require('react-dom/server'),React=require('react');
 const {CustomerPriceBreakdown0553}=require('../src/project0553/CustomerPriceBreakdown0553');
 const html=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official}));
-assert(html.includes('NOT VERIFIED'));assert.equal((html.match(/data-breakdown-key=/g)||[]).length,model.groups.reduce((s,g)=>s+g.rows.length,0));
+assert(html.includes('Price totals reconcile; technical and supplier scope review remains open.'));assert.equal((html.match(/data-breakdown-key=/g)||[]).length,model.groups.reduce((s,g)=>s+g.rows.length,0));
 assert(!html.includes('data-price-detail='),'Default hides detail price cells from the DOM');
 const detailedHtml=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official,showPriceDetails:true}));
 assert.equal((detailedHtml.match(/data-price-detail=/g)||[]).length,282);
@@ -69,7 +69,7 @@ for(const showPriceDetails of [false,true]){
  assert(!customer.includes('data-breakdown-key='));
  assert(!customer.includes('↗ Source'));
  for(const term of ['MGW R2','customerSellTHB','EXION','MANAGEMENT_SELECTED','parentPackage'])assert(!customer.includes(term),'customer presentation leaked '+term);
- assert(customer.includes('NOT VERIFIED'));
+ assert(customer.includes('Price totals reconcile; technical and supplier scope review remains open.'));
 }
 assert.equal(JSON.stringify(source),before);
 (async()=>{

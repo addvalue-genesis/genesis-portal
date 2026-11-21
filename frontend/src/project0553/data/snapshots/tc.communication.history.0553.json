@@ -1,0 +1,598 @@
+{
+  "schemaVersion": "0553-tc-history-v1",
+  "folderUrl": "https://drive.google.com/drive/folders/1I9InBXnxFvTm82EI3lf4HHreMcYxXoIM",
+  "documents": [
+    {
+      "id": "TC-0001-IN-20261014",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "date": "2026-10-14",
+      "direction": "JUTAL (GCME) -> SAMTEL -> ADDVALUE",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0001_SAMTEL_20261014.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "file": "TC-0001_20261014.xlsx"
+    },
+    {
+      "id": "TC-0001-OUT-20261019",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "date": "2026-10-19",
+      "direction": "ADDVALUE -> SAMTEL -> JUTAL (GCME)",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0001_SAMTEL_JUTAL_20261019.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "file": "TC-0001_20261019.xlsx"
+    },
+    {
+      "id": "TC-0002-IN-20261009",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "date": "2026-10-09",
+      "direction": "JUTAL (GCME) -> SAMTEL -> ADDVALUE",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0002_SAMTEL_20261009.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1-YXFHJ7OjZnMAEpTCOH5-WX3qNdSAOog/edit",
+      "file": null
+    },
+    {
+      "id": "TC-0002-IN-20261014",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "date": "2026-10-14",
+      "direction": "JUTAL (GCME) -> SAMTEL -> ADDVALUE",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0002_SAMTEL_20261014.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "file": "TC-0002_20261014.xlsx"
+    },
+    {
+      "id": "TC-0002-OUT-20261019",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "date": "2026-10-19",
+      "direction": "ADDVALUE -> SAMTEL -> JUTAL (GCME)",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0002_SAMTEL_JUTAL_20261019.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "file": "TC-0002_20261019.xlsx"
+    },
+    {
+      "id": "TC-0003-IN-20261014",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "date": "2026-10-14",
+      "direction": "JUTAL (GCME) -> SAMTEL -> ADDVALUE",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0003_SAMTEL_20261014.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "file": "TC-0003_20261014.xlsx"
+    },
+    {
+      "id": "TC-0003-OUT-20261019",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "date": "2026-10-19",
+      "direction": "ADDVALUE -> SAMTEL -> JUTAL (GCME)",
+      "name": "MM-ZTK-1F-GEN-TEL-TC-0003_SAMTEL_JUTAL_20261019.xlsx",
+      "url": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "file": "TC-0003_20261019.xlsx"
+    }
+  ],
+  "items": [
+    {
+      "id": "TC-0001-1",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "1",
+      "subject": "Path Calculation Criteria",
+      "reference": "MM-ZTK-1F-GEN-SCADA-TEL-CAL-0001_Rev00",
+      "question": "As bidder use %F1=100 to calculation. If the first fresnal zone (F1) criterail reduce to 60% what will be reduce for antenna size?",
+      "vendorResponse": "- Bidder confirms that the ZPQ–ZWP8 link has been reviewed using 60% First Fresnel Zone (F1) clearance criteria. - The antenna size can be reduced to 4 ft at both ZPQ and ZWP8 while maintaining the required link performance. The design basis achieves annual link availability better than 99.99% at the applicable modulation. - The revised Link Budget / Pathloss Calculation reflecting the final proposed equipment shall be submitted separately.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-2",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "2",
+      "subject": "ZWP-8 / ZPQ PTMP",
+      "reference": "MM-ZTK-1F-GEN-SCADA-TEL-CAL-0001_Rev00/ MM-ZTK-1F-GEN-SCADA-TEL-MTO-0001_Rev00",
+      "question": "Bidder shall confirm to propose antenna 6 ft / 6 ft (SPD6-5.2 / SPD6-5.2)",
+      "vendorResponse": "- Bidder proposes 4 ft / 4 ft parabolic antennas for the ZPQ–ZWP8 PTP link replacing the previously indicated 6 ft / 6 ft antennas. - The proposed 4 ft / 4 ft configuration is supported by the project communication-link design basis using 60% F1 clearance and annual link availability better than 99.99%.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-3",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "3",
+      "subject": "Power supply 230VAC at ZPQ",
+      "reference": "",
+      "question": "Bidder shall be provide telecom equipment with power supply 230VAC at ZPQ",
+      "vendorResponse": "- Comply. Bidder shall provide the SCADA telecom equipment at ZPQ suitable for the available 230 VAC power supply. - The proposed AC PoE power supply accepts 100–240 VAC, 50–60 Hz input.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": false
+      }
+    },
+    {
+      "id": "TC-0001-4",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "4",
+      "subject": "Import license and operating license",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0001",
+      "question": "- Bidder shall provide import license and operating license of the radio equipment (including antenna, peripherals and accessories) for importing the radio equipment into Myanmar - Bidder shall be responsible for any necessary Approvals that may require before importing to Thailand for assembly, FAT, etc. and exporting the complete telecom equipment to China where the construction yard is located.",
+      "vendorResponse": "- Comply. Bidder shall obtain the applicable Myanmar import licence, type approval (if required) and operating licence for the SCADA Radio Package on behalf of COMPANY. - Applicable approvals required for import to Thailand for assembly/FAT and subsequent export to China shall be arranged by Bidder.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-5",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "5",
+      "subject": "Import license and operating license",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0001",
+      "question": "- Optional Scope: Bidder shall be responsible for any necessary Approvals that may require to import to China Fabrication Yard and export from China to Myanmar where the platforms are located",
+      "vendorResponse": "- Optional scope. Import formalities into China Fabrication Yard and subsequent export formalities from China shall be under JUTAL's scope. - Myanmar import licence, type approval (if required) and operating licence shall be obtained by Bidder on behalf of COMPANY.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-6",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "6",
+      "subject": "NETWORK MANAGEMENT SYSTEM (NMS)",
+      "reference": "",
+      "question": "NMS shall be license extension of existing NMS at ZPQ. The numbers sensor provision shall be specified in EPCI stage Confirmed license suffificient from site survey",
+      "vendorResponse": "- Comply. Bidder confirms that the proposed NMS scope shall be an extension of the existing NMS at ZPQ. - The existing NMS licence capacity has been confirmed as sufficient based on the site survey; no additional NMS licence is required for the proposed scope.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-7",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "7",
+      "subject": "Section 6.6.1.1 Coaxial Cable for normal equipmen",
+      "reference": "MM-ZTK-1F-GEN-TEL-SPE-0001",
+      "question": "The cables shall be at least flame retardant as per IEC 60332-1-2, IEC-60332-3-22 Category A and fire resistant as per IEC-60331",
+      "vendorResponse": "- Bidder proposes RFS LCF12-50JFN 1/2 in. CELLFLEX coaxial cable for the RF application. - The proposed cable is flame-retardant and LSZH, complying with IEC 60332-1-2 and IEC 60332-3-24 (Category C). - Bidder requests acceptance of the proposed cable.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-8",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "8",
+      "subject": "Section 6.6.2 ETHERNET CABLE",
+      "reference": "MM-ZTK-1F-GEN-TEL-SPE-0001",
+      "question": "CAT6A shall be Fire Retardant cable with LSZH, constructed with 4 individually foil-shielded twisted pairs. Steel braid armor is required for outdoor cable. The cables shall be at least flame retardant as per IEC- 60332-3-22 Category A and fire resistant as per IEC- 60331. Fire resistant cables shall withstand a flame test at 750 °C temperature for 90 minutes as per IEC-61892- 4 Clause 4.14.",
+      "vendorResponse": "- Bidder proposes Tecnikabel TKSEA ARMOURED LAN S/FTP 23AWG FLEX LSZH Cable, Cat.6A, for the outdoor Ethernet cable application. - The proposed cable is S/FTP with individually screened pairs, braided armour and LSZH/SHF1 outer sheath; the manufacturer datasheet confirms IEC 60332-1-2 and IEC 60332-3-22 flame performance. - Compliance with IEC 60331 and IEC 61892-4 Clause 4.14 (750 °C / 90 min) is not stated in the submitted manufacturer datasheet and shall be subject to confirmation.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-9",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "9",
+      "subject": "Brownfiled Equipment and Materail Deliverable",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0001",
+      "question": "Bidder shall recommend to delivery location for Brownfield Equipment",
+      "vendorResponse": "- Recommended delivery location for Brownfield equipment: Nonthaburi, Thailand.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-10",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "10",
+      "subject": "Delivery Time",
+      "reference": "",
+      "question": "Bidder shall be provide the delivery time for SCADA Radio System",
+      "vendorResponse": "- Delivery time: 22–24 weeks, DAP Nonthaburi, Thailand.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-11",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "11",
+      "subject": "Warranty Period",
+      "reference": "",
+      "question": "Bidder shall be provide the warranty period for SCADA Radio System",
+      "vendorResponse": "- Warranty period: Sixty (60) months worldwide warranty for the RDL3000 radio equipment.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0001-13",
+      "doc": "TC-0001",
+      "mr": "MR-0001",
+      "itemNo": "13",
+      "subject": "Layer 3 Switch",
+      "reference": "MM-ZTK-1F-GEN-TEL-SPE-0001",
+      "question": "As revised design for Trunk Radio, the Layer 3 Switch shall be reduce for 8 port. Bidder shall revised for quotation",
+      "vendorResponse": "",
+      "clientResponse": "",
+      "reply20261019": "• Revised Layer 3 switch: Cisco IE-3400-8P2S-E (8 Ethernet access ports and 2 SFP uplink ports). • Expansion Module: excluded from the revised scope of supply. • Expansion SmartNet: support associated with the Expansion Module is excluded accordingly. • The corresponding bill of materials and quotation shall be revised to reflect this reduction. The IE-3400-8P2S-E base switch remains included.",
+      "status": "REVISED_SENT_20261019",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1d5ojrUmUbiktKlz_visIUdNSzysvSdkc/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1ojfTwNKdGeVwhFpdPTCpGEiPaKQvatg5/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-1",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "1",
+      "subject": "Import license and operating license",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0002",
+      "question": "- Bidder shall provide import license and operating license of the radio equipment (including antenna, peripherals and accessories) for importing the radio equipment into Myanmar - Bidder shall be responsible for any necessary Approvals that may require before importing to Thailand for assembly, FAT, etc. and exporting the complete telecom equipment to China where the construction yard is located.",
+      "vendorResponse": "- Comply. Bidder shall obtain the applicable Myanmar import licence, type approval (if required) and operating licence for the Trunk Radio Package on behalf of COMPANY. - Applicable approvals required for import to Thailand for assembly/FAT and subsequent export to China shall be arranged by Bidder.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-2",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "2",
+      "subject": "Import license and operating license",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0002",
+      "question": "- Optional Scope: Bidder shall be responsible for any necessary Approvals that may require to import to China Fabrication Yard and export from China to Myanmar where the platforms are located.",
+      "vendorResponse": "- Optional scope. Import formalities into China Fabrication Yard and subsequent export formalities from China shall be under JUTAL's scope. - Myanmar import licence, type approval (if required) and operating licence shall be obtained by Bidder on behalf of COMPANY.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-3",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "3",
+      "subject": "DMR Coverage Calculation",
+      "reference": "MM-ZTK-1F-GEN-TEL-MR-0002",
+      "question": "c) Design and supply of TRUNK RADIO PACKAGE complete with required VENDOR to perform link budget calculation base on VENDOR's selected components to verify to design report for communication link and accessories as specified in TRUNK Radio data sheets, specifications and other documents listed in PCL (Package Contents Listing); - Requir Bidder to perform Link Budget Calculation for exsiting DMR from ZPQ following site surver Detail.",
+      "vendorResponse": "- Comply. The required Link Budget Calculation is under preparation based on the selected components and available site survey data.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-4",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "4",
+      "subject": "RF Surge Arrestor and Exd Enclosure for RF Surge",
+      "reference": "",
+      "question": "- Not require RF Surge Arresstor Exd Enclosure - RF Surge Arrestors will be installed in Exd LNA Enclousure because of short distance between LNA Enclousure and Antennas",
+      "vendorResponse": "- Comply. Separate Ex d enclosure for the RF Surge Arrestors is not required. - RF Surge Arrestors shall be installed within the LNA enclosure as specified.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-5",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "5",
+      "subject": "DMR Amplifier",
+      "reference": "MM-ZTK-1F-GEN-DMR-TEL-MTO-0001_Rev00",
+      "question": "- Bidder shall be specify the DMR Amplifier Manufacture and Model, include datasheet and catalogue - Existing Equipment, ZPQ ICT used Low Noise Amplifier (LNA) : RFI, RXxxxx-2002-11 Series for 380-520 MHz.",
+      "vendorResponse": "- Comply. Bidder proposes RFI RX3852-2002-11 Low Noise Amplifier (LNA), 380-520 MHz, 40 dB maximum adjustable gain, NF <=2 dB, OIP3 >45 dBm. - Manufacturer datasheet/catalogue is provided with the technical submission.",
+      "clientResponse": "Noted",
+      "reply20261019": "• Revised proposal: RFI BD4345-00N0-AC Bi-Directional Amplifier (BDA), in lieu of the previously proposed LNA. • Frequency: 430–450 MHz; 1.5 MHz passband; adjustable gain 38–67 dB; maximum output power +21 dBm per carrier (single carrier). • Proposed with Ex d protective enclosure (Warom HRMD95-VIIIB). Differences are recorded under Deviation List Item 1.1. Final DMR frequency compatibility, RF link budget and Ex/IP conformity shall be verified during detailed engineering.",
+      "status": "REVISED_SENT_20261019",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-6",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "6",
+      "subject": "Delivery Time",
+      "reference": "",
+      "question": "Bidder shall be provide the delivery time for Trunk Radio System",
+      "vendorResponse": "- Delivery 240 Days",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-7",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "7",
+      "subject": "Warranty Period",
+      "reference": "",
+      "question": "Bidder shall be provide the delivery time for Trunk Radio System",
+      "vendorResponse": "- Warranty 1 year",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": false,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-8",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "8",
+      "subject": "Yagi Antenna",
+      "reference": "",
+      "question": "Bidder shall be confirm for 3 element Yagi antenna, 6 dBd that can be sent the signal to ZPQ",
+      "vendorResponse": "- Bidder proposes Sinclair SY303-SF3SNM(ABK), 3-element Yagi antenna, 380–400 MHz, 6 dBd (8.1 dBi), VSWR ≤1.5:1. - Suitability for the ZWP–ZPQ path shall be confirmed by the DMR link budget / coverage calculation.",
+      "clientResponse": "Not accepte for this antenna",
+      "reply20261019": "• Revised proposal: RFI YBSS6-99, 6-element marine-grade SS316 Yagi antenna, 11 dBi (9 dBd) nominal gain, N-female connector. • Operating frequency to be factory tuned within 350–600 MHz (5% tuned bandwidth). Final VSWR and ZWP–ZPQ link performance shall be verified for the assigned DMR channels. • Replaces the previously proposed 3-element antenna; refer to Deviation List Item 1.1.",
+      "status": "REVISED_SENT_20261019",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0002-9",
+      "doc": "TC-0002",
+      "mr": "MR-0002",
+      "itemNo": "9",
+      "subject": "Omni Antenna",
+      "reference": "",
+      "question": "Bidder shall be specify model/brand and catalogue for Omni antenna",
+      "vendorResponse": "- Bidder proposes Sinclair SC343-HF3SNF collinear omni antenna, 380–400 MHz, 3 dBd (5.1 dBi). - Product catalogue / supporting technical document shall be submitted with the technical package.",
+      "clientResponse": "Noted",
+      "reply20261019": "• Revised proposal: Kenbotong (KBT) TQJ-400AD5 fiberglass Omni antenna, 400–470 MHz frequency range, 15 MHz bandwidth, 5 dBi gain and N-female connector. • Refer to the TQJ-400AD5 manufacturer datasheet. Actual channel compatibility and hazardous-area suitability/certification shall be verified; refer to Deviation List Item 1.1.",
+      "status": "REVISED_SENT_20261019",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1EE_aJysAjWJbk8ZLcdj0DiUlvU6rxU5T/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1LD8PpfzuECtJPGnDt_8Ak2v_MiFk75df/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0003-1",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "itemNo": "1",
+      "subject": "TELEPHONE SPECIFICATION",
+      "reference": "MM-ZTK-1F-GEN-TEL-DTS-0003",
+      "question": "24 Handset Cable Cord Material: SS316 coiled cord",
+      "vendorResponse": "- Comply. Bidder proposes the Explosion Proof Telephone with standard-length 316 stainless-steel handset cord.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0003-2",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "itemNo": "2",
+      "subject": "TELEPHONE SPECIFICATION",
+      "reference": "MM-ZTK-1F-GEN-TEL-DTS-0003",
+      "question": "26 Power Supply: PoE (IEEE 802.3af) or drawn from L3 Switch",
+      "vendorResponse": "- Comply. Bidder proposes the Explosion Proof Telephone with IEEE-compliant Power-over-Ethernet (PoE) capability. The proposed telephone also supports local 24–48 VDC power supply.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0003-3",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "itemNo": "3",
+      "subject": "Delivery Time",
+      "reference": "",
+      "question": "Bidder shall be provide the delivery time for Telephone System",
+      "vendorResponse": "- Delivery time: 16 weeks ARO, DDP Nonthaburi, Thailand.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0003-4",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "itemNo": "4",
+      "subject": "Warranty Period",
+      "reference": "",
+      "question": "Bidder shall be provide the delivery time for Telephone System",
+      "vendorResponse": "- Warranty: Twelve (12) months from Ex-Works delivery.",
+      "clientResponse": "Noted",
+      "reply20261019": "",
+      "status": "CLOSED_NOTED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    },
+    {
+      "id": "TC-0003-5",
+      "doc": "TC-0003",
+      "mr": "MR-0003",
+      "itemNo": "5",
+      "subject": "Explosion-proof sounder, 24 VDC",
+      "reference": "MM-ZTK-1F-GEN-TPH-TEL-MTO-0001_Rev00",
+      "question": "Bidder Proposed E2S brand, is not in AVL, Bidder shall revise for quotation",
+      "vendorResponse": "Bidder proposes Eaton Crouse-Hinds MEDC, Model DB3B. Revised quotation will be submitted accordingly.",
+      "clientResponse": "",
+      "reply20261019": "",
+      "status": "OPEN_ACTION_REQUIRED",
+      "incomingUrl": "https://docs.google.com/spreadsheets/d/1IxUVjUjVbUFugldKfdMZr9pHFCiQC2Qa/edit",
+      "outgoingUrl": "https://docs.google.com/spreadsheets/d/1Rf2SSyTtk8cWf0q94fw8N44D70KSYy1i/edit",
+      "impact": {
+        "cus": true,
+        "vnd": true,
+        "si": true
+      }
+    }
+  ]
+}

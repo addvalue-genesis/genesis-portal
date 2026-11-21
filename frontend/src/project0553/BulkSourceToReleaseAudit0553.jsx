@@ -29,9 +29,10 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
  },[focusModuleId,opened,placement,mr,site]);
  const toggle=k=>setOpened(p=>({...p,[k]:!p[k]}));
  const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"PENDING";
- return <section className="p55-panel" data-component-key={id}>
-  <h4>Source → Engineering BULK → Working BOM → Release · Completeness Audit
-    {" "}<ComponentCopyId projectId="PJ2608-0553" componentKey={id}/></h4>
+ return <details className="p55-panel p553-budget-phase" data-component-key={id} open={placement!=="RELEASE"}>
+  <summary><strong>Source → Engineering BULK → Working BOM → Release · Completeness Audit</strong>
+    {" "}<ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
+    <small>{model.scopeSlots} slots · {model.applicable} applicable · SOURCE-TO-RELEASE HOLD</small></summary>
   <p className="p55-note"><strong>Controlled scope:</strong> MR0001 7 original MTO lots; MR0002 3 bulk lots;
    MR0003 4 phone/sounder systems with conditional special cable (NOT fictitious lots);
    MR0004 3 RACON sites with ONE shared phase adapter/charging kit.
@@ -92,5 +93,5 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
   {placement==="RELEASE"&&<p className="p55-note"><strong>Customer release remains HOLD:</strong> this coverage matrix exposes
    incomplete BULK engineering. Any numeric A/B/C shown in Release Preview comes from the existing
    Working source, not from this audit; no validated complete supply cost is asserted.</p>}
- </section>;
+ </details>;
 }

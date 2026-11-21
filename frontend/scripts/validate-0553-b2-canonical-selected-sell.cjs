@@ -42,7 +42,7 @@ assert.equal(sp.knownAddvalueWorkingSellTHB,source.knownWorkingSellTHB);
 const cfoB2=cfo.b.find(x=>x.code==="B2");
 assert(cfoB2);
 assert.equal(cfoB2.workingSellTHB,237121.13);
-assert.equal(cfoB2.customerSellTHB,237121.13);
+assert.equal(cfoB2.customerSellTHB,248977.19);
 assert.equal(cfoB2.actualCostTHB,null);
 assert.equal(cfoB2.profitTHB,null);
 assert.equal(cfoB2.releaseAllowed,false);

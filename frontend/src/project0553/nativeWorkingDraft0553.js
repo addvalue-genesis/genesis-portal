@@ -98,6 +98,20 @@ function replaceCell(xml,address,value){
   "<v>"+value+"</v>";
  return xml.replace(match[0],start+contents+"</c>");
 }
+// Excel repairs a workbook when calcChain.xml names a cell whose formula was
+// replaced by a value. Drop the chain and its package references. Excel
+// rebuilds the chain from the formulas that remain.
+export async function omitCalcChain0553(entries,changes){
+ const names=["[Content_Types].xml","xl/_rels/workbook.xml.rels"];
+ for(const name of names){
+  const entry=entries.find(item=>item.name===name);
+  if(!entry&&!changes.has(name))continue;
+  const xml=changes.has(name)?decode.decode(changes.get(name)):decode.decode(await readEntry(entry));
+  const stripped=xml.replace(/<(?:Relationship|Override)\b[^>]*(?:\/>|>[\s\S]*?<\/(?:Relationship|Override)>)/g,tag=>/calcChain\.xml/.test(tag)?"":tag);
+  changes.set(name,encode.encode(stripped));
+ }
+ return entries.filter(entry=>entry.name!=="xl/calcChain.xml");
+}
 export function rebuildZip(entries,changes){
  const localParts=[],centralParts=[];let offset=0;
  for(const e of entries){
@@ -476,8 +490,9 @@ export async function buildNativeWorkingDraft0553(file,model){
   a:model.a.map(x=>({...x,amount:x.previewSellTHB})),b:bc.map(x=>({...x,amount:x.customerSellTHB})),
   total:priced.reduce((sum,n)=>sum+n,0),unpricedText:"NOT ESTABLISHED",sharedXml
  });
- // All unrelated ZIP parts are copied byte-for-byte.
- const result=rebuildZip(entries,changes);
+ // All unrelated ZIP parts are copied byte-for-byte, except the calculation
+ // chain, which Excel rebuilds after formula cells are rewritten.
+ const result=rebuildZip(await omitCalcChain0553(entries,changes),changes);
  const date=new Date().toISOString().slice(0,10).replace(/-/g,"");
  return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
   filename:"PJ2608-0553_ScopeOfSupply_NATIVE_WORKING_DRAFT_NOT_RELEASED_"+date+".xlsx",
@@ -682,7 +697,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   const xml=decode.decode(await readEntry(e)).replace(/<(?:Relationship|Override)\b[^>]*(?:\/>|>[\s\S]*?<\/(?:Relationship|Override)>)/g,tag=>/customXml\/|calcChain\.xml|docProps\/custom\.xml/.test(tag)?"":tag);
   changes.set(e.name,encode.encode(xml));
  }
- const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
+ const result=rebuildZip(await omitCalcChain0553(entries.filter(e=>!remove(e.name)),changes),changes);
  return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD_PRE_AWARD_NOT_ISSUED.xlsx",warnings:[...warnings,"C1/C2 are CONDITIONAL BUDGETARY PRICED OPTION OFFERS only, not confirmed supplier OEM unit prices; exclude from A+B and verify technical stock/CIF terms before contracting."]};
 }
 
@@ -761,7 +776,8 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
  // Existing 6 original worksheet identities/styles, columns, printing and
  // unrelated ZIP files remain untouched. The cloned row-18 carries native
  // borders/fills/column format into all added B10 lines.
- const out=rebuildZip(entries,new Map([["xl/worksheets/sheet2.xml",encode.encode(xml)]]));
+ const b10Changes=new Map([["xl/worksheets/sheet2.xml",encode.encode(xml)]]);
+ const out=rebuildZip(await omitCalcChain0553(entries,b10Changes),b10Changes);
  return {blob:new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
   filename:"PJ2608-0553_B10_ORIGINAL_NATIVE_BUDGETARY_WORKING_ALLOCATION_INTERNAL_NOT_RELEASED.xlsx",
   rowCount:annex.rows.length,originalCapacity:original13,insertedRows:extra,totalRow,

@@ -14,6 +14,6 @@ assert(summary.includes("summarizeMR0001TagCost0553(site)"));
 assert(a1.includes("selectMR0001TagCostRows0553(location.site)"));
 assert(!a1.includes("BUDGETARY-4FT-SCENARIO"));
 assert(ui.includes("getMR0001LocationCost0553(siteName)"));
-assert(ui.includes("Tag ledger:"));
+assert(ui.includes("Tag ledger:")); // SimpleBom labels the same allocated TAG ledger it already sums
 assert(summary.includes("SEPARATE_BULK_PROJECTION_NOT_POSTED_TO_EQUIPMENT"));
 console.log("PASS shared MR0001 per-tag working cost contract for seven locations; candidate costs excluded");

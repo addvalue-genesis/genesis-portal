@@ -16,5 +16,6 @@ assert(ui.includes('const remoteBudget=getZWP20RemoteBudgetChoice(x)'));
 assert(ui.includes("deriveZWP20VendorFunctionCosts(x)"));
 assert(ui.includes("Derived extended USD"));
 assert(ui.includes("NOT complete/verified package cost"));
+assert(ui.includes("NOT complete ZWP20 package cost"));
 assert(model.includes("deriveZWP20VendorFunctionCosts(item)"));
 console.log("PASS ZWP20 MR-502-001 Row4: provisional one-remote assembly USD 8574.12; not complete item cost or final engineering acceptance.");

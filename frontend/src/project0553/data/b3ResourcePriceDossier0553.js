@@ -264,7 +264,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     mgwLines.length!==0||fatLines.length!==20||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
     total(mgwLines)!==0||total(fatLines)!==452850||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2322450||
+    total(rental)!==30000||budgetSelected!==rollupTotalTHB||
     selectedBaseExcludingConditionalBFTHB!==2070450||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||

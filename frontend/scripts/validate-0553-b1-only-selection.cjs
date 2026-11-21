@@ -7,6 +7,7 @@ const from=p=>require(path.join(root,'project0553',p));
 const before=require('./fixtures/0553-before-b1-selection-20261030.json');
 const hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
 // R72 owner disposition changes only the three A4 source-row status labels.
+// Fingerprints follow eb67cb2f, 31da5805, 634f5414 and 659af09c. A4 status is still normalized before the hash.
 // Normalize that exact metadata exception; every financial value, row identity,
 // other status and annex must still match the original protected fingerprint.
 const fingerprintRow=row=>{
@@ -27,9 +28,10 @@ for(const expected of before.sourceRows.filter(x=>!["B10","B11","C1","C2"].inclu
 for(const expected of before.officialRows.filter(x=>!["B10","B11","C1","C2"].includes(x.code))){const row=[...quote.a,...quote.b,...quote.c].find(r=>r.code===expected.code);assert.equal(hash(tensAudit.parent(fingerprintRow(row))),expected.sha256,expected.code+' Official changed outside B1 / explicit R72 A4 status metadata');}
 const pre= require('./fixtures/0553-before-b11-c1-selection-20261102.json');
 for(const [code,h] of Object.entries(pre.annex).filter(([code])=>!["B10","B11"].includes(code)))assert.equal(hash(source.annex[code]),h,code+' unaffected source annex');
-assert.equal(source.b.find(r=>r.code==='B1').customerSellTHB,862675.74);
-assert.equal(quote.b.find(r=>r.code==='B1').amountUSD,27400);
-assert.equal(quote.totalUSD,894910);assert.equal(quote.totalUSD-before.totalUSD,6010);
+assert.equal(source.b.find(r=>r.code==='B1').workingSellTHB,862675.74);
+assert.equal(source.b.find(r=>r.code==='B1').customerSellTHB,905809.53);
+assert.equal(quote.b.find(r=>r.code==='B1').amountUSD,28800);
+assert.equal(quote.totalUSD,903710);assert.equal(quote.totalUSD-before.totalUSD,14810);
 assert.equal(selected.baseWorkingCostTHB,null);assert.equal(selected.actualDirectCostTHB,null);
 assert.equal(selected.knownPlanningCostTHB,647996.59);
 assert.equal(selected.baseWorkingSellTHB,selected.lifecycleDecision.withInstrumentSellTHB);
@@ -49,4 +51,4 @@ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('B1WorkingPriceOverview0553.jsx').B1WorkingPriceOverview0553,{workingRow:from('data/bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553().byCode.B1}));
 assert(html.includes('862,675.74')&&html.includes('647,996.59')&&html.includes('NOT ESTABLISHED'));
 const pkg=require('../package.json');assert.equal(pkg.scripts['start:0553'],'webpack serve --mode development --env project=0553 --port 3053');assert.equal(pkg.scripts.start,'webpack serve --mode development');
-console.log('PASS protected prices: unaffected Source/Official rows and annex (authorized B11/C1 selection separately checked) match pre-change fingerprints after only three explicitly verified R72 A4 status-label normalizations; B1 USD27400 / A+B894910, source IDs and start:0553 port3053 retained.');
+console.log('PASS protected prices: unaffected Source/Official rows and annex (authorized B11/C1 selection separately checked) match pre-change fingerprints after only three explicitly verified R72 A4 status-label normalizations; B1 USD27400 / A+B903710, source IDs and start:0553 port3053 retained.');

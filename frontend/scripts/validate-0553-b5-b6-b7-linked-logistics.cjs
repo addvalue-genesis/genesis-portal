@@ -44,8 +44,10 @@ for(const code of ["B5","B6","B7"]){
  const rows=m.rowsByCode[code],expected=m.selectedWorkingSellByCode[code];
  assert.equal(bc.byCode[code].workingSellTHB,expected,"10.2 selected owner changed "+code);
  assert.equal(bc.byCode[code].directCostTHB,null);
- assert.equal(model.b.find(r=>r.code===code).customerSellTHB,expected,
-  "10.3 customer preview must still use 10.2 owner-only working sell for "+code);
+ const serviceRelease=Math.round((expected*1.05+Number.EPSILON)*100)/100;
+ assert.equal(model.b.find(r=>r.code===code).commercialCategory,"service");
+ assert.equal(model.b.find(r=>r.code===code).customerSellTHB,serviceRelease,
+  "10.3 service release is Item 7 × 1.05 for "+code);
  const html=renderToStaticMarkup(React.createElement(Host,{workingRow:bc.byCode[code]}));
  const rootId="bid.budget.working.bc."+code.toLowerCase()+".price-trace.work-scope";
  assert(html.includes('data-component-key="'+rootId+'"'),"Missing owner work-scope "+code);

@@ -1,3 +1,4 @@
+// Fingerprints follow eb67cb2f, 31da5805, 634f5414 and 659af09c. B10 and C2 stay outside this guard.
 const tensAudit=require('./fixtures/0553-pre-tens-audit.cjs');
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const babel=require('@babel/core'),root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
@@ -16,7 +17,7 @@ assert.equal(raw.rows.C2.length,12);assert.equal(raw.totals.C2,721806.6);
 assert.equal(option.excludedRows.length,1);assert.equal(option.excludedRows[0].id,'C2-REV08-07');assert.equal(option.excludedRows[0].extendedTHB,285210.95);
 assert.equal(option.sourceSellTHB,852086.5);assert.equal(option.rows.length,11);
 assert.equal(option.priorSelectedSourceSellTHB,436595.65);assert.equal(option.preTensQuoteUSD,27110.64);assert.equal(option.budgetaryQuoteUSD,27220);assert.equal(before.oldC2USD-Math.ceil(option.priorSelectedSourceSellTHB/31.5/100-1e-10)*100,9100);
-assert.equal(option.sourceId,'C2-OPTION-REV08-12');assert.equal(official.totalUSD,894910);
+assert.equal(option.sourceId,'C2-OPTION-REV08-12');assert.equal(official.totalUSD,903710);
 assert(!option.rows.some(x=>x.id==='C2-REV08-07'));
 for(const row of option.rows.filter(x=>!['C2-REV08-10','C2-REV08-09'].includes(x.id))){const original=raw.rows.C2.find(x=>x.id===row.id);assert.equal(row.quantity,original.quantity);assert.equal(row.unitPriceTHB,original.unitPriceTHB);assert.equal(row.extendedTHB,original.extendedTHB);assert(Number.isInteger(row.unitUSD));assert.equal(row.unitUSD*row.quantity,row.totalUSD);}
 assert.equal(option.rows.reduce((s,x)=>s+x.totalUSD,0),27220);
@@ -34,7 +35,7 @@ const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)<
   assert(cell(summary,'G42').includes('<v>'+total+'</v>'));assert(cell(c2,'I19').includes('<v>'+total+'</v>'));
   assert(!c2.includes('RACON distribution box spare'));assert(!c2.includes('DB-5P'));assert(c1.includes('DB-5P'));
   assert(!cell(c2,'I17').includes('<v>'),'Old twelfth price must be cleared');
-  if(kind!=='THB')assert(cell(summary,'G38').includes('<v>894910</v>'));
+  if(kind!=='THB')assert(cell(summary,'G38').includes('<v>903710</v>'));
  }
  console.log('PASS C2 owner DB-5P exclusion: 11 selected / 12 historical, THB852086.5 -> USD27220; all other financial parents, C1/Part A DB-5P inclusions and B13 unchanged; active UI and USD/THB/Breakdown synchronized.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

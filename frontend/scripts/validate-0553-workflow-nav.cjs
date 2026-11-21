@@ -9,5 +9,7 @@ assert(nav.includes('tabs:["registry"]'),"Data & Code must stay in Control");
 for(const area of ['["A","A — Original / Received Documents"]','["B","B — Internal Engineering & Bid Preparation"]','["C","C — Communications & Submissions"]'])assert(page.includes(area),"missing L3 workspace "+area);
 assert(page.includes('tabGroups={l3Area==="B"?TAB_GROUPS:[]}'),"L3 internal tab groups missing");
 assert(nav.includes('["budget","10 Budget & Commercial Analysis"]')&&page.includes('setWorkspaceTab("budget")'),"Budget navigation broken");
-assert(shell.includes("tabGroups ? tabGroups.map")&&shell.includes("group.tabs.includes(t.id)"),"shared shell group navigation broken");
+const tabsUi=read("src/common/ui/ProjectAuditPrimitives.jsx");
+assert(shell.includes("<ProjectTabs")&&shell.includes("tabGroups={tabGroups}"),"shared shell group navigation broken");
+assert(tabsUi.includes("tabGroups ? tabGroups.map")&&tabsUi.includes("group.tabs.includes(t.id)"),"shared ProjectTabs group navigation broken");
 console.log("PASS 0553 L3 A/B/C workspaces, updated tab grouping and Budget navigation");

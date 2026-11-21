@@ -7,7 +7,7 @@ const official=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(s
 const ceil=x=>x===null?null:x===0?0:Math.ceil(x/10-1e-10)*10;
 const check=(rows,prior,amount='totalUSD')=>{assert.equal(rows.length,prior.length);for(let i=0;i<rows.length;i++){const a=rows[i],b=prior[i];assert.equal(a.qty,b.qty);if(b.unitUSD===null){assert.equal(a.unitUSD,null);assert.equal(a[amount],b[amount]);}else{assert.equal(a.unitUSD,ceil(b.unitUSD));assert.equal(a[amount],a.qty*a.unitUSD);assert.equal(a.unitUSD%10,0);assert(a.unitUSD>=b.unitUSD&&a.unitUSD-b.unitUSD<10.000001);}}};
 assert.equal(JSON.stringify(source),frozen,'No Working/source financial writeback');assert.equal(official.policy.thbPerUsd,31.5);assert.equal(official.policy.incrementUSD,10);
-assert.equal(official.totalUSD,894910);assert.equal(official.totalUSD-before.official.totalUSD,410);
+assert.equal(official.totalUSD,903710);assert.equal(official.totalUSD-before.official.totalUSD,9210);
 assert.deepEqual(official.a.map(x=>x.amountUSD),[241290,137130,34200,292500]);
 assert.deepEqual(['B10','B13'].map(c=>official.b.find(x=>x.code===c).amountUSD),[12960,1530]);
 assert.deepEqual(official.c.map(x=>x.budgetaryOptionQuoteUSD),[181100,27220]);
@@ -46,11 +46,11 @@ const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)<
  const usd=await native.buildNativeOfficialRelease0553(file,official),ten=await from('nativePriceBreakdown0553').buildNativePriceBreakdown0553(file,official,breakdown);
  for(const [kind,out] of [['USD',usd],['Breakdown',ten]]){
   const entries=native.entriesFromZip(new Uint8Array(await out.blob.arrayBuffer())),read=async i=>new TextDecoder().decode(await native.readEntry(entries.find(x=>x.name==='xl/worksheets/sheet'+i+'.xml')));
-  const scope=await read(1);for(const [a,n] of [['G8',241290],['G9',137130],['G33',12960],['G36',1530],['G38',894910],['G41',181100],['G42',27220]])num(scope,a,n);
+  const scope=await read(1);for(const [a,n] of [['G8',241290],['G9',137130],['G33',12960],['G36',1530],['G38',903710],['G41',181100],['G42',27220]])num(scope,a,n);
   const sheets=[[2,official.b10ItemizedAnnex.rows,20],[4,official.otherSpareItemizedAnnex.rows.B13,19],[5,official.otherSpareItemizedAnnex.rows.C1,19],[6,official.otherSpareItemizedAnnex.rows.C2,19]];
   for(const [index,rows,total] of sheets){const xml=await read(index);for(let i=0;i<rows.length;i++){num(xml,'H'+(6+i),rows[i].unitUSD);num(xml,'I'+(6+i),rows[i].totalUSD);}num(xml,'I'+total,rows.reduce((n,x)=>n+x.totalUSD,0));}
   if(kind==='Breakdown')for(let i=0;i<4;i++){const g=breakdown.groups[i],xml=await read(7+i);for(const [j,r] of g.rows.entries())if(r.amountUSD!==null){num(xml,'G'+(5+j),r.unitUSD);num(xml,'H'+(5+j),r.amountUSD);assert(cell(xml,'H'+(5+j)).includes('ROUND(E'+(5+j)+'*G'+(5+j)+',2)'));}}
  }
  const again=await native.buildNativeOfficialRelease0553({name:usd.filename,arrayBuffer:()=>usd.blob.arrayBuffer()},official);assert.deepEqual(new Uint8Array(await again.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
- assert.equal(JSON.stringify(source),frozen);console.log('PASS revision-bound policies: A1-A3 fixed parent allocations, A4 upward units, exact current Rev03 B10/B13/C1/C2 Qty x USD10 units; A+B894910/C227220, source THB/FX/quantity/N/A unchanged; actual six-/ten-sheet exports and repeat export agree. Historical pre-tens fixture retained.');
+ assert.equal(JSON.stringify(source),frozen);console.log('PASS revision-bound policies: A1-A3 fixed parent allocations, A4 upward units, exact current Rev03 B10/B13/C1/C2 Qty x USD10 units; A+B903710/C227220, source THB/FX/quantity/N/A unchanged; actual six-/ten-sheet exports and repeat export agree. Historical pre-tens fixture retained.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

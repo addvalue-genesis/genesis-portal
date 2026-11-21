@@ -50,9 +50,10 @@ async function main(){
  assert.equal(cab.countedInWorkingTotal,true);assert.equal(cab.releaseAllowed,false);
  assert.equal(cab.originProcurementQty,0);assert.equal(cab.originRawTHB,0);
  assert.equal(cab.ownerDecision.date,'2026-11-03');
- assert.equal(official.a.find(x=>x.code==='A1').amountUSD,241100);
- assert.equal(official.a.find(x=>x.code==='A2').amountUSD,137000);
- assert.equal(official.totalUSD,894590);
+ // 013c79a05f / 397556f901 hold Part A at the owner Rev03 workbook, after this cabinet was costed inside Working.
+ assert.equal(official.a.find(x=>x.code==='A1').amountUSD,241290);
+ assert.equal(official.a.find(x=>x.code==='A2').amountUSD,137130);
+ assert.equal(official.totalUSD,903710);
  assert.equal(official.commercialPriceHold.additionalPartAChargeUSD,0);
  assert.deepEqual(official.b,baseline.b);assert.deepEqual(official.c,baseline.c);
  const leaf=breakdown.groups.flatMap(g=>g.rows);
@@ -67,6 +68,6 @@ async function main(){
  assert.equal(breakdown.reconciled,true);assert.equal(official.issued,false);
  const owned=source.a.find(x=>x.code==='A1').sourceRows.filter(r=>r.site==='ZWP11'&&r.tag==='TCAB-500-003');
  assert.equal(owned.length,1);assert.equal(owned[0].costTHB,39200);
- console.log('PASS ZWP11 MTO C1: 1 new cabinet, existing THB39200 cost once; cabinet direct cost retained inside owner-held A1 USD241100; A2 USD137000; base894590; B/C and frozen source unchanged.');
+ console.log('PASS ZWP11 MTO C1: 1 new cabinet, existing THB39200 cost once; cabinet direct cost retained inside owner-held A1 USD241100; A2 USD137000; base903710; B/C and frozen source unchanged.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

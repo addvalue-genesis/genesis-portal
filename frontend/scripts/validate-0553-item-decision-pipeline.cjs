@@ -8,4 +8,5 @@ for(const token of ["MR0001_PACKAGE_COMPOSITION","AVIAT_0553_TECHNICAL_EVALUATIO
  assert(engine.includes(token),"Missing trace or safe decision rule: "+token);
 assert(ui.includes("ITEM_DECISION_PIPELINE_0553.evaluate(x)"),"Leaf BOM does not execute the gate evaluator");
 assert(ui.includes("Stage-gated qualification / MCDA / CBS trace"),"Item decision gate not visible");
+assert(engine.includes("budgetaryEstimate:null")&&engine.includes("verifiedCost:null"));
 console.log("PASS 0553 item-level source → FPR → constraints → vendor → MCDA → cost → CBS structural checks. Runtime/engineering acceptance still required.");

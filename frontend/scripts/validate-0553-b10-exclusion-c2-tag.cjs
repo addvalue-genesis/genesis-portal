@@ -8,12 +8,14 @@ const from=p=>require(path.join(root,'project0553',p)),before=require('./fixture
 const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5}),official=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
 const schedule=from('data/spareCustomerSchedule0553').selectSpareCustomerSchedule0553(),working=from('data/bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553();
 assert.deepEqual(official.a.map(audit.parent),before.a);
-for(const e of [...before.b,...before.c].filter(x=>!['B10','C2'].includes(x.code)))assert.deepEqual(audit.parent([...official.b,...official.c].find(x=>x.code===e.code)),e,'Unrelated price changed '+e.code);
+const serviceReleaseUSD={B1:28800,B2:8000,B3:77500,B5:10400,B6:11200,B7:1000,B8:4800,B9:16100,B14:26300};
+for(const e of [...before.b,...before.c].filter(x=>!['B10','C2'].includes(x.code)&&!Object.hasOwn(serviceReleaseUSD,x.code)))assert.deepEqual(audit.parent([...official.b,...official.c].find(x=>x.code===e.code)),e,'Unrelated price changed '+e.code);
+for(const [code,usd] of Object.entries(serviceReleaseUSD))assert.equal(official.b.find(x=>x.code===code).amountUSD,usd);
 assert.equal(schedule.originalCurrentByCode.B10.length,4);assert.equal(schedule.currentRows.length,16);
 assert.equal(schedule.excludedB10Rows[0].id,'B10-PTTEP-04');assert.equal(schedule.excludedB10Rows[0].extendedTHB,104422.5);
 assert.equal(schedule.b10OwnerDecision.contractualComplianceConfirmed,false);assert.equal(schedule.currentBudgetaryByCode.B10,405405);
 assert.equal(working.knownWorkingSellTHB,before.workingPartB-104422.5);assert.equal(official.b.find(x=>x.code==='B10').amountUSD,12960);
-assert.equal(official.totalUSD,before.totalUSD-2890);assert.equal(official.totalUSD,894910);
+assert.equal(official.totalUSD,before.totalUSD-2890+8800);assert.equal(official.totalUSD,903710);
 assert(official.b.find(x=>x.code==='B10').commercialRemark.includes('RACON commissioning spares excluded'));
 assert.equal(source.annexTraceAudit.totalRows,15);assert(source.annexTraceAudit.sourceToReleasePassed&&source.annexTraceAudit.releaseToSourcePassed);
 assert.deepEqual(source.annex.B10.map(x=>x.sourceId),['B10-PTTEP-01','B10-PTTEP-02','B10-PTTEP-03']);
@@ -41,7 +43,7 @@ const text=new TextDecoder(),cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+
 const xmls=async blob=>{const entries=native.entriesFromZip(new Uint8Array(await blob.arrayBuffer())),out={};for(let i=1;i<=6;i++)out[i]=text.decode(await native.readEntry(entries.find(x=>x.name==='xl/worksheets/sheet'+i+'.xml')));return out;};
 (async()=>{
  const usd=await native.buildNativeOfficialRelease0553(file,official),ux=await xmls(usd.blob),thb=await native.buildNativeWorkingDraft0553(file,source),tx=await xmls(thb.blob);
- assert(cell(ux[1],'G33').includes('<v>12960</v>'));assert(cell(ux[1],'G38').includes('<v>894910</v>'));assert(cell(tx[1],'G33').includes('<v>405405</v>'));
+ assert(cell(ux[1],'G33').includes('<v>12960</v>'));assert(cell(ux[1],'G38').includes('<v>903710</v>'));assert(cell(tx[1],'G33').includes('<v>405405</v>'));
  for(const xml of [ux[2],tx[2]])assert(!/RACON control|RACON Ex cable|Marine RACON commissioning/.test(xml));
  assert(cell(ux[2],'I20').includes('<v>12960</v>'));assert(cell(tx[2],'I19').includes('<v>405405</v>'));
  for(let i=17;i<=19;i++)for(const col of ['B','C','D','E','F','G','H','I'])assert(!cell(ux[2],col+i).includes('<v>')&&!cell(ux[2],col+i).includes('<f>'),'Stale B10 cell '+col+i);
@@ -54,5 +56,5 @@ const xmls=async blob=>{const entries=native.entriesFromZip(new Uint8Array(await
  const bad=native.rebuildZip(entries,new Map([['xl/worksheets/sheet2.xml',new TextEncoder().encode(stale)]])),badFile={name:'Previous-B10.xlsx',arrayBuffer:async()=>bad.buffer.slice(bad.byteOffset,bad.byteOffset+bad.byteLength)};
  const repaired=await native.buildNativeOfficialRelease0553(badFile,official);assert(!(await xmls(repaired.blob))[2].includes('RACON control-box gasket'));
  const review=await native.buildNativeB10ItemizedReview0553(badFile,from('data/b10NativeAnnexReview0553').selectB10NativeAnnexReview0553());assert.equal(review.rowCount,11);assert(!(await xmls(review.blob))[2].includes('RACON control-box gasket'));
- console.log('PASS B10 RACON exclusion: raw source preserved, THB104422.50 removed, USD12960/total894910, 11 whole-USD rows; C2 exact TAG/specification with only owner-selected cable drums changed, B13 COMMON; actual USD/THB, stale and repeated native exports reconcile.');
+ console.log('PASS B10 RACON exclusion: raw source preserved, THB104422.50 removed, USD12960/total903710, 11 whole-USD rows; C2 exact TAG/specification with only owner-selected cable drums changed, B13 COMMON; actual USD/THB, stale and repeated native exports reconcile.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

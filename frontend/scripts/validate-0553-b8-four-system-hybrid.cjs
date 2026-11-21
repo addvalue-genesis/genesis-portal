@@ -61,14 +61,14 @@ assert.equal(m.groups[2].rows.find(x=>x.sourceId==="MR0002-RFI-DEMO").workingSel
 assert.equal(m.groups[2].rows.find(x=>x.sourceId==="MR0004-RACON-DEMO").workingSellTHB,0);
 assert(m.trainingEvidence.raconMdsAlternate.supplier.includes("SELECTED"));
 const r=release(),s=scope();
-assert.equal(r.b.find(x=>x.code==="B8").customerSellTHB,142550);
+assert.equal(r.b.find(x=>x.code==="B8").customerSellTHB,149677.5);
 assert.equal(r.b.find(x=>x.code==="B8").workingSellTHB,142550);
 assert.equal(s.lines.B8.workingSellTHB,142550);
 assert.equal(s.lines.B8.directCostTHB,null);
 assert.equal(r.b.find(x=>x.code==="B8").releaseAllowed,false);
-assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2322450);
-assert.equal(r.b.find(x=>x.code==="B9").customerSellTHB,480550);
-assert.equal(r.b.find(x=>x.code==="B6").customerSellTHB,335584);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2438572.5);
+assert.equal(r.b.find(x=>x.code==="B9").customerSellTHB,504577.5);
+assert.equal(r.b.find(x=>x.code==="B6").customerSellTHB,352363.2);
 const html=renderToStaticMarkup(React.createElement(View,{workingRow:b8}));
 const parent=renderToStaticMarkup(React.createElement(Parent,{workingRow:b8}));
 for(const token of ["142,550.00","66,150.00","50,400.00","26,000.00","15,000.00","5,000.00","85,100.00",

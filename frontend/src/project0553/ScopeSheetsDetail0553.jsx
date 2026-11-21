@@ -13,6 +13,7 @@ import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
+import {selectContingencyRegister0553} from "./data/contingencyRegister0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
@@ -46,7 +47,9 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  const [showBulk,setShowBulk]=useState(true);
  const [scadaSite,setScadaSite]=useState("ALL");
  const scadaBulk=deriveScadaBulkVerification0553();
- const scadaEnvelope=deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd});
+ const contingencyRegister=selectContingencyRegister0553();
+ const scadaContingency=contingencyRegister.lines.find(row=>row.id==="SCADA-ENVELOPE-10");
+ const scadaEnvelope=deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd,contingencyPct:scadaContingency.pct});
  const scadaShown=scadaEnvelope.locations.filter(s=>scadaSite==="ALL"||s.site===scadaSite);
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
  const category=SHEETS.find(x=>x[0]===sheet);
@@ -253,7 +256,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B WBS Working Sell Reference (B1/B2/B3/B8/B9 only — NOT turnkey direct cost):</strong> {cash(scopeBC.knownAddvalueWorkingSellTHB)} from source-linked Rev05 WBS, not internal direct cost or full SAMTEL client price. Unpriced B/C amounts are unknown, never zero. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={scopeBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
-   <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted.</p>
+   <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted. The {scadaContingency.pct}% envelope contingency is owned by the risk register ({scadaContingency.customerTotalEffect}) and is not added to the customer total.</p>
    <label>Location <select value={scadaSite} onChange={e=>setScadaSite(e.target.value)}><option value="ALL">All 7 locations</option>{scadaEnvelope.locations.map(s=><option key={s.site} value={s.site}>{s.site}</option>)}</select></label>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Location</th><th>Base Budget THB</th><th>Conditional priced floor THB</th><th>Conditional complete</th><th>Contingency THB (10% illustrative)</th><th>Priced envelope floor THB</th><th>Outstanding</th></tr></thead><tbody>
    {scadaShown.map(s=><tr key={s.site}><td><strong>{s.site}</strong><small>{s.replacementBasis}</small></td><td>{cash(s.baseBudgetTHB)}<small>Source THB {cash(s.baseSourceTHB)} + USD {s.baseSourceUSD.toLocaleString("en-US")} + incremental field bulk {cash(s.incrementalBaseBulkTHB)}</small></td><td>{cash(s.pricedConditionalFloorTHB)}</td><td>{cash(s.conditionalAllowanceTHB)}</td><td>{cash(s.contingencyTHB)}</td><td>{cash(s.pricedEnvelopeTHB)}<small>NOT full budget / not approved sell price</small></td><td>{s.unresolvedAccessoryFunctions.length} accessory rate/qty gaps; {s.unpricedLedgerRows.length} unpriced MTO rows; {s.unresolvedQuantityTags.length} unknown quantity tags {s.bulkBookedUnverifiable?"· existing bulk not decomposable":""}</td></tr>)}

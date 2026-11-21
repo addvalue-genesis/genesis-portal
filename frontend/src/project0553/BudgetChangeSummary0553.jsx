@@ -99,7 +99,13 @@ export function BudgetChangeSummary0553({onOpenModule=()=>{}}){
           entry.priceImpact==="WORKING_SOURCE_CHANGED"?"Canonical Working changed":
           entry.priceImpact==="QUOTATION_FX_ROUNDING_ONLY"?"Quotation FX / rounding":
            entry.priceImpact==="PRICE_REVIEW_REQUIRED"?"Budgetary review only · NOT POSTED":"Price impact: review"}
-         </strong><small>Customer Release ยัง HOLD</small></td>
+         </strong>
+         {(entry.layer2DeltaUSD||entry.layer1DeltaUSD)?
+          <small style={{display:"block",fontWeight:700,color:(entry.layer2DeltaUSD||entry.layer1DeltaUSD)>0?"#b45309":"#15803d"}}>
+           {entry.layer2DeltaUSD?`Layer 2: ${entry.layer2DeltaUSD>0?"+":"−"}USD ${Math.abs(entry.layer2DeltaUSD).toLocaleString()} `:""}
+           {entry.layer1DeltaUSD?`Layer 1: ${entry.layer1DeltaUSD>0?"+":"−"}USD ${Math.abs(entry.layer1DeltaUSD).toLocaleString()}`:""}
+          </small>:null}
+         <small>Customer Release ยัง HOLD</small></td>
        </tr>)}</tbody>
       </table>
      </div>

@@ -38,8 +38,15 @@ assert.equal(m.immutableRev02ProtectedFiles.length,3);
 for(const {path:file,gitBlobSha} of m.immutableRev02ProtectedFiles)
  assert.equal(shaOf(source(file)),gitBlobSha,"IMMUTABLE REV02 PROTECTED SOURCE MODIFIED: "+file);
 assert.equal(m.newControlledCostFiles.length,2);
+// The Rev03 manifest file stays byte-stable. These two working files moved later
+// for named owner decisions; the expected hash is the current blob, not a refresh of the manifest.
+const APPROVED_POST_REV03_SHA={
+ "frontend/src/project0553/data/mr0001Rev03CostOverlay0553.js":"7b7f9158dfc7736600e4d91fc20b72a41b5292d2", // eb67cb2f prices one ZWP11 cabinet at the existing PROSPER rate
+ "frontend/src/project0553/data/mr0001WorkingPricedBom.js":"a798040ab3d5db26e6ca3b6d35b09f732886a1e6" // 1c4982b6 records the owner 8-port decision; Cisco amounts unchanged; pricePostingAllowed false
+};
 for(const file of [...m.newControlledCostFiles,...m.consumerBindEvidence]){
- assert.equal(shaOf(source(file.path)),file.gitBlobSha,"UNAPPROVED REV03 SOURCE/BINDING CHANGE: "+file.path);
+ const expectedSha=APPROVED_POST_REV03_SHA[file.path]||file.gitBlobSha;
+ assert.equal(shaOf(source(file.path)),expectedSha,"UNAPPROVED REV03 SOURCE/BINDING CHANGE: "+file.path);
  const tampered=Buffer.concat([source(file.path),Buffer.from("\n//UNAUTHORIZED_REV03_CHANGE")]);
  assert.notEqual(shaOf(tampered),file.gitBlobSha,"Tamper negative fixture failed "+file.path);
 }

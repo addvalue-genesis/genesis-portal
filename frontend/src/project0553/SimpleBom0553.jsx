@@ -120,6 +120,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const thbMoney=(v,currency)=>{if(!Number.isFinite(v))return "—";if(currency==="THB")return "THB "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});if(currency==="USD"&&fx?.thbPerUsd>0)return "THB "+(v*fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});return "FX REQUIRED · "+currency+" "+v.toFixed(2);};
  const originalWithThb=(v,currency)=>Number.isFinite(v)?<><strong>{thbMoney(v,currency)}</strong><small>Original: {currency} {v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small></>:"—";
  const originalMoney=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+ const itemGate=x=>ITEM_DECISION_PIPELINE_0553.evaluate(x);
  const wpSummary=siteName=>{
   const cost=getMR0001LocationCost0553(siteName);
   return {usd:cost.allocatedUSD,thb:cost.allocatedTHB,costed:cost.costedRows,
@@ -325,12 +326,20 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
        <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"} / {g.rfDemand?.antennaReferenceDemand??"—"}</td>
        <td><span className="p553-vendor-brief">{vendorFlags.length?vendorFlags.join(" · "):"Source review"}</span></td>
        <td className="p553-location-total"><strong>{displaySiteTotal(g.site)}</strong>
-        <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small>
+        <small>Tag ledger: {financial.costed}/{financial.total} costed · {financial.gaps} pending</small>
+        {g.items[0]&&<small>Stage-gated qualification / MCDA / CBS trace: {itemGate(g.items[0]).state}</small>}
         {g.site==="ZWP8"&&<small><strong>OWNER AUDIT: AFC radio/sector and independent IDU/Surge owners costed; OEM licence/NMS and Existing/PTP scope gates remain.</strong></small>}</td>
       </tr>
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
        <div className="p553-location-details">
         <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
+        {g.items.filter(x=>getZWP20RemoteBudgetChoice(x)).map(x=>{
+         const remoteBudget=getZWP20RemoteBudgetChoice(x);
+         const remoteFunctions=deriveZWP20VendorFunctionCosts(x);
+         const scenarios=getMR502BudgetaryScenarios(x);
+         return <p key={x.id||x.sourceTag} className="p55-note">ZWP20 MR-502-001 provisional reference only. Derived extended USD {remoteFunctions?.partialUSD??"—"}. NOT complete/verified package cost. NOT complete ZWP20 package cost. {remoteBudget?.state}. Alternative groups {scenarios.map(s=>s.group).join("/")} are not added together.</p>;
+        })}
+        {g.site==="ZWP8"&&<p className="p55-note">{ZWP8_ROW43_COST_TRACE.items.map(item=>item.tag).join(", ")} · {ZWP8_ROW43_COST_TRACE.referenceScenarios.map(scenario=>scenario.id).join(", ")} · {ZWP8_ROW43_COST_TRACE.preferredBudgetaryAntenna}. NOT full ZWP8 cost. The 6ft candidate stays outside the posted owner.</p>}
         <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".cost-allocation"} title={"Cost Allocation by TAG ("+financial.costed+" priced / "+financial.total+" source TAGs)"} description="กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID" defaultOpen>
          <LocationBomDetail0553 site={g.site} fx={fx}/>
          <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
@@ -346,7 +355,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
              <td>Source quotation scenario, not a confirmed OEM or customer price</td>
             </tr>}
             {g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<tr>
-             <td>Next G / USD</td><td>Quotation unit rates mapped to functional candidates</td>
+             <td>Next G Vendor Source → Function → Rate Evidence</td><td>Quotation unit rates mapped to functional candidates. Site quantity remains NOT ALLOCATED until engineering accepts it.</td>
              <td>Follow current TAG-specific Engineering Quantity / Cost Owner</td>
             </tr>}
             {g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<tr>

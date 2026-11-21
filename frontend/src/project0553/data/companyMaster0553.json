@@ -115,6 +115,87 @@
         "P26-058 quotes UHF antennas/feeder and other systems; it does not quote RFI RX3852-2002-11 directly",
         "RFI LNA THB500000/unit is management budgetary allowance and not MGW firm price"
       ]
+    },
+    {
+      "id": "mot smart solutions co., ltd.",
+      "displayName": "MOT Smart Solutions Co., Ltd.",
+      "legalName": "MOT Smart Solutions Company Limited",
+      "verification": "SOURCE_QUOTATION_EN113_69",
+      "roles": [
+        "QUOTED_SUPPLIER"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "MOT Smart Solutions Co., Ltd.",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "MOT Smart Solutions Company Limited",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "MOT",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quotation EN113/69 (2026-10-30) quotes RFI LNA RX3852-2002-11 system for MR-0002 (Equipment THB 1,351,900 + Option FAT/Install/SAT THB 648,000 = THB 1,999,900 ex VAT)",
+        "Explicitly excludes Ex d enclosure box (Exd BOX) — must be prepared separately by ADDVALUE/SI"
+      ]
+    },
+    {
+      "id": "versed automation system co., ltd.",
+      "displayName": "Versed Automation System Co., Ltd.",
+      "legalName": "Versed Automation System Co., Ltd.",
+      "verification": "SOURCE_QUOTATION_QT2603_149",
+      "roles": [
+        "QUOTED_SUPPLIER"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "Versed Automation System Co., Ltd.",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "Versed Automation",
+          "relation": "SHORT_FORM_NAME"
+        },
+        {
+          "sourceLabel": "VAS",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quotation QT2603-149 (2026-03-20) quotes CMP Stainless Steel Ex Cable Glands & Exd/Exe Stopping Plugs (Subtotal THB 336,265 ex VAT)"
+      ]
+    },
+    {
+      "id": "royaltec international co., ltd.",
+      "displayName": "Royaltec International Co., Ltd.",
+      "legalName": "Royaltec International Co., Ltd.",
+      "verification": "SOURCE_QUOTATION_QIN2311155",
+      "roles": [
+        "QUOTED_SUPPLIER"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "Royaltec International Co., Ltd.",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "Royaltec",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quotation QIN/2311155 (2023-11-21) quotes Belden #50106ASFLB 010305M CAT6A SWB S/FTP cable at 210 THB/m (1 reel = 305m)"
+      ]
     }
   ],
   "noAutomaticCostSelection": true,

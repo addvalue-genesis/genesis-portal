@@ -14,6 +14,6 @@ assert(detail.includes("Converted ({displayCurrency})"));
 assert(detail.includes("Per MR:"));
 assert(detail.includes('useState(true)'));
 assert(detail.includes('money=n=>Number.isFinite(n)?'));
-assert(wb.includes("deriveWorkingCostReview0553(currency,currentFx)"));
-assert(wb.includes("PartAWorkingBomReadOnly0553 displayCurrency={currency} fx={currentFx}"));
+assert(detail.includes("deriveWorkingCostReview0553(displayCurrency,fx)"));
+assert(wb.includes("selectWorkingBomProjection0553({mr})"));
 console.log("PASS 0553 working cost: same A1 read model, item/site/MR totals, zero display, original/converted FX, B/C/project incomplete");

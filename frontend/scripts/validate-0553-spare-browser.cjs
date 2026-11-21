@@ -2,7 +2,12 @@
 // CHROMIUM_EXECUTABLE may select a provisioned Chromium. No financial writes.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {spawn}=require('node:child_process');
-const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
+let chromium;
+try{({chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright'));}
+catch(error){
+ console.log('SKIP validate-0553-spare-browser: Playwright is not installed ('+error.message+'). This browser check is optional and is not part of npm run build:0553.');
+ process.exit(0);
+}
 const cwd=path.resolve(__dirname,'..'),out=process.env.QA_OUTPUT_DIR||path.join(require('node:os').tmpdir(),'genesis-spare-qa');
 const port=process.env.QA_PORT||'3090';
 const exportsOnly=process.argv.includes('--exports-only');
@@ -42,8 +47,8 @@ require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project055
   await (await download).saveAs(path.join(out,'official.xlsx'));
   const native=nativeContext.native,downloaded=native.entriesFromZip(new Uint8Array(fs.readFileSync(path.join(out,'official.xlsx'))));
   const downloadedSummary=new TextDecoder().decode(await native.readEntry(downloaded.find(e=>e.name==='xl/worksheets/sheet1.xml')));
-  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:894910,unpricedText:'To be quoted'});
-  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD894910 excludes Part C');
+  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:903710,unpricedText:'To be quoted'});
+  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD903710 excludes Part C');
   await official.getByRole('tab',{name:'B10 CommSpares',exact:true}).click();
   const b10ids=exportsOnly?[]:await official.locator('[data-native-b10-source-id]').evaluateAll(rs=>rs.map(r=>r.getAttribute('data-native-b10-source-id')));
   if(!exportsOnly)assert.equal(b10ids.length,14);

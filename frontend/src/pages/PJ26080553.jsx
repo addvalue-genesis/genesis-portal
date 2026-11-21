@@ -25,16 +25,20 @@ import { ENGINEERING_VIEW_MODEL_0553 } from "../project0553/engineeringViewModel
 import {B1B2EquationAudit0553} from "../project0553/B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "../project0553/B3EquationAudit0553";
 import {B5EquationAudit0553} from "../project0553/B5EquationAudit0553";
+import {B3BrownfieldAdditional0553} from "../project0553/B3BrownfieldAdditional0553";
+import {DeviationWorkspace0553} from "../project0553/DeviationWorkspace0553";
+import {ClarifyWorkspace0553} from "../project0553/ClarifyWorkspace0553";
+import {VdrlReportWorkspace0553} from "../project0553/VdrlReportWorkspace0553";
 import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
 import { SYSTEMS_0553, SYSTEM_GROUPS_0553 } from "../project0553/systemsBinding";
 import { PROJECT_0553_FACTS } from "../project0553/projectFacts";
-import { PROJECT_0553_EVIDENCE, TECHNICAL_HOLDS } from "../project0553/evidenceRegistry";
+import { PROJECT_0553_EVIDENCE } from "../project0553/evidenceRegistry";
 import { BID_0553_SOURCES, BID_0553_GATES, validateBidReview } from "../project0553/bidReview";
-import { VENDOR_0553_SOURCES } from "../project0553/vendorEvidence";
-import { ARCHITECTURE_0553 } from "../project0553/architectureManifest";
-import { deriveManHours, deriveLaborCost } from "../common/cost/derivationKernel";
-import { STANDARD_PROJECT_TABS, AuditBadge, AuditMetric, AuditTable, AuditSection, ProjectTabs } from "../common/ui/ProjectAuditPrimitives";
+import { AuditBadge, AuditTable, AuditSection } from "../common/ui/ProjectAuditPrimitives";
+import { selectBcWorkCostLines0553 } from "../project0553/data/bcWorkCostLines0553";
+import { BC_EXECUTION_ACTIVITIES_0553 } from "../project0553/data/bcExecutionActivities0553";
+import { selectContingencyRegister0553 } from "../project0553/data/contingencyRegister0553";
 import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
@@ -46,7 +50,6 @@ import "../project0553/moduleHierarchy0553.css";
 const TABS = L3_TABS_0553.map(([id,label])=>[id,`${TAB_IDENTITY_0553.tabs.find(t=>t.route===id)?.semanticCode||"BID-UNKNOWN"} · ${label}`]);
 const TAB_GROUPS = L3_TAB_GROUPS_0553;
 const Badge = AuditBadge;
-const Metric = AuditMetric;
 const Table = AuditTable;
 const Section = AuditSection;
 const sourceLinks = ids => ids.map(id => {
@@ -54,6 +57,26 @@ const sourceLinks = ids => ids.map(id => {
   return s?<a key={id} href={s.url} target="_blank" rel="noreferrer" style={{display:"block"}}>{id}</a>:id;
 });
 
+function ExecutionResourcePlan0553(){
+ const lines=selectBcWorkCostLines0553();
+ const activities=Object.values(BC_EXECUTION_ACTIVITIES_0553);
+ return <div className="p55-stack">
+  <Section title="Execution activities — same source as 10.2">
+   <Table headers={["Code","Activity","What is included","Boundary"]} rows={activities.map(row=>[row.code,row.title,row.activities.join(" "),row.releaseText])}/>
+  </Section>
+  <Section title="Resource lines — selectBcWorkCostLines0553">
+   <p className="p55-note">{lines.policy} Direct cost total stays {lines.totalCostTHB==null?"not established":lines.totalCostTHB}. These lines do not add a second selling price.</p>
+   <Table headers={["Owner","Line","Quantity","Unit"]} rows={lines.rows.map(row=>[row.code,row.name,row.quantity??"Not established",row.unit])}/>
+  </Section>
+ </div>;
+}
+function ContingencyRegister0553(){
+ const register=selectContingencyRegister0553();
+ return <Section title="Contingency register — BID-RSK">
+  <p className="p55-note">This register displays the two existing factors. It does not change either percent and does not add the SCADA envelope to the customer total.</p>
+  <Table headers={["Item","Percent","Source","Basis","In customer total"]} rows={register.lines.map(row=>[row.id,row.pct+"%",row.source,row.basis,row.includedInCustomerTotal?"Yes — "+row.customerTotalEffect:"No — "+row.customerTotalEffect])}/>
+ </Section>;
+}
 export function PJ26080553() {
  const [moduleQuery,setModuleQuery]=useState("");
  const mainModuleIndex=[
@@ -71,7 +94,18 @@ export function PJ26080553() {
   {id:"bid.documents",name:"Source Documents / Evidence Register",tab:"documents",keywords:"source documents original vendor supplier quote"},
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
   {id:"bid.budget.pricing.official",name:"10.3.4 — Official Release English USD",tab:"budget",keywords:"official quotation USD Excel export"},
+  {id:"bid.budget.pricing.official.part-a-breakdown",name:"10.3.4 — Official Part A 141-Row BOM Breakdown (SI)",tab:"budget",keywords:"official part a breakdown 141 rows schedule c1"},
+  {id:"bid.budget.pricing.official.schedule-c1",name:"10.3.4 — Official Part A Schedule C1 Hierarchical BOM",tab:"budget",keywords:"schedule c1 0550 breakdown mr0001 mr0002 mr0003 mr0004"},
+  {id:"bid.budget.pricing.release.preview",name:"10.3.3 — Customer Release Workbook Preview (6 Excel Sheets: Scope / B / C)",tab:"budget",keywords:"release preview scope of supply b10 b11 b13 c1 c2"},
+  {id:"bid.budget.pricing.part-a-breakdown",name:"10.3 — Part A Internal Item Breakdown (141 Rows · Schedule C1)",tab:"budget",keywords:"part a breakdown 141 rows a1 mr0001 mr0002 mr0003 mr0004 eqdisp"},
+  {id:"bid.budget.pricing.part-a-breakdown.schedule-c1",name:"10.3 — Part A Schedule C1 Hierarchical BOM & EQ-DISP Pricing",tab:"budget",keywords:"schedule c1 0550 breakdown a1 mr0001 mr0002 mr0003 mr0004 eqdisp"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
+  {id:"bid.b3bf",name:"10B B3 Brownfield Additional",tab:"b3bf",keywords:"brownfield additional proposal ZPQ ZWP8 ZWP11"},
+  {id:"bid.deviations",name:"14 Deviations",tab:"deviations",keywords:"deviation bda lna"},
+  {id:"bid.clarify",name:"15 Clarify (TC / CCL)",tab:"clarify",keywords:"clarify tc ccl bartec cif fat painting training jutal"},
+  {id:"bid.clarify.history",name:"15.4 Clarify — TC / CCL History & Source Chain (CUS / 07 VND / SI)",tab:"clarify",keywords:"tc-0001 tc-0002 tc-0003 samtel jutal gcme 20261014 20261019 history"},
+  {id:"bid.clarify.particulars",name:"15.5 Clarify — CUS Particular Requirements (MR / PHI / BOD / DTS / SPE / LIS)",tab:"clarify",keywords:"particular phi bod dts spe lis mr-0001 mr-0002 mr-0003 mr-0004"},
+  {id:"bid.vdrl",name:"16 Report - VDRL (PTTEP 10008-STD-6-GEN-002 · ADDV)",tab:"vdrl",keywords:"vdrl report mto lis spir dts dwg cal pro itp rpt addv naming"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
   {id:"bid.budget.working.bc.cost-lines",name:"10.2 — Part B/C WBS Cost Lines / Evidence-Backed Resource Ledger",tab:"budget",keywords:"B1 B2 B3 B6 B9 B10 B11 964 man-hour 39 offshore days 78 man-days special tools cost rate source annex first principles"},
   {id:"bid.budget.working.bc.execution-audit",name:"10.2 B/C — Execution, Permits, MOB/DEMOB & Tools Audit",tab:"budget",keywords:"annex 4 annex 6 pack shipment special tools logistics license transport 01 08 10.2"},
@@ -157,9 +191,13 @@ export function PJ26080553() {
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/><B1B2EquationAudit0553/><B3EquationAudit0553/><B5EquationAudit0553/></SharedEngineeringView>}
-   {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
+   {tab==="execution"&&<ExecutionResourcePlan0553/>}
    {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationOwner={navOwner} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
-   {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
+   {tab==="b3bf"&&<B3BrownfieldAdditional0553/>}
+   {tab==="deviations"&&<DeviationWorkspace0553 onNavigate={jumpModule}/>}
+   {tab==="clarify"&&<ClarifyWorkspace0553 onNavigate={jumpModule}/>}
+   {tab==="vdrl"&&<VdrlReportWorkspace0553 onNavigate={jumpModule}/>}
+   {tab==="risk"&&<div className="p55-stack"><ContingencyRegister0553/><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack">
     <VendorProductCatalog0553/>
     <SmartDataGroup moduleKey="bid.documents" projectId="PJ2608-0553"

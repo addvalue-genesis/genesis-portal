@@ -6,6 +6,8 @@ const plan=from('importOperationalBudget0553').selectImportOperationalBudget0553
 const source=from('bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553();
 const scope=from('scopePartBcReadModel0553').selectScopePartBcWorking0553();
 const release=from('releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=from('samtelEngineeringServiceMarkup0553');
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?Math.round((working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553+Number.EPSILON)*100)/100:working;
 const b1=source.byCode.B1.b1SupportPlanningBudget;
 assert.deepEqual(plan.stages.map(s=>s.costTHB),[30000,20000,200000]);
 assert.deepEqual(plan.stages.map(s=>s.owner),['B6','B6','B1']);
@@ -36,11 +38,11 @@ for(let i=1;i<=14;i++){
  assert.equal(r.executionActivities.independentPostingAllowed,false);
  assert.equal(scope.lines[code].executionActivities.releaseText,r.executionActivities.releaseText);
  assert.equal(out.executionActivities.releaseText,r.executionActivities.releaseText);
- assert.equal(out.customerSellTHB,r.workingSellTHB);
+ assert.equal(out.customerSellTHB,partBReleaseTHB(code,r.workingSellTHB));
  assert.equal(r.directCostTHB,null);
 }
 assert.deepEqual(['B4','B12','B14'].map(c=>source.byCode[c].workingSellTHB),[null,null,787500]);
-assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500+441495.74-157657.5);
+assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500+441495.74-157657.5-104422.5); // 93c5146a removes the RACON B10 allowance THB 104422.50; working sell is 5961702.87
 assert.equal(release.approval.releaseAllowed,false);
 assert.equal(b1.engineeringScopeReview.filter(r=>r.proposedOwner==='B2/B3').length,2);
 assert(b1.engineeringScopeReview.every(r=>r.workingSellTHB===null));

@@ -14,8 +14,9 @@ export const B1_LIFECYCLE_REVIEW_0553=Object.freeze({
  authority:"ESTIMATOR_WHAT_IF_NOT_OWNER_SELECTED",postingAllowed:false,
  instrumentLicenceAllowance:Object.freeze({sellTHB:100000,
   authority:"USER_SELECTED_INCREMENTAL_SELL_ALLOWANCE_20261030",
-  classification:"PROVISIONAL_SELL_NOT_VERIFIED_COST",currency:"THB",
-  scope:"Additional Myanmar licensing service for Instrument Wireless Gateway and Antenna",
+  classification:"ADDVALUE_SERVICE_HANDLING_ALLOWANCE",currency:"THB",
+  supplierOwner:"ADDVALUE",
+  scope:"Additional Myanmar licensing service for Instrument Wireless Gateway and Antenna (ADDVALUE supplier / handling scope)",
   replacesIllustrativeUSD:1600,verifiedCostTHB:null,firmPartnerQuote:false}),
  engineering:Object.freeze([
   {id:"SI-01",title:"Cross-system responsibility and technical exception decisions",qty:4,hoursPerUnit:8,boundary:"Four MR decision packages; excludes B2 requirement/document review and OEM design"},
@@ -85,7 +86,7 @@ export function evaluateB1LifecycleReview0553({months=9,weeklyHours={},regulator
    "Check every SI decision package against B2's 131 work objects, Part A OEM design and B3/B9 execution before accepting any technical hours.",
    "Replace the PM salary proxy with an agreed SI engineering role rate; 144 hours are new estimator assumptions, not historical 964-MH carry-forward.",
    "Confirm actual meeting/trip counts; this case retains two management person-trips and six room-nights.",
-   "Owner selected THB100000 incremental Instrument licence SELL allowance, replacing the illustrative USD1600. Actual cost, partner quotation, models, quantities and serials remain unconfirmed; no automatic posting or claim of firm premium/fee.",
+   "Owner selected THB100000 incremental Instrument licence SELL allowance as ADDVALUE supplier/service scope, replacing the illustrative USD1600. Models, quantities and serials from JUTAL/instrument remain pending for filing.",
    "Review use of existing THB96250 Myanmar reserves; never treat them as wholly free or automatically add another reserve for the same work.",
    "Check recurring licence/third-party charges and government fees if applicable; existing external package is not proof of validity for every duration."]};
 }

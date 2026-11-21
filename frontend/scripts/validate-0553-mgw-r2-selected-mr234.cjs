@@ -43,14 +43,14 @@ for(const [id,model,price,qty] of expected){
 assert(q.lines.find(x=>x.id==="UHF-2").includedComponents.some(x=>x.includes("Solexy RXNMS0200JX0")));
 assert(q.lines.find(x=>x.id==="PHONE-1").includedComponents.some(x=>x.includes("EATON DB3B")));
 assert.equal(mr2.quoteEquipmentTotalUSD,99564);
-assert.equal(mr3.budgetTotalTHB,828000);
+assert.equal(mr3.budgetTotalTHB,926000); // 634f5414 restores four telephone JB allowances, THB 24500 each, on top of EXION THB 828000
 assert.equal(mr4.budgetTotalUSD,225000);
 assert.equal(mr3.sites.length,4);
 assert.equal(mr4.sites.length,3);
 assert.equal(mr4.manufacturer,"ORGA / Tideland");
 assert.equal(mr4.historicalAlternative.selected,false);
 assert.deepEqual(mr3.sites.map(x=>x.site),["ZWP20","ZWP21","ZWP22","ZWP23"]);
-for(const [mr,total,n,currency] of [["MR-0002",99564,3,"USD"],["MR-0003",828000,4,"THB"],["MR-0004",225000,3,"USD"]]){
+for(const [mr,total,n,currency] of [["MR-0002",99564,3,"USD"],["MR-0003",926000,4,"THB"],["MR-0004",225000,3,"USD"]]){
  const p=project({mr});
  const booked=p.lines.filter(x=>x.counted&&x.currency===currency);
  const sum=booked.reduce((t,x)=>t+x.extended,0);
@@ -58,14 +58,18 @@ for(const [mr,total,n,currency] of [["MR-0002",99564,3,"USD"],["MR-0003",828000,
  assert.equal(p.invalidPosting.length,0,mr+" invalid cost lines");
  assert.equal(new Set(booked.map(x=>x.site)).size,n,mr+" site count");
  assert(p.lines.filter(x=>x.item.priceInclusion).every(x=>!x.counted),mr+" duplicate vendor accessory");
- assert(booked.every(x=>mr==="MR-0002"?/MGW/.test(x.source):mr==="MR-0003"?/EXION/.test(x.source):/MDS/.test(x.source)),mr+" selected vendor mismatch");
+ assert(booked.every(x=>mr==="MR-0002"?/MGW/.test(x.source):mr==="MR-0003"?(/EXION/.test(x.source)||/PROSRY/.test(x.source)):/MDS/.test(x.source)),mr+" selected vendor mismatch");
 }
 const phone=project({mr:"MR-0003"});
 for(const site of ["ZWP20","ZWP21","ZWP22","ZWP23"]){
  const items=phone.lines.filter(x=>x.site===site);
  const parent=items.filter(x=>x.counted);
- assert.equal(parent.length,1);
- assert.equal(parent[0].extended,207000);
+ const exion=parent.filter(x=>/EXION/.test(x.source));
+ const jb=parent.filter(x=>/PROSRY/.test(x.source)); // 634f5414 historical JB allowance, THB 24500, counted beside the EXION pair
+ assert.equal(exion.length,1);
+ assert.equal(exion[0].extended,207000);
+ assert.equal(jb.length,1);
+ assert.equal(jb[0].extended,24500);
  for(const sku of ["212-02-6008-510","DB3BDG048N2BNR"])
   assert(items.some(x=>String(x.item.sku||"").includes(sku)),site+" missing "+sku);
 }

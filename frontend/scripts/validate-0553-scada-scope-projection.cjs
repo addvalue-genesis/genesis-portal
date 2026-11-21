@@ -3,9 +3,9 @@ const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8"
 const scope=read("ScopeSheetsDetail0553.jsx"),workspace=read("CommercialWorkspace.jsx");
 const budget=read("data/scadaBudgetEnvelope0553.js"),bulk=read("data/scadaBulkQuantityVerification0553.js");
 assert(scope.includes('data-component-key="bid.budget.scope.scada-working"'));
-assert(scope.includes("deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd})"));
+assert(scope.includes("deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd,contingencyPct:scadaContingency.pct})"));
 assert(scope.includes("deriveScadaBulkVerification0553()"));
-assert(workspace.includes("<ScopeSheetsDetail0553 fx={fx}/>"));
+assert(workspace.includes("<ScopeSheetsDetail0553 fx={fx}"));
 assert(scope.includes("scadaEnvelope.locations.map"));
 assert(scope.includes("s.unpricedLedgerRows.length"));
 assert(scope.includes("s.unresolvedAccessoryFunctions.length"));

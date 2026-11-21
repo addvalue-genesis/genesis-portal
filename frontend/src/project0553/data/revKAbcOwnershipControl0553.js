@@ -9,6 +9,7 @@ import {selectB3SelectedSatSurveyPrice0553} from "./b3SelectedSatSurveyPrice0553
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
+import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 const roundRevKAbc0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function selectRevKAbcOwnershipControl0553(working){
  if(!working?.byCode)throw Error("Rev.K ABC needs current canonical 10.2 Working Sell");
@@ -22,7 +23,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
     working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13-157657.5+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB+b1.baseWorkingSellTHB-421180-working.byCode.B10.b10WorkingSellDecision.excludedWorkingSellTHB) ||
     working.byCode.B14?.workingSellTHB!==ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB ||
-    working.byCode.B3?.workingSellTHB!==2322450 ||
+    working.byCode.B3?.workingSellTHB!==selectB3ResourcePriceDossier0553(working.byCode.B3).rollupTotalTHB ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))

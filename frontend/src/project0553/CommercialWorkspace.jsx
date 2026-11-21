@@ -24,6 +24,7 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
+import {RevisionComparison0553} from "./RevisionComparison0553";
 import {CustomerPriceBreakdown0553,BreakdownSourceRow0553,BreakdownSourcePicker0553} from "./CustomerPriceBreakdown0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
@@ -33,6 +34,7 @@ import {buildSpareLifecycleTrace0553} from "./data/spareLifecycleTrace0553";
 import {SpareLifecycleControl0553} from "./SpareLifecycleControl0553";
 import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
+import {SAMTEL_ENGINEERING_SERVICE_MARKUP_0553} from "./data/samtelEngineeringServiceMarkup0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
 import {PRICING_VIEWS_0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
@@ -50,7 +52,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [recipient,setRecipient]=useState("INTERNAL");
  // These are three workflow navigation shortcuts, NOT three independent price models.
  const [pricingStage,setPricingStage]=useState(()=>
-  ["working","budgetary","released","official"].includes(initialMode)?initialMode:"released");
+  ["working","budgetary","released","official","compare"].includes(initialMode)?initialMode:"released");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
  const [bcTab,setBcTab]=useState("ALL");
@@ -138,9 +140,11 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const activePricingView=PRICING_VIEWS_0553.find(view=>view.key===pricingStage)||PRICING_VIEWS_0553.find(view=>view.key==="released");
  const sourceB3=bcWorking.byCode.B3;
  const previewB3=releaseModel.b.find(x=>x.code==="B3");
+ const roundRelease=n=>Math.round((n+Number.EPSILON)*100)/100;
  if(!sourceB3||!previewB3||previewB3.workingSellTHB!==sourceB3.workingSellTHB||
-    previewB3.customerSellTHB!==sourceB3.workingSellTHB)
-  throw Error("10.2 B3 selected Working SELL does not match 10.3 Release Preview");
+    previewB3.commercialCategory!=="service"||
+    previewB3.customerSellTHB!==roundRelease(sourceB3.workingSellTHB*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553))
+  throw Error("10.2 B3 Item 7 does not match 10.3 Release Item 7 × SAMTEL engineering service markup");
  // Navigate directly to the selected canonical 10.1/10.2 Module ID.
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
@@ -275,12 +279,26 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
       aria-pressed={pricingStage==="official"} onClick={()=>openPricingStage("official")}>
       <strong>10.3.4 · Official Release</strong><small>English / USD · Export Excel</small>
      </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--official"+(pricingStage==="compare"?" is-active":"")}
+      aria-pressed={pricingStage==="compare"} onClick={()=>openPricingStage("compare")}>
+      <strong>10.3.5 · Revision Compare</strong><small>Rev02 / Rev03 / Rev03.1 Table</small>
+     </button>
     </nav>
  );
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
+ if(pricingStage==="compare")return <div className="p55-stack">
+  <div className="p55-filterbar p55-filterbar--simple">
+   {pricingNavigation}
+   <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
+  </div>
+  <RevisionComparison0553/>
+ </div>;
  if(pricingStage==="official")return <div className="p55-stack">
-  <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
+  <div className="p55-filterbar p55-filterbar--simple">
+   {pricingNavigation}
+   <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
+  </div>
+  <OfficialUsdRelease0553 source={releaseModel} recipient={recipient} onOpenSource={openReleaseSource}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -320,7 +338,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. Official Release defaults to the owner-selected Rev03 quotation. Submitted Rev02 is available only as history; Working changes do not overwrite either source workbook. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     {pricingNavigation}
-    <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
+    <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x} value={x}>{x==="INTERNAL"?"AVS view":x}</option>)}</select></label>
   </div>
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
@@ -406,17 +424,19 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <h3>Customer Release — HOLD</h3>
    <p className="p55-note" data-component-key="bid.budget.pricing.release.source-trace">
     <strong>LIVE SOURCE TRACE:</strong> Part A comes from 10.1 Equipment BOM;
-    B/C from 10.2 selected canonical owners. B3 source
+    B/C from 10.2 selected canonical owners. B3 Item 7
     <strong> THB {sourceB3.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
-    {" → "} Release Preview
+    {" · SAMTEL 5% "}
+    <strong> THB {previewB3.samtelServiceTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
+    {" → Item 10/Release "}
     <strong> THB {previewB3.customerSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
-    {" · "} PASS selected-source reconciliation.
+    {" · "} PASS Item 7 × 1.05. B3-BF is not included.
     Historical Working/Budgetary previews and unapproved SAT scenarios are NONPOSTING.
     Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
-   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
+   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} defaultView="customer" onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
    {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>

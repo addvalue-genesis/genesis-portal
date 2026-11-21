@@ -15,4 +15,5 @@ assert(code.includes("illustrativeAssemblyQty:1"));
 assert(code.includes("BUDGETARY_PARTIAL_SCENARIO_NOT_SELECTED"));
 assert(ui.includes("getMR502BudgetaryScenarios(x)"));
 assert(ui.includes("NOT complete ZWP20 package cost"));
+assert(code.includes("BUDGETARY_PARTIAL_SCENARIO_NOT_SELECTED"));
 console.log("PASS 0553: MR502 budgetary one-radio partial scenarios A/B/C use original NG source rates; no automatic ZWP20 allocation or sum across alternatives.");

@@ -1,0 +1,35 @@
+{
+  "id": "ROYALTEC-QIN2311155",
+  "vendor": "Royaltec International Co., Ltd.",
+  "quotation": "QIN/2311155",
+  "revision": "Rev.0",
+  "date": "2023-11-21",
+  "currency": "THB",
+  "quotedTotal": 512400,
+  "vatAmount": 35868,
+  "totalIncVat": 548268,
+  "validUntil": "2023-12-21",
+  "status": "HISTORICAL_QUOTE_SELECTED_FOR_BELDEN_CAT6A_SWB__REQUOTE_PENDING",
+  "source": "Add value_QIN2311155 Belden SWB 2442.pdf",
+  "sourceUrl": "https://drive.google.com/file/d/1vKepDRDRZ_goh5Pny_3VH5UrEG3hoWdP/view",
+  "mr": "MR-0001/MR-0003/MR-0004",
+  "scope": "Belden #50106ASFLB 010305M CAT6A SWB 4 Pair AWG23 S/FTP LSZH Black Cable (1 reel = 305 meters)",
+  "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+  "lines": [
+    {
+      "code": "1",
+      "sku": "50106ASFLB 010305M",
+      "description": "BELDEN #50106ASFLB 010305M; CAT6A SWB 4 Pair AWG23 Solid Bare Copper, FMPE insulation, AL-Mylar Individual Shield, TC; Braid Over Shield, LSZH, SWB, LSZH jacket Black Color (1 reel = 305 meters)",
+      "qty": 2440,
+      "unit": "METER",
+      "unitPrice": 210,
+      "quotedTotal": 512400
+    }
+  ],
+  "terms": [
+    { "topic": "Tax", "value": "THB excluded VAT 7% (Subtotal 512,400.00 THB; VAT 7% 35,868.00 THB; Total 548,268.00 THB)", "page": 1 },
+    { "topic": "Delivery", "value": "Lead time 12-14 weeks after receive PO (1 reel = 305 meters)", "page": 1 },
+    { "topic": "Payment", "value": "P/C 30", "page": 1 },
+    { "topic": "Validity", "value": "2023-12-21 (For Bidding; requote current price before PO)", "page": 1 }
+  ]
+}

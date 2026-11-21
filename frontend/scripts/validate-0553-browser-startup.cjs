@@ -35,10 +35,10 @@ try{
  assert.equal(money.allocateFixedParent([{id:'a',qty:'1.000',weight:'1.01'},{id:'b',qty:'1',weight:'1.01'}],'100','10').reduce((s,r)=>s+Number(r.amount),0),100);
  const source=require(path.join(root,'project0553/data/releaseCommercialModel0553')).buildReleaseCommercialModel0553({thbPerUsd:31.5});
  const official=require(path.join(root,'project0553/data/officialUsdRelease0553')).buildOfficialUsdRelease0553(source);
- assert.equal(official.totalUSD,894910);assert.deepEqual(official.a.map(r=>r.amountUSD),[241290,137130,34200,292500]);
- for(const [code,amount] of [['B10',12960],['B11',null],['B12',null],['B13',1530],['B14',25000]])assert.equal(official.b.find(r=>r.code===code).amountUSD,amount);
+ assert.equal(official.totalUSD,903710);assert.deepEqual(official.a.map(r=>r.amountUSD),[241290,137130,34200,292500]);
+ for(const [code,amount] of [['B10',12960],['B11',null],['B12',null],['B13',1530],['B14',26300]])assert.equal(official.b.find(r=>r.code===code).amountUSD,amount);
  assert.deepEqual(official.c.map(r=>r.budgetaryOptionQuoteUSD),[181100,27220]);
- console.log('PASS full0553 entry + real default route render under webpack browser Babel configuration; BigInt scaling/rounding/allocation incl scale36; A/B/C prices and base894910 unchanged. No real-browser DOM/effects claim.');
+ console.log('PASS full0553 entry + real default route render under webpack browser Babel configuration; BigInt scaling/rounding/allocation incl scale36; A/B/C prices and base903710 unchanged. No real-browser DOM/effects claim.');
 }finally{
  Module._load=load;console.error=error;require.extensions['.js']=beforeJs;
  if(beforeJsx)require.extensions['.jsx']=beforeJsx;else delete require.extensions['.jsx'];

@@ -75,9 +75,19 @@ async function main(){
  assert.equal(x.mto.quantitySummary.netAdditionalUnpricedScopeTHB,null);
  assert.equal(x.bulk.postAdditionalTHB,0);assert.equal(x.mto.pricesComplete,false);
  assert.equal(x.official.a.find(r=>r.code==='A2').amountUSD,137130);
- assert.equal(x.official.totalUSD,894910);assert.equal(x.official.totalUSD-baseline.totalUSD,-1620);
+ assert.equal(x.official.totalUSD,903710);assert.equal(x.official.totalUSD-baseline.totalUSD,7180);
  for(const row of x.official.a.filter(r=>r.code==='A4')){const {commercialScopeInclusion,...unchanged}=row;assert.deepEqual(unchanged,baseline.a.find(r=>r.code===row.code));}
- assert.deepEqual(x.official.b,baseline.b);assert.deepEqual(x.official.c,baseline.c);
+ const serviceReleaseUSD={B1:28800,B2:8000,B3:77500,B5:10400,B6:11200,B7:1000,B8:4800,B9:16100,B14:26300};
+ for(const row of x.official.b){
+  const old=baseline.b.find(r=>r.code===row.code);
+  if(!Object.hasOwn(serviceReleaseUSD,row.code))assert.deepEqual(row,old);
+  else{
+   assert.equal(row.amountUSD,serviceReleaseUSD[row.code]);
+   const {amountUSD,sourceTHB,...rest}=row,{amountUSD:oldAmount,sourceTHB:oldSource,...oldRest}=old;
+   assert.deepEqual(rest,oldRest);
+  }
+ }
+ assert.deepEqual(x.official.c,baseline.c);
  const changed=[];
  for(const row of x.breakdown.groups.flatMap(g=>g.rows)){
   const old=baseline.rows.find(r=>r.key===row.key);assert(old,'Row identity changed');
@@ -88,6 +98,6 @@ async function main(){
  for(const r of changed)assert(['A1','A2','A3'].includes(r.code),'Fixed-price allocation is restricted to A1/A2/A3');
  assert.equal(changed.filter(r=>r.id.endsWith('-BULK-LNA-BOX')&&r.status==='INCLUDED'&&r.amountUSD===null).length,3);
  assert.equal(x.breakdown.reconciled,true);assert.equal(x.official.issued,false);
- console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB allowances restored at24500, alternative22000 not posted; cable overlap not credited; Rev03 A1/A2 prices 241290/137130 and A+B894910; unchanged A3/A4 customer totals and B/C.');
+ console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB allowances restored at24500, alternative22000 not posted; cable overlap not credited; Rev03 A1/A2 prices 241290/137130 and A+B903710; unchanged A3/A4 customer totals and B/C.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

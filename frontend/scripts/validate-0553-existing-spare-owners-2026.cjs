@@ -18,6 +18,8 @@ const {selectDocumentSpareObligations0553}=from("data/documentSpareObligations05
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {selectScopePartBcWorking0553}=from("data/scopePartBcReadModel0553.js");
 const {buildReleaseCommercialModel0553,auditAnnexBidirectionalTrace0553}=from("data/releaseCommercialModel0553.js");
+const {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553}=from("data/samtelEngineeringServiceMarkup0553.js");
+const partBReleaseTHB=(code,working)=>working==null?null:PART_B_COMMERCIAL_CATEGORY_0553[code]==="service"?Math.round((working*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553+Number.EPSILON)*100)/100:working;
 const {auditCurrentCustomerProjection0553}=from("estimateToBidMapping.js");
 const costs=selectSpareCustomerSchedule0553(),docs=selectDocumentSpareObligations0553();
 const bc=selectBcTurnkeyWorkingCost0553(),scope=selectScopePartBcWorking0553(),rel=buildReleaseCommercialModel0553({thbPerUsd:31.5});
@@ -112,7 +114,7 @@ const unchangedOwners={B1:862675.74,B2:237121.13,B3:2322450,B4:null,B5:311184,
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");
  assert.equal(scope.lines[code].workingSellTHB,value);
- assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,value);
+ assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,partBReleaseTHB(code,value));
 }
 assert.equal(rel.summary.baseCustomerSellTHB,null,"A+B complete total must not be constructed from partial costs");
 assert.equal(rel.approval.releaseAllowed,false);
@@ -161,9 +163,9 @@ const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook05
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
 for(const amount of ["405,405.00","46,683.00"])assert(html.includes(amount));
 assert(html.includes("CONDITIONAL BUDGETARY")&&html.includes("Not quoted; excluded from this offer."));
-for(const amount of ["5,704,650.00","436,595.65"])assert(html.includes(amount));
+for(const amount of ["5,704,650.00","852,086.50"])assert(html.includes(amount)); // C2 budgetary offer after the CSS 305 m drum, not the prior THB 436,595.65
 assert.equal((html.match(/data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"/g)||[]).length,2);
-assert(html.includes("28,159,255.10")&&html.includes("WORKING DRAFT"));
+assert(html.includes("28,387,130.59")&&html.includes("WORKING DRAFT")); // priced A+B after the approved Part B service release
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
 for(const amount of ["405,405.00","46,683.00"])assert(scopeHtml.includes(amount));

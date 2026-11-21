@@ -1,7 +1,8 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
 const m=read("data/scadaBudgetEnvelope0553.js"),q=read("data/scadaBulkQuantityVerification0553.js"),v=read("ScadaPhysicalCompleteness0553.jsx"),ui=read("SimpleBom0553.jsx");
-for(const k of ["baseSourceTHB","baseSourceUSD","conditionalAllowanceTHB","contingencyTHB","pricedEnvelopeTHB","unresolvedAccessoryFunctions","completeEnvelope:false","amountNotComplete:true"])assert(m.includes(k),k);
+for(const k of ["baseSourceTHB","baseSourceUSD","conditionalAllowanceTHB","contingencyTHB","pricedEnvelopeTHB","unresolvedAccessoryFunctions","const completeEnvelope=","amountNotComplete:true"])assert(m.includes(k),k);
+assert(!m.includes("completeEnvelope:true"),"A priced floor must not be marked a complete envelope");
 assert(m.includes('bulkBookedComponents.has("SCADA_FIELD_CAT6A")'),"CAT6A booking must be function linked");
 assert(m.includes('bulkBookedComponents.has("INDOOR_M20_GLAND")'),"M20 booking must be function linked");
 assert(m.includes('x.id==="ODU_CAT6A"'),"exclude only explicitly booked cable");

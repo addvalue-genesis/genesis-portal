@@ -7,7 +7,7 @@ const ui=src("SimpleBom0553.jsx");
 assert.equal(q.lines.length,53,"Full Next G source lines expected");
 assert.equal(q.quotedGrandTotal,191610.15);
 for(const id of ["A-1","A-4","B-1","B-3","C-1","C-3"])assert(q.lines.some(x=>x.code===id&&Number.isFinite(x.unitPrice)));
-for(const s of ["sourceRowIndex===item.sourceRow","siteRequiredQty:null","siteAllocatedQty:null","siteVendorEstimateUSD:null","MR0001_PACKAGE_COMPOSITION","AVIAT_0553_TECHNICAL_EVALUATION"])assert(model.includes(s),"Missing model trace "+s);
+for(const s of ["sourceRowIndex===item.sourceRow","siteRequiredQty:null","siteAllocatedQty:null","estimatedSiteCost:null","MR0001_PACKAGE_COMPOSITION","AVIAT_0553_TECHNICAL_EVALUATION"])assert(model.includes(s),"Missing model trace "+s);
 assert(ui.includes("NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x)"));
 assert(ui.includes("Next G Vendor Source → Function → Rate Evidence"));
 assert(ui.includes("NOT ALLOCATED"));

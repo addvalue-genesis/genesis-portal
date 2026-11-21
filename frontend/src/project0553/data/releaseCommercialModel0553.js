@@ -1,4 +1,7 @@
 import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
+import {PART_B_COMMERCIAL_CATEGORY_0553,SAMTEL_ENGINEERING_SERVICE_MARKUP_0553,priceSamtelEngineeringServiceRelease0553} from "./samtelEngineeringServiceMarkup0553";
+import {PART_AC_OMISSION_RESERVE_PCT_0553} from "./contingencyRegister0553";
+import {isBuildingB3BrownfieldAdditional0553,selectB3BrownfieldAdditional0553} from "./b3BrownfieldAdditional0553";
 // PJ2608-0553 · 10.3 Customer Release staging model.
 // NEVER mutate 10.1 / 10.2. Never equate Working SELL with direct COST.
 // A/C: cost × (1 + 20% SAMTEL + 5% ADDVALUE + 5% ADDVALUE omission reserve).
@@ -14,7 +17,7 @@ import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
  id:"P553-RELEASE-PRICING-R01",
- aAndC:{samtelCostPct:20,addvalueCostPct:5,omissionReserveCostPct:5,priceFactor:1.30},
+ aAndC:{samtelCostPct:20,addvalueCostPct:5,omissionReserveCostPct:PART_AC_OMISSION_RESERVE_PCT_0553,priceFactor:1.30},
  b:{customerSellMultiplier:1,samtelDeductionOfCustomerSellPct:5},
  base:["A","B"],optional:["C1","C2"],currency:"THB",
  state:"INTERNAL_PROVISIONAL__NOT_APPROVED"
@@ -311,12 +314,18 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    costComplete,releaseAllowed:false};
  });
  const b=bc.rows.filter(r=>r.code.startsWith("B")).map(r=>{
-  const price=priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,
-   r.code==="B3"?r.b3MgwPurchasedFatWorkingSell:null);
+  const commercialCategory=PART_B_COMMERCIAL_CATEGORY_0553[r.code];
+  if(commercialCategory!=="service"&&commercialCategory!=="goods")
+   throw Error("Part B item has no service/goods category "+r.code);
+  const goodsPrice=commercialCategory==="goods"?priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,null):null;
+  const servicePrice=commercialCategory==="service"?priceSamtelEngineeringServiceRelease0553(r.workingSellTHB):null;
+  const price=commercialCategory==="service"?servicePrice:goodsPrice;
   const b3Source=r.code==="B3"?selectB3ResourcePriceDossier0553(r):null;
-  if(b3Source&&(b3Source.rollupTotalTHB!==r.workingSellTHB||
-    b3Source.rollupTotalTHB!==price?.customerSellTHB))
+  if(b3Source&&b3Source.rollupTotalTHB!==r.workingSellTHB)
    throw Error("10.3 B3 GROUP Source→Release parity failed");
+  if(b3Source&&servicePrice?.customerSellTHB!==null&&
+     servicePrice.customerSellTHB!==round(b3Source.rollupTotalTHB*SAMTEL_ENGINEERING_SERVICE_MARKUP_0553))
+   throw Error("10.3 B3 release must be Item 7 × SAMTEL engineering service markup and must not include B3-BF");
   const b3GroupTrace=b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
    id:g.id,sourceModuleId:g.id,workingSellId:"WS-B3",
    scopeId:"SOW-B3",customerProposalId:"CP-B3",
@@ -333,12 +342,16 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
    b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,
+   commercialCategory,
+   item7CostTHB:commercialCategory==="service"?servicePrice.item7CostTHB:(n(r.workingSellTHB)?round(r.workingSellTHB):null),
+   samtelServiceTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:null,
+   releaseTHB:price?.customerSellTHB??null,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
-   samTelDeductionTHB:price?.samTelDeductionTHB??null,
-   samTelOrdinaryB5PctDeductionTHB:price?.samTelOrdinaryB5PctDeductionTHB??null,
-   samTelPurchased20PctCostShareTHB:price?.samTelPurchased20PctCostShareTHB??null,
-   mgwPurchasedServicesSellIncludedTHB:price?.mgwPurchasedServicesSellIncludedTHB??null,
+   samTelDeductionTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:(price?.samTelDeductionTHB??null),
+   samTelOrdinaryB5PctDeductionTHB:commercialCategory==="service"?servicePrice.samtelServiceTHB:(price?.samTelOrdinaryB5PctDeductionTHB??null),
+   samTelPurchased20PctCostShareTHB:commercialCategory==="service"?0:(price?.samTelPurchased20PctCostShareTHB??null),
+   mgwPurchasedServicesSellIncludedTHB:commercialCategory==="service"?0:(price?.mgwPurchasedServicesSellIncludedTHB??null),
    addvalueReceivableTHB:price?.addvalueReceivableTHB??null,
    actualCostTHB:price?.directCostTHB??null,
    profitTHB:price?.addvalueProfitTHB??null,
@@ -412,8 +425,27 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
   ...(aOverflow?["Part A exceeds 15 original TAG rows"]:[]),
   "Approval snapshot, verified FX, commercial owner sign-off and original XLSX reconciliation required"
  ];
+ const b3Base=b.find(x=>x.code==="B3");
+ // The brownfield builder calls this function for its base preview. Skip the
+ // additional while that build is in progress so the two files do not recurse.
+ const brownfield=isBuildingB3BrownfieldAdditional0553()?null:selectB3BrownfieldAdditional0553();
+ const b3BrownfieldAdditional=brownfield?Object.freeze({
+  code:"B3-BF",
+  description:"B3-BF Brownfield Additional",
+  grandTotalTHB:brownfield.grandTotalTHB,
+  grandTotalUSD:brownfield.grandTotalUSD,
+  includedInBaseB3:false,
+  includedInPartBPricedTotal:false,
+  includedInExistingSummaryTotals:false,
+  source:"selectB3BrownfieldAdditional0553"
+ }):null;
+ const b3BaseReleasePlusBrownfieldAdditionalTHB=b3BrownfieldAdditional&&n(b3Base?.customerSellTHB)
+  ?round(b3Base.customerSellTHB+b3BrownfieldAdditional.grandTotalTHB):null;
+ const pricedABPlusBrownfieldAdditionalTHB=b3BrownfieldAdditional&&n(aPrice)&&n(bPrice)
+  ?round(aPrice+bPrice+b3BrownfieldAdditional.grandTotalTHB):null;
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
+  b3BrownfieldAdditional,
   a,b,c,annex,annexModels,annexTraceAudit,b10OwnerDecision:spare.b10OwnerDecision,excludedB10Rows:spare.excludedB10Rows,b13TagPresentation:selectB13TagPresentation0553(),
   budgetaryOptionAnnex:Object.freeze(Object.fromEntries(
    Object.entries(selectedOptionBudgetaryQuote.offers).map(([code,offer])=>[code,offer.rows]))),
@@ -431,7 +463,11 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    bProfitTHB:bProfitComplete?sum(b.map(x=>x.profitTHB)):null,
    cOptionalCustomerSellTHB:cCostComplete?sum(cKnown.map(x=>x.customerSellTHB)):null,
    baseCustomerSellTHB:aCostComplete&&b.every(x=>n(x.customerSellTHB))?round(aPrice+bPrice):null,
-   addvalueRealizedProfitTHB:null // Incomplete verified total cost; never invent profit.
+   addvalueRealizedProfitTHB:null, // Incomplete verified total cost; never invent profit.
+   b3BrownfieldAdditionalTHB:b3BrownfieldAdditional?.grandTotalTHB??null,
+   b3BrownfieldAdditionalUSD:b3BrownfieldAdditional?.grandTotalUSD??null,
+   b3BaseReleasePlusBrownfieldAdditionalTHB,
+   pricedABPlusBrownfieldAdditionalTHB
   },
   sourceCoverage:{aReady:aCostComplete,bSellReady:b.length===bKnown.length,
    b10PurchasableSpirComplete:!bc.byCode.B10.b10ItemizedPurchaseEvidence?.noVerifiedPhysicalPurchaseLine,

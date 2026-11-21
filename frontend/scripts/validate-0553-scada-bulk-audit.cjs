@@ -6,7 +6,7 @@ const simple=read("SimpleBom0553.jsx");
 const reference=read("data/zwp20BulkScopeAudit0553.js");
 assert(audit.includes("deriveScadaBulkVerification0553"));
 assert(audit.includes("bulkBySite.find(x=>x.site===g.site)"));
-assert(simple.includes("<ScadaPhysicalCompleteness0553 site={site}/>"));
+assert(simple.includes("<ScadaPhysicalCompleteness0553 site={site} fx={fx}/>"));
 for (const id of ["ODU_CAT6A","PANEL_M20","ODU_NPT","ODU_RJ45","PANEL_RJ45","RF_JUMPER","ANT_MOUNT","ODU_MOUNT","RF_SURGE","EARTH","SUPPORT","GLAND_PLUG","POWER","LABEL","CABLE_TEST","START_SPARES"])assert(reference.includes('id:"'+id+'"'));
 assert(model.includes("postedToCostLedger:false"));
 assert(model.includes("totalBudgetComplete:false"));

@@ -4,6 +4,7 @@ import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
 import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {RF_AND_PATCH_REFERENCE_0553} from "./rfAndPatchReference0553";
+import MOT_EN113_69 from "./quotes/MOT-EN113-69.current.json";
 const allowance=[
  ["RF-SMA",2,"pc",1138.31,"WEB_ANALOG","https://www.digikey.co.th/en/products/detail/crystek-corporation/CCSMA-MM-RG316DS-12/1867560","SMA RF pigtail, benchmark only"],
  ["LNA-POWER",1,"lot",3500,"MANAGEMENT_ALLOWANCE","RFI A2671 / DC cable interface","DC power cable and mating plug"],
@@ -26,8 +27,21 @@ const latestUhf=MGW_P26_058_R2_SELECTED_0553.lines.filter(line=>line.mr==="MR-00
  componentInclusions:line.componentInclusions,datasheets:line.datasheets,
  quoteRevision:MGW_P26_058_R2_SELECTED_0553.quoteNumber
 }));
-const lna=RFI_LNA_PRICE_DECISION_0553;
+ const lna=RFI_LNA_PRICE_DECISION_0553;
+const motLines=MOT_EN113_69.lines.map(line=>({
+ id:"MOT-"+line.code,supplier:MOT_EN113_69.vendor,manufacturer:line.sku.startsWith("MR356")?"Sinclair":line.sku.startsWith("LDF")?"CommScope":line.sku.startsWith("MOT-")?"MOT":"RFI",
+ model:line.sku,description:line.description,currency:MOT_EN113_69.currency,
+ unitRate:line.unitPrice,quoteQty:line.qty,unit:line.unit,quotedTotal:line.quotedTotal,
+ source:MOT_EN113_69.quotation,priceType:"SUPPLIER_QUOTE_CURRENT__EXD_ENCLOSURE_EXCLUDED",
+ selected:true,
+ selectionStatus:line.group==="EQUIPMENT"?"MOT_EN113_69_QUOTED_LNA_SCOPE__SELF_PREPARE_EXD_BOX":"MOT_EN113_69_QUOTED_LNA_SERVICE__FAT_INSTALL_SAT",
+ quoteRevision:MOT_EN113_69.revision
+}));
 export const MR0002_PRICE_REGISTRY_0553=Object.freeze([
+ ...motLines,
+ {id:"PROSPER-BARTEC-LNA-EXD-EST",supplier:"Prosper E&T / BARTEC (Estimate)",manufacturer:"BARTEC",model:"EJB / Ex d Panel (Q-PROSRY-24051 Item 5 proxy)",description:"Self-prepared Ex d Enclosure estimate for LNA system (excluded from MOT EN113/69); 2024 Zawtika 1E BARTEC Ex d panel comparable",currency:"THB",unitRate:436100,qty:3,unit:"set",quotedTotal:1308300,source:"PROSPER Q-PROSRY-24051 Rev0 Item5",priceType:"HISTORICAL_COMPARABLE_SELF_PREPARED_EXD_ALLOWANCE",selected:true,selectionStatus:"ESTIMATED_SELF_PREPARED_EXD_ENCLOSURE__REQUOTE_PENDING"},
+ {id:"CMP-M20-LNA-EXD",supplier:"Versed Automation System Co., Ltd.",manufacturer:"CMP",model:"20TE1FU1RA4 + 20LN4 + 20ET4 + 20ETS2 + PVC06",description:"CMP M20 Stainless Steel Ex Cable Gland complete set for LNA Ex d enclosure (2 sets/platform x 3 platforms)",currency:"THB",unitRate:3401,qty:6,unit:"set",quotedTotal:20406,source:"VERSED QT2603-149 (2026-03-20)",priceType:"SUPPLIER_QUOTE_2026_RECONFIRM",selected:true,selectionStatus:"VERSED_QT2603_149_CMP_SS_GLAND__LNA_SELF_PREPARED"},
+ {id:"CMP-PLUG-LNA-EXD",supplier:"Versed Automation System Co., Ltd.",manufacturer:"CMP",model:"757DM24 + 20LN4 + 20ETS2",description:"CMP M20 Exd/Exe Stainless Steel Stopping Plug complete set for LNA Ex d enclosure (2 sets/platform x 3 platforms)",currency:"THB",unitRate:1041,qty:6,unit:"set",quotedTotal:6246,source:"VERSED QT2603-149 (2026-03-20)",priceType:"SUPPLIER_QUOTE_2026_RECONFIRM",selected:true,selectionStatus:"VERSED_QT2603_149_CMP_SS_PLUG__LNA_SELF_PREPARED"},
  {id:"RFI-LNA",supplier:lna.supplierWorkingAssignment,manufacturer:"RFI",model:lna.model,
   description:lna.product,currency:lna.currency,unitRate:lna.unitBudgetAllowance,
   source:lna.decisionSource,priceType:"HISTORICAL_SUPERSEDED_NOT_ACTIVE",selected:false,

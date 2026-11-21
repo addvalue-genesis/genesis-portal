@@ -1,4 +1,4 @@
-import {buildNativeOfficialRelease0553,entriesFromZip,readEntry,rebuildZip} from "./nativeWorkingDraft0553";
+import {buildNativeOfficialRelease0553,entriesFromZip,omitCalcChain0553,readEntry,rebuildZip} from "./nativeWorkingDraft0553";
 import {customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 
 const enc=new TextEncoder(),dec=new TextDecoder();
@@ -94,6 +94,7 @@ export async function buildNativePriceBreakdown0553(file,official,breakdown){
  else if(workbook.includes('</definedNames>'))workbook=workbook.replace('</definedNames>',definitions+'</definedNames>');
  else workbook=workbook.replace('</sheets>','</sheets><definedNames>'+definitions+'</definedNames>');
  changes.set('xl/workbook.xml',enc.encode(workbook));changes.set('xl/_rels/workbook.xml.rels',enc.encode(rels));changes.set('[Content_Types].xml',enc.encode(types));
- return {blob:new Blob([rebuildZip(entries,changes)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
+ const kept=await omitCalcChain0553(entries,changes);
+ return {blob:new Blob([rebuildZip(kept,changes)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),
   filename:'PJ2608-0553_PriceBreakdown_USD_DRAFT_NOT_ISSUED.xlsx'};
 }

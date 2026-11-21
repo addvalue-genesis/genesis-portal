@@ -128,10 +128,15 @@ const decoder=new TextDecoder();
  const result=await box.ext.buildNativeB10ItemizedReview0553(file,annex);
  assert.equal(result.rowCount,11);assert.equal(result.insertedRows,0);assert.equal(result.totalRow,19);
  const inputZip=box.ext.entriesFromZip(bytes),outputZip=box.ext.entriesFromZip(new Uint8Array(await result.blob.arrayBuffer()));
- assert.deepEqual(outputZip.map(e=>e.name),inputZip.map(e=>e.name));
- for(let i=0;i<inputZip.length;i++)if(inputZip[i].name!=="xl/worksheets/sheet2.xml")
-  assert.deepEqual(Array.from(await box.ext.readEntry(outputZip[i])),Array.from(await box.ext.readEntry(inputZip[i])),
-   "Original unrelated XLSX ZIP part modified: "+inputZip[i].name);
+ const names=rows=>rows.map(e=>e.name).filter(name=>name!=="xl/calcChain.xml");
+ assert.deepEqual(names(outputZip),names(inputZip));
+ assert(!outputZip.some(e=>e.name==="xl/calcChain.xml"),"calcChain must stay out of the B10 review workbook");
+ const skipped=new Set(["xl/worksheets/sheet2.xml","[Content_Types].xml","xl/_rels/workbook.xml.rels"]);
+ for(const part of inputZip)if(!skipped.has(part.name)&&part.name!=="xl/calcChain.xml")
+  assert.deepEqual(Array.from(await box.ext.readEntry(outputZip.find(e=>e.name===part.name))),Array.from(await box.ext.readEntry(part)),
+   "Original unrelated XLSX ZIP part modified: "+part.name);
+ for(const name of ["[Content_Types].xml","xl/_rels/workbook.xml.rels"])
+  assert(!decoder.decode(await box.ext.readEntry(outputZip.find(e=>e.name===name))).includes("calcChain"),name);
  const xml=decoder.decode(await box.ext.readEntry(outputZip.find(e=>e.name==="xl/worksheets/sheet2.xml")));
  assert(xml.includes('<mergeCell ref="B19:H19"'));
  assert(xml.includes('<mergeCell ref="B20:E20"'));
