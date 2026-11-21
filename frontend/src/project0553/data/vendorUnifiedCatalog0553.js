@@ -6,6 +6,8 @@ import {VENDOR_EXTERNAL_EVIDENCE_0553} from "./vendorExternalEvidence0553";
 import HISTORICAL_VENDOR from "./historicalVendorEvidence0553.json";
 import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
 import EXION_LATEST from "./quotes/EXION-1260576-R0.current.json";
+import MOT_EN113_69 from "./quotes/MOT-EN113-69.current.json";
+import VERSED_QT2603_149 from "./quotes/VERSED-QT2603-149.current.json";
 import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
 import DATASHEET_ASSIGNMENTS from "./vendorDatasheetAssignments0553.json";
 import {VENDOR_0553_SOURCES} from "../vendorEvidence";
@@ -82,7 +84,7 @@ KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
  if(!suppliers.has(supplierId))suppliers.set(supplierId,{id:supplierId,name:p.manufacturer,quoteIds:[]});
  if(!products.has(key))products.set(key,{id:key,partNumber:key,description:p.product});
  relationships.push({id:p.id,vendorId:supplierId,productKey:key,description:p.product,
-  quoteId:null,quotation:null,mr:p.projectCandidate?.startsWith("MR-0004")?"MR-0004":"ALL",
+  quoteId:null,quotation:null,mr:p.projectCandidate?.startsWith("MR-0004")?"MR-0004":p.projectCandidate?.startsWith("MR-0002")?"MR-0002":"ALL",
   quantity:null,unitPrice:null,currency:null,pricingUnit:null,
   sourceClass:p.sourceType,priceStatus:"NO_QUOTATION",source:p.sourceUrl,sourceUrl:p.sourceUrl,
   referenceFrom:p.sourceDocument,referenceDocument:p.sourceDocument,
@@ -90,16 +92,18 @@ KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
   scopeDriver:p.category,approvedForBudget:false,
   specifications:p.specifications,sourceLine:i+1});
 });
-const latestVendorId="exion (thailand)";
-if(!suppliers.has(latestVendorId))suppliers.set(latestVendorId,{id:latestVendorId,name:EXION_LATEST.vendor,quoteIds:[]});
-suppliers.get(latestVendorId).quoteIds.push(EXION_LATEST.id);
-EXION_LATEST.lines.forEach((l,i)=>{
- if(!products.has(l.sku))products.set(l.sku,{id:l.sku,partNumber:l.sku,description:l.description});
- relationships.push({id:EXION_LATEST.id+":"+i,vendorId:latestVendorId,productKey:l.sku,
- description:l.description,quoteId:EXION_LATEST.id,quotation:EXION_LATEST.quotation,
- mr:EXION_LATEST.mr,quantity:l.qty,unitPrice:l.unitPrice,currency:EXION_LATEST.currency,
- pricingUnit:l.unit,sourceClass:EXION_LATEST.sourceClass,priceStatus:EXION_LATEST.status,
- source:EXION_LATEST.source,referenceFrom:EXION_LATEST.source,approvedForBudget:false});
+[EXION_LATEST,MOT_EN113_69,VERSED_QT2603_149].forEach(quote=>{
+ const vendorId=quote.vendor.trim().toLowerCase();
+ if(!suppliers.has(vendorId))suppliers.set(vendorId,{id:vendorId,name:quote.vendor,quoteIds:[]});
+ suppliers.get(vendorId).quoteIds.push(quote.id);
+ quote.lines.forEach((l,i)=>{
+  if(!products.has(l.sku))products.set(l.sku,{id:l.sku,partNumber:l.sku,description:l.description});
+  relationships.push({id:quote.id+":"+i,vendorId,productKey:l.sku,
+  description:l.description,quoteId:quote.id,quotation:quote.quotation,
+  mr:quote.mr,quantity:l.qty,unitPrice:l.unitPrice,currency:quote.currency,
+  pricingUnit:l.unit,sourceClass:quote.sourceClass,priceStatus:quote.status,
+  source:quote.source,sourceUrl:quote.sourceUrl||null,referenceFrom:quote.source,approvedForBudget:false});
+ });
 });
 // Existing RFQ datasheets now share the SAME company/product relationship index.
 // Supplier association is explicitly classified; never convert a datasheet into a quotation.

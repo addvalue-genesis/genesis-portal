@@ -1,0 +1,191 @@
+{
+  "id": "MOT-EN113-69",
+  "vendor": "MOT Smart Solutions Co., Ltd.",
+  "quotation": "EN113/69",
+  "revision": "Rev.0",
+  "date": "2026-10-30",
+  "currency": "THB",
+  "equipmentSubtotal": 1351900,
+  "optionSubtotal": 648000,
+  "quotedTotal": 1999900,
+  "vatAmount": 139993,
+  "totalIncVat": 2139893,
+  "validUntil": "2026-11-29",
+  "status": "2026_PROJECT_QUOTE_VALID__EXCLUDES_EXD_ENCLOSURE",
+  "source": "113_MOT_QT_EN113-69_LNA_Zawtika 1F_บจ.สามารถเทลคอม_30-10-69.pdf",
+  "sourceUrl": "https://drive.google.com/file/d/1NmwCd1xiGbvYPLHH-KtwxbXIVF81WSfA/view",
+  "datasheetFolderUrl": "https://drive.google.com/drive/folders/1MSQaKlUOTOfdFW4Mjs6lbkJbR72pmoSA",
+  "mr": "MR-0002",
+  "scope": "MR-0002 Trunk Radio LNA System (3 wellhead platforms, 6 LNA sets); EXCLUDES Ex d enclosure box (Exd BOX) & FAT/SAT/Installation Report/Drawing",
+  "sourceClass": "CURRENT_PROJECT_QUOTE_EVIDENCE",
+  "exclusions": [
+    "Ex d enclosure box (Exd BOX) is NOT included — must be prepared separately by ADDVALUE/SI",
+    "FAT, SAT and Installation Report and Drawing preparation are NOT included"
+  ],
+  "lines": [
+    {
+      "code": "1",
+      "sku": "RX3852-2002-11",
+      "description": "RFI Low Noise Amplifier, 380-520MHz, 40dB Gain (module only, Ex d enclosure excluded)",
+      "qty": 6,
+      "unit": "Set",
+      "unitPrice": 55000,
+      "quotedTotal": 330000,
+      "function": "DTRS_LNA_MODULE",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "2",
+      "sku": "RAD16-99",
+      "description": "RFI Yagi Antenna, RAD16-99, 350-600MHz, 14dBi, Mounting Clamp set",
+      "qty": 3,
+      "unit": "Set",
+      "unitPrice": 52000,
+      "quotedTotal": 156000,
+      "function": "DTRS_YAGI_ANTENNA",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "3",
+      "sku": "COL45-400P",
+      "description": "RFI Omni Antenna, COL45-400P, 380-400MHz, 14dBi (datasheet: 7 dBd / 9.1 dBi), Mounting Clamp set",
+      "qty": 6,
+      "unit": "Set",
+      "unitPrice": 50000,
+      "quotedTotal": 300000,
+      "function": "DTRS_OMNI_ANTENNA",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "4",
+      "sku": "MR356N-4",
+      "description": "Sinclair Duplexer MR356N-4, 380-400MHz, N(f)",
+      "qty": 3,
+      "unit": "Set",
+      "unitPrice": 45000,
+      "quotedTotal": 135000,
+      "function": "DTRS_DUPLEXER",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "5",
+      "sku": "POLYPHASER-RF-ARRESTER",
+      "description": "RF Lightning arrester Polyphaser",
+      "qty": 3,
+      "unit": "Set",
+      "unitPrice": 8500,
+      "quotedTotal": 25500,
+      "function": "RF_SURGE_ARRESTER",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "6",
+      "sku": "LDF4-50RK-50A",
+      "description": "CommScope Coaxial Cable 1/2in, LDF4-50RK-50A",
+      "qty": 500,
+      "unit": "Meter",
+      "unitPrice": 650,
+      "quotedTotal": 325000,
+      "function": "RF_COAX_FEEDER",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "7",
+      "sku": "LDF4-50RK-N-MALE",
+      "description": "CommScope N Male Connector for Coaxial Cable 1/2in, LDF4-50RK-50A",
+      "qty": 12,
+      "unit": "Ea",
+      "unitPrice": 1200,
+      "quotedTotal": 14400,
+      "function": "RF_CONNECTOR_N_MALE",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "8",
+      "sku": "LDF4-50RK-4.3-10-MALE",
+      "description": "CommScope 4.3-10 Male Connectors for Coaxial Cable 1/2in, LDF4-50RK-50A",
+      "qty": 6,
+      "unit": "Ea",
+      "unitPrice": 2000,
+      "quotedTotal": 12000,
+      "function": "RF_CONNECTOR_4310_MALE",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "9",
+      "sku": "RG142-JUMPER-SMA-NF",
+      "description": "RG142 Jumper Cable for Duplexer to LNA, SMA Male to N-Female (angle connector)",
+      "qty": 9,
+      "unit": "Ea",
+      "unitPrice": 6000,
+      "quotedTotal": 54000,
+      "function": "RF_JUMPER_CABLE",
+      "group": "EQUIPMENT"
+    },
+    {
+      "code": "10",
+      "sku": "MOT-OPT-FAT-LNA",
+      "description": "Option: FAT Test for LNA System (Bangkok Thailand)",
+      "qty": 3,
+      "unit": "Site",
+      "unitPrice": 36000,
+      "quotedTotal": 108000,
+      "function": "VENDOR_FAT_OPTION",
+      "group": "OPTION"
+    },
+    {
+      "code": "11",
+      "sku": "MOT-OPT-INST-LNA",
+      "description": "Option: Installation and Equipment for LNA System at 3 wellhead platforms Offshore in Myanmar for Commissioning (2 Engineers)",
+      "qty": 3,
+      "unit": "Site",
+      "unitPrice": 90000,
+      "quotedTotal": 270000,
+      "function": "VENDOR_INSTALLATION_OPTION",
+      "group": "OPTION"
+    },
+    {
+      "code": "12",
+      "sku": "MOT-OPT-SAT-LNA",
+      "description": "Option: SAT Test for LNA System Offshore at 3 wellhead platforms in Myanmar for Commissioning (2 Engineers)",
+      "qty": 3,
+      "unit": "Site",
+      "unitPrice": 90000,
+      "quotedTotal": 270000,
+      "function": "VENDOR_SAT_OPTION",
+      "group": "OPTION"
+    }
+  ],
+  "terms": [
+    {
+      "topic": "Tax",
+      "value": "THB excluded VAT 7% (Equipment 1,351,900 + Option 648,000 = 1,999,900 THB; VAT 139,993 THB; Total 2,139,893 THB)",
+      "page": 1
+    },
+    {
+      "topic": "Exclusions",
+      "value": "1) Ex d enclosure box (Exd BOX) NOT included — ADDVALUE/SI must prepare separately; 2) FAT, SAT, Installation Report and Drawing preparation NOT included",
+      "page": 1
+    },
+    {
+      "topic": "Delivery",
+      "value": "90-120 days",
+      "page": 1
+    },
+    {
+      "topic": "Payment",
+      "value": "20% upon PO confirmation, 30% upon equipment delivery, 30% upon installation completion, 20% upon SAT completion",
+      "page": 1
+    },
+    {
+      "topic": "Validity",
+      "value": "30 days (until 2026-11-29)",
+      "page": 1
+    },
+    {
+      "topic": "Warranty",
+      "value": "2 years",
+      "page": 1
+    }
+  ]
+}

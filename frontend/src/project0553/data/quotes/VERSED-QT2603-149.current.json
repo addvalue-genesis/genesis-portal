@@ -1,0 +1,50 @@
+{
+  "id": "VERSED-QT2603-149",
+  "vendor": "Versed Automation System Co., Ltd.",
+  "quotation": "QT2603-149",
+  "revision": "Rev.0",
+  "date": "2026-03-20",
+  "currency": "THB",
+  "quotedTotal": 336265,
+  "vatAmount": 23538.55,
+  "totalIncVat": 359803.55,
+  "validUntil": "2026-04-20",
+  "status": "2026_PROJECT_QUOTE_VALID_EXPIRED_RECONFIRM",
+  "source": "QT2603-149 Add Value CMP.pdf",
+  "sourceUrl": "https://drive.google.com/file/d/1-CbdG9u7AX1czj5w9ELzpABKKWDdQKEf/view",
+  "mr": "MR-0001/MR-0002",
+  "scope": "CMP Stainless Steel Ex Cable Glands, Locknuts, Earth Tags, Nylon Washers, PVC Shrouds & Exd/Exe Stopping Plugs (T2603024 CMP)",
+  "sourceClass": "CURRENT_PROJECT_QUOTE_EVIDENCE",
+  "completeSetUnitRatesTHB": {
+    "40SS2K1RA4_set": 8843,
+    "20STE1FU1RA4_M20S_set": 2678,
+    "20TE1FU1RA4_M20_set": 3401,
+    "757DM24_M20_StoppingPlug_set": 1041
+  },
+  "lines": [
+    { "code": "1", "sku": "40SS2K1RA4", "description": "40 SS2K S/STEEL GLAND", "qty": 20, "unit": "EA", "unitPrice": 8368, "quotedTotal": 167360 },
+    { "code": "2", "sku": "40LN4", "description": "40MM STAINLESS STEEL LOCKNUT", "qty": 20, "unit": "EA", "unitPrice": 200, "quotedTotal": 4000 },
+    { "code": "3", "sku": "40ET4", "description": "40MM STAINLESS STEEL EARTH TAG", "qty": 20, "unit": "EA", "unitPrice": 202, "quotedTotal": 4040 },
+    { "code": "4", "sku": "40ETS2", "description": "40MM WHITE NYLON ETS 2MM THICK", "qty": 20, "unit": "EA", "unitPrice": 17, "quotedTotal": 340 },
+    { "code": "5", "sku": "PVC13", "description": "PVC 13 SHROUD", "qty": 20, "unit": "EA", "unitPrice": 56, "quotedTotal": 1120 },
+    { "code": "6", "sku": "20STE1FU1RA4", "description": "M20S TE1FU STAINLESS STEEL CABLE GLAND", "qty": 20, "unit": "EA", "unitPrice": 2439, "quotedTotal": 48780 },
+    { "code": "7", "sku": "20LN4", "description": "20LN4 20MM STAINLESS STEEL LOCKNUT", "qty": 20, "unit": "EA", "unitPrice": 64, "quotedTotal": 1280 },
+    { "code": "8", "sku": "20ET4", "description": "20ET4 20MM STAINLESS STEEL EARTH TAG", "qty": 20, "unit": "EA", "unitPrice": 149, "quotedTotal": 2980 },
+    { "code": "9", "sku": "20ETS2", "description": "20ETS2 20MM WHITE NYLON ETS 2MM THICK", "qty": 20, "unit": "EA", "unitPrice": 4, "quotedTotal": 80 },
+    { "code": "10", "sku": "PVC04", "description": "PVC 04 SHROUD", "qty": 20, "unit": "EA", "unitPrice": 22, "quotedTotal": 440 },
+    { "code": "11", "sku": "20TE1FU1RA4", "description": "20 TE1FU STAINLESS STEEL GLAND", "qty": 25, "unit": "EA", "unitPrice": 3162, "quotedTotal": 79050 },
+    { "code": "12", "sku": "20LN4", "description": "20LN4 20MM STAINLESS STEEL LOCKNUT", "qty": 25, "unit": "EA", "unitPrice": 64, "quotedTotal": 1600 },
+    { "code": "13", "sku": "20ET4", "description": "20ET4 20MM STAINLESS STEEL EARTH TAG", "qty": 25, "unit": "EA", "unitPrice": 149, "quotedTotal": 3725 },
+    { "code": "14", "sku": "20ETS2", "description": "20ETS2 20MM WHITE NYLON ETS 2MM THICK", "qty": 25, "unit": "EA", "unitPrice": 4, "quotedTotal": 100 },
+    { "code": "15", "sku": "PVC06", "description": "PVC-06 SHROUD", "qty": 25, "unit": "EA", "unitPrice": 22, "quotedTotal": 550 },
+    { "code": "16", "sku": "757DM24", "description": "757 M20 Exd/Exe STAINLESS STEEL HEX HEAD 2 STOPPING PLUG", "qty": 20, "unit": "EA", "unitPrice": 973, "quotedTotal": 19460 },
+    { "code": "17", "sku": "20LN4", "description": "20LN4 20MM STAINLESS STEEL LOCKNUT", "qty": 20, "unit": "EA", "unitPrice": 64, "quotedTotal": 1280 },
+    { "code": "18", "sku": "20ETS2", "description": "20ETS2 20MM WHITE NYLON ETS 2MM THICK", "qty": 20, "unit": "EA", "unitPrice": 4, "quotedTotal": 80 }
+  ],
+  "terms": [
+    { "topic": "Tax", "value": "THB excluded VAT 7% (Subtotal 336,265.00 THB; VAT 7% 23,538.55 THB; Grand Total 359,803.55 THB)", "page": 2 },
+    { "topic": "Delivery", "value": "9-11 working weeks after received PO; free Bangkok delivery if > 5,000 THB", "page": 2 },
+    { "topic": "Payment", "value": "Cash", "page": 1 },
+    { "topic": "Validity", "value": "Until 2026-04-20 (reconfirm stock and price before PO)", "page": 1 }
+  ]
+}
